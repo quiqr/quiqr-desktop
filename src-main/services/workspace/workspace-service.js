@@ -411,9 +411,9 @@ class WorkspaceService{
                 hugover: workspaceDetails.hugover,
             }
 
-            let hugoServer = new HugoServer(JSON.parse(JSON.stringify(hugoServerConfig)));
+            global.hugoServer = new HugoServer(JSON.parse(JSON.stringify(hugoServerConfig)));
 
-            hugoServer.serve(function(err, stdout, stderr){
+            global.hugoServer.serve(function(err, stdout, stderr){
                 if(err) reject(err);
                 else{ resolve(); }
             });

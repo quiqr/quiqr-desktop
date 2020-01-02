@@ -14,6 +14,10 @@ unhandled();
 const app = electron.app
 const Menu = electron.Menu
 
+//global.sharedObj = {prop1: null};
+global.hugoServer = undefined;
+global.currentServerProccess = undefined;
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -49,6 +53,15 @@ function openCookbooks() {
   mainWindow = mainWindowManager.getCurrentInstanceOrNew();
   if (mainWindow) {
     mainWindow.webContents.send("redirectCookbook")
+  }
+}
+
+function stopServer() {
+  if(global.hugoServer){
+    global.hugoServer.stopIfRunning(function(err, stdout, stderr){
+      if(err) reject(err);
+      else{ resolve(); }
+    });
   }
 }
 
@@ -149,6 +162,12 @@ function createMainMenu(){
             createLogWindow()
           }
         },
+        {
+          label: 'Stop server',
+          click: async () => {
+            stopServer()
+          }
+        },
         { type: 'separator' },
 
         { role: 'reload' },
@@ -206,6 +225,10 @@ function createMainMenu(){
 app.on('ready', function () {
   createMainMenu();
   createMainWindow();
+})
+
+app.on('before-quit', function () {
+  stopServer();
 })
 
 

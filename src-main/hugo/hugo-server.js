@@ -5,8 +5,7 @@ const pathHelper = require('./../path-helper');
 const fs = require('fs-extra');
 const outputConsole = require('./../output-console');
 
-
-let currentServerProccess = undefined;
+global.currentServerProccess = undefined;
 
 /*::
 type HugoServerConfig = {
@@ -45,10 +44,13 @@ class HugoServer{
         });
     }
     
-    stopIfRunning(){
-        if(currentServerProccess){
-            currentServerProccess.kill();
-            currentServerProccess = undefined;
+    stopIfRunning(callback){
+      if(global.currentServerProccess){
+        outputConsole.appendLine('Stopping Hugo Server...');
+        outputConsole.appendLine('');
+
+            global.currentServerProccess.kill();
+            global.currentServerProccess = undefined;
         }
     }
 
@@ -72,7 +74,7 @@ class HugoServer{
         }
         
         try{
-            currentServerProccess = spawn(
+            global.currentServerProccess = spawn(
                 exec,
                 hugoArgs,
                 {
@@ -82,14 +84,14 @@ class HugoServer{
                     env: {}
                 }
             );
-            let {stdout, stderr} = currentServerProccess;
+            let {stdout, stderr} = global.currentServerProccess;
             this.emitLines(stdout);
             
-            currentServerProccess.stderr.on('data', (data) => {
+            global.currentServerProccess.stderr.on('data', (data) => {
                 outputConsole.appendLine('Hugo Server Error: '+data);
             });
 
-            currentServerProccess.on('close', (code) => {
+            global.currentServerProccess.on('close', (code) => {
                 outputConsole.appendLine('Hugo Server Closed: '+code);
             });
 

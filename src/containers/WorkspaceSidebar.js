@@ -11,6 +11,7 @@ import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 import IconMenu from 'material-ui/svg-icons/navigation/menu';
 import IconMore from 'material-ui/svg-icons/navigation/more-vert';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
+import IconOpenInBrowser from 'material-ui/svg-icons/action/open-in-browser';
 import Border from './../components/Border';
 import { TriggerWithOptions } from './../components/TriggerWithOptions';
 import service from './../services/service'
@@ -76,6 +77,10 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
         style={{flex:1, minWidth:40}}
         icon={<IconFileFolder color="white" style={{opacity:.2}} />} />
+      <FlatButton
+        onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
+        style={{flex:1, minWidth:40}}
+        icon={<IconOpenInBrowser color="white" style={{opacity:.2}} />} />
       {/* <FlatButton
         style={{flex:1, minWidth:40}}
         icon={<IconMore color="white"  style={{opacity:.2}} />} /> */}
