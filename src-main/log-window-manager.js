@@ -6,11 +6,11 @@ const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
 
-let mainWindow/*: any*/;
+let logWindow/*: any*/;
 
-function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
+function showNotFound(logWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
-    mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
     <h1>Oops...</h1>
     <p>The file <b>index.html</b> was not found!</p>
@@ -20,9 +20,8 @@ function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
 </html>`));
 }
 
-
-function showTesting(mainWindow/*: any*/){
-    mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+function showTesting(logWindow/*: any*/){
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Testing</h1>
 <p>Testing...</p>
@@ -30,8 +29,8 @@ function showTesting(mainWindow/*: any*/){
 </html>`));
 }
 
-function showLookingForServer(mainWindow/*: any*/, port/*: string*/){
-    mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+function showLookingForServer(logWindow/*: any*/, port/*: string*/){
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Waiting for Development Server</h1>
 <p>Waiting for React development server in port ${port}...</p>
@@ -40,8 +39,8 @@ function showLookingForServer(mainWindow/*: any*/, port/*: string*/){
 </html>`));
 }
 
-function showInvalidDevelopmentUrl(mainWindow/*: any*/, url/*: ?string*/){
-    mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+function showInvalidDevelopmentUrl(logWindow/*: any*/, url/*: ?string*/){
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Invalid Development Server URL</h1>
 <p>The provided URL (${url||'EMPTY'}) does not match the required pattern.</p>
@@ -50,27 +49,65 @@ function showInvalidDevelopmentUrl(mainWindow/*: any*/, url/*: ?string*/){
 </html>`));
 }
 
-function getLocation(locPath = ''){
+function createWindow () {
+  //  console.log(process.env)
+    const configurationDataProvider = require('./configuration-data-provider')
+
+    let icon;
+    if(process.env.REACT_DEV_URL)
+        icon = path.normalize(__dirname + "/../public/icon.png");
+
+
+    configurationDataProvider.get(function(err, configurations){
+      if(configurations.empty===true) throw new Error('Configurations is empty.');
+
+      let showFrame=false;
+      configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
+
+      // Create the browser window.
+      logWindow = new BrowserWindow({
+        show: false,
+        frame: showFrame,
+        backgroundColor:"#ffffff",
+        minWidth:1024,
+        //webPreferences:{webSecurity:false },
+        icon
+      });
+
+
+      if(configurations.global.maximizeAtStart){
+        logWindow.maximize();
+      }
+      if(configurations.global.hideMenuBar){
+        logWindow.setMenuBarVisibility(false);
+      }
+
+
+      logWindow.show();
+    });
 
     if(process.env.REACT_DEV_URL){
 
-        //DEVELOPMENT SERVER
+      //DEVELOPMENT SERVER
 
-      let url = process.env.REACT_DEV_URL+locPath;
-        const urlWithPortMatch = url.match(/:([0-9]{4})$/);
+      //let url = process.env.REACT_DEV_URL+'/console';
+      let url = process.env.REACT_DEV_URL;
+      console.log(url)
+      const urlWithPortMatch = url.match(/:([0-9]{4})/);
+      console.log(urlWithPortMatch)
         if(urlWithPortMatch==null){
             showInvalidDevelopmentUrl(url);
         }
         else{
             let port = urlWithPortMatch[1];
-            showLookingForServer(mainWindow, port);
+            showLookingForServer(logWindow, port);
 
             const net = require('net');
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
                     client.end();
-                    if(mainWindow)
-                        mainWindow.loadURL(url);
+                    if(logWindow)
+                        logWindow.loadURL(url);
                 }
             );
             client.on('error', (error) => {
@@ -97,56 +134,17 @@ function getLocation(locPath = ''){
             }
         }
         if(indexFile){
-            mainWindow.loadURL(
-                url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
+            logWindow.loadURL(
+              url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
         }
         else{
-            showNotFound(mainWindow, lookups);
+            showNotFound(logWindow, lookups);
         }
     }
 
-}
-
-function createWindow () {
-    const configurationDataProvider = require('./configuration-data-provider')
-
-    let icon;
-    if(process.env.REACT_DEV_URL)
-        icon = path.normalize(__dirname + "/../public/icon.png");
-
-
-    configurationDataProvider.get(function(err, configurations){
-      if(configurations.empty===true) throw new Error('Configurations is empty.');
-
-      let showFrame=false;
-      configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
-
-      // Create the browser window.
-      mainWindow = new BrowserWindow({
-        show: false,
-        frame: showFrame,
-        backgroundColor:"#ffffff",
-        minWidth:1024,
-        //webPreferences:{webSecurity:false },
-        icon
-      });
-
-
-      if(configurations.global.maximizeAtStart){
-        mainWindow.maximize();
-      }
-      if(configurations.global.hideMenuBar){
-        mainWindow.setMenuBarVisibility(false);
-      }
-
-      mainWindow.show();
-    });
-
-    getLocation();
-
-    mainWindow.on('closed', function () {
-        mainWindow = undefined; //clear reference
+    logWindow.on('closed', function () {
+        logWindow = undefined; //clear reference
     })
 
     var handleRedirect = (e, url) => {
@@ -156,16 +154,15 @@ function createWindow () {
         }
     }
 
-    mainWindow.webContents.on('will-navigate', handleRedirect);
-    mainWindow.webContents.on('new-window', handleRedirect);
+    logWindow.webContents.on('will-navigate', handleRedirect);
+    logWindow.webContents.on('new-window', handleRedirect);
 
-    //mainWindow.webContents.openDevTools();
+    //logWindow.webContents.openDevTools();
 }
 
 module.exports = {
-
     getCurrentInstance: function(){
-        return mainWindow;
+        return logWindow;
     },
     getCurrentInstanceOrNew: function(){
         let instance = this.getCurrentInstance();
@@ -175,6 +172,6 @@ module.exports = {
         }
 
         createWindow();
-        return mainWindow;
+        return logWindow;
     }
 }

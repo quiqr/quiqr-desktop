@@ -1,4 +1,4 @@
-//@flow
+ //@flow
 
 /*:: 
     type MessageHandler = (eventData:any, arg:any) => void;

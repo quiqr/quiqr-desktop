@@ -59,6 +59,7 @@ const GLOBAL_DEFAULTS = {
     maximizeAtStart: true,
     hideWindowFrame: true,
     hideMenuBar: true,
+    hideInlineMenus: false,
     appTheme: "default"
 }
 
@@ -116,6 +117,7 @@ function get(callback/*: (err: ?Error, data: Configurations | EmptyConfiguration
                 maximizeAtStart: global.maximizeAtStart == null ? GLOBAL_DEFAULTS.maximizeAtStart : global.maximizeAtStart===true,
                 hideWindowFrame: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideWindowFrame : global.hideWindowFrame===true,
                 hideMenuBar: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideMenuBar : global.hideMenuBar===true,
+                hideInlineMenus: global.hideInlineMenus == null ? GLOBAL_DEFAULTS.hideInlineMenus : global.hideInlineMenus===true,
                 appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme
             }
             configurations.global = global;

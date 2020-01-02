@@ -8,6 +8,7 @@ import Home from './containers/Home'
 import Collection from './containers/Collection';
 import CollectionItem from './containers/CollectionItem';
 import Single from './containers/Single';
+import Console from './containers/Console';
 import Header from './containers/Header';
 import NotificationUI from './containers/NotificationUI';
 import WorkspaceSidebar from './containers/WorkspaceSidebar';
@@ -22,10 +23,15 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Redirect from 'react-router-dom/Redirect';
 
+//import { createBrowserHistory } from "history";
+
+
+
 import service from './services/service';
 
 import type { EmptyConfigurations, Configurations } from './types';
 
+//export const history = createBrowserHistory();
 
 type AppProps = {
 }
@@ -42,6 +48,7 @@ let style = require('./themes/default/style.js');
 
 class App extends React.Component<AppProps,AppState>{
 
+  //history: any;
   constructor(props : any ){
     super(props);
 
@@ -52,6 +59,9 @@ class App extends React.Component<AppProps,AppState>{
       style: style,
       menuIsLocked: true,
       forceShowMenu: false,
+      redirectCookbook: false,
+      redirectConsole: false,
+      redirectHome: false,
       skipMenuTransition: false
     };
 
@@ -71,6 +81,38 @@ class App extends React.Component<AppProps,AppState>{
       this.setState(stateUpdate);
 
     })
+  }
+
+  redirectHome(){
+    console.log('home');
+    if(this.state.redirectHome){
+      this.setState({redirectHome: false});
+    }
+    else{
+      this.setState({redirectCookbook: false});
+      this.setState({redirectConsole: false});
+      this.setState({redirectHome: true});
+    }
+  }
+
+  redirectCookbook(){
+    if(this.state.redirectCookbook){
+      this.setState({redirectCookbook: false});
+    }
+    else{
+      this.setState({redirectCookbook: true});
+      this.setState({redirectHome: false});
+    }
+  }
+
+  redirectConsole(){
+    this.setState({redirectConsole: true});
+  }
+
+  componentWillMount(){
+    window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
+    window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
+    window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
   }
 
   minimizeWindow(){
@@ -128,6 +170,7 @@ class App extends React.Component<AppProps,AppState>{
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
 
         let items = this.getExtraItems();
+
         if(this.state.configurations && this.state.configurations.global.cookbookEnabled){
           items.push(
             <MenuItem primaryText="Exit Cookbook" onClick={()=>{ history.push('/') }} />
@@ -181,6 +224,9 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/' exact render={ () => {
         return <Home key={ 'home' } />
       }} />
+      <Route path='/console' exact render={ () => {
+        return <Console /> }} />
+      }} />
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
         //$FlowFixMe
         return <Home key={ 'home' } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
@@ -196,7 +242,9 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
         //$FlowFixMe
         return <Single key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } singleKey={ decodeURIComponent(match.params.single) } /> }} />
-      <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
+  <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
+    console.log(window.location.href);
+
         return <FormsCookbookRouted />;
       }} />
       <Route path="*" component={(data)=>{
@@ -234,30 +282,96 @@ class App extends React.Component<AppProps,AppState>{
         menuContainerStyle.transition = transition;
       }
       this.state.skipMenuTransition = false;
+     }
+
+
+    let showInlineMenus = true;
+    console.log(this.state.configurations);
+    if(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideInlineMenus === false){
+      console.log('hallo');
+      showInlineMenus = false;
     }
-   
-    return (
-      <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
-        <div className="App">
-          {header}
-          <div style={containerStyle}>
 
-            { this.getExtraOptionsSwitch() }
-            
+    return (<Switch>
+      <Route path="/console" exact={false} render={ ({match, history})=> {
 
-            <div style={menuContainerStyle} className='hideScrollbar' >
-              { this.getMenuSwitch() }
+       return (
+         <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+           <div className="App">
+             <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+
+               { this.getContentSwitch() }
+
+              </div>
             </div>
+          </MuiThemeProvider>
 
-            <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
-              { this.getContentSwitch() }
-            </div>
+          )
 
-          </div>
-          <NotificationUI />
-        </div>
-      </MuiThemeProvider>
-    );
+      }} />
+      <Route
+        path="*"
+        render={ ({match, history})=>{
+          return (
+            <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+              <div className="App">
+
+                {(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideWindowFrame === true) ? (
+                  header
+                ) : (
+                  <div></div>
+                )}
+
+                <div style={containerStyle}>
+
+                  {(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideInlineMenus === false) ? (
+                    this.getExtraOptionsSwitch()
+                  ) : (
+                    <div></div>
+                  )}
+
+                  <div style={menuContainerStyle} className='hideScrollbar' >
+                    { this.getMenuSwitch() }
+                  </div>
+
+                  <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+                    { this.getContentSwitch() }
+                  </div>
+
+                    </div>
+
+                {(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideInlineMenus === false) ? (
+
+                  <NotificationUI />
+                ) : (
+                  <div></div>
+                )}
+
+                {(this.state.redirectCookbook) ? (
+                  <Redirect to='/forms-cookbook' />
+                ) : (
+                  <div></div>
+                )}
+
+                {(this.state.redirectHome) ? (
+                  <Redirect to='/' />
+                ) : (
+                  <div></div>
+                )}
+
+                {(this.state.redirectConsole) ? (
+                  <Redirect to='/console' />
+                ) : (
+                  <div></div>
+                )}
+
+              </div>
+            </MuiThemeProvider>
+          );
+
+        }}
+      />
+    </Switch>);
   }
 }
 

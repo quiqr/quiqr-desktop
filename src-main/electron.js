@@ -3,8 +3,10 @@
 const electron = require('electron')
 const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
+const logWindowManager = require('./log-window-manager');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
+const BrowserWindow = electron.BrowserWindow;
 
 unhandled();
 
@@ -15,10 +17,10 @@ const Menu = electron.Menu
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-
+let logWindow;
 
 function createMainWindow () {
-  
+
   // Create the browser window.
   mainWindow = mainWindowManager.getCurrentInstanceOrNew();
 
@@ -36,8 +38,40 @@ function createMainWindow () {
   contextMenu(mainWindow);
 }
 
+function openHome() {
+  mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+  if (mainWindow) {
+    mainWindow.webContents.send("redirectHome")
+  }
+}
+
+function openCookbooks() {
+  mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+  if (mainWindow) {
+    mainWindow.webContents.send("redirectCookbook")
+  }
+}
+
+function createLogWindow () {
+  logWindow = logWindowManager.getCurrentInstanceOrNew();
+  if (logWindow) {
+    logWindow.webContents.send("redirectConsole")
+  }
+
+  logWindow.once('ready-to-show', () => {
+    logWindow.webContents.send("redirectConsole")
+  })
+
+  logWindow.webContents.on('did-finish-load',() => {
+    logWindow.webContents.send("redirectConsole")
+  })
+
+  logWindow.on('closed', function() {
+    logWindow = null
+  })
+}
+
 function createMainMenu(){
-  // iconst { app, Menu } = require('electron')
 
   const isMac = process.platform === 'darwin'
 
@@ -97,18 +131,32 @@ function createMainMenu(){
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
+        {
+          label: 'Front page',
+          click: async () => {
+            openHome()
+          }
+        },
+        {
+          label: 'Open Form Cookbooks',
+          click: async () => {
+            openCookbooks()
+          }
+        },
         {
           label: 'Show Log Window',
           click: async () => {
-            const { shell } = require('electron')
-            await shell.openExternal('https://lingewoud.nl')
+            createLogWindow()
           }
         },
+        { type: 'separator' },
+
         { role: 'reload' },
         { role: 'forcereload' },
         { role: 'toggledevtools' },
+
         { type: 'separator' },
+
         { role: 'resetzoom' },
         { role: 'zoomin' },
         { role: 'zoomout' },
@@ -182,5 +230,3 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 ipcMainBinder.bind();
-
-
