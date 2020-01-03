@@ -11,6 +11,12 @@ https://www.hokuscms.com/
 
 **Alpha Warning**: Hokus is still a work in progress and some awesome features are not yet ready. 
 
+## Version 0.5mip1
+
+Version 0.5.mip1 is a customized version by Pim Snel. Waiting for features to be merged in the main project source. Download binaries below:
+
+- [hokus-cms_win-0.5mip1.exe.zip](https://www.dropbox.com/s/zxmp6hqh0z4t01l/hokus-cms_win-0.5mip1.exe.zip?dl=0)
+
 ## Features
 
 Take a look at our features and understand why Hokus is a great tool for your Hugo websites:
