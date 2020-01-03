@@ -128,6 +128,7 @@ function createWindow () {
         frame: showFrame,
         backgroundColor:"#ffffff",
         minWidth:1024,
+        width:1024,
         //webPreferences:{webSecurity:false },
         icon
       });

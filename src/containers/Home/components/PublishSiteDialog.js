@@ -57,7 +57,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
 
         let { open, workspace, site } = this.props;
         let { build, publish } = this.state;
-        
+
         let valid = this.validate();
 
         const actions = [
@@ -91,7 +91,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
                         <MenuItem
                             key={`build-${i}`} value={i}
                             primaryText={build.key}
-                            secondaryText={build.config}
+                          secondaryText={build.config}
                         />
                     ))}
                 </SelectField>

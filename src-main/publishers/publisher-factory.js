@@ -19,6 +19,10 @@ class PublisherFactory{
             let FolderPublisher = require('./folder-publisher');
             return new FolderPublisher(genericPublisherConfig);
         }
+        if(type==='ftp'){
+            let FtpPublisher = require('./ftp-publisher');
+            return new FtpPublisher(genericPublisherConfig);
+        }
         if(type==='s3'){
             let S3Publisher = require('./s3-publisher');
             return new S3Publisher(genericPublisherConfig);
