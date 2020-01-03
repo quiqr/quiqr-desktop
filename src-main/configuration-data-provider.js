@@ -56,11 +56,11 @@ const GLOBAL_DEFAULTS = {
     debugEnabled: false,
     cookbookEnabled: true,
     siteManagementEnabled: true,
-    maximizeAtStart: true,
-    hideWindowFrame: true,
-    hideMenuBar: true,
-    hideInlineMenus: false,
-    appTheme: "default"
+    maximizeAtStart: false,
+    hideWindowFrame: false,
+    hideMenuBar: false,
+    hideInlineMenus: true,
+    appTheme: "simple"
 }
 
 function invalidateCache(){
