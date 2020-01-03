@@ -3,7 +3,6 @@
 const fs = require('fs-extra');
 const pathHelper = require('./../path-helper');
 
-var JSFtp = require("jsftp");
 var FtpDeploy = require("ftp-deploy");
 
 class FtpPublisher/*:: implements IPublisher*/{
