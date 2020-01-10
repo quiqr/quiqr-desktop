@@ -193,13 +193,15 @@ class WorkspaceService{
         if(collection==null)
             throw new Error('Could not find collection.');
         let folder = path.join(this.workspacePath, collection.folder).replace(/\\/g,'/');
-        
+
         // TODO: make it more flexible! This should not be handled with IF ELSE.
         //  But is good enough for now.
 
         let supportedContentExt = ['md','html','markdown'];
         if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
-            let globExpression = path.join(folder, `**/index.{${supportedContentExt.join(',')}}`);
+            // TODO config for allowing all files
+            //let globExpression = path.join(folder, `**/index.{${supportedContentExt.join(',')}}`);
+            let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
             let files = await globJob(globExpression, {});
             return files.map(function(item){
                 let key = item.replace(folder,'').replace(/^\//,'');
