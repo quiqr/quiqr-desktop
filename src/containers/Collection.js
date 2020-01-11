@@ -13,6 +13,60 @@ const Fragment = React.Fragment;
 
 const MAX_RECORDS = 200;
 
+type MakePageBundleItemKeyDialogProps = {
+    busy: bool,
+    itemLabel: string,
+    handleClose: ()=> void,
+    handleConfirm: (string)=> void
+}
+
+type MakePageBundleItemKeyDialogState = {
+    value:string,
+    valid: ?bool
+}
+
+class MakePageBundleItemKeyDialog extends React.Component<MakePageBundleItemKeyDialogProps,MakePageBundleItemKeyDialogState>{
+    constructor(props : MakePageBundleItemKeyDialogProps){
+        super(props);
+        this.state = {
+            value:'',
+            valid: null
+        }
+    }
+
+    handleClose(){
+        if(this.props.handleClose && !this.props.busy)
+            this.props.handleClose();
+    }
+
+    handleConfirm(){
+        if(this.props.handleConfirm)
+            this.props.handleConfirm(this.state.value);
+    }
+
+    render(){
+        let { busy, itemLabel } = this.props;
+
+        return (
+            <Dialog
+                title={"MakePageBundle Item"}
+                modal={true}
+                open={true}
+                onRequestClose={this.handleClose}
+                actions={[
+                  <FlatButton disabled={busy} primary={true} label="Cancel" onClick={this.handleClose.bind(this)} />,
+                  <FlatButton disabled={busy} primary={true} label="MakePageBundle" onClick={this.handleConfirm.bind(this)}  />
+                ]}
+            >
+                {this.state.valid? undefined : <p>Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?</p>}
+
+                { busy? <Spinner /> : undefined }
+                
+            </Dialog>
+        );
+    }
+}
+
 type DeleteItemKeyDialogProps = {
     busy: bool,
     itemLabel: string,
@@ -168,9 +222,10 @@ class CollectionListItems extends React.PureComponent<{
     onItemClick: (item: any)=>void,
     onRenameItemClick: (item: any)=>void,
     onDeleteItemClick: (item: any)=>void,
+    onMakePageBundleItemClick: (item: any)=>void,
 }> {
     render(){
-        let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick } = this.props;
+        let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick, onMakePageBundleItemClick } = this.props;
         return (<React.Fragment>
             { filteredItems.map((item, index) => {  
 
@@ -184,6 +239,7 @@ class CollectionListItems extends React.PureComponent<{
                     <IconMenu iconButtonElement={iconButtonElement}>
                         <MenuItem onClick={()=> onRenameItemClick(item) }>Rename</MenuItem>
                         <MenuItem onClick={()=> onDeleteItemClick(item) }>Delete</MenuItem>
+                        <MenuItem onClick={()=> onMakePageBundleItemClick(item) }>Make Page Bundle</MenuItem>
                     </IconMenu>
                 );
 
@@ -228,6 +284,11 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
         this.setState({view:{key:'renameItem', item}, modalBusy:false});
     }
 
+    setMakePageBundleItemView(item: any){
+        this.setState({view:{key:'makePageBundleItem', item}, modalBusy:false});
+    }
+
+
     setDeleteItemView(item: any){
         this.setState({view:{key:'deleteItem', item }, modalBusy:false});
     }
@@ -268,6 +329,22 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     componentWillUnmount(){
         service.unregisterListener(this);
     }
+
+    makePageBundleCollectionItem(){
+        let { siteKey, workspaceKey, collectionKey } = this.props;
+        let view = this.state.view;
+        if(view==null) return;
+        service.api.makePageBundleCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
+            .then(()=>{
+                let itemsCopy : Array<any> = (this.state.items||[]).slice(0);
+                let itemIndex = itemsCopy.findIndex(x=>x.key === view.item.key);
+                itemsCopy.splice(itemIndex,1);
+                this.setState({items:itemsCopy, modalBusy:false, view: undefined, ...(this.resolveFilteredItems(itemsCopy)) });
+            },()=>{
+                this.setState({modalBusy:false, view: undefined});
+            });
+    }
+
 
     deleteCollectionItem(){
         let { siteKey, workspaceKey, collectionKey } = this.props;
@@ -365,6 +442,9 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     handleRenameItemClick = (item: any)=>{
         this.setRenameItemView(item)
     }
+    handleMakePageBundleItemClick = (item: any)=>{
+        this.setMakePageBundleItemView(item)
+    }
 
     handleDirClick = (e: any) => {
         this.setState({filter:e.currentTarget.dataset.dir});
@@ -409,6 +489,14 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                     itemLabel={view.item.label}
                 />
             }
+            else if(view.key==="makePageBundleItem"){
+                dialog = <MakePageBundleItemKeyDialog
+                    busy={this.state.modalBusy}
+                    handleClose={this.setRootView.bind(this)}
+                    handleConfirm={this.makePageBundleCollectionItem.bind(this)}
+                    itemLabel={view.item.label}
+                />
+            }
         }
 
         if(this.state.selectedWorkspaceDetails==null){
@@ -449,6 +537,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                             onItemClick={this.handleItemClick}
                             onRenameItemClick={this.handleRenameItemClick}
                             onDeleteItemClick={this.handleDeleteItemClick}
+                            onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
                         />
                         { trunked ? (
                             <React.Fragment>

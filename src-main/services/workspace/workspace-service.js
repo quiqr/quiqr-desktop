@@ -275,6 +275,33 @@ class WorkspaceService{
         return false;
     }
 
+    async makePageBundleCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */){
+        //TODO: only work with "label" of a collection item
+        let config = await this.getConfigurationsData();
+        let collection = config.collections.find(x => x.key === collectionKey);
+        if(collection==null)
+            throw new Error('Could not find collection.');
+        let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+
+        /*
+         if( fs.lstatSync(filePath).isDirectory()){
+            return false;
+        }
+        */
+
+        if (fs.existsSync(filePath)){
+            //TODO: use async await with a promise to test if deletion succeded
+
+            //fs.renameSync(filePath, filePath+".bak");
+            let newdir = path.join(this.workspacePath, collection.folder, collectionItemKey.split('.').slice(0, -1).join('.'));
+            fs.mkdirSync(newdir);
+            fs.renameSync(filePath, path.join(newdir, "index.md"));
+
+            return true;
+        }
+        return false;
+    }
+
     async updateCollectionItem(collectionKey /* : string */ , collectionItemKey /* : string */, document /* : any */){
         //TODO: only work with "label" of a collection item
         let config = await this.getConfigurationsData();

@@ -271,6 +271,18 @@ api.deleteCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
     });
 }
 
+api.makePageBundleCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}/*: any*/, context/*: any*/) {
+    getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+        if(err){ context.reject(err); return; }
+        workspaceService.makePageBundleCollectionItem(collectionKey, collectionItemKey)
+        .then((result)=>{
+            context.resolve({deleted:result});
+        })
+        .catch((error)=>{
+            context.reject(error);
+        });
+    });
+}
 api.renameCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey}/*: any*/, context/*: any*/) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
