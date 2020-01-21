@@ -117,7 +117,6 @@ function createWindow () {
 
 
     configurationDataProvider.get(function(err, configurations){
-      if(configurations.empty===true) throw new Error('Configurations is empty.');
 
       let showFrame=false;
       configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;

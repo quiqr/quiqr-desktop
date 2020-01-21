@@ -8,32 +8,18 @@ const formatProviderResolver = require('./format-provider-resolver');
 const outputConsole = require('./output-console');
 const Joi = require('joi');
 
-let configurationCache /*? : Configurations */ = undefined;
+let configurationCache = undefined;
 
 const supportedFormats = formatProviderResolver.allFormatsExt().join(',');
 const defaultPathSearchPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
 const namespacedPathSearchPattern = (pathHelper.getRoot() + 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
 const globalConfigPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
-/*::
-    import type { EmptyConfigurations, SiteConfig, Configurations } from './../global-types';
-*/
 
-
-let EMPTY_CFG = {
-    empty:true,
-    fileSearchPatterns: [defaultPathSearchPattern, namespacedPathSearchPattern]
-};
-function emptyCfg(){
-    return EMPTY_CFG;
-}
-
-
-
-function normalizeSite(site/*: SiteConfig*/)/*: void*/{
+function normalizeSite(site){
 
 }
 
-function validateSite(site/*: SiteConfig*/)/*: void*/{
+function validateSite(site) {
     if(site==null){
         throw new Error(`Site config can't be null.`);
     }
@@ -67,7 +53,7 @@ function invalidateCache(){
     configurationCache = undefined;
 }
 
-function get(callback/*: (err: ?Error, data: Configurations | EmptyConfigurations )=>void*/, {invalidateCache}/*: {invalidateCache?: bool}*/ = {}){
+function get(callback, {invalidateCache} = {}){
 
     if(invalidateCache===true)
         configurationCache = undefined;
@@ -81,7 +67,7 @@ function get(callback/*: (err: ?Error, data: Configurations | EmptyConfiguration
         .concat(glob.sync(namespacedPathSearchPattern))
         .map(x=>path.normalize(x));
 
-    let configurations/*: Configurations */ = {sites:[], global: GLOBAL_DEFAULTS};
+    let configurations = {sites:[], global: GLOBAL_DEFAULTS};
 
     for(let i = 0; i < files.length; i++){
         let file = files[i];
@@ -127,17 +113,10 @@ function get(callback/*: (err: ?Error, data: Configurations | EmptyConfiguration
         }
     }
 
-
-    if(configurations.sites.length>0){
-        configurationCache = configurations;
-        callback(undefined, configurations);
-    }
-    else{
-        callback(undefined, EMPTY_CFG);
-    }
-
+    configurationCache = configurations;
+    callback(undefined, configurations);
 }
-function getPromise(options/*::?:{invalidateCache?: bool}*/)/*: Promise<Configurations | EmptyConfigurations> */{
+function getPromise(options) {
     return new Promise((resolve, reject)=>{
         get((err, data)=>{
             if(err) reject(err);
