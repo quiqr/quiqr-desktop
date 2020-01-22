@@ -128,11 +128,11 @@ class WorkspaceConfigValidator {
         //validate all fields common to content or data files
         validationError = joi.validate(single,
             joi.object().keys({
-                key: joi.string().trim().alphanum().min(3).max(30).required().error(new Error('The x value is invalid.')),
-                title: joi.string().trim().min(3).max(30).required().error(new Error('The x value is invalid.')),
-                file: joi.string().trim().regex(/^(content|data|config[.]).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The x value is invalid.')),
-                dataformat: joi.string().trim().error(new Error('The x value is invalid.')),
-                fields: joi.array().min(1).required().error(new Error('The x value is invalid.'))
+                key: joi.string().trim().alphanum().min(3).max(30).required().error(new Error('The singles.key value is invalid.')),
+                title: joi.string().trim().min(3).max(30).required().error(new Error('The singles.title value is invalid.')),
+                file: joi.string().trim().regex(/^(hokus|content|data|config[.]).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.')),
+                dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
+                fields: joi.array().min(1).required().error(new Error('The singles.fields value is invalid.'))
             })
         ).error;
 
@@ -142,7 +142,7 @@ class WorkspaceConfigValidator {
         if(single.file.startsWith('content')){
             //content file, dataformat must be provided
             validationError = joi.validate(single.dataformat,
-                joi.string().trim().regex(validationUtils.dataFormatReg).required().error(new Error('The x value is invalid.'))
+                joi.string().trim().regex(validationUtils.dataFormatReg).required().error(new Error('The dataformat value is invalid.'))
             ).error;
 
             if(validationError) return validationError.message;
