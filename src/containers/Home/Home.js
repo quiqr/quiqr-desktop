@@ -141,7 +141,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentWillUnmount(){
         service.unregisterListener(this);
     }
-    
+
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
         return (<Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Management">
             <InfoLine label="Name">{site.name}</InfoLine>
@@ -152,7 +152,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             </InfoLine>
             { configurations.global.siteManagementEnabled? (
                 <InfoLine label="Config Location">
-                    <TextField id="config-location" value={site.configPath} readOnly={true} /> 
+                    <TextField id="config-location" value={site.configPath} readOnly={true} />
                     <FlatButton
                         style={{minWidth:'40px'}}
                         icon={<IconFileFolder />}
@@ -195,7 +195,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
         return (
             <Route render={({history})=>{
-                
+
                 this.history = history; //ugly
 
                 if(workspaces==null)
@@ -211,9 +211,9 @@ class Home extends React.Component<HomeProps, HomeState>{
                             service.api.openFileExplorer(location)
                         }}
                         onPublishClick={(workspaceHeader, workspace)=>{
-                            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});                            
+                            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
                         }}
-                        onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } } 
+                        onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }
                         onSelectWorkspaceClick={ this.handleSelectWorkspaceClick }
                         site={site}
                     />
@@ -261,13 +261,13 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let { siteKey } = this.props;
         let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
-        
+
         let _configurations = ((configurations: any): Configurations);
 
         if(configurations==null){
             return <Spinner />
         }
-   
+
         return (
             <div style={ styles.container }>
                 <div style={ styles.sitesCol }>
@@ -280,7 +280,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                                 key={index}
                                 style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
                                 rightIcon={<IconNavigationCheck color={active?this.props.muiTheme.palette.primary1Color:undefined}  />}
-                                onClick={ ()=>{ this.selectSite(item); } } 
+                                onClick={ ()=>{ this.selectSite(item); } }
                                 primaryText={ item.name }
                             />);
                         })}
@@ -289,7 +289,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                                 key="add-site"
                                 style={ styles.siteInactiveStyle }
                                 rightIcon={<IconAdd />}
-                                onClick={ this.handleAddSiteClick.bind(this) } 
+                                onClick={ this.handleAddSiteClick.bind(this) }
                                 primaryText="New"
                             />
                         ) : ( null ) }
@@ -319,13 +319,13 @@ class Home extends React.Component<HomeProps, HomeState>{
                         open={publishSiteDialog!=null&&publishSiteDialog.open}
                     />
                 ):(null) }
-                
+
                 {/*this should be moved to a UI service*/}
                 <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
-            </div>         
+            </div>
         );
     }
-    
+
 }
 
 export default muiThemeable()(Home);

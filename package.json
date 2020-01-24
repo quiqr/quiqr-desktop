@@ -25,6 +25,7 @@
     "toml": "2.3.3",
     "tomlify-j0.4": "3.0.0",
     "ftp-deploy": "2.3.6",
+    "adm-zip": "0.4.13",
     "user-home": "2.0.0"
   },
   "devDependencies": {

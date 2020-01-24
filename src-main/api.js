@@ -108,6 +108,8 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, conte
     let configuration /*: any */;
     try{
         configuration = await workspaceService.getConfigurationsData();
+        global.currentSiteKey = siteKey;
+        global.currentSitePath = configuration.path;
     }
     catch(e){
         context.resolve({error: `Could not load workspace configuration (website: ${siteKey}, workspace: ${workspaceKey}). ${e.message}`});

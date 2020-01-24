@@ -105,7 +105,6 @@ function getLocation(locPath = ''){
             showNotFound(mainWindow, lookups);
         }
     }
-
 }
 
 function createWindow () {
@@ -114,7 +113,6 @@ function createWindow () {
     let icon;
     if(process.env.REACT_DEV_URL)
         icon = path.normalize(__dirname + "/../public/icon.png");
-
 
     configurationDataProvider.get(function(err, configurations){
 

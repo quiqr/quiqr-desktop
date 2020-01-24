@@ -36,6 +36,7 @@ class SiteService{
     }
 
     async mountWorkspace(workspaceKey/*: string*/)/*: Promise<void>*/{
+        console.log(this._getSiteSource().mountWorkspace(workspaceKey));
         await this._getSiteSource().mountWorkspace(workspaceKey);
     }
 

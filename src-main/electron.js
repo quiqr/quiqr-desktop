@@ -8,11 +8,16 @@ const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
 
+const pathHelper = require('./path-helper');
+const AdmZip = require('adm-zip');
 unhandled();
 
 // Module to control application life.
 const app = electron.app
 const Menu = electron.Menu
+
+global.currentSiteKey = undefined;
+global.currentSitePath = undefined;
 
 //global.sharedObj = {prop1: null};
 global.hugoServer = undefined;
@@ -64,6 +69,78 @@ function stopServer() {
     });
   }
 }
+function importSite() {
+    let dir;
+
+    const dialog = electron.dialog;
+
+    dir = dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile']
+    }, function (file) {
+        if (file) {
+
+            var path = require('path');
+            var filename = path.parse(file[0]).base;
+
+            console.log(file);
+            var siteKey = filename.slice(7, -4);
+
+            var zip = new AdmZip(file[0]);
+            var zipEntries = zip.getEntries();
+
+            var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
+            var pathSource = (pathHelper.getRoot()+"siteSources/"+siteKey+"-"+todayDate);
+
+            zipEntries.forEach(function(zipEntry) {
+                //console.log(zipEntry.toString());
+                if (zipEntry.entryName == "config."+siteKey+".json") {
+
+
+                    var newConf = JSON.parse((zipEntry.getData().toString('utf8')));
+                    console.log(newConf.source.path);
+                    newConf.source.path = pathSource;
+                    console.log(newConf);
+
+                    var fs = require('fs');
+                    fs.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', function(){
+                        mainWindow.reload();
+                    });
+                }
+            });
+
+            zip.extractAllTo(pathSource, true);
+
+        }
+    });
+
+}
+
+function exportSite() {
+    let dir;
+
+    const dialog = electron.dialog;
+
+    if(global.currentSiteKey){
+
+        dir = dialog.showOpenDialog(mainWindow, {
+            properties: ['openDirectory']
+        }, function (path) {
+            if (path) {
+                var zip = new AdmZip();
+                zip.addLocalFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'));
+                zip.addLocalFolder(global.currentSitePath);
+                var willSendthis = zip.toBuffer();
+                zip.writeZip(path+"/config."+global.currentSiteKey+".zip");
+            }
+        });
+    }
+    else{
+        dialog.showMessageBox(mainWindow, {
+            type: 'error',
+            message: "First, select a site to export.",
+        });
+    }
+}
 
 function createLogWindow () {
   logWindow = logWindowManager.getCurrentInstanceOrNew();
@@ -107,7 +184,19 @@ function createMainMenu(){
     // { role: 'fileMenu' }
     {
       label: 'File',
-      submenu: [
+        submenu: [
+        {
+            label: 'Import website',
+            click: async () => {
+                importSite()
+            }
+        },
+        {
+            label: 'Export website',
+            click: async () => {
+                exportSite()
+            }
+        },
         isMac ? { role: 'close' } : { role: 'quit' }
       ]
     },
