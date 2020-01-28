@@ -102,10 +102,15 @@ function get(callback, {invalidateCache} = {}){
                 siteManagementEnabled: global.siteManagementEnabled == null ? GLOBAL_DEFAULTS.siteManagementEnabled : global.siteManagementEnabled===true,
                 maximizeAtStart: global.maximizeAtStart == null ? GLOBAL_DEFAULTS.maximizeAtStart : global.maximizeAtStart===true,
                 hideWindowFrame: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideWindowFrame : global.hideWindowFrame===true,
-                hideMenuBar: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideMenuBar : global.hideMenuBar===true,
+                hideMenuBar: false,
+                //hideMenuBar: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideMenuBar : global.hideMenuBar===true,
                 hideInlineMenus: global.hideInlineMenus == null ? GLOBAL_DEFAULTS.hideInlineMenus : global.hideInlineMenus===true,
                 appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme
             }
+
+            //settings overruled
+
+
             configurations.global = global;
         }
         catch(e){

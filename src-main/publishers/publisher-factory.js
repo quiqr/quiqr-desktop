@@ -23,6 +23,10 @@ class PublisherFactory{
             let FtpPublisher = require('./ftp-publisher');
             return new FtpPublisher(genericPublisherConfig);
         }
+        if(type==='github'){
+            let GithubPublisher = require('./github-publisher');
+            return new GithubPublisher(genericPublisherConfig);
+        }
         if(type==='s3'){
             let S3Publisher = require('./s3-publisher');
             return new S3Publisher(genericPublisherConfig);

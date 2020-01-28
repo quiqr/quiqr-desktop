@@ -135,7 +135,7 @@ function createWindow () {
         mainWindow.maximize();
       }
       if(configurations.global.hideMenuBar){
-        mainWindow.setMenuBarVisibility(false);
+          //mainWindow.setMenuBarVisibility(false);
       }
 
       mainWindow.show();

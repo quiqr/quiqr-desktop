@@ -29,7 +29,10 @@ class PathHelper{
     }
 
     getHugoBinRoot(){
-        return this.getRoot() + 'tools/hugobin/';        
+        return this.getRoot() + 'tools/hugobin/';
+    }
+    getPublishReposRoot(){
+        return this.getRoot() + 'sitesRepos/';
     }
 
     getHugoBinDirForVer(version/*: string*/){

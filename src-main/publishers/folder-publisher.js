@@ -23,7 +23,7 @@ class FolderPublisher/*:: implements IPublisher*/{
 
     async publish(context/*: PublishContext*/)/*: Promise<void>*/{
         let { path, clean } = this._config;
-        
+
         let resolvedDest = path || pathHelper.getSiteDefaultPublishDir(context.siteKey, context.publishKey);
         await fs.ensureDir(resolvedDest);
         let cleanDestBefore = clean===true;
