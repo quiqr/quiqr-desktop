@@ -1,18 +1,11 @@
 require('dotenv').config();
 const { notarize } = require('electron-notarize');
 
-exports.default = async function notarizing(context) {
-  const { electronPlatformName, appOutDir } = context;  
-  if (electronPlatformName !== 'darwin') {
-    return;
-  }
-
-  const appName = context.packager.appInfo.productFilename;
-
-  return await notarize({
+notarize({
     appBundleId: 'com.lingewoud.sukoh',
-    appPath: `${appOutDir}/${appName}.app`,
+    appPath: 'dist/mac/Sukoh.app',
     appleId: process.env.APPLEID,
     appleIdPassword: process.env.APPLEIDPASS,
-  });
-};
+});
+
+
