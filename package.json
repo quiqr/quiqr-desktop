@@ -2,12 +2,15 @@
   "homepage": "./",
   "name": "hokus-cms",
   "author": {
-    "name": "Juliano Appel Klein",
-    "email": "julianoaklein@gmail.com"
+    "name": "Pim Snel",
+    "email": "pim@lingewoud.nl"
   },
   "description": "A CMS for Hugo.",
   "version": "0.5.0",
   "private": true,
+  "disdeps": {
+    "nodegit": "0.23.0"
+  },
   "dependencies": {
     "7zip-bin": "3.1.0",
     "electron-context-menu": "^0.10.1",
@@ -19,7 +22,6 @@
     "joi": "13.4.0",
     "js-yaml": "3.12.0",
     "mkdirp": "0.5.1",
-    "nodegit": "0.23.0",
     "request": "2.87.0",
     "s3": "4.4.0",
     "toml": "2.3.3",
@@ -35,8 +37,10 @@
     "concurrently": "3.5.1",
     "copyfiles": "2.1.0",
     "cross-env": "5.1.3",
+    "dotenv": "^8.2.0",
     "electron": "3.0.5",
     "electron-builder": "^20.44.4",
+    "electron-notarize": "^0.2.1",
     "flow-bin": "0.75.0",
     "flow-typed": "2.4.0",
     "markdown-it": "8.4.1",
@@ -70,13 +74,14 @@
     "dist-win": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win",
     "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
     "dist-mac": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-mac",
+    "dist-mac-notarize": "scripts/notarize.js",
     "test": "./node_modules/.bin/mocha",
     "flow-restart": "concurrently \"taskkill /F /IM flow.exe\" \"flow\""
   },
   "build": {
-    "appId": "julianoaklein.hokus",
+    "appId": "com.lingewoud.sukoh",
     "artifactName": "hokus-cms_${os}_${arch}.${ext}",
-    "productName": "Hokus CMS",
+    "productName": "Sukoh",
     "directories": {
       "buildResources": "public"
     },
@@ -84,7 +89,11 @@
       "icon": "public/icon"
     },
     "mac": {
-      "icon": "public/icon"
+      "icon": "public/icon",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "entitlementsInherit": "build/entitlements.mac.plist"
     }
   },
   "browserslist": [

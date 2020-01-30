@@ -1,6 +1,6 @@
 // @flow
 const FolderSiteSource = require('./folder-site-source');
-const GitSiteSource = require('./git-site-source');
+//const GitSiteSource = require('./git-site-source');
 
 /*::
 import type { SiteSource } from './types';
@@ -17,8 +17,8 @@ class SiteSourceFactory{
         let type = config.type.toLowerCase();
         if(type==='folder')
             return FolderSiteSource;
-        else if(type==='git')
-            return GitSiteSource;
+        //       else if(type==='git')
+        //    return GitSiteSource;
         else
             throw new Error(`Site source (${config.type}) not implemented.`);
     }

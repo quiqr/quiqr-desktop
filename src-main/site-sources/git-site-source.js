@@ -5,10 +5,13 @@
     https://github.com/nodegit/nodegit/tree/master/examples
 */
 
+/*
 let pathHelper = require('./../path-helper');
 let fs = require('fs-extra');
 var NodeGit = require('nodegit');
 let jobManager = require('./../jobs/job-manager');
+*/
+
 /*::
 
 import { SiteSource } from './types';
@@ -26,15 +29,16 @@ type GitSiteSourceConfig = {
 
 */
 
-class GitSiteSource/*:: implements SiteSource*/ {
+/*
 
-    /*:: config: any;*/ 
-    
-    constructor(config/*: any*/){
+class GitSiteSource {
+
+
+    constructor(config){
         this.config = config;
     }
 
-    async _isEmptyDir(path/*: string*/)/*: Promise<bool>*/{
+    async _isEmptyDir(path){
         return new Promise((resolve, reject)=>{
             fs.readdir(path, function(err, files) {
                 if (err) reject(err);
@@ -49,7 +53,7 @@ class GitSiteSource/*:: implements SiteSource*/ {
                 certificateCheck: () => {
                     return 1;
                 },
-                credentials: (url /*: string */, userName /*: string */) => {
+                credentials: (url , userName ) => {
                     let { sshPrivateKey, sshPublicKey } = this.config.credentials;
                     return NodeGit.Cred.sshKeyMemoryNew(userName, sshPublicKey, sshPrivateKey, "");
                 }
@@ -57,7 +61,7 @@ class GitSiteSource/*:: implements SiteSource*/ {
         };
     }
 
-    async _getRepo()/*: Promise<any>*/{
+    async _getRepo(){
 
         let repositoryPath = pathHelper.getSiteWorkspacesRoot(this.config.key);
         let siteRootPath = pathHelper.getSiteRoot(this.config.key);
@@ -71,7 +75,7 @@ class GitSiteSource/*:: implements SiteSource*/ {
         }
     }
 
-    async listWorkspaces()/*: Promise<Array<WorkspaceHeader>>*/{
+    async listWorkspaces(){
         return jobManager.runSharedJob(
             `git-site-source:list-workspaces:${this.config.key}`,
             async ()=>{
@@ -87,7 +91,7 @@ class GitSiteSource/*:: implements SiteSource*/ {
                     ()=> repo.fetch('origin', this._getNodeGitFetchOptions())
                 );
 
-                function onlyUnique(value, index, self) { 
+                function onlyUnique(value, index, self) {
                     return self.indexOf(value) === index;
                 }
 
@@ -103,7 +107,7 @@ class GitSiteSource/*:: implements SiteSource*/ {
         );
     }
 
-    async mountWorkspace(key/*: string*/)/*: Promise<void>*/{
+    async mountWorkspace(key){
         let repo = await this._getRepo();
         let branches = await repo.getReferenceNames(NodeGit.Reference.TYPE.LISTALL);
         let refName = branches.find(x => x.endsWith('/'+key) && x.indexOf('/remotes/')!==-1);
@@ -118,16 +122,17 @@ class GitSiteSource/*:: implements SiteSource*/ {
         // await repo.pull(this._getNodeGitFetchOptions());
         // await repo.push(this._getNodeGitFetchOptions());
         return undefined;
-        
+
     }
 
-    async unmountWorkspace(key/*: string*/)/*: Promise<void>*/{
+    async unmountWorkspace(key){
         //won't be necessary
     }
 
-    async update()/*: Promise<void> */{
+    async update(){
         //huuumm...
     }
 }
 
 module.exports = GitSiteSource;
+*/

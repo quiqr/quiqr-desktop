@@ -24,10 +24,12 @@ class FolderSiteSourceBuilder/*:: implements SiteSourceBuilder*/ {
         //create a hokus config
         //create a config
 
+        /*
         if(config.theme!=null && config.theme){
             let themeInstaller = new ThemeInstaller();
             await themeInstaller.siteFromTheme(config.theme, config.folderPath);
         }
+        */
 
         let siteConfig/*: RawSiteConfig*/ = {
             key: config.key,

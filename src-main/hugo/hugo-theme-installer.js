@@ -1,4 +1,5 @@
 //@flow
+/*
 const NodeGit = require('nodegit');
 const fs = require('fs-extra');
 const glob = require('glob');
@@ -8,7 +9,7 @@ const formatProviderResolver = require('../format-provider-resolver');
 class ThemeInstaller{
     constructor(){}
 
-    async siteFromTheme(repoUrl/*: string*/, destPath/*:string*/, options/*:?{ force: bool }*/ = null)
+    async siteFromTheme(repoUrl, destPath, options = null)
     {
         let opts = Object.assign({}, { force:false }, options);
 
@@ -25,10 +26,10 @@ class ThemeInstaller{
         let themeKey = repoUrl.replace(/^.+[/]([^/]+).git$/,'$1');
         let themePath = path.join(destPath, 'themes', themeKey);
         await fs.ensureDir(themePath);
-        
+
 
         await NodeGit.Clone(repoUrl, themePath);
-        
+
         //copy "sample" or "example" site to dest
         let sampleSitesPath = ['exampleSite','sampleSite'].map(x => path.join(themePath, x));
         let sampleSiteCopied = false;
@@ -58,7 +59,7 @@ class ThemeInstaller{
                 }
             }
         }
-        
+
 
         //remove .git folder
         let gitFolder = path.join(destPath, '.git');
@@ -67,6 +68,7 @@ class ThemeInstaller{
 }
 
 module.exports = ThemeInstaller;
+*/
 
 // async function test(){
 //     let themeInstaller = new ThemeInstaller();
