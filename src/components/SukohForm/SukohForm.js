@@ -9,7 +9,7 @@ import dynamicFormComponents from './components/all'
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
-type HokusFormProps = {
+type SukohFormProps = {
     onSave: ({data:any, accept:any, reject:any})=>void,
     fields: any,
     plugins: {[key:string]: Function},
@@ -17,17 +17,17 @@ type HokusFormProps = {
     values: {}
 }
 
-type HokusFormState = {
+type SukohFormState = {
     changed: bool,
     error: ?string,
     savedOnce: bool
 }
 
-export class HokusForm extends React.Component<HokusFormProps, HokusFormState>{
-    
+export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
+
     _valueFactory: ()=>any;
-    
-    constructor(props: HokusFormProps){
+
+    constructor(props: SukohFormProps){
         super(props);
         this.state = {
             changed: false,
@@ -45,7 +45,7 @@ export class HokusForm extends React.Component<HokusFormProps, HokusFormState>{
                 this.saveContent();
             }
             return;
-        }        
+        }
     }
 
     componentWillMount(){
@@ -84,7 +84,7 @@ export class HokusForm extends React.Component<HokusFormProps, HokusFormState>{
         }
         else{
             this.setState({error: 'Save not implemented'});
-        }        
+        }
     }
 
     handleFormChange(valueFactory: ()=>any){
@@ -93,7 +93,7 @@ export class HokusForm extends React.Component<HokusFormProps, HokusFormState>{
             this.setState({changed:true});
         }
     }
-    
+
     render(){
 
         let floatingActionButtonClass = 'animated';

@@ -4,7 +4,7 @@ import React from 'react';
 import service from './../services/service'
 import { snackMessageService } from './../services/ui-service'
 import { Redirect } from 'react-router-dom'
-import { HokusForm } from './../components/HokusForm';
+import { SukohForm } from './../components/SukohForm';
 import Spinner from './../components/Spinner';
 import { FormBreadcumb } from './../components/Breadcumb'
 
@@ -39,7 +39,7 @@ class Single extends React.Component<SingleProps,SingleState>{
     componentDidMount(){
         var stateUpdate  = {};
         var { siteKey, workspaceKey, singleKey } = this.props;
-        
+
         Promise.all([
             service.api.getSingle(siteKey, workspaceKey, singleKey).then((single)=>{
                 stateUpdate.singleValues = single;
@@ -50,9 +50,9 @@ class Single extends React.Component<SingleProps,SingleState>{
         ]).then(()=>{
             this.setState(stateUpdate);
         }).catch((e)=>{
-                
+
         });
-        
+
     }
 
     componentWillUnmount(){
@@ -70,15 +70,15 @@ class Single extends React.Component<SingleProps,SingleState>{
             context.reject('Something went wrong.');
         });
     }
- 
+
     render(){
         if(this.state.singleValues===undefined || this.state.selectedWorkspaceDetails==null){
             return <Spinner />;
-        }       
+        }
         let single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
         if(single==null) return null;
 
-        return(<HokusForm
+        return(<SukohForm
             debug={false}
             rootName={single.title}
             fields={single.fields}
@@ -86,7 +86,7 @@ class Single extends React.Component<SingleProps,SingleState>{
             onSave={this.handleSave.bind(this)}
             plugins={{}}
             />
-        );        
+        );
     }
 }
 

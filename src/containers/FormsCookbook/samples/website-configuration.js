@@ -15,11 +15,11 @@ export const websiteConfiguration: FormCookbookSample = {
         ]}
     ],
     values: {
-        title: 'Hokus, a sleek CMS for Hugo',
-        baseURL: 'https://hokus.netlify.com',
+        title: 'Sukoh, a sleek CMS for Hugo',
+        baseURL: 'https://sukoh.gitlab.io',
         params: {
-            author: 'Juliano Appel Klein',
-            description: 'Hokus, a open source CMS for Hugo. Try it now!'
+            author: 'Multiple Authors',
+            description: 'Sukoh, a open source CMS for Hugo. Try it now!'
         }
     }
 }

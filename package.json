@@ -1,6 +1,6 @@
 {
   "homepage": "./",
-  "name": "hokus-cms",
+  "name": "sukoh",
   "author": {
     "name": "Pim Snel",
     "email": "pim@lingewoud.nl"
@@ -80,7 +80,7 @@
   },
   "build": {
     "appId": "com.lingewoud.sukoh",
-    "artifactName": "hokus-cms_${os}_${arch}.${ext}",
+    "artifactName": "sukoh_${os}_${arch}.${ext}",
     "productName": "Sukoh",
     "directories": {
       "buildResources": "public"

@@ -29,16 +29,16 @@ service.getConfigurations().then((c) => {
 let samplesExt = [{key:'none', title:'Introduction', description: '', values: {}, fields: [
     { type:"info", lineHeight:'1.4', theme:'black-bare', content:`
 
-# Welcome to Hokus Forms Cookbook!
+# Welcome to Sukoh Forms Cookbook!
 
-This UI was crated as a part of Hokus CMS, a CMS for Hugo. It only covers the forms creation process, abstracting away other concepts from the CMS.
+This UI was crated as a part of Sukoh CMS, a CMS for Hugo. It only covers the forms creation process, abstracting away other concepts from the CMS.
 
 I decided to extract it to the web having two purposes in mind:
 
-1. To quickly show how powerfull is the engine behing the form construction process from Hokus CMS.
+1. To quickly show how powerfull is the engine behing the form construction process from Sukoh CMS.
 2. To give practical samples to serve as documentation for those who are learning to create their own forms.
 
-With Hokus, is very easy to create performatic forms that supports complex hierarchies. There are no nesting limits!  
+With Sukoh, is very easy to create performatic forms that supports complex hierarchies. There are no nesting limits!  
 
 All you have to do is to create simple configuration files.
 
@@ -51,20 +51,7 @@ Once ready, you can bind these forms to collections of documents or to single fi
 In the bottom right corner, there are buttons to access **the current form state** and **the configurations used to build the current form**.
 
 Note 1: This very page is built using the engine. We are using the componente "info" to render markdown as HTML. The component does not have a state.
-Note 2: Although the samples are using **JSON**, Hokus also supports **YAML** and **TOML**.
-
-## Request Your Sample
-
-I accept the challange to port your document data structure to Hokus Forms.
-
-To throw me a challenge, just create an issue: [https://github.com/julianoappelklein/hokus/issues](https://github.com/julianoappelklein/hokus/issues)
-
-For more informations, access our website [https://hokus.netlify.com](https://hokus.netlify.com) or our repository: [https://github.com/julianoappelklein/hokus](https://github.com/julianoappelklein/hokus).
-
-If you have any doubts, please, reach me by using the website contact form or from our repo.
-
-*Juliano Appel Klein*
-*Hokus Author*
+Note 2: Although the samples are using **JSON**, Sukoh also supports **YAML** and **TOML**.
 
 ` }
 ]}].concat(samples);

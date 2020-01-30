@@ -86,7 +86,7 @@ export class AceEditor extends React.Component<AceEditorProps,AceEditorState> {
         if(this._aceContainer!=null){ 
             let options: AceEditor$Options = {
                 mode: this.props.language==='html'? 'ace/mode/html':'ace/mode/markdown',
-                theme: this.props.lightTheme===true? 'ace/theme/hokus-light' : 'ace/theme/hokus',
+                theme: this.props.lightTheme===true? 'ace/theme/sukoh-light' : 'ace/theme/sukoh',
                 fontFamily: 'Roboto Mono',
                 fontSize: '15px',
                 wrap: true,

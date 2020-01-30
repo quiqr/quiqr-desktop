@@ -59,14 +59,14 @@ class WorkspaceConfigProvider{
     }
 
     _getFilePath(workspacePath/*: string*/){
-        let fileExp = path.join(workspacePath,'hokus.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+        let fileExp = path.join(workspacePath,'sukoh.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
         return glob.sync(fileExp)[0];
     }
 
     _buildDefaultConfig(workspacePath/*: string*/)/*: {config: WorkspaceConfig, path: string}*/{
         let configBuilder/*: any*/ = new InitialWorkspaceConfigBuilder(workspacePath);
         let {data, formatProvider} = configBuilder.build();
-        let filePath = path.join(workspacePath,'hokus.'+formatProvider.defaultExt());
+        let filePath = path.join(workspacePath,'sukoh.'+formatProvider.defaultExt());
         fs.writeFileSync(
             filePath, 
             formatProvider.dump(data)

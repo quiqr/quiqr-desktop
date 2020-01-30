@@ -1,25 +1,10 @@
-# Hokus CMS
-
-<img src="https://www.hokuscms.com/img/logo-dark.svg" alt="Hokus CMS" width="90"/>
+# Sukoh CMS
 
 A CMS for Hugo to run on your computer. **No hosting fees are required**.
 
-[![screenshot](https://www.hokuscms.com/img/home-video-placeholder.jpg)](https://www.hokuscms.com/)
-
-For a quick preview, access our website and look for our **preview video**:
-https://www.hokuscms.com/
-
-**Alpha Warning**: Hokus is still a work in progress and some awesome features are not yet ready. 
-
-## Version 0.5mip1
-
-Version 0.5.mip1 is a customized version by Pim Snel. Waiting for features to be merged in the main project source. Download binaries below:
-
-- [hokus-cms_win-0.5mip1.exe.zip](https://www.dropbox.com/s/zxmp6hqh0z4t01l/hokus-cms_win-0.5mip1.exe.zip?dl=0)
-
 ## Features
 
-Take a look at our features and understand why Hokus is a great tool for your Hugo websites:
+Take a look at our features and understand why Sukoh is a great tool for your Hugo websites:
 
 * **Runs on your computer.** Supported Platforms: Windows, Linux and macOS.
 * **Free for commercial use.** Download our binaries today and use it for your own commercial purposes.
@@ -31,40 +16,30 @@ Take a look at our features and understand why Hokus is a great tool for your Hu
 
 *Some features may be under development.*
 
-## Current State
-
-**You can use Hokus for some workflows right now**. It is fully ready to manage local Hugo websites.
-
-Start today, [download our installer (Windows, Linux or macOS)](https://github.com/julianoappelklein/hokus/releases), install Hokus on your PC and set up a website within seconds by using our wizard.
-
-Just keep in mind that **Hokus will be much more** in the future.
-
 ## Getting Started
 
-* [Download](https://github.com/julianoappelklein/hokus/releases) and install. 
+* Download
 * Open the application.
 * In the home screen, add a new website and choose a Site Source _(at the moment, the only option is the Folder Source)_ and complete the form.
-* A default configuration file (hokus.yaml) will be placed at the root of your website. After this, open your website workspace and try to create a post.
-* Tweak the configuration file to suit your needs. You can create multiple collections and singles and set many build and serve configurations.
 
 ## Basics
 
-You'll have to learn some concepts before diving deep into Hokus. But don't worry, they are very easy to master.
+You'll have to learn some concepts before diving deep into Sukoh. But don't worry, they are very easy to master.
 
 ### Website Configuration File
 
-The website configuration files are stored in your *home/username/Hokus* folder. It don't not be versioned, but you can if it get complex.
+The website configuration files are stored in your *home/username/Sukoh* folder. It don't not be versioned, but you can if it get complex.
 You can have multiple websites registered, each having their own configuration file. _\(e.g. config.website-1.json, config.website-2.json\)_
 
 A minimal website configuration file looks like this:
 
 ```json
-{   
-  "name": "Hokus Website", /* your website friendly name */
-  "key": "hokus-website", /* your website unique key */
+{
+  "name": "Sukoh Website", /* your website friendly name */
+  "key": "sukoh-website", /* your website unique key */
   "source": { /* where your website workspaces will come from */
     "type": "folder", /* every source has a type but for now we only have the folder type */
-    "path": "D:/Projects/hokus-website/" /* an absolute path to your website folder */
+    "path": "D:/Projects/sukoh-website/" /* an absolute path to your website folder */
   },
   "publish": [ /* configurations used to server your workspaces to use with Hugo executable */
     {
@@ -74,16 +49,16 @@ A minimal website configuration file looks like this:
         "path": "D:\\website-output-path\\"
       }
     }
-  ]       
+  ]
 }
 ```
 
 Note that your website configuration can be a JSON, YAML or TOML file.
 
-### Hokus Configuration File
+### Sukoh Configuration File
 
-An optional configuration file can be stored in your *home/username/Hokus*
-folder. When *config.json* is found hokus will read the settings at startup.
+An optional configuration file can be stored in your *home/username/Sukoh*
+folder. When *config.json* is found sukoh will read the settings at startup.
 
 It looks like this:
 
@@ -113,7 +88,7 @@ For a minimal configuration file, see the default workspace configuration (which
 
 ```json
 {
-  "hugover": "0.35",
+  "hugover": "0.63.1",
   "serve":[
     {
       "key":"default",
@@ -171,7 +146,7 @@ Note that your workspace configuration can be a JSON, YAML or TOML file.
 
 Collections and singles configurations have a property named "fields" where you must provide an array of field configurations.
 
-Each field must use one of the available Hokus components by setting a "type" property. The current types list is below:
+Each field must use one of the available Sukoh components by setting a "type" property. The current types list is below:
 
 * accordion
 * boolean
@@ -191,17 +166,15 @@ Each field must use one of the available Hokus components by setting a "type" pr
 
 Some components have a "field" or "fields" property, allowing for nesting and composition.
 
-To see the components in action, you can access our [Forms Cookbook](http://formscookbook.hokus.io.s3-website-us-east-1.amazonaws.com/). For quick reference. _\(the Forms Cookbook is also included in the desktop app.\)_
+To see the components in action, you can access our [Forms Cookbook](http://formscookbook.sukoh.io.s3-website-us-east-1.amazonaws.com/). For quick reference. _\(the Forms Cookbook is also included in the desktop app.\)_
 
 You can also refer to the source code to see all available properties for each component type.
 
 ## Global configuration
 
-
-
 ### More Concepts
 
-More concepts are yet to come, but with those already given, and by looking into the Forms Cookbook, you should now be ready to use Hokus CMS.
+More concepts are yet to come, but with those already given, and by looking into the Forms Cookbook, you should now be ready to use Sukoh CMS.
 
 ## Building
 
@@ -230,7 +203,7 @@ sudo apt-get install libssl-dev
 
 Clone the repository and set the current directory to the root:
 
-```git clone https://github.com/julianoappelklein/hokus.git && cd hokus```
+```git clone https://github.com/julianoappelklein/sukoh.git && cd sukoh```
 
 Install NPM dependencies and build:
 
@@ -247,26 +220,18 @@ brew install npm
 
 Clone the repository and set the current directory to the root:
 
-```git clone https://github.com/julianoappelklein/hokus.git && cd hokus```
+```git clone https://github.com/julianoappelklein/sukoh.git && cd sukoh```
 
 Install NPM dependencies and build:
 
 ```npm install && npm run _rebuild-native && npm run dist-mac```
 
-## Help Wanted
-
-Right now, Hokus is almost a one-man project. When I (Juliano Appel Klein) started to develop it, I was trying to create a simple tool to let customers edit their Hugo websites. But soon I figured out this was not a simple task.
-
-I believe Hokus can become a great project. The Hugo community is large and there is a lack os simple tools to use.
-
-If you want to contribute, please let me know. You can [create an issue](https://github.com/julianoappelklein/hokus/issues) or reach me through the website [contact page](https://www.hokuscms.com/contact/).
-
 ## Vision
 
-The desired workflow for Hokus is:
+The desired workflow for Sukoh is:
 
-* Someone installs Hokus and opens it.
-* A list of existent Hugo website templates ("Hokus-ready") are listed for selection.
+* Someone installs Sukoh and opens it.
+* A list of existent Hugo website templates ("Sukoh-ready") are listed for selection.
 * The user select the desired template and the website is downloaded.
 * Right from the start, the user can create posts without hassle.
 * The user selects a way to version the content and a place to publish it, just providing minimal configurations.

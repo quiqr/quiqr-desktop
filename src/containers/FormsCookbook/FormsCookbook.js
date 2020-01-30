@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { samples } from './samples';
 import { Form, ComponentRegistry } from './../../components/HoForm';
-import dynamicFormComponents from './../../components/HokusForm/components/all'
+import dynamicFormComponents from './../../components/SukohForm/components/all'
 import { FormBreadcumb } from './../../components/Breadcumb';
 import { Dialog, RaisedButton } from 'material-ui';
 

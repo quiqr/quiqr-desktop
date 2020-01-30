@@ -4,7 +4,7 @@ import React from 'react';
 import service from './../services/service'
 import { snackMessageService } from './../services/ui-service'
 import { Redirect } from 'react-router-dom'
-import { HokusForm } from './../components/HokusForm';
+import { SukohForm } from './../components/SukohForm';
 import Spinner from './../components/Spinner'
 import { FormBreadcumb } from './../components/Breadcumb'
 
@@ -42,7 +42,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
     componentDidMount(){
         var stateUpdate  = {};
         var { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-        
+
         Promise.all([
             service.api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails)=>{
                 stateUpdate.selectedWorkspaceDetails = workspaceDetails;
@@ -53,7 +53,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
         ]).then(()=>{
             this.setState(stateUpdate);
         });
-        
+
     }
 
     handleSave(context: any){
@@ -67,13 +67,13 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
             context.reject('Something went wrong.');
         })
     }
-    
+
 
     render(){
         if(this.state.collectionItemValues===undefined||this.state.selectedWorkspaceDetails==null){
             return <Spinner />;
         }
-        
+
         let { selectedWorkspaceDetails, collectionItemValues } = this.state;
         let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
@@ -85,7 +85,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
 
         let values =  Object.assign({__item: collectionItemKey}, this.state.collectionItemValues)
 
-        return(<HokusForm
+        return(<SukohForm
             debug={false}
             rootName={collection.itemtitle || collection.title}
             fields={fields}
@@ -100,7 +100,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
                 }
             }}
             onSave={this.handleSave.bind(this)}
-        />);        
+        />);
     }
 }
 

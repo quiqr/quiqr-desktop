@@ -64,7 +64,7 @@ class GithubPublisher {
                       if(code==0){
 
                           var spawn = require("child_process").spawn;
-                          let clonecmd3 = spawn( git_bin, [ "commit" , '-a', '-m', 'publish from hokus'],{cwd: full_gh_dest});
+                          let clonecmd3 = spawn( git_bin, [ "commit" , '-a', '-m', 'publish from sukoh'],{cwd: full_gh_dest});
                           clonecmd3.stdout.on("data", (data) => {
                           });
                           clonecmd3.stderr.on("data", (err) => {

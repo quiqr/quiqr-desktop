@@ -9,7 +9,7 @@ class PathHelper{
     */
 
     getRoot(){
-        return userHome +'/Hokus/';
+        return userHome +'/Sukoh/';
     }
 
     getSiteRoot(siteKey/*: string*/){

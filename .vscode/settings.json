@@ -6,7 +6,7 @@
         "build/":true
     },
     "files.associations": {
-        "*.hokus": "json",
+        "*.sukoh": "json",
         "*.jsonc": "jsonc"
     }
 }

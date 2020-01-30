@@ -21,8 +21,6 @@ class FolderSiteSourceBuilder/*:: implements SiteSourceBuilder*/ {
     }
 
     async build(config/*: BuildConfig*/)/*:Promise<void>*/{
-        //create a hokus config
-        //create a config
 
         /*
         if(config.theme!=null && config.theme){

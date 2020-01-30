@@ -5,11 +5,11 @@ const path = require('path');
 const glob = require('glob');
 const { nativeImage } = require('electron');
 const formatProviderResolver = require('./../../format-provider-resolver');
-const WorkspaceConfigValidator = require('./workspace-config-validator'); 
-const { WorkspaceConfigProvider } = require('./workspace-config-provider'); 
-const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder'); 
+const WorkspaceConfigValidator = require('./workspace-config-validator');
+const { WorkspaceConfigProvider } = require('./workspace-config-provider');
+const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 
-const contentFormats = require('./../../content-formats'); 
+const contentFormats = require('./../../content-formats');
 const { promisify } = require('util');
 const mainWindowManager = require('./../../main-window-manager');
 const Jimp = require("jimp");
@@ -45,11 +45,11 @@ class WorkspaceService{
                 formatProvider = await formatProviderResolver.resolveForMdFilePromise(filePath);
         }
         else
-            formatProvider = formatProviderResolver.resolveForFilePath(filePath);         
-        
+            formatProvider = formatProviderResolver.resolveForFilePath(filePath);
+
         if(formatProvider)
             return formatProvider;
-        
+
         if(fallbacks){
             for(let i = 0; i < fallbacks.length; i++){
                 if(fallbacks[i]){
@@ -59,7 +59,7 @@ class WorkspaceService{
                 }
             }
         }
-        
+
         return undefined;
     }
 
@@ -113,12 +113,12 @@ class WorkspaceService{
         let filePath = path.join(this.workspacePath, single.file);
 
         let directory = path.dirname(filePath);
-        
+
         if (!fs.existsSync(directory))
             fs.mkdirSync(directory);//ensure directory existence
-                 
+
         this._stripNonDocumentData(document);
-        
+
         let stringData = await this._smartDump(filePath, [path.extname(single.file).replace('.','')], document);
         fs.writeFileSync(filePath, stringData);
         return document;
@@ -133,7 +133,7 @@ class WorkspaceService{
         let expression = `_?index[.](${contentFormats.SUPPORTED_CONTENT_EXTENSIONS.join('|')})$`;
         let pageOrSectionIndexReg = new RegExp(expression);
         allFiles = allFiles.filter(x => !pageOrSectionIndexReg.test(x));
-        
+
         let merged = allFiles.map(src =>{
             return Object.assign({ src }, currentResources.find(r => r.src===src));
         });
@@ -340,10 +340,10 @@ class WorkspaceService{
             throw new Error('Could not find collection.');
         let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^\/]+$/,'') , targetPath);
         let filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
-        
+
         for(let i =0; i < files.length; i++){
             let file = files[i]
-        
+
             let from = file;
             let to = path.join(filesBasePath, path.basename(file));
 
@@ -354,7 +354,7 @@ class WorkspaceService{
 
             await fs.copy(from, to);
         };
-        
+
         return files.map(x => {
             return path.join(targetPath, path.basename(x)).replace(/\\/g,'/');
         });
@@ -369,20 +369,20 @@ class WorkspaceService{
     }
 
     async getThumbnailForCollectionItemImage(collectionKey /* : string */, collectionItemKey /* : string */, targetPath /* : string */){
-        
+
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
         if(collection==null)
             throw new Error('Could not find collection.');
         let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
         let src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
-        
+
         let srcExists = await this.existsPromise(src);
         if(!srcExists){
             return 'NOT_FOUND';
         }
-        
-        let thumbSrc = path.join(this.workspacePath, '.hokus/thumbs', collection.folder, itemPath, targetPath);
+
+        let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', collection.folder, itemPath, targetPath);
         let thumbSrcExists = await this.existsPromise(thumbSrc);
         if(!thumbSrcExists){
             try{
@@ -399,12 +399,12 @@ class WorkspaceService{
         let base64 = buffer.toString('base64');
 
         return `data:${mime};base64,${base64}`;
-        
+
     }
 
     _findFirstMatchOrDefault/*::<T: any>*/(arr/*: Array<T>*/, key/*: string*/)/*: T*/{
         let result;
-        
+
         if(key){
             result = (arr||[]).find(x => x.key===key);
             if(result) return result;
@@ -415,7 +415,7 @@ class WorkspaceService{
 
         if(arr!==undefined && arr.length===1)
             return arr[0];
-        
+
         if(key){
             throw new Error(`Could not find a config for key "${key}" and a default value was not available.`);
         }
@@ -427,13 +427,13 @@ class WorkspaceService{
     async serve(serveKey/*:string*/)/*: Promise<void>*/{
         let workspaceDetails = await this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
-            
+
             let serveConfig;
             if(workspaceDetails.serve && workspaceDetails.serve.length){
                 serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
             }
             else serveConfig = {config:''};
-            
+
             let hugoServerConfig = {
                 config: serveConfig.config,
                 workspacePath: this.workspacePath,
@@ -453,8 +453,8 @@ class WorkspaceService{
         let workspaceDetails = await  this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
 
-            
-            
+
+
             let buildConfig;
             if(workspaceDetails.build && workspaceDetails.build.length){
                 buildConfig = this._findFirstMatchOrDefault(workspaceDetails.build, buildKey);
