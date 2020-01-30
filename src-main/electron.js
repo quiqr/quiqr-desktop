@@ -7,8 +7,10 @@ const logWindowManager = require('./log-window-manager');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
+const outputConsole = require('./output-console');
 
 const pathHelper = require('./path-helper');
+const fs = require('fs-extra');
 const AdmZip = require('adm-zip');
 unhandled();
 
@@ -76,7 +78,7 @@ function importSite() {
 
     dir = dialog.showOpenDialog(mainWindow, {
         properties: ['openFile']
-    }, function (file) {
+    }, async function (file) {
         if (file) {
 
             var path = require('path');
@@ -89,26 +91,34 @@ function importSite() {
             var zipEntries = zip.getEntries();
 
             var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
-            var pathSource = (pathHelper.getRoot()+"siteSources/"+siteKey+"-"+todayDate);
+            var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
+            var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
+            var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
+            await fs.ensureDir(pathSite);
+            await fs.ensureDir(pathSiteSources);
+            await fs.ensureDir(pathSource);
 
             zipEntries.forEach(function(zipEntry) {
                 //console.log(zipEntry.toString());
                 if (zipEntry.entryName == "config."+siteKey+".json") {
-
-
                     var newConf = JSON.parse((zipEntry.getData().toString('utf8')));
-                    console.log(newConf.source.path);
+                    outputConsole.appendLine('Found a site with key ' + siteKey);
                     newConf.source.path = pathSource;
-                    console.log(newConf);
 
                     var fs = require('fs');
-                    fs.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', function(){
-                        mainWindow.reload();
+                    fs.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', async function(){
+                        outputConsole.appendLine('wrote new site configuration');
+                        await zip.extractAllTo(pathSource, true);
+                        outputConsole.appendLine('unpacked site, please restart Sukoh.');
+                        dialog.showMessageBox(mainWindow, {
+                            type: 'info',
+                            message: "Unpacked site, please restart Sukoh.",
+                        });
+
                     });
                 }
             });
 
-            zip.extractAllTo(pathSource, true);
 
         }
     });
@@ -124,13 +134,18 @@ function exportSite() {
 
         dir = dialog.showOpenDialog(mainWindow, {
             properties: ['openDirectory']
-        }, function (path) {
+        }, async function (path) {
             if (path) {
                 var zip = new AdmZip();
-                zip.addLocalFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'));
-                zip.addLocalFolder(global.currentSitePath);
+                await zip.addLocalFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'));
+                await zip.addLocalFolder(global.currentSitePath);
                 var willSendthis = zip.toBuffer();
-                zip.writeZip(path+"/config."+global.currentSiteKey+".zip");
+                await zip.writeZip(path+"/config."+global.currentSiteKey+".zip");
+                dialog.showMessageBox(mainWindow, {
+                    type: 'info',
+                    message: "Finished export. Check" + path+"/config."+global.currentSiteKey+".zip",
+                });
+
             }
         });
     }
