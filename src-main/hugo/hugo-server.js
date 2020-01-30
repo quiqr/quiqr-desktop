@@ -7,23 +7,11 @@ const outputConsole = require('./../output-console');
 
 global.currentServerProccess = undefined;
 
-/*::
-type HugoServerConfig = {
-    config: string,
-    workspacePath: string,
-    hugover: string
-}
-*/
-
 class HugoServer{
 
-    /*::
-    config: HugoServerConfig;
-    */
-
-    constructor(config/*: HugoServerConfig*/){
+    constructor(config){
         this.config = config;
-    }   
+    }
 
     emitLines (stream) {
         var backlog = ''
@@ -43,7 +31,7 @@ class HugoServer{
             }
         });
     }
-    
+
     stopIfRunning(callback){
       if(global.currentServerProccess){
         outputConsole.appendLine('Stopping Hugo Server...');
@@ -61,18 +49,18 @@ class HugoServer{
         this.stopIfRunning();
 
         const exec = pathHelper.getHugoBinForVer(hugover);
-        
+
         if(!fs.existsSync(exec)){
             callback(new Error('Could not find hugo.exe for version '+ hugover));
             return;
         }
 
         let hugoArgs = [ 'server' ];
-        if(config){ 
+        if(config){
             hugoArgs.push('--config');
             hugoArgs.push(config);
         }
-        
+
         try{
             global.currentServerProccess = spawn(
                 exec,
@@ -86,7 +74,7 @@ class HugoServer{
             );
             let {stdout, stderr} = global.currentServerProccess;
             this.emitLines(stdout);
-            
+
             global.currentServerProccess.stderr.on('data', (data) => {
                 outputConsole.appendLine('Hugo Server Error: '+data);
             });
@@ -108,8 +96,8 @@ class HugoServer{
                 }
                 outputConsole.appendLine(line);
             });
-            
-            
+
+
         }
         catch(e){
             outputConsole.appendLine('Hugo Server failed to start.');
