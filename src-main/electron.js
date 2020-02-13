@@ -21,7 +21,6 @@ const Menu = electron.Menu
 global.currentSiteKey = undefined;
 global.currentSitePath = undefined;
 
-//global.sharedObj = {prop1: null};
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 
@@ -78,8 +77,7 @@ function importSite() {
 
     dir = dialog.showOpenDialog(mainWindow, {
         filters: [
-            { name: "Sukoh Sites", extensions: ["hsite"] },
-            { name: "Sukoh Themes", extensions: ["htheme"] }
+            { name: "Sukoh Sites", extensions: ["hsite"] }
         ],
         properties: ['openFile']
 
@@ -88,9 +86,18 @@ function importSite() {
 
             var zip = new AdmZip(file[0]);
             var zipEntries = zip.getEntries();
-            var siteKey = zip.readAsText("sitekey")
-            console.log(siteKey);
-            if(siteKey){
+            var siteKey = "";
+
+            await zipEntries.forEach(function(zipEntry) {
+                if (zipEntry.entryName == "sitekey") {
+                    siteKey = zip.readAsText("sitekey");
+                }
+                else{
+                    console.log("no sitekey");
+                }
+            });
+
+            if(siteKey!=""){
 
                 var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
                 var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
@@ -100,65 +107,155 @@ function importSite() {
                 await fs.ensureDir(pathSiteSources);
                 await fs.ensureDir(pathSource);
 
-                zipEntries.forEach(function(zipEntry) {
-                    if (zipEntry.entryName == "config."+siteKey+".json") {
-                        var newConf = JSON.parse((zipEntry.getData().toString('utf8')));
-                        outputConsole.appendLine('Found a site with key ' + siteKey);
-                        newConf.source.path = pathSource;
+                var conftxt = zip.readAsText("config."+siteKey+".json");
+                if(conftxt){
+                    var newConf = JSON.parse(conftxt);
 
-                        var fs = require('fs');
-                        fs.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', async function(){
-                            outputConsole.appendLine('wrote new site configuration');
-                            await zip.extractAllTo(pathSource, true);
-                            outputConsole.appendLine('unpacked site, please restart Sukoh.');
-                            dialog.showMessageBox(mainWindow, {
-                                type: 'info',
-                                message: "Site has been imported, please restart Sukoh.",
-                            });
+                    outputConsole.appendLine('Found a site with key ' + siteKey);
+                    newConf.source.path = pathSource;
 
+                    fssimple = require('fs');
+                    fssimple.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', async function(){
+                        outputConsole.appendLine('wrote new site configuration');
+                        await zip.extractAllTo(pathSource, true);
+
+                        dialog.showMessageBox(mainWindow, {
+                            type: 'info',
+                            message: "Site has been imported, Sukoh will now be restarted.",
                         });
-                    }
-                });
+
+                        app.relaunch()
+                        app.exit()
+
+                    });
+                }
+                else{
+                    dialog.showMessageBox(mainWindow, {
+                        type: 'warning',
+                        message: "Failed to import site. Invalid site file. 2",
+                    });
+                }
+
             }
             else{
                 dialog.showMessageBox(mainWindow, {
                     type: 'warning',
-                    message: "Failed to import site.",
+                    message: "Failed to import site. Invalid site file 1",
                 });
+                return;
             }
-
-
-
         }
     });
 
 }
 
-function exportSite() {
+function deleteSite() {
     let dir;
 
     const dialog = electron.dialog;
 
     if(global.currentSiteKey){
 
-        dir = dialog.showOpenDialog(mainWindow, {
-            properties: ['openDirectory']
-        }, async function (path) {
-            if (path) {
-                var newName = path+"/"+global.currentSiteKey+".hsite";
-                var zip = new AdmZip();
-                await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
-                await zip.addLocalFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'));
-                await zip.addLocalFolder(global.currentSitePath);
-                var willSendthis = zip.toBuffer();
-                await zip.writeZip(newName);
-                dialog.showMessageBox(mainWindow, {
-                    type: 'info',
-                    message: "Finished export. Check" + path+"/"+global.currentSiteKey+".hsite",
-                });
+        let options  = {
+            buttons: ["Yes","Cancel"],
+            message: "Do you really want to delete " + global.currentSiteKey
+        }
 
-            }
+        //Synchronous usage
+        let response = dialog.showMessageBox(options)
+        if(response === 1) return;
+        fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: "Site "+ global.currentSiteKey +" deleted. Please restart Sukoh",
         });
+
+        app.relaunch()
+        app.exit()
+    }
+    else{
+        dialog.showMessageBox(mainWindow, {
+            type: 'error',
+            message: "First, select a site to delete.",
+        });
+    }
+}
+
+function exportSite() {
+
+    const dialog = electron.dialog;
+
+    if(global.currentSiteKey){
+
+        const prompt = require('electron-prompt');
+        var newKey = "";
+        prompt({
+            title: 'Enter site key',
+            label: 'key:',
+            value: global.currentSiteKey,
+            inputAttrs: {
+                type: 'text',
+                required: true
+            },
+            type: 'input'
+        }, mainWindow)
+        .then((r) => {
+            if(r === null) {
+            } else {
+                newKey = r;
+                if(newKey!=""){
+
+                    let dir;
+
+                    dir = dialog.showOpenDialog(mainWindow, {
+                        properties: ['openDirectory']
+                    }, async function (path) {
+                        if (path) {
+                            fssimple = require('fs');
+                            fssimple.readFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'), 'utf8', async (err, conftxt) => {
+                                if (err) {
+                                    dialog.showMessageBox(mainWindow, {
+                                        type: 'warning',
+                                        message: "Failed to export. 2",
+                                    });
+                                    return;
+                                }
+
+                                var newName = path+"/"+newKey+".hsite";
+                                var zip = new AdmZip();
+
+                                var newConf = JSON.parse(conftxt);
+                                newConf.key = newKey;
+                                newConf.name = newKey;
+                                var newConfJson = JSON.stringify(newConf);
+
+                                await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
+                                await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
+
+                                await zip.addLocalFolder(global.currentSitePath);
+                                var willSendthis = zip.toBuffer();
+                                await zip.writeZip(newName);
+                                dialog.showMessageBox(mainWindow, {
+                                    type: 'info',
+                                    message: "Finished export. Check" + path+"/"+newKey+".hsite",
+                                });
+
+                                return;
+                            })
+                        }
+                    });
+                }
+                else {
+                    dialog.showMessageBox(mainWindow, {
+                        type: 'error',
+                        message: "A site key is required",
+                    });
+                }
+                console.log('result', r);
+            }
+        })
+        .catch(console.error);
+
     }
     else{
         dialog.showMessageBox(mainWindow, {
@@ -221,6 +318,12 @@ function createMainMenu(){
             label: 'Export website',
             click: async () => {
                 exportSite()
+            }
+        },
+        {
+            label: 'Delete Site',
+            click: async () => {
+                deleteSite()
             }
         },
         isMac ? { role: 'close' } : { role: 'quit' }
