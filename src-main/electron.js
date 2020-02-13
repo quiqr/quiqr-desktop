@@ -165,6 +165,12 @@ function deleteSite() {
         let response = dialog.showMessageBox(options)
         if(response === 1) return;
         fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
+
+        var rimraf = require("rimraf");
+        rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, function(){
+            console.log("rm done");
+        });
+
         dialog.showMessageBox(mainWindow, {
             type: 'info',
             message: "Site "+ global.currentSiteKey +" deleted. Please restart Sukoh",
