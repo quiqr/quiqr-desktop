@@ -6,7 +6,7 @@
     "email": "pim@lingewoud.nl"
   },
   "description": "A CMS for Hugo.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "disdeps": {
     "nodegit": "0.23.0"
@@ -94,7 +94,15 @@
       "entitlements": "build/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "entitlementsInherit": "build/entitlements.mac.plist"
-    }
+    },
+    "fileAssociations": [
+      {
+        "ext": "hsite",
+        "name": "Sukoh Site",
+        "role": "Editor",
+        "perMachine": true
+      }
+    ]
   },
   "browserslist": [
     ">0.2%",

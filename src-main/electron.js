@@ -77,47 +77,56 @@ function importSite() {
     const dialog = electron.dialog;
 
     dir = dialog.showOpenDialog(mainWindow, {
+        filters: [
+            { name: "Sukoh Sites", extensions: ["hsite"] },
+            { name: "Sukoh Themes", extensions: ["htheme"] }
+        ],
         properties: ['openFile']
+
     }, async function (file) {
         if (file) {
 
-            var path = require('path');
-            var filename = path.parse(file[0]).base;
-
-            console.log(file);
-            var siteKey = filename.slice(7, -4);
-
             var zip = new AdmZip(file[0]);
             var zipEntries = zip.getEntries();
+            var siteKey = zip.readAsText("sitekey")
+            console.log(siteKey);
+            if(siteKey){
 
-            var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
-            var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
-            var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
-            var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
-            await fs.ensureDir(pathSite);
-            await fs.ensureDir(pathSiteSources);
-            await fs.ensureDir(pathSource);
+                var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
+                var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
+                var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
+                var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
+                await fs.ensureDir(pathSite);
+                await fs.ensureDir(pathSiteSources);
+                await fs.ensureDir(pathSource);
 
-            zipEntries.forEach(function(zipEntry) {
-                //console.log(zipEntry.toString());
-                if (zipEntry.entryName == "config."+siteKey+".json") {
-                    var newConf = JSON.parse((zipEntry.getData().toString('utf8')));
-                    outputConsole.appendLine('Found a site with key ' + siteKey);
-                    newConf.source.path = pathSource;
+                zipEntries.forEach(function(zipEntry) {
+                    if (zipEntry.entryName == "config."+siteKey+".json") {
+                        var newConf = JSON.parse((zipEntry.getData().toString('utf8')));
+                        outputConsole.appendLine('Found a site with key ' + siteKey);
+                        newConf.source.path = pathSource;
 
-                    var fs = require('fs');
-                    fs.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', async function(){
-                        outputConsole.appendLine('wrote new site configuration');
-                        await zip.extractAllTo(pathSource, true);
-                        outputConsole.appendLine('unpacked site, please restart Sukoh.');
-                        dialog.showMessageBox(mainWindow, {
-                            type: 'info',
-                            message: "Unpacked site, please restart Sukoh.",
+                        var fs = require('fs');
+                        fs.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', async function(){
+                            outputConsole.appendLine('wrote new site configuration');
+                            await zip.extractAllTo(pathSource, true);
+                            outputConsole.appendLine('unpacked site, please restart Sukoh.');
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'info',
+                                message: "Site has been imported, please restart Sukoh.",
+                            });
+
                         });
+                    }
+                });
+            }
+            else{
+                dialog.showMessageBox(mainWindow, {
+                    type: 'warning',
+                    message: "Failed to import site.",
+                });
+            }
 
-                    });
-                }
-            });
 
 
         }
@@ -136,14 +145,16 @@ function exportSite() {
             properties: ['openDirectory']
         }, async function (path) {
             if (path) {
+                var newName = path+"/"+global.currentSiteKey+".hsite";
                 var zip = new AdmZip();
+                await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
                 await zip.addLocalFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'));
                 await zip.addLocalFolder(global.currentSitePath);
                 var willSendthis = zip.toBuffer();
-                await zip.writeZip(path+"/config."+global.currentSiteKey+".zip");
+                await zip.writeZip(newName);
                 dialog.showMessageBox(mainWindow, {
                     type: 'info',
-                    message: "Finished export. Check" + path+"/config."+global.currentSiteKey+".zip",
+                    message: "Finished export. Check" + path+"/"+global.currentSiteKey+".hsite",
                 });
 
             }
