@@ -1,4 +1,4 @@
-# Sukoh CMS
+# Sugo CMS
 
 A CMS for Hugo to run on your computer. **No hosting fees are required**.
 
