@@ -9,7 +9,7 @@ const toml = require('toml');
 /*::
 
 interface FormatProvider{
-    
+
     defaultExt(): string;
 
     matchContentFirstLine(line: string): bool;
@@ -73,19 +73,19 @@ ${content}`;
         else{
             json = data.substr(0,jsonEnd+1);
             md = data.substr(jsonEnd+1);
-        }            
-        
+        }
+
         let parsedData = this.parse(json);
         if(parsedData===undefined){
             return {};
         }
-        
+
         if (/\S/.test(md)) { //if have non thitespaces
             //remove the two first line breaks
             md = md.replace(/(\r?\n|\r)/,'').replace(/(\r?\n|\r)/,'');
             parsedData.mainContent = md;
         }
-        
+
         return parsedData;
     }
 }
@@ -132,7 +132,7 @@ ${content}`;
                 break;
             if(i===1)
                 tomlEnd = execResult.index;
-        }      
+        }
 
         let tomlStr, md;
 
@@ -143,19 +143,19 @@ ${content}`;
         else{
             tomlStr = data.substr(3,tomlEnd-3);
             md = data.substr(tomlEnd+3);
-        }            
-        
+        }
+
         let parsedData = this.parse(tomlStr);
         if(parsedData===undefined){
             return {};
         }
-        
+
         if (/\S/.test(md)) { //if have non thitespaces
             //remove the two first line breaks
             md = md.replace(/(\r?\n|\r)/,'').replace(/(\r?\n|\r)/,'');
             parsedData.mainContent = md;
         }
-        
+
         return parsedData;
     }
 }
@@ -202,7 +202,7 @@ ${content}`;
                 break;
             if(i===1)
                 yamlEnd = execResult.index;
-        }      
+        }
 
         let yamlStr, md;
 
@@ -213,25 +213,25 @@ ${content}`;
         else{
             yamlStr = data.substr(3,yamlEnd-3);
             md = data.substr(yamlEnd+3);
-        }            
-        
+        }
+
         let parsedData = this.parse(yamlStr);
         if(parsedData===undefined){
             return {};
         }
-        
+
         if (/\S/.test(md)) { //if have non thitespaces
             //remove the two first line breaks
             md = md.replace(/(\r?\n|\r)/,'').replace(/(\r?\n|\r)/,'');
             parsedData.mainContent = md;
         }
-        
+
         return parsedData;
     }
 }
 
 class FormatProviderResolver{
-     
+
      /*::
      _formats: {[key:string]: FormatProvider};
      _exts: Array<string>;
@@ -262,7 +262,7 @@ class FormatProviderResolver{
 
     _getFileLinePromise(filename/*: string*/, line_no/*: number*/) /*: Promise<?string>*/ {
         return new Promise((resolve, reject) =>{
-                        
+
             var stream = fs.createReadStream(filename, {
                 flags: 'r',
                 encoding: 'utf8',
@@ -270,7 +270,7 @@ class FormatProviderResolver{
                 mode: '0666',
                 bufferSize: 64 * 1024
             });
-        
+
             var fileData = '';
             stream.on('data', function(data){
                 fileData += data;
@@ -281,15 +281,15 @@ class FormatProviderResolver{
                     resolve(lines[+line_no]);
                 }
             });
-        
+
             stream.on('error', (e)=>{
                 reject(e);
             });
-        
+
             stream.on('end', function(){
                 resolve(undefined);
             });
-            
+
         });
     }
 

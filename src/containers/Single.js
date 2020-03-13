@@ -78,13 +78,23 @@ class Single extends React.Component<SingleProps,SingleState>{
         let single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
         if(single==null) return null;
 
+
+        var { siteKey, workspaceKey, singleKey } = this.props;
+
         return(<SukohForm
             debug={false}
             rootName={single.title}
             fields={single.fields}
             values={this.state.singleValues}
             onSave={this.handleSave.bind(this)}
-            plugins={{}}
+            plugins={{
+                openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
+                    return service.api.openFileDialogForCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions});
+                },
+                getBundleThumbnailSrc: function(targetPath){
+                    return service.api.getThumbnailForCollectionItemImage(siteKey,workspaceKey,"",singleKey, targetPath);
+                }
+            }}
             />
         );
     }

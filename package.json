@@ -6,7 +6,7 @@
     "email": "pim@lingewoud.nl"
   },
   "description": "A CMS for Hugo.",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "disdeps": {
     "nodegit": "0.23.0"

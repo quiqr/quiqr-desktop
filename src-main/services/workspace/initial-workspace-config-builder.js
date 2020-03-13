@@ -86,10 +86,10 @@ class InitialWorkspaceConfigBuilder{
     build(){
         let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
         let hugoConfigPath = glob.sync(hugoConfigExp)[0];
-        
+
         let formatProvider;
         if(hugoConfigPath==null){
-            hugoConfigPath = path.join(this.workspacePath, 'config.'+formatProviderResolver.getDefaultFormatExt());        
+            hugoConfigPath = path.join(this.workspacePath, 'config.'+formatProviderResolver.getDefaultFormatExt());
             formatProvider = formatProviderResolver.getDefaultFormat();
             let minimalConfigStr = formatProvider.dump({title:'New Site Title', baseURL: 'http://newsite.com'});
             fs.writeFileSync(hugoConfigPath, minimalConfigStr, 'utf-8');
@@ -99,12 +99,12 @@ class InitialWorkspaceConfigBuilder{
         }
         if(formatProvider==null)
             throw new Error('Could not resolve a FormatProvider.');
-         
+
         let hugoConfigData = formatProvider.parse(fs.readFileSync(hugoConfigPath, 'utf-8'));
 
         let relHugoConfigPath = path.relative(this.workspacePath, hugoConfigPath);
-        
-        let data = this.getConfig({configFile: relHugoConfigPath, ext: formatProvider.defaultExt(), hugover:'0.50', hugoConfigData});
+
+        let data = this.getConfig({configFile: relHugoConfigPath, ext: formatProvider.defaultExt(), hugover:'0.66.0', hugoConfigData});
 
         return {formatProvider, data};
     }

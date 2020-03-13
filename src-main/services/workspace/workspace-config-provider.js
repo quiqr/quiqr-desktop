@@ -4,8 +4,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 const formatProviderResolver = require('./../../format-provider-resolver');
-const WorkspaceConfigValidator = require('./workspace-config-validator'); 
-const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder'); 
+const WorkspaceConfigValidator = require('./workspace-config-validator');
+const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 const pathHelper = require('./../../path-helper');
 const { FileCacheToken } = require('./file-cache-token');
 
@@ -23,8 +23,8 @@ class WorkspaceConfigProvider{
         this.cache = {};
     }
 
-    async getConfig(workspacePath/*: string*/, workspaceKey/*: string*/)/*: Promise<WorkspaceConfig & { path: string, key: string }>*/{       
-        
+    async getConfig(workspacePath/*: string*/, workspaceKey/*: string*/)/*: Promise<WorkspaceConfig & { path: string, key: string }>*/{
+
         let filePath = this._getFilePath(workspacePath);
         let config/*: WorkspaceConfig*/;
 
@@ -37,13 +37,13 @@ class WorkspaceConfigProvider{
                     return cached.config;
                 }
             }
-            
+
             let config = this._loadConfigurationsData(filePath, workspaceKey);
             config.path = workspacePath;
             config.key = workspaceKey;
             this.cache[filePath] = { token, config }
             return config;
-            
+
         }
         else{
             // need to build default config and update cache
@@ -68,21 +68,21 @@ class WorkspaceConfigProvider{
         let {data, formatProvider} = configBuilder.build();
         let filePath = path.join(workspacePath,'sukoh.'+formatProvider.defaultExt());
         fs.writeFileSync(
-            filePath, 
+            filePath,
             formatProvider.dump(data)
         );
         return { config: data, path: filePath };
     }
 
     _loadConfigurationsData(filePath/*: string*/, workspaceKey/*: string*/)/*: WorkspaceConfig*/{
-               
+
         let strData = fs.readFileSync(filePath,'utf8');
         let formatProvider = formatProviderResolver.resolveForFilePath(filePath);
         if(formatProvider==null){
             formatProvider = formatProviderResolver.getDefaultFormat();
         }
         let returnData = formatProvider.parse(strData);
-        
+
         let validator = new WorkspaceConfigValidator();
         let result = validator.validate(returnData);
         if(result)

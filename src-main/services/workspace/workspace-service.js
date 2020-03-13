@@ -105,6 +105,22 @@ class WorkspaceService{
         }
     }
 
+    async getSingleFolder(singleKey /* : string */){
+        let config = await this.getConfigurationsData();
+        let single = config.singles.find(x => x.key === singleKey);
+        if(single==null)throw new Error('Could not find single.');
+        let filePath = path.join(this.workspacePath, single.file);
+
+        let directory = path.dirname(filePath);
+
+        if(fs.existsSync(directory)){
+            return directory;
+        }
+        else{
+            return '';
+        }
+    }
+
     //Update the single
     async updateSingle(singleKey /* : string */, document /* : any */ ){
         let config = await this.getConfigurationsData();
@@ -335,11 +351,22 @@ class WorkspaceService{
 
     async copyFilesIntoCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */, targetPath /* : string */, files /* : Array<string> */){
         let config = await this.getConfigurationsData();
-        let collection = config.collections.find(x => x.key === collectionKey);
-        if(collection==null)
-            throw new Error('Could not find collection.');
-        let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^\/]+$/,'') , targetPath);
-        let filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
+
+        let filesBasePath = ""
+        if(collectionKey == ""){
+            filesBasePath =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+
+        }
+        else {
+
+            let collection = config.collections.find(x => x.key === collectionKey);
+            if(collection==null)
+                throw new Error('Could not find collection.');
+
+            let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^\/]+$/,'') , targetPath);
+            filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
+
+        }
 
         for(let i =0; i < files.length; i++){
             let file = files[i]
@@ -371,18 +398,32 @@ class WorkspaceService{
     async getThumbnailForCollectionItemImage(collectionKey /* : string */, collectionItemKey /* : string */, targetPath /* : string */){
 
         let config = await this.getConfigurationsData();
-        let collection = config.collections.find(x => x.key === collectionKey);
-        if(collection==null)
-            throw new Error('Could not find collection.');
+
+        let src;
+        let folder;
         let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
-        let src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
+        if(collectionKey == ""){
+
+            src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+            folder = path.basename(await this.getSingleFolder(collectionItemKey));
+        }
+        else {
+            let collection = config.collections.find(x => x.key === collectionKey);
+            folder = collection.folder;
+
+            if(collection==null)
+                throw new Error('Could not find collection.');
+
+            //    itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
+            src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
+        }
 
         let srcExists = await this.existsPromise(src);
         if(!srcExists){
             return 'NOT_FOUND';
         }
 
-        let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', collection.folder, itemPath, targetPath);
+        let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
         let thumbSrcExists = await this.existsPromise(thumbSrc);
         if(!thumbSrcExists){
             try{
