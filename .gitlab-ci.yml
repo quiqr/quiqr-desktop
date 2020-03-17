@@ -1,10 +1,17 @@
 stages:
+  - warmup
   - build
-  - deploya
+  - deploy
 
 cache:
   paths:
     - node_modules/
+
+warmup:
+  stage: warmup
+  script: ls
+  tags:
+    - macos
 
 #pages:
 #  stage: deploy
