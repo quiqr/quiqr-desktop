@@ -1,0 +1,37 @@
+stages:
+  - build
+  - deploya
+
+cache:
+  paths:
+    - node_modules/
+
+#pages:
+#  stage: deploy
+#  script:
+#    - mkdir .public
+#    - cp -r packages/app/desktop/build/installers/* .public
+#    - mv .public public
+#  dependencies:
+#    - build
+#  artifacts:
+#    paths:
+#      - public/*-mac.zip
+#      - public/*.exe
+#  only:
+#    - master
+
+build:
+#  image: 4tqrgqe5yrgfd/electron
+  stage: build
+  script:
+    - npm i
+    - npm run dist-mac
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - dist
+  tags:
+    - macos
+#  only:
+#    - master
