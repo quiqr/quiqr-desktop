@@ -6,11 +6,8 @@
     "email": "pim@lingewoud.nl"
   },
   "description": "A CMS for Hugo.",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": true,
-  "disdeps": {
-    "nodegit": "0.23.0"
-  },
   "dependencies": {
     "7zip-bin": "3.1.0",
     "adm-zip": "0.4.13",
@@ -18,6 +15,7 @@
     "electron-is-dev": "^1.1.0",
     "electron-prompt": "^1.5.1",
     "electron-unhandled": "^1.1.0",
+    "electron-root-path": "^1.0.16",
     "fs-extra": "5.0.0",
     "ftp-deploy": "2.3.6",
     "glob": "7.1.2",
@@ -87,6 +85,15 @@
     "directories": {
       "buildResources": "public"
     },
+    "extraFiles": [
+      {
+        "from": "resources/${os}",
+        "to": "Resources/bin",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "win": {
       "icon": "public/icon"
     },

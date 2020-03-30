@@ -1,10 +1,13 @@
 # CHANGELOG
 
-# versie de sukoh Next - Jeanette
+## versie 0.2.5 - Lize
+- github publisher now uses embgit (https://github.com/mipmip/embgit)
+
+## versie 0.2.4
 - afbeeldingen mogelijk maken in singles
 - standaard hugo versie bij nieuwe site 0.66.0
 
-# versie de sukoh 0.2.3 - Andreas
+## versie de sukoh 0.2.3 - Andreas
 - geen zip extensie
 - probleem met starten
 - betere afhandeling site naam import export
@@ -14,7 +17,7 @@
 - meer feedback na exporten
 - pas site key aan
 
-# versie de sukoh 0.2.2 - Andreas
+## versie de sukoh 0.2.2 - Andreas
 
 - code signature
 - git publisher gebaseerd op key
@@ -24,11 +27,11 @@
 - git
 - betere bestandsstructuur
 
-# versie de sukoh 0.2.1 - Andreas
+## versie de sukoh 0.2.1 - Andreas
 - rename to sokuh
 - start met versioning
 
-# versie de downward spiral 0.1 - Laurens
+## versie de downward spiral 0.1 - Laurens
 
 ## Hokus
 - start
