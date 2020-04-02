@@ -1,7 +1,8 @@
 //@flow
 
 import React from 'react';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+import type {FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import FormItemWrapper from './shared/FormItemWrapper';
 import MenuItem from 'material-ui/MenuItem';
@@ -20,7 +21,7 @@ type SelectDynamicField = {
 }
 
 type SelectDynamicState = {
-    
+
 }
 
 class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
@@ -49,7 +50,7 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
     handleChange = (e: any, index: number, payload: Array<string>)=>{
         let {context} = this.props;
         let field = context.node.field;
-        
+
         if(field.multiple===true){
             context.setValue(payload)
         }
@@ -59,16 +60,16 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
         }
     }
 
-    renderComponent(){       
-        
+    renderComponent(){
+
         let {context} = this.props;
         let {node, currentPath, parentPath} = context;
         let {field} = node;
-                
+
         if(currentPath!==parentPath){
             return (null);
         }
-        
+
         let iconButtons = [];
         if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 

@@ -4,7 +4,9 @@ import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import Tip from '../../Tip';
 import Toggle from 'material-ui/Toggle';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+import type { FormStateBuilder } from '../../HoForm';
+
 import { BaseDynamic } from '../../HoForm';
 
 type ToggleDynamicField = {
@@ -38,11 +40,11 @@ class ToggleDynamic extends BaseDynamic<ToggleDynamicField,ToggleDynamicFieldSta
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
-        
+
         if(currentPath!==context.parentPath){
             return (null);
         }
-        
+
         let iconButtons = [];
         if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 

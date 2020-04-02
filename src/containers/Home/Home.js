@@ -1,20 +1,20 @@
 //@flow
 
-import invariant from 'assert';
+//import invariant from 'assert';
 import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import Paper from 'material-ui/Paper';
+//import RaisedButton from 'material-ui/RaisedButton';
+//import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 import IconAdd from 'material-ui/svg-icons/content/add';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
-import {Accordion,AccordionItem} from './../../components/Accordion';
-import DangerButton from './../../components/DangerButton';
+//import {Accordion,AccordionItem} from './../../components/Accordion';
+//import DangerButton from './../../components/DangerButton';
 import TextField from 'material-ui/TextField';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, InfoLine, InfoBlock, MessageBlock } from './components/shared';
@@ -27,7 +27,7 @@ import Spinner from './../../components/Spinner';
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
 //$FlowFixMe
-const Fragment = React.Fragment;
+//const Fragment = React.Fragment;
 
 const styles = {
     container:{
@@ -156,7 +156,9 @@ class Home extends React.Component<HomeProps, HomeState>{
                     <FlatButton
                         style={{minWidth:'40px'}}
                         icon={<IconFileFolder />}
-                        onClick={()=>{ service.api.openFileExplorer(site.configPath.replace(/(\\|\/)[^\/\\]+$/,'')) }}
+                        //onClick={()=>{ service.api.openFileExplorer(site.configPath.replace(/(\\|\/)[^\/\\]+$/,'')) }}
+                        onClick={()=>{ service.api.openFileExplorer(site.configPath.replace(/(\\|\/)[^\\]+$/,'')) }}
+
                     />
                 </InfoLine>
             ): ( null ) }
@@ -178,8 +180,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         let select = (
             activeWorkspaceKey==null ||
             activeSiteKey==null ||
-            activeWorkspaceKey!=workspace.key ||
-            activeSiteKey!=siteKey
+            //activeWorkspaceKey!=workspace.key ||
+            activeWorkspaceKey!==workspace.key ||
+            //activeSiteKey!=siteKey
+            activeSiteKey!==siteKey
         );
 
         if(select){
@@ -260,7 +264,9 @@ class Home extends React.Component<HomeProps, HomeState>{
     render(){
 
         let { siteKey } = this.props;
-        let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        //let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+
 
         let _configurations = ((configurations: any): Configurations);
 

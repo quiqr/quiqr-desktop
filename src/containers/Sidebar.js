@@ -1,16 +1,16 @@
 //@flow
 
 import React from 'react';
-import { Route } from 'react-router-dom'
+//import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import IconActionList from 'material-ui/svg-icons/action/list';
-import IconActionSetting from 'material-ui/svg-icons/action/settings';
-import IconPlay from 'material-ui/svg-icons/av/play-arrow';
+//import IconActionSetting from 'material-ui/svg-icons/action/settings';
+//import IconPlay from 'material-ui/svg-icons/av/play-arrow';
 import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 import IconMenu from 'material-ui/svg-icons/navigation/menu';
-import IconMore from 'material-ui/svg-icons/navigation/more-vert';
-import IconFileFolder from 'material-ui/svg-icons/file/folder';
+//import IconMore from 'material-ui/svg-icons/navigation/more-vert';
+//import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import Border from './../components/Border';
 
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -19,8 +19,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { FlatButton, IconButton } from 'material-ui';
 
 const Fragment = React.Fragment;
-const translucentColor = 'RGBA(255,255,255,.2)';
-const translucentColorSubtle = 'RGBA(255,255,255,.05)';
+const translucentColor = 'RGBA(255,255,0,1)';
+const translucentColorSubtle = 'RGBA(255,0,255,1)';
 
 let MenuBorder = ({ children }) => {
   return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>

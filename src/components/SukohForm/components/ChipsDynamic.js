@@ -3,7 +3,8 @@
 import React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
 import Chips from '../../Chips';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 type ChipsDynamicField = {
@@ -33,7 +34,7 @@ class ChipsDynamic extends BaseDynamic<ChipsDynamicField, ChipsDynamicState> {
     deepEqual(array: Array<string>, otherArray: Array<string>){
         if(array.length !== otherArray.length)
             return false;
-        
+
         for(let i = 0; i < array.length; i++){
             if(array[i] !== otherArray[i])
                 return false;
@@ -66,15 +67,15 @@ class ChipsDynamic extends BaseDynamic<ChipsDynamicField, ChipsDynamicState> {
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
-        
+
         if(currentPath!==context.parentPath){
             return (null);
         }
-        
+
         return (
         <DefaultWrapper>
             <Chips

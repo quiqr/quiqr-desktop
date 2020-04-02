@@ -61,7 +61,7 @@ class MakePageBundleItemKeyDialog extends React.Component<MakePageBundleItemKeyD
                 {this.state.valid? undefined : <p>Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?</p>}
 
                 { busy? <Spinner /> : undefined }
-                
+
             </Dialog>
         );
     }
@@ -87,7 +87,7 @@ class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps,Delet
             valid: null
         }
     }
-    
+
     handleClose(){
         if(this.props.handleClose && !this.props.busy)
             this.props.handleClose();
@@ -115,7 +115,7 @@ class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps,Delet
                 {this.state.valid? undefined : <p>Do you really want to delete the item <b>"{itemLabel}"</b>?</p>}
 
                 { busy? <Spinner /> : undefined }
-                
+
             </Dialog>
         );
     }
@@ -194,7 +194,7 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
                 {this.state.valid? undefined : <p>Allowed characters: alphanumeric, dash, underline and slash.</p>}
 
                 { busy? <Spinner /> : undefined }
-                
+
             </Dialog>
         );
     }
@@ -227,14 +227,14 @@ class CollectionListItems extends React.PureComponent<{
     render(){
         let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick, onMakePageBundleItemClick } = this.props;
         return (<React.Fragment>
-            { filteredItems.map((item, index) => {  
+            { filteredItems.map((item, index) => {
 
                 let iconButtonElement = (
                     <IconButton touch={true}>
                         <MoreVertIcon/>
                     </IconButton>
                 );
-                
+
                 let rightIconMenu = (
                     <IconMenu iconButtonElement={iconButtonElement}>
                         <MenuItem onClick={()=> onRenameItemClick(item) }>Rename</MenuItem>
@@ -364,7 +364,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     renameCollectionItem(itemKey : string, itemOldKey: string){
         let { siteKey, workspaceKey, collectionKey } = this.props;
         if(this.state.view==null)return;
-        let view = this.state.view;
+        //let view = this.state.view;
         service.api.renameCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
             .then((result)=>{
                 if(result.renamed){
@@ -407,11 +407,11 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
         let trunked = false;
         let dirs = {'':true};
         let filteredItems: Array<any> = (items||[]).filter((item)=> {
-            
+
             let parts = item.label.split('/');
             let c = '';
             for(let i = 0; i < parts.length-1; i++){ c = c+parts[i] + '/'; dirs[c] = true; }
-            
+
             return item.key.startsWith(this.state.filter);
         });
         if(filteredItems.length > MAX_RECORDS){
@@ -454,8 +454,9 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     }
 
     render(){
-        
-        let { siteKey, workspaceKey, collectionKey } = this.props;
+
+        //let { siteKey, workspaceKey, collectionKey } = this.props;
+        let { collectionKey } = this.props;
         let { filteredItems, trunked } = this.state;
         let dialog = undefined;
 
@@ -503,7 +504,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
             return (<Spinner />);
         }
 
-        let collection = this.state.selectedWorkspaceDetails.collections.find(x => x.key == collectionKey);
+        let collection = this.state.selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
         if(collection==null)
             return null;
 
@@ -547,11 +548,11 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                         ) : (null) }
                     </List>
                 </Paper>
-                    
+
                 { dialog }
             </div>
             );
-        }} />);        
+        }} />);
     }
 }
 

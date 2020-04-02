@@ -45,22 +45,22 @@ class Tip extends Component<TipProps, TipState> {
             clearTimeout(this.closeTimeout);
 
         this.setState({visible:true});
-        document.addEventListener('click', this.closeTipAndUnbind);       
+        document.addEventListener('click', this.closeTipAndUnbind);
     }
 
     handleMouseEnter(e: any){
         if(this.closeTimeout)
             clearTimeout(this.closeTimeout);
-          
+
         if(!this.state.visible){
             this.setState({visible:true});
         }
     }
-      
+
     handleMouseLeave(e: any){
         if(this.closeTimeout)
             clearTimeout(this.closeTimeout);
-    
+
         this.closeTimeout = setTimeout(()=>{
             if(this.state.visible){
                 this.closeTipAndUnbind();
@@ -76,7 +76,7 @@ class Tip extends Component<TipProps, TipState> {
         } = this.props;
 
         let tip = undefined;
-        let alignLeft = (this.props.horizontalAlign||'left')=='left';
+        let alignLeft = (this.props.horizontalAlign||'left')==='left';
 
         if(markdown){
 
@@ -146,7 +146,7 @@ class Tip extends Component<TipProps, TipState> {
                 { toggle }
             </span>
         );
-        
+
     }
 }
 

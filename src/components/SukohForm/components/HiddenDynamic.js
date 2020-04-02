@@ -1,7 +1,7 @@
 //@flow
 
 import { BaseDynamic } from '../../HoForm';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 
 type HiddenDynamicField = {
     type: string,

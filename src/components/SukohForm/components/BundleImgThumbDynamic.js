@@ -1,9 +1,10 @@
 //@flow
 
 import React from 'react';
-import Border from '../../Border';
+//import Border from '../../Border';
 import IconBroken from 'material-ui/svg-icons/image/broken-image';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import Spinner from '../../Spinner';
 
@@ -28,8 +29,9 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
     }
 
     renderComponent(){
-        let {node, form} = this.props.context;
-        let {field, state} = node;
+        //let {node, form} = this.props.context;
+        //let {node} = this.props.context;
+        //let {field, state} = node;
         return (
         <div style={{ width:'64px', height:'64px', marginBottom:'16px', overflow:'hidden', background:'#16062f' }}>
             {

@@ -1,8 +1,10 @@
 //@flow
 
 import React from 'react';
-import dynamicComponentUtils from './shared/dynamic-component-utils';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
+//import dynamicComponentUtils from './shared/dynamic-component-utils';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
+import type { DynamicFormNode, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
+
 import { BaseDynamic } from '../../HoForm';
 
 type SectionDynamicField = {
@@ -35,7 +37,7 @@ class SectionDynamic extends BaseDynamic<SectionDynamicField, SectionDynamicStat
     }
 
     normalizeState({state, field, stateBuilder} : { state: any, field: SectionDynamicField, stateBuilder: FormStateBuilder }){
-        stateBuilder.setLevelState(state, field.fields);        
+        stateBuilder.setLevelState(state, field.fields);
     }
 
     getType(){
@@ -43,7 +45,7 @@ class SectionDynamic extends BaseDynamic<SectionDynamicField, SectionDynamicStat
     }
 
     buildBreadcumbFragment(currentNode: DynamicFormNode<SectionDynamicField>, items: Array<{label: string, node:?DynamicFormNode<FieldBase>}>): void{
-        
+
     }
 
     buildPathFragment(node: DynamicFormNode<SectionDynamicField>, nodeLevel: number, nodes: Array<DynamicFormNode<FieldBase>>): ?string {
@@ -51,11 +53,11 @@ class SectionDynamic extends BaseDynamic<SectionDynamicField, SectionDynamicStat
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath, nodePath, parentPath} = context;
         let {field} = node;
-        
+
         if(currentPath===parentPath){
             var state = node.state;
             var level = context.renderLevel({
@@ -65,11 +67,11 @@ class SectionDynamic extends BaseDynamic<SectionDynamicField, SectionDynamicStat
             });
 
             return (<React.Fragment>
-                {field.title?<div style={{padding:'16px 0'}}>{field.title}</div>:undefined} 
+                {field.title?<div style={{padding:'16px 0'}}>{field.title}</div>:undefined}
                 <div style={{padding:'16px 0px 0px 16px', marginBottom:'16px', overflow:'auto', borderLeft: 'solid 10px #eee'}}>{level}</div>
             </React.Fragment>);
         }
-        
+
         if(currentPath.startsWith(nodePath)){
             return context.renderLevel({
                 field,

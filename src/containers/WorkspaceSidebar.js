@@ -3,24 +3,24 @@
 import React from 'react';
 import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
-import { FlatButton, Subheader } from 'material-ui';
-import IconActionList from 'material-ui/svg-icons/action/list';
+//import { FlatButton, Subheader } from 'material-ui';
+//import IconActionList from 'material-ui/svg-icons/action/list';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
-import IconPlay from 'material-ui/svg-icons/av/play-arrow';
-import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
-import IconMenu from 'material-ui/svg-icons/navigation/menu';
-import IconMore from 'material-ui/svg-icons/navigation/more-vert';
-import IconFileFolder from 'material-ui/svg-icons/file/folder';
-import IconOpenInBrowser from 'material-ui/svg-icons/action/open-in-browser';
+//import IconPlay from 'material-ui/svg-icons/av/play-arrow';
+//import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
+//import IconMenu from 'material-ui/svg-icons/navigation/menu';
+//import IconMore from 'material-ui/svg-icons/navigation/more-vert';
+//import IconFileFolder from 'material-ui/svg-icons/file/folder';
+//import IconOpenInBrowser from 'material-ui/svg-icons/action/open-in-browser';
 import Border from './../components/Border';
-import { TriggerWithOptions } from './../components/TriggerWithOptions';
+//import { TriggerWithOptions } from './../components/TriggerWithOptions';
 import service from './../services/service'
 import type { SiteConfig, WorkspaceConfig } from './../types'
 import * as Sidebar from './Sidebar';
 
-const Fragment = React.Fragment;
+//const Fragment = React.Fragment;
 const translucentColor = 'RGBA(255,255,255,.2)';
-const translucentColorSubtle = 'RGBA(255,255,255,.05)';
+//const translucentColorSubtle = 'RGBA(255,255,255,.05)';
 
 let MenuBorder = ({ children }) => {
   return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
@@ -43,7 +43,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       workspaceConfig,
     } = this.props;
 
-    let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
+  //  let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
     return (<MenuBorder>
     <List style={{padding: 0}}>
@@ -63,6 +63,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     { siteConfig!=null && workspaceConfig!=null ? (
     <div style={{display:'flex'}}>
 
+      {/*
       <TriggerWithOptions
         triggerType={FlatButton}
         triggerProps={{
@@ -77,7 +78,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       />
 
 
-       
+       {/*
       <FlatButton
         onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
         style={{flex:1, minWidth:40}}
@@ -86,7 +87,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
         style={{flex:1, minWidth:40}}
         icon={<IconOpenInBrowser color="white" style={{opacity:.2}} />} />
-
+        */}
 
       {/*
       <FlatButton
@@ -99,12 +100,12 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
   }
 }
 
-type ListItemCustomProps = {
-  label : string,
-  pathname: string,
-  history : any,
-  location: {pathname:string}
-};
+// type ListItemCustomProps = {
+//   label : string,
+//   pathname: string,
+//   history : any,
+//   location: {pathname:string}
+// };
 
 type WorkspaceSidebarProps = {
   siteKey : ?string,

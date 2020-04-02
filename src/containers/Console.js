@@ -1,7 +1,7 @@
 import React from 'react';
 import Snackbar from 'material-ui/Snackbar';
 import { consoleService, snackMessageService } from '../services/ui-service';
-import ConsoleIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
+//import ConsoleIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 
 const consoleStyle ={
   pre: {
@@ -39,24 +39,24 @@ class ConsoleOutput extends React.Component{
 
   handleMouseEnter(e){
     return;
-    if(this.closeTimeout)
-      clearTimeout(this.closeTimeout);
-
-    if(consoleService.getConsoleIsHidden()){
-      consoleService.toggleConsoleVisibility();
-    }
+   // if(this.closeTimeout) {
+   //   clearTimeout(this.closeTimeout);
+   //
+   // if(consoleService.getConsoleIsHidden()){
+   //    consoleService.toggleConsoleVisibility();
+   //  }
   }
 
   handleMouseLeave(e){
     return;
-    if(this.closeTimeout)
-      clearTimeout(this.closeTimeout);
-
-      this.closeTimeout = setTimeout(()=>{
-        if(!consoleService.getConsoleIsHidden()){
-          consoleService.toggleConsoleVisibility();
-        }
-      }, 10);
+    // if(this.closeTimeout)
+    //   clearTimeout(this.closeTimeout);
+    //
+    //   this.closeTimeout = setTimeout(()=>{
+    //     if(!consoleService.getConsoleIsHidden()){
+    //       consoleService.toggleConsoleVisibility();
+    //     }
+    //   }, 10);
   }
 
   render(){

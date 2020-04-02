@@ -10,7 +10,7 @@ import Paper from 'material-ui/Paper';
 import MarkdownIt from 'markdown-it';
 import { AceEditor } from './AceEditor'
 
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../../HoForm';
 import { BaseDynamic } from '../../../HoForm';
 
 
@@ -31,18 +31,18 @@ type AceDynamicState = {
     preview: ?string
 }
 
-function debounce(fn: ()=>void, delay: number) {
-    var timer: ?TimeoutID = null;
-    return function () {
-        let context = this;
-        let args = arguments;
-        if(timer!=null)
-            clearTimeout(timer);
-        timer = setTimeout(function () {
-        fn.apply(context, args);
-        }, delay);
-    };
-}
+// function debounce(fn: ()=>void, delay: number) {
+//     var timer: ?TimeoutID = null;
+//     return function () {
+//         let context = this;
+//         let args = arguments;
+//         if(timer!=null)
+//             clearTimeout(timer);
+//         timer = setTimeout(function () {
+//         fn.apply(context, args);
+//         }, delay);
+//     };
+// }
 
 class Debounce{
 
@@ -57,7 +57,7 @@ class Debounce{
         this.cancelNext();
         this._timeoutID = setTimeout(action, this._time);
     }
-    
+
     cancelNext(){
         if(this._timeoutID) clearTimeout(this._timeoutID);
     }
@@ -65,7 +65,7 @@ class Debounce{
 
 
 class AceDynamic extends BaseDynamic<AceDynamicField,AceDynamicState> {
-    
+
     _updateDebounce: Debounce;
 
     constructor(props: ComponentProps<AceDynamicField>){
@@ -120,11 +120,11 @@ class AceDynamic extends BaseDynamic<AceDynamicField,AceDynamicState> {
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath, nodePath} = context;
         let {field} = node;
-        
+
         if(!nodePath.startsWith(currentPath)){
             return (null);
         }
@@ -132,7 +132,7 @@ class AceDynamic extends BaseDynamic<AceDynamicField,AceDynamicState> {
         let isFullScreen = this.isFullScreen();
         let height = isFullScreen ? 'calc(100vh - 140px)':'300px';
         let MaximixeIcon = isFullScreen ? IconFullscreenExit : IconFullscreen;
-        
+
         let centerColItems = [];
 
         if(field.tip){
@@ -146,7 +146,7 @@ class AceDynamic extends BaseDynamic<AceDynamicField,AceDynamicState> {
                 isFullScreen? this.exitFullScreen() : this.goFullScreen();
             } }
         ><MaximixeIcon /></IconButton>);
-        
+
         let lightTheme = field.lightTheme===true;
 
         return (

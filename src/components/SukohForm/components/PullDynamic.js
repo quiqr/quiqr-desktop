@@ -1,8 +1,9 @@
 // @flow
 
 import { BaseDynamic } from '../../HoForm';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FieldsExtender, FormStateBuilder } from '../../HoForm';
-import dynamicComponentUtils from './shared/dynamic-component-utils';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FieldsExtender, FormStateBuilder } from '../../HoForm';
+import type { DynamicFormNode, FieldsExtender, FormStateBuilder } from '../../HoForm';
+//import dynamicComponentUtils from './shared/dynamic-component-utils';
 
 type PullDynamicField = {
     type: string,
@@ -13,7 +14,7 @@ type PullDynamicField = {
 }
 
 type PullDynamicState = {
-    
+
 }
 
 class PullDynamic extends BaseDynamic<PullDynamicField, PullDynamicState> {
@@ -22,7 +23,7 @@ class PullDynamic extends BaseDynamic<PullDynamicField, PullDynamicState> {
         let key = field.group||field.key;
         if(parentState[key]===undefined)
             parentState[key]={};
-        return parentState[key];        
+        return parentState[key];
     }
 
     extendField(field: PullDynamicField, fieldExtender: FieldsExtender){
@@ -30,7 +31,7 @@ class PullDynamic extends BaseDynamic<PullDynamicField, PullDynamicState> {
     }
 
     normalizeState({state, field, stateBuilder} : { state: any, field: PullDynamicField, stateBuilder: FormStateBuilder }){
-        stateBuilder.setLevelState(state, field.fields);        
+        stateBuilder.setLevelState(state, field.fields);
     }
 
     getType(){
@@ -38,19 +39,19 @@ class PullDynamic extends BaseDynamic<PullDynamicField, PullDynamicState> {
     }
 
     buildBreadcumbFragment(node : any, buttons : Array<{label:string, node:any}>){
-        
+
     }
 
     buildPathFragment(node: DynamicFormNode<PullDynamicField>){
         return undefined;
     }
 
-    renderComponent(){      
-         
+    renderComponent(){
+
         let {context} = this.props;
         let {node, currentPath, nodePath} = context;
         let {field} = node;
-               
+
         if(currentPath.startsWith(nodePath)){
             var state = node.state;
             return context.renderLevel({ field, state, parent: node });

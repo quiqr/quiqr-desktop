@@ -27,7 +27,7 @@ const SITE_SOURCES = [
     { key:'aws-s3', title:'AWS S3', enabled: false, form: NotImplementedSourceForm, description:'' }
 ];
 
-const OUTPUT_FORMATS = ['JSON','YAML','TOML'];
+//const OUTPUT_FORMATS = ['JSON','YAML','TOML'];
 
 const INITIAL_STATE = {
     formIsValid: false,
@@ -37,7 +37,7 @@ const INITIAL_STATE = {
 };
 
 export default class CreateSiteDialog extends React.Component<CreateSiteDialogProps,CreateSiteDialogState>{
-    
+
     constructor(props: CreateSiteDialogProps){
         super(props);
 
@@ -80,7 +80,7 @@ export default class CreateSiteDialog extends React.Component<CreateSiteDialogPr
     validate(){
         let { formIsValid, sourceIndex, key } = this.state;
         let source = SITE_SOURCES[sourceIndex];
-    
+
         if(source==null || !source.enabled)
             return false;
         if(!formIsValid)
@@ -89,7 +89,7 @@ export default class CreateSiteDialog extends React.Component<CreateSiteDialogPr
             return false;
         }
         return true;
-        
+
     }
 
     render(){
@@ -98,7 +98,7 @@ export default class CreateSiteDialog extends React.Component<CreateSiteDialogPr
         let { model, sourceIndex, key } = this.state;
         let source = SITE_SOURCES[sourceIndex];
         let SourceForm = source ? source.form : null;
-        
+
         let valid = this.validate();
 
         const actions = [

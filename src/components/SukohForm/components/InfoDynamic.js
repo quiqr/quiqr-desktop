@@ -3,7 +3,7 @@
 import * as React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
 import { BaseDynamic } from '../../HoForm';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 import MarkdownIt from 'markdown-it';
 const md = new MarkdownIt({html:true});
 
@@ -35,13 +35,13 @@ type InfoDynamicField = {
 }
 
 type InfoDynamicState = {
-    
+
 }
 
 class InfoDynamic extends BaseDynamic<InfoDynamicField, InfoDynamicState> {
 
     normalizeState({state, field}: {state: any, field: InfoDynamicField}){
-        
+
     }
 
     getType(){
@@ -49,7 +49,7 @@ class InfoDynamic extends BaseDynamic<InfoDynamicField, InfoDynamicState> {
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath, parentPath} = context;
         let {field} = node;
@@ -59,7 +59,7 @@ class InfoDynamic extends BaseDynamic<InfoDynamicField, InfoDynamicState> {
         }
 
         let style = {padding:'10px 20px', borderRadius: '2px', lineHeight: field.lineHeight};
-        
+
         let infoStyle = infoStyles['default'];
         if(field.theme && infoStyles[field.theme])
             infoStyle = infoStyles[field.theme];
@@ -67,7 +67,7 @@ class InfoDynamic extends BaseDynamic<InfoDynamicField, InfoDynamicState> {
         let infoSizeStyle = infoSizeStyles['default'];
         if(field.size && infoSizeStyles[field.size])
             infoSizeStyle = Object.assign(style, infoSizeStyles[field.size]);
-        
+
         style = Object.assign({}, style, infoStyle, infoSizeStyle);
 
         return (<DefaultWrapper key={field.key}>

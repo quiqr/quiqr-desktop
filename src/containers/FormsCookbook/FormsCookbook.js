@@ -79,7 +79,7 @@ export class FormsCookbook extends React.Component<FormsCookbookProps, FormsCook
                                 return Promise.resolve([`${targetPath}/some-file.${extensions[0]||'png'}`]);
                             },
                             getBundleThumbnailSrc: function(targetPath){
-                                return Promise.resolve('data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4\/\/8\/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
+                                return Promise.resolve('data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P48w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
                             }
                         }}
                     />
@@ -105,7 +105,7 @@ export class FormsCookbook extends React.Component<FormsCookbookProps, FormsCook
             )
         }
         return (<p>Sample not found.</p>);
-        
+
     }
-    
+
 }

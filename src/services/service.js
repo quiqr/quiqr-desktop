@@ -17,7 +17,7 @@ class Service extends BaseService {
     api : api.API;
     _configurations : ?Configurations;
     _configurationsPromise : ?Promise<Configurations>;
-    _siteAndWorkspaceDataPromise : ?Promise<any>;   
+    _siteAndWorkspaceDataPromise : ?Promise<any>;
 
     constructor(){
         super();
@@ -46,22 +46,22 @@ class Service extends BaseService {
     }
 
     getSiteAndWorkspaceData(siteKey: string, workspaceKey: string): Promise<SiteAndWorkspaceData> {
-        
+
         var bundle = {};
 
         if(this._siteAndWorkspaceDataPromise == null){
-            
-            let errors = [];
+
+            //let errors = [];
             this._siteAndWorkspaceDataPromise = this.getConfigurations()
             .then((configurations)=>{
                 bundle.configurations = configurations;
                 //$FlowFixMe
                 bundle.site = configurations.sites.find(site => { return site.key === siteKey });
                 //$FlowFixMe
-                return this.api.listWorkspaces(siteKey);        
+                return this.api.listWorkspaces(siteKey);
             }).then((workspaces)=>{
                 bundle.siteWorkspaces = workspaces;
-                bundle.workspace = workspaces.find((workspace) => { return workspace.key === workspaceKey });               
+                bundle.workspace = workspaces.find((workspace) => { return workspace.key === workspaceKey });
             }).then(()=>{
                 return this.api.getWorkspaceDetails(siteKey, workspaceKey);
             }).then((workspaceDetails)=>{
@@ -75,13 +75,13 @@ class Service extends BaseService {
         }
 
         //$FlowFixMe
-        return ( this._siteAndWorkspaceDataPromise: Promise<SiteAndWorkspaceData>); 
+        return ( this._siteAndWorkspaceDataPromise: Promise<SiteAndWorkspaceData>);
     }
 
     getWorkspaceDetails(siteKey: string, workspaceKey: string){
         return this.api.getWorkspaceDetails(siteKey, workspaceKey);
     }
-    
+
     serveWorkspace(siteKey: string, workspaceKey: string, serveKey: string){
         this.api.serveWorkspace(siteKey, workspaceKey, serveKey);
     }

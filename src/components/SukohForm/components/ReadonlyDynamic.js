@@ -4,7 +4,8 @@ import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import TextField from 'material-ui/TextField';
 import Tip from '../../Tip';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
+import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 
@@ -36,15 +37,15 @@ class ReadonlyDynamic extends BaseDynamic<ReadonlyDynamicField,ReadonlyDynamicSt
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath, parentPath} = context;
         let {field} = node;
-                
+
         if(currentPath!==parentPath){
             return (null);
         }
-        
+
         let iconButtons = [];
         if(field.tip) iconButtons.push(<Tip markdown={field.tip} />)
 

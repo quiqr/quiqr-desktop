@@ -1,15 +1,16 @@
 //@flow
 
 import React from 'react';
-import Tip from '../../Tip';
-import IconButtonGroup from '../../IconButtonGroup';
+//import Tip from '../../Tip';
+//import IconButtonGroup from '../../IconButtonGroup';
 import IconUpload from 'material-ui/svg-icons/file/file-upload';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Accordion, AccordionItem } from '../../Accordion';
 import DangerButton from '../../DangerButton';
 import FlatButton from 'material-ui/FlatButton';
 import IconRemove from 'material-ui/svg-icons/content/clear';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 const regExtractExt = /[.]([^.]+)$/
@@ -47,7 +48,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         }
         for(let r = 0; r < state['resources'].length; r++){
             let resource = state['resources'][r];
-            if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!=-1)){
+            if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
                 stateBuilder.setLevelState(resource, field.fields);
             }
         }
@@ -62,7 +63,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     }
 
     onButtonClick(e: any){
-        
+
         let {context} = this.props;
         let {field} = context.node;
 
@@ -70,7 +71,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         .then((files)=>{
             if(files){
                 let currentFiles = context.value.slice();
-                let newItems = [];
+                //let newItems = [];
                 for(let f = 0; f < files.length; f++){
                     let file = files[f];
                     let match = currentFiles.find((x)=>x.src===file);
@@ -94,7 +95,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath, parentPath} = context;
         let {field} = node;
@@ -102,15 +103,15 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         if(currentPath!==parentPath){
             return (null);
         }
-        
+
         let itemsStates = context.value.filter(x => {
             return (
                 x.src.startsWith(field.path)
                 && x.__deleted!==true
-                && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!=-1 )
+                && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
             );
         });
-        
+
 
         return (<React.Fragment>
             {field.title?<div style={{padding:'16px 0'}}>{field.title}</div>:undefined}
@@ -146,9 +147,9 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
             </Accordion>
             <RaisedButton style={{marginBottom:'16px', marginTop:itemsStates.length?'16px':undefined}} onClick={this.onButtonClick.bind(this)} icon={<IconUpload />} />
             </div>
-            
-                
-            
+
+
+
         </React.Fragment>);
     }
 

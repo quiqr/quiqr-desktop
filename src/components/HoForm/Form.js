@@ -3,7 +3,8 @@
 import * as React from 'react';
 import { ComponentContext } from './component-context';
 import { Debounce } from './debounce';
-import type { FieldBase, FieldBaseGroup, DynamicFormNode, ComponentProps, BreadcumbComponentType } from './types';
+//import type { FieldBase, FieldBaseGroup, DynamicFormNode, ComponentProps, BreadcumbComponentType } from './types';
+import type { FieldBase, FieldBaseGroup, DynamicFormNode, BreadcumbComponentType } from './types';
 import { ComponentRegistry } from './component-registry';
 import { FormStateBuilder } from './form-state-builder';
 import { FieldsExtender } from './fields-extender';
@@ -60,7 +61,7 @@ class Form extends React.Component<FormProps,FormState> {
                 parent: (null/*: ?DynamicFormNode<FieldBase>*/),
                 uiState: (null/*: ?any*/)
             };
-            this.root = root; 
+            this.root = root;
             this.currentNode = root;
             this.state = {
                 document: formState,
@@ -124,7 +125,7 @@ class Form extends React.Component<FormProps,FormState> {
                         path = fragment + '/' + path;
                     }
                 }
-                else{ 
+                else{
                     throw new Error('Could not find component of type '+currentNode.field.type);
                 }
             }
@@ -164,7 +165,7 @@ class Form extends React.Component<FormProps,FormState> {
     /**
      * Render a level of components
      * Can be used recursively when called by a component
-     * 
+     *
      * @field - the parent field config of the level
      * @state - the level state
      * @uiState - hard to describe
@@ -195,17 +196,17 @@ class Form extends React.Component<FormProps,FormState> {
     forceUpdateDebounce: Debounce = new Debounce();
     handleChange(node: any, debounce: number){
         this.forceUpdateDebounce.run(this.forceUpdateThis, debounce);
-        
+
         if(this.props.onChange!=null){
             this.props.onChange(this.getFormDocumentClone);
         }
     }
-   
+
     renderBreadcumb(){
-        
+
         let currentNode = this.currentNode;
-        let nodeLevel = 0;
-        
+        //let nodeLevel = 0;
+
         let items = [];
         let nodes = [];
 
@@ -234,7 +235,7 @@ class Form extends React.Component<FormProps,FormState> {
         items.reverse();
 
         let Breadcumb = this.props.breadcumbComponentType;
-        return <Breadcumb items={items} onNodeSelected={this.setPath.bind(this)} />;       
+        return <Breadcumb items={items} onNodeSelected={this.setPath.bind(this)} />;
     }
 
     getCurrentNodeDebugInfo(){
@@ -247,7 +248,7 @@ class Form extends React.Component<FormProps,FormState> {
         }
         return { path: path };
     }
-    
+
     render(){
 
         if(this.state.renderError)
@@ -256,9 +257,9 @@ class Form extends React.Component<FormProps,FormState> {
         let breadcumb = this.renderBreadcumb();
 
         let form = (<div key={'dynamic-form'} style={{padding:'20px'}}>
-            
+
             {breadcumb}
-            
+
             {this.renderLevel({
                 field: {fields: this.state.fields, key:'root', compositeKey:'root', type:'root' },
                 state: this.state.document,
@@ -271,13 +272,13 @@ class Form extends React.Component<FormProps,FormState> {
                 <pre style={{padding:16, margin:0, whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>
                     {JSON.stringify(this.getCurrentNodeDebugInfo())}
                 </pre>
-                
+
                 <pre style={{padding:16, margin:0, whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>
                     {JSON.stringify(this.state, null,'   ')}
                 </pre>
             </div> : undefined }
-            
-            
+
+
         </div>);
 
         return form;

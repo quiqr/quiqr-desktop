@@ -12,8 +12,12 @@ import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import { FlatButton } from 'material-ui';
 import DangerButton from '../../DangerButton';
 import dynamicComponentUtils from './shared/dynamic-component-utils'
-import type { BreadcumbItem, ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
-import { BaseDynamic, FieldsExtender, FormStateBuilder, Updatable } from '../../HoForm';
+
+//import type { BreadcumbItem, ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+import type {DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+
+//import { BaseDynamic, FieldsExtender, FormStateBuilder, Updatable } from '../../HoForm';
+import { BaseDynamic, FieldsExtender, FormStateBuilder } from '../../HoForm';
 //import cyan500 from 'material-ui/styles/colors'
 
 const Fragment = React.Fragment;
@@ -65,7 +69,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     buildPathFragment(node: any, nodeLevel: any, nodes: any){
         if(nodeLevel > 0)
             return node.field.key + '/' + nodes[nodeLevel-1].uiState.childIndex;
-        return node.field.key;        
+        return node.field.key;
     }
 
     onAddClickHandler(){
@@ -81,7 +85,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         let context = this.props.context;
         let copy = context.value.slice(0);
         copy.splice(i, 1);
-        context.setValue(copy);        
+        context.setValue(copy);
     }
 
     swapItems({index, otherIndex}: {index: number, otherIndex: number}){
@@ -99,7 +103,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     getDocumentMouseUpListener(){
         this.documentMouseUpListener = function(e: any){
             if(this.state.dragFromIndex!=null&&this.state.dragToIndex!=null){
-                this.swapItems({index:this.state.dragFromIndex, otherIndex:this.state.dragToIndex});   
+                this.swapItems({index:this.state.dragFromIndex, otherIndex:this.state.dragToIndex});
                 this.setState({ dragFromIndex: null, dragToIndex:null });
             }
             document.removeEventListener('mouseup', this.documentMouseUpListener);
@@ -117,15 +121,15 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     }
 
     getOnItemMouseEnter(index: number){
-        return function(e: any){           
+        return function(e: any){
             if(this.state.dragFromIndex!=null){
                 this.setState({dragToIndex: index});
             }
         }.bind(this)
     }
 
-    renderComponent(){       
-        
+    renderComponent(){
+
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
@@ -205,7 +209,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                         if(childIndex===dragFromIndex){
                             return renderItem(componentKey, item, childIndex, true);
                         }
-                        
+
                         if(childIndex===dragToIndex&&dragFromIndex!=null&&dragToIndex!=null){
                             let movedItem = <div style={{margin:'8px 0', height:'8px', background:'#00bcd4'/*cyan500*/, borderRadius:3}}></div>;
                             let beforeItem, afterItem;
@@ -243,9 +247,9 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                 field,
                 state: context.value[childIndex],
                 uiState: {childIndex},
-                parent: node 
+                parent: node
             }));
-            
+
         }
 
         return (null);

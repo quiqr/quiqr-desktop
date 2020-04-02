@@ -4,8 +4,8 @@ import React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
-import dynamicComponentUtils from './shared/dynamic-component-utils';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import dynamicComponentUtils from './shared/dynamic-component-utils';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 type NestDynamicField  = {
@@ -29,7 +29,7 @@ class NestDynamic extends BaseDynamic<NestDynamicField, void> {
     }
 
     normalizeState({state, field, stateBuilder} : { state: any, field: NestDynamicField, stateBuilder: any }){
-        stateBuilder.setLevelState(state, field.fields);        
+        stateBuilder.setLevelState(state, field.fields);
     }
 
 
@@ -49,12 +49,12 @@ class NestDynamic extends BaseDynamic<NestDynamicField, void> {
         return node.field.key;
     }
 
-    renderComponent(){      
-         
+    renderComponent(){
+
         let {context} = this.props;
         let {node, currentPath, nodePath, parentPath} = context;
         let {field} = node;
-        
+
         if(currentPath===parentPath){
             let childLabels = field.fields.map((x) => x.title).join(', ');
             childLabels = `(${childLabels})`;
@@ -68,7 +68,7 @@ class NestDynamic extends BaseDynamic<NestDynamicField, void> {
             /></List>
             );
         }
-        
+
         if(currentPath.startsWith(nodePath)){
             var state = node.state;
             return context.renderLevel({ field, state, parent: node });

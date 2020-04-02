@@ -5,7 +5,7 @@ import FormItemWrapper from './shared/FormItemWrapper';
 import DatePicker from 'material-ui/DatePicker';
 import Tip from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 import IconClear from 'material-ui/svg-icons/content/clear';
 import IconButton from 'material-ui/IconButton';
 
@@ -51,7 +51,7 @@ class DateDynamic extends BaseDynamic<DateDynamicField, DateDynamicState> {
             let year = parseInt(values[0],10);
             let month = parseInt(values[1],10)-1;
             let day = parseInt(values[2],10);
-            return new Date(year, month, day, 12);    
+            return new Date(year, month, day, 12);
         }
         return undefined;
     }
@@ -73,15 +73,15 @@ class DateDynamic extends BaseDynamic<DateDynamicField, DateDynamicState> {
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
-        
+
         if(currentPath!==context.parentPath){
             return (null);
         }
-        
+
         let iconButtons = [];
         iconButtons.push(<IconButton onClick={()=>context.clearValue()}><IconClear /></IconButton>);
         if(field.tip) iconButtons.push(<Tip markdown={field.tip} />)

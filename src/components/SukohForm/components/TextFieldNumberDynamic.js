@@ -4,7 +4,8 @@ import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import TextField from 'material-ui/TextField';
 import Tip from '../../Tip';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
+import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 type TextFieldNumberDynamicField = {
@@ -34,15 +35,15 @@ class TextFieldNumberDynamic extends BaseDynamic<TextFieldNumberDynamicField,Tex
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
-        
+
         if(currentPath!==context.parentPath){
             return (null);
         }
-        
+
         let setNumberValue = (e,value) => {
             if(value===undefined||value.length===0){
                 context.clearValue();

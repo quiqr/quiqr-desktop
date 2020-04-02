@@ -1,6 +1,6 @@
  //@flow
 
-/*:: 
+/*::
     type MessageHandler = (eventData:any, arg:any) => void;
 */
 
@@ -8,7 +8,7 @@ export type AbortablePromise<T> = Promise<T> & { forceAbort: ()=>void };
 
 class MainProcessBridge{
 
-    /*::    
+    /*::
     ipcRenderer : {
         send: (string, any) => void,
         on: (
@@ -17,7 +17,7 @@ class MainProcessBridge{
         ) => void
     };
 
-    _messageHandlers : { [string] : Array<MessageHandler> }; 
+    _messageHandlers : { [string] : Array<MessageHandler> };
 
     pendingCallbacks : Array<{ token: string, handler:MessageHandler }>;
 
@@ -30,7 +30,9 @@ class MainProcessBridge{
         this.pendingCallbacks = [];
 
         this.ipcRenderer.on('messageAsyncResponse', (event, arg) => {
-            const { token, response, key } = arg;
+
+            //const { token, response, key } = arg;
+            const { token, response } = arg;
             let callback = this._getCallback(token);
             if(callback){
                 callback(response);
@@ -75,7 +77,7 @@ class MainProcessBridge{
 
     _createToken() /*: string */ {
         function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); 
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
         }
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     }

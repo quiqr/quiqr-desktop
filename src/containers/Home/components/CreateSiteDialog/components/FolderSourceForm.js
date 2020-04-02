@@ -1,6 +1,7 @@
 //@flow
 import * as React from 'react';
-import { RaisedButton, TextField } from 'material-ui';
+//import { RaisedButton, TextField } from 'material-ui';
+import {TextField } from 'material-ui';
 import FolderPicker from './../../../../../components/FolderPicker';
 
 type FolderSourceFormModel = {
@@ -14,11 +15,11 @@ type FolderSourceFormProps = {
 }
 
 type FolderSourceFormState = {
-    
+
 }
 
 export default class FolderSourceForm extends React.Component<FolderSourceFormProps,FolderSourceFormState>{
-    
+
     validateModel(model: FolderSourceFormModel){
         let isValid = true;
         if(model.folderPath==null||model.folderPath.trim().length===0){

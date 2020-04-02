@@ -8,7 +8,7 @@ import DefaultWrapper from './shared/DefaultWrapper';
 import IconAdd from 'material-ui/svg-icons/content/add';
 import IconRemove from 'material-ui/svg-icons/content/remove';
 import { BaseDynamic } from '../../HoForm';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 
 class TextFieldLabelMock extends React.Component<{children: any},void>{
     render(){
@@ -41,7 +41,7 @@ class LeafArrayDynamic extends BaseDynamic<LeafArrayDynamicField,{hasError:bool}
     deepEqual(array: Array<any>, otherArray: Array<any>) : bool{
         if(array.length !== otherArray.length)
             return false;
-        
+
         for(let i = 0; i < array.length; i++){
             if(array[i] !== otherArray[i])
                 return false;
@@ -80,15 +80,15 @@ class LeafArrayDynamic extends BaseDynamic<LeafArrayDynamicField,{hasError:bool}
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
-        
+
         if(currentPath!==context.parentPath){
             return (null);
         }
-        
+
         let arrayData = context.value;
         return (
         <DefaultWrapper>
@@ -107,7 +107,7 @@ class LeafArrayDynamic extends BaseDynamic<LeafArrayDynamicField,{hasError:bool}
                             iconButtons={[
                                 <IconButton onClick={this.getOnRequestDeleteHandler(index)}><IconRemove /></IconButton>
                             ]
-                        } />            
+                        } />
                     </div>
                 );
             })}

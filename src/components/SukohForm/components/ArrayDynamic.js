@@ -6,7 +6,8 @@ import { List, ListItem } from 'material-ui/List';
 import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import { BaseDynamic } from '../../HoForm';
-import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FieldsExtender, FormStateBuilder } from '../../HoForm';
+//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FieldsExtender, FormStateBuilder } from '../../HoForm';
+import type {DynamicFormNode, FieldsExtender, FormStateBuilder } from '../../HoForm';
 import dynamicComponentUtils from './shared/dynamic-component-utils';
 
 type ArrayDynamicField = {
@@ -60,12 +61,12 @@ class ArrayDynamic extends BaseDynamic<ArrayDynamicField,ArrayDynamicState> {
         }
     }
 
-    renderComponent(){       
-        
+    renderComponent(){
+
         let {context} = this.props;
         let {node, currentPath} = context;
         let {field} = node;
-                
+
         if(currentPath===context.parentPath){
             return (<List style={{marginBottom:16, padding: 0}}><ListItem
                 style={{ border: 'solid 1px #e8e8e8', borderRadius:'7px'}}
@@ -97,10 +98,10 @@ class ArrayDynamic extends BaseDynamic<ArrayDynamicField,ArrayDynamicState> {
                 }) }
                 />
             );
-        }  
+        }
 
         if(currentPath.startsWith(context.nodePath)){
-            
+
             let matchedNode = context.findNodeInCurrentNodeTree(node);
             return (context.renderLevel({
                 field,

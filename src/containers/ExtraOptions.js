@@ -5,13 +5,13 @@ import RaisedButton from 'material-ui/RaisedButton';
 import IconMore from 'material-ui/svg-icons/navigation/more-vert';
 import Popover from 'material-ui/Popover';
 import { Menu, MenuItem } from 'material-ui/Menu';
-import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+//import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
+//import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+//import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 const Fragment = React.Fragment;
-const translucentColor = 'RGBA(255,255,255,.2)';
-const translucentColorSubtle = 'RGBA(255,255,255,.05)';
+//const translucentColor = 'RGBA(255,255,255,.2)';
+//const translucentColorSubtle = 'RGBA(255,255,255,.05)';
 
 type ExtraOptionsProps = {
   items: Array<React.Element<typeof MenuItem>>
@@ -23,9 +23,9 @@ type ExtraOptionsState = {
   anchorEl: ?any
 }
 class ExtraOptions extends React.Component<ExtraOptionsProps,ExtraOptionsState>{
-  
+
     closeTimeout : any;
-  
+
     constructor(props: any){
       super(props);
       this.state = {
@@ -34,24 +34,24 @@ class ExtraOptions extends React.Component<ExtraOptionsProps,ExtraOptionsState>{
         anchorEl: null
       };
     }
-  
+
     handleRequestClose(){
-      this.setState({menuOpen: false});    
+      this.setState({menuOpen: false});
     }
-  
+
     handleMouseEnter(e: Event){
       this.setState({buttonVisible:true });
     }
-  
+
     handleMouseLeave(e: Event){
       this.setState({buttonVisible:false });
     }
-  
+
     handleClick(e: Event){
       e.preventDefault();
       this.setState({menuOpen:true, anchorEl: e.currentTarget });
     }
-  
+
     requestClose(){
       if(this.closeTimeout)
       clearTimeout(this.closeTimeout);
@@ -59,7 +59,7 @@ class ExtraOptions extends React.Component<ExtraOptionsProps,ExtraOptionsState>{
         this.setState({menuOpen:false});
       }.bind(this), 300);
     }
-  
+
     render(){
       return <Fragment><RaisedButton
         style={{

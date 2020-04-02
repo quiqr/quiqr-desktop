@@ -1,9 +1,9 @@
 //@flow
 
 import * as React from 'react';
-import { Route } from 'react-router-dom'
+//import { Route } from 'react-router-dom'
 import { Accordion, AccordionItem } from './../../../components/Accordion';
-import DangerButton from './../../../components/DangerButton';
+//import DangerButton from './../../../components/DangerButton';
 import { TriggerWithOptions } from './../../../components/TriggerWithOptions';
 import type { WorkspaceHeader, SiteConfig } from './../../../types';
 import { FlatButton, RaisedButton, TextField } from 'material-ui/';
@@ -30,7 +30,7 @@ type WorkspaceState = {
 }
 
 export class Workspace extends React.Component<WorkspaceProps,WorkspaceState> {
-    
+
     constructor(props: WorkspaceProps){
         super(props);
         this.state = { config: null, error: null, refreshing: false };
@@ -40,7 +40,7 @@ export class Workspace extends React.Component<WorkspaceProps,WorkspaceState> {
         let cfg = this.state.config;
         if(cfg==null) throw new Error('Invalid operation');
         this.props.onStartServerClick(this.props.header,  cfg.serve[index].key);
-        
+
     }
     handleOpenLocation = ()=>{ this.props.onLocationClick(this.props.header.path); }
     handleWorkspaceSelect = (e: any)=>{ this.props.onSelectWorkspaceClick(e, this.props.site.key, this.props.header); }
@@ -68,14 +68,15 @@ export class Workspace extends React.Component<WorkspaceProps,WorkspaceState> {
     }
 
     render(){
-        let {active, header, onLocationClick, onPublishClick, onSelectWorkspaceClick, site} = this.props;
+        //let {active, header, onLocationClick, onPublishClick, onSelectWorkspaceClick, site} = this.props;
+        let {active, header, site} = this.props;
         let { config, error } = this.state;
-        let publishDisabled = config==null||config.build==null||config.build.length==0||site.publish==null||site.publish.length==0;
-        let startServerDisabled = config==null||config.serve==null||config.serve.length==0;
+        let publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
+        let startServerDisabled = config===null||config.serve===null||config.serve.length===0;
 
         return (<div style={{opacity: this.state.refreshing?.5:1}}>
             <InfoLine label="Location">
-                <TextField id="location" value={header.path} readOnly={true} /> 
+                <TextField id="location" value={header.path} readOnly={true} />
                 <FlatButton
                     style={{minWidth:'40px'}}
                     icon={<IconFileFolder />}
@@ -94,7 +95,7 @@ export class Workspace extends React.Component<WorkspaceProps,WorkspaceState> {
                     onClick={ this.handleWorkspaceSelect }
                 />
                 &nbsp;
-                <TriggerWithOptions 
+                <TriggerWithOptions
                     triggerType={FlatButton}
                     triggerProps={{
                         label:"Start Server",
@@ -127,8 +128,8 @@ export function Workspaces(
     let {
         workspaces, activeWorkspaceKey, activeSiteKey, onLocationClick, onPublishClick, onStartServerClick, onSelectWorkspaceClick, getWorkspaceDetails, site
     } = props;
-    
-    
+
+
     return (
         <Accordion style={{ margin:'0 8px' }}>
             { (workspaces||[]).map((workspace,i) => {

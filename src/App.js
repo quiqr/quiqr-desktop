@@ -12,7 +12,7 @@ import Console from './containers/Console';
 import Header from './containers/Header';
 import NotificationUI from './containers/NotificationUI';
 import WorkspaceSidebar from './containers/WorkspaceSidebar';
-import { Sidebar } from './containers/Sidebar';
+// import { Sidebar } from './containers/Sidebar';
 import ExtraOptions from './containers/ExtraOptions';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 
@@ -76,7 +76,7 @@ class App extends React.Component<AppProps,AppState>{
       var stateUpdate  = {};
       stateUpdate.configurations = c;
       stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
-      let css = require('./themes/' + c.global.appTheme + '/css/App.css');
+      // let css = require('./themes/' + c.global.appTheme + '/css/App.css');
 
       this.setState(stateUpdate);
 
@@ -133,8 +133,8 @@ class App extends React.Component<AppProps,AppState>{
     }
   }
 
-  toggleMenuIsLocked(){   
-    let menuIsLocked = !this.state.menuIsLocked;    
+  toggleMenuIsLocked(){
+    let menuIsLocked = !this.state.menuIsLocked;
     this.setState({menuIsLocked, forceShowMenu: true, skipMenuTransition:true});
     window.dispatchEvent(new Event('resize'));
   }
@@ -158,7 +158,7 @@ class App extends React.Component<AppProps,AppState>{
 
   getExtraItems(){
     let items = [
-      <MenuItem primaryText="Reload" onClick={ ()=>{ window.location = window.location; } } />,
+      // <MenuItem primaryText="Reload" onClick={ ()=>{ window.location = window.location; } } />,
       <MenuItem primaryText="Restart Application" onClick={ ()=>{ const app = window.require('electron').remote.app; app.relaunch(); app.exit(0); } } />,
     ];
     return items;
@@ -237,7 +237,7 @@ class App extends React.Component<AppProps,AppState>{
       }} />
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item' exact render={ ({match})=> {
         //$FlowFixMe
-        return <CollectionItem key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } collectionKey={ decodeURIComponent(match.params.collection) }           collectionItemKey={ decodeURIComponent(match.params.item) } /> 
+        return <CollectionItem key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } collectionKey={ decodeURIComponent(match.params.collection) }           collectionItemKey={ decodeURIComponent(match.params.item) } />
       }} />
       <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
         //$FlowFixMe
@@ -266,12 +266,12 @@ class App extends React.Component<AppProps,AppState>{
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;
     let contentContainerStyle = this.state.style.contentContainer;
-    let hideMenuItems = false;
+  //  let hideMenuItems = false;
 
      if(!this.state.menuIsLocked){
       contentContainerStyle = Object.assign({}, contentContainerStyle, {display: 'block', paddingLeft:'66px' });
       menuContainerStyle = Object.assign({}, menuContainerStyle, { position: 'absolute', zIndex: '2', height:'100%', width:'280px', transform: 'translateX(-214px)' } )
-      hideMenuItems = true;
+      //hideMenuItems = true;
       if(this.state.forceShowMenu){
         menuContainerStyle.transform='translateX(0px)';
         contentContainerStyle.transform='translateX(214px)';
@@ -281,15 +281,15 @@ class App extends React.Component<AppProps,AppState>{
         contentContainerStyle.transition = transition;
         menuContainerStyle.transition = transition;
       }
-      this.state.skipMenuTransition = false;
+      this.state.skipMenuTransition.setState(false);
      }
 
 
-    let showInlineMenus = true;
+    //let showInlineMenus = true;
     console.log(this.state.configurations);
     if(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideInlineMenus === false){
       console.log('hallo');
-      showInlineMenus = false;
+      //showInlineMenus = false;
     }
 
     return (<Switch>
