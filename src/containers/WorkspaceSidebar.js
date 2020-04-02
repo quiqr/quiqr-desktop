@@ -59,10 +59,10 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         rightIcon={<IconActionSetting color={translucentColor} />}
       />) }
     </List>
+  {/* TODO  - Knop die weg moet -*/}
     { siteConfig!=null && workspaceConfig!=null ? (
     <div style={{display:'flex'}}>
 
-    // TODO  - Knop die weg moet -
       <TriggerWithOptions
         triggerType={FlatButton}
         triggerProps={{
@@ -75,6 +75,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         options={ serverOptions }
         onOptionClick={(serve)=>{ service.serveWorkspace(siteConfig.key, workspaceConfig.key, serverOptions[serve]) }}
       />
+
+
+       
       <FlatButton
         onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
         style={{flex:1, minWidth:40}}
@@ -83,9 +86,14 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
         style={{flex:1, minWidth:40}}
         icon={<IconOpenInBrowser color="white" style={{opacity:.2}} />} />
-      {/* <FlatButton
-        style={{flex:1, minWidth:40}}
-        icon={<IconMore color="white"  style={{opacity:.2}} />} /> */}
+
+
+      {/*
+      <FlatButton
+      style={{flex:1, minWidth:40}}
+      icon={<IconMore color="white"  style={{opacity:.2}} />} />
+      */}
+
     </div>) : (null) }
   </MenuBorder>);
   }

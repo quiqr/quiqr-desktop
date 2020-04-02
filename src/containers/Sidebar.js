@@ -53,7 +53,7 @@ export type SidebarProps = {
 }
 
 type SidebarState = {
-  
+
 }
 
 export class Sidebar extends React.Component<SidebarProps,SidebarState>{
@@ -97,29 +97,29 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
         <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
             <React.Fragment>
                 <div className={'slideFadeInRight animated'}  style={{position:'relative', opacity: 1}}>
-                    
+
                     <IconMenu style={{ position: 'absolute', right: '21px', top:'15px' }} />
 
                     <FlatButton
-                    style={Object.assign({}, 
+                    style={Object.assign({},
                         { height:'calc(100vh - 42px)',width:'100%', position:'absolute'},
                         { transition: menuIsLocked? undefined: 'opacity 1s linear' },
                         hideItems? { opacity:1 } : { opacity:0, pointerEvents:'none' }
                     )}
                     label=" " onClick={()=>{onToggleItemVisibility()}}/>
-                    
+
                     <div style={ Object.assign({},
                         { width:'280px', transition: 'all .2s' },
                         hideItems? { opacity:0, pointerEvents:'none' } : { opacity:1 }
                     )}>
-        
+
                         <IconButton
                             onClick={()=>this.props.onLockMenuClicked()}
                             style={{ position: 'absolute', right: '48px', top:'3px' }}
                             iconStyle={{opacity: (menuIsLocked?'1':'.2')  }}>
                             <IconLockMenu />}
                         </IconButton>
-        
+
                         { menusNodes }
 
                         <br />

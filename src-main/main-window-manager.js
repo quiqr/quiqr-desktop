@@ -2,6 +2,7 @@
 
 const electron = require('electron');
 const BrowserWindow = electron.BrowserWindow;
+const windowStateKeeper = require('electron-window-state');
 const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
@@ -108,7 +109,12 @@ function getLocation(locPath = ''){
 }
 
 function createWindow () {
+
+
+
     const configurationDataProvider = require('./configuration-data-provider')
+
+
 
     let icon;
     if(process.env.REACT_DEV_URL)
@@ -119,17 +125,33 @@ function createWindow () {
       let showFrame=false;
       configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
 
+      // Load the previous state with fallback to defaults
+      let mainWindowState = windowStateKeeper({
+        defaultWidth: 1000,
+        defaultHeight: 800
+      });
+
       // Create the browser window.
       mainWindow = new BrowserWindow({
         show: false,
         frame: showFrame,
         backgroundColor:"#ffffff",
-        minWidth:1024,
-        width:1024,
+
+        x: mainWindowState.x,
+        y: mainWindowState.y,
+        width: mainWindowState.width,
+        height: mainWindowState.height,
+
+        //minWidth:1024,
+        //width:1024,
         //webPreferences:{webSecurity:false },
         icon
       });
 
+      // Let us register listeners on the window, so we can update the state
+      // automatically (the listeners will be removed when the window is closed)
+      // and restore the maximized or full screen state
+      mainWindowState.manage(mainWindow);
 
       if(configurations.global.maximizeAtStart){
         mainWindow.maximize();
@@ -145,6 +167,7 @@ function createWindow () {
 
     mainWindow.on('closed', function () {
         mainWindow = undefined; //clear reference
+
     })
 
     var handleRedirect = (e, url) => {
