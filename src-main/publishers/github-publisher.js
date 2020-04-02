@@ -53,16 +53,18 @@ class GithubPublisher {
         await fs.writeFileSync(tmpkeypath, this._config.privatekey, 'utf-8');
         await fs.chmodSync(tmpkeypath, '0600');
 
-        outputConsole.appendLine('Cloning GitHub destination...');
+        outputConsole.appendLine('Cloning GitHub destination on ' + full_gh_url);
         var spawn = require("child_process").spawn;
         //let clonecmd = spawn( git_bin, [ "clone" , full_gh_url , full_gh_dest ], {env: { GIT_SSH_COMMAND: gitsshcommand }});
         let clonecmd = spawn( git_bin, [ "clone", "-i", tmpkeypath, full_gh_url , full_gh_dest ]);
 
+        outputConsole.appendLine('Using the following tmpkeypath: ' + tmpkeypath + " and full_gh_dest: " + full_gh_dest );
+
         clonecmd.stdout.on("data", (data) => {
-            //outputConsole.appendLine('Start cloning with:' + git_bin);
+            outputConsole.appendLine('Start cloning with:' + git_bin);
         });
         clonecmd.stderr.on("data", (err) => {
-            //outputConsole.appendLine('Clone error ...');
+            outputConsole.appendLine('Clone error ...:' + err);
         });
         clonecmd.on("exit", (code) => {
             if(code==0){
@@ -128,7 +130,7 @@ class GithubPublisher {
                 });
             }
             else {
-                outputConsole.appendLine('Could not clone destination repository ...');
+                outputConsole.appendLine('Could not clone destination repository with code: ' + code);
             }
         });
 

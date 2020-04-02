@@ -35,13 +35,13 @@ type WorkspaceWidgetProps = {
 }
 
 class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
-  
+
   render(){
     let {
       onClick,
       siteConfig,
       workspaceConfig,
-    } = this.props;    
+    } = this.props;
 
     let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
@@ -61,7 +61,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     </List>
     { siteConfig!=null && workspaceConfig!=null ? (
     <div style={{display:'flex'}}>
-      <TriggerWithOptions 
+
+    // TODO  - Knop die weg moet -
+      <TriggerWithOptions
         triggerType={FlatButton}
         triggerProps={{
             style: {flex:1, minWidth:40},
@@ -211,7 +213,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
       });
     }
 
-    
+
 
     return (<React.Fragment>
       <Sidebar.Sidebar
