@@ -63,7 +63,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     { siteConfig!=null && workspaceConfig!=null ? (
     <div style={{display:'flex'}}>
 
-
+{/*
       <TriggerWithOptions
         triggerType={FlatButton}
         triggerProps={{
@@ -88,7 +88,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         style={{flex:1, minWidth:40}}
         icon={<IconOpenInBrowser color="white" style={{opacity:.2}} />} />
 
-
+*/}
       {/*
       <FlatButton
       style={{flex:1, minWidth:40}}

@@ -281,7 +281,8 @@ class App extends React.Component<AppProps,AppState>{
         contentContainerStyle.transition = transition;
         menuContainerStyle.transition = transition;
       }
-      this.state.skipMenuTransition.setState(false);
+
+      this.state.skipMenuTransition = false ;
      }
 
 

@@ -177,6 +177,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         let activeWorkspaceKey = this.props.workspaceKey;
         let activeSiteKey = this.props.siteKey;
 
+
         let select = (
             activeWorkspaceKey==null ||
             activeSiteKey==null ||
@@ -189,6 +190,14 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
             this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
+
+            // Serve the workspace at selection of the workspace right after mounting the workspace
+
+            await service.api.serveWorkspace(siteKey, workspace.key, "instantly serve at selectWorkspace"/*serveKey*/);
+
+            // Open a new window with the served site.
+
+            window.require('electron').shell.openExternal('http://localhost:1313');
         }
         else{
             this.history.push(`/`);
