@@ -19,7 +19,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { FlatButton, IconButton } from 'material-ui';
 
 const Fragment = React.Fragment;
-const translucentColor = 'RGBA(255,255,255,.2)';
+const translucentColor = 'RGBA(255,255,255,1)';
 const translucentColorSubtle = 'RGBA(255,0,255,1)';
 
 let MenuBorder = ({ children }) => {
