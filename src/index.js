@@ -7,8 +7,8 @@ import App from './App';
 import service from './services/service';
 
 service.getConfigurations().then((c) => {
-  //let cssIndex = require('./themes/' + c.global.appTheme + '/css/index.css');
-  //let cssBootstrap = require('./themes/' + c.global.appTheme + '/css/bootstrap-grid.css');
+  let cssIndex = require('./themes/' + c.global.appTheme + '/css/index.css');
+  let cssBootstrap = require('./themes/' + c.global.appTheme + '/css/bootstrap-grid.css');
 })
 
 const isDev = window.require('electron-is-dev');
