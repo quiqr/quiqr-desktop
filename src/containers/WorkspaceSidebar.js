@@ -19,7 +19,7 @@ import type { SiteConfig, WorkspaceConfig } from './../types'
 import * as Sidebar from './Sidebar';
 
 //const Fragment = React.Fragment;
-const translucentColor = 'RGBA(255,255,255,.2)';
+const translucentColor = 'RGBA(255,255,255,.8)';
 //const translucentColorSubtle = 'RGBA(255,255,255,.05)';
 
 let MenuBorder = ({ children }) => {
@@ -72,7 +72,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
           previewButton = <FlatButton
           onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
           style={{flex:1, minWidth:40}}
-          icon={<IconPlay color="white" style={{opacity:1.0}} />} />
+          icon={<IconPlay color="white" style={{opacity:.8}} />} />
       }
       else{
           previewButton = <FlatButton
@@ -80,7 +80,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
           style={{flex:1, minWidth:40}}
           icon={<IconPlay color="white" style={{opacity:.2}} />} />
       }
-
 
     let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
@@ -115,18 +114,14 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         options={ serverOptions }
         onOptionClick={(serve)=>{ service.serveWorkspace(siteConfig.key, workspaceConfig.key, serverOptions[serve]) }}
       />
-
-
-
+      */}
 
       <FlatButton
         onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
         style={{flex:1, minWidth:40}}
-        icon={<IconPlay color="white" style={{opacity:.2}} />} />
-        */}
+        icon={<IconFileFolder color="white" style={{opacity:.8}} />} />
 
       {previewButton}
-
 
       {/*
       <FlatButton
