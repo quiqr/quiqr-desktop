@@ -196,8 +196,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             await service.api.serveWorkspace(siteKey, workspace.key, "instantly serve at selectWorkspace"/*serveKey*/);
 
             // Open a new window with the served site.
-
-            window.require('electron').shell.openExternal('http://localhost:1313');
+            //window.require('electron').shell.openExternal('http://localhost:1313');
         }
         else{
             this.history.push(`/`);

@@ -5,6 +5,7 @@ import { Switch, Route } from 'react-router-dom'
 
 //CONTAINERS
 import Home from './containers/Home'
+import Prefs from './containers/Prefs'
 import Collection from './containers/Collection';
 import CollectionItem from './containers/CollectionItem';
 import Single from './containers/Single';
@@ -61,6 +62,7 @@ class App extends React.Component<AppProps,AppState>{
       forceShowMenu: false,
       redirectCookbook: false,
       redirectConsole: false,
+      redirectPrefs: false,
       redirectHome: false,
       skipMenuTransition: false
     };
@@ -84,13 +86,13 @@ class App extends React.Component<AppProps,AppState>{
   }
 
   redirectHome(){
-    console.log('home');
     if(this.state.redirectHome){
       this.setState({redirectHome: false});
     }
     else{
       this.setState({redirectCookbook: false});
       this.setState({redirectConsole: false});
+      this.setState({redirectPrefs: false});
       this.setState({redirectHome: true});
     }
   }
@@ -109,10 +111,15 @@ class App extends React.Component<AppProps,AppState>{
     this.setState({redirectConsole: true});
   }
 
+  redirectPrefs(){
+    this.setState({redirectPrefs: true});
+  }
+
   componentWillMount(){
     window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
     window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
     window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
+    window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
   }
 
   minimizeWindow(){
@@ -224,8 +231,11 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/' exact render={ () => {
         return <Home key={ 'home' } />
       }} />
+      <Route path='/prefs' exact render={ () => {
+        return <Prefs />
+      }} />
       <Route path='/console' exact render={ () => {
-        return <Console /> }} />
+        return <Console />
       }} />
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
         //$FlowFixMe
@@ -242,9 +252,8 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
         //$FlowFixMe
         return <Single key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } singleKey={ decodeURIComponent(match.params.single) } /> }} />
-  <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
-    console.log(window.location.href);
-
+      <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
+          console.log(window.location.href);
         return <FormsCookbookRouted />;
       }} />
       <Route path="*" component={(data)=>{
@@ -295,6 +304,22 @@ class App extends React.Component<AppProps,AppState>{
 
     return (<Switch>
       <Route path="/console" exact={false} render={ ({match, history})=> {
+
+       return (
+         <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+           <div className="App">
+             <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+
+               { this.getContentSwitch() }
+
+              </div>
+            </div>
+          </MuiThemeProvider>
+
+          )
+
+      }} />
+      <Route path="/prefs" exact={false} render={ ({match, history})=> {
 
        return (
          <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
@@ -365,6 +390,13 @@ class App extends React.Component<AppProps,AppState>{
                 ) : (
                   <div></div>
                 )}
+
+                {(this.state.redirectPrefs) ? (
+                    <Redirect to='/prefs' />
+                ) : (
+                    <div></div>
+                )}
+ 
 
               </div>
             </MuiThemeProvider>

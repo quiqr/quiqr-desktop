@@ -4,6 +4,7 @@ const electron = require('electron')
 const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
 const logWindowManager = require('./log-window-manager');
+const prefsWindowManager = require('./prefs-window-manager');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
@@ -271,6 +272,27 @@ function exportSite() {
     }
 }
 
+
+function createPrefsWindow () {
+  prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
+  if (prefsWindow) {
+    prefsWindow.webContents.send("redirectPrefs")
+  }
+
+  prefsWindow.once('ready-to-show', () => {
+    prefsWindow.webContents.send("redirectPrefs")
+  })
+
+  prefsWindow.webContents.on('did-finish-load',() => {
+    prefsWindow.webContents.send("redirectPrefs")
+  })
+
+  prefsWindow.on('closed', function() {
+    prefsWindow = null
+  })
+}
+
+
 function createLogWindow () {
   logWindow = logWindowManager.getCurrentInstanceOrNew();
   if (logWindow) {
@@ -301,6 +323,12 @@ function createMainMenu(){
       submenu: [
         { role: 'about' },
         { type: 'separator' },
+        {
+          label: 'Preferences',
+          click: async () => {
+            createPrefsWindow()
+          }
+        },
         { role: 'services' },
         { type: 'separator' },
         { role: 'hide' },

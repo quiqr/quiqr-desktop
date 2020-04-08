@@ -4,9 +4,9 @@ import React from 'react';
 import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
 import { FlatButton, Subheader } from 'material-ui';
-//import IconActionList from 'material-ui/svg-icons/action/list';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
 import IconPlay from 'material-ui/svg-icons/av/play-arrow';
+//import IconActionList from 'material-ui/svg-icons/action/list';
 //import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 //import IconMenu from 'material-ui/svg-icons/navigation/menu';
 //import IconMore from 'material-ui/svg-icons/navigation/more-vert';
@@ -36,12 +36,51 @@ type WorkspaceWidgetProps = {
 
 class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
+  constructor(props : WorkspaceWidgetProps){
+    super(props);
+    this.state = {
+      hugoRunning: false
+    };
+  }
+
+    componentWillMount(){
+        window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
+        window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
+    }
+
+    activatePreview(){
+        this.setState({hugoRunning: true});
+        console.log('serverLive');
+    }
+
+    disablePreview(){
+        this.setState({hugoRunning: false});
+        console.log('serverDown');
+    }
+
+
   render(){
     let {
       onClick,
       siteConfig,
       workspaceConfig,
     } = this.props;
+
+      let previewButton;
+
+      if(this.state.hugoRunning){
+          previewButton = <FlatButton
+          onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
+          style={{flex:1, minWidth:40}}
+          icon={<IconPlay color="white" style={{opacity:1.0}} />} />
+      }
+      else{
+          previewButton = <FlatButton
+          onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
+          style={{flex:1, minWidth:40}}
+          icon={<IconPlay color="white" style={{opacity:.2}} />} />
+      }
+
 
     let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
@@ -79,16 +118,16 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
 
 
+
       <FlatButton
         onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
         style={{flex:1, minWidth:40}}
-        icon={<IconFileFolder color="white" style={{opacity:.2}} />} />
-      <FlatButton
-        onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
-        style={{flex:1, minWidth:40}}
-        icon={<IconOpenInBrowser color="white" style={{opacity:.2}} />} />
+        icon={<IconPlay color="white" style={{opacity:.2}} />} />
+        */}
 
-*/}
+      {previewButton}
+
+
       {/*
       <FlatButton
       style={{flex:1, minWidth:40}}

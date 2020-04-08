@@ -4,6 +4,7 @@ const { spawn } = require('child_process');
 const pathHelper = require('./../path-helper');
 const fs = require('fs-extra');
 const outputConsole = require('./../output-console');
+const mainWindowManager = require('../main-window-manager');
 
 global.currentServerProccess = undefined;
 
@@ -45,6 +46,16 @@ class HugoServer{
     serve(callback/*: (error: ?Error)=>void*/){
 
         let {config, workspacePath, hugover} = this.config;
+
+        let mainWindow = mainWindowManager.getCurrentInstance();
+
+        if(mainWindow){
+            outputConsole.appendLine('Sending serverDown.');
+            mainWindow.webContents.send("serverDown")
+        }
+        else{
+            outputConsole.appendLine('No mainWindow.');
+        }
 
         this.stopIfRunning();
 
@@ -92,6 +103,14 @@ class HugoServer{
                     isFirst=false;
                     outputConsole.appendLine('Starting Hugo Server...');
                     outputConsole.appendLine('');
+                    if(mainWindow){
+                        outputConsole.appendLine('Sending serverLive.');
+                        mainWindow.webContents.send("serverLive")
+                    }
+                    else{
+                        outputConsole.appendLine('No mainWindow.');
+                    }
+
                     return;
                 }
                 outputConsole.appendLine(line);
@@ -102,6 +121,13 @@ class HugoServer{
         catch(e){
             outputConsole.appendLine('Hugo Server failed to start.');
             outputConsole.appendLine(e.message);
+                    if(mainWindow){
+                        outputConsole.appendLine('Sending serverDown.');
+                        mainWindow.webContents.send("serverDown")
+                    }
+                    else{
+                        outputConsole.appendLine('No mainWindow.');
+                    }
             callback(e);
         }
         callback(null);
