@@ -58,29 +58,29 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
 
     saveContent(){
         if(this.props.onSave){
-            // var context = {
-            //     accept: function(updatedValues){
-            //
-            //         //this is a rule dependency that must be resolved in the "server" and the changes must be merged in the document
-            //         // if(this.state.document.resources){
-            //         //     this.state.document.resources = this.state.document.resources.filter(x => !x.__deleted===true);
-            //         // }
-            // 
-            //         this.setState({
-            //             changed: false,
-            //             savedOnce:true
-            //             //document:updatedValues,   //THIS IS A BAD IDEA! BAD WAY TO APPLY CHANGES FROM A SERVER
-            //                                         //THE FORM WILL HAVE PROBLEMS. WE MUST UPDATE THE DOCUMENT, NOT REPLACE IT
-            //                                         //THE DOC - AGAINST ALL RECOMMENDATIONS - IS MUTABLE
-            //                                         // WE MUST FIND A WAY TO UPDATE THIS WITHOUT REPLACING IT
-            //         });
-            //     }.bind(this),
-            //     reject: function(msg){
-            //         this.setState({error: msg || 'Error'});
-            //     }.bind(this),
-            //     data: Object.assign({}, this._valueFactory())
-            // }
-            //let updatedValues = this.props.onSave.call(this, context);
+            var context = {
+                accept: function(updatedValues){
+
+                    //this is a rule dependency that must be resolved in the "server" and the changes must be merged in the document
+                    // if(this.state.document.resources){
+                    //     this.state.document.resources = this.state.document.resources.filter(x => !x.__deleted===true);
+                    // }
+
+                    this.setState({
+                        changed: false,
+                        savedOnce:true
+                        //document:updatedValues,   //THIS IS A BAD IDEA! BAD WAY TO APPLY CHANGES FROM A SERVER
+                                                    //THE FORM WILL HAVE PROBLEMS. WE MUST UPDATE THE DOCUMENT, NOT REPLACE IT
+                                                    //THE DOC - AGAINST ALL RECOMMENDATIONS - IS MUTABLE
+                                                    // WE MUST FIND A WAY TO UPDATE THIS WITHOUT REPLACING IT
+                    });
+                }.bind(this),
+                reject: function(msg){
+                    this.setState({error: msg || 'Error'});
+                }.bind(this),
+                data: Object.assign({}, this._valueFactory())
+            }
+            let updatedValues = this.props.onSave.call(this, context);
         }
         else{
             this.setState({error: 'Save not implemented'});

@@ -3,10 +3,10 @@
 import React from 'react';
 import service from './../services/service'
 import { snackMessageService } from './../services/ui-service'
-//import { Redirect } from 'react-router-dom'
+// import { Redirect } from 'react-router-dom'
 import { SukohForm } from './../components/SukohForm';
 import Spinner from './../components/Spinner'
-//import { FormBreadcumb } from './../components/Breadcumb'
+// import { FormBreadcumb } from './../components/Breadcumb'
 
 import type { WorkspaceConfig } from './../types';
 
@@ -74,7 +74,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
             return <Spinner />;
         }
 
-        //let { selectedWorkspaceDetails, collectionItemValues } = this.state;
+        // let { selectedWorkspaceDetails, collectionItemValues } = this.state;
         let { selectedWorkspaceDetails} = this.state;
         let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
