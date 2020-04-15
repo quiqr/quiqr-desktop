@@ -5,6 +5,7 @@
  * It's consumed by the SPA.
  */
 const configurationDataProvider = require('./configuration-data-provider')
+const mainWindowManager = require('./main-window-manager')
 const SiteService = require('./services/site/site-service')
 const WorkspaceService = require('./services/workspace/workspace-service')
 const siteSourceBuilderFactory = require('./site-sources/builders/site-source-builder-factory');
@@ -41,11 +42,12 @@ function getSiteService(siteKey/*: string*/, callback/*: CallbackTyped<SiteServi
     })
 }
 
+
 function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     return new Promise((resolve, reject)=>{
         configurationDataProvider.get(function(err, configurations){
             if(configurations.empty===true) throw new Error('Configurations is empty.');
-            if(err) { reject(err); return; } 
+            if(err) { reject(err); return; }
             let siteData = configurations.sites.find((x)=>x.key===siteKey);
             if(siteData==null) throw new Error('Could not find site is empty.');
             let siteService = new SiteService(siteData);
@@ -100,7 +102,7 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
     let service = await getSiteServicePromise(siteKey);
     let workspaces = await service.listWorkspaces();
     context.resolve(workspaces);
-    
+
 }
 
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
@@ -122,7 +124,7 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, conte
         // warn about HugoDownloader error?
     }
     context.resolve(configuration);
-    
+
 }
 
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
@@ -134,10 +136,14 @@ api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*:
 }
 
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
+
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+
         if(err){ context.reject(err); return; }
         workspaceService.serve(serveKey).then(()=>{
-            shell.openItem('http://localhost:1313');
+
+
+            //shell.openItem('http://localhost:1313');
             context.resolve();
         }, ()=>{
             context.reject(err); return
@@ -146,6 +152,12 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
             context.reject(error);
         });
     });
+
+    return new Promise((resolve, reject)=>{
+        mainWindowManager.reloadPreview();
+    });
+
+
 }
 
 api.buildWorkspace = function({siteKey, workspaceKey, buildKey}/*: any*/, context/*: any*/){
@@ -203,7 +215,7 @@ api.getCollectionItem = function({siteKey, workspaceKey, collectionKey, collecti
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.getCollectionItem(collectionKey, collectionItemKey)
-        .then((result)=>{ 
+        .then((result)=>{
             context.resolve(result);
         })
         .catch((error)=>{
@@ -225,7 +237,7 @@ api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.updateCollectionItem(collectionKey, collectionItemKey, document)
-        .then((result)=>{ 
+        .then((result)=>{
             context.resolve(result);
         })
         .catch((error)=>{
@@ -238,7 +250,7 @@ api.createCollectionItemKey = function({siteKey, workspaceKey, collectionKey, co
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.createCollectionItemKey(collectionKey, collectionItemKey)
-        .then((result)=>{ 
+        .then((result)=>{
             context.resolve(result);
         })
         .catch((error)=>{
@@ -329,6 +341,10 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
             context.reject(err);
         });
     });
+}
+
+api.reloadPreview = function(){
+  global.previewWindow.reload();
 }
 
 
