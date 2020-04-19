@@ -109,6 +109,30 @@ function getLocation(locPath = ''){
     }
 }
 
+function createPreviewWindow (windowState) {
+let mainWindowState = windowState;
+  let previewWindowX = mainWindowState.x + mainWindowState.width;
+
+
+  previewWindow = new BrowserWindow({
+
+    show: false,
+    parent: mainWindow,
+    x: previewWindowX,
+    y: mainWindowState.y,
+    width: 500,
+    height: mainWindowState.height,
+  });
+
+  previewWindow.setMenuBarVisibility(false);
+  previewWindow.loadURL("http://localhost:1313");
+
+
+previewWindow.on('closed', function () {
+    previewWindow.show = false;
+
+})
+}
 
 function createWindow () {
 
@@ -158,36 +182,11 @@ function createWindow () {
 
       mainWindow.show();
 
-      // Create the preview window.
-
-      let previewWindowX = mainWindowState.x + mainWindowState.width;
-
-      previewWindow = new BrowserWindow({
-
-
-        show: false,
-        parent: mainWindow,
-        x: previewWindowX,
-        y: mainWindowState.y,
-        width: 500,
-        height: mainWindowState.height,
-      });
-
-      previewWindow.setMenuBarVisibility(false);
-      previewWindow.loadURL("http://localhost:1313");
-
-
-    previewWindow.on('closed', function () {
-        previewWindow = undefined; //clear reference
-
-    })
-
-    // previewWindow.webContents.on('dom-ready', function (){
-    //    previewWindow.reload();
-    //   });
-    //previewWindow.webContents.on('new-window', previewWindow.Reload);
+      createPreviewWindow(mainWindowState);
 
     });
+
+
 
     getLocation();
 
@@ -218,12 +217,18 @@ module.exports = {
     reloadPreview: function() {
       console.log ("function reloadPreview was called");
 
-      previewWindow.reload();
-
-      previewWindow.webContents.once('dom-ready', function (){
+      //previewWindow.loadURL("http://localhost:1313");
+      if (previewWindow){
         previewWindow.reload();
-        previewWindow.show();
-      });
+
+        previewWindow.webContents.once('dom-ready', function (){
+          previewWindow.reload();
+          previewWindow.show();
+          });
+      } else {
+        createPreviewWindow;
+      }
+
 
 
       return;

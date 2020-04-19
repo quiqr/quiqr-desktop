@@ -66,28 +66,28 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       workspaceConfig,
     } = this.props;
 
-      // let previewButton;
-      //
-      // if(this.state.hugoRunning){
-      //     previewButton = <FlatButton
-      //     onClick=
-      //
-      //     {function(){
-      //        window.require('electron').shell.openExternal('http://localhost:1313');
-      //        }
-      //      }
-      //
-      //
-      //
-      //     style={{flex:1, minWidth:40}}
-      //     icon={<IconPlay color="white" style={{opacity:.8}} />} />
-      // }
-      // else{
-      //     previewButton = <FlatButton
-      //     onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
-      //     style={{flex:1, minWidth:40}}
-      //     icon={<IconPlay color="white" style={{opacity:.2}} />} />
-      // }
+      let previewButton;
+
+      if(this.state.hugoRunning){
+          previewButton = <FlatButton
+          onClick=
+
+          {function(){
+             window.require('electron').shell.openExternal('http://localhost:1313');
+             }
+           }
+
+
+
+          style={{flex:1, minWidth:40}}
+          icon={<IconPlay color="white" style={{opacity:.8}} />} />
+      }
+      else{
+          previewButton = <FlatButton
+          onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
+          style={{flex:1, minWidth:40}}
+          icon={<IconPlay color="white" style={{opacity:.2}} />} />
+      }
 
     let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
@@ -107,7 +107,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     </List>
 
     { siteConfig!=null && workspaceConfig!=null ? (
-      
+
     <div style={{display:'flex'}}>
 
 {/*
@@ -132,7 +132,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         icon={<IconFileFolder color="white" style={{opacity:.8}} />} />
       */}
 
-    {/*{previewButton}*/}
+    {previewButton}
 
 
       {/*

@@ -343,9 +343,5 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     });
 }
 
-api.reloadPreview = function(){
-  global.previewWindow.reload();
-}
-
 
 module.exports = api;

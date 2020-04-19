@@ -84,7 +84,7 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
                                     innerDivStyle={style}
                                     onClick={item.onClick}
                                     primaryText={item.label}
-                                    leftIcon={<IconActionList color={translucentColor} />}
+                                    //leftIcon={<IconActionList color={translucentColor} />}
                                 />
                             );
                         }) }
