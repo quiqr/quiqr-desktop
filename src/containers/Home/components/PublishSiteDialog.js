@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui';
 import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
+import { Accordion, AccordionItem } from './../../../components/Accordion';
+import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 
 type PublishSiteDialogProps = {
     site: SiteConfig,
@@ -82,15 +84,16 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
             />,
         ];
 
+        let active=true;
 
         return (
             <Dialog
                 title="Publish Site"
                 open={open}
-                actions={actions}
-            >
+            actions={actions}>
+            <div>
+
                 <TextField floatingLabelText={'Site'} readOnly fullWidth value={this.props.site.key} />
-                <TextField floatingLabelText={'Workspace'} readOnly fullWidth value={this.props.workspaceHeader.key} />
                 <SelectField
                     onChange={this.handleBuildChange}
                     fullWidth
@@ -116,7 +119,8 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
                             secondaryText={publish.config.type}
                         />
                     ))}
-                </SelectField>
+                    </SelectField>
+                </div>
             </Dialog>
         );
     }
