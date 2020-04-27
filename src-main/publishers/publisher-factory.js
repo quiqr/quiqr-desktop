@@ -32,9 +32,9 @@ class PublisherFactory{
             let GithubPublisher = require('./github-publisher');
             return new GithubPublisher(genericPublisherConfig);
         }
-        if(type==='gitlab'){
-            let GitlabPublisher = require('./gitlab-publisher');
-            return new GitlabPublisher(genericPublisherConfig);
+        if(type==='poppygo'){
+            let PogoPublisher = require('./pogo-publisher');
+            return new PogoPublisher(genericPublisherConfig);
         }
 
         if(type==='s3'){
