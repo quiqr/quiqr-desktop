@@ -127,7 +127,7 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
         service.api.listWorkspaces(site.key).then((workspaces)=>{
 
             if(workspaces.length === 1){
-                //this.selectWorkspace(site.key, workspaces[0]);
+                this.selectWorkspace(site.key, workspaces[0]);
             }
 
             //this.setState({selectedSiteWorkspaces: workspaces});
@@ -142,13 +142,6 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
 
     componentWillUnmount(){
         service.unregisterListener(this);
-    }
-
-    renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
-        return (<Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
-            <InfoLine label="Name">{site.name}</InfoLine>
-            { this.renderWorkspaces(site, site.key===this.props.siteKey, this.state.selectedSiteWorkspaces) }
-        </Wrapper>);
     }
 
     handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
@@ -172,35 +165,13 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
 
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
-            this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
-
-            // Serve the workspace at selection of the workspace right after mounting the workspace
-
+            await service.api.parentMountWorkspace(siteKey, workspace.key);
             await service.api.serveWorkspace(siteKey, workspace.key, "instantly serve at selectWorkspace"/*serveKey*/);
-
-            // Open a new window with the served site.
-            //window.require('electron').shell.openExternal('http://localhost:1313');
         }
         else{
-            this.history.push(`/`);
+            //this.history.push(`/`);
         }
         console.log(window.location.toString());
-    }
-
-    renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
-        return (
-            <Route render={({history})=>{
-
-                this.history = history; //ugly
-
-                if(workspaces==null)
-                    return (<Wrapper></Wrapper>);
-
-                return (
-                    <Wrapper></Wrapper>
-                )
-            }} />
-        );
     }
 
     handleAddSiteClick(){

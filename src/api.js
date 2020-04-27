@@ -113,6 +113,9 @@ export class API {
     mountWorkspace(siteKey: string, workspaceKey: string){
         return mainProcessBridge.request('mountWorkspace', {siteKey, workspaceKey});
     }
+    parentMountWorkspace(siteKey: string, workspaceKey: string){
+        return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
+    }
 }
 
 export const instance = new API();

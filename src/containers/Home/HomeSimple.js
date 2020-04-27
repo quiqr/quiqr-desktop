@@ -84,23 +84,29 @@ class Home extends React.Component<HomeProps, HomeState>{
         super(props);
         this.state = {
             blockingOperation: null,
+            currentSiteKey: null,
             createSiteDialog: false,
             publishSiteDialog: undefined
         };
     }
 
     componentDidUpdate(preProps: HomeProps){
+        if(this._ismounted && preProps.siteKey !== this.props.siteKey){
+            this.checkSiteInProps();
+        }
     }
 
     componentWillMount(){
         service.registerListener(this);
     }
 
-    componentDidMount(){
-        console.log('HOME MOUNTED');
+    checkSiteInProps(){
 
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
+            //alert(site);
+            this.setState({currentSiteKey: siteKey});
+
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = bundle.configurations;
@@ -119,6 +125,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                 this.setState(stateUpdate);
             })
         }
+
+    }
+
+    componentDidMount(){
+        this.checkSiteInProps();
+        this._ismounted = true;
     }
 
     selectSite(site : SiteConfig ){
@@ -250,8 +262,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         })
     }
 
-    render(){
-
+    renderSelectSites(){
         let { siteKey } = this.props;
         //let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
@@ -261,9 +272,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(configurations==null){
             return <Spinner />
         }
-
         return (
-            <div style={ styles.container }>
                 <div style={ styles.sitesCol }>
                     <List>
                         <Subheader>All Sites</Subheader>
@@ -289,6 +298,28 @@ class Home extends React.Component<HomeProps, HomeState>{
                         ) : ( null ) }
                     </List>
                 </div>
+        );
+
+    }
+
+    render(){
+
+        let { siteKey } = this.props;
+        //let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+
+        let _configurations = ((configurations: any): Configurations);
+
+        if(configurations==null){
+            return <Spinner />
+        }
+
+        return (
+            <div style={ styles.container }>
+
+                {this.props.siteKey ? (null) : this.renderSelectSites() }
+
+
                 <div style={styles.selectedSiteCol}>
                     { selectedSite==null ? (
                         <Wrapper title="Site Management">

@@ -87,6 +87,19 @@ class App extends React.Component<AppProps,AppState>{
     })
   }
 
+  redirectMountSite(){
+    if(this.state.redirectHome){
+      this.setState({redirectHome: false});
+    }
+    else{
+      this.setState({redirectCookbook: false});
+      this.setState({redirectConsole: false});
+      this.setState({redirectPrefs: false});
+      this.setState({redirectHome: true});
+    }
+  }
+
+
   redirectHome(){
     if(this.state.redirectHome){
       this.setState({redirectHome: false});
@@ -121,11 +134,16 @@ class App extends React.Component<AppProps,AppState>{
   }
 
   componentWillMount(){
-    window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
-    window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
-    window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
-    window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
-    window.require('electron').ipcRenderer.on('redirectselectsite', this.redirectSelectSite.bind(this));
+      window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
+      window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
+      window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
+      window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
+      window.require('electron').ipcRenderer.on('redirectselectsite', this.redirectSelectSite.bind(this));
+      window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
+          this.setState({redirectMountSite: args});
+      }.bind(this));
+
+
   }
 
   minimizeWindow(){
@@ -406,6 +424,13 @@ class App extends React.Component<AppProps,AppState>{
                 ) : (
                   <div></div>
                 )}
+
+                {(this.state.redirectMountSite) ? (
+                  <Redirect to={this.state.redirectMountSite} />
+                ) : (
+                  <div></div>
+                )}
+
 
                 {(this.state.redirectHome) ? (
                   <Redirect to='/' />
