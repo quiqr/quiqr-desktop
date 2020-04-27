@@ -6,6 +6,7 @@ import { Switch, Route } from 'react-router-dom'
 //CONTAINERS
 import Home from './containers/Home'
 import Prefs from './containers/Prefs'
+import SelectSite from './containers/SelectSite'
 import Collection from './containers/Collection';
 import CollectionItem from './containers/CollectionItem';
 import Single from './containers/Single';
@@ -64,6 +65,7 @@ class App extends React.Component<AppProps,AppState>{
       redirectConsole: false,
       redirectPrefs: false,
       redirectHome: false,
+      redirectSelectSite: false,
       skipMenuTransition: false
     };
 
@@ -114,12 +116,16 @@ class App extends React.Component<AppProps,AppState>{
   redirectPrefs(){
     this.setState({redirectPrefs: true});
   }
+  redirectSelectSite(){
+    this.setState({redirectSelectSite: true});
+  }
 
   componentWillMount(){
     window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
     window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
     window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
     window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
+    window.require('electron').ipcRenderer.on('redirectselectsite', this.redirectSelectSite.bind(this));
   }
 
   minimizeWindow(){
@@ -234,6 +240,9 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/prefs' exact render={ () => {
         return <Prefs />
       }} />
+      <Route path='/selectsite' exact render={ () => {
+        return <SelectSite />
+      }} />
       <Route path='/console' exact render={ () => {
         return <Console />
       }} />
@@ -319,6 +328,25 @@ class App extends React.Component<AppProps,AppState>{
           )
 
       }} />
+
+      <Route path="/selectsite" exact={false} render={ ({match, history})=> {
+
+       return (
+         <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+           <div className="App">
+             <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+
+               { this.getContentSwitch() }
+
+              </div>
+            </div>
+          </MuiThemeProvider>
+
+          )
+
+      }} />
+
+
       <Route path="/prefs" exact={false} render={ ({match, history})=> {
 
        return (
@@ -396,7 +424,11 @@ class App extends React.Component<AppProps,AppState>{
                 ) : (
                     <div></div>
                 )}
- 
+                {(this.state.redirectSelectSite) ? (
+                    <Redirect to='/selectsite' />
+                ) : (
+                    <div></div>
+                )}
 
               </div>
             </MuiThemeProvider>

@@ -35,11 +35,11 @@ const styles = {
         height: '100%'
     },
     sitesCol: {
-        flex: '0 0 280px',
+        flex: '0 0 100%',
         overflowY:'auto',
         overflowX:'hidden',
         userSelect:'none',
-        borderRight: 'solid 1px #e0e0e0',
+        //borderRight: 'solid 1px #e0e0e0',
         background:'#fafafa'
     },
     selectedSiteCol: {
@@ -76,7 +76,7 @@ type HomeState = {
     blockingOperation: ?string //this should be moved to a UI service
 }
 
-class Home extends React.Component<HomeProps, HomeState>{
+class SelectSite extends React.Component<HomeProps, HomeState>{
 
     history: any;
 
@@ -122,14 +122,16 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     selectSite(site : SiteConfig ){
-        this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
+        //this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
         //load all site configuration to enforce validation
         service.api.listWorkspaces(site.key).then((workspaces)=>{
+
             if(workspaces.length === 1){
-              this.selectWorkspace(site.key, workspaces[0]);
+                //this.selectWorkspace(site.key, workspaces[0]);
             }
 
-            this.setState({selectedSiteWorkspaces: workspaces});
+            //this.setState({selectedSiteWorkspaces: workspaces});
+            window.close();
         });
     }
 
@@ -195,21 +197,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     return (<Wrapper></Wrapper>);
 
                 return (
-                    <WorkspacesSimple
-                        getWorkspaceDetails={this.getWorkspaceDetails}
-                        workspaces={workspaces}
-                        activeSiteKey={this.props.siteKey}
-                        activeWorkspaceKey={this.props.workspaceKey}
-                        onLocationClick={(location)=>{
-                            service.api.openFileExplorer(location)
-                        }}
-                        onPublishClick={(workspaceHeader, workspace)=>{
-                            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
-                        }}
-                        onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }
-                        onSelectWorkspaceClick={ this.handleSelectWorkspaceClick }
-                        site={site}
-                    />
+                    <Wrapper></Wrapper>
                 )
             }} />
         );
@@ -289,15 +277,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                         ) : ( null ) }
                     </List>
                 </div>
-                <div style={styles.selectedSiteCol}>
-                    { selectedSite==null ? (
-                        <Wrapper title="Site Management">
-                            <MessageBlock>Please, select a site.</MessageBlock>
-                        </Wrapper>
-                    ) : (
-                        this.renderSelectedSiteContent(_configurations, selectedSite)
-                    ) }
-                </div>
                 <CreateSiteDialog
                     open={createSiteDialog}
                     onCancelClick={()=>this.setState({createSiteDialog:false})}
@@ -322,4 +301,4 @@ class Home extends React.Component<HomeProps, HomeState>{
 
 }
 
-export default muiThemeable()(Home);
+export default muiThemeable()(SelectSite);

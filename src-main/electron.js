@@ -5,6 +5,7 @@ const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
 const logWindowManager = require('./log-window-manager');
 const prefsWindowManager = require('./prefs-window-manager');
+const selectsiteWindowManager = require('./selectsite-window-manager');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
@@ -272,6 +273,26 @@ function exportSite() {
     }
 }
 
+function createSelectSiteWindow () {
+  selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
+  if (selectsiteWindow) {
+    selectsiteWindow.webContents.send("redirectselectsite")
+  }
+
+  selectsiteWindow.once('ready-to-show', () => {
+    selectsiteWindow.webContents.send("redirectselectsite")
+  })
+
+  selectsiteWindow.webContents.on('did-finish-load',() => {
+    selectsiteWindow.webContents.send("redirectselectsite")
+  })
+
+  selectsiteWindow.on('closed', function() {
+    selectsiteWindow = null
+  })
+}
+
+
 
 function createPrefsWindow () {
   prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
@@ -343,6 +364,12 @@ function createMainMenu(){
       label: 'File',
         submenu: [
         {
+          label: 'Select site',
+          click: async () => {
+            createSelectSiteWindow()
+          }
+        },
+        {
             label: 'Import website',
             click: async () => {
                 importSite()
@@ -388,7 +415,13 @@ function createMainMenu(){
         ] : [
           { role: 'delete' },
           { type: 'separator' },
-          { role: 'selectAll' }
+          { role: 'selectAll' },
+            {
+                label: 'Preferences',
+                click: async () => {
+                    createPrefsWindow()
+                }
+            }
         ])
       ]
     },

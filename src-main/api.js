@@ -122,7 +122,7 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, conte
         // warn about HugoDownloader error?
     }
     context.resolve(configuration);
-    
+
 }
 
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
@@ -137,7 +137,6 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.serve(serveKey).then(()=>{
-            shell.openItem('http://localhost:1313');
             context.resolve();
         }, ()=>{
             context.reject(err); return
