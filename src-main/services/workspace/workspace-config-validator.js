@@ -49,7 +49,7 @@ class WorkspaceConfigValidator {
 
         validationErrorMessage = config.singles.map(x => this.validateSingle(x)).find(x=> x!==null);
         if(validationErrorMessage) return validationErrorMessage;
-        
+
         return null;
     }
 
@@ -137,7 +137,7 @@ class WorkspaceConfigValidator {
         ).error;
 
         if(validationError) return validationError.message;
-        
+
         let extension = path.extname(single.file).replace('.','');
         if(single.file.startsWith('content')){
             //content file, dataformat must be provided

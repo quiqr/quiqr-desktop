@@ -12,6 +12,7 @@ const hugoDownloader = require('./hugo/hugo-downloader')
 const fs = require('fs-extra');
 const {dirname} = require('path');
 const {shell} = require('electron');
+const mainWindowManager = require('./main-window-manager');
 
 /*::
 type APIContext = {
@@ -45,7 +46,7 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     return new Promise((resolve, reject)=>{
         configurationDataProvider.get(function(err, configurations){
             if(configurations.empty===true) throw new Error('Configurations is empty.');
-            if(err) { reject(err); return; } 
+            if(err) { reject(err); return; }
             let siteData = configurations.sites.find((x)=>x.key===siteKey);
             if(siteData==null) throw new Error('Could not find site is empty.');
             let siteService = new SiteService(siteData);
@@ -100,7 +101,7 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
     let service = await getSiteServicePromise(siteKey);
     let workspaces = await service.listWorkspaces();
     context.resolve(workspaces);
-    
+
 }
 
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
@@ -127,10 +128,17 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, conte
 
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
+
+    console.log(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`);
     bindResponseToContext(
         siteService.mountWorkspace(workspaceKey),
         context
     );
+}
+
+api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
@@ -202,7 +210,7 @@ api.getCollectionItem = function({siteKey, workspaceKey, collectionKey, collecti
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.getCollectionItem(collectionKey, collectionItemKey)
-        .then((result)=>{ 
+        .then((result)=>{
             context.resolve(result);
         })
         .catch((error)=>{
@@ -224,7 +232,7 @@ api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.updateCollectionItem(collectionKey, collectionItemKey, document)
-        .then((result)=>{ 
+        .then((result)=>{
             context.resolve(result);
         })
         .catch((error)=>{
@@ -237,7 +245,7 @@ api.createCollectionItemKey = function({siteKey, workspaceKey, collectionKey, co
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.createCollectionItemKey(collectionKey, collectionItemKey)
-        .then((result)=>{ 
+        .then((result)=>{
             context.resolve(result);
         })
         .catch((error)=>{

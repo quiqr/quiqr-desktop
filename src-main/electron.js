@@ -292,8 +292,6 @@ function createSelectSiteWindow () {
   })
 }
 
-
-
 function createPrefsWindow () {
   prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
   if (prefsWindow) {
