@@ -53,21 +53,21 @@ pages:\n\
     paths:\n\
     - public\n\
   only:\n\
+  - master\n\
+pogoform:\n\
+  image: 'node:latest'\n\
+  script:\n\
+  - echo 'INSTALL SSH AUTH'\n\
+  - mkdir /root/.ssh\n\
+  - echo '$SSH_PRIVATE_KEY' > /root/.ssh/id_rsa\n\
+  - chmod 700 /root/.ssh\n\
+  - chmod 600 /root/.ssh/id_rsa\n\
+  - echo 'POPULATE KNOWN HOSTS'\n\
+  - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
+  - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
+  - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
+  only:\n\
   - master\n"
-// pogoform:\n\
-//   image: 'node:latest'\n\
-//   script:\n\
-//   - echo 'INSTALL SSH AUTH'\n\
-//   - mkdir /root/.ssh\n\
-//   - echo '$SSH_PRIVATE_KEY' > /root/.ssh/id_rsa\n\
-//   - chmod 700 /root/.ssh\n\
-//   - chmod 600 /root/.ssh/id_rsa\n\
-//   - echo 'POPULATE KNOWN HOSTS'\n\
-//   - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
-//   - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
-//   - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
-//   only:\n\
-//   - master\n"
 
 
         //var gitsshcommand = 'ssh -o IdentitiesOnly=yes -i ' + tmpkeypath;
