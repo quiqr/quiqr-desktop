@@ -18,7 +18,7 @@ type PublishSiteDialogState = {
 }
 
 export default class PublishSiteDialog extends React.Component<PublishSiteDialogProps,PublishSiteDialogState>{
-    
+
     constructor(props: PublishSiteDialogProps){
         super(props);
         this.state = {
@@ -58,6 +58,14 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
         let { open, workspace, site } = this.props;
         let { build, publish } = this.state;
 
+        if(build==="" && workspace.build.length > 0){
+            this.setState({build: this.props.workspace.build[0].key});
+        }
+
+        if(publish==="" && site.publish.length > 0){
+            this.setState({publish: this.props.site.publish[0].key});
+        }
+
         let valid = this.validate();
 
         const actions = [
@@ -73,6 +81,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
                 onClick={this.handleBuildAndPublishClick}
             />,
         ];
+
 
         return (
             <Dialog
@@ -99,7 +108,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
                     onChange={this.handlePublishChange}
                     fullWidth
                     value={site.publish.findIndex(x => x.key===publish)}
-                    floatingLabelText="Publish Config *">                        
+                    floatingLabelText="Publish Config *">
                     {this.props.site.publish.map((publish, i)=>(
                         <MenuItem
                             key={`publish-${i}`} value={i}

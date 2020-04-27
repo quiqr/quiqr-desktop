@@ -18,7 +18,7 @@ import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import TextField from 'material-ui/TextField';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, InfoLine, InfoBlock, MessageBlock } from './components/shared';
-import { Workspaces } from './components/Workspaces';
+import { WorkspacesSimple } from './components/WorkspacesSimple';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import BlockDialog from './components/BlockDialog';
@@ -143,28 +143,9 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
-        return (<Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Management">
+        return (<Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
             <InfoLine label="Name">{site.name}</InfoLine>
-            <InfoLine label="Key">{site.key}</InfoLine>
-            <InfoLine label="Source Type">{site.source.type}</InfoLine>
-            <InfoLine label="Publish Options">
-                {site.publish && site.publish.length>0?(site.publish.map(x => x.key).join(', ')):('EMPTY')}
-            </InfoLine>
-            { configurations.global.siteManagementEnabled? (
-                <InfoLine label="Config Location">
-                    <TextField id="config-location" value={site.configPath} readOnly={true} />
-                    <FlatButton
-                        style={{minWidth:'40px'}}
-                        icon={<IconFileFolder />}
-                        //onClick={()=>{ service.api.openFileExplorer(site.configPath.replace(/(\\|\/)[^\/\\]+$/,'')) }}
-                        onClick={()=>{ service.api.openFileExplorer(site.configPath.replace(/(\\|\/)[^\\]+$/,'')) }}
-
-                    />
-                </InfoLine>
-            ): ( null ) }
-            <InfoBlock label="Workspaces">
-                { this.renderWorkspaces(site, site.key===this.props.siteKey, this.state.selectedSiteWorkspaces) }
-            </InfoBlock>
+            { this.renderWorkspaces(site, site.key===this.props.siteKey, this.state.selectedSiteWorkspaces) }
         </Wrapper>);
     }
 
@@ -214,7 +195,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     return (<Wrapper></Wrapper>);
 
                 return (
-                    <Workspaces
+                    <WorkspacesSimple
                         getWorkspaceDetails={this.getWorkspaceDetails}
                         workspaces={workspaces}
                         activeSiteKey={this.props.siteKey}
