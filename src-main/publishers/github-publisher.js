@@ -103,12 +103,12 @@ class GithubPublisher {
                                     var spawn = require("child_process").spawn;
                                     //let clonecmd4 = spawn( git_bin, [ "push" ], {cwd: full_gh_dest, env: { GIT_SSH_COMMAND: gitsshcommand }});
                                     let clonecmd4 = spawn( git_bin, [ "push", "-i", tmpkeypath, full_gh_dest ]);
+                                    outputConsole.appendLine(git_bin+ 'push -i'+ tmpkeypath+ ' '+ full_gh_dest);
                                     clonecmd4.stdout.on("data", (data) => {
                                     });
                                     clonecmd4.stderr.on("data", (err) => {
                                     });
                                     clonecmd4.on("exit", (err) => {
-
                                         if(code==0){
                                             outputConsole.appendLine('git-push finished ... changes are published.');
                                         }

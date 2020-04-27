@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## versie 0.3.0 - Birth Poppy Go
+- new icon
+- new product name
+- remember window size
+- direct start of server after site switch
+- gitlab publisher now uses embgit (https://github.com/mipmip/embgit)
+
 ## versie 0.2.5 - Lize
 - github publisher now uses embgit (https://github.com/mipmip/embgit)
 
