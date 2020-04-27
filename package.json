@@ -13,6 +13,7 @@
     "adm-zip": "0.4.13",
     "electron-context-menu": "^0.10.1",
     "electron-is-dev": "^1.1.0",
+    "electron-progressbar": "^1.2.0",
     "electron-prompt": "^1.5.1",
     "electron-root-path": "^1.0.16",
     "electron-unhandled": "^1.1.0",

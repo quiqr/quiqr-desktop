@@ -2,10 +2,14 @@
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
 const path = require('path');
 const rootPath = require('electron-root-path').rootPath;
+const electron = require('electron')
 
 const fs = require('fs-extra');
 const pathHelper = require('./../path-helper');
 const outputConsole = require('./../output-console');
+
+const ProgressBar = require('electron-progressbar');
+const mainWindowManager = require('../main-window-manager');
 
 class GithubPublisher {
     constructor(config){
@@ -36,15 +40,35 @@ class GithubPublisher {
 
     async publish(context){
 
+        const dialog = electron.dialog;
+        let mainWindow = mainWindowManager.getCurrentInstance();
+
         var tmpkeypath = pathHelper.getRoot()+'ghkey';
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/githubrepo/';
         var full_gh_url = 'git@github.com:' + this._config.user + '/' + this._config.repo +'.git';
         var full_gh_dest = resolvedDest + '' + this._config.repo;
 
-        //var gitsshcommand = 'ssh -o IdentitiesOnly=yes -i ' + tmpkeypath;
         var git_bin = this.getGitBin();
 
         outputConsole.appendLine('Git Bin' + git_bin);
+
+        var progressBar = new ProgressBar({
+            indeterminate: false,
+            text: 'Publishing website..',
+            abortOnError: true,
+            detail: 'Preparing upload..'
+        });
+
+        progressBar.on('completed', function() {
+            progressBar.detail = 'The website has been uploaded.';
+        })
+            .on('aborted', function(value) {
+                console.info(`aborted... ${value}`);
+            })
+            .on('progress', function(value) {
+            });
+
+        progressBar.value += 1;
 
         await fs.ensureDir(resolvedDest);
         await fs.emptyDir(resolvedDest);
@@ -60,9 +84,13 @@ class GithubPublisher {
 
         outputConsole.appendLine('Using the following tmpkeypath: ' + tmpkeypath + " and full_gh_dest: " + full_gh_dest );
 
+
         clonecmd.stdout.on("data", (data) => {
             outputConsole.appendLine('Start cloning with:' + git_bin);
+            progressBar.value += 1;
+            progressBar.detail = 'Get remote website for synchronizing (git-clone)';
         });
+
         clonecmd.stderr.on("data", (err) => {
             outputConsole.appendLine('Clone error ...:' + err);
         });
@@ -72,10 +100,11 @@ class GithubPublisher {
 
                 fs.copy(context.from, full_gh_dest,function(err){
 
+                    progressBar.value += 1;
+                    progressBar.detail = 'Sync changes with destination (git-add)';
                     outputConsole.appendLine('copy finished, going to git-add ...');
 
                     var spawn = require("child_process").spawn;
-                    //let clonecmd2 = spawn( git_bin, [ "add" , '.'],{cwd: full_gh_dest});
                     let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
 
                     clonecmd2.stdout.on("data", (data) => {
@@ -85,6 +114,8 @@ class GithubPublisher {
                     clonecmd2.on("exit", (code) => {
                         if(code==0){
 
+                            progressBar.value += 1;
+                            progressBar.detail = 'Commit changes (git-commit)';
                             outputConsole.appendLine('git-add finished, going to git-commit ...');
 
                             var spawn = require("child_process").spawn;
@@ -98,10 +129,11 @@ class GithubPublisher {
 
                                 if(code==0){
 
+                                    progressBar.value += 1;
+                                    progressBar.detail = 'Uploading changes (git-push)';
                                     outputConsole.appendLine('git-commit finished, going to git-push ...');
 
                                     var spawn = require("child_process").spawn;
-                                    //let clonecmd4 = spawn( git_bin, [ "push" ], {cwd: full_gh_dest, env: { GIT_SSH_COMMAND: gitsshcommand }});
                                     let clonecmd4 = spawn( git_bin, [ "push", "-i", tmpkeypath, full_gh_dest ]);
                                     outputConsole.appendLine(git_bin+ 'push -i'+ tmpkeypath+ ' '+ full_gh_dest);
                                     clonecmd4.stdout.on("data", (data) => {
@@ -111,32 +143,55 @@ class GithubPublisher {
                                     clonecmd4.on("exit", (err) => {
                                         if(code==0){
                                             outputConsole.appendLine('git-push finished ... changes are published.');
+                                            progressBar.value = 100;
+                                            progressBar.detail = 'Uploading finished';
+                                            progressBar.setCompleted();
                                         }
                                         else{
                                             outputConsole.appendLine('ERROR: Could not git-push ...');
+                                            progressBar.close();
+                                            dialog.showMessageBox(mainWindow, {
+                                                type: 'warning',
+                                                message: "Publishing failed. (git-push)",
+                                            });
                                         }
                                     });
                                 }
                                 else {
                                     outputConsole.appendLine('ERROR: Could not git-commit ...');
+                                    progressBar.close();
+                                    dialog.showMessageBox(mainWindow, {
+                                        type: 'warning',
+                                        message: "Publishing failed. (git-commit)",
+                                    });
                                 }
 
                             });
                         }
                         else {
                             outputConsole.appendLine('ERROR: Could not git-add ...');
+                            progressBar.close();
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'warning',
+                                message: "Publishing failed. (git-add)",
+                            });
+
                         }
                     });
                 });
             }
             else {
                 outputConsole.appendLine('Could not clone destination repository with code: ' + code);
+                progressBar.close();
+                dialog.showMessageBox(mainWindow, {
+                    type: 'warning',
+                    message: "Publishing failed. (git-clone)",
+                });
             }
         });
 
         return true;
     }
-
 }
 
 module.exports = GithubPublisher;

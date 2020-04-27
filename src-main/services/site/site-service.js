@@ -7,16 +7,8 @@ const WorkspaceService = require('./../workspace/workspace-service');
 const publisherFactory = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 
-/*::
-    import type { SiteConfig, WorkspaceHeader } from './../../../global-types';
-*/
-
-
 
 class SiteService{
-    /*::
-        _config: SiteConfig;
-    */
     constructor(config/*: SiteConfig*/){
         this._config = config;
     }
@@ -42,7 +34,7 @@ class SiteService{
 
     _findFirstMatchOrDefault/*::<T: any>*/(arr/*: Array<T>*/, key/*: string*/)/*: T*/{
         let result;
-        
+
         if(key){
             result = (arr||[]).find(x => x.key===key);
             if(result) return result;
@@ -53,7 +45,7 @@ class SiteService{
 
         if(arr!==undefined && arr.length===1)
             return arr[0];
-        
+
         if(key){
             throw new Error(`Could not find a config for key "${key}" and a default value was not available.`);
         }
@@ -63,7 +55,7 @@ class SiteService{
     }
 
     publish(publishKey/*: string*/)/*: Promise<void>*/{
-        
+
         let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
         if(publishConfig==null)
             throw new Error(`Could not find a publisher config for key '${publishKey}'.`);
