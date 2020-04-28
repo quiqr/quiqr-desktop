@@ -11,8 +11,8 @@ type FolderSiteSourceConfig = {
 
 class FolderSiteSource/*:: implements SiteSource*/ {
 
-    /*:: config: FolderSiteSourceConfig;*/ 
-    
+    /*:: config: FolderSiteSourceConfig;*/
+
     constructor(config/*: FolderSiteSourceConfig*/){
         this.config = config;
     }

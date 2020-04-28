@@ -2,6 +2,7 @@
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
 const path = require('path');
 const rootPath = require('electron-root-path').rootPath;
+const electron = require('electron')
 
 const fs = require('fs-extra');
 const pathHelper = require('./../path-helper');
@@ -39,6 +40,8 @@ class PogoPublisher {
 
     async publish(context){
 
+        let mainWindow = mainWindowManager.getCurrentInstance();
+        const dialog = electron.dialog;
         var tmpkeypath = pathHelper.getRoot()+'ghkey';
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
         var full_gh_url = 'git@gitlab.brepi.eu:' + this._config.user + '/' + this._config.repo +'.git';
@@ -112,7 +115,6 @@ pogoform:\n\
 
         var spawn = require("child_process").spawn;
         //let clonecmd = spawn( git_bin, [ "clone" , full_gh_url , full_gh_dest ], {env: { GIT_SSH_COMMAND: gitsshcommand }});
-        let clonecmd = spawn( git_bin, [ "clone", "-i", tmpkeypath, full_gh_url , full_gh_dest ]);
         let clonecmd = spawn( git_bin, [ "clone", "-i", tmpkeypath, full_gh_url , full_gh_dest ]);
 
         clonecmd.stdout.on("data", (data) => {
