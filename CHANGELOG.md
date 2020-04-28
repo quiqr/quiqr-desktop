@@ -4,6 +4,7 @@
 - poppygo publisher
 - custom menu slots
 - interface cleanups
+- progress windows
 
 ## versie 0.3.0 - Birth Poppy Go
 - new icon
