@@ -127,7 +127,8 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
         service.api.listWorkspaces(site.key).then((workspaces)=>{
 
             if(workspaces.length === 1){
-                this.selectWorkspace(site.key, workspaces[0]);
+                //this.selectWorkspace(site.key, workspaces[0]);
+                service.api.parentMountWorkspace(site.key, workspaces[0].key);
             }
 
             //this.setState({selectedSiteWorkspaces: workspaces});
@@ -153,7 +154,6 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
         let activeWorkspaceKey = this.props.workspaceKey;
         let activeSiteKey = this.props.siteKey;
 
-
         let select = (
             activeWorkspaceKey==null ||
             activeSiteKey==null ||
@@ -165,7 +165,6 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
 
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
-            await service.api.parentMountWorkspace(siteKey, workspace.key);
             await service.api.serveWorkspace(siteKey, workspace.key, "instantly serve at selectWorkspace"/*serveKey*/);
         }
         else{

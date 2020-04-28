@@ -93,6 +93,8 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentDidUpdate(preProps: HomeProps){
         if(this._ismounted && preProps.siteKey !== this.props.siteKey){
             this.checkSiteInProps();
+
+            service.api.serveWorkspace(this.props.siteKey, this.props.workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
         }
     }
 
@@ -137,6 +139,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
         //load all site configuration to enforce validation
         service.api.listWorkspaces(site.key).then((workspaces)=>{
+
             if(workspaces.length === 1){
               this.selectWorkspace(site.key, workspaces[0]);
             }
