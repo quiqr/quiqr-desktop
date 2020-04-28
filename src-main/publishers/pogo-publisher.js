@@ -1,11 +1,15 @@
-
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
 const path = require('path');
 const rootPath = require('electron-root-path').rootPath;
+const electron = require('electron')
 
 const fs = require('fs-extra');
 const pathHelper = require('./../path-helper');
 const outputConsole = require('./../output-console');
+
+const ProgressBar = require('electron-progressbar');
+const mainWindowManager = require('../main-window-manager');
+const rimraf = require("rimraf");
 
 class PogoPublisher {
     constructor(config){
@@ -36,10 +40,36 @@ class PogoPublisher {
 
     async publish(context){
 
+        let mainWindow = mainWindowManager.getCurrentInstance();
+        const dialog = electron.dialog;
+
+        var progressBar = new ProgressBar({
+            indeterminate: false,
+            text: 'Publishing website..',
+            abortOnError: true,
+            detail: 'Preparing upload..'
+        });
+
+        progressBar.on('completed', function() {
+            progressBar.detail = 'The website has been uploaded.';
+        })
+            .on('aborted', function(value) {
+                console.info(`aborted... ${value}`);
+            })
+            .on('progress', function(value) {
+            });
+
+        progressBar.value += 1;
+        progressBar.detail = 'Preparing upload';
+
+
         var tmpkeypath = pathHelper.getRoot()+'ghkey';
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
         var full_gh_url = 'git@gitlab.brepi.eu:' + this._config.user + '/' + this._config.repo +'.git';
         var full_gh_dest = resolvedDest + '' + this._config.repo;
+        var gitignore = "/public\n\
+.sukoh\n";
+
         var gitlabCi = "image: registry.gitlab.com/pages/hugo:latest\n\
 test:\n\
   script:\n\
@@ -67,8 +97,7 @@ pogoform:\n\
   - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
   - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
   only:\n\
-  - master\n"
-
+  - master\n";
 
         //var gitsshcommand = 'ssh -o IdentitiesOnly=yes -i ' + tmpkeypath;
         var git_bin = this.getGitBin();
@@ -82,10 +111,11 @@ pogoform:\n\
 
         outputConsole.appendLine('Writing temporaty key ' + tmpkeypath);
 
-
         await fs.writeFileSync(tmpkeypath, this._config.privatekey, 'utf-8');
         await fs.chmodSync(tmpkeypath, '0600');
 
+        progressBar.value += 10;
+        progressBar.detail = 'Get remote website for synchronizing (git-clone)';
 
         outputConsole.appendLine('Start cloning from: ' + full_gh_url);
 
@@ -93,10 +123,7 @@ pogoform:\n\
         //let clonecmd = spawn( git_bin, [ "clone" , full_gh_url , full_gh_dest ], {env: { GIT_SSH_COMMAND: gitsshcommand }});
         let clonecmd = spawn( git_bin, [ "clone", "-i", tmpkeypath, full_gh_url , full_gh_dest ]);
 
-
-
         clonecmd.stdout.on("data", (data) => {
-            outputConsole.appendLine('Start cloning with:' + git_bin);
         });
         clonecmd.stderr.on("data", (err) => {
             outputConsole.appendLine('Clone error ...:' + err);
@@ -105,75 +132,134 @@ pogoform:\n\
             if(code==0){
                 outputConsole.appendLine('Clone succes ...');
                 fs.writeFileSync(full_gh_dest + "/.gitlab-ci.yml" , gitlabCi , 'utf-8');
+                fs.writeFileSync(full_gh_dest + "/.gitignore" , gitignore , 'utf-8');
                 outputConsole.appendLine('copy gitlab ci to: ' + full_gh_dest);
                 outputConsole.appendLine('gitlabCi is: ' + gitlabCi);
-                // fs.ensureDir(full_gh_dest + "/public");
-                // fs.copy(context.from, full_gh_dest + "/public",function(err){
+                outputConsole.appendLine('gitignore is: ' + gitignore);
 
-                fs.ensureDir(full_gh_dest);
-                fs.copy(context.from, full_gh_dest,function(err){
+                progressBar.value += 10;
+                progressBar.detail = 'Synchronizing site with last changes (copy)';
 
-                  outputConsole.appendLine('context.from is: ' + context.from);
+                //fs.ensureDir(full_gh_dest);
 
-                    outputConsole.appendLine('copy finished, going to git-add ...');
+                console.log(full_gh_dest + '/.git');
+                console.log(full_gh_dest + '/.gitmove');
+                fs.move(full_gh_dest + '/.git', full_gh_dest + '/.gitmove', err => {
+                    if (err) return console.error(err)
+                    else console.log('success!move .git')
 
-                    var spawn = require("child_process").spawn;
-                    //let clonecmd2 = spawn( git_bin, [ "add" , '.'],{cwd: full_gh_dest});
-                    let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
+                    fs.copy(context.from, full_gh_dest, function(err){
 
-                    clonecmd2.stdout.on("data", (data) => {
-                    });
-                    clonecmd2.stderr.on("data", (err) => {
-                    });
-                    clonecmd2.on("exit", (code) => {
-                        if(code==0){
+                        fs.ensureDir(full_gh_dest+'/.git');
+                        rimraf(full_gh_dest+'/.git', function(){
 
-                            outputConsole.appendLine('git-add finished, going to git-commit ...');
+                            fs.move(full_gh_dest + '/.gitmove', full_gh_dest + '/.git', err => {
+                                if (err) return console.error(err);
+                                else console.log('move success!');
 
-                            var spawn = require("child_process").spawn;
-                            //let clonecmd3 = spawn( git_bin, [ "commit" , '-a', '-m', 'publish from sukoh'],{cwd: full_gh_dest});
-                            let clonecmd3 = spawn( git_bin, [ "commit" , '-n','sukoh','-e','sukoh@brepi.eu', '-m', 'publish from sukoh',full_gh_dest]);
-                            clonecmd3.stdout.on("data", (data) => {
+                                rimraf(full_gh_dest+'/public', function(){
+                                    outputConsole.appendLine('removing public');
+                                    console.log("remove public done");
+                                });
+
+                                outputConsole.appendLine('context.from is: ' + context.from);
+
+                                outputConsole.appendLine('copy finished, going to git-add ...');
+                                progressBar.value += 10;
+                                progressBar.detail = 'Registering changes with destination (git-add)';
+
+                                var spawn = require("child_process").spawn;
+                                //let clonecmd2 = spawn( git_bin, [ "add" , '.'],{cwd: full_gh_dest});
+                                let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
+
+                                clonecmd2.stdout.on("data", (data) => {
+                                });
+                                clonecmd2.stderr.on("data", (err) => {
+                                });
+                                clonecmd2.on("exit", (code) => {
+                                    if(code==0){
+
+                                        outputConsole.appendLine('git-add finished, going to git-commit ...');
+                                        progressBar.value += 10;
+                                        progressBar.detail = 'Commit changes (git-commit)';
+
+                                        var spawn = require("child_process").spawn;
+                                        //let clonecmd3 = spawn( git_bin, [ "commit" , '-a', '-m', 'publish from sukoh'],{cwd: full_gh_dest});
+                                        let clonecmd3 = spawn( git_bin, [ "commit" , '-n','sukoh','-e','sukoh@brepi.eu', '-m', 'publish from sukoh',full_gh_dest]);
+                                        clonecmd3.stdout.on("data", (data) => {
+                                        });
+                                        clonecmd3.stderr.on("data", (err) => {
+                                        });
+                                        clonecmd3.on("exit", (code) => {
+
+                                            if(code==0){
+
+                                                outputConsole.appendLine('git-commit finished, going to git-push ...');
+
+                                                var spawn = require("child_process").spawn;
+                                                //let clonecmd4 = spawn( git_bin, [ "push" ], {cwd: full_gh_dest, env: { GIT_SSH_COMMAND: gitsshcommand }});
+                                                let clonecmd4 = spawn( git_bin, [ "push", "-i", tmpkeypath, full_gh_dest ]);
+                                                clonecmd4.stdout.on("data", (data) => {
+                                                });
+                                                clonecmd4.stderr.on("data", (err) => {
+                                                });
+                                                clonecmd4.on("exit", (err) => {
+
+                                                    if(code==0){
+                                                        outputConsole.appendLine('git-push finished ... changes are published.');
+                                                        progressBar.value = 100;
+                                                        progressBar.detail = 'Uploading finished';
+                                                        progressBar.setCompleted();
+                                                        dialog.showMessageBox(mainWindow, {
+                                                            type: 'info',
+                                                            message: "Finished publishing. (git-push)",
+                                                        });
+
+                                                    }
+                                                    else{
+                                                        outputConsole.appendLine('ERROR: Could not git-push ...');
+
+                                                        progressBar.close();
+                                                        dialog.showMessageBox(mainWindow, {
+                                                            type: 'warning',
+                                                            message: "Publishing failed. (git-push)",
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                outputConsole.appendLine('ERROR: Could not git-commit ...');
+                                                progressBar.close();
+                                                dialog.showMessageBox(mainWindow, {
+                                                    type: 'warning',
+                                                    message: "Publishing failed. (git-commit)",
+                                                });
+                                            }
+
+                                        });
+                                    }
+                                    else {
+                                        outputConsole.appendLine('ERROR: Could not git-add ...');
+                                        progressBar.close();
+                                        dialog.showMessageBox(mainWindow, {
+                                            type: 'warning',
+                                            message: "Publishing failed. (git-add)",
+                                        });
+                                    }
+                                });
                             });
-                            clonecmd3.stderr.on("data", (err) => {
-                            });
-                            clonecmd3.on("exit", (code) => {
-
-                                if(code==0){
-
-                                    outputConsole.appendLine('git-commit finished, going to git-push ...');
-
-                                    var spawn = require("child_process").spawn;
-                                    //let clonecmd4 = spawn( git_bin, [ "push" ], {cwd: full_gh_dest, env: { GIT_SSH_COMMAND: gitsshcommand }});
-                                    let clonecmd4 = spawn( git_bin, [ "push", "-i", tmpkeypath, full_gh_dest ]);
-                                    clonecmd4.stdout.on("data", (data) => {
-                                    });
-                                    clonecmd4.stderr.on("data", (err) => {
-                                    });
-                                    clonecmd4.on("exit", (err) => {
-
-                                        if(code==0){
-                                            outputConsole.appendLine('git-push finished ... changes are published.');
-                                        }
-                                        else{
-                                            outputConsole.appendLine('ERROR: Could not git-push ...');
-                                        }
-                                    });
-                                }
-                                else {
-                                    outputConsole.appendLine('ERROR: Could not git-commit ...');
-                                }
-
-                            });
-                        }
-                        else {
-                            outputConsole.appendLine('ERROR: Could not git-add ...');
-                        }
+                        });
                     });
                 });
             }
             else {
                 outputConsole.appendLine('Could not clone destination repository');
+                outputConsole.appendLine(`${git_bin} clone -i ${tmpkeypath} ${full_gh_url} ${full_gh_dest}`);
+                progressBar.close();
+                dialog.showMessageBox(mainWindow, {
+                    type: 'warning',
+                    message: "Publishing failed. (git-clone)",
+                });
             }
         });
 

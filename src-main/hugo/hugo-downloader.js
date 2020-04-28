@@ -9,6 +9,9 @@ const request = require('request');
 const outputConsole = require('./../output-console');
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
 
+const ProgressBar = require('electron-progressbar');
+const mainWindowManager = require('../main-window-manager');
+
 class OfficialHugoSourceUrlBuilder{
     build(enviromnent, version){
         let platform;
@@ -83,7 +86,7 @@ class OfficialHugoUnpacker{
             default:
                 throw new Error('Not implemented.');
         }
-    }    
+    }
 }
 
 class HugoDownloader{
@@ -94,7 +97,7 @@ class HugoDownloader{
     }
 
     async _downloadToFile(url, dest){
-        
+
         let dir = path.dirname(dest);
         let exists = fs.existsSync(dir);
         if(!exists)
@@ -131,24 +134,56 @@ class HugoDownloader{
             let unpacker = new OfficialHugoUnpacker();
             let tempDest = pathHelper.getHugoBinDirForVer(version) + 'download.partial';
 
-            
+
             if(fs.existsSync(tempDest)){
                 await fs.unlink(tempDest)
             }
-            
+
+            var progressBar = new ProgressBar({
+                indeterminate: false,
+                text: 'Downloading PoppyGo Components, ..',
+                abortOnError: true,
+                detail: 'Preparing download..'
+            });
+
+            progressBar.on('completed', function() {
+                progressBar.detail = 'Hugo has been installed';
+            })
+                .on('aborted', function(value) {
+                    console.info(`aborted... ${value}`);
+                })
+                .on('progress', function(value) {
+                });
+
+            progressBar.value += 1;
+
+
             outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);
+            progressBar.value += 1;
+            progressBar.detail = `Hugo installation started. Downloading...`
 
             await this._downloadToFile(url, tempDest);
-            
+
             outputConsole.appendLine(`Unpacking....`);
+            progressBar.value += 1;
+            progressBar.detail = `Unpacking Hugo-component`
             await unpacker.unpack(tempDest, enviromnent);
             await fs.unlink(tempDest);
 
+            progressBar.value = 100;
+            progressBar.detail = `Hugo installation completed.`
+            progressBar.setCompleted();
             outputConsole.appendLine(`Hugo installation completed.`);
             this._isRunning = false;
         }
         catch(e){
             outputConsole.appendLine(`Hugo installation failed.`);
+            dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                message: "Hugo installation failed. Please contact your developer",
+            });
+
+            progressBar.close();
             this._isRunning = false;
             return e;
         }
