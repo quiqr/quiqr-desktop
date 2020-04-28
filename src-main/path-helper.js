@@ -47,15 +47,16 @@ class PathHelper{
         else{
             return this.getHugoBinDirForVer(version) + 'hugo';
         }
-        
+
     }
 
     getLastBuildDir() /*: ?string*/{
         return this._lastBuildDir;
     }
 
-    getBuildDir(siteKey/*: string*/, workspaceKey/*: string*/, buildKey/*: string*/){
-        this._lastBuildDir = this.getSiteRoot(siteKey) + `build/${workspaceKey}/${buildKey}/`;
+    getBuildDir(path/*: string*/){
+        //this._lastBuildDir = this.getSiteRoot(siteKey) + `build/${workspaceKey}/${buildKey}/`;
+        this._lastBuildDir = path + "/";
         return this._lastBuildDir;
     }
 

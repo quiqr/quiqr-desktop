@@ -7,7 +7,7 @@ const fs = require('fs-extra');
 const pathHelper = require('./../path-helper');
 const outputConsole = require('./../output-console');
 
-class GitlabPublisher {
+class PogoPublisher {
     constructor(config){
         this._config = config;
     }
@@ -40,16 +40,35 @@ class GitlabPublisher {
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
         var full_gh_url = 'git@gitlab.brepi.eu:' + this._config.user + '/' + this._config.repo +'.git';
         var full_gh_dest = resolvedDest + '' + this._config.repo;
-        var gitlabCi = "image: alpine:latest\n\
-pages:\n\
-  stage: deploy\n\
+        var gitlabCi = "image: registry.gitlab.com/pages/hugo:latest\n\
+test:\n\
   script:\n\
-  - echo 'Place everything in public'\n\
+  - hugo\n\
+  except:\n\
+  - master\n\
+pages:\n\
+  script:\n\
+  - hugo\n\
   artifacts:\n\
     paths:\n\
     - public\n\
   only:\n\
+  - master\n\
+pogoform:\n\
+  image: 'node:latest'\n\
+  script:\n\
+  - echo 'INSTALL SSH AUTH'\n\
+  - mkdir /root/.ssh\n\
+  - echo '$SSH_PRIVATE_KEY' > /root/.ssh/id_rsa\n\
+  - chmod 700 /root/.ssh\n\
+  - chmod 600 /root/.ssh/id_rsa\n\
+  - echo 'POPULATE KNOWN HOSTS'\n\
+  - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
+  - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
+  - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
+  only:\n\
   - master\n"
+
 
         //var gitsshcommand = 'ssh -o IdentitiesOnly=yes -i ' + tmpkeypath;
         var git_bin = this.getGitBin();
@@ -86,8 +105,15 @@ pages:\n\
             if(code==0){
                 outputConsole.appendLine('Clone succes ...');
                 fs.writeFileSync(full_gh_dest + "/.gitlab-ci.yml" , gitlabCi , 'utf-8');
-                fs.ensureDir(full_gh_dest + "/public");
-                fs.copy(context.from, full_gh_dest + "/public",function(err){
+                outputConsole.appendLine('copy gitlab ci to: ' + full_gh_dest);
+                outputConsole.appendLine('gitlabCi is: ' + gitlabCi);
+                // fs.ensureDir(full_gh_dest + "/public");
+                // fs.copy(context.from, full_gh_dest + "/public",function(err){
+
+                fs.ensureDir(full_gh_dest);
+                fs.copy(context.from, full_gh_dest,function(err){
+
+                  outputConsole.appendLine('context.from is: ' + context.from);
 
                     outputConsole.appendLine('copy finished, going to git-add ...');
 
@@ -156,4 +182,4 @@ pages:\n\
 
 }
 
-module.exports = GitlabPublisher;
+module.exports = PogoPublisher;

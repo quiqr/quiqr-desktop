@@ -70,7 +70,15 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
       if(this.state.hugoRunning){
           previewButton = <FlatButton
-          onClick={function(){ window.require('electron').shell.openExternal('http://localhost:1313'); }}
+          onClick=
+
+          {function(){
+             window.require('electron').shell.openExternal('http://localhost:1313');
+             }
+           }
+
+
+
           style={{flex:1, minWidth:40}}
           icon={<IconPlay color="white" style={{opacity:.8}} />} />
       }
@@ -83,22 +91,23 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
-    return (<MenuBorder>
+    return (<div>
     <List style={{padding: 0}}>
       { siteConfig!=null && workspaceConfig!=null ? (<ListItem
         primaryText={siteConfig.name}
-        secondaryText={workspaceConfig.key}
+        //secondaryText={workspaceConfig.key}
         onClick={onClick}
-        rightIcon={<IconActionSetting color={translucentColor} />}
+        //rightIcon={<IconActionSetting color={translucentColor} />}
       />) : (<ListItem
-        primaryText={'Please'}
-        secondaryText={'select a workspace'}
+        //primaryText={'Please'}
+        secondaryText={'select a website'}
         onClick={onClick}
         rightIcon={<IconActionSetting color={translucentColor} />}
       />) }
     </List>
-  {/* TODO  - Knop die weg moet -*/}
+
     { siteConfig!=null && workspaceConfig!=null ? (
+
     <div style={{display:'flex'}}>
 
 {/*
@@ -116,12 +125,15 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       />
       */}
 
+{/*}
       <FlatButton
         onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
         style={{flex:1, minWidth:40}}
         icon={<IconFileFolder color="white" style={{opacity:.8}} />} />
+      */}
 
-      {previewButton}
+    {previewButton}
+
 
       {/*
       <FlatButton
@@ -130,7 +142,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       */}
 
     </div>) : (null) }
-  </MenuBorder>);
+
+
+  </div>);
   }
 }
 
@@ -145,7 +159,7 @@ type WorkspaceSidebarProps = {
   siteKey : ?string,
   workspaceKey : ?string,
   history: any,
-  menuIsLocked: bool,
+  //menuIsLocked: bool,
   onLockMenuClicked: ()=> void,
   onToggleItemVisibility: ()=> void,
   hideItems : bool
@@ -206,7 +220,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
     //append workspace widget
     menus.push({
-      title: 'Current Workspace',
+      //title: 'Current website',
       widget: (
         <WorkspaceWidget
           siteConfig={this.state.site}
@@ -227,7 +241,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     if(this.state.workspace){
       //collections menu
       menus.push({
-        title: 'Collections',
+        title: 'Items',
         items: this.state.workspace.collections.map((collection, index) => {
           return {
             label: collection.title,
@@ -242,7 +256,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
       //singles menu
       menus.push({
-        title: 'Singles',
+        title: 'Pages',
         items: this.state.workspace.singles.map((collection, index) => {
           return {
             label: collection.title,

@@ -8,6 +8,7 @@ const path = require('path')
 const fs = require('fs-extra')
 
 let mainWindow/*: any*/;
+let previewWindow
 
 function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -108,9 +109,32 @@ function getLocation(locPath = ''){
     }
 }
 
+function createPreviewWindow (windowState) {
+let mainWindowState = windowState;
+  let previewWindowX = mainWindowState.x + mainWindowState.width;
+
+
+  previewWindow = new BrowserWindow({
+
+    show: false,
+    parent: mainWindow,
+    x: previewWindowX,
+    y: mainWindowState.y,
+    width: 500,
+    height: mainWindowState.height,
+  });
+
+  previewWindow.setMenuBarVisibility(false);
+  previewWindow.loadURL("http://localhost:1313");
+
+
+previewWindow.on('closed', function () {
+    previewWindow.show = false;
+
+})
+}
+
 function createWindow () {
-
-
 
     const configurationDataProvider = require('./configuration-data-provider')
 
@@ -127,8 +151,8 @@ function createWindow () {
 
       // Load the previous state with fallback to defaults
       let mainWindowState = windowStateKeeper({
-        defaultWidth: 1000,
-        defaultHeight: 800
+        defaultWidth: 800,
+        defaultHeight: 600
       });
 
       // Create the browser window.
@@ -142,10 +166,6 @@ function createWindow () {
         width: mainWindowState.width,
         height: mainWindowState.height,
 
-        //minWidth:1024,
-        //width:1024,
-        //webPreferences:{webSecurity:false },
-        icon
       });
 
       // Let us register listeners on the window, so we can update the state
@@ -161,6 +181,7 @@ function createWindow () {
       }
 
       mainWindow.show();
+        //createPreviewWindow(mainWindowState);
     });
 
     getLocation();
@@ -188,6 +209,28 @@ module.exports = {
     getCurrentInstance: function(){
         return mainWindow;
     },
+
+    reloadPreview: function() {
+      console.log ("function reloadPreview was called");
+
+      //previewWindow.loadURL("http://localhost:1313");
+      if (previewWindow){
+        previewWindow.reload();
+
+        previewWindow.webContents.once('dom-ready', function (){
+          previewWindow.reload();
+          previewWindow.show();
+          });
+      } else {
+        createPreviewWindow;
+      }
+
+
+
+      return;
+    },
+
+
     getCurrentInstanceOrNew: function(){
         let instance = this.getCurrentInstance();
 

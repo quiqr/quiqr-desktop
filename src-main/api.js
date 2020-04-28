@@ -42,6 +42,7 @@ function getSiteService(siteKey/*: string*/, callback/*: CallbackTyped<SiteServi
     })
 }
 
+
 function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     return new Promise((resolve, reject)=>{
         configurationDataProvider.get(function(err, configurations){
@@ -142,7 +143,9 @@ api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, cont
 }
 
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
+
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+
         if(err){ context.reject(err); return; }
         workspaceService.serve(serveKey).then(()=>{
             context.resolve();
@@ -153,6 +156,12 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
             context.reject(error);
         });
     });
+
+    return new Promise((resolve, reject)=>{
+        mainWindowManager.reloadPreview();
+    });
+
+
 }
 
 api.buildWorkspace = function({siteKey, workspaceKey, buildKey}/*: any*/, context/*: any*/){
