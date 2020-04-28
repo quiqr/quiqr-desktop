@@ -152,10 +152,10 @@ class MarkdownDynamic extends BaseDynamic<MarkdownDynamicField, MarkdownDynamicS
 
 
         return (
-        <DefaultWrapper style={{display:'flex', justifyContent: 'space-between'}}>
+        <DefaultWrapper style={{justifyContent: 'space-between'}}>
             <div
                 ref={(div) => { this.inputWrapper = div; }}
-                style={{ flex:1, marginRight: '7px' }}
+                style={{ width:'100%' }}
             >
                 <TextField
                     onChange={this.onChange.bind(this)}
@@ -172,7 +172,7 @@ class MarkdownDynamic extends BaseDynamic<MarkdownDynamicField, MarkdownDynamicS
             {tip}
             <div
                 ref={(div) => { this.markdownWrapper = div; }}
-                style={{flex:1, marginLeft: '7px', position:'relative', height:this.state.maxHeight, transition:'all .25s ease-in-out',}}
+                style={{ width: '100%', height:this.state.maxHeight, transition:'all .25s ease-in-out',}}
             >
                 <Paper zDepth={1} rounded={false} style={{height:'100%', overflow:'auto'}}>
                     <div className="markdown"
