@@ -1,12 +1,12 @@
 {
-  "homepage": "./",
+  "homepage": "https://poppygo.io",
   "name": "poppygo",
   "author": {
     "name": "Pim Snel",
     "email": "pim@lingewoud.nl"
   },
   "description": "A CMS for Hugo.",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",

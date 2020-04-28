@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## versie 0.3.2 - Private Beta 1
+- poppygo publisher
+- custom menu slots
+- interface cleanups
+
 ## versie 0.3.0 - Birth Poppy Go
 - new icon
 - new product name
