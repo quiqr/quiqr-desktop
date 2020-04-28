@@ -11,6 +11,8 @@ const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
 const outputConsole = require('./output-console');
 
+const ProgressBar = require('electron-progressbar');
+
 const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
 const AdmZip = require('adm-zip');
@@ -229,6 +231,26 @@ function exportSite() {
                         properties: ['openDirectory']
                     }, async function (path) {
                         if (path) {
+
+                            var progressBar = new ProgressBar({
+                                indeterminate: false,
+                                text: 'Downloading PoppyGo Components, ..',
+                                abortOnError: true,
+                                detail: 'Preparing download..'
+                            });
+
+                            progressBar.on('completed', function() {
+                                progressBar.detail = 'Site has been exported';
+                            })
+                                .on('aborted', function(value) {
+                                    console.info(`aborted... ${value}`);
+                                })
+                                .on('progress', function(value) {
+                                });
+
+                            progressBar.value += 1;
+                            progressBar.detail = `Start exporting site...`
+
                             fssimple = require('fs');
                             fssimple.readFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'), 'utf8', async (err, conftxt) => {
                                 if (err) {
@@ -246,13 +268,23 @@ function exportSite() {
                                 newConf.key = newKey;
                                 newConf.name = newKey;
                                 var newConfJson = JSON.stringify(newConf);
+                                progressBar.value += 1;
+                                progressBar.detail = `Packing configuration...`
 
                                 await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
                                 await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
 
+                                progressBar.value += 1;
+                                progressBar.detail = `Packing files...`
+
                                 await zip.addLocalFolder(global.currentSitePath);
                                 var willSendthis = zip.toBuffer();
+
+                                progressBar.value += 1;
+                                progressBar.detail = `Creating site file...`
+
                                 await zip.writeZip(newName);
+                                progressBar.setCompleted();
                                 dialog.showMessageBox(mainWindow, {
                                     type: 'info',
                                     message: "Finished export. Check" + path+"/"+newKey+".hsite",

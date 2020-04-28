@@ -15,9 +15,9 @@ const pathHelper = require('./../../path-helper');
 const ThemeInstaller = require('./../../hugo/hugo-theme-installer');
 
 class FolderSiteSourceBuilder/*:: implements SiteSourceBuilder*/ {
-    
+
     constructor(){
-        
+
     }
 
     async build(config/*: BuildConfig*/)/*:Promise<void>*/{
