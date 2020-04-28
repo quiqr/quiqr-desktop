@@ -27,6 +27,7 @@ class WorkspaceConfigValidator {
         let validationError = joi.validate(config,
             joi.object().keys({
                 hugover: joi.string().trim().required(),
+                menu: joi.array(),
                 collections: joi.array().required(),
                 singles: joi.array().required(),
                 build: joi.array().items(joi.object().keys({
