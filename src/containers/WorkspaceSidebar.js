@@ -239,38 +239,81 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     });
 
     if(this.state.workspace){
-      //collections menu
-      menus.push({
-        title: 'Items',
-        items: this.state.workspace.collections.map((collection, index) => {
-          return {
-            label: collection.title,
-            onClick: () => {
-              history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
-              this.refresh();
-            },
-            active: false
-          }
-        })
-      });
 
-      //singles menu
-      menus.push({
-        title: 'Pages',
-        items: this.state.workspace.singles.map((collection, index) => {
-          return {
-            label: collection.title,
-            onClick: () => {
-              history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
-              this.refresh();
-            },
-            active: false
-          }
-        })
-      });
+        if("menu" in this.state.workspace){
+            this.state.workspace.menu.map((menuslot, index) => {
+                //collections menu
+                menus.push({
+                    title: menuslot.title,
+                    items: menuslot.menuItems.map((menuitem, index) => {
+                        let item = null;
+                        let itemType = null;
+
+                        if(this.state.workspace.collections.some(e => e.key == menuitem.key)) {
+                            item = this.state.workspace.collections.find(e => e.key == menuitem.key);
+                            itemType = "collections";
+                        }
+                        else if(this.state.workspace.singles.some(e => e.key == menuitem.key)) {
+                            item = this.state.workspace.singles.find(e => e.key == menuitem.key);
+                            itemType = "singles";
+                        }
+
+                        if(item){
+                            return {
+                                label: item.title,
+                                onClick: () => {
+                                    history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
+                                    this.refresh();
+                                },
+                                active: false
+                            }
+                        }
+                        else{
+                            return {
+                                label: menuitem.key +' (missing)',
+                                active: false
+                            }
+                        }
+
+                    })
+                });
+
+            });
+
+        }
+        else{
+            //collections menu
+            menus.push({
+                title: 'Items',
+                items: this.state.workspace.collections.map((collection, index) => {
+                    return {
+                        label: collection.title,
+                        onClick: () => {
+                            history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
+                            this.refresh();
+                        },
+                        active: false
+                    }
+                })
+            });
+
+            //singles menu
+            menus.push({
+                title: 'Pages',
+                items: this.state.workspace.singles.map((collection, index) => {
+                    return {
+                        label: collection.title,
+                        onClick: () => {
+                            history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
+                            this.refresh();
+                        },
+                        active: false
+                    }
+                })
+            });
+
+        }
     }
-
-
 
     return (<React.Fragment>
       <Sidebar.Sidebar
