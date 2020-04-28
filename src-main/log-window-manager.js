@@ -78,10 +78,7 @@ function createWindow () {
       if(configurations.global.maximizeAtStart){
         logWindow.maximize();
       }
-      if(configurations.global.hideMenuBar){
-        logWindow.setMenuBarVisibility(false);
-      }
-
+      logWindow.setMenuBarVisibility(false);
 
       logWindow.show();
     });
