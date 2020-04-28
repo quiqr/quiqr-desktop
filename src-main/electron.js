@@ -121,7 +121,8 @@ function importSite() {
                 await fs.ensureDir(pathSiteSources);
                 await fs.ensureDir(pathSource);
 
-                var conftxt = zip.readAsText("config."+siteKey+".json");
+                var confFileName = "config."+siteKey+".json";
+                var conftxt = zip.readAsText(confFileName);
                 if(conftxt){
                     var newConf = JSON.parse(conftxt);
 
@@ -133,9 +134,14 @@ function importSite() {
                         outputConsole.appendLine('wrote new site configuration');
                         await zip.extractAllTo(pathSource, true);
 
+                        fs.remove(pathSource+'/'+confFileName, err => {
+                            if (err) return console.error(err)
+                            console.log('rm success!')
+                        })
+
                         dialog.showMessageBox(mainWindow, {
                             type: 'info',
-                            message: "Site has been imported, Sukoh will now be restarted.",
+                            message: "Site has been imported, PoppyGo will now be restarted.",
                         });
 
                         app.relaunch()

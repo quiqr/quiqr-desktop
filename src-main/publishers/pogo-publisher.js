@@ -10,6 +10,7 @@ const outputConsole = require('./../output-console');
 
 const ProgressBar = require('electron-progressbar');
 const mainWindowManager = require('../main-window-manager');
+const rimraf = require("rimraf");
 
 class PogoPublisher {
     constructor(config){
@@ -42,10 +43,34 @@ class PogoPublisher {
 
         let mainWindow = mainWindowManager.getCurrentInstance();
         const dialog = electron.dialog;
+
+        var progressBar = new ProgressBar({
+            indeterminate: false,
+            text: 'Publishing website..',
+            abortOnError: true,
+            detail: 'Preparing upload..'
+        });
+
+        progressBar.on('completed', function() {
+            progressBar.detail = 'The website has been uploaded.';
+        })
+            .on('aborted', function(value) {
+                console.info(`aborted... ${value}`);
+            })
+            .on('progress', function(value) {
+            });
+
+        progressBar.value += 1;
+        progressBar.detail = 'Preparing upload';
+
+
         var tmpkeypath = pathHelper.getRoot()+'ghkey';
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
         var full_gh_url = 'git@gitlab.brepi.eu:' + this._config.user + '/' + this._config.repo +'.git';
         var full_gh_dest = resolvedDest + '' + this._config.repo;
+        var gitignore = "/public\n\
+.sukoh\n";
+
         var gitlabCi = "image: registry.gitlab.com/pages/hugo:latest\n\
 test:\n\
   script:\n\
@@ -73,7 +98,7 @@ pogoform:\n\
   - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
   - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
   only:\n\
-  - master\n"
+  - master\n";
 
 
         //var gitsshcommand = 'ssh -o IdentitiesOnly=yes -i ' + tmpkeypath;
@@ -92,23 +117,7 @@ pogoform:\n\
         await fs.writeFileSync(tmpkeypath, this._config.privatekey, 'utf-8');
         await fs.chmodSync(tmpkeypath, '0600');
 
-        var progressBar = new ProgressBar({
-            indeterminate: false,
-            text: 'Publishing website..',
-            abortOnError: true,
-            detail: 'Preparing upload..'
-        });
-
-        progressBar.on('completed', function() {
-            progressBar.detail = 'The website has been uploaded.';
-        })
-            .on('aborted', function(value) {
-                console.info(`aborted... ${value}`);
-            })
-            .on('progress', function(value) {
-            });
-
-        progressBar.value += 1;
+        progressBar.value += 10;
         progressBar.detail = 'Get remote website for synchronizing (git-clone)';
 
         outputConsole.appendLine('Start cloning from: ' + full_gh_url);
@@ -118,7 +127,6 @@ pogoform:\n\
         let clonecmd = spawn( git_bin, [ "clone", "-i", tmpkeypath, full_gh_url , full_gh_dest ]);
 
         clonecmd.stdout.on("data", (data) => {
-            outputConsole.appendLine('Start cloning with:' + git_bin);
         });
         clonecmd.stderr.on("data", (err) => {
             outputConsole.appendLine('Clone error ...:' + err);
@@ -127,19 +135,28 @@ pogoform:\n\
             if(code==0){
                 outputConsole.appendLine('Clone succes ...');
                 fs.writeFileSync(full_gh_dest + "/.gitlab-ci.yml" , gitlabCi , 'utf-8');
+                fs.writeFileSync(full_gh_dest + "/.gitignore" , gitignore , 'utf-8');
                 outputConsole.appendLine('copy gitlab ci to: ' + full_gh_dest);
                 outputConsole.appendLine('gitlabCi is: ' + gitlabCi);
-                // fs.ensureDir(full_gh_dest + "/public");
-                // fs.copy(context.from, full_gh_dest + "/public",function(err){
+                outputConsole.appendLine('gitignore is: ' + gitignore);
+
+                progressBar.value += 10;
+                progressBar.detail = 'Synchronizing site with last changes (copy)';
 
                 fs.ensureDir(full_gh_dest);
-                fs.copy(context.from, full_gh_dest,function(err){
+
+                fs.copy(context.from, full_gh_dest, function(err){
+
+                  rimraf(full_gh_dest+'/public', function(){
+                      outputConsole.appendLine('removing public');
+                      console.log("remove public done");
+                  });
 
                   outputConsole.appendLine('context.from is: ' + context.from);
 
                     outputConsole.appendLine('copy finished, going to git-add ...');
-                    progressBar.value += 1;
-                    progressBar.detail = 'Sync changes with destination (git-add)';
+                    progressBar.value += 10;
+                    progressBar.detail = 'Registering changes with destination (git-add)';
 
                     var spawn = require("child_process").spawn;
                     //let clonecmd2 = spawn( git_bin, [ "add" , '.'],{cwd: full_gh_dest});
@@ -153,7 +170,7 @@ pogoform:\n\
                         if(code==0){
 
                             outputConsole.appendLine('git-add finished, going to git-commit ...');
-                            progressBar.value += 1;
+                            progressBar.value += 10;
                             progressBar.detail = 'Commit changes (git-commit)';
 
                             var spawn = require("child_process").spawn;
@@ -183,6 +200,11 @@ pogoform:\n\
                                             progressBar.value = 100;
                                             progressBar.detail = 'Uploading finished';
                                             progressBar.setCompleted();
+                                            dialog.showMessageBox(mainWindow, {
+                                                type: 'info',
+                                                message: "Finished publishing. (git-push)",
+                                            });
+
                                         }
                                         else{
                                             outputConsole.appendLine('ERROR: Could not git-push ...');
