@@ -73,12 +73,10 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
           onClick=
 
           {function(){
-              service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
+              //service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
               window.require('electron').shell.openExternal('http://localhost:1313');
              }
            }
-
-
 
           style={{flex:1, minWidth:40}}
           icon={<IconPlay color="white" style={{opacity:.8}} />} />
