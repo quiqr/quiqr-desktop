@@ -22,6 +22,11 @@ unhandled();
 const app = electron.app
 const Menu = electron.Menu
 
+if(app.isPackaged) {
+    process.env.NODE_ENV = 'production';
+    console.log('production!');
+}
+
 global.currentSiteKey = undefined;
 global.currentSitePath = undefined;
 

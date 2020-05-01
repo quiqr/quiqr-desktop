@@ -21,15 +21,33 @@ class PogoPublisher {
         let platform;
         let executable;
         let cmd;
+
         switch(enviromnent.platform){
-            case PLATFORMS.linux: { platform = 'Linux'; executable = 'embgit'; break; }
-            case PLATFORMS.windows: { platform = 'Windows'; executable = 'embgit.exe'; break; }
-            case PLATFORMS.macOS: { platform = 'macOS'; executable = 'embgit'; break; }
+            case PLATFORMS.linux: {
+                platform = 'linux';
+                executable = 'embgit';
+                break;
+            }
+            case PLATFORMS.windows: {
+                platform = 'windows';
+                executable = 'embgit.exe';
+                break;
+            }
+            case PLATFORMS.macOS: {
+                platform = 'mac';
+                executable = 'embgit';
+                break;
+            }
             default:{ throw new Error('Not implemented.') }
         }
 
         if(process.env.NODE_ENV === 'production'){
-            cmd = path.join(rootPath, 'resources','bin',executable);
+            if(enviromnent.platform == PLATFORMS.macOS){
+                cmd = path.join(rootPath, 'Contents','Resources','bin',executable);
+            }
+            else{
+                cmd = path.join(rootPath, 'resources','bin',executable);
+            }
         }
         else{
             cmd = path.join(rootPath, 'resources',platform,executable);
