@@ -11,6 +11,8 @@ const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
 const outputConsole = require('./output-console');
 
+const rimraf = require("rimraf");
+
 const ProgressBar = require('electron-progressbar');
 
 const pathHelper = require('./path-helper');
@@ -243,66 +245,100 @@ function exportSite() {
                     }, async function (path) {
                         if (path) {
 
-                            var progressBar = new ProgressBar({
-                                indeterminate: false,
-                                text: 'Downloading PoppyGo Components, ..',
-                                abortOnError: true,
-                                detail: 'Preparing download..'
+                            let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
+                            await fs.ensureDir(tmppath);
+
+                            rimraf(tmppath, function(){
+                                console.log("rm done1");
+
+                                fs.copy(global.currentSitePath, tmppath, async function(err){
+
+                                    console.log("cleaning");
+
+                                    await fs.ensureDir(tmppath + '/.git');
+                                    await rimraf(tmppath+'/.git', async function(){
+                                        console.log("rm done2");
+
+                                        await fs.ensureDir(tmppath + '/public');
+                                        await rimraf(tmppath+'/public', async function(){
+                                            console.log("rm done3");
+
+
+                                            console.log("start packing");
+
+                                            var progressBar = new ProgressBar({
+                                                indeterminate: false,
+                                                text: 'Exporting, ..',
+                                                abortOnError: true,
+                                                detail: 'Preparing export..'
+                                            });
+
+                                            progressBar.on('completed', function() {
+                                                progressBar.detail = 'Site has been exported';
+                                            })
+                                                .on('aborted', function(value) {
+                                                    console.info(`aborted... ${value}`);
+                                                })
+                                                .on('progress', function(value) {
+                                                });
+
+                                            progressBar.value += 1;
+                                            progressBar.detail = `Start exporting site...`
+
+                                            fssimple = require('fs');
+                                            fssimple.readFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'), 'utf8', async (err, conftxt) => {
+                                                if (err) {
+                                                    dialog.showMessageBox(mainWindow, {
+                                                        type: 'warning',
+                                                        message: "Failed to export. 2",
+                                                    });
+                                                    return;
+                                                }
+
+                                                var newName = path+"/"+newKey+".hsite";
+                                                var zip = new AdmZip();
+
+                                                var newConf = JSON.parse(conftxt);
+                                                newConf.key = newKey;
+                                                newConf.name = newKey;
+                                                var newConfJson = JSON.stringify(newConf);
+                                                progressBar.value += 1;
+                                                progressBar.detail = `Packing configuration...`
+
+                                                await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
+                                                await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
+
+                                                progressBar.value += 1;
+                                                progressBar.detail = `Packing files...`
+
+                                                await zip.addLocalFolder(tmppath);
+                                                var willSendthis = zip.toBuffer();
+
+                                                progressBar.value += 1;
+                                                progressBar.detail = `Creating site file...`
+
+                                                await zip.writeZip(newName);
+                                                progressBar.setCompleted();
+                                                dialog.showMessageBox(mainWindow, {
+                                                    type: 'info',
+                                                    message: "Finished export. Check" + path+"/"+newKey+".hsite",
+                                                });
+
+                                                return;
+                                            })
+
+
+
+                                        });
+
+
+
+                                    });
+
+
+                                });
                             });
 
-                            progressBar.on('completed', function() {
-                                progressBar.detail = 'Site has been exported';
-                            })
-                                .on('aborted', function(value) {
-                                    console.info(`aborted... ${value}`);
-                                })
-                                .on('progress', function(value) {
-                                });
-
-                            progressBar.value += 1;
-                            progressBar.detail = `Start exporting site...`
-
-                            fssimple = require('fs');
-                            fssimple.readFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'), 'utf8', async (err, conftxt) => {
-                                if (err) {
-                                    dialog.showMessageBox(mainWindow, {
-                                        type: 'warning',
-                                        message: "Failed to export. 2",
-                                    });
-                                    return;
-                                }
-
-                                var newName = path+"/"+newKey+".hsite";
-                                var zip = new AdmZip();
-
-                                var newConf = JSON.parse(conftxt);
-                                newConf.key = newKey;
-                                newConf.name = newKey;
-                                var newConfJson = JSON.stringify(newConf);
-                                progressBar.value += 1;
-                                progressBar.detail = `Packing configuration...`
-
-                                await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
-                                await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
-
-                                progressBar.value += 1;
-                                progressBar.detail = `Packing files...`
-
-                                await zip.addLocalFolder(global.currentSitePath);
-                                var willSendthis = zip.toBuffer();
-
-                                progressBar.value += 1;
-                                progressBar.detail = `Creating site file...`
-
-                                await zip.writeZip(newName);
-                                progressBar.setCompleted();
-                                dialog.showMessageBox(mainWindow, {
-                                    type: 'info',
-                                    message: "Finished export. Check" + path+"/"+newKey+".hsite",
-                                });
-
-                                return;
-                            })
                         }
                     });
                 }
@@ -315,7 +351,7 @@ function exportSite() {
                 console.log('result', r);
             }
         })
-        .catch(console.error);
+            .catch(console.error);
 
     }
     else{
@@ -327,230 +363,230 @@ function exportSite() {
 }
 
 function createSelectSiteWindow () {
-  selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
-  if (selectsiteWindow) {
-    selectsiteWindow.webContents.send("redirectselectsite")
-  }
+    selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
+    if (selectsiteWindow) {
+        selectsiteWindow.webContents.send("redirectselectsite")
+    }
 
-  selectsiteWindow.once('ready-to-show', () => {
-    selectsiteWindow.webContents.send("redirectselectsite")
-  })
+    selectsiteWindow.once('ready-to-show', () => {
+        selectsiteWindow.webContents.send("redirectselectsite")
+    })
 
-  selectsiteWindow.webContents.on('did-finish-load',() => {
-    selectsiteWindow.webContents.send("redirectselectsite")
-  })
+    selectsiteWindow.webContents.on('did-finish-load',() => {
+        selectsiteWindow.webContents.send("redirectselectsite")
+    })
 
-  selectsiteWindow.on('closed', function() {
-    selectsiteWindow = null
-  })
+    selectsiteWindow.on('closed', function() {
+        selectsiteWindow = null
+    })
 }
 
 function createPrefsWindow () {
-  prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
-  if (prefsWindow) {
-    prefsWindow.webContents.send("redirectPrefs")
-  }
+    prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
+    if (prefsWindow) {
+        prefsWindow.webContents.send("redirectPrefs")
+    }
 
-  prefsWindow.once('ready-to-show', () => {
-    prefsWindow.webContents.send("redirectPrefs")
-  })
+    prefsWindow.once('ready-to-show', () => {
+        prefsWindow.webContents.send("redirectPrefs")
+    })
 
-  prefsWindow.webContents.on('did-finish-load',() => {
-    prefsWindow.webContents.send("redirectPrefs")
-  })
+    prefsWindow.webContents.on('did-finish-load',() => {
+        prefsWindow.webContents.send("redirectPrefs")
+    })
 
-  prefsWindow.on('closed', function() {
-    prefsWindow = null
-  })
+    prefsWindow.on('closed', function() {
+        prefsWindow = null
+    })
 }
 
 
 function createLogWindow () {
-  logWindow = logWindowManager.getCurrentInstanceOrNew();
-  if (logWindow) {
-    logWindow.webContents.send("redirectConsole")
-  }
+    logWindow = logWindowManager.getCurrentInstanceOrNew();
+    if (logWindow) {
+        logWindow.webContents.send("redirectConsole")
+    }
 
-  logWindow.once('ready-to-show', () => {
-    logWindow.webContents.send("redirectConsole")
-  })
+    logWindow.once('ready-to-show', () => {
+        logWindow.webContents.send("redirectConsole")
+    })
 
-  logWindow.webContents.on('did-finish-load',() => {
-    logWindow.webContents.send("redirectConsole")
-  })
+    logWindow.webContents.on('did-finish-load',() => {
+        logWindow.webContents.send("redirectConsole")
+    })
 
-  logWindow.on('closed', function() {
-    logWindow = null
-  })
+    logWindow.on('closed', function() {
+        logWindow = null
+    })
 }
 
 function createMainMenu(){
 
-  const isMac = process.platform === 'darwin'
+    const isMac = process.platform === 'darwin'
 
-  const template = [
-    // { role: 'appMenu' }
-    ...(isMac ? [{
-      label: app.name,
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        {
-          label: 'Preferences',
-          click: async () => {
-            createPrefsWindow()
-          }
-        },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    }] : []),
-    // { role: 'fileMenu' }
-    {
-      label: 'File',
-        submenu: [
-        {
-          label: 'Select site',
-          click: async () => {
-            createSelectSiteWindow()
-          }
-        },
-        {
-            label: 'Import website',
-            click: async () => {
-                importSite()
-            }
-        },
-        {
-            label: 'Export website',
-            click: async () => {
-                exportSite()
-            }
-        },
-        {
-            label: 'Delete Site',
-            click: async () => {
-                deleteSite()
-            }
-        },
-        isMac ? { role: 'close' } : { role: 'quit' }
-      ]
-    },
-    // { role: 'editMenu' }
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        ...(isMac ? [
-          { role: 'pasteAndMatchStyle' },
-          { role: 'delete' },
-          { role: 'selectAll' },
-          { type: 'separator' },
-          {
-            label: 'Speech',
+    const template = [
+        // { role: 'appMenu' }
+        ...(isMac ? [{
+            label: app.name,
             submenu: [
-              { role: 'startspeaking' },
-              { role: 'stopspeaking' }
+                { role: 'about' },
+                { type: 'separator' },
+                {
+                    label: 'Preferences',
+                    click: async () => {
+                        createPrefsWindow()
+                    }
+                },
+                { role: 'services' },
+                { type: 'separator' },
+                { role: 'hide' },
+                { role: 'hideothers' },
+                { role: 'unhide' },
+                { type: 'separator' },
+                { role: 'quit' }
             ]
-          }
-        ] : [
-          { role: 'delete' },
-          { type: 'separator' },
-          { role: 'selectAll' },
-            {
-                label: 'Preferences',
-                click: async () => {
-                    createPrefsWindow()
+        }] : []),
+        // { role: 'fileMenu' }
+        {
+            label: 'File',
+            submenu: [
+                {
+                    label: 'Select site',
+                    click: async () => {
+                        createSelectSiteWindow()
+                    }
+                },
+                {
+                    label: 'Import website',
+                    click: async () => {
+                        importSite()
+                    }
+                },
+                {
+                    label: 'Export website',
+                    click: async () => {
+                        exportSite()
+                    }
+                },
+                {
+                    label: 'Delete Site',
+                    click: async () => {
+                        deleteSite()
+                    }
+                },
+                isMac ? { role: 'close' } : { role: 'quit' }
+            ]
+        },
+        // { role: 'editMenu' }
+        {
+            label: 'Edit',
+            submenu: [
+                { role: 'undo' },
+                { role: 'redo' },
+                { type: 'separator' },
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
+                ...(isMac ? [
+                    { role: 'pasteAndMatchStyle' },
+                    { role: 'delete' },
+                    { role: 'selectAll' },
+                    { type: 'separator' },
+                    {
+                        label: 'Speech',
+                        submenu: [
+                            { role: 'startspeaking' },
+                            { role: 'stopspeaking' }
+                        ]
+                    }
+                ] : [
+                    { role: 'delete' },
+                    { type: 'separator' },
+                    { role: 'selectAll' },
+                    {
+                        label: 'Preferences',
+                        click: async () => {
+                            createPrefsWindow()
+                        }
+                    }
+                ])
+            ]
+        },
+        // { role: 'viewMenu' }
+        {
+            label: 'View',
+            submenu: [
+                {
+                    label: 'Front page',
+                    click: async () => {
+                        openHome()
+                    }
+                },
+                {
+                    label: 'Open Form Cookbooks',
+                    click: async () => {
+                        openCookbooks()
+                    }
+                },
+                {
+                    label: 'Show Log Window',
+                    click: async () => {
+                        createLogWindow()
+                    }
+                },
+                {
+                    label: 'Stop server',
+                    click: async () => {
+                        stopServer()
+                    }
+                },
+                { type: 'separator' },
+
+                { role: 'reload' },
+                { role: 'forcereload' },
+                { role: 'toggledevtools' },
+
+                { type: 'separator' },
+
+                { role: 'resetzoom' },
+                { role: 'zoomin' },
+                { role: 'zoomout' },
+                { type: 'separator' },
+                { role: 'togglefullscreen' }
+            ]
+        },
+        // { role: 'windowMenu' }
+        {
+            label: 'Window',
+            submenu: [
+                { role: 'minimize' },
+                { role: 'zoom' },
+                ...(isMac ? [
+                    { type: 'separator' },
+                    { role: 'front' },
+                    { type: 'separator' },
+                    { role: 'window' }
+                ] : [
+                    { role: 'close' }
+                ])
+            ]
+        },
+        {
+            role: 'help',
+            submenu: [
+                {
+                    label: 'Learn More',
+                    click: async () => {
+                        const { shell } = require('electron')
+                        await shell.openExternal('https://electronjs.org')
+                    }
                 }
-            }
-        ])
-      ]
-    },
-    // { role: 'viewMenu' }
-    {
-      label: 'View',
-      submenu: [
-        {
-          label: 'Front page',
-          click: async () => {
-            openHome()
-          }
-        },
-        {
-          label: 'Open Form Cookbooks',
-          click: async () => {
-            openCookbooks()
-          }
-        },
-        {
-          label: 'Show Log Window',
-          click: async () => {
-            createLogWindow()
-          }
-        },
-        {
-          label: 'Stop server',
-          click: async () => {
-            stopServer()
-          }
-        },
-        { type: 'separator' },
-
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-
-        { type: 'separator' },
-
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-    },
-    // { role: 'windowMenu' }
-    {
-      label: 'Window',
-      submenu: [
-        { role: 'minimize' },
-        { role: 'zoom' },
-        ...(isMac ? [
-          { type: 'separator' },
-          { role: 'front' },
-          { type: 'separator' },
-          { role: 'window' }
-        ] : [
-          { role: 'close' }
-        ])
-      ]
-    },
-    {
-      role: 'help',
-      submenu: [
-        {
-          label: 'Learn More',
-          click: async () => {
-            const { shell } = require('electron')
-            await shell.openExternal('https://electronjs.org')
-          }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
 }
 
 
@@ -559,30 +595,30 @@ function createMainMenu(){
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-  createMainMenu();
-  createWindow();
+    createMainMenu();
+    createWindow();
 })
 
 app.on('before-quit', function () {
-  stopServer();
+    stopServer();
 })
 
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 })
 
 app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow();
-  }
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) {
+        createWindow();
+    }
 })
 
 
