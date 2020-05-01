@@ -29,7 +29,7 @@ class GithubPublisher {
         }
 
         if(process.env.NODE_ENV === 'production'){
-            cmd = path.join(rootPath, 'resources','bin',executable);
+            cmd = path.join(rootPath, 'Resources','bin',executable);
         }
         else{
             cmd = path.join(rootPath, 'resources',platform,executable);
