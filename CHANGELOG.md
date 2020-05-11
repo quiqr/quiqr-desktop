@@ -1,4 +1,10 @@
-# CHANGELOG
+# PoppyGo Aoo CHANGELOG
+
+## versie 0.3.5 - Private Beta 3
+- cleanup export file (ignore .git and public)
+
+## versie 0.3.4 - Private Beta 2
+- embgit fixes
 
 ## versie 0.3.2 - Private Beta 1
 - poppygo publisher

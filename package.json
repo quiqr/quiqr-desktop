@@ -6,7 +6,7 @@
     "email": "pim@lingewoud.nl"
   },
   "description": "A CMS for Hugo.",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",
