@@ -1,14 +1,17 @@
 //@flow
 
 const electron = require('electron');
-const BrowserWindow = electron.BrowserWindow;
+//const {BrowserWindow, BrowserView} = electron.BrowserWindow;
+const { BrowserView, BrowserWindow } = require('electron');
 const windowStateKeeper = require('electron-window-state');
 const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
 
-let mainWindow/*: any*/;
-let previewWindow
+let mainWindow;
+//let previewWindowl;
+let mainWindowState;
+let mobilePreviewView;
 
 function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -110,35 +113,32 @@ function getLocation(locPath = ''){
 }
 
 function createPreviewWindow (windowState) {
-let mainWindowState = windowState;
-  let previewWindowX = mainWindowState.x + mainWindowState.width;
+    let mainWindowState = windowState;
+    let previewWindowX = mainWindowState.x + mainWindowState.width;
+
+    previewWindow = new BrowserWindow({
+
+        show: false,
+        parent: mainWindow,
+        x: previewWindowX,
+        y: mainWindowState.y,
+        width: 500,
+        height: mainWindowState.height,
+    });
+
+    previewWindow.setMenuBarVisibility(false);
+    previewWindow.loadURL("http://localhost:1313");
 
 
-  previewWindow = new BrowserWindow({
+    previewWindow.on('closed', function () {
+        previewWindow.show = false;
 
-    show: false,
-    parent: mainWindow,
-    x: previewWindowX,
-    y: mainWindowState.y,
-    width: 500,
-    height: mainWindowState.height,
-  });
-
-  previewWindow.setMenuBarVisibility(false);
-  previewWindow.loadURL("http://localhost:1313");
-
-
-previewWindow.on('closed', function () {
-    previewWindow.show = false;
-
-})
+    })
 }
 
 function createWindow () {
 
     const configurationDataProvider = require('./configuration-data-provider')
-
-
 
     let icon;
     if(process.env.REACT_DEV_URL)
@@ -150,7 +150,7 @@ function createWindow () {
       configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
 
       // Load the previous state with fallback to defaults
-      let mainWindowState = windowStateKeeper({
+      mainWindowState = windowStateKeeper({
         defaultWidth: 800,
         defaultHeight: 600
       });
@@ -179,6 +179,9 @@ function createWindow () {
       if(configurations.global.hideMenuBar){
           //mainWindow.setMenuBarVisibility(false);
       }
+
+      mobilePreviewView = new BrowserView();
+      mainWindow.setBrowserView(mobilePreviewView);
 
       mainWindow.show();
         //createPreviewWindow(mainWindowState);
@@ -210,6 +213,21 @@ module.exports = {
         return mainWindow;
     },
 
+    openMobilePreview: function(){
+        let mobwidth = 340;
+        mobilePreviewView.setBounds({ x: (mainWindowState.width-mobwidth), y: 0, width: mobwidth, height: mainWindowState.height });
+        mobilePreviewView.webContents.loadURL('http://localhost:1313');
+        //mainWindow.setContentBounds({ x: mainWindowState.x, y: mainWindowState.y, width: (mainWindowState.width-mobwidth), height: mainWindowState.height })
+        mainWindow.webContents.send("setMobileBrowserOpen");
+    },
+
+    closeMobilePreview: function(){
+        mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        //mainWindow.setContentBounds({ x: mainWindowState.x, y: mainWindowState.y, width: mainWindowState.width, height: mainWindowState.height })
+        mainWindow.webContents.send("setMobileBrowserClose");
+    },
+
+    /*
     reloadPreview: function() {
       console.log ("function reloadPreview was called");
 
@@ -229,6 +247,7 @@ module.exports = {
 
       return;
     },
+    */
 
 
     getCurrentInstanceOrNew: function(){

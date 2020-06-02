@@ -22,6 +22,14 @@ export class API {
         return mainProcessBridge.request('serveWorkspace', {siteKey, workspaceKey, serveKey});
     }
 
+    openMobilePreview(){
+        return mainProcessBridge.request('openMobilePreview');
+    }
+
+    closeMobilePreview(){
+        return mainProcessBridge.request('closeMobilePreview');
+    }
+
     buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string){
         return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey});
     }

@@ -64,6 +64,7 @@ class App extends React.Component<AppProps,AppState>{
       redirectCookbook: false,
       redirectConsole: false,
       redirectPrefs: false,
+      mobileBrowserActive: false,
       redirectHome: false,
       redirectSelectSite: false,
       skipMenuTransition: false
@@ -126,6 +127,13 @@ class App extends React.Component<AppProps,AppState>{
     this.setState({redirectConsole: true});
   }
 
+  setMobileBrowserOpen(){
+    this.setState({mobileBrowserActive: true});
+  }
+  setMobileBrowserClose(){
+    this.setState({mobileBrowserActive: false});
+  }
+
   redirectPrefs(){
     this.setState({redirectPrefs: true});
   }
@@ -138,6 +146,8 @@ class App extends React.Component<AppProps,AppState>{
       window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
       window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
       window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
+      window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
+      window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
       window.require('electron').ipcRenderer.on('redirectselectsite', this.redirectSelectSite.bind(this));
       window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
           this.setState({redirectMountSite: args});
@@ -290,13 +300,27 @@ class App extends React.Component<AppProps,AppState>{
     </Switch>);
   }
 
-  render() {
+    render() {
 
-    let header = <Header
-      minimizeHandler={this.minimizeWindow.bind(this)}
-      toggleMaximizeHandler={this.toggleWindowMode.bind(this)}
-      closeHandler={this.closeWindow.bind(this)}
-      isMaximized={this.state.maximized}
+        let marginStyles;
+        if(this.state.mobileBrowserActive){
+            marginStyles = {
+                marginRight:'340px',
+                borderRightWidth: 1,
+                borderRightColor: '#ccc',
+                borderRightStyle: 'solid'
+            };
+        }else{
+            marginStyles = {
+                marginRight:'0px'
+            };
+        }
+
+        let header = <Header
+        minimizeHandler={this.minimizeWindow.bind(this)}
+        toggleMaximizeHandler={this.toggleWindowMode.bind(this)}
+        closeHandler={this.closeWindow.bind(this)}
+        isMaximized={this.state.maximized}
     />;
 
     let containerStyle = this.state.style.container;
@@ -386,7 +410,7 @@ class App extends React.Component<AppProps,AppState>{
         render={ ({match, history})=>{
           return (
             <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
-              <div className="App">
+                <div className="App" style={marginStyles}>
 
                 {(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideWindowFrame === true) ? (
                   header

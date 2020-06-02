@@ -142,6 +142,17 @@ api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, cont
     mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
+api.openMobilePreview = function(context){
+    return new Promise((resolve, reject)=>{
+        mainWindowManager.openMobilePreview();
+    });
+}
+api.closeMobilePreview = function(context){
+    return new Promise((resolve, reject)=>{
+        mainWindowManager.closeMobilePreview();
+    });
+}
+
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
 
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
@@ -157,9 +168,11 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
         });
     });
 
+    /*
     return new Promise((resolve, reject)=>{
         mainWindowManager.reloadPreview();
     });
+    */
 
 
 }

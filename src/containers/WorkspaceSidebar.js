@@ -5,13 +5,12 @@ import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
 import { FlatButton, Subheader, Toggle } from 'material-ui';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
-import IconOpenBrowser from 'material-ui/svg-icons/action/launch';
+import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
 //import IconActionList from 'material-ui/svg-icons/action/list';
 //import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 //import IconMenu from 'material-ui/svg-icons/navigation/menu';
 //import IconMore from 'material-ui/svg-icons/navigation/more-vert';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
-import IconOpenInBrowser from 'material-ui/svg-icons/action/open-in-browser';
 import Border from './../components/Border';
 import { TriggerWithOptions } from './../components/TriggerWithOptions';
 import service from './../services/service'
@@ -36,16 +35,41 @@ type WorkspaceWidgetProps = {
 
 class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
-  constructor(props : WorkspaceWidgetProps){
-    super(props);
-    this.state = {
-      hugoRunning: false
-    };
-  }
+    constructor(props : WorkspaceWidgetProps){
+        super(props);
+        this.state = {
+            hugoRunning: false
+        };
+    }
 
     componentWillMount(){
         window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
+
+        //window.require('electron').ipcRenderer.on('openMobilePreview', this.activateMobilePreview.bind(this));
+        //window.require('electron').ipcRenderer.on('closeMobilePreview', this.disableMobilePreview.bind(this));
+    }
+
+
+    toggleMobilePreview(){
+        if(this.state.mobilePreviewActive){
+            this.disableMobilePreview();
+        } else{
+            this.activateMobilePreview();
+        }
+
+    }
+
+    activateMobilePreview(){
+        service.api.openMobilePreview();
+        this.setState({mobilePreviewActive: true});
+        console.log('mobilepre on');
+    }
+
+    disableMobilePreview(){
+        service.api.closeMobilePreview();
+        this.setState({mobilePreviewActive: false});
+        console.log('mobilepre off');
     }
 
     activatePreview(){
@@ -84,9 +108,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
           mobileButton = <Toggle
               label="Mobile preview"
               toggled={true}
-              onToggle={function(e,value){
-                  window.require('electron').shell.openExternal('http://localhost:1313');
-              }}
+          onToggle={function(e,value){
+              this.toggleMobilePreview();
+              }.bind(this)}
               labelPosition='right' />
       }
       else{
@@ -152,8 +176,16 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         icon={<IconFileFolder color="white" style={{opacity:.8}} />} />
       */}
 
-    <div style={{margin:'10px'}}>{mobileButton}</div>
-    <div style={{margin:'10px',color:'white'}}>{previewButton} Open in browser</div>
+    <div style={{margin:'10px',color:'white'}}>
+        <Toggle
+        label="Mobile preview"
+        toggled={this.state.mobilePreviewActive}
+        onToggle={function(e,value){
+              this.toggleMobilePreview();
+              }.bind(this)}
+        labelPosition='right' />
+    </div>
+    <div style={{margin:'5px',color:'white'}}>{previewButton} Open in browser</div>
 
 
       {/*
