@@ -45,11 +45,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     componentWillMount(){
         window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
-
-        //window.require('electron').ipcRenderer.on('openMobilePreview', this.activateMobilePreview.bind(this));
-        //window.require('electron').ipcRenderer.on('closeMobilePreview', this.disableMobilePreview.bind(this));
     }
-
 
     toggleMobilePreview(){
         if(this.state.mobilePreviewActive){
@@ -152,49 +148,19 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     { siteConfig!=null && workspaceConfig!=null ? (
 
-    <div style={{paddingLeft:'15px'}}>
+        <div style={{paddingLeft:'15px'}}>
+        <div style={{margin:'10px',color:'white'}}>
+            <Toggle
+            label="Mobile preview"
+            toggled={this.state.mobilePreviewActive}
+            onToggle={function(e,value){
+                this.toggleMobilePreview();
+            }.bind(this)}
+            labelPosition='right' />
+        </div>
+        <div style={{margin:'5px',color:'white'}}>{previewButton} Open in browser</div>
 
-{/*
-      <TriggerWithOptions
-        triggerType={FlatButton}
-        triggerProps={{
-            style: {flex:1, minWidth:40},
-            icon: (<IconPlay color="white" style={{opacity:.2}} />),
-            disabled: workspaceConfig==null||workspaceConfig.build==null||workspaceConfig.build.length==0
-        }}
-        menuProps={{ style:{ background:'rgb(22, 6, 47)' } }}
-        popoverProps={{ style:{ background:'rgb(22, 6, 47)' } }}
-        options={ serverOptions }
-        onOptionClick={(serve)=>{ service.serveWorkspace(siteConfig.key, workspaceConfig.key, serverOptions[serve]) }}
-      />
-      */}
-
-{/*}
-      <FlatButton
-        onClick={function(){ service.openWorkspaceDir(siteConfig.key, workspaceConfig.key) }}
-        style={{flex:1, minWidth:40}}
-        icon={<IconFileFolder color="white" style={{opacity:.8}} />} />
-      */}
-
-    <div style={{margin:'10px',color:'white'}}>
-        <Toggle
-        label="Mobile preview"
-        toggled={this.state.mobilePreviewActive}
-        onToggle={function(e,value){
-              this.toggleMobilePreview();
-              }.bind(this)}
-        labelPosition='right' />
-    </div>
-    <div style={{margin:'5px',color:'white'}}>{previewButton} Open in browser</div>
-
-
-      {/*
-      <FlatButton
-      style={{flex:1, minWidth:40}}
-      icon={<IconMore color="white"  style={{opacity:.2}} />} />
-      */}
-
-    </div>) : (null) }
+  </div>) : (null) }
 
 
   </div>);

@@ -17,6 +17,7 @@ const ProgressBar = require('electron-progressbar');
 
 const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
+const { shell } = require('electron')
 const AdmZip = require('adm-zip');
 unhandled();
 
@@ -64,7 +65,6 @@ function reloadPreview() {
     mobilePreviewView.reload();
   }
 }
-
 
 function openCookbooks() {
   mainWindow = mainWindowManager.getCurrentInstanceOrNew();
@@ -418,6 +418,33 @@ function createLogWindow () {
     })
 }
 
+function openWorkSpaceDir(){
+    let path = global.currentSitePath;
+    //let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
+    console.log(path);
+    try{
+        let lstat = fs.lstatSync(path);
+        if(lstat.isDirectory()){
+            shell.openItem(path);
+        }
+        else{
+            shell.openItem(dirname(path));
+        }
+    }
+    catch(e){
+    }
+}
+function openWorkSpaceConfig(){
+    let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
+    console.log(path);
+    try{
+        shell.openItem(path);
+    }
+    catch(e){
+    }
+}
+
+
 function createMainMenu(){
 
     const isMac = process.platform === 'darwin'
@@ -514,35 +541,8 @@ function createMainMenu(){
         {
             label: 'View',
             submenu: [
-                {
-                    label: 'Front page',
-                    click: async () => {
-                        openHome()
-                    }
-                },
-                {
-                    label: 'Open Form Cookbooks',
-                    click: async () => {
-                        openCookbooks()
-                    }
-                },
-                {
-                    label: 'Show Log Window',
-                    click: async () => {
-                        createLogWindow()
-                    }
-                },
-                {
-                    label: 'Stop server',
-                    click: async () => {
-                        stopServer()
-                    }
-                },
-                { type: 'separator' },
 
                 { role: 'reload' },
-                { role: 'forcereload' },
-                { role: 'toggledevtools' },
 
                 { type: 'separator' },
 
@@ -570,12 +570,56 @@ function createMainMenu(){
             ]
         },
         {
+            label: 'Expert',
+            submenu: [
+                {
+                    label: 'Front page',
+                    click: async () => {
+                        openHome()
+                    }
+                },
+                {
+                    label: 'Open Form Cookbooks',
+                    click: async () => {
+                        openCookbooks()
+                    }
+                },
+                {
+                    label: 'Show Log Window',
+                    click: async () => {
+                        createLogWindow()
+                    }
+                },
+                {
+                    label: 'Stop server',
+                    click: async () => {
+                        stopServer()
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: 'Open Site Directory',
+                    click: async () => {
+                        openWorkSpaceDir()
+                    }
+                },
+                {
+                    label: 'Open Workspace Config',
+                    click: async () => {
+                        openWorkSpaceConfig()
+                    }
+                },
+                { type: 'separator' },
+                { role: 'forcereload' },
+                { role: 'toggledevtools' },
+            ]
+        },
+        {
             role: 'help',
             submenu: [
                 {
                     label: 'Learn More',
                     click: async () => {
-                        const { shell } = require('electron')
                         await shell.openExternal('https://electronjs.org')
                     }
                 }
