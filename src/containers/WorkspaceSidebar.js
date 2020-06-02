@@ -3,9 +3,9 @@
 import React from 'react';
 import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
-import { FlatButton, Subheader } from 'material-ui';
+import { FlatButton, Subheader, Toggle } from 'material-ui';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
-import IconPlay from 'material-ui/svg-icons/av/play-arrow';
+import IconOpenBrowser from 'material-ui/svg-icons/action/launch';
 //import IconActionList from 'material-ui/svg-icons/action/list';
 //import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 //import IconMenu from 'material-ui/svg-icons/navigation/menu';
@@ -58,7 +58,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         console.log('serverDown');
     }
 
-
   render(){
     let {
       onClick,
@@ -67,6 +66,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     } = this.props;
 
       let previewButton;
+      let mobileButton;
 
       if(this.state.hugoRunning){
           previewButton = <FlatButton
@@ -79,7 +79,15 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
            }
 
           style={{flex:1, minWidth:40}}
-          icon={<IconPlay color="white" style={{opacity:.8}} />} />
+          icon={<IconOpenBrowser color="white" style={{opacity:.8}} />} />
+
+          mobileButton = <Toggle
+              label="Mobile preview"
+              toggled={true}
+              onToggle={function(e,value){
+                  window.require('electron').shell.openExternal('http://localhost:1313');
+              }}
+              labelPosition='right' />
       }
       else{
           previewButton = <FlatButton
@@ -89,7 +97,16 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
               }
           }
           style={{flex:1, minWidth:40}}
-          icon={<IconPlay color="white" style={{opacity:.2}} />} />
+          icon={<IconOpenBrowser color="white" style={{opacity:.2}} />} />
+
+          mobileButton = <Toggle
+              label="Mobile preview"
+              toggled={true}
+              onToggle={function(e,value){
+                  window.require('electron').shell.openExternal('http://localhost:1313');
+              }}
+              labelPosition='right' />
+
       }
 
     let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
@@ -111,7 +128,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     { siteConfig!=null && workspaceConfig!=null ? (
 
-    <div style={{display:'flex'}}>
+    <div style={{paddingLeft:'15px'}}>
 
 {/*
       <TriggerWithOptions
@@ -135,7 +152,8 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         icon={<IconFileFolder color="white" style={{opacity:.8}} />} />
       */}
 
-    {previewButton}
+    <div style={{margin:'10px'}}>{mobileButton}</div>
+    <div style={{margin:'10px',color:'white'}}>{previewButton} Open in browser</div>
 
 
       {/*
