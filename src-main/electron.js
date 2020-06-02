@@ -59,14 +59,12 @@ function openHome() {
 }
 
 function reloadPreview() {
-    return;
-    /*
-  previewWindow = mainWindowManager.previewWindow;
-  if (previewWindow) {
-    previewWindow.reload();
+  let mobilePreviewView = mainWindowManager.mobilePreviewView;
+  if (mobilePreviewView) {
+    mobilePreviewView.reload();
   }
-  */
 }
+
 
 function openCookbooks() {
   mainWindow = mainWindowManager.getCurrentInstanceOrNew();

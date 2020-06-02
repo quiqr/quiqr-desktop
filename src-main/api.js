@@ -168,13 +168,9 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
         });
     });
 
-    /*
     return new Promise((resolve, reject)=>{
-        mainWindowManager.reloadPreview();
+        mainWindowManager.closeMobilePreview();
     });
-    */
-
-
 }
 
 api.buildWorkspace = function({siteKey, workspaceKey, buildKey}/*: any*/, context/*: any*/){
