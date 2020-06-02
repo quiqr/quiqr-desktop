@@ -89,6 +89,15 @@ function stopServer() {
     });
   }
 }
+
+function importTheme() {
+    console.log('import')
+}
+
+function exportTheme() {
+    console.log('export')
+}
+
 function importSite() {
     let dir;
 
@@ -456,12 +465,12 @@ function createMainMenu(){
             submenu: [
                 { role: 'about' },
                 { type: 'separator' },
-                {
+                /*                {
                     label: 'Preferences',
                     click: async () => {
                         createPrefsWindow()
                     }
-                },
+                },*/
                 { role: 'services' },
                 { type: 'separator' },
                 { role: 'hide' },
@@ -476,11 +485,12 @@ function createMainMenu(){
             label: 'File',
             submenu: [
                 {
-                    label: 'Select site',
+                    label: 'Select website',
                     click: async () => {
                         createSelectSiteWindow()
                     }
                 },
+                { type: 'separator' },
                 {
                     label: 'Import website',
                     click: async () => {
@@ -499,6 +509,20 @@ function createMainMenu(){
                         deleteSite()
                     }
                 },
+                { type: 'separator' },
+                {
+                    label: 'Import theme',
+                    click: async () => {
+                        importTheme()
+                    }
+                },
+                {
+                    label: 'Export theme',
+                    click: async () => {
+                        exportTheme()
+                    }
+                },
+                { type: 'separator' },
                 isMac ? { role: 'close' } : { role: 'quit' }
             ]
         },
@@ -528,12 +552,14 @@ function createMainMenu(){
                     { role: 'delete' },
                     { type: 'separator' },
                     { role: 'selectAll' },
+                    /*
                     {
                         label: 'Preferences',
                         click: async () => {
                             createPrefsWindow()
                         }
                     }
+                    */
                 ])
             ]
         },
