@@ -14,7 +14,7 @@ class BaseService{
 
     /*:: _listeners : Array<component> */
     /*:: _notifyChangesTimeout : any */
-    
+
 
     constructor(){
         this._listeners = [];

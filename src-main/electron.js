@@ -110,19 +110,7 @@ function deleteSite() {
             console.log("rm done");
         });
 
-        /*
-        dialog.showMessageBox(mainWindow, {
-            type: 'info',
-            message: "Site "+ global.currentSiteKey +" deleted. Please restart Sukoh",
-        });
-        */
-
-        // global.currentSiteKey = null;
-        // global.currentSitePath = null;
-
         mainWindow.webContents.send("unselectSite");
-        //app.relaunch()
-        //app.exit()
     }
     else{
         dialog.showMessageBox(mainWindow, {

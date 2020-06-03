@@ -28,16 +28,16 @@ class Pogozipper{
         console.log("created and rm'd dir: " + path);
     }
 
+    async fileRegexRemove(path, regex){
+        fssimple.readdirSync(path)
+            .filter(f => regex.test(f))
+            .map(f => fs.unlinkSync(path +"/"+ f))
+    }
+
     async exportSite() {
         const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
 
-        if(!global.currentSiteKey){
-            dialog.showMessageBox(mainWindow, {
-                type: 'error',
-                message: "First, select a site to export.",
-            });
-            return;
-        }
+        if(!this.checkCurrentSiteKey()) {return;}
 
         const prompt = require('electron-prompt');
         var newKey = await prompt({
@@ -61,26 +61,6 @@ class Pogozipper{
             return;
         }
 
-        var progressBar = new ProgressBar({
-            indeterminate: false,
-            text: 'Exporting, ..',
-            abortOnError: true,
-            detail: 'Preparing export..',
-            browserWindow: { parent: mainWindow }
-        });
-
-        progressBar.on('completed', function() {
-            progressBar.detail = 'Site has been exported';
-        })
-            .on('aborted', function(value) {
-                console.info(`aborted... ${value}`);
-            })
-            .on('progress', function(value) {
-            });
-
-        progressBar.value += 1;
-        progressBar.detail = `Start exporting site...`
-
         let path = dirs[0];
         let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
 
@@ -91,6 +71,12 @@ class Pogozipper{
 
         await this.recurForceRemove(tmppath + '/.git');
         await this.recurForceRemove(tmppath + '/public');
+        await this.fileRegexRemove(tmppath, /sitekey$/);
+        await this.fileRegexRemove(tmppath, /config.*.json/);
+        await this.fileRegexRemove(tmppath, /.gitignore/);
+        await this.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
+        await this.fileRegexRemove(tmppath, /.gitmodules/);
+        await this.fileRegexRemove(tmppath, /.DS_Store/);
 
         let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
         const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
@@ -103,31 +89,19 @@ class Pogozipper{
         newConf.name = newKey;
         var newConfJson = JSON.stringify(newConf);
 
-        progressBar.value += 1;
-        progressBar.detail = `Packing configuration...`
-
         await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
         await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
-
-        progressBar.value += 1;
-        progressBar.detail = `Packing files...`
 
         await zip.addLocalFolder(tmppath);
         var willSendthis = zip.toBuffer();
 
-        progressBar.value += 1;
-        progressBar.detail = `Creating site file...`
-
         var exportFilePath = path+"/"+newKey+"."+PogoSiteExtension;
         await zip.writeZip(exportFilePath);
 
-        progressBar.setCompleted();
         dialog.showMessageBox(mainWindow, {
             type: 'info',
             message: "Finished export. Check" + exportFilePath,
         });
-
-        console.log("Finished export:"+exportFilePath);
     }
 
     async importSite() {
@@ -207,12 +181,77 @@ class Pogozipper{
         //app.exit()
     }
 
-    importTheme() {
-        console.log('import')
+    //themes, sukoh.*, config.toml
+    async importTheme() {
     }
 
-    exportTheme() {
-        console.log('export')
+    checkCurrentSiteKey(){
+        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+
+        if(global.currentSiteKey){
+            return true;
+        }
+        else {
+            dialog.showMessageBox(mainWindow, {
+                type: 'error',
+                message: "First, select a site to export.",
+            });
+            return;
+        }
+
+    }
+
+    //themes, sukoh.*, config.toml
+    async exportTheme() {
+        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+
+        if(!this.checkCurrentSiteKey()) {return;}
+
+        let dirs = dialog.showOpenDialog(mainWindow,
+            { properties: ['openDirectory'] });
+        if (!dirs || dirs.length != 1) {
+            return;
+        }
+
+        let path = dirs[0];
+        let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
+
+        await this.recurForceRemove(tmppath);
+
+        fs.copySync(global.currentSitePath, tmppath);
+        console.log("copied to temp dir");
+
+        await this.recurForceRemove(tmppath + '/.git');
+        await this.recurForceRemove(tmppath + '/public');
+        await this.recurForceRemove(tmppath + '/content');
+        await this.recurForceRemove(tmppath + '/static');
+        await this.recurForceRemove(tmppath + '/data');
+        await this.fileRegexRemove(tmppath, /sitekey$/);
+        await this.fileRegexRemove(tmppath, /config.*.json/);
+        await this.fileRegexRemove(tmppath, /.gitignore/);
+        await this.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
+        await this.fileRegexRemove(tmppath, /.gitmodules/);
+        await this.fileRegexRemove(tmppath, /.DS_Store/);
+
+        let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
+
+        var zip = new AdmZip();
+
+        await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
+
+        await zip.addLocalFolder(tmppath);
+        var willSendthis = zip.toBuffer();
+
+        var exportFilePath = path+"/"+global.currentSiteKey+"."+PogoThemeExtension;
+        await zip.writeZip(exportFilePath);
+
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: "Finished theme export. Check" + exportFilePath,
+        });
+
+        console.log("Finished theme export:"+exportFilePath);
     }
 
 }

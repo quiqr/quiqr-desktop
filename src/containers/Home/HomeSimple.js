@@ -93,7 +93,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentDidUpdate(preProps: HomeProps){
         if(this._ismounted && preProps.siteKey !== this.props.siteKey){
             this.checkSiteInProps();
-
             //service.api.serveWorkspace(this.props.siteKey, this.props.workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
         }
     }
@@ -205,7 +204,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             this.history.push(`/`);
         }
-        console.log(window.location.toString());
+        //console.log(window.location.toString());
     }
 
     renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){

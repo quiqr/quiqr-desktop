@@ -114,12 +114,18 @@
         "icon": "public/iconfile"
       },
       {
-        "ext": "pogozip",
-        "name": "PoppyGo Zip",
-        "description": "A PoppyGo Zip can contain a site, theme or other component",
+        "ext": "pogosite",
+        "name": "PoppyGo Site File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogotheme",
+        "name": "PoppyGo Theme File",
         "role": "Editor",
         "icon": "public/iconfile"
       }
+
 
     ]
   },
