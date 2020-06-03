@@ -1,5 +1,3 @@
-//@flow
-
 const electron = require('electron')
 const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
@@ -48,140 +46,47 @@ let previewWindow;
 let logWindow;
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-  mainWindow.on('closed', function () {
-    mainWindow = null
-  })
+    // Create the browser window.
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.on('closed', function () {
+        mainWindow = null
+    })
 
-  contextMenu(mainWindow);
+    contextMenu(mainWindow);
 }
 
 function openHome() {
-  mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-  if (mainWindow) {
-    mainWindow.webContents.send("redirectHome")
-  }
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    if (mainWindow) {
+        mainWindow.webContents.send("redirectHome")
+    }
 }
-
-/*
-function reloadPreview() {
-  let mobilePreviewView = mainWindowManager.mobilePreviewView;
-  if (mobilePreviewView) {
-    mobilePreviewView.reload();
-  }
-}
-*/
 
 function openCookbooks() {
-  mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-  if (mainWindow) {
-    mainWindow.webContents.send("redirectCookbook")
-  }
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    if (mainWindow) {
+        mainWindow.webContents.send("redirectCookbook")
+    }
 }
 
 function openpreviewWindow() {
     return;
-  previewWindow = previewWindowManager.getCurrentInstanceOrNew();
-  if (previewWindow) {
-    previewWindow.webContents.send("redirectCookbook")
-  }
+    previewWindow = previewWindowManager.getCurrentInstanceOrNew();
+    if (previewWindow) {
+        previewWindow.webContents.send("redirectCookbook")
+    }
 }
 
 function stopServer() {
-  if(global.hugoServer){
-    global.hugoServer.stopIfRunning(function(err, stdout, stderr){
-      if(err) reject(err);
-      else{ resolve(); }
-    });
-  }
+    if(global.hugoServer){
+        global.hugoServer.stopIfRunning(function(err, stdout, stderr){
+            if(err) reject(err);
+            else{ resolve(); }
+        });
+    }
 }
 
 
-function importSite() {
-    let dir;
-
-    const dialog = electron.dialog;
-
-    dir = dialog.showOpenDialog(mainWindow, {
-        filters: [
-            { name: "Sukoh Sites", extensions: ["hsite"] }
-        ],
-        properties: ['openFile']
-
-    }, async function (file) {
-        if (file) {
-
-            var zip = new AdmZip(file[0]);
-            var zipEntries = zip.getEntries();
-            var siteKey = "";
-
-            await zipEntries.forEach(function(zipEntry) {
-                if (zipEntry.entryName == "sitekey") {
-                    siteKey = zip.readAsText("sitekey");
-                }
-                else{
-                    console.log("no sitekey");
-                }
-            });
-
-            if(siteKey!=""){
-
-                var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
-                var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
-                var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
-                var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
-                await fs.ensureDir(pathSite);
-                await fs.ensureDir(pathSiteSources);
-                await fs.ensureDir(pathSource);
-
-                var confFileName = "config."+siteKey+".json";
-                var conftxt = zip.readAsText(confFileName);
-                if(conftxt){
-                    var newConf = JSON.parse(conftxt);
-
-                    outputConsole.appendLine('Found a site with key ' + siteKey);
-                    newConf.source.path = pathSource;
-
-                    fssimple = require('fs');
-                    fssimple.writeFile(pathHelper.getRoot()+'config.'+siteKey+'.json', JSON.stringify(newConf), 'utf8', async function(){
-                        outputConsole.appendLine('wrote new site configuration');
-                        await zip.extractAllTo(pathSource, true);
-
-                        fs.remove(pathSource+'/'+confFileName, err => {
-                            if (err) return console.error(err)
-                            console.log('rm success!')
-                        })
-
-                        dialog.showMessageBox(mainWindow, {
-                            type: 'info',
-                            message: "Site has been imported, PoppyGo will now be restarted.",
-                        });
-
-                        app.relaunch()
-                        app.exit()
-
-                    });
-                }
-                else{
-                    dialog.showMessageBox(mainWindow, {
-                        type: 'warning',
-                        message: "Failed to import site. Invalid site file. 2",
-                    });
-                }
-
-            }
-            else{
-                dialog.showMessageBox(mainWindow, {
-                    type: 'warning',
-                    message: "Failed to import site. Invalid site file 1",
-                });
-                return;
-            }
-        }
-    });
-
-}
 
 function deleteSite() {
     let dir;
@@ -210,8 +115,13 @@ function deleteSite() {
             message: "Site "+ global.currentSiteKey +" deleted. Please restart Sukoh",
         });
 
-        app.relaunch()
-        app.exit()
+        // global.currentSiteKey = null;
+        // global.currentSitePath = null;
+
+        mainWindow.webContents.send("refreshSites");
+
+        //app.relaunch()
+        //app.exit()
     }
     else{
         dialog.showMessageBox(mainWindow, {
@@ -221,8 +131,12 @@ function deleteSite() {
     }
 }
 
-
 function createSelectSiteWindow () {
+
+    mainWindow.webContents.send("redirectHome");
+    mainWindow.webContents.send("unselectSite");
+    return;
+
     selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
     if (selectsiteWindow) {
         selectsiteWindow.webContents.send("redirectselectsite")
@@ -346,7 +260,7 @@ function createMainMenu(){
                 {
                     label: 'Import website',
                     click: async () => {
-                        importSite()
+                        pogozipper.importSite()
                     }
                 },
                 {

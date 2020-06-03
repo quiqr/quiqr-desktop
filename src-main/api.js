@@ -65,10 +65,12 @@ function getWorkspaceService(siteKey/*: string*/, workspaceKey/*: string*/, call
     })
 }
 
-async function getWorkspaceServicePromise(siteKey/*: string*/, workspaceKey/*: string*/){
+async function getWorkspaceServicePromise(siteKey, workspaceKey){
     let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
     let workspaceHead = await siteService.getWorkspaceHead(workspaceKey);
-    if(workspaceHead==null) return Promise.reject(new Error('Could not find workspace.'));
+    if(workspaceHead==null){
+        return Promise.reject(new Error('Could not find workspace.'));
+    }
     else{
         let workspaceService = new WorkspaceService(workspaceHead.path, workspaceHead.key, siteKey);
         return { siteService, workspaceService };
@@ -104,6 +106,12 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
     context.resolve(workspaces);
 
 }
+
+api.unselectSite = async function(){
+    global.currentSiteKey = null;
+    global.currentSitePath = null;
+}
+
 
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
@@ -158,6 +166,9 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
 
         if(err){ context.reject(err); return; }
+
+        if(!workspaceService){ return; }
+
         workspaceService.serve(serveKey).then(()=>{
             context.resolve();
         }, ()=>{

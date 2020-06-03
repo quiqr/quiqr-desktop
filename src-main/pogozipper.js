@@ -14,9 +14,11 @@ const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
 const fssimple = require('fs');
 const AdmZip = require('adm-zip');
-//const PogozipperExtension = "pogozip"
-const PogozipperExtension = "hsite"
+const PogoSiteExtension = "pogosite";
+const PogoThemeExtension = "pogotheme";
 const dialog = electron.dialog;
+const outputConsole = require('./output-console');
+const app = electron.app
 
 class Pogozipper{
 
@@ -53,7 +55,8 @@ class Pogozipper{
             return;
         }
 
-        let dirs = dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] });
+        let dirs = dialog.showOpenDialog(mainWindow,
+            { properties: ['openDirectory'] });
         if (!dirs || dirs.length != 1) {
             return;
         }
@@ -89,7 +92,8 @@ class Pogozipper{
         await this.recurForceRemove(tmppath + '/.git');
         await this.recurForceRemove(tmppath + '/public');
 
-        const conftxt = fssimple.readFileSync((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'), {encoding:'utf8', flag:'r'});
+        let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
         console.log("read and parsed conf file");
 
@@ -114,7 +118,7 @@ class Pogozipper{
         progressBar.value += 1;
         progressBar.detail = `Creating site file...`
 
-        var exportFilePath = path+"/"+newKey+"."+PogozipperExtension;
+        var exportFilePath = path+"/"+newKey+"."+PogoSiteExtension;
         await zip.writeZip(exportFilePath);
 
         progressBar.setCompleted();
@@ -124,6 +128,82 @@ class Pogozipper{
         });
 
         console.log("Finished export:"+exportFilePath);
+    }
+
+    async importSite() {
+        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+
+        let files = dialog.showOpenDialog(mainWindow, {
+            filters: [
+                { name: "Sukoh Sites", extensions: [PogoSiteExtension] }
+            ],
+            properties: ['openFile'] });
+
+        if (!files || files.length != 1) {
+            return;
+        }
+
+        var zip = new AdmZip(files[0]);
+        var zipEntries = zip.getEntries();
+        var siteKey = "";
+
+        await zipEntries.forEach(function(zipEntry) {
+            if (zipEntry.entryName == "sitekey") {
+                siteKey = zip.readAsText("sitekey");
+                console.log("found sitekey:" + siteKey);
+            }
+            else if (zipEntry.entryName == "pogoziptype") {
+                pogoziptype = zip.readAsText("pogoziptype");
+            }
+        });
+
+        if(siteKey==""){
+            dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                message: "Failed to import site. Invalid site file 1, no siteKey",
+            });
+            return;
+        }
+
+        outputConsole.appendLine('Found a site with key ' + siteKey);
+
+        var confFileName = "config."+siteKey+".json";
+        var conftxt = zip.readAsText(confFileName);
+        if(!conftxt){
+            dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                message: "Failed to import site. Invalid site file. 2, unreadable config."+siteKey+".json",
+            });
+            return;
+        }
+
+        var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
+        var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
+        var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
+        var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
+        await fs.ensureDir(pathSite);
+        await fs.ensureDir(pathSiteSources);
+        await fs.ensureDir(pathSource);
+
+        var newConf = JSON.parse(conftxt);
+        newConf.source.path = pathSource;
+
+        let newConfigJsobPath = pathHelper.getRoot()+'config.'+siteKey+'.json';
+        await fssimple.writeFileSync(newConfigJsobPath, JSON.stringify(newConf), { encoding: "utf8"});
+
+        outputConsole.appendLine('wrote new site configuration');
+        await zip.extractAllTo(pathSource, true);
+
+        await fs.removeSync(pathSource+'/'+confFileName);
+
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: "Site has been imported, PoppyGo will now be restarted.",
+        });
+
+        mainWindow.webContents.send("refreshSites");
+        //app.relaunch()
+        //app.exit()
     }
 
     importTheme() {
