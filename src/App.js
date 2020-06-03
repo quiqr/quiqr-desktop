@@ -434,7 +434,7 @@ class App extends React.Component<AppProps,AppState>{
                     { this.getContentSwitch() }
                   </div>
 
-                    </div>
+                </div>
 
                 {(this.state.configurations && this.state.configurations.global && this.state.configurations.global.hideInlineMenus === false) ? (
 
@@ -454,7 +454,6 @@ class App extends React.Component<AppProps,AppState>{
                 ) : (
                   <div></div>
                 )}
-
 
                 {(this.state.redirectHome) ? (
                   <Redirect to='/' />

@@ -93,14 +93,21 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
     }
 
     componentWillMount(){
+        window.require('electron').ipcRenderer.on('refreshSites', this.checkSiteInProps.bind(this));
         service.registerListener(this);
     }
 
     componentDidMount(){
         console.log('HOME MOUNTED');
+        this.checkSiteInProps();
+    }
 
+    checkSiteInProps(){
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
+            //alert(site);
+            this.setState({currentSiteKey: siteKey});
+
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = bundle.configurations;
@@ -113,7 +120,7 @@ class SelectSite extends React.Component<HomeProps, HomeState>{
             })
         }
         else{
-            service.getConfigurations().then((c)=>{
+            service.getConfigurations(true).then((c)=>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = c;
                 this.setState(stateUpdate);

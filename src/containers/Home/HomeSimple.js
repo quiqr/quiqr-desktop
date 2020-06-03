@@ -94,20 +94,38 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this._ismounted && preProps.siteKey !== this.props.siteKey){
             this.checkSiteInProps();
 
-            service.api.serveWorkspace(this.props.siteKey, this.props.workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
+            //service.api.serveWorkspace(this.props.siteKey, this.props.workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
         }
     }
 
     componentWillMount(){
+        window.require('electron').ipcRenderer.on('refreshSites', this.checkSiteInProps.bind(this));
+        window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
         service.registerListener(this);
     }
 
-    checkSiteInProps(){
+    componentDidMount(){
+        this.checkSiteInProps();
+        this._ismounted = true;
+    }
 
+    unselectSite(){
+        this.setState({currentSiteKey: null});
+        this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
+
+        service.getConfigurations(true).then((c)=>{
+            var stateUpdate  = {};
+            stateUpdate.configurations = c;
+            this.setState(stateUpdate);
+        });
+    }
+
+    checkSiteInProps(){
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
             //alert(site);
             this.setState({currentSiteKey: siteKey});
+            this.setState({currentWorkspaceKey: workspaceKey});
 
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 var stateUpdate  = {};
@@ -121,18 +139,12 @@ class Home extends React.Component<HomeProps, HomeState>{
             })
         }
         else{
-            service.getConfigurations().then((c)=>{
+            service.getConfigurations(true).then((c)=>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = c;
                 this.setState(stateUpdate);
             })
         }
-
-    }
-
-    componentDidMount(){
-        this.checkSiteInProps();
-        this._ismounted = true;
     }
 
     selectSite(site : SiteConfig ){
@@ -160,7 +172,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
         return (<Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
             <InfoLine label="Name">{site.name}</InfoLine>
-            { this.renderWorkspaces(site, site.key===this.props.siteKey, this.state.selectedSiteWorkspaces) }
+            { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
         </Wrapper>);
     }
 
@@ -170,16 +182,13 @@ class Home extends React.Component<HomeProps, HomeState>{
     };
 
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-        let activeWorkspaceKey = this.props.workspaceKey;
-        let activeSiteKey = this.props.siteKey;
-
+        let activeWorkspaceKey = this.state.currentWorkspaceKey;
+        let activeSiteKey = this.state.currentSiteKey;
 
         let select = (
             activeWorkspaceKey==null ||
             activeSiteKey==null ||
-            //activeWorkspaceKey!=workspace.key ||
             activeWorkspaceKey!==workspace.key ||
-            //activeSiteKey!=siteKey
             activeSiteKey!==siteKey
         );
 
@@ -188,7 +197,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
 
             // Serve the workspace at selection of the workspace right after mounting the workspace
-
             await service.api.serveWorkspace(siteKey, workspace.key, "instantly serve at selectWorkspace"/*serveKey*/);
 
             // Open a new window with the served site.
@@ -213,8 +221,8 @@ class Home extends React.Component<HomeProps, HomeState>{
                     <WorkspacesSimple
                         getWorkspaceDetails={this.getWorkspaceDetails}
                         workspaces={workspaces}
-                        activeSiteKey={this.props.siteKey}
-                        activeWorkspaceKey={this.props.workspaceKey}
+                        activeSiteKey={this.state.currentSiteKey}
+                        activeWorkspaceKey={this.state.currentWorkspaceKey}
                         onLocationClick={(location)=>{
                             service.api.openFileExplorer(location)
                         }}
@@ -236,6 +244,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleCreateSiteSubmit = (data)=>{
         this.setState({createSiteDialog:false, blockingOperation:'Creating site...'})
+
         service.api.createSite(data).then(()=>{
             return service.getConfigurations(true);
         }).then(configurations=>{
@@ -320,7 +329,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         return (
             <div style={ styles.container }>
 
-                {this.props.siteKey ? (null) : this.renderSelectSites() }
+                {this.state.currentSiteKey ? (null) : this.renderSelectSites() }
 
 
                 <div style={styles.selectedSiteCol}>

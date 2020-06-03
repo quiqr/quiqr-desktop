@@ -22,15 +22,15 @@ const translucentColor = 'RGBA(255,255,255,.8)';
 //const translucentColorSubtle = 'RGBA(255,255,255,.05)';
 
 let MenuBorder = ({ children }) => {
-  return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
-    {children}
-  </Border>;
+    return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
+        {children}
+        </Border>;
 }
 
 type WorkspaceWidgetProps = {
-  onClick : ()=> void,
-  siteConfig : ?SiteConfig,
-  workspaceConfig : ?WorkspaceConfig
+    onClick : ()=> void,
+    siteConfig : ?SiteConfig,
+    workspaceConfig : ?WorkspaceConfig
 }
 
 class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
@@ -78,93 +78,93 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         console.log('serverDown');
     }
 
-  render(){
-    let {
-      onClick,
-      siteConfig,
-      workspaceConfig,
-    } = this.props;
+    render(){
+        let {
+            onClick,
+            siteConfig,
+            workspaceConfig,
+        } = this.props;
 
-      let previewButton;
-      let mobileButton;
+        let previewButton;
+        let mobileButton;
 
-      if(this.state.hugoRunning){
-          previewButton = <FlatButton
-          onClick=
+        if(this.state.hugoRunning){
+            previewButton = <FlatButton
+            onClick=
 
-          {function(){
-              //service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
-              window.require('electron').shell.openExternal('http://localhost:1313');
-             }
-           }
+            {function(){
+                //service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
+                window.require('electron').shell.openExternal('http://localhost:1313');
+            }
+            }
 
-          style={{flex:1, minWidth:40}}
-          icon={<IconOpenBrowser color="white" style={{opacity:.8}} />} />
+            style={{flex:1, minWidth:40}}
+            icon={<IconOpenBrowser color="white" style={{opacity:.8}} />} />
 
-          mobileButton = <Toggle
-              label="Mobile preview"
-              toggled={true}
-          onToggle={function(e,value){
-              this.toggleMobilePreview();
-              }.bind(this)}
-              labelPosition='right' />
-      }
-      else{
-          previewButton = <FlatButton
-          onClick={function(){
-              service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
-              window.require('electron').shell.openExternal('http://localhost:1313');
-              }
-          }
-          style={{flex:1, minWidth:40}}
-          icon={<IconOpenBrowser color="white" style={{opacity:.2}} />} />
+                mobileButton = <Toggle
+                label="Mobile preview"
+                toggled={true}
+                onToggle={function(e,value){
+                    this.toggleMobilePreview();
+                }.bind(this)}
+                labelPosition='right' />
+        }
+        else{
+            previewButton = <FlatButton
+            onClick={function(){
+                service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
+                window.require('electron').shell.openExternal('http://localhost:1313');
+            }
+            }
+            style={{flex:1, minWidth:40}}
+            icon={<IconOpenBrowser color="white" style={{opacity:.2}} />} />
 
-          mobileButton = <Toggle
-              label="Mobile preview"
-              toggled={true}
-              onToggle={function(e,value){
-                  window.require('electron').shell.openExternal('http://localhost:1313');
-              }}
-              labelPosition='right' />
+                mobileButton = <Toggle
+                label="Mobile preview"
+                toggled={true}
+                onToggle={function(e,value){
+                    window.require('electron').shell.openExternal('http://localhost:1313');
+                }}
+                labelPosition='right' />
 
-      }
+        }
 
-    let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
+        let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
-    return (<div>
-    <List style={{padding: 0}}>
-      { siteConfig!=null && workspaceConfig!=null ? (<ListItem
-        primaryText={siteConfig.name}
-        //secondaryText={workspaceConfig.key}
-        onClick={onClick}
-        //rightIcon={<IconActionSetting color={translucentColor} />}
-      />) : (<ListItem
-        //primaryText={'Please'}
-        secondaryText={'select a website'}
-        onClick={onClick}
-        rightIcon={<IconActionSetting color={translucentColor} />}
-      />) }
-    </List>
+        return (<div>
+            <List style={{padding: 0}}>
+                { siteConfig!=null && workspaceConfig!=null ? (<ListItem
+                primaryText={siteConfig.name}
+                //secondaryText={workspaceConfig.key}
+                    onClick={onClick}
+                //rightIcon={<IconActionSetting color={translucentColor} />}
+                    />) : (<ListItem
+                        //primaryText={'Please'}
+                        secondaryText={'select a website'}
+                    onClick={onClick}
+                    rightIcon={<IconActionSetting color={translucentColor} />}
+                />) }
+                    </List>
 
-    { siteConfig!=null && workspaceConfig!=null ? (
+                    { siteConfig!=null && workspaceConfig!=null ? (
 
-        <div style={{paddingLeft:'15px'}}>
-        <div style={{margin:'10px',color:'white'}}>
-            <Toggle
-            label="Mobile preview"
-            toggled={this.state.mobilePreviewActive}
-            onToggle={function(e,value){
-                this.toggleMobilePreview();
-            }.bind(this)}
-            labelPosition='right' />
-        </div>
-        <div style={{margin:'5px',color:'white'}}>{previewButton} Open in browser</div>
+                        <div style={{paddingLeft:'15px'}}>
+                            <div style={{margin:'10px',color:'white'}}>
+                                <Toggle
+                                label="Mobile preview"
+                                toggled={this.state.mobilePreviewActive}
+                                onToggle={function(e,value){
+                                    this.toggleMobilePreview();
+                                }.bind(this)}
+                                labelPosition='right' />
+                            </div>
+                            <div style={{margin:'5px',color:'white'}}>{previewButton} Open in browser</div>
 
-  </div>) : (null) }
+                            </div>) : (null) }
 
 
-  </div>);
-  }
+                            </div>);
+    }
 }
 
 // type ListItemCustomProps = {
@@ -175,181 +175,186 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 // };
 
 type WorkspaceSidebarProps = {
-  siteKey : ?string,
-  workspaceKey : ?string,
-  history: any,
-  //menuIsLocked: bool,
-  onLockMenuClicked: ()=> void,
-  onToggleItemVisibility: ()=> void,
-  hideItems : bool
+    siteKey : ?string,
+    workspaceKey : ?string,
+    history: any,
+    //menuIsLocked: bool,
+    onLockMenuClicked: ()=> void,
+    onToggleItemVisibility: ()=> void,
+    hideItems : bool
 }
 
 type WorkspaceSidebarState = {
-  site : any,
-  workspace : any,
-  error: any
+    site : any,
+    workspace : any,
+    error: any
 }
 
 
 class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSidebarState>{
 
-  constructor(props : WorkspaceSidebarProps){
-    super(props);
-    this.state = {
-      site: null,
-      workspace: null,
-      error: null
-    };
-  }
-
-  componentWillMount(){
-    service.registerListener(this);
-    this.refresh();
-  }
-
-  refresh = ()=>{
-    let {siteKey, workspaceKey } = this.props;
-    if(siteKey && workspaceKey){
-      let stateUpdate = {};
-      service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-        stateUpdate.site = bundle.site;
-        stateUpdate.workspace = bundle.workspaceDetails;
-        this.setState(stateUpdate);
-      }).catch(e=>{
-        this.setState({site: null, workspace: null, error: e});
-      });
+    constructor(props : WorkspaceSidebarProps){
+        super(props);
+        this.state = {
+            site: null,
+            workspace: null,
+            error: null
+        };
     }
-  }
 
-  componentWillUnmount(){
-    service.unregisterListener(this);
-  }
+    componentWillMount(){
+        window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
+        service.registerListener(this);
+        this.refresh();
+    }
 
-  render(){
-    return (<Route render={({history})=>{ return this.renderWithRoute(history) }} />);
-  }
+    unselectSite(){
+        this.setState({site: null, workspace: null});
+    }
 
-  renderWithRoute(history: any){
+    refresh = ()=>{
+        let {siteKey, workspaceKey } = this.props;
+        if(siteKey && workspaceKey){
+            let stateUpdate = {};
+            service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
+                stateUpdate.site = bundle.site;
+                stateUpdate.workspace = bundle.workspaceDetails;
+                this.setState(stateUpdate);
+            }).catch(e=>{
+                this.setState({site: null, workspace: null, error: e});
+            });
+        }
+    }
 
-    let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
-    let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+    componentWillUnmount(){
+        service.unregisterListener(this);
+    }
 
-    let menus: Array<Sidebar.SidebarMenu> = [];
+    render(){
+        return (<Route render={({history})=>{ return this.renderWithRoute(history) }} />);
+    }
 
-    //append workspace widget
-    menus.push({
-      //title: 'Current website',
-      widget: (
-        <WorkspaceWidget
-          siteConfig={this.state.site}
-          workspaceConfig={this.state.workspace}
-          onClick={()=>{
-            if(this.state.error!=null){
-              history.push('/');
-              this.refresh();
+    renderWithRoute(history: any){
+
+        let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
+        let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
+        let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+
+        let menus: Array<Sidebar.SidebarMenu> = [];
+
+        //append workspace widget
+        menus.push({
+            //title: 'Current website',
+            widget: (
+                <WorkspaceWidget
+                siteConfig={this.state.site}
+                workspaceConfig={this.state.workspace}
+                onClick={()=>{
+                    if(this.state.error!=null){
+                        history.push('/');
+                        this.refresh();
+                    }
+                    else if(this.state.site!=null){
+                        history.push(basePath);
+                        this.refresh();
+                    }
+                }} />
+            )
+        });
+
+        if(this.state.workspace){
+
+            if("menu" in this.state.workspace){
+                this.state.workspace.menu.map((menuslot, index) => {
+                    //collections menu
+                    menus.push({
+                        title: menuslot.title,
+                        items: menuslot.menuItems.map((menuitem, index) => {
+                            let item = null;
+                            let itemType = null;
+
+                            if(this.state.workspace.collections.some(e => e.key == menuitem.key)) {
+                                item = this.state.workspace.collections.find(e => e.key == menuitem.key);
+                                itemType = "collections";
+                            }
+                            else if(this.state.workspace.singles.some(e => e.key == menuitem.key)) {
+                                item = this.state.workspace.singles.find(e => e.key == menuitem.key);
+                                itemType = "singles";
+                            }
+
+                            if(item){
+                                return {
+                                    label: item.title,
+                                    onClick: () => {
+                                        history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
+                                        this.refresh();
+                                    },
+                                    active: false
+                                }
+                            }
+                            else{
+                                return {
+                                    label: menuitem.key +' (missing)',
+                                    active: false
+                                }
+                            }
+
+                        })
+                    });
+
+                });
+
             }
-            else if(this.state.site!=null){
-              history.push(basePath);
-              this.refresh();
-            }
-          }} />
-      )
-    });
-
-    if(this.state.workspace){
-
-        if("menu" in this.state.workspace){
-            this.state.workspace.menu.map((menuslot, index) => {
+            else{
                 //collections menu
                 menus.push({
-                    title: menuslot.title,
-                    items: menuslot.menuItems.map((menuitem, index) => {
-                        let item = null;
-                        let itemType = null;
-
-                        if(this.state.workspace.collections.some(e => e.key == menuitem.key)) {
-                            item = this.state.workspace.collections.find(e => e.key == menuitem.key);
-                            itemType = "collections";
+                    title: 'Items',
+                    items: this.state.workspace.collections.map((collection, index) => {
+                        return {
+                            label: collection.title,
+                            onClick: () => {
+                                history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
+                                this.refresh();
+                            },
+                            active: false
                         }
-                        else if(this.state.workspace.singles.some(e => e.key == menuitem.key)) {
-                            item = this.state.workspace.singles.find(e => e.key == menuitem.key);
-                            itemType = "singles";
-                        }
-
-                        if(item){
-                            return {
-                                label: item.title,
-                                onClick: () => {
-                                    history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
-                                    this.refresh();
-                                },
-                                active: false
-                            }
-                        }
-                        else{
-                            return {
-                                label: menuitem.key +' (missing)',
-                                active: false
-                            }
-                        }
-
                     })
                 });
 
-            });
+                //singles menu
+                menus.push({
+                    title: 'Pages',
+                    items: this.state.workspace.singles.map((collection, index) => {
+                        return {
+                            label: collection.title,
+                            onClick: () => {
+                                history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
+                                this.refresh();
+                            },
+                            active: false
+                        }
+                    })
+                });
 
+            }
         }
-        else{
-            //collections menu
-            menus.push({
-                title: 'Items',
-                items: this.state.workspace.collections.map((collection, index) => {
-                    return {
-                        label: collection.title,
-                        onClick: () => {
-                            history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
-                            this.refresh();
-                        },
-                        active: false
-                    }
-                })
-            });
 
-            //singles menu
-            menus.push({
-                title: 'Pages',
-                items: this.state.workspace.singles.map((collection, index) => {
-                    return {
-                        label: collection.title,
-                        onClick: () => {
-                            history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
-                            this.refresh();
-                        },
-                        active: false
-                    }
-                })
-            });
-
-        }
+        return (<React.Fragment>
+            <Sidebar.Sidebar
+            hideItems={this.props.hideItems}
+            menuIsLocked={this.props.menuIsLocked}
+            menus={menus}
+            onLockMenuClicked={this.props.onLockMenuClicked}
+            onToggleItemVisibility={this.props.onToggleItemVisibility}
+        />
+                { this.state.error && (<p style={{
+                    color: '#EC407A', padding: '10px', margin: '16px',
+                    fontSize:'14px', border: 'solid 1px #EC407A',
+                    borderRadius:3
+                }}>{this.state.error}</p>) }
+            </React.Fragment>
+        )
     }
-
-    return (<React.Fragment>
-      <Sidebar.Sidebar
-        hideItems={this.props.hideItems}
-        menuIsLocked={this.props.menuIsLocked}
-        menus={menus}
-        onLockMenuClicked={this.props.onLockMenuClicked}
-        onToggleItemVisibility={this.props.onToggleItemVisibility}
-      />
-      { this.state.error && (<p style={{
-        color: '#EC407A', padding: '10px', margin: '16px',
-        fontSize:'14px', border: 'solid 1px #EC407A',
-        borderRadius:3
-        }}>{this.state.error}</p>) }
-      </React.Fragment>
-    )
-  }
 }
 
 export default WorkspaceSidebar;

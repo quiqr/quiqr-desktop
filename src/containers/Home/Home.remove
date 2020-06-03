@@ -121,6 +121,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
+
+
+
+
     selectSite(site : SiteConfig ){
         this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
         //load all site configuration to enforce validation
