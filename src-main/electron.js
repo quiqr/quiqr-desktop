@@ -407,7 +407,6 @@ function createPrefsWindow () {
     })
 }
 
-
 function createLogWindow () {
     logWindow = logWindowManager.getCurrentInstanceOrNew();
     if (logWindow) {
@@ -646,7 +645,7 @@ function createMainMenu(){
                 {
                     label: 'Learn More',
                     click: async () => {
-                        await shell.openExternal('https://electronjs.org')
+                        await shell.openExternal('https://docs.poppygo.app/')
                     }
                 }
             ]

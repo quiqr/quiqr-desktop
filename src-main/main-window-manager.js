@@ -12,6 +12,7 @@ let mainWindow;
 //let previewWindowl;
 let mainWindowState;
 let mobilePreviewView;
+let mobilePreviewViewActive = false;
 
 function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -181,17 +182,22 @@ function createWindow () {
       }
 
       mobilePreviewView = new BrowserView();
-      mainWindow.setBrowserView(mobilePreviewView);
 
+      mainWindow.setBrowserView(mobilePreviewView);
       mainWindow.show();
-        //createPreviewWindow(mainWindowState);
     });
 
     getLocation();
 
+    mainWindow.on('resize', () => {
+        //Linux hack, Win and Mac should use will-resize with newBound
+        setTimeout(function(){
+            setMobilePreviewBounds(mainWindowState);
+        }, 200);
+    })
+
     mainWindow.on('closed', function () {
         mainWindow = undefined; //clear reference
-
     })
 
     var handleRedirect = (e, url) => {
@@ -207,6 +213,21 @@ function createWindow () {
     //mainWindow.webContents.openDevTools();
 }
 
+async function setMobilePreviewBounds(newBounds){
+    let mobwidth = 340;
+
+    if(mobilePreviewViewActive){
+        mobilePreviewView.setBounds({
+            x: (newBounds.width-mobwidth),
+            y: 0,
+            width: mobwidth,
+            height: newBounds.height
+        });
+    }
+
+}
+
+
 module.exports = {
 
     getCurrentInstance: function(){
@@ -214,16 +235,16 @@ module.exports = {
     },
 
     openMobilePreview: function(){
-        let mobwidth = 340;
-        mobilePreviewView.setBounds({ x: (mainWindowState.width-mobwidth), y: 0, width: mobwidth, height: mainWindowState.height });
+        mobilePreviewViewActive = true;
         mobilePreviewView.webContents.loadURL('http://localhost:1313');
-        //mainWindow.setContentBounds({ x: mainWindowState.x, y: mainWindowState.y, width: (mainWindowState.width-mobwidth), height: mainWindowState.height })
+
         mainWindow.webContents.send("setMobileBrowserOpen");
+        setMobilePreviewBounds(mainWindowState);
     },
 
     closeMobilePreview: function(){
+        mobilePreviewViewActive = false;
         mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-        //mainWindow.setContentBounds({ x: mainWindowState.x, y: mainWindowState.y, width: mainWindowState.width, height: mainWindowState.height })
         mainWindow.webContents.send("setMobileBrowserClose");
     },
 
