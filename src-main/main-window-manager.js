@@ -210,7 +210,6 @@ function createWindow () {
     mainWindow.webContents.on('will-navigate', handleRedirect);
     mainWindow.webContents.on('new-window', handleRedirect);
 
-    //mainWindow.webContents.openDevTools();
 }
 
 async function setMobilePreviewBounds(newBounds){
@@ -226,7 +225,6 @@ async function setMobilePreviewBounds(newBounds){
     }
 
 }
-
 
 module.exports = {
 
@@ -247,29 +245,6 @@ module.exports = {
         mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
         mainWindow.webContents.send("setMobileBrowserClose");
     },
-
-    /*
-    reloadPreview: function() {
-      console.log ("function reloadPreview was called");
-
-      //previewWindow.loadURL("http://localhost:1313");
-      if (previewWindow){
-        previewWindow.reload();
-
-        previewWindow.webContents.once('dom-ready', function (){
-          previewWindow.reload();
-          previewWindow.show();
-          });
-      } else {
-        createPreviewWindow;
-      }
-
-
-
-      return;
-    },
-    */
-
 
     getCurrentInstanceOrNew: function(){
         let instance = this.getCurrentInstance();

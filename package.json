@@ -112,7 +112,15 @@
         "name": "PoppyGo Site",
         "role": "Editor",
         "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogozip",
+        "name": "PoppyGo Zip",
+        "description": "A PoppyGo Zip can contain a site, theme or other component",
+        "role": "Editor",
+        "icon": "public/iconfile"
       }
+
     ]
   },
   "browserslist": [

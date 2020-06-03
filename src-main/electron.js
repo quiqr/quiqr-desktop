@@ -15,10 +15,13 @@ const rimraf = require("rimraf");
 
 const ProgressBar = require('electron-progressbar');
 
+const pogozipper = require('./pogozipper');
+
 const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
 const { shell } = require('electron')
 const AdmZip = require('adm-zip');
+
 unhandled();
 
 // Module to control application life.
@@ -29,6 +32,8 @@ if(app.isPackaged) {
     process.env.NODE_ENV = 'production';
     console.log('production!');
 }
+
+//console.log(process.argv);
 
 global.currentSiteKey = undefined;
 global.currentSitePath = undefined;
@@ -59,12 +64,14 @@ function openHome() {
   }
 }
 
+/*
 function reloadPreview() {
   let mobilePreviewView = mainWindowManager.mobilePreviewView;
   if (mobilePreviewView) {
     mobilePreviewView.reload();
   }
 }
+*/
 
 function openCookbooks() {
   mainWindow = mainWindowManager.getCurrentInstanceOrNew();
@@ -90,13 +97,6 @@ function stopServer() {
   }
 }
 
-function importTheme() {
-    console.log('import')
-}
-
-function exportTheme() {
-    console.log('export')
-}
 
 function importSite() {
     let dir;
@@ -221,153 +221,6 @@ function deleteSite() {
     }
 }
 
-function exportSite() {
-
-    const dialog = electron.dialog;
-
-    if(global.currentSiteKey){
-
-        const prompt = require('electron-prompt');
-        var newKey = "";
-        prompt({
-            title: 'Enter site key',
-            label: 'key:',
-            value: global.currentSiteKey,
-            inputAttrs: {
-                type: 'text',
-                required: true
-            },
-            type: 'input'
-        }, mainWindow)
-        .then((r) => {
-            if(r === null) {
-            } else {
-                newKey = r;
-                if(newKey!=""){
-
-                    let dir;
-
-                    dir = dialog.showOpenDialog(mainWindow, {
-                        properties: ['openDirectory']
-                    }, async function (path) {
-                        if (path) {
-
-                            let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
-                            await fs.ensureDir(tmppath);
-
-                            rimraf(tmppath, function(){
-                                console.log("rm done1");
-
-                                fs.copy(global.currentSitePath, tmppath, async function(err){
-
-                                    console.log("cleaning");
-
-                                    await fs.ensureDir(tmppath + '/.git');
-                                    await rimraf(tmppath+'/.git', async function(){
-                                        console.log("rm done2");
-
-                                        await fs.ensureDir(tmppath + '/public');
-                                        await rimraf(tmppath+'/public', async function(){
-                                            console.log("rm done3");
-
-
-                                            console.log("start packing");
-
-                                            var progressBar = new ProgressBar({
-                                                indeterminate: false,
-                                                text: 'Exporting, ..',
-                                                abortOnError: true,
-                                                detail: 'Preparing export..'
-                                            });
-
-                                            progressBar.on('completed', function() {
-                                                progressBar.detail = 'Site has been exported';
-                                            })
-                                                .on('aborted', function(value) {
-                                                    console.info(`aborted... ${value}`);
-                                                })
-                                                .on('progress', function(value) {
-                                                });
-
-                                            progressBar.value += 1;
-                                            progressBar.detail = `Start exporting site...`
-
-                                            fssimple = require('fs');
-                                            fssimple.readFile((pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json'), 'utf8', async (err, conftxt) => {
-                                                if (err) {
-                                                    dialog.showMessageBox(mainWindow, {
-                                                        type: 'warning',
-                                                        message: "Failed to export. 2",
-                                                    });
-                                                    return;
-                                                }
-
-                                                var newName = path+"/"+newKey+".hsite";
-                                                var zip = new AdmZip();
-
-                                                var newConf = JSON.parse(conftxt);
-                                                newConf.key = newKey;
-                                                newConf.name = newKey;
-                                                var newConfJson = JSON.stringify(newConf);
-                                                progressBar.value += 1;
-                                                progressBar.detail = `Packing configuration...`
-
-                                                await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
-                                                await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
-
-                                                progressBar.value += 1;
-                                                progressBar.detail = `Packing files...`
-
-                                                await zip.addLocalFolder(tmppath);
-                                                var willSendthis = zip.toBuffer();
-
-                                                progressBar.value += 1;
-                                                progressBar.detail = `Creating site file...`
-
-                                                await zip.writeZip(newName);
-                                                progressBar.setCompleted();
-                                                dialog.showMessageBox(mainWindow, {
-                                                    type: 'info',
-                                                    message: "Finished export. Check" + path+"/"+newKey+".hsite",
-                                                });
-
-                                                return;
-                                            })
-
-
-
-                                        });
-
-
-
-                                    });
-
-
-                                });
-                            });
-
-                        }
-                    });
-                }
-                else {
-                    dialog.showMessageBox(mainWindow, {
-                        type: 'error',
-                        message: "A site key is required",
-                    });
-                }
-                console.log('result', r);
-            }
-        })
-            .catch(console.error);
-
-    }
-    else{
-        dialog.showMessageBox(mainWindow, {
-            type: 'error',
-            message: "First, select a site to export.",
-        });
-    }
-}
 
 function createSelectSiteWindow () {
     selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
@@ -499,7 +352,7 @@ function createMainMenu(){
                 {
                     label: 'Export website',
                     click: async () => {
-                        exportSite()
+                        pogozipper.exportSite()
                     }
                 },
                 {
@@ -512,13 +365,13 @@ function createMainMenu(){
                 {
                     label: 'Import theme',
                     click: async () => {
-                        importTheme()
+                        pogozipper.importTheme()
                     }
                 },
                 {
                     label: 'Export theme',
                     click: async () => {
-                        exportTheme()
+                        pogozipper.exportTheme()
                     }
                 },
                 { type: 'separator' },
