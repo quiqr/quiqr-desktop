@@ -198,10 +198,11 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
-            message: "Site has been imported, PoppyGo will now be restarted.",
+            message: "Site has been imported.",
         });
 
-        mainWindow.webContents.send("refreshSites");
+        //mainWindow.webContents.send("refreshSites");
+        mainWindow.webContents.send("unselectSite");
         //app.relaunch()
         //app.exit()
     }
