@@ -136,12 +136,12 @@ class App extends React.Component<AppProps,AppState>{
     this.setState({mobileBrowserActive: false});
   }
 
-  redirectPrefs(){
-    this.setState({redirectPrefs: true});
-  }
-  redirectSelectSite(){
-    this.setState({redirectSelectSite: true});
-  }
+    redirectPrefs(){
+        this.setState({redirectPrefs: true});
+    }
+    redirectSelectSite(){
+        this.setState({redirectSelectSite: true});
+    }
 
     componentWillMount(){
         window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
@@ -156,7 +156,7 @@ class App extends React.Component<AppProps,AppState>{
         }.bind(this));
     }
 
-  minimizeWindow(){
+    minimizeWindow(){
     window.require('electron').remote.getCurrentWindow().minimize();
   }
 
