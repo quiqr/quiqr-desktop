@@ -1,30 +1,24 @@
 const electron = require('electron')
 const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
-const logWindowManager = require('./log-window-manager');
-const prefsWindowManager = require('./prefs-window-manager');
+//const logWindowManager = require('./log-window-manager');
+//const prefsWindowManager = require('./prefs-window-manager');
 //const selectsiteWindowManager = require('./selectsite-window-manager');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
-const outputConsole = require('./output-console');
-
-const rimraf = require("rimraf");
-
-const ProgressBar = require('electron-progressbar');
-
+//const outputConsole = require('./output-console');
 const pogozipper = require('./pogozipper');
 
-const pathHelper = require('./path-helper');
-const fs = require('fs-extra');
-const { shell } = require('electron')
-const AdmZip = require('adm-zip');
+const menuManager = require('./menu-manager');
+
+//const AdmZip = require('adm-zip');
 
 unhandled();
 
 // Module to control application life.
 const app = electron.app
-const Menu = electron.Menu
+//const Menu = electron.Menu
 
 if(app.isPackaged) {
     process.env.NODE_ENV = 'production';
@@ -35,6 +29,7 @@ if(app.isPackaged) {
 
 global.currentSiteKey = undefined;
 global.currentSitePath = undefined;
+
 
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
@@ -55,20 +50,8 @@ function createWindow () {
     contextMenu(mainWindow);
 }
 
-function openHome() {
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-    if (mainWindow) {
-        mainWindow.webContents.send("redirectHome")
-    }
-}
 
-function openCookbooks() {
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-    if (mainWindow) {
-        mainWindow.webContents.send("redirectCookbook")
-    }
-}
-
+/*
 function openpreviewWindow() {
     return;
     previewWindow = previewWindowManager.getCurrentInstanceOrNew();
@@ -76,141 +59,9 @@ function openpreviewWindow() {
         previewWindow.webContents.send("redirectCookbook")
     }
 }
-
-function stopServer() {
-    if(global.hugoServer){
-        global.hugoServer.stopIfRunning(function(err, stdout, stderr){
-            if(err) reject(err);
-            else{ resolve(); }
-        });
-    }
-}
-
-function deleteSite() {
-    let dir;
-
-    const dialog = electron.dialog;
-
-    if(global.currentSiteKey){
-
-        let options  = {
-            buttons: ["Yes","Cancel"],
-            message: "Do you really want to delete " + global.currentSiteKey
-        }
-        let response = dialog.showMessageBox(options)
-        if(response === 1) return;
-
-        fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
-
-        var rimraf = require("rimraf");
-        rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, function(){
-            console.log("rm done");
-        });
-
-        mainWindow.webContents.send("unselectSite");
-    }
-    else{
-        dialog.showMessageBox(mainWindow, {
-            type: 'error',
-            message: "First, select a site to delete.",
-        });
-    }
-}
-
-function createSelectSiteWindow () {
-
-    global.currentSitePath = null;
-    global.currentSiteKey = null;
-    mainWindow.webContents.send("redirectHome");
-    mainWindow.webContents.send("unselectSite");
-
-    return;
+*/
 
     /*
-    selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
-    if (selectsiteWindow) {
-        selectsiteWindow.webContents.send("redirectselectsite")
-    }
-
-    selectsiteWindow.once('ready-to-show', () => {
-        selectsiteWindow.webContents.send("redirectselectsite")
-    })
-
-    selectsiteWindow.webContents.on('did-finish-load',() => {
-        selectsiteWindow.webContents.send("redirectselectsite")
-    })
-
-    selectsiteWindow.on('closed', function() {
-        selectsiteWindow = null
-    })
-    */
-}
-
-function createPrefsWindow () {
-    prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
-    if (prefsWindow) {
-        prefsWindow.webContents.send("redirectPrefs")
-    }
-
-    prefsWindow.once('ready-to-show', () => {
-        prefsWindow.webContents.send("redirectPrefs")
-    })
-
-    prefsWindow.webContents.on('did-finish-load',() => {
-        prefsWindow.webContents.send("redirectPrefs")
-    })
-
-    prefsWindow.on('closed', function() {
-        prefsWindow = null
-    })
-}
-
-function createLogWindow () {
-    logWindow = logWindowManager.getCurrentInstanceOrNew();
-    if (logWindow) {
-        logWindow.webContents.send("redirectConsole")
-    }
-
-    logWindow.once('ready-to-show', () => {
-        logWindow.webContents.send("redirectConsole")
-    })
-
-    logWindow.webContents.on('did-finish-load',() => {
-        logWindow.webContents.send("redirectConsole")
-    })
-
-    logWindow.on('closed', function() {
-        logWindow = null
-    })
-}
-
-function openWorkSpaceDir(){
-    let path = global.currentSitePath;
-    //let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
-    console.log(path);
-    try{
-        let lstat = fs.lstatSync(path);
-        if(lstat.isDirectory()){
-            shell.openItem(path);
-        }
-        else{
-            shell.openItem(dirname(path));
-        }
-    }
-    catch(e){
-    }
-}
-function openWorkSpaceConfig(){
-    let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
-    console.log(path);
-    try{
-        shell.openItem(path);
-    }
-    catch(e){
-    }
-}
-
-
 function createMainMenu(){
 
     const isMac = process.platform === 'darwin'
@@ -222,12 +73,11 @@ function createMainMenu(){
             submenu: [
                 { role: 'about' },
                 { type: 'separator' },
-                /*                {
                     label: 'Preferences',
                     click: async () => {
                         createPrefsWindow()
                     }
-                },*/
+                },
                 { role: 'services' },
                 { type: 'separator' },
                 { role: 'hide' },
@@ -309,14 +159,12 @@ function createMainMenu(){
                     { role: 'delete' },
                     { type: 'separator' },
                     { role: 'selectAll' },
-                    /*
                     {
                         label: 'Preferences',
                         click: async () => {
                             createPrefsWindow()
                         }
                     }
-                    */
                 ])
             ]
         },
@@ -379,6 +227,15 @@ function createMainMenu(){
                         stopServer()
                     }
                 },
+
+                ...(global.currentSiteKey ?
+                [{
+                    label: 'Start server',
+                    click: async () => {
+                        startServer()
+                    }
+                }]:[]),
+
                 { type: 'separator' },
                 {
                     label: 'Open Site Directory',
@@ -413,6 +270,7 @@ function createMainMenu(){
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
 }
+    */
 
 
 
@@ -420,8 +278,10 @@ function createMainMenu(){
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-    createMainMenu();
+    //createMainMenu();
+    menuManager.createMainMenu();
     createWindow();
+    menuManager.init();
 })
 
 app.on('before-quit', function () {

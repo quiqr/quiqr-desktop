@@ -43,7 +43,8 @@ class HugoServer{
         }
     }
 
-    serve(callback/*: (error: ?Error)=>void*/){
+    //Start Hugo Server
+    serve(callback){
 
         let {config, workspacePath, hugover} = this.config;
 

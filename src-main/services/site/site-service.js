@@ -6,6 +6,7 @@ const path = require('path');
 const WorkspaceService = require('./../workspace/workspace-service');
 const publisherFactory = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
+const menuManager = require('./../../menu-manager');
 
 
 class SiteService{
@@ -30,6 +31,8 @@ class SiteService{
     async mountWorkspace(workspaceKey/*: string*/)/*: Promise<void>*/{
         console.log(this._getSiteSource().mountWorkspace(workspaceKey));
         await this._getSiteSource().mountWorkspace(workspaceKey);
+
+        //menuManager.updateMenu(global.currentSiteKey);
     }
 
     _findFirstMatchOrDefault/*::<T: any>*/(arr/*: Array<T>*/, key/*: string*/)/*: T*/{

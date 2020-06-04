@@ -13,6 +13,7 @@ const fs = require('fs-extra');
 const {dirname} = require('path');
 const {shell} = require('electron');
 const mainWindowManager = require('./main-window-manager');
+const menuManager = require('./menu-manager');
 
 /*::
 type APIContext = {
@@ -110,6 +111,7 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
 api.unselectSite = async function(){
     global.currentSiteKey = null;
     global.currentSitePath = null;
+    menuManager.updateMenu(null);
 }
 
 
@@ -138,11 +140,13 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, conte
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
 
-    console.log(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`);
+    //console.log(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`);
     bindResponseToContext(
         siteService.mountWorkspace(workspaceKey),
         context
     );
+
+    menuManager.updateMenu(siteKey);
 }
 
 api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){

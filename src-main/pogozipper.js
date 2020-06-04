@@ -247,6 +247,7 @@ class Pogozipper{
 
         outputConsole.appendLine('Found a site with key ' + siteKey);
 
+        /*
         var confFileName = "config."+siteKey+".json";
 
         var conftxt = zip.readAsText(confFileName);
@@ -267,10 +268,11 @@ class Pogozipper{
         await fssimple.writeFileSync(newConfigJsobPath, JSON.stringify(newConf), { encoding: "utf8"});
 
         outputConsole.appendLine('replaced site configuration');
+        */
 
         await this.recurForceRemove(global.currentSitePath + '/themes');
         await zip.extractAllTo(global.currentSitePath, true);
-        await fs.removeSync(global.currentSitePath+'/'+confFileName);
+        //await fs.removeSync(global.currentSitePath+'/'+confFileName);
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
@@ -278,7 +280,6 @@ class Pogozipper{
         });
 
         //start server
-
         //mainWindow.webContents.send("unselectSite");
     }
 
@@ -333,13 +334,13 @@ class Pogozipper{
         await this.fileRegexRemove(tmppath, /.gitmodules/);
         await this.fileRegexRemove(tmppath, /.DS_Store/);
 
-        let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
-        const newConfJson = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
-
         var zip = new AdmZip();
 
+        //let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        //const newConfJson = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
+        //await zip.addFile('config.'+global.currentSiteKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
+
         await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
-        await zip.addFile('config.'+global.currentSiteKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
 
         await zip.addLocalFolder(tmppath);
         var willSendthis = zip.toBuffer();

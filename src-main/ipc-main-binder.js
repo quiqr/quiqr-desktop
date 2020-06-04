@@ -36,11 +36,12 @@ exports.bind = function(){
                         response
                     };
                     event.sender.send('messageAsyncResponse', pack);
-                    console.log('IPC_MAIN_RESPONDED: '+ key, pack);
+                    //console.log('IPC_MAIN_RESPONDED: '+ key, pack);
                 }
 
-                if(enableLogging)
-                    console.log('IPC_MAIN_REQUESTED: '+ key, args);
+                if(enableLogging){
+                    //    console.log('IPC_MAIN_REQUESTED: '+ key, args);
+                }
 
                 api[key](args.data, context);
             };
