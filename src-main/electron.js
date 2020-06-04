@@ -86,8 +86,6 @@ function stopServer() {
     }
 }
 
-
-
 function deleteSite() {
     let dir;
 
@@ -447,6 +445,22 @@ app.on('activate', function () {
         createWindow();
     }
 })
+
+app.on('open-file', (event, path) => {
+    event.preventDefault();
+
+    if (mainWindow === null) {
+        createWindow();
+    }
+
+    if(path.split('.').pop()=='pogosite'){
+        pogozipper.importSite(path)
+
+    }
+    else if(path.split('.').pop()=='pogotheme'){
+        pogozipper.importTheme(path)
+    }
+});
 
 
 // In this file you can include the rest of your app's specific main process

@@ -98,24 +98,37 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
-            message: "Finished export. Check" + exportFilePath,
+            message: "Finished site export. Check" + exportFilePath,
         });
     }
 
-    async importSite() {
+    async importSite(path=null) {
+
         const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
 
-        let files = dialog.showOpenDialog(mainWindow, {
-            filters: [
-                { name: "Sukoh Sites", extensions: [PogoSiteExtension] }
-            ],
-            properties: ['openFile'] });
+        if(!path){
+            let files = dialog.showOpenDialog(mainWindow, {
+                filters: [
+                    { name: "Sukoh Sites", extensions: [PogoSiteExtension] }
+                ],
+                properties: ['openFile'] });
 
-        if (!files || files.length != 1) {
-            return;
+            if (!files || files.length != 1) {
+                return;
+            }
+            path = files[0];
+        }
+        else {
+            let filename = path.split('/').pop();
+            let options  = {
+                buttons: ["Yes","Cancel"],
+                message: "You're about to import the site "+filename+". Do you like to continue?"
+            }
+            let response = dialog.showMessageBox(options)
+            if(response === 1) return;
         }
 
-        var zip = new AdmZip(files[0]);
+        var zip = new AdmZip(path);
         var zipEntries = zip.getEntries();
         var siteKey = "";
 
@@ -174,7 +187,7 @@ class Pogozipper{
     }
 
     //themes, sukoh.*, config.toml
-    async importTheme() {
+    async importTheme(path=null) {
 
         //stop server
         //stop preview
@@ -182,17 +195,29 @@ class Pogozipper{
         if(!this.checkCurrentSiteKey()) {return;}
         const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
 
-        let files = dialog.showOpenDialog(mainWindow, {
-            filters: [
-                { name: "Sukoh Sites", extensions: [PogoThemeExtension] }
-            ],
-            properties: ['openFile'] });
+        if(!path){
+            let files = dialog.showOpenDialog(mainWindow, {
+                filters: [
+                    { name: "Sukoh Sites", extensions: [PogoThemeExtension] }
+                ],
+                properties: ['openFile'] });
 
-        if (!files || files.length != 1) {
-            return;
+            if (!files || files.length != 1) {
+                return;
+            }
+            path = files[0];
+        }
+        else {
+            let filename = path.split('/').pop();
+            let options  = {
+                buttons: ["Yes","Cancel"],
+                message: "You're about to import the theme "+filename+" into "+ global.currentSiteKey +". Do you like to continue?"
+            }
+            let response = dialog.showMessageBox(options)
+            if(response === 1) return;
         }
 
-        var zip = new AdmZip(files[0]);
+        var zip = new AdmZip(path);
         var zipEntries = zip.getEntries();
         var siteKey = "";
 
@@ -214,7 +239,7 @@ class Pogozipper{
         if(siteKey != global.currentSiteKey){
             let options  = {
                 buttons: ["Yes","Cancel"],
-                message: "The Sitekey of the themefile does not match. Do you want to continue?"
+                message: "The Sitekey of the themefile does not match. Do you like to continue?"
             }
             let response = dialog.showMessageBox(options)
             if(response === 1) return;
@@ -249,7 +274,7 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
-            message: "Site has been imported.",
+            message: "Theme has been imported.",
         });
 
         //start server
@@ -265,8 +290,8 @@ class Pogozipper{
         }
         else {
             dialog.showMessageBox(mainWindow, {
-                type: 'error',
-                message: "First, select a site to export.",
+                type: 'warning',
+                message: "First, you need to select a site.",
             });
             return;
         }
@@ -327,7 +352,6 @@ class Pogozipper{
             message: "Finished theme export. Check" + exportFilePath,
         });
 
-        console.log("Finished theme export:"+exportFilePath);
     }
 
 }

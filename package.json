@@ -125,8 +125,6 @@
         "role": "Editor",
         "icon": "public/iconfile"
       }
-
-
     ]
   },
   "browserslist": [
