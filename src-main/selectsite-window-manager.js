@@ -67,7 +67,10 @@ function createWindow () {
       selectsiteWindow = new BrowserWindow({
         show: false,
         frame: showFrame,
-        backgroundColor:"#ffffff",
+          webPreferences: {
+              nodeIntegration: true,
+          },
+          backgroundColor:"#ffffff",
           //minWidth:1024,
         width: 500,
         height: 400,

@@ -65,9 +65,12 @@ function createWindow () {
 
       // Create the browser window.
       prefsWindow = new BrowserWindow({
-        show: false,
-        frame: showFrame,
-        backgroundColor:"#ffffff",
+          show: false,
+          webPreferences: {
+              nodeIntegration: true,
+          },
+          frame: showFrame,
+          backgroundColor:"#ffffff",
         //minWidth:1024,
         //webPreferences:{webSecurity:false },
         icon

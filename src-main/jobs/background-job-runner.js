@@ -8,12 +8,15 @@ class BackgroundJobRunner{
     run(action /*: string */, params /*: any */) /*: Promise<any> */{
         return new Promise((resolve, reject)=>{
             let actionWindow = new BrowserWindow({
+                webPreferences: {
+                    nodeIntegration: true,
+                },
                 show: false,
                 backgroundColor:"#ffffff"
             });
             let html = `<html><body><p>Running Action.</p></body></html>`;
             actionWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
-            
+
             let channel = crypto.randomBytes(16).toString("hex");
             ipcMain.once(channel, (event, {response, e})=>{
                 actionWindow.close();

@@ -50,7 +50,7 @@ function showInvalidDevelopmentUrl(logWindow/*: any*/, url/*: ?string*/){
 }
 
 function createWindow () {
-  //  console.log(process.env)
+    //  console.log(process.env)
     const configurationDataProvider = require('./configuration-data-provider')
 
     let icon;
@@ -59,39 +59,42 @@ function createWindow () {
 
 
     configurationDataProvider.get(function(err, configurations){
-      if(configurations.empty===true) throw new Error('Configurations is empty.');
+        if(configurations.empty===true) throw new Error('Configurations is empty.');
 
-      let showFrame=false;
-      configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
+        let showFrame=false;
+        configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
 
-      // Create the browser window.
-      logWindow = new BrowserWindow({
-        show: false,
-        frame: showFrame,
-        backgroundColor:"#ffffff",
-        minWidth:1024,
-        //webPreferences:{webSecurity:false },
-        icon
-      });
+        // Create the browser window.
+        logWindow = new BrowserWindow({
+            show: false,
+            webPreferences: {
+                nodeIntegration: true,
+            },
+            frame: showFrame,
+            backgroundColor:"#ffffff",
+            minWidth:1024,
+            //webPreferences:{webSecurity:false },
+            icon
+        });
 
 
-      if(configurations.global.maximizeAtStart){
-        logWindow.maximize();
-      }
-      logWindow.setMenuBarVisibility(false);
+        if(configurations.global.maximizeAtStart){
+            logWindow.maximize();
+        }
+        logWindow.setMenuBarVisibility(false);
 
-      logWindow.show();
+        logWindow.show();
     });
 
     if(process.env.REACT_DEV_URL){
 
-      //DEVELOPMENT SERVER
+        //DEVELOPMENT SERVER
 
-      //let url = process.env.REACT_DEV_URL+'/console';
-      let url = process.env.REACT_DEV_URL;
-      console.log(url)
-      const urlWithPortMatch = url.match(/:([0-9]{4})/);
-      console.log(urlWithPortMatch)
+        //let url = process.env.REACT_DEV_URL+'/console';
+        let url = process.env.REACT_DEV_URL;
+        console.log(url)
+        const urlWithPortMatch = url.match(/:([0-9]{4})/);
+        console.log(urlWithPortMatch)
         if(urlWithPortMatch==null){
             showInvalidDevelopmentUrl(url);
         }
@@ -102,10 +105,10 @@ function createWindow () {
             const net = require('net');
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
-                    client.end();
-                    if(logWindow)
-                        logWindow.loadURL(url);
-                }
+                client.end();
+                if(logWindow)
+                    logWindow.loadURL(url);
+            }
             );
             client.on('error', (error) => {
                 setTimeout(tryConnection, 1000);
@@ -132,7 +135,7 @@ function createWindow () {
         }
         if(indexFile){
             logWindow.loadURL(
-              url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
+                url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
         }
         else{

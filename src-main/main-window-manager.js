@@ -62,7 +62,7 @@ function getLocation(locPath = ''){
 
         //DEVELOPMENT SERVER
 
-      let url = process.env.REACT_DEV_URL+locPath;
+        let url = process.env.REACT_DEV_URL+locPath;
         const urlWithPortMatch = url.match(/:([0-9]{4})$/);
         if(urlWithPortMatch==null){
             showInvalidDevelopmentUrl(url);
@@ -74,10 +74,10 @@ function getLocation(locPath = ''){
             const net = require('net');
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
-                    client.end();
-                    if(mainWindow)
-                        mainWindow.loadURL(url);
-                }
+                client.end();
+                if(mainWindow)
+                    mainWindow.loadURL(url);
+            }
             );
             client.on('error', (error) => {
                 setTimeout(tryConnection, 1000);
@@ -113,30 +113,6 @@ function getLocation(locPath = ''){
     }
 }
 
-function createPreviewWindow (windowState) {
-    let mainWindowState = windowState;
-    let previewWindowX = mainWindowState.x + mainWindowState.width;
-
-    previewWindow = new BrowserWindow({
-
-        show: false,
-        parent: mainWindow,
-        x: previewWindowX,
-        y: mainWindowState.y,
-        width: 500,
-        height: mainWindowState.height,
-    });
-
-    previewWindow.setMenuBarVisibility(false);
-    previewWindow.loadURL("http://localhost:1313");
-
-
-    previewWindow.on('closed', function () {
-        previewWindow.show = false;
-
-    })
-}
-
 function createWindow () {
 
     const configurationDataProvider = require('./configuration-data-provider')
@@ -147,44 +123,46 @@ function createWindow () {
 
     configurationDataProvider.get(function(err, configurations){
 
-      let showFrame=false;
-      configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
+        let showFrame=false;
+        configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
 
-      // Load the previous state with fallback to defaults
-      mainWindowState = windowStateKeeper({
-        defaultWidth: 800,
-        defaultHeight: 600
-      });
+        // Load the previous state with fallback to defaults
+        mainWindowState = windowStateKeeper({
+            defaultWidth: 800,
+            defaultHeight: 600
+        });
 
-      // Create the browser window.
-      mainWindow = new BrowserWindow({
-        show: false,
-        frame: showFrame,
-        backgroundColor:"#ffffff",
+        // Create the browser window.
+        mainWindow = new BrowserWindow({
+            show: false,
+            frame: showFrame,
+            backgroundColor:"#ffffff",
+            webPreferences: {
+                nodeIntegration: true,
+            },
+            x: mainWindowState.x,
+            y: mainWindowState.y,
+            width: mainWindowState.width,
+            height: mainWindowState.height,
 
-        x: mainWindowState.x,
-        y: mainWindowState.y,
-        width: mainWindowState.width,
-        height: mainWindowState.height,
+        });
 
-      });
+        // Let us register listeners on the window, so we can update the state
+        // automatically (the listeners will be removed when the window is closed)
+        // and restore the maximized or full screen state
+        mainWindowState.manage(mainWindow);
 
-      // Let us register listeners on the window, so we can update the state
-      // automatically (the listeners will be removed when the window is closed)
-      // and restore the maximized or full screen state
-      mainWindowState.manage(mainWindow);
+        if(configurations.global.maximizeAtStart){
+            mainWindow.maximize();
+        }
+        if(configurations.global.hideMenuBar){
+            //mainWindow.setMenuBarVisibility(false);
+        }
 
-      if(configurations.global.maximizeAtStart){
-        mainWindow.maximize();
-      }
-      if(configurations.global.hideMenuBar){
-          //mainWindow.setMenuBarVisibility(false);
-      }
+        mobilePreviewView = new BrowserView();
 
-      mobilePreviewView = new BrowserView();
-
-      mainWindow.setBrowserView(mobilePreviewView);
-      mainWindow.show();
+        mainWindow.setBrowserView(mobilePreviewView);
+        mainWindow.show();
     });
 
     getLocation();
