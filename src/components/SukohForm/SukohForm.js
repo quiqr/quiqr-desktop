@@ -30,6 +30,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
     constructor(props: SukohFormProps){
         super(props);
         this.state = {
+            actionButtonRightPos:40,
             changed: false,
             error: null,
             savedOnce: false
@@ -48,12 +49,32 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
         }
     }
 
+    componentDidMount(){
+        this._ismounted=true;
+    }
+
+    setMobileBrowserOpen(){
+        if(this._ismounted){
+            this.setState({actionButtonRightPos:380});
+        }
+    }
+    setMobileBrowserClose(){
+        if(this._ismounted){
+            this.setState({actionButtonRightPos:40});
+        }
+    }
+
     componentWillMount(){
         document.addEventListener('keydown', this.keydownHandler.bind(this));
+        window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
+        window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
     }
 
     componentWillUnmount(){
         document.removeEventListener('keydown', this.keydownHandler);
+        window.require('electron').ipcRenderer.removeListener('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
+        window.require('electron').ipcRenderer.removeListener('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
+        this._ismounted=false;
     }
 
     saveContent(){
@@ -115,7 +136,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
                 <FloatingActionButton
                     style={{
                         position:'fixed',
-                        right:40,
+                        right:this.state.actionButtonRightPos,
                         bottom:'20px',
                         zIndex:3
                     }}
