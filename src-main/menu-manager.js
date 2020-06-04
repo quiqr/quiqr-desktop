@@ -10,6 +10,7 @@ const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
 const { shell } = require('electron')
 
+const app = electron.app
 let mainWindow = null;
 let logWindow = null;
 let menu = null;
