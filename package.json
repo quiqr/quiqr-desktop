@@ -5,7 +5,7 @@
     "name": "Pim Snel",
     "email": "pim@lingewoud.nl"
   },
-  "description": "A CMS for Hugo.",
+  "description": "A Hugo Publishing App.",
   "version": "0.4.1",
   "private": true,
   "dependencies": {

@@ -168,8 +168,8 @@ class MenuManager {
             'delete-site',
             'export-theme',
             'import-theme',
-            //            'export-pass',
-            //            'import-pass',
+            'export-pass',
+            'import-pass',
             'start-server',
             'open-site-dir',
             'open-site-conf'
@@ -263,6 +263,23 @@ class MenuManager {
                         label: 'Export theme',
                         click: async () => {
                             pogozipper.exportTheme()
+                        }
+                    },
+                    { type: 'separator' },
+                    {
+                        id: 'import-pass',
+                        enabled: this.siteSelected(),
+                        label: 'Import passport',
+                        click: async () => {
+                            pogozipper.importPass()
+                        }
+                    },
+                    {
+                        id: 'export-pass',
+                        enabled: this.siteSelected(),
+                        label: 'Export passport',
+                        click: async () => {
+                            pogozipper.exportPass()
                         }
                     },
                     { type: 'separator' },
