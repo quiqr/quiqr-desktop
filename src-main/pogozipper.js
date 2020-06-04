@@ -82,13 +82,11 @@ class Pogozipper{
         const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
         console.log("read and parsed conf file");
-
-        var zip = new AdmZip();
-
         newConf.key = newKey;
         newConf.name = newKey;
         var newConfJson = JSON.stringify(newConf);
 
+        var zip = new AdmZip();
         await zip.addFile("sitekey", Buffer.alloc(newKey.length, newKey), "");
         await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
 
@@ -125,9 +123,6 @@ class Pogozipper{
             if (zipEntry.entryName == "sitekey") {
                 siteKey = zip.readAsText("sitekey");
                 console.log("found sitekey:" + siteKey);
-            }
-            else if (zipEntry.entryName == "pogoziptype") {
-                pogoziptype = zip.readAsText("pogoziptype");
             }
         });
 
@@ -175,14 +170,91 @@ class Pogozipper{
             message: "Site has been imported.",
         });
 
-        //mainWindow.webContents.send("refreshSites");
         mainWindow.webContents.send("unselectSite");
-        //app.relaunch()
-        //app.exit()
     }
 
     //themes, sukoh.*, config.toml
     async importTheme() {
+
+        //stop server
+        //stop preview
+
+        if(!this.checkCurrentSiteKey()) {return;}
+        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+
+        let files = dialog.showOpenDialog(mainWindow, {
+            filters: [
+                { name: "Sukoh Sites", extensions: [PogoThemeExtension] }
+            ],
+            properties: ['openFile'] });
+
+        if (!files || files.length != 1) {
+            return;
+        }
+
+        var zip = new AdmZip(files[0]);
+        var zipEntries = zip.getEntries();
+        var siteKey = "";
+
+        await zipEntries.forEach(function(zipEntry) {
+            if (zipEntry.entryName == "sitekey") {
+                siteKey = zip.readAsText("sitekey");
+                console.log("found sitekey:" + siteKey);
+            }
+        });
+
+        if(siteKey == ""){
+            dialog.showmessagebox(mainwindow, {
+                type: 'warning',
+                message: "failed to import site. invalid site file 1, no sitekey",
+            });
+            return;
+        }
+
+        if(siteKey != global.currentSiteKey){
+            let options  = {
+                buttons: ["Yes","Cancel"],
+                message: "The Sitekey of the themefile does not match. Do you want to continue?"
+            }
+            let response = dialog.showMessageBox(options)
+            if(response === 1) return;
+        }
+
+        outputConsole.appendLine('Found a site with key ' + siteKey);
+
+        var confFileName = "config."+siteKey+".json";
+
+        var conftxt = zip.readAsText(confFileName);
+        if(!conftxt){
+            dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                message: "Failed to import site. Invalid site file. 2, unreadable config."+siteKey+".json",
+            });
+            return;
+        }
+
+        var newConf = JSON.parse(conftxt);
+        newConf.source.path = global.currentSitePath;
+        newConf.key = global.currentSiteKey;
+        newConf.name = global.currentSiteKey;
+
+        let newConfigJsobPath = pathHelper.getRoot()+'config.'+currentSiteKey+'.json';
+        await fssimple.writeFileSync(newConfigJsobPath, JSON.stringify(newConf), { encoding: "utf8"});
+
+        outputConsole.appendLine('replaced site configuration');
+
+        await this.recurForceRemove(global.currentSitePath + '/themes');
+        await zip.extractAllTo(global.currentSitePath, true);
+        await fs.removeSync(global.currentSitePath+'/'+confFileName);
+
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: "Site has been imported.",
+        });
+
+        //start server
+
+        //mainWindow.webContents.send("unselectSite");
     }
 
     checkCurrentSiteKey(){
@@ -225,6 +297,9 @@ class Pogozipper{
         await this.recurForceRemove(tmppath + '/public');
         await this.recurForceRemove(tmppath + '/content');
         await this.recurForceRemove(tmppath + '/static');
+        await this.recurForceRemove(tmppath + '/archetypes');
+        await this.recurForceRemove(tmppath + '/resources');
+        await this.recurForceRemove(tmppath + '/layouts');
         await this.recurForceRemove(tmppath + '/data');
         await this.fileRegexRemove(tmppath, /sitekey$/);
         await this.fileRegexRemove(tmppath, /config.*.json/);
@@ -234,11 +309,12 @@ class Pogozipper{
         await this.fileRegexRemove(tmppath, /.DS_Store/);
 
         let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
-        const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
+        const newConfJson = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
 
         var zip = new AdmZip();
 
         await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
+        await zip.addFile('config.'+global.currentSiteKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
 
         await zip.addLocalFolder(tmppath);
         var willSendthis = zip.toBuffer();

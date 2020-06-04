@@ -3,7 +3,7 @@ const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
 const logWindowManager = require('./log-window-manager');
 const prefsWindowManager = require('./prefs-window-manager');
-const selectsiteWindowManager = require('./selectsite-window-manager');
+//const selectsiteWindowManager = require('./selectsite-window-manager');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
@@ -99,10 +99,9 @@ function deleteSite() {
             buttons: ["Yes","Cancel"],
             message: "Do you really want to delete " + global.currentSiteKey
         }
-
-        //Synchronous usage
         let response = dialog.showMessageBox(options)
         if(response === 1) return;
+
         fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
 
         var rimraf = require("rimraf");
@@ -122,10 +121,14 @@ function deleteSite() {
 
 function createSelectSiteWindow () {
 
+    global.currentSitePath = null;
+    global.currentSiteKey = null;
     mainWindow.webContents.send("redirectHome");
     mainWindow.webContents.send("unselectSite");
+
     return;
 
+    /*
     selectsiteWindow = selectsiteWindowManager.getCurrentInstanceOrNew();
     if (selectsiteWindow) {
         selectsiteWindow.webContents.send("redirectselectsite")
@@ -142,6 +145,7 @@ function createSelectSiteWindow () {
     selectsiteWindow.on('closed', function() {
         selectsiteWindow = null
     })
+    */
 }
 
 function createPrefsWindow () {
