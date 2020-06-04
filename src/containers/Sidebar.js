@@ -58,13 +58,13 @@ type SidebarState = {
 
 export class Sidebar extends React.Component<SidebarProps,SidebarState>{
 
-  constructor(props : SidebarProps){
-    super(props);
-    this.state = {
-      site: null,
-      workspace: null
-    };
-  }
+    constructor(props : SidebarProps){
+        super(props);
+        this.state = {
+            site: null,
+            workspace: null
+        };
+    }
 
     render(){
 

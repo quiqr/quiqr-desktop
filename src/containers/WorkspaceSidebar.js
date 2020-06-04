@@ -42,10 +42,20 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         };
     }
 
+    componentDidMount(){
+        this._ismounted = true;
+    }
     componentWillMount(){
         window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
     }
+
+    componentWillUnmount(){
+        window.require('electron').ipcRenderer.removeListener('serverLive', this.activatePreview.bind(this));
+        window.require('electron').ipcRenderer.removeListener('serverDown', this.disablePreview.bind(this));
+        this._ismounted = false;
+    }
+
 
     toggleMobilePreview(){
         if(this.state.mobilePreviewActive){
@@ -58,23 +68,31 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     activateMobilePreview(){
         service.api.openMobilePreview();
-        this.setState({mobilePreviewActive: true});
+        if(this._ismounted){
+            this.setState({mobilePreviewActive: true});
+        }
         console.log('mobilepre on');
     }
 
     disableMobilePreview(){
         service.api.closeMobilePreview();
-        this.setState({mobilePreviewActive: false});
+        if(this._ismounted){
+            this.setState({mobilePreviewActive: false});
+        }
         console.log('mobilepre off');
     }
 
     activatePreview(){
-        this.setState({hugoRunning: true});
+        if(this._ismounted){
+            this.setState({hugoRunning: true});
+        }
         console.log('serverLive');
     }
 
     disablePreview(){
-        this.setState({hugoRunning: false});
+        if(this._ismounted){
+            this.setState({hugoRunning: false});
+        }
         console.log('serverDown');
     }
 
@@ -202,14 +220,19 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
         };
     }
 
+    componentDidMount(){
+        this._ismounted = true;
+        this.refresh();
+    }
     componentWillMount(){
         window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
         service.registerListener(this);
-        this.refresh();
     }
 
     unselectSite(){
-        this.setState({site: null, workspace: null});
+        if(this._ismounted){
+            this.setState({site: null, workspace: null});
+        }
     }
 
     refresh = ()=>{
@@ -219,15 +242,21 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 stateUpdate.site = bundle.site;
                 stateUpdate.workspace = bundle.workspaceDetails;
-                this.setState(stateUpdate);
+                if(this._ismounted){
+                    this.setState(stateUpdate);
+                }
             }).catch(e=>{
-                this.setState({site: null, workspace: null, error: e});
+                if(this._ismounted){
+                    this.setState({site: null, workspace: null, error: e});
+                }
             });
         }
     }
 
     componentWillUnmount(){
         service.unregisterListener(this);
+        window.require('electron').ipcRenderer.removeListener('unselectSite', this.unselectSite.bind(this));
+        this._ismounted = false;
     }
 
     render(){

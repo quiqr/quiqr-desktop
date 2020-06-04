@@ -75,41 +75,43 @@ class App extends React.Component<AppProps,AppState>{
     window.state = this.state;
   }
 
-  componentDidMount(){
-    console.log('App MOUNTED');
-    service.getConfigurations().then((c)=>{
-      var stateUpdate  = {};
-      stateUpdate.configurations = c;
-      stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
-      // let css = require('./themes/' + c.global.appTheme + '/css/App.css');
+    componentDidMount(){
+        console.log('App MOUNTED');
+        this._ismounted = true;
 
-      this.setState(stateUpdate);
+        service.getConfigurations().then((c)=>{
+            var stateUpdate  = {};
+            stateUpdate.configurations = c;
+            stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
+            // let css = require('./themes/' + c.global.appTheme + '/css/App.css');
 
-    })
-  }
+            this.setState(stateUpdate);
 
-  redirectMountSite(){
-    if(this.state.redirectHome){
-      this.setState({redirectHome: false});
+        })
     }
-    else{
-      this.setState({redirectCookbook: false});
-      this.setState({redirectConsole: false});
-      this.setState({redirectPrefs: false});
-      this.setState({redirectHome: true});
+
+    redirectMountSite(){
+        if(this.state.redirectHome){
+            this.setState({redirectHome: false});
+        }
+        else{
+            this.setState({redirectCookbook: false});
+            this.setState({redirectConsole: false});
+            this.setState({redirectPrefs: false});
+            this.setState({redirectHome: true});
+        }
     }
-  }
 
 
   redirectHome(){
-    if(this.state.redirectHome){
-      this.setState({redirectHome: false});
-    }
-    else{
-      this.setState({redirectCookbook: false});
-      this.setState({redirectConsole: false});
-      this.setState({redirectPrefs: false});
-      this.setState({redirectHome: true});
+      if(this.state.redirectHome){
+          this.setState({redirectHome: false});
+      }
+      else{
+          this.setState({redirectCookbook: false});
+          this.setState({redirectConsole: false});
+          this.setState({redirectPrefs: false});
+          this.setState({redirectHome: true});
     }
   }
 
@@ -141,20 +143,18 @@ class App extends React.Component<AppProps,AppState>{
     this.setState({redirectSelectSite: true});
   }
 
-  componentWillMount(){
-      window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
-      window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
-      window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
-      window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
-      window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
-      window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
-      window.require('electron').ipcRenderer.on('redirectselectsite', this.redirectSelectSite.bind(this));
-      window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
-          this.setState({redirectMountSite: args});
-      }.bind(this));
-
-
-  }
+    componentWillMount(){
+        window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
+        window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
+        window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
+        window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
+        window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
+        window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
+        window.require('electron').ipcRenderer.on('redirectselectsite', this.redirectSelectSite.bind(this));
+        window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
+            this.setState({redirectMountSite: args});
+        }.bind(this));
+    }
 
   minimizeWindow(){
     window.require('electron').remote.getCurrentWindow().minimize();
