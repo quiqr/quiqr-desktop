@@ -69,9 +69,9 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
     render(){
 
         let { hideItems, menus, menuIsLocked, onToggleItemVisibility } = this.props;
-        let menusNodes = menus.map((menu)=>{
+        let menusNodes = menus.map((menu,i)=>{
         return (
-            <Fragment key={menu.key||menu.title}>
+            <Fragment key={i+menu.key||i+menu.title}>
                 <WhiteSubHeader>{ menu.title }</WhiteSubHeader>
                 { menu.widget ? (menu.widget) : (null) }
                 { menu.items ? (<MenuBorder>

@@ -111,6 +111,7 @@ export function WorkspacesSimple(
                 let active = activeSiteKey === site.key && workspace.key===activeWorkspaceKey;
                 return (
                     <WorkspaceSimple
+                    key={'key'+1}
                     site={site}
                     active={active}
                     header={workspace}
