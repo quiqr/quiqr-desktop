@@ -97,15 +97,15 @@ class MenuManager {
     createLogWindow () {
         logWindow = logWindowManager.getCurrentInstanceOrNew();
         if (logWindow) {
-            //            logWindow.webContents.send("redirectConsole")
+            logWindow.webContents.send("redirectConsole")
         }
 
         logWindow.once('ready-to-show', () => {
-            //            logWindow.webContents.send("redirectConsole")
+            logWindow.webContents.send("redirectConsole")
         })
 
         logWindow.webContents.on('did-finish-load',() => {
-            //logWindow.webContents.send("redirectConsole")
+            logWindow.webContents.send("redirectConsole")
         })
 
         logWindow.on('closed', function() {
