@@ -1,5 +1,18 @@
 # PoppyGo Aoo CHANGELOG
 
+## v0.4.2
+## v0.4.1
+## v0.4.0 [04.06.20 03:22]
+- mobile browser,
+- import/export theme's,
+- double click pogosite files opens the app and starts importing,
+- double click pogotheme files opens the app and starts importing,
+- select site no popup anymore,
+- no need to restart the app after site import, or site deletion,
+- open site directoty in expert-menu,
+- open site config in expert-menu
+- help-menu opens https://docs.poppygo.app/
+
 ## versie 0.3.5 - Private Beta 3
 - cleanup export file (ignore .git and public)
 

@@ -116,10 +116,11 @@ pogoform:\n\
   - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
   - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
   - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
-  only:\n\
-  - master\n";
+  rules:\n\
+    - if: '$POGOFORM_GATEWAY'\n\
+      when: always\n\
+    - when: never\n";
 
-        //var gitsshcommand = 'ssh -o IdentitiesOnly=yes -i ' + tmpkeypath;
         var git_bin = this.getGitBin();
 
         outputConsole.appendLine('Creating empty directory at: ' + resolvedDest);
