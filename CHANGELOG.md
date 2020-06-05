@@ -4,6 +4,7 @@
 - Fix unknown host problem ssh/git
 - Upgrade to from electron 3.x to 5.x
 - Fix strange browserview HTML behaviour
+- Stop server is not defined
 
 ## v0.4.1 [04.06.20 20:59]
 - Menu rewrote, disable items when no site selected

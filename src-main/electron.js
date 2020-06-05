@@ -52,7 +52,12 @@ app.on('ready', function () {
 })
 
 app.on('before-quit', function () {
-    stopServer();
+    if(global.hugoServer){
+        global.hugoServer.stopIfRunning(function(err, stdout, stderr){
+            if(err) reject(err);
+            else{ resolve(); }
+        });
+    }
 })
 
 
