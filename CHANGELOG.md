@@ -1,7 +1,14 @@
-# PoppyGo Aoo CHANGELOG
+# PoppyGo App CHANGELOG
 
-## v0.4.2
-## v0.4.1
+## v0.4.2 [05.06.20 03.03]
+- Fix unknown host problem ssh/git
+- Upgrade to from electron 3.x to 5.x
+- Fix strange browserview HTML behaviour
+
+## v0.4.1 [04.06.20 20:59]
+- Menu rewrote, disable items when no site selected
+- Export config with private key as .pogopass-file
+
 ## v0.4.0 [04.06.20 03:22]
 - mobile browser,
 - import/export theme's,
