@@ -8,6 +8,10 @@ class PathHelper{
     _lastBuildDir: ?string;
     */
 
+    getKnownHosts(){
+        return userHome +'/.ssh/known_hosts';
+    }
+
     getRoot(){
         return userHome +'/Sukoh/';
     }

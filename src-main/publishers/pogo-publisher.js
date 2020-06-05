@@ -10,6 +10,8 @@ const outputConsole = require('./../output-console');
 const ProgressBar = require('electron-progressbar');
 const mainWindowManager = require('../main-window-manager');
 const rimraf = require("rimraf");
+const spawn = require("child_process").spawn;
+//const spawnAw = require('await-spawn')
 
 class PogoPublisher {
     constructor(config){
@@ -132,14 +134,15 @@ pogoform:\n\
         await fs.writeFileSync(tmpkeypath, this._config.privatekey, 'utf-8');
         await fs.chmodSync(tmpkeypath, '0600');
 
+        //const sshkeyscan = await spawnAw("ssh-keyscan" , ["-H", "gitlab.brepi.eu");
+        //console.log(sshkeyscan.toString());
+
         progressBar.value += 10;
         progressBar.detail = 'Get remote website for synchronizing (git-clone)';
 
         outputConsole.appendLine('Start cloning from: ' + full_gh_url);
 
-        var spawn = require("child_process").spawn;
-        //let clonecmd = spawn( git_bin, [ "clone" , full_gh_url , full_gh_dest ], {env: { GIT_SSH_COMMAND: gitsshcommand }});
-        let clonecmd = spawn( git_bin, [ "clone", "-i", tmpkeypath, full_gh_url , full_gh_dest ]);
+        let clonecmd = spawn( git_bin, [ "clone", "-s" ,"-i", tmpkeypath, full_gh_url , full_gh_dest ]);
 
         clonecmd.stdout.on("data", (data) => {
         });
@@ -187,7 +190,6 @@ pogoform:\n\
                                 progressBar.detail = 'Registering changes with destination (git-add)';
 
                                 var spawn = require("child_process").spawn;
-                                //let clonecmd2 = spawn( git_bin, [ "add" , '.'],{cwd: full_gh_dest});
                                 let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
 
                                 clonecmd2.stdout.on("data", (data) => {
@@ -202,7 +204,6 @@ pogoform:\n\
                                         progressBar.detail = 'Commit changes (git-commit)';
 
                                         var spawn = require("child_process").spawn;
-                                        //let clonecmd3 = spawn( git_bin, [ "commit" , '-a', '-m', 'publish from sukoh'],{cwd: full_gh_dest});
                                         let clonecmd3 = spawn( git_bin, [ "commit" , '-n','sukoh','-e','sukoh@brepi.eu', '-m', 'publish from sukoh',full_gh_dest]);
                                         clonecmd3.stdout.on("data", (data) => {
                                         });
@@ -215,8 +216,9 @@ pogoform:\n\
                                                 outputConsole.appendLine('git-commit finished, going to git-push ...');
 
                                                 var spawn = require("child_process").spawn;
-                                                //let clonecmd4 = spawn( git_bin, [ "push" ], {cwd: full_gh_dest, env: { GIT_SSH_COMMAND: gitsshcommand }});
-                                                let clonecmd4 = spawn( git_bin, [ "push", "-i", tmpkeypath, full_gh_dest ]);
+                                                let clonecmd4 = spawn( git_bin, [ "push","-s", "-i", tmpkeypath, full_gh_dest ]);
+                                                //outputConsole.appendLine(git_bin+" push -i "+ tmpkeypath +" "+ full_gh_dest);
+
                                                 clonecmd4.stdout.on("data", (data) => {
                                                 });
                                                 clonecmd4.stderr.on("data", (err) => {

@@ -19,6 +19,7 @@
     "electron-unhandled": "^1.1.0",
     "electron-window-state": "^5.0.3",
     "fs-extra": "5.0.0",
+    "await-spawn": "3.0.0",
     "ftp-deploy": "2.3.6",
     "glob": "7.1.2",
     "jimp": "0.2.28",
