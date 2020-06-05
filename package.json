@@ -125,7 +125,7 @@
         "name": "PoppyGo Content File",
         "role": "Editor",
         "icon": "public/iconfile"
-      }
+      },
       {
         "ext": "pogotheme",
         "name": "PoppyGo Theme File",
