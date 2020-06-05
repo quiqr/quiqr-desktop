@@ -17,6 +17,7 @@ const AdmZip = require('adm-zip');
 const PogoSiteExtension = "pogosite";
 const PogoThemeExtension = "pogotheme";
 const PogoPassExtension = "pogopass";
+const PogoContentExtension = "pogocontent";
 const dialog = electron.dialog;
 const outputConsole = require('./output-console');
 const app = electron.app
@@ -229,7 +230,7 @@ class Pogozipper{
         });
 
         if(siteKey == ""){
-            dialog.showmessagebox(mainwindow, {
+            dialog.showMessageBox(mainwindow, {
                 type: 'warning',
                 message: "failed to import site. invalid site file 1, no sitekey",
             });
@@ -246,29 +247,6 @@ class Pogozipper{
         }
 
         outputConsole.appendLine('Found a site with key ' + siteKey);
-
-        /*
-        var confFileName = "config."+siteKey+".json";
-
-        var conftxt = zip.readAsText(confFileName);
-        if(!conftxt){
-            dialog.showMessageBox(mainWindow, {
-                type: 'warning',
-                message: "Failed to import site. Invalid site file. 2, unreadable config."+siteKey+".json",
-            });
-            return;
-        }
-
-        var newConf = JSON.parse(conftxt);
-        newConf.source.path = global.currentSitePath;
-        newConf.key = global.currentSiteKey;
-        newConf.name = global.currentSiteKey;
-
-        let newConfigJsobPath = pathHelper.getRoot()+'config.'+currentSiteKey+'.json';
-        await fssimple.writeFileSync(newConfigJsobPath, JSON.stringify(newConf), { encoding: "utf8"});
-
-        outputConsole.appendLine('replaced site configuration');
-        */
 
         await this.recurForceRemove(global.currentSitePath + '/themes');
         await zip.extractAllTo(global.currentSitePath, true);
@@ -433,7 +411,7 @@ class Pogozipper{
         });
 
         if(siteKey == ""){
-            dialog.showmessagebox(mainwindow, {
+            dialog.showMessageBox(mainwindow, {
                 type: 'warning',
                 message: "failed to import site. invalid site file 1, no sitekey",
             });
@@ -480,6 +458,132 @@ class Pogozipper{
         //start server
         //mainWindow.webContents.send("unselectSite");
     }
+
+    async exportContent() {
+        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+
+        if(!this.checkCurrentSiteKey()) {return;}
+
+        let dirs = dialog.showOpenDialog(mainWindow,
+            { properties: ['openDirectory'] });
+        if (!dirs || dirs.length != 1) {
+            return;
+        }
+
+        let path = dirs[0];
+        let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
+
+        await this.recurForceRemove(tmppath);
+
+        fs.copySync(global.currentSitePath, tmppath);
+        console.log("copied to temp dir");
+
+        await this.recurForceRemove(tmppath + '/.git');
+        await this.recurForceRemove(tmppath + '/public');
+        await this.recurForceRemove(tmppath + '/themes');
+        await this.recurForceRemove(tmppath + '/archetypes');
+        await this.recurForceRemove(tmppath + '/resources');
+        await this.recurForceRemove(tmppath + '/layouts');
+        await this.fileRegexRemove(tmppath, /sitekey$/);
+        await this.fileRegexRemove(tmppath, /config.*.json/);
+        await this.fileRegexRemove(tmppath, /config.toml/);
+        await this.fileRegexRemove(tmppath, /config.yaml/);
+        await this.fileRegexRemove(tmppath, /config.json/);
+        await this.fileRegexRemove(tmppath, /.gitignore/);
+        await this.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
+        await this.fileRegexRemove(tmppath, /sukoh.yml/);
+        await this.fileRegexRemove(tmppath, /.gitmodules/);
+        await this.fileRegexRemove(tmppath, /.DS_Store/);
+
+        var zip = new AdmZip();
+
+        await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
+
+        await zip.addLocalFolder(tmppath);
+        var willSendthis = zip.toBuffer();
+
+        var exportFilePath = path+"/"+global.currentSiteKey+"."+PogoContentExtension;
+        await zip.writeZip(exportFilePath);
+
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: "Finished content export. Check" + exportFilePath,
+        });
+    }
+
+    async importContent(path){
+        //stop server
+        //stop preview
+
+        if(!this.checkCurrentSiteKey()) {return;}
+        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+
+        if(!path){
+            let files = dialog.showOpenDialog(mainWindow, {
+                filters: [
+                    { name: "PoppyGo Content", extensions: [PogoContentExtension] }
+                ],
+                properties: ['openFile'] });
+
+            if (!files || files.length != 1) {
+                return;
+            }
+            path = files[0];
+        }
+        else {
+            let filename = path.split('/').pop();
+            let options  = {
+                buttons: ["Yes","Cancel"],
+                message: "You're about to import the content "+filename+" into "+ global.currentSiteKey +". Do you like to continue?"
+            }
+            let response = dialog.showMessageBox(options)
+            if(response === 1) return;
+        }
+
+        var zip = new AdmZip(path);
+        var zipEntries = zip.getEntries();
+        var siteKey = "";
+
+        await zipEntries.forEach(function(zipEntry) {
+            if (zipEntry.entryName == "sitekey") {
+                siteKey = zip.readAsText("sitekey");
+                console.log("found sitekey:" + siteKey);
+            }
+        });
+
+        if(siteKey == ""){
+            dialog.showMessageBox(mainwindow, {
+                type: 'warning',
+                message: "failed to import site. invalid site file 1, no sitekey",
+            });
+            return;
+        }
+
+        if(siteKey != global.currentSiteKey){
+            let options  = {
+                buttons: ["Yes","Cancel"],
+                message: "The Sitekey of the contentfile does not match. Do you like to continue?"
+            }
+            let response = dialog.showMessageBox(options)
+            if(response === 1) return;
+        }
+
+        outputConsole.appendLine('Found a site with key ' + siteKey);
+
+        await this.recurForceRemove(global.currentSitePath + '/content');
+        await zip.extractAllTo(global.currentSitePath, true);
+
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: "Content has been imported.",
+        });
+
+        //start server
+        //mainWindow.webContents.send("unselectSite");
+
+    }
+
+
 
 }
 

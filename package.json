@@ -109,17 +109,23 @@
     },
     "fileAssociations": [
       {
-        "ext": "hsite",
-        "name": "PoppyGo Site",
-        "role": "Editor",
-        "icon": "public/iconfile"
-      },
-      {
         "ext": "pogosite",
         "name": "PoppyGo Site File",
         "role": "Editor",
         "icon": "public/iconfile"
       },
+      {
+        "ext": "pogopass",
+        "name": "PoppyGo Passport File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogocontent",
+        "name": "PoppyGo Content File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      }
       {
         "ext": "pogotheme",
         "name": "PoppyGo Theme File",

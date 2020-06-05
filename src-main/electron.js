@@ -94,6 +94,9 @@ app.on('open-file', (event, path) => {
     else if(path.split('.').pop()=='pogopass'){
         pogozipper.importPass(path)
     }
+    else if(path.split('.').pop()=='pogocontent'){
+        pogozipper.importContent(path)
+    }
 });
 
 

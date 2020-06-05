@@ -171,6 +171,8 @@ class MenuManager {
             'import-theme',
             'export-pass',
             'import-pass',
+            'export-content',
+            'import-content',
             'start-server',
             'open-site-dir',
             'open-site-conf'
@@ -264,6 +266,23 @@ class MenuManager {
                         label: 'Export theme',
                         click: async () => {
                             pogozipper.exportTheme()
+                        }
+                    },
+                    { type: 'separator' },
+                    {
+                        id: 'import-content',
+                        enabled: this.siteSelected(),
+                        label: 'Import content',
+                        click: async () => {
+                            pogozipper.importContent()
+                        }
+                    },
+                    {
+                        id: 'export-content',
+                        enabled: this.siteSelected(),
+                        label: 'Export content',
+                        click: async () => {
+                            pogozipper.exportContent()
                         }
                     },
                     { type: 'separator' },
