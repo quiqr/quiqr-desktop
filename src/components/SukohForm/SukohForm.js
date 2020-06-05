@@ -30,7 +30,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
     constructor(props: SukohFormProps){
         super(props);
         this.state = {
-            actionButtonRightPos:40,
+            actionButtonRightPos:380,
             changed: false,
             error: null,
             savedOnce: false
