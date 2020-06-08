@@ -213,6 +213,8 @@ module.exports = {
     openMobilePreview: function(){
         mobilePreviewViewActive = true;
         mobilePreviewView.webContents.loadURL('http://localhost:1313');
+        mobilePreviewView.webContents.session.clearCache(function(){return true});
+
 
         mainWindow.webContents.send("setMobileBrowserOpen");
         setMobilePreviewBounds(mainWindowState);

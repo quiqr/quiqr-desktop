@@ -6,11 +6,12 @@
 const electron = require('electron')
 const mainWindowManager = require('./main-window-manager');
 
-const rimraf = require("rimraf");
+//const rimraf = require("rimraf");
 
 const ProgressBar = require('electron-progressbar');
 
 const pathHelper = require('./path-helper');
+const fileDirUtils = require('./file-dir-utils');
 const fs = require('fs-extra');
 const fssimple = require('fs');
 const AdmZip = require('adm-zip');
@@ -24,17 +25,6 @@ const app = electron.app
 
 class Pogozipper{
 
-    async recurForceRemove(path){
-        await fs.ensureDir(path);
-        await rimraf.sync(path);
-        console.log("created and rm'd dir: " + path);
-    }
-
-    async fileRegexRemove(path, regex){
-        fssimple.readdirSync(path)
-            .filter(f => regex.test(f))
-            .map(f => fs.unlinkSync(path +"/"+ f))
-    }
 
     async exportSite() {
         const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
@@ -66,19 +56,19 @@ class Pogozipper{
         let path = dirs[0];
         let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
 
-        await this.recurForceRemove(tmppath);
+        await fileDirUtils.recurForceRemove(tmppath);
 
         fs.copySync(global.currentSitePath, tmppath);
         console.log("copied to temp dir");
 
-        await this.recurForceRemove(tmppath + '/.git');
-        await this.recurForceRemove(tmppath + '/public');
-        await this.fileRegexRemove(tmppath, /sitekey$/);
-        await this.fileRegexRemove(tmppath, /config.*.json/);
-        await this.fileRegexRemove(tmppath, /.gitignore/);
-        await this.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
-        await this.fileRegexRemove(tmppath, /.gitmodules/);
-        await this.fileRegexRemove(tmppath, /.DS_Store/);
+        await fileDirUtils.recurForceRemove(tmppath + '/.git');
+        await fileDirUtils.recurForceRemove(tmppath + '/public');
+        await fileDirUtils.fileRegexRemove(tmppath, /sitekey$/);
+        await fileDirUtils.fileRegexRemove(tmppath, /config.*.json/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitignore/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitmodules/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.DS_Store/);
 
         let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
         const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
@@ -248,7 +238,7 @@ class Pogozipper{
 
         outputConsole.appendLine('Found a site with key ' + siteKey);
 
-        await this.recurForceRemove(global.currentSitePath + '/themes');
+        await fileDirUtils.recurForceRemove(global.currentSitePath + '/themes');
         await zip.extractAllTo(global.currentSitePath, true);
         //await fs.removeSync(global.currentSitePath+'/'+confFileName);
 
@@ -291,25 +281,25 @@ class Pogozipper{
         let path = dirs[0];
         let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
 
-        await this.recurForceRemove(tmppath);
+        await fileDirUtils.recurForceRemove(tmppath);
 
         fs.copySync(global.currentSitePath, tmppath);
         console.log("copied to temp dir");
 
-        await this.recurForceRemove(tmppath + '/.git');
-        await this.recurForceRemove(tmppath + '/public');
-        await this.recurForceRemove(tmppath + '/content');
-        await this.recurForceRemove(tmppath + '/static');
-        await this.recurForceRemove(tmppath + '/archetypes');
-        await this.recurForceRemove(tmppath + '/resources');
-        await this.recurForceRemove(tmppath + '/layouts');
-        await this.recurForceRemove(tmppath + '/data');
-        await this.fileRegexRemove(tmppath, /sitekey$/);
-        await this.fileRegexRemove(tmppath, /config.*.json/);
-        await this.fileRegexRemove(tmppath, /.gitignore/);
-        await this.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
-        await this.fileRegexRemove(tmppath, /.gitmodules/);
-        await this.fileRegexRemove(tmppath, /.DS_Store/);
+        await fileDirUtils.recurForceRemove(tmppath + '/.git');
+        await fileDirUtils.recurForceRemove(tmppath + '/public');
+        await fileDirUtils.recurForceRemove(tmppath + '/content');
+        await fileDirUtils.recurForceRemove(tmppath + '/static');
+        await fileDirUtils.recurForceRemove(tmppath + '/archetypes');
+        await fileDirUtils.recurForceRemove(tmppath + '/resources');
+        await fileDirUtils.recurForceRemove(tmppath + '/layouts');
+        await fileDirUtils.recurForceRemove(tmppath + '/data');
+        await fileDirUtils.fileRegexRemove(tmppath, /sitekey$/);
+        await fileDirUtils.fileRegexRemove(tmppath, /config.*.json/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitignore/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitmodules/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.DS_Store/);
 
         var zip = new AdmZip();
 
@@ -346,7 +336,7 @@ class Pogozipper{
         let path = dirs[0];
         let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
 
-        await this.recurForceRemove(tmppath);
+        await fileDirUtils.recurForceRemove(tmppath);
         await fs.ensureDir(tmppath);
 
         var zip = new AdmZip();
@@ -473,27 +463,27 @@ class Pogozipper{
         let path = dirs[0];
         let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
 
-        await this.recurForceRemove(tmppath);
+        await fileDirUtils.recurForceRemove(tmppath);
 
         fs.copySync(global.currentSitePath, tmppath);
         console.log("copied to temp dir");
 
-        await this.recurForceRemove(tmppath + '/.git');
-        await this.recurForceRemove(tmppath + '/public');
-        await this.recurForceRemove(tmppath + '/themes');
-        await this.recurForceRemove(tmppath + '/archetypes');
-        await this.recurForceRemove(tmppath + '/resources');
-        await this.recurForceRemove(tmppath + '/layouts');
-        await this.fileRegexRemove(tmppath, /sitekey$/);
-        await this.fileRegexRemove(tmppath, /config.*.json/);
-        await this.fileRegexRemove(tmppath, /config.toml/);
-        await this.fileRegexRemove(tmppath, /config.yaml/);
-        await this.fileRegexRemove(tmppath, /config.json/);
-        await this.fileRegexRemove(tmppath, /.gitignore/);
-        await this.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
-        await this.fileRegexRemove(tmppath, /sukoh.yml/);
-        await this.fileRegexRemove(tmppath, /.gitmodules/);
-        await this.fileRegexRemove(tmppath, /.DS_Store/);
+        await fileDirUtils.recurForceRemove(tmppath + '/.git');
+        await fileDirUtils.recurForceRemove(tmppath + '/public');
+        await fileDirUtils.recurForceRemove(tmppath + '/themes');
+        await fileDirUtils.recurForceRemove(tmppath + '/archetypes');
+        await fileDirUtils.recurForceRemove(tmppath + '/resources');
+        await fileDirUtils.recurForceRemove(tmppath + '/layouts');
+        await fileDirUtils.fileRegexRemove(tmppath, /sitekey$/);
+        await fileDirUtils.fileRegexRemove(tmppath, /config.*.json/);
+        await fileDirUtils.fileRegexRemove(tmppath, /config.toml/);
+        await fileDirUtils.fileRegexRemove(tmppath, /config.yaml/);
+        await fileDirUtils.fileRegexRemove(tmppath, /config.json/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitignore/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitlab-ci.yml/);
+        await fileDirUtils.fileRegexRemove(tmppath, /sukoh.yml/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.gitmodules/);
+        await fileDirUtils.fileRegexRemove(tmppath, /.DS_Store/);
 
         var zip = new AdmZip();
 
@@ -570,7 +560,7 @@ class Pogozipper{
 
         outputConsole.appendLine('Found a site with key ' + siteKey);
 
-        await this.recurForceRemove(global.currentSitePath + '/content');
+        await fileDirUtils.recurForceRemove(global.currentSitePath + '/content');
         await zip.extractAllTo(global.currentSitePath, true);
 
         dialog.showMessageBox(mainWindow, {

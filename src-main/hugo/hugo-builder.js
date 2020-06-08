@@ -1,31 +1,18 @@
-//@flow
-
 const { execFile } = require('child_process');
 const pathHelper = require('./../path-helper');
 const fs = require('fs-extra');
-
-/*::
-type HugoBuilderConfig = {
-    config: string,
-    destination: string,
-    workspacePath: string,
-    hugover: string
-}
-*/
+const rimraf = require("rimraf");
 
 class HugoBuilder{
-    /*::
-    config: HugoBuilderConfig;
-    */
 
-    constructor(config/*: HugoBuilderConfig*/){
+    constructor(config){
         this.config = config;
-    }   
+    }
 
-    async build()/*: Promise<void>*/ {
-        
+    async build() {
+
         let hugoArgs = ['--destination', this.config.destination ];
-        if(this.config.config){ 
+        if(this.config.config){
             hugoArgs.push('--config');
             hugoArgs.push(this.config.config);
         }
@@ -36,8 +23,9 @@ class HugoBuilder{
             return;
         }
 
+        await rimraf.sync(this.config.destination);
         await fs.ensureDir(this.config.destination);
-    
+
         return new Promise((resolve, reject)=>{
             execFile(
                 exec,
@@ -54,7 +42,7 @@ class HugoBuilder{
                     }
                     resolve();
                 }
-            );        
+            );
         })
     }
 }
