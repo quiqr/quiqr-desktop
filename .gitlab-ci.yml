@@ -28,7 +28,7 @@ pages:
   tags:
     - macos
   rules:
-    when: never
+    - when: never
 
 build:
   stage: build
@@ -39,4 +39,4 @@ build:
   tags:
     - macos
   rules:
-    when: never
+    - when: never
