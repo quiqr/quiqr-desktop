@@ -25,20 +25,18 @@ pages:
     paths:
       - public/*_mac.dmg
       - public/*_mac.zip
-#      - public/*.exe
-  only:
-    - master
   tags:
     - macos
+  rules:
+    when: never
+
 build:
   stage: build
   script:
     - npm i
     - npm run dist-mac
     - npm run dist-mac-notarize
-#  artifacts:
-#    expire_in: 1 day
-#    paths:
-#      - dist
   tags:
     - macos
+  rules:
+    when: never

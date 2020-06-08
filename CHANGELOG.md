@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.4.next
+- disable gitlab-ci
+
+
 ## v0.4.2 [05.06.20 03.03]
 - Fix unknown host problem ssh/git
 - Upgrade to from electron 3.x to 5.x
