@@ -63,6 +63,7 @@ class Pogozipper{
 
         await fileDirUtils.recurForceRemove(tmppath + '/.git');
         await fileDirUtils.recurForceRemove(tmppath + '/public');
+        await fileDirUtils.recurForceRemove(tmppath + '/resources');
         await fileDirUtils.fileRegexRemove(tmppath, /sitekey$/);
         await fileDirUtils.fileRegexRemove(tmppath, /config.*.json/);
         await fileDirUtils.fileRegexRemove(tmppath, /.gitignore/);
