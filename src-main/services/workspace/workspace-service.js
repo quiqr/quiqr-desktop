@@ -494,8 +494,6 @@ class WorkspaceService{
         let workspaceDetails = await  this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
 
-
-
             let buildConfig;
             if(workspaceDetails.build && workspaceDetails.build.length){
                 buildConfig = this._findFirstMatchOrDefault(workspaceDetails.build, buildKey);

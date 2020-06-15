@@ -23,8 +23,8 @@ class HugoBuilder{
             return;
         }
 
-        await rimraf.sync(this.config.destination);
-        await fs.ensureDir(this.config.destination);
+        //await fs.ensureDir(this.config.destination);
+        //await rimraf.sync(this.config.destination);
 
         return new Promise((resolve, reject)=>{
             execFile(
