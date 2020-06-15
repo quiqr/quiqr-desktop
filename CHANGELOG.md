@@ -1,8 +1,10 @@
 # PoppyGo App CHANGELOG
 
-## v0.4.next
-- disable gitlab-ci
+## v0.4.4
 
+- refactored pogopublish, impl.commit -a
+- disable gitlab-ci
+- remove resources add export
 
 ## v0.4.2 [05.06.20 03.03]
 - Fix unknown host problem ssh/git
