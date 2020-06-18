@@ -100,7 +100,8 @@ test:\n\
   - master\n\
 pages:\n\
   script:\n\
-  - hugo\n\
+  - hugo --minify\n\
+  - find public -type f -regex '.*\\.\\(htm\\|html\\|txt\\|text\\|js\\|css\\)$' -exec gzip -f -k {} \\;\n\
   artifacts:\n\
     paths:\n\
     - public\n\
