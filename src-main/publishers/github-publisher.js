@@ -74,7 +74,14 @@ class GithubPublisher {
             indeterminate: false,
             text: 'Publishing website..',
             abortOnError: true,
-            detail: 'Preparing upload..'
+            detail: 'Preparing upload..',
+            browserWindow: {
+                frame: false,
+                parent: mainWindow,
+                webPreferences: {
+                    nodeIntegration: true
+                }
+            }
         });
 
         progressBar.on('completed', function() {

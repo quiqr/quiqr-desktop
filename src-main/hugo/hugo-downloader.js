@@ -1,4 +1,5 @@
 const { execFile } = require('child_process');
+const electron = require('electron')
 const fs = require('fs-extra');
 const mkdirp = require("mkdirp");
 const path = require("path");
@@ -139,11 +140,20 @@ class HugoDownloader{
                 await fs.unlink(tempDest)
             }
 
+            let mainWindow = mainWindowManager.getCurrentInstance();
             var progressBar = new ProgressBar({
                 indeterminate: false,
                 text: 'Downloading PoppyGo Components, ..',
                 abortOnError: true,
-                detail: 'Preparing download..'
+                detail: 'Preparing download..',
+                browserWindow: {
+                    frame: false,
+                    parent: mainWindow,
+                    webPreferences: {
+                        nodeIntegration: true
+                    }
+                }
+
             });
 
             progressBar.on('completed', function() {
@@ -178,6 +188,8 @@ class HugoDownloader{
         }
         catch(e){
             outputConsole.appendLine(`Hugo installation failed.`);
+            const dialog = electron.dialog;
+            let mainWindow = mainWindowManager.getCurrentInstance();
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
                 message: "Hugo installation failed. Please contact your developer",
