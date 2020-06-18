@@ -112,13 +112,13 @@ pogoform:\n\
   script:\n\
   - echo 'INSTALL SSH AUTH'\n\
   - mkdir /root/.ssh\n\
-  - echo '$SSH_PRIVATE_KEY' > /root/.ssh/id_rsa\n\
+  - echo \"$SSH_PRIVATE_KEY\" > /root/.ssh/id_rsa\n\
   - chmod 700 /root/.ssh\n\
   - chmod 600 /root/.ssh/id_rsa\n\
   - echo 'POPULATE KNOWN HOSTS'\n\
   - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
   - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
-  - scp -r poppygo/forms pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY\n\
+  - scp -r poppygo/forms/* pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY/\n\
   rules:\n\
     - if: '$POGOFORM_GATEWAY'\n\
       when: always\n\
@@ -155,6 +155,7 @@ pogoform:\n\
         clonecmd.on("exit", async (code) => {
             if(code==0){
                 outputConsole.appendLine('Clone succes ...');
+                await fileDirUtils.fileRegexRemove(full_gh_dest, /.gitlab-ci.yml/);
                 fs.writeFileSync(full_gh_dest + "/.gitlab-ci.yml" , gitlabCi , 'utf-8');
                 fs.writeFileSync(full_gh_dest + "/.gitignore" , gitignore , 'utf-8');
                 outputConsole.appendLine('copy gitlab ci to: ' + full_gh_dest);
