@@ -120,13 +120,13 @@ app.on('activate', function () {
 app.on('open-url', function(event, schemeData){
     const dialog = electron.dialog;
     const remoteFileURL = schemeData.substr(10);
+    const tmppath = pathHelper.getRoot() + "tempdownloadpogozip."+remoteFileURL.split('.').pop();
 
     dialog.showMessageBox(mainWindow, {
         type: 'info',
         message: 'protocol process args ' + schemeData +'remote: ' + remoteFileURL + ' to ' + tmppath
     });
 
-    let tmppath = pathHelper.getRoot() + "tempdownloadpogozip."+remoteFileURL.split('.').pop();
     //await fileDirUtils.fileRegexRemove(tmppath, /tempdownloadpogozip.*/);
     downloadFile(remoteFileURL, tmppath);
 
