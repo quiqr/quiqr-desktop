@@ -79,11 +79,11 @@ app.on('activate', function () {
     }
 })
 
-app.on('open-url', function(){
+app.on('open-url', function(event, schemeData){
     const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
         type: 'info',
-        message: 'protocol process args ' + process.argv.join(','),
+        message: 'protocol process args ' + schemeData
     });
 });
 
