@@ -1,12 +1,16 @@
 const electron = require('electron')
 const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
+const fileDirUtils = require('./file-dir-utils');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
 const pogozipper = require('./pogozipper');
 const menuManager = require('./menu-manager');
-
+const request = require('request');
+const fs = require('fs-extra');
+const fssimple = require('fs');
+const pathHelper = require('./path-helper');
 
 unhandled();
 
@@ -43,6 +47,40 @@ function createWindow () {
     contextMenu(mainWindow);
 }
 
+function downloadFile(file_url , targetPath){
+    // Save variable to know progress
+    var received_bytes = 0;
+    var total_bytes = 0;
+
+    var req = request({
+        method: 'GET',
+        uri: file_url
+    });
+
+    var out = fssimple.createWriteStream(targetPath);
+    req.pipe(out);
+
+    req.on('response', function ( data ) {
+        // Change the total bytes value to get progress later.
+        total_bytes = parseInt(data.headers['content-length' ]);
+    });
+
+    req.on('data', function(chunk) {
+        // Update the received bytes
+        received_bytes += chunk.length;
+
+        showProgress(received_bytes, total_bytes);
+    });
+
+    req.on('end', function() {
+        alert("File succesfully downloaded");
+    });
+}
+
+function showProgress(received,total){
+    var percentage = (received * 100) / total;
+    console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
+}
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -81,11 +119,19 @@ app.on('activate', function () {
 
 app.on('open-url', function(event, schemeData){
     const dialog = electron.dialog;
+    const remoteFileURL = schemeData.substr(10);
+
     dialog.showMessageBox(mainWindow, {
         type: 'info',
-        message: 'protocol process args ' + schemeData
+        message: 'protocol process args ' + schemeData +'remote: ' + remoteFileURL + ' to ' + tmppath
     });
+
+    let tmppath = pathHelper.getRoot() + "tempdownloadpogozip."+remoteFileURL.split('.').pop();
+    //await fileDirUtils.fileRegexRemove(tmppath, /tempdownloadpogozip.*/);
+    downloadFile(remoteFileURL, tmppath);
+
 });
+
 
 app.on('open-file', (event, path) => {
     event.preventDefault();
