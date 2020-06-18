@@ -72,18 +72,21 @@ app.on('window-all-closed', function () {
 })
 
 app.on('activate', function () {
-    const dialog = electron.dialog;
-    dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        message: 'protocol process args ' + process.argv.join(','),
-    });
-
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
         createWindow();
     }
 })
+
+app.on('open-url', function(){}
+    const dialog = electron.dialog;
+    dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        message: 'protocol process args ' + process.argv.join(','),
+    });
+);
+
 
 app.on('open-file', (event, path) => {
     event.preventDefault();
