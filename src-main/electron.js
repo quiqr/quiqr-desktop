@@ -79,14 +79,13 @@ app.on('activate', function () {
     }
 })
 
-app.on('open-url', function(){}
+app.on('open-url', function(){
     const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
         type: 'info',
         message: 'protocol process args ' + process.argv.join(','),
     });
-);
-
+});
 
 app.on('open-file', (event, path) => {
     event.preventDefault();
