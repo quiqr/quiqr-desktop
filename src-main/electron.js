@@ -73,7 +73,7 @@ function downloadFile(file_url , targetPath){
     });
 
     req.on('end', function() {
-        alert("File succesfully downloaded");
+        importPogoFile(targetPath);
     });
 }
 
@@ -118,10 +118,10 @@ app.on('activate', function () {
 })
 
 app.on('open-url', function(event, schemeData){
-    const dialog = electron.dialog;
     const remoteFileURL = schemeData.substr(10);
     const tmppath = pathHelper.getRoot() + "tempdownloadpogozip."+remoteFileURL.split('.').pop();
 
+    const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
         type: 'info',
         message: 'protocol process args ' + schemeData +'remote: ' + remoteFileURL + ' to ' + tmppath
@@ -133,13 +133,7 @@ app.on('open-url', function(event, schemeData){
 });
 
 
-app.on('open-file', (event, path) => {
-    event.preventDefault();
-
-    if (mainWindow === null) {
-        createWindow();
-    }
-
+function importPogoFile(path){
     if(path.split('.').pop()=='pogosite'){
         pogozipper.importSite(path)
     }
@@ -152,6 +146,17 @@ app.on('open-file', (event, path) => {
     else if(path.split('.').pop()=='pogocontent'){
         pogozipper.importContent(path)
     }
+}
+
+
+app.on('open-file', (event, path) => {
+    event.preventDefault();
+
+    if (mainWindow === null) {
+        createWindow();
+    }
+
+    importPogoFile(path);
 });
 
 
