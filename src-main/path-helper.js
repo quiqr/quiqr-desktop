@@ -1,6 +1,3 @@
-
-const fs = require('fs-extra');
-const fssimple = require('fs');
 const userHome = require('user-home');
 
 class PathHelper{
@@ -13,8 +10,7 @@ class PathHelper{
         return userHome +'/Sukoh/';
     }
 
-    async getTempDir(){
-        await fs.ensureDir(this.getRoot()+ 'temp/');
+    getTempDir(){
         return this.getRoot()+ 'temp/';
     }
 

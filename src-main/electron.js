@@ -81,6 +81,11 @@ function showProgress(received,total){
     var percentage = (received * 100) / total;
     console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
 }
+
+function runQueue(){
+    return true;
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -88,6 +93,7 @@ app.on('ready', function () {
     menuManager.createMainMenu();
     createWindow();
     menuManager.init();
+    //runQueue();
 })
 
 app.on('before-quit', function () {
@@ -118,29 +124,41 @@ app.on('activate', function () {
 })
 
 async function cleanTempDir(){
+    await fs.ensureDir(pathHelper.getTempDir());
     await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
 }
 
 
 app.on('open-url', function(event, schemeData){
 
+    if(app.isReady()){
+        handlePogoUrl(event, schemeData);
+    }
+    else{
+        app.whenReady(function(){
+            handlePogoUrl(event, schemeData);
+        })
+    }
+});
+
+function handlePogoUrl(event, schemeData){
+
+    cleanTempDir();
+
     const remoteFileURL = schemeData.substr(10);
     const remoteFileName = remoteFileURL.split('/').pop();
 
     //const tmppath = remoteFilesTempDir+remoteFileURL.split('.').pop();
     const tmppath = pathHelper.getTempDir() + remoteFileName;
-    cleanTempDir();
 
     const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
         type: 'info',
-        message: 'protocol process args ' + schemeData +"\nremote: " + remoteFileURL + "\n to: " + tmppath
+        message: 'protocol process args: ' + schemeData +"\nremote: " + remoteFileURL + "\n to: " + tmppath
     });
 
     downloadFile(remoteFileURL, tmppath);
-
-});
-
+}
 
 function importPogoFile(path){
     if(path.split('.').pop()=='pogosite'){
@@ -165,7 +183,14 @@ app.on('open-file', (event, path) => {
         createWindow();
     }
 
-    importPogoFile(path);
+    if(app.isReady()){
+        importPogoFile(path);
+    }
+    else{
+        app.whenReady(function(){
+            importPogoFile(path);
+        })
+    }
 });
 
 
