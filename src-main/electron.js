@@ -54,7 +54,8 @@ function downloadFile(file_url , targetPath){
         indeterminate: false,
         //text: 'To: '+targetPath+' ..',
         text: 'Downloading '+file_url+' ..',
-        abortOnError: true,
+        closeOnComplete: true,
+        //abortOnError: true,
         detail: 'Preparing upload..',
         browserWindow: {
             frame: false,
@@ -77,7 +78,7 @@ function downloadFile(file_url , targetPath){
     req.pipe(out);
 
     out.on('finish', function(){
-        progressBar.close();
+        //progressBar.close();
         importPogoFile(targetPath);
     });
 
@@ -95,8 +96,8 @@ function downloadFile(file_url , targetPath){
     });
 
     req.on('end', async function() {
-        progressBar.close();
         progressBar.setCompleted();
+        //progressBar.close();
     });
 }
 
