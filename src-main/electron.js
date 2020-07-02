@@ -50,14 +50,6 @@ function createWindow () {
 
 function downloadFile(file_url , targetPath){
 
-    var received_bytes = 0;
-    var total_bytes = 0;
-
-    var req = request({
-        method: 'GET',
-        uri: file_url
-    });
-
     var progressBar = new ProgressBar({
         indeterminate: false,
         text: 'To: '+targetPath+' ..',
@@ -71,6 +63,14 @@ function downloadFile(file_url , targetPath){
                 nodeIntegration: true
             }
         }
+    });
+
+    var received_bytes = 0;
+    var total_bytes = 0;
+
+    var req = request({
+        method: 'GET',
+        uri: file_url
     });
 
     progressBar.on('completed', function() {
@@ -98,7 +98,7 @@ function downloadFile(file_url , targetPath){
         showProgress(progressBar,received_bytes, total_bytes);
     });
 
-    req.on('end', function() {
+    req.on('finish', function() {
         progressBar.setCompleted();
         importPogoFile(targetPath);
     });
@@ -165,7 +165,7 @@ app.on('activate', function () {
 
 async function cleanTempDir(){
     await fs.ensureDir(pathHelper.getTempDir());
-    await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
+    //await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
 }
 
 
