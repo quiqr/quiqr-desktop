@@ -92,7 +92,6 @@ function downloadFile(file_url , targetPath){
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
 
-
     req.on('response', function ( data ) {
         total_bytes = parseInt(data.headers['content-length' ]);
     });
@@ -102,12 +101,12 @@ function downloadFile(file_url , targetPath){
         showProgress(received_bytes, total_bytes);
     });
 
-    out.on('finish', () =>{
+    out.on('finish', async () =>{
         //importProgrBar.close();
         //importProgrBar = null;
-        importProgrBar.close();
-        importPogoFile(targetPath);
-        resolve(true);
+        await importProgrBar.close();
+        await importPogoFile(targetPath);
+        return true;
     });
 
     /*
