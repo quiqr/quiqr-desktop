@@ -114,6 +114,10 @@ export class API {
         return mainProcessBridge.request('publishSite', {siteKey, publishKey});
     }
 
+    getCreatorMessage(siteKey: string, workspaceKey: string){
+        return mainProcessBridge.request('getCreatorMessage', {siteKey, workspaceKey});
+    }
+
     getHugoTemplates(){
         return mainProcessBridge.request('getHugoTemplates', null, {timeout: 30000});
     }

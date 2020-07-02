@@ -122,7 +122,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     checkSiteInProps(){
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
-            //alert(site);
             this.setState({currentSiteKey: siteKey});
             this.setState({currentWorkspaceKey: workspaceKey});
 
