@@ -1,7 +1,6 @@
 const electron = require('electron')
 const ipcMainBinder = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
-const fileDirUtils = require('./file-dir-utils');
 const unhandled = require('electron-unhandled');
 const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
@@ -11,6 +10,7 @@ const request = require('request');
 const fs = require('fs-extra');
 const fssimple = require('fs');
 const pathHelper = require('./path-helper');
+const fileDirUtils = require('./file-dir-utils');
 
 unhandled();
 
@@ -117,17 +117,26 @@ app.on('activate', function () {
     }
 })
 
+async function cleanTempDir(){
+    await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
+}
+
+
 app.on('open-url', function(event, schemeData){
+
     const remoteFileURL = schemeData.substr(10);
-    const tmppath = pathHelper.getRoot() + "tempdownloadpogozip."+remoteFileURL.split('.').pop();
+    const remoteFileName = remoteFileURL.split('/').pop();
+
+    //const tmppath = remoteFilesTempDir+remoteFileURL.split('.').pop();
+    const tmppath = pathHelper.getTempDir() + remoteFileName;
+    cleanTempDir();
 
     const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
         type: 'info',
-        message: 'protocol process args ' + schemeData +'remote: ' + remoteFileURL + ' to ' + tmppath
+        message: 'protocol process args ' + schemeData +"\nremote: " + remoteFileURL + "\n to: " + tmppath
     });
 
-    //await fileDirUtils.fileRegexRemove(tmppath, /tempdownloadpogozip.*/);
     downloadFile(remoteFileURL, tmppath);
 
 });

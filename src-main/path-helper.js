@@ -1,12 +1,9 @@
-//@flow
 
+const fs = require('fs-extra');
+const fssimple = require('fs');
 const userHome = require('user-home');
 
 class PathHelper{
-
-    /*::
-    _lastBuildDir: ?string;
-    */
 
     getKnownHosts(){
         return userHome +'/.ssh/known_hosts';
@@ -14,6 +11,11 @@ class PathHelper{
 
     getRoot(){
         return userHome +'/Sukoh/';
+    }
+
+    async getTempDir(){
+        await fs.ensureDir(this.getRoot()+ 'temp/');
+        return this.getRoot()+ 'temp/';
     }
 
     getSiteRoot(siteKey/*: string*/){
