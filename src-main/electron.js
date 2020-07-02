@@ -50,13 +50,6 @@ function createWindow () {
 }
 
 function downloadFile(file_url , targetPath){
-    /*
-    const dialog = electron.dialog;
-    dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        message: 'downloadFile'
-    });
-    */
 
     importProgrBar = new ProgressBar({
         indeterminate: false,
@@ -106,6 +99,11 @@ function downloadFile(file_url , targetPath){
         //importProgrBar = null;
         await importProgrBar.close();
         await importPogoFile(targetPath);
+        const dialog = electron.dialog;
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            message: 'downloadFile'
+        });
         return true;
     });
 
