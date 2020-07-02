@@ -87,7 +87,7 @@ function downloadFile(file_url , targetPath){
 
     out.on('finish', async function(){
         await importProgrBar.close();
-        importPogoFile = null;
+        importProgrBar = null;
         importPogoFile(targetPath);
         //importProgrBar.close();
     });
