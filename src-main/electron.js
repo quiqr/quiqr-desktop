@@ -92,9 +92,9 @@ function downloadFile(file_url , targetPath){
         showProgress(progressBar,received_bytes, total_bytes);
     });
 
-    req.on('end', function() {
-        out.end();
-        progressBar.setCompleted();
+    req.on('end', async function() {
+        await out.end();
+        await progressBar.setCompleted();
         progressBar = null;
         importPogoFile(targetPath);
     });
