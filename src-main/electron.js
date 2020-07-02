@@ -50,11 +50,13 @@ function createWindow () {
 }
 
 function downloadFile(file_url , targetPath){
+    /*
     const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
         type: 'info',
         message: 'downloadFile'
     });
+    */
 
     importProgrBar = new ProgressBar({
         indeterminate: false,
@@ -90,12 +92,6 @@ function downloadFile(file_url , targetPath){
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
 
-    out.on('finish', async function(){
-        //importProgrBar.close();
-        //importProgrBar = null;
-        importProgrBar.close();
-        importPogoFile(targetPath);
-    });
 
     req.on('response', function ( data ) {
         total_bytes = parseInt(data.headers['content-length' ]);
@@ -103,14 +99,22 @@ function downloadFile(file_url , targetPath){
 
     req.on('data', function(chunk) {
         received_bytes += chunk.length;
-
         showProgress(received_bytes, total_bytes);
+    });
+
+    out.on('finish', async function(){
+        //importProgrBar.close();
+        //importProgrBar = null;
+        importProgrBar.close();
+        //importPogoFile(targetPath);
 
     });
 
+    /*
     req.on('end', async function() {
         //importProgrBar.close();
     });
+    */
 }
 
 function formatBytes(bytes, decimals = 1) {
