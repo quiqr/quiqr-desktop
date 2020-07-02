@@ -77,7 +77,6 @@ function downloadFile(file_url , targetPath){
     req.pipe(out);
 
     out.on('finish', function(){
-        //await progressBar.setCompleted();
         progressBar.close();
         importPogoFile(targetPath);
     });
@@ -108,6 +107,7 @@ function formatBytes(bytes, decimals = 2) {
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
+
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
@@ -115,8 +115,13 @@ function formatBytes(bytes, decimals = 2) {
 
 function showProgress(progressBar,received,total){
     var percentage = (received * 100) / total;
-    progressBar.value = percentage;
-    progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
+    if(percentage > 90){
+        progressBar.setCompleted();
+    }
+    else{
+        progressBar.value = percentage;
+        progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
+    }
 }
 
 function runQueue(){
