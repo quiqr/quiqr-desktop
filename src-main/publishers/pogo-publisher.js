@@ -229,6 +229,7 @@ pogoform:\n\
                                         progressBar.value = 100;
                                         progressBar.detail = 'Uploading finished';
                                         progressBar.setCompleted();
+                                        progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
                                             type: 'info',
