@@ -229,6 +229,7 @@ pogoform:\n\
                                         progressBar.value = 100;
                                         progressBar.detail = 'Uploading finished';
                                         progressBar.setCompleted();
+                                        progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
                                             type: 'info',
                                             message: "Finished publishing. (git-push)",

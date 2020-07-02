@@ -94,22 +94,14 @@ function downloadFile(file_url , targetPath){
         showProgress(received_bytes, total_bytes);
     });
 
-    out.on('finish', async () =>{
-        //importProgrBar.close();
-        //importProgrBar = null;
-        await importProgrBar.close();
-        await importPogoFile(targetPath);
-        const dialog = electron.dialog;
-        dialog.showMessageBox(mainWindow, {
-            type: 'info',
-            message: 'downloadFile'
-        });
+    out.on('finish', () =>{
+        importPogoFile(targetPath);
         return true;
     });
 
     /*
     req.on('end', async function() {
-        //importProgrBar.close();
+        importProgrBar.close();
     });
     */
 }
