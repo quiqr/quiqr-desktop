@@ -53,7 +53,6 @@ function downloadFile(file_url , targetPath){
 
     let progressBar = new ProgressBar({
         indeterminate: false,
-        //abortOnError: true,
         text: 'Downloading '+file_url+' ..',
         detail: 'Preparing upload..',
         browserWindow: {
@@ -64,17 +63,6 @@ function downloadFile(file_url , targetPath){
             }
         }
     });
-    /*
-    progressBar.on('completed', function() {
-            console.info("completed");
-    })
-        .on('aborted', function(value) {
-            console.info("aborted");
-        })
-        .on('progress', function(value) {
-            console.info("progress");
-        });
-        */
 
     var received_bytes = 0;
     var total_bytes = 0;

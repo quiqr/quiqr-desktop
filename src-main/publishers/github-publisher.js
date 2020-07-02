@@ -171,9 +171,11 @@ class GithubPublisher {
                                             progressBar.value = 100;
                                             progressBar.detail = 'Uploading finished';
                                             progressBar.setCompleted();
+                                            progressBar.close();
                                         }
                                         else{
                                             outputConsole.appendLine('ERROR: Could not git-push ...');
+                                            progressBar._window.hide();
                                             progressBar.close();
                                             dialog.showMessageBox(mainWindow, {
                                                 type: 'warning',
@@ -184,6 +186,7 @@ class GithubPublisher {
                                 }
                                 else {
                                     outputConsole.appendLine('ERROR: Could not git-commit ...');
+                                    progressBar._window.hide();
                                     progressBar.close();
                                     dialog.showMessageBox(mainWindow, {
                                         type: 'warning',
@@ -195,6 +198,7 @@ class GithubPublisher {
                         }
                         else {
                             outputConsole.appendLine('ERROR: Could not git-add ...');
+                            progressBar._window.hide();
                             progressBar.close();
                             dialog.showMessageBox(mainWindow, {
                                 type: 'warning',
@@ -207,6 +211,7 @@ class GithubPublisher {
             }
             else {
                 outputConsole.appendLine('Could not clone destination repository with code: ' + code);
+                progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {
                     type: 'warning',

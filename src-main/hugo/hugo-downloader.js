@@ -183,6 +183,7 @@ class HugoDownloader{
             progressBar.value = 100;
             progressBar.detail = `Hugo installation completed.`
             progressBar.setCompleted();
+            progressBar._window.hide();
             outputConsole.appendLine(`Hugo installation completed.`);
             this._isRunning = false;
         }
@@ -195,6 +196,7 @@ class HugoDownloader{
                 message: "Hugo installation failed. Please contact your developer",
             });
 
+            progressBar._window.hide();
             progressBar.close();
             this._isRunning = false;
             return e;
