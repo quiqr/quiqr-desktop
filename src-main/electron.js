@@ -60,7 +60,8 @@ function downloadFile(file_url , targetPath){
 
     var progressBar = new ProgressBar({
         indeterminate: false,
-        text: 'Downloading '+file_url+' ..',
+        text: 'To: '+targetPath+' ..',
+        //text: 'Downloading '+file_url+' ..',
         abortOnError: true,
         detail: 'Preparing upload..',
         browserWindow: {
@@ -220,7 +221,7 @@ app.on('open-file', (event, path) => {
         importPogoFile(path);
     }
     else{
-        app.whenReady.then(() => {
+        app.whenReady().then(() => {
             if (mainWindow === null) {
                 createWindow();
             }
