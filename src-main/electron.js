@@ -76,9 +76,9 @@ function downloadFile(file_url , targetPath){
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
 
-    out.on('finish', async function(){
-        await progressBar.setCompleted();
-        //await progressBar.close();
+    out.on('finish', function(){
+        //await progressBar.setCompleted();
+        progressBar.close();
         importPogoFile(targetPath);
     });
 
