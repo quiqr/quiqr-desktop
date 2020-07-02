@@ -95,7 +95,7 @@ function downloadFile(file_url , targetPath){
     req.on('end', async function() {
         await out.end();
         await progressBar.setCompleted();
-        progressBar = null;
+        await progressBar.close();
         importPogoFile(targetPath);
     });
 }
