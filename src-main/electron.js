@@ -82,12 +82,10 @@ function downloadFile(file_url , targetPath){
     });
 
     req.on('response', function ( data ) {
-        // Change the total bytes value to get progress later.
         total_bytes = parseInt(data.headers['content-length' ]);
     });
 
     req.on('data', function(chunk) {
-        // Update the received bytes
         received_bytes += chunk.length;
 
         if(!progressBar.isCompleted()){
@@ -96,11 +94,11 @@ function downloadFile(file_url , targetPath){
 
     });
 
-    req.on('end', async function() {
-    });
+    //req.on('end', async function() {
+    //});
 }
 
-function formatBytes(bytes, decimals = 2) {
+function formatBytes(bytes, decimals = 1) {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -115,6 +113,11 @@ function formatBytes(bytes, decimals = 2) {
 
 function showProgress(progressBar,received,total){
     var percentage = (received * 100) / total;
+
+    if(progressBar.isCompleted()){
+        return;
+    }
+
     if(percentage > 90){
         progressBar.setCompleted();
     }
@@ -177,18 +180,22 @@ app.on('open-url', function(event, schemeData){
     }
     else{
         app.whenReady().then(()=>{
+            /*
             if (mainWindow === null) {
                 createWindow();
             }
+            */
             handlePogoUrl(event, schemeData);
         });
     }
 });
 
 function handlePogoUrl(event, schemeData){
+    /*
     if (mainWindow === null) {
         createWindow();
     }
+    */
 
     cleanTempDir();
 
@@ -208,9 +215,11 @@ function handlePogoUrl(event, schemeData){
 
 function importPogoFile(path){
 
-    if (mainWindow === null) {
+    /*
+        if (mainWindow === null) {
         createWindow();
     }
+    */
 
     if(path.split('.').pop()=='pogosite'){
         pogozipper.importSite(path)
@@ -235,9 +244,11 @@ app.on('open-file', (event, path) => {
     }
     else{
         app.whenReady().then(() => {
+            /*
             if (mainWindow === null) {
                 createWindow();
             }
+            */
             importPogoFile(path);
         });
     }
