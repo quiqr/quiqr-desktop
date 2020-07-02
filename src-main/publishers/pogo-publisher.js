@@ -229,6 +229,8 @@ pogoform:\n\
                                         progressBar.value = 100;
                                         progressBar.detail = 'Uploading finished';
                                         progressBar.setCompleted();
+                                        progressBar._window.hide();
+                                        progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
                                             type: 'info',
                                             message: "Finished publishing. (git-push)",
@@ -238,6 +240,7 @@ pogoform:\n\
                                     else{
                                         outputConsole.appendLine('ERROR: Could not git-push ...');
 
+                                        progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
                                             type: 'warning',
@@ -248,6 +251,7 @@ pogoform:\n\
                             }
                             else {
                                 outputConsole.appendLine('ERROR: Could not git-commit ...');
+                                progressBar._window.hide();
                                 progressBar.close();
                                 dialog.showMessageBox(mainWindow, {
                                     type: 'warning',
@@ -259,6 +263,7 @@ pogoform:\n\
                     }
                     else {
                         outputConsole.appendLine('ERROR: Could not git-add ...');
+                        progressBar._window.hide();
                         progressBar.close();
                         dialog.showMessageBox(mainWindow, {
                             type: 'warning',
@@ -270,6 +275,7 @@ pogoform:\n\
             else {
                 outputConsole.appendLine('Could not clone destination repository');
                 outputConsole.appendLine(`${git_bin} clone -i ${tmpkeypath} ${full_gh_url} ${full_gh_dest}`);
+                progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {
                     type: 'warning',

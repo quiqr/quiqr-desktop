@@ -1,12 +1,6 @@
-//@flow
-
 const userHome = require('user-home');
 
 class PathHelper{
-
-    /*::
-    _lastBuildDir: ?string;
-    */
 
     getKnownHosts(){
         return userHome +'/.ssh/known_hosts';
@@ -14,6 +8,10 @@ class PathHelper{
 
     getRoot(){
         return userHome +'/Sukoh/';
+    }
+
+    getTempDir(){
+        return this.getRoot()+ 'temp/';
     }
 
     getSiteRoot(siteKey/*: string*/){

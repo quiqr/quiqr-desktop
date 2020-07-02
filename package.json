@@ -88,6 +88,11 @@
     "directories": {
       "buildResources": "public"
     },
+    "protocols": [{
+      "name": "poppygo",
+      "role": "Editor",
+      "schemes": ["poppygo"]
+    }],
     "extraFiles": [
       {
         "from": "resources/${os}",

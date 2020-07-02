@@ -6,7 +6,12 @@ const contextMenu = require('electron-context-menu');
 const BrowserWindow = electron.BrowserWindow;
 const pogozipper = require('./pogozipper');
 const menuManager = require('./menu-manager');
-
+const request = require('request');
+const fs = require('fs-extra');
+const fssimple = require('fs');
+const pathHelper = require('./path-helper');
+const fileDirUtils = require('./file-dir-utils');
+const ProgressBar = require('electron-progressbar');
 
 unhandled();
 
@@ -38,8 +43,70 @@ function createWindow () {
     mainWindow.on('closed', function () {
         mainWindow = null
     })
+    console.log('process args ' + process.argv.join(','))
 
     contextMenu(mainWindow);
+}
+
+function downloadFile(file_url , targetPath){
+
+    let progressBar = new ProgressBar({
+        indeterminate: false,
+        text: 'Downloading '+file_url+' ..',
+        detail: 'Preparing upload..',
+        browserWindow: {
+            frame: false,
+            parent: mainWindow,
+            webPreferences: {
+                nodeIntegration: true
+            }
+        }
+    });
+
+    var received_bytes = 0;
+    var total_bytes = 0;
+
+    var req = request({
+        method: 'GET',
+        uri: file_url
+    });
+
+    var out = fssimple.createWriteStream(targetPath);
+    req.pipe(out);
+
+    req.on('response', function ( data ) {
+        total_bytes = parseInt(data.headers['content-length' ]);
+    });
+
+    req.on('data', function(chunk) {
+        received_bytes += chunk.length;
+        showProgress(progressBar,received_bytes, total_bytes);
+    });
+
+    out.on('finish', () =>{
+        progressBar.setCompleted();
+        progressBar._window.hide();
+        importPogoFile(targetPath);
+    });
+
+}
+
+function formatBytes(bytes, decimals = 1) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function showProgress(progressBar,received,total){
+    var percentage = (received * 100) / total;
+    progressBar.value = percentage;
+    progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
 }
 
 // This method will be called when Electron has finished
@@ -78,12 +145,30 @@ app.on('activate', function () {
     }
 })
 
-app.on('open-file', (event, path) => {
-    event.preventDefault();
+app.on('open-url', function(event, schemeData){
 
-    if (mainWindow === null) {
-        createWindow();
+    if(app.isReady()){
+        handlePogoUrl(event, schemeData);
     }
+    else{
+        app.whenReady().then(()=>{
+            handlePogoUrl(event, schemeData);
+        });
+    }
+});
+
+async function handlePogoUrl(event, schemeData){
+
+    await fs.ensureDir(pathHelper.getTempDir());
+
+    const remoteFileURL = schemeData.substr(10);
+    const remoteFileName = remoteFileURL.split('/').pop();
+    const tmppath = pathHelper.getTempDir() + remoteFileName;
+
+    downloadFile(remoteFileURL, tmppath);
+}
+
+function importPogoFile(path){
 
     if(path.split('.').pop()=='pogosite'){
         pogozipper.importSite(path)
@@ -96,6 +181,25 @@ app.on('open-file', (event, path) => {
     }
     else if(path.split('.').pop()=='pogocontent'){
         pogozipper.importContent(path)
+    }
+}
+
+
+app.on('open-file', (event, path) => {
+    event.preventDefault();
+
+    if(app.isReady()){
+        importPogoFile(path);
+    }
+    else{
+        app.whenReady().then(() => {
+            /*
+            if (mainWindow === null) {
+                createWindow();
+            }
+            */
+            importPogoFile(path);
+        });
     }
 });
 
