@@ -75,8 +75,16 @@ function getLocation(locPath = ''){
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
                 client.end();
-                if(mainWindow)
+                if(mainWindow){
                     mainWindow.loadURL(url);
+
+                    mainWindow.webContents.once('dom-ready', () => {
+                        if(global.currentSiteKey && global.currentWorkspaceKey){
+                            mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
+                            //console.log(`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
+                        }
+                    });
+                }
             }
             );
             client.on('error', (error) => {
@@ -106,11 +114,19 @@ function getLocation(locPath = ''){
             mainWindow.loadURL(
                 url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
+            mainWindow.webContents.once('dom-ready', () => {
+                if(global.currentSiteKey && global.currentWorkspaceKey){
+                    mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
+                    //console.log(`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
+                }
+            });
+
         }
         else{
             showNotFound(mainWindow, lookups);
         }
     }
+
 }
 
 function createWindow () {
@@ -163,9 +179,12 @@ function createWindow () {
 
         mainWindow.setBrowserView(mobilePreviewView);
         mainWindow.show();
+
+
     });
 
     getLocation();
+
 
     mainWindow.on('resize', () => {
         //Linux hack, Win and Mac should use will-resize with newBound
