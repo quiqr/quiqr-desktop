@@ -145,12 +145,6 @@ app.on('activate', function () {
     }
 })
 
-async function cleanTempDir(){
-    await fs.ensureDir(pathHelper.getTempDir());
-    await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
-}
-
-
 app.on('open-url', function(event, schemeData){
 
     if(app.isReady()){
@@ -163,15 +157,13 @@ app.on('open-url', function(event, schemeData){
     }
 });
 
-function handlePogoUrl(event, schemeData){
+async function handlePogoUrl(event, schemeData){
 
-    cleanTempDir();
+    await fs.ensureDir(pathHelper.getTempDir());
 
     const remoteFileURL = schemeData.substr(10);
     const remoteFileName = remoteFileURL.split('/').pop();
-
     const tmppath = pathHelper.getTempDir() + remoteFileName;
-
 
     downloadFile(remoteFileURL, tmppath);
 }
