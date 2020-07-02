@@ -89,7 +89,7 @@ function downloadFile(file_url , targetPath){
         // Update the received bytes
         received_bytes += chunk.length;
 
-        //showProgress(progressBar,received_bytes, total_bytes);
+        showProgress(progressBar,received_bytes, total_bytes);
     });
 
     req.on('end', function() {
@@ -115,7 +115,7 @@ function formatBytes(bytes, decimals = 2) {
 function showProgress(progressBar,received,total){
     var percentage = (received * 100) / total;
     progressBar.value = percentage;
-    progressBar.detail = percentage.toFixed(1); + "% | " + formatBytes(received) + " of " + formatBytes(total);
+    progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
 }
 
 function runQueue(){
