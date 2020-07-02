@@ -65,10 +65,6 @@ function downloadFile(file_url , targetPath){
         }
     });
 
-    //progressBar.on('completed', function() {
-    //    progressBar.detail = 'The file has been downloaded.';
-    //})
-
     var received_bytes = 0;
     var total_bytes = 0;
 
@@ -93,7 +89,7 @@ function downloadFile(file_url , targetPath){
     });
 
     req.on('end', async function() {
-        await out.end();
+        //await out.end();
         await progressBar.setCompleted();
         await progressBar.close();
         importPogoFile(targetPath);
@@ -129,7 +125,6 @@ app.on('ready', function () {
     menuManager.createMainMenu();
     createWindow();
     menuManager.init();
-    //runQueue();
 })
 
 app.on('before-quit', function () {
