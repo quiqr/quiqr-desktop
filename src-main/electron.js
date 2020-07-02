@@ -94,7 +94,7 @@ function downloadFile(file_url , targetPath){
         // Update the received bytes
         received_bytes += chunk.length;
 
-        showProgress(ProgressBar,received_bytes, total_bytes);
+        showProgress(progressBar,received_bytes, total_bytes);
     });
 
     req.on('end', function() {
@@ -103,7 +103,7 @@ function downloadFile(file_url , targetPath){
     });
 }
 
-function showProgress(ProgressBar,received,total){
+function showProgress(progressBar,received,total){
     var percentage = (received * 100) / total;
     progressBar.value = percentage;
     progressBar.detail = percentage + "% | " + received + " bytes out of " + total + " bytes.";
@@ -220,12 +220,12 @@ app.on('open-file', (event, path) => {
         importPogoFile(path);
     }
     else{
-        app.whenReady(function(){
+        app.whenReady.then(() => {
             if (mainWindow === null) {
                 createWindow();
             }
             importPogoFile(path);
-        })
+        });
     }
 });
 
