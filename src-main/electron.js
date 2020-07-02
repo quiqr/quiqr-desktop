@@ -50,6 +50,11 @@ function createWindow () {
 }
 
 function downloadFile(file_url , targetPath){
+    const dialog = electron.dialog;
+    dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        message: 'downloadFile'
+    });
 
     importProgrBar = new ProgressBar({
         indeterminate: false,
@@ -86,10 +91,10 @@ function downloadFile(file_url , targetPath){
     req.pipe(out);
 
     out.on('finish', async function(){
-        await importProgrBar.close();
-        importProgrBar = null;
-        importPogoFile(targetPath);
         //importProgrBar.close();
+        //importProgrBar = null;
+        importProgrBar.close();
+        importPogoFile(targetPath);
     });
 
     req.on('response', function ( data ) {
@@ -99,12 +104,12 @@ function downloadFile(file_url , targetPath){
     req.on('data', function(chunk) {
         received_bytes += chunk.length;
 
-        //showProgress(received_bytes, total_bytes);
+        showProgress(received_bytes, total_bytes);
 
     });
 
     req.on('end', async function() {
-        importProgrBar.close();
+        //importProgrBar.close();
     });
 }
 
@@ -124,16 +129,13 @@ function showProgress(received,total){
     var percentage = (received * 100) / total;
 
     if(percentage > 90){
+        importProgrBar.setCompleted();
         return;
     }
     else {
         importProgrBar.value = percentage;
         importProgrBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
     }
-}
-
-function runQueue(){
-    return true;
 }
 
 // This method will be called when Electron has finished
@@ -209,11 +211,6 @@ function handlePogoUrl(event, schemeData){
 
     const tmppath = pathHelper.getRoot() + remoteFileName;
 
-    const dialog = electron.dialog;
-    dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        message: 'protocol process args: ' + schemeData +"\nremote: " + remoteFileURL + "\n to: " + tmppath
-    });
 
     downloadFile(remoteFileURL, tmppath);
 }
