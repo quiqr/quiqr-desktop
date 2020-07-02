@@ -77,7 +77,7 @@ function downloadFile(file_url , targetPath){
     req.pipe(out);
 
     out.on('finish', function(){
-        progressBar.close();
+        //progressBar.close();
         importPogoFile(targetPath);
     });
 
