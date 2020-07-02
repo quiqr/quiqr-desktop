@@ -77,7 +77,7 @@ function downloadFile(file_url , targetPath){
     req.pipe(out);
 
     out.on('finish', function(){
-        //progressBar.close();
+        progressBar.close();
         importPogoFile(targetPath);
     });
 
@@ -94,8 +94,10 @@ function downloadFile(file_url , targetPath){
 
     });
 
-    //req.on('end', async function() {
-    //});
+    req.on('end', async function() {
+        progressBar.close();
+        progressBar.setCompleted();
+    });
 }
 
 function formatBytes(bytes, decimals = 1) {
