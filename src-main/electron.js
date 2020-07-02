@@ -37,6 +37,7 @@ global.currentServerProccess = undefined;
 let mainWindow;
 let previewWindow;
 let logWindow;
+let importProgrBar;
 
 function createWindow () {
     mainWindow = mainWindowManager.getCurrentInstanceOrNew();
@@ -50,21 +51,28 @@ function createWindow () {
 
 function downloadFile(file_url , targetPath){
 
-    var progressBar = new ProgressBar({
+    importProgrBar = new ProgressBar({
         indeterminate: false,
-        //text: 'To: '+targetPath+' ..',
+        abortOnError: true,
         text: 'Downloading '+file_url+' ..',
-        closeOnComplete: true,
-        //abortOnError: true,
         detail: 'Preparing upload..',
         browserWindow: {
-            frame: false,
+            frame: true,
             parent: mainWindow,
             webPreferences: {
                 nodeIntegration: true
             }
         }
     });
+    importProgrBar.on('completed', function() {
+            console.info("completed");
+    })
+        .on('aborted', function(value) {
+            console.info("aborted");
+        })
+        .on('progress', function(value) {
+            console.info("progress");
+        });
 
     var received_bytes = 0;
     var total_bytes = 0;
@@ -78,8 +86,9 @@ function downloadFile(file_url , targetPath){
     req.pipe(out);
 
     out.on('finish', function(){
-        //progressBar.close();
+        importProgrBar.close();
         importPogoFile(targetPath);
+        importProgrBar.close();
     });
 
     req.on('response', function ( data ) {
@@ -89,15 +98,12 @@ function downloadFile(file_url , targetPath){
     req.on('data', function(chunk) {
         received_bytes += chunk.length;
 
-        if(!progressBar.isCompleted()){
-            showProgress(progressBar,received_bytes, total_bytes);
-        }
+        showProgress(importProgrBar,received_bytes, total_bytes);
 
     });
 
     req.on('end', async function() {
-        progressBar.setCompleted();
-        //progressBar.close();
+        importProgrBar.close();
     });
 }
 
@@ -108,25 +114,20 @@ function formatBytes(bytes, decimals = 1) {
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-function showProgress(progressBar,received,total){
+function showProgress(received,total){
     var percentage = (received * 100) / total;
 
-    if(progressBar.isCompleted()){
+    if(percentage > 90){
         return;
     }
-
-    if(percentage > 90){
-        progressBar.setCompleted();
-    }
     else{
-        progressBar.value = percentage;
-        progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
+        importProgrBar.value = percentage;
+        importProgrBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
     }
 }
 

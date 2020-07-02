@@ -176,7 +176,7 @@ class Pogozipper{
             message: "Site has been imported.",
         });
 
-        //mainWindow.webContents.send("unselectSite");
+        mainWindow.webContents.send("unselectSite");
 
     }
 
