@@ -50,6 +50,7 @@ function createWindow () {
 
 function downloadFile(file_url , targetPath){
 
+    /*
     var progressBar = new ProgressBar({
         indeterminate: false,
         text: 'To: '+targetPath+' ..',
@@ -65,14 +66,6 @@ function downloadFile(file_url , targetPath){
         }
     });
 
-    var received_bytes = 0;
-    var total_bytes = 0;
-
-    var req = request({
-        method: 'GET',
-        uri: file_url
-    });
-
     progressBar.on('completed', function() {
         progressBar.detail = 'The file has been downloaded.';
     })
@@ -81,7 +74,14 @@ function downloadFile(file_url , targetPath){
         })
         .on('progress', function(value) {
         });
+        */
+    var received_bytes = 0;
+    var total_bytes = 0;
 
+    var req = request({
+        method: 'GET',
+        uri: file_url
+    });
 
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
@@ -95,11 +95,11 @@ function downloadFile(file_url , targetPath){
         // Update the received bytes
         received_bytes += chunk.length;
 
-        showProgress(progressBar,received_bytes, total_bytes);
+        //showProgress(progressBar,received_bytes, total_bytes);
     });
 
-    req.on('finish', function() {
-        progressBar.setCompleted();
+    req.on('end', function() {
+        //progressBar.setCompleted();
         importPogoFile(targetPath);
     });
 }
