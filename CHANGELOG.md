@@ -1,5 +1,14 @@
 # PoppyGo App CHANGELOG
 
+## v0.5.0
+
+- fix progress windows not closing bug
+- fix double click pogofile error when poppygo not running
+- first working version of the poppy:// handler
+
+## v0.4.5
+- fix scss bug
+
 ## v0.4.4
 
 - refactored pogopublish, impl.commit -a
