@@ -88,7 +88,7 @@ function downloadFile(file_url , targetPath){
         showProgress(progressBar,received_bytes, total_bytes);
     });
 
-    req.on('end', async function() {
+    req.on('close', async function() {
         //await out.end();
         await progressBar.setCompleted();
         await progressBar.close();
