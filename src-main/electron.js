@@ -85,10 +85,11 @@ function downloadFile(file_url , targetPath){
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
 
-    out.on('finish', function(){
-        importProgrBar.close();
+    out.on('finish', async function(){
+        await importProgrBar.close();
+        importPogoFile = null;
         importPogoFile(targetPath);
-        importProgrBar.close();
+        //importProgrBar.close();
     });
 
     req.on('response', function ( data ) {
@@ -125,7 +126,7 @@ function showProgress(received,total){
     if(percentage > 90){
         return;
     }
-    else{
+    else {
         importProgrBar.value = percentage;
         importProgrBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
     }
