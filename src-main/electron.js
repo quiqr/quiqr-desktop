@@ -49,7 +49,7 @@ function createWindow () {
 }
 
 function downloadFile(file_url , targetPath){
-    // Save variable to know progress
+
     var received_bytes = 0;
     var total_bytes = 0;
 
@@ -104,12 +104,22 @@ function downloadFile(file_url , targetPath){
     });
 }
 
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 function showProgress(progressBar,received,total){
     var percentage = (received * 100) / total;
     progressBar.value = percentage;
-    progressBar.detail = percentage + "% | " + received + " bytes out of " + total + " bytes.";
-
-    //console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
+    progressBar.detail = percentage.toFixed(1); + "% | " + formatBytes(received) + " of " + formatBytes(total);
 }
 
 function runQueue(){
@@ -165,9 +175,12 @@ app.on('open-url', function(event, schemeData){
         handlePogoUrl(event, schemeData);
     }
     else{
-        app.whenReady(function(){
+        app.whenReady().then(()=>{
+            if (mainWindow === null) {
+                createWindow();
+            }
             handlePogoUrl(event, schemeData);
-        })
+        });
     }
 });
 
@@ -181,8 +194,7 @@ function handlePogoUrl(event, schemeData){
     const remoteFileURL = schemeData.substr(10);
     const remoteFileName = remoteFileURL.split('/').pop();
 
-    //const tmppath = remoteFilesTempDir+remoteFileURL.split('.').pop();
-    const tmppath = pathHelper.getTempDir() + remoteFileName;
+    const tmppath = pathHelper.getRoot() + remoteFileName;
 
     const dialog = electron.dialog;
     dialog.showMessageBox(mainWindow, {
