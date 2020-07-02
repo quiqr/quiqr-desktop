@@ -11,6 +11,7 @@ const fs = require('fs-extra');
 const fssimple = require('fs');
 const pathHelper = require('./path-helper');
 const fileDirUtils = require('./file-dir-utils');
+const ProgressBar = require('electron-progressbar');
 
 unhandled();
 
@@ -57,6 +58,30 @@ function downloadFile(file_url , targetPath){
         uri: file_url
     });
 
+    var progressBar = new ProgressBar({
+        indeterminate: false,
+        text: 'Downloading '+file_url+' ..',
+        abortOnError: true,
+        detail: 'Preparing upload..',
+        browserWindow: {
+            frame: false,
+            parent: mainWindow,
+            webPreferences: {
+                nodeIntegration: true
+            }
+        }
+    });
+
+    progressBar.on('completed', function() {
+        progressBar.detail = 'The file has been downloaded.';
+    })
+        .on('aborted', function(value) {
+            console.info(`aborted... ${value}`);
+        })
+        .on('progress', function(value) {
+        });
+
+
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
 
@@ -69,17 +94,21 @@ function downloadFile(file_url , targetPath){
         // Update the received bytes
         received_bytes += chunk.length;
 
-        showProgress(received_bytes, total_bytes);
+        showProgress(ProgressBar,received_bytes, total_bytes);
     });
 
     req.on('end', function() {
+        progressBar.setCompleted();
         importPogoFile(targetPath);
     });
 }
 
-function showProgress(received,total){
+function showProgress(ProgressBar,received,total){
     var percentage = (received * 100) / total;
-    console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
+    progressBar.value = percentage;
+    progressBar.detail = percentage + "% | " + received + " bytes out of " + total + " bytes.";
+
+    //console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
 }
 
 function runQueue(){
@@ -142,6 +171,9 @@ app.on('open-url', function(event, schemeData){
 });
 
 function handlePogoUrl(event, schemeData){
+    if (mainWindow === null) {
+        createWindow();
+    }
 
     cleanTempDir();
 
@@ -161,6 +193,11 @@ function handlePogoUrl(event, schemeData){
 }
 
 function importPogoFile(path){
+
+    if (mainWindow === null) {
+        createWindow();
+    }
+
     if(path.split('.').pop()=='pogosite'){
         pogozipper.importSite(path)
     }
@@ -179,15 +216,14 @@ function importPogoFile(path){
 app.on('open-file', (event, path) => {
     event.preventDefault();
 
-    if (mainWindow === null) {
-        createWindow();
-    }
-
     if(app.isReady()){
         importPogoFile(path);
     }
     else{
         app.whenReady(function(){
+            if (mainWindow === null) {
+                createWindow();
+            }
             importPogoFile(path);
         })
     }
