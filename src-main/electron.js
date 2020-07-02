@@ -50,11 +50,10 @@ function createWindow () {
 
 function downloadFile(file_url , targetPath){
 
-    /*
     var progressBar = new ProgressBar({
         indeterminate: false,
-        text: 'To: '+targetPath+' ..',
-        //text: 'Downloading '+file_url+' ..',
+        //text: 'To: '+targetPath+' ..',
+        text: 'Downloading '+file_url+' ..',
         abortOnError: true,
         detail: 'Preparing upload..',
         browserWindow: {
@@ -66,15 +65,10 @@ function downloadFile(file_url , targetPath){
         }
     });
 
-    progressBar.on('completed', function() {
-        progressBar.detail = 'The file has been downloaded.';
-    })
-        .on('aborted', function(value) {
-            console.info(`aborted... ${value}`);
-        })
-        .on('progress', function(value) {
-        });
-        */
+    //progressBar.on('completed', function() {
+    //    progressBar.detail = 'The file has been downloaded.';
+    //})
+
     var received_bytes = 0;
     var total_bytes = 0;
 
@@ -99,7 +93,9 @@ function downloadFile(file_url , targetPath){
     });
 
     req.on('end', function() {
-        //progressBar.setCompleted();
+        out.end();
+        progressBar.setCompleted();
+        progressBar = null;
         importPogoFile(targetPath);
     });
 }
