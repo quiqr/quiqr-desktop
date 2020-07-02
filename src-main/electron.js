@@ -37,7 +37,7 @@ global.currentServerProccess = undefined;
 let mainWindow;
 let previewWindow;
 let logWindow;
-let importProgrBar;
+//let importProgrBar;
 
 function createWindow () {
     mainWindow = mainWindowManager.getCurrentInstanceOrNew();
@@ -51,20 +51,21 @@ function createWindow () {
 
 function downloadFile(file_url , targetPath){
 
-    importProgrBar = new ProgressBar({
+    let progressBar = new ProgressBar({
         indeterminate: false,
-        abortOnError: true,
+        //abortOnError: true,
         text: 'Downloading '+file_url+' ..',
         detail: 'Preparing upload..',
         browserWindow: {
-            frame: true,
+            frame: false,
             parent: mainWindow,
             webPreferences: {
                 nodeIntegration: true
             }
         }
     });
-    importProgrBar.on('completed', function() {
+    /*
+    progressBar.on('completed', function() {
             console.info("completed");
     })
         .on('aborted', function(value) {
@@ -73,6 +74,7 @@ function downloadFile(file_url , targetPath){
         .on('progress', function(value) {
             console.info("progress");
         });
+        */
 
     var received_bytes = 0;
     var total_bytes = 0;
@@ -91,19 +93,15 @@ function downloadFile(file_url , targetPath){
 
     req.on('data', function(chunk) {
         received_bytes += chunk.length;
-        showProgress(received_bytes, total_bytes);
+        showProgress(progressBar,received_bytes, total_bytes);
     });
 
     out.on('finish', () =>{
+        progressBar.setCompleted();
+        progressBar._window.hide();
         importPogoFile(targetPath);
-        return true;
     });
 
-    /*
-    req.on('end', async function() {
-        importProgrBar.close();
-    });
-    */
 }
 
 function formatBytes(bytes, decimals = 1) {
@@ -118,17 +116,10 @@ function formatBytes(bytes, decimals = 1) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-function showProgress(received,total){
+function showProgress(progressBar,received,total){
     var percentage = (received * 100) / total;
-
-    if(percentage > 90){
-        importProgrBar.setCompleted();
-        return;
-    }
-    else {
-        importProgrBar.value = percentage;
-        importProgrBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
-    }
+    progressBar.value = percentage;
+    progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
 }
 
 // This method will be called when Electron has finished
