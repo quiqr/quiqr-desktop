@@ -78,7 +78,7 @@ function downloadFile(file_url , targetPath){
 
     out.on('finish', async function(){
         await progressBar.setCompleted();
-        await progressBar.close();
+        //await progressBar.close();
         importPogoFile(targetPath);
     });
 
@@ -91,7 +91,10 @@ function downloadFile(file_url , targetPath){
         // Update the received bytes
         received_bytes += chunk.length;
 
-        showProgress(progressBar,received_bytes, total_bytes);
+        if(!progressBar.isCompleted()){
+            showProgress(progressBar,received_bytes, total_bytes);
+        }
+
     });
 
     req.on('end', async function() {

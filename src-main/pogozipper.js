@@ -8,7 +8,7 @@ const mainWindowManager = require('./main-window-manager');
 
 //const rimraf = require("rimraf");
 
-const ProgressBar = require('electron-progressbar');
+//const ProgressBar = require('electron-progressbar');
 
 const pathHelper = require('./path-helper');
 const fileDirUtils = require('./file-dir-utils');
