@@ -99,7 +99,7 @@ function downloadFile(file_url , targetPath){
     req.on('data', function(chunk) {
         received_bytes += chunk.length;
 
-        showProgress(received_bytes, total_bytes);
+        //showProgress(received_bytes, total_bytes);
 
     });
 
