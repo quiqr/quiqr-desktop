@@ -167,7 +167,6 @@ class HugoDownloader{
 
             progressBar.value += 1;
 
-
             outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);
             progressBar.value += 1;
             progressBar.detail = `Hugo installation started. Downloading...`

@@ -37,7 +37,6 @@ global.currentServerProccess = undefined;
 let mainWindow;
 let previewWindow;
 let logWindow;
-//let importProgrBar;
 
 function createWindow () {
     mainWindow = mainWindowManager.getCurrentInstanceOrNew();
@@ -148,7 +147,7 @@ app.on('activate', function () {
 
 async function cleanTempDir(){
     await fs.ensureDir(pathHelper.getTempDir());
-    //await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
+    await fileDirUtils.fileRegexRemove(pathHelper.getTempDir(), /.*\.pogo*/);
 }
 
 
@@ -159,41 +158,25 @@ app.on('open-url', function(event, schemeData){
     }
     else{
         app.whenReady().then(()=>{
-            /*
-            if (mainWindow === null) {
-                createWindow();
-            }
-            */
             handlePogoUrl(event, schemeData);
         });
     }
 });
 
 function handlePogoUrl(event, schemeData){
-    /*
-    if (mainWindow === null) {
-        createWindow();
-    }
-    */
 
     cleanTempDir();
 
     const remoteFileURL = schemeData.substr(10);
     const remoteFileName = remoteFileURL.split('/').pop();
 
-    const tmppath = pathHelper.getRoot() + remoteFileName;
+    const tmppath = pathHelper.getTempDir() + remoteFileName;
 
 
     downloadFile(remoteFileURL, tmppath);
 }
 
 function importPogoFile(path){
-
-    /*
-        if (mainWindow === null) {
-        createWindow();
-    }
-    */
 
     if(path.split('.').pop()=='pogosite'){
         pogozipper.importSite(path)
