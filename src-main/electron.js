@@ -102,12 +102,12 @@ function downloadFile(file_url , targetPath){
         showProgress(received_bytes, total_bytes);
     });
 
-    out.on('finish', async function(){
+    out.on('finish', () =>{
         //importProgrBar.close();
         //importProgrBar = null;
         importProgrBar.close();
-        //importPogoFile(targetPath);
-
+        importPogoFile(targetPath);
+        resolve(true);
     });
 
     /*
