@@ -76,6 +76,10 @@ function downloadFile(file_url , targetPath){
     var out = fssimple.createWriteStream(targetPath);
     req.pipe(out);
 
+    out.on('finish', async function(){
+        importPogoFile(targetPath);
+    });
+
     req.on('response', function ( data ) {
         // Change the total bytes value to get progress later.
         total_bytes = parseInt(data.headers['content-length' ]);
@@ -89,10 +93,8 @@ function downloadFile(file_url , targetPath){
     });
 
     req.on('close', async function() {
-        //await out.end();
         await progressBar.setCompleted();
         await progressBar.close();
-        importPogoFile(targetPath);
     });
 }
 
