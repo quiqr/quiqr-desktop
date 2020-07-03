@@ -23,8 +23,11 @@ import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
+import MarkdownIt from 'markdown-it'
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
+
+const md = new MarkdownIt({html:true});
 
 //$FlowFixMe
 //const Fragment = React.Fragment;
@@ -56,6 +59,12 @@ const styles = {
     siteInactiveStyle: {
         borderBottom: 'solid 1px transparent',
         borderTop: 'solid 1px transparent'
+    },
+    creatorMessage: {
+        borderBottom: 'solid 1px transparent',
+        borderTop: 'solid 1px #ccc',
+        padding: '0 20px ',
+        fontSize: '80%'
     }
 }
 
@@ -86,7 +95,8 @@ class Home extends React.Component<HomeProps, HomeState>{
             blockingOperation: null,
             currentSiteKey: null,
             createSiteDialog: false,
-            publishSiteDialog: undefined
+            publishSiteDialog: undefined,
+            siteCreatorMessage: null
         };
     }
 
@@ -105,6 +115,8 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     componentDidMount(){
         this.checkSiteInProps();
+
+
         this._ismounted = true;
     }
 
@@ -124,6 +136,12 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(siteKey && workspaceKey){
             this.setState({currentSiteKey: siteKey});
             this.setState({currentWorkspaceKey: workspaceKey});
+
+            service.getSiteCreatorMessage(siteKey, workspaceKey).then((message)=>{
+                let siteCreatorMessage = md.render(message);
+                this.setState({siteCreatorMessage:siteCreatorMessage});
+            });
+
 
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 var stateUpdate  = {};
@@ -168,10 +186,19 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
-        return (<Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
-            <InfoLine label="Name">{site.name}</InfoLine>
-            { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
-        </Wrapper>);
+        return (
+            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
+
+                <InfoLine label="Name">{site.name}</InfoLine>
+
+                { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
+
+                <div className="markdown"
+                style={ styles.creatorMessage }
+                dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}}></div>
+
+            </Wrapper>
+        );
     }
 
     handleSelectWorkspaceClick = (e, siteKey, workspace)=> {

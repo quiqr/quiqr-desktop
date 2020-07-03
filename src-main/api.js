@@ -122,7 +122,10 @@ api.unselectSite = async function(){
 }
 
 api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
-    context.resolve("# joehoeho "+ siteKey+" "+workspaceKey);
+    let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
+    siteService.getCreatorMessage().then(function(message){
+        context.resolve(message);
+    });
 }
 
 

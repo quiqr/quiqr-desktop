@@ -11,9 +11,6 @@ import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import { InfoLine } from './shared';
 import type { WorkspaceConfig } from './../../../types';
-import service from './../../../services/service';
-import MarkdownIt from 'markdown-it'
-const md = new MarkdownIt({html:true});
 
 type WorkspaceProps = {
     site: SiteConfig,
@@ -62,13 +59,6 @@ export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceSta
 
     componentDidMount = ()=>{
         this.load();
-
-        service.getSiteCreatorMessage({siteKey: this.props.siteKey, workspaceKey: this.props.workspaceKey}).then((message)=>{
-            let siteCreatorMessage = md.render(message);
-            this.setState({siteCreatorMessage:siteCreatorMessage});
-        });
-
-        //let val = this.props ? this.props.context.value : '';
     }
 
     load = ()=>{
@@ -100,10 +90,6 @@ export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceSta
                         &nbsp;
                         <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={this.handlePublishClick} />
                     </InfoLine>
-                    <hr/>
-                    <div className="markdown"
-                    style={{ padding:0 }}
-                    dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}}></div>
 
                 </div>);
     }
