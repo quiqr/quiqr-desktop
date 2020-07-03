@@ -14,6 +14,7 @@ const {dirname} = require('path');
 const {shell} = require('electron');
 const mainWindowManager = require('./main-window-manager');
 const menuManager = require('./menu-manager');
+const PoppyGoAppConfig = require('./poppygo-app-config');
 
 /*::
 type APIContext = {
@@ -26,6 +27,7 @@ type CallbackTyped<T> = (error: any, data: T)=>void
 */
 
 let api/*: { [key: string]: ( payload: any, context: APIContext ) => (void|Promise<void>) }*/ = {};
+let pogoconf = PoppyGoAppConfig();
 
 function bindResponseToContext(promise/*: Promise<any>*/, context/*: any*/){
     promise.then((result)=>{
@@ -110,18 +112,35 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
 
 api.unselectSite = async function(){
     global.currentSiteKey = null;
+    global.currentWorkspaceKey = null;
     global.currentSitePath = null;
+
+    pogoconf.setLastOpenedSite(null, null, null);
+    pogoconf.saveState();
+
     menuManager.updateMenu(null);
 }
 
+api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
+    let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
+    siteService.getCreatorMessage().then(function(message){
+        context.resolve(message);
+    });
+}
 
-api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
+
+api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
     let configuration /*: any */;
     try{
         configuration = await workspaceService.getConfigurationsData();
         global.currentSiteKey = siteKey;
+        global.currentWorkspaceKey = workspaceKey;
         global.currentSitePath = configuration.path;
+
+        pogoconf.setLastOpenedSite(siteKey, workspaceKey, currentSitePath);
+        pogoconf.saveState();
+
     }
     catch(e){
         context.resolve({error: `Could not load workspace configuration (website: ${siteKey}, workspace: ${workspaceKey}). ${e.message}`});
@@ -139,8 +158,6 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}/*: any*/, conte
 
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
-
-    //console.log(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`);
     bindResponseToContext(
         siteService.mountWorkspace(workspaceKey),
         context

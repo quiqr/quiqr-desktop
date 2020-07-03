@@ -14,6 +14,8 @@ import type { WorkspaceConfig } from './../../../types';
 
 type WorkspaceProps = {
     site: SiteConfig,
+    siteKey:siteKey,
+    workspaceKey: workspaceKey,
     header: WorkspaceHeader,
     active: bool,
     onLocationClick: (location: string)=>void,
@@ -33,7 +35,12 @@ export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceSta
 
     constructor(props: WorkspaceProps){
         super(props);
-        this.state = { config: null, error: null, refreshing: false };
+        this.state = {
+            config: null,
+            error: null,
+            siteCreatorMessage: null,
+            refreshing: false
+        };
     }
 
     handleOnStartServerOptionClick = (index: number)=>{
@@ -73,16 +80,18 @@ export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceSta
         let publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
         let startServerDisabled = config===null||config.serve===null||config.serve.length===0;
 
-        return (<div style={{opacity: this.state.refreshing?.5:1}}>
-            { error != null && (<InfoLine label="Validation Error">
-                <p style={{color:'#EC407A'}}>{error}</p>
-                <FlatButton primary={true} label="Refresh" onClick={this.handleRefreshClick} />
-            </InfoLine>) }
-            <InfoLine childrenWrapperStyle={{marginTop:'8px'}} label="Actions">
-                &nbsp;
-                <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={this.handlePublishClick} />
-            </InfoLine>
-        </div>);
+        return (
+            <div style={{opacity: this.state.refreshing?.5:1}}>
+                { error != null && (<InfoLine label="Validation Error">
+                    <p style={{color:'#EC407A'}}>{error}</p>
+                    <FlatButton primary={true} label="Refresh" onClick={this.handleRefreshClick} />
+                    </InfoLine>) }
+                    <InfoLine childrenWrapperStyle={{marginTop:'8px'}} label="Actions">
+                        &nbsp;
+                        <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={this.handlePublishClick} />
+                    </InfoLine>
+
+                </div>);
     }
 
 }
@@ -113,6 +122,8 @@ export function WorkspacesSimple(
                     <WorkspaceSimple
                     key={'key'+1}
                     site={site}
+                    workspaceKey={activeWorkspaceKey}
+                    siteKey={activeSiteKey}
                     active={active}
                     header={workspace}
                     onLocationClick={onLocationClick}

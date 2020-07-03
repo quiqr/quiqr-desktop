@@ -82,6 +82,8 @@ export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceSta
                 &nbsp;
                 <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={this.handlePublishClick} />
             </InfoLine>
+
+            <div>Hier komt de developer boodschap</div>
         </div>);
     }
 

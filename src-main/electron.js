@@ -11,6 +11,7 @@ const fs = require('fs-extra');
 const fssimple = require('fs');
 const pathHelper = require('./path-helper');
 const fileDirUtils = require('./file-dir-utils');
+const PoppyGoAppConfig = require('./poppygo-app-config');
 const ProgressBar = require('electron-progressbar');
 
 unhandled();
@@ -24,13 +25,14 @@ if(app.isPackaged) {
 }
 
 //console.log(process.argv);
-
-global.currentSiteKey = undefined;
-global.currentSitePath = undefined;
-
+let pogoconf = PoppyGoAppConfig();
+global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
+global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
+global.currentWorkspaceKey = pogoconf.lastOpenedSite.workspaceKey;
 
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -43,9 +45,9 @@ function createWindow () {
     mainWindow.on('closed', function () {
         mainWindow = null
     })
-    console.log('process args ' + process.argv.join(','))
 
     contextMenu(mainWindow);
+
 }
 
 function downloadFile(file_url , targetPath){
@@ -116,6 +118,9 @@ app.on('ready', function () {
     menuManager.createMainMenu();
     createWindow();
     menuManager.init();
+
+    //console.log('process args ' + process.argv.join(','))
+
 })
 
 app.on('before-quit', function () {

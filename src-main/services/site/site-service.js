@@ -35,6 +35,21 @@ class SiteService{
         //menuManager.updateMenu(global.currentSiteKey);
     }
 
+    async getCreatorMessage(){
+
+        let indexPath = this._config.source.path + "/poppygo/home/index.md"
+        try {
+            if (fs.existsSync(indexPath)) {
+                var data = fs.readFileSync(indexPath);
+                return data.toString();
+            }
+        } catch(err) {
+            console.error('error checking');
+        }
+        return '';
+
+    }
+
     _findFirstMatchOrDefault/*::<T: any>*/(arr/*: Array<T>*/, key/*: string*/)/*: T*/{
         let result;
 
