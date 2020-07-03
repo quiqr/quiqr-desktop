@@ -1,5 +1,8 @@
 # PoppyGo App CHANGELOG
 
+## v0.5.1
+- [site-source]/poppygo/home/index.md is displayed on the site dashboard
+
 ## v0.5.0
 
 - fix progress windows not closing bug
