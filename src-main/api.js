@@ -121,6 +121,14 @@ api.unselectSite = async function(){
     menuManager.updateMenu(null);
 }
 
+api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
+    let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
+    siteService.getCreatorMessage().then(function(message){
+        context.resolve(message);
+    });
+}
+
+
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
     let configuration /*: any */;
