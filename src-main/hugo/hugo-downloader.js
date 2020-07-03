@@ -165,16 +165,16 @@ class HugoDownloader{
                 .on('progress', function(value) {
                 });
 
-            progressBar.value += 1;
+            progressBar.value += 20;
 
             outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);
-            progressBar.value += 1;
+            progressBar.value += 30;
             progressBar.detail = `Hugo installation started. Downloading...`
 
             await this._downloadToFile(url, tempDest);
 
             outputConsole.appendLine(`Unpacking....`);
-            progressBar.value += 1;
+            progressBar.value += 30;
             progressBar.detail = `Unpacking Hugo-component`
             await unpacker.unpack(tempDest, enviromnent);
             await fs.unlink(tempDest);

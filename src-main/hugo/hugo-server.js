@@ -1,5 +1,3 @@
-//@flow
-
 const { spawn } = require('child_process');
 const pathHelper = require('./../path-helper');
 const fs = require('fs-extra');
