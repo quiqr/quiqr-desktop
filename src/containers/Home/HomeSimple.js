@@ -252,6 +252,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                             service.api.openFileExplorer(location)
                         }}
                         onPublishClick={(workspaceHeader, workspace)=>{
+                            service.api.parentCloseMobilePreview();
                             this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
                         }}
                         onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }

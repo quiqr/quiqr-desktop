@@ -171,6 +171,11 @@ api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, cont
     mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
+api.parentCloseMobilePreview = function(context){
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.webContents.send("disableMobilePreview")
+}
+
 api.openMobilePreview = function(context){
     return new Promise((resolve, reject)=>{
         mainWindowManager.openMobilePreview();

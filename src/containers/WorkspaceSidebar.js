@@ -48,11 +48,13 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     componentWillMount(){
         window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
+        window.require('electron').ipcRenderer.on('disableMobilePreview', this.disableMobilePreview.bind(this));
     }
 
     componentWillUnmount(){
         window.require('electron').ipcRenderer.removeListener('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.removeListener('serverDown', this.disablePreview.bind(this));
+        window.require('electron').ipcRenderer.removeListener('disableMobilePreview', this.disableMobilePreview.bind(this));
         this._ismounted = false;
     }
 

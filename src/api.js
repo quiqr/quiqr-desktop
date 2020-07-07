@@ -113,6 +113,9 @@ export class API {
     publishSite(siteKey: string, publishKey: string){
         return mainProcessBridge.request('publishSite', {siteKey, publishKey});
     }
+    parentCloseMobilePreview(){
+        return mainProcessBridge.request('parentCloseMobilePreview', {})
+    }
 
     getCreatorMessage(siteKey: string, workspaceKey: string){
         return mainProcessBridge.request('getCreatorMessage', {siteKey, workspaceKey});
