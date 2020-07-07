@@ -440,9 +440,27 @@ class MenuManager {
                 role: 'help',
                 submenu: [
                     {
-                        label: 'Learn More',
+                        label: 'PoppyGo Introduction',
                         click: async () => {
-                            await shell.openExternal('https://docs.poppygo.app/')
+                            await shell.openExternal('https://poppygo.nl/docs/introduction/')
+                        }
+                    },
+                    {
+                        label: 'Quick start',
+                        click: async () => {
+                            await shell.openExternal('https://poppygo.nl/docs/quickstart/')
+                        }
+                    },
+                    {
+                        label: 'FAQ',
+                        click: async () => {
+                            await shell.openExternal('https://poppygo.nl/docs/faq/')
+                        }
+                    },
+                    {
+                        label: 'Release notes',
+                        click: async () => {
+                            await shell.openExternal('https://poppygo.nl/releases/')
                         }
                     }
                 ]
