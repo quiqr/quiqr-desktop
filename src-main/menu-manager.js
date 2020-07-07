@@ -22,12 +22,14 @@ class MenuManager {
     }
 
     openCookbooks() {
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        mainWindow.webContents.send("disableMobilePreview");
+        //mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         if (mainWindow) {
             mainWindow.webContents.send("redirectCookbook")
         }
     }
     stopServer() {
+        mainWindow.webContents.send("disableMobilePreview");
         if(global.hugoServer){
             global.hugoServer.stopIfRunning(function(err, stdout, stderr){
                 if(err) reject(err);
@@ -45,6 +47,7 @@ class MenuManager {
     }
 
     deleteSite() {
+        mainWindow.webContents.send("disableMobilePreview");
         let dir;
 
         const dialog = electron.dialog;
@@ -145,6 +148,7 @@ class MenuManager {
 
         global.currentSitePath = null;
         global.currentSiteKey = null;
+        mainWindow.webContents.send("disableMobilePreview");
         mainWindow.webContents.send("redirectHome");
         mainWindow.webContents.send("unselectSite");
         this.updateMenu(null);
