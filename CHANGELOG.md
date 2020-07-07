@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.5.2
+- specific help links
+- close mobile preview window in multiple situations where needed
+
 ## v0.5.1
 - [site-source]/poppygo/home/index.md is displayed on the site dashboard
 

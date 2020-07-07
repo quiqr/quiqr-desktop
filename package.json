@@ -6,7 +6,7 @@
     "email": "pim@lingewoud.nl"
   },
   "description": "A Hugo Publishing App.",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",
