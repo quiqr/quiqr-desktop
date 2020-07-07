@@ -252,7 +252,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                             service.api.openFileExplorer(location)
                         }}
                         onPublishClick={(workspaceHeader, workspace)=>{
-                            service.api.parentCloseMobilePreview();
+                            service.api.parentTempHideMobilePreview();
                             this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
                         }}
                         onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }
@@ -283,10 +283,12 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     handlePublishSiteCancelClick = () => {
+        service.api.parentTempUnHideMobilePreview();
         this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
     }
 
     handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
+        service.api.parentTempUnHideMobilePreview();
         this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
         service.api.buildWorkspace(siteKey, workspaceKey, build).then(()=>{
             this.setState({blockingOperation: 'Publishing site...'});
@@ -302,7 +304,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderSelectSites(){
         let { siteKey } = this.props;
-        //let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
 
         let _configurations = ((configurations: any): Configurations);

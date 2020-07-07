@@ -236,7 +236,11 @@ class CollectionListItems extends React.PureComponent<{
                 );
 
                 let rightIconMenu = (
-                    <IconMenu iconButtonElement={iconButtonElement}>
+                    <IconMenu iconButtonElement={iconButtonElement}
+                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                    targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                >
+
                         <MenuItem onClick={()=> onRenameItemClick(item) }>Rename</MenuItem>
                         <MenuItem onClick={()=> onDeleteItemClick(item) }>Delete</MenuItem>
                         <MenuItem onClick={()=> onMakePageBundleItemClick(item) }>Make Page Bundle</MenuItem>
@@ -277,23 +281,27 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     }
 
     setCreateItemView(){
+        service.api.parentTempHideMobilePreview();
         this.setState({view:{key:'createItem', item: null}, modalBusy:false});
     }
 
     setRenameItemView(item: any){
+        service.api.parentTempHideMobilePreview();
         this.setState({view:{key:'renameItem', item}, modalBusy:false});
     }
 
     setMakePageBundleItemView(item: any){
+        service.api.parentTempHideMobilePreview();
         this.setState({view:{key:'makePageBundleItem', item}, modalBusy:false});
     }
 
-
     setDeleteItemView(item: any){
+        service.api.parentTempHideMobilePreview();
         this.setState({view:{key:'deleteItem', item }, modalBusy:false});
     }
 
     setRootView(){
+        service.api.parentTempUnHideMobilePreview();
         this.setState({view:undefined, modalBusy:false});
     }
 
@@ -343,6 +351,8 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
             },()=>{
                 this.setState({modalBusy:false, view: undefined});
             });
+
+        service.api.parentTempUnHideMobilePreview();
     }
 
 
@@ -359,6 +369,8 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
             },()=>{
                 this.setState({modalBusy:false, view: undefined});
             });
+
+        service.api.parentTempUnHideMobilePreview();
     }
 
     renameCollectionItem(itemKey : string, itemOldKey: string){
@@ -381,6 +393,8 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                 //TODO: warn someone!
                 this.setState({modalBusy:false, view: undefined});
             });
+
+        service.api.parentTempUnHideMobilePreview();
     }
 
     createCollectionItemKey(itemKey : string){
@@ -401,6 +415,8 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
             }).then(()=>{
                 this.setRootView();
             });
+
+        service.api.parentTempUnHideMobilePreview();
     }
 
     resolveFilteredItems = (items: Array<any>) => {

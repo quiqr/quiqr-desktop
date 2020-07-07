@@ -49,12 +49,15 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
         window.require('electron').ipcRenderer.on('disableMobilePreview', this.disableMobilePreview.bind(this));
+        window.require('electron').ipcRenderer.on('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
+        window.require('electron').ipcRenderer.on('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
     }
 
     componentWillUnmount(){
         window.require('electron').ipcRenderer.removeListener('serverLive', this.activatePreview.bind(this));
         window.require('electron').ipcRenderer.removeListener('serverDown', this.disablePreview.bind(this));
-        window.require('electron').ipcRenderer.removeListener('disableMobilePreview', this.disableMobilePreview.bind(this));
+        window.require('electron').ipcRenderer.removeListener('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
+        window.require('electron').ipcRenderer.removeListener('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
         this._ismounted = false;
     }
 
@@ -65,7 +68,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         } else{
             this.activateMobilePreview();
         }
-
     }
 
     activateMobilePreview(){
@@ -73,7 +75,23 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         if(this._ismounted){
             this.setState({mobilePreviewActive: true});
         }
-        console.log('mobilepre on');
+    }
+
+    tempHideMobilePreview(){
+        if(this._ismounted){
+            if(this.state.mobilePreviewActive){
+                service.api.closeMobilePreview();
+                this.setState({mobilePreviewTempHidden: true});
+            }
+        }
+    }
+    tempUnHideMobilePreview(){
+        if(this._ismounted){
+            if(this.state.mobilePreviewActive){
+                service.api.openMobilePreview();
+                this.setState({mobilePreviewTempHidden: false});
+            }
+        }
     }
 
     disableMobilePreview(){
@@ -81,21 +99,18 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         if(this._ismounted){
             this.setState({mobilePreviewActive: false});
         }
-        console.log('mobilepre off');
     }
 
     activatePreview(){
         if(this._ismounted){
             this.setState({hugoRunning: true});
         }
-        console.log('serverLive');
     }
 
     disablePreview(){
         if(this._ismounted){
             this.setState({hugoRunning: false});
         }
-        console.log('serverDown');
     }
 
     render(){

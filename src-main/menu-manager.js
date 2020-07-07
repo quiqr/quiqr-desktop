@@ -23,7 +23,6 @@ class MenuManager {
 
     openCookbooks() {
         mainWindow.webContents.send("disableMobilePreview");
-        //mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         if (mainWindow) {
             mainWindow.webContents.send("redirectCookbook")
         }

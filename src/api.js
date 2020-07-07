@@ -116,6 +116,12 @@ export class API {
     parentCloseMobilePreview(){
         return mainProcessBridge.request('parentCloseMobilePreview', {})
     }
+    parentTempHideMobilePreview(){
+        return mainProcessBridge.request('parentTempHideMobilePreview', {})
+    }
+    parentTempUnHideMobilePreview(){
+        return mainProcessBridge.request('parentTempUnHideMobilePreview', {})
+    }
 
     getCreatorMessage(siteKey: string, workspaceKey: string){
         return mainProcessBridge.request('getCreatorMessage', {siteKey, workspaceKey});

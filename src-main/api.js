@@ -176,6 +176,16 @@ api.parentCloseMobilePreview = function(context){
     mainWindow.webContents.send("disableMobilePreview")
 }
 
+api.parentTempHideMobilePreview = function(context){
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.webContents.send("tempHideMobilePreview")
+}
+
+api.parentTempUnHideMobilePreview = function(context){
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.webContents.send("tempUnHideMobilePreview")
+}
+
 api.openMobilePreview = function(context){
     return new Promise((resolve, reject)=>{
         mainWindowManager.openMobilePreview();

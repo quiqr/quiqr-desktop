@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.5.3
+- soft close mobile preview window in multiple situations where needed
+- reopen mobile preview when softclosed
+
 ## v0.5.2
 - specific help links
 - close mobile preview window in multiple situations where needed
