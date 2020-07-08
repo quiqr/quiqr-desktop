@@ -203,6 +203,17 @@ function createWindow () {
         }, 200);
     })
 
+    mainWindow.on('enter-html-full-screen', () => {
+        mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+    })
+
+    mainWindow.on('leave-html-full-screen', () => {
+        setTimeout(function(){
+            setMobilePreviewBounds();
+        }, 200);
+    })
+
+
     mainWindow.on('closed', function () {
         mainWindow = undefined; //clear reference
     })
