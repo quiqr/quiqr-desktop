@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.5.4
+- hide previewwindow when video's are played full screen
+- position previewwindow correctly when app is fullscreen
+
 ## v0.5.3
 - soft close mobile preview window in multiple situations where needed
 - reopen mobile preview when softclosed
