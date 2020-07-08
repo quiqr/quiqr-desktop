@@ -204,7 +204,10 @@ function createWindow () {
     })
 
     mainWindow.on('enter-html-full-screen', () => {
-        mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        console.log('videofull');
+        setTimeout(function(){
+            mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        }, 200);
     })
 
     mainWindow.on('leave-html-full-screen', () => {
