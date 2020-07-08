@@ -185,9 +185,19 @@ function createWindow () {
 
     getLocation();
 
-
     mainWindow.on('resize', () => {
         //Linux hack, Win and Mac should use will-resize with newBound
+        setTimeout(function(){
+            setMobilePreviewBounds(mainWindowState);
+        }, 200);
+    })
+
+    mainWindow.on('enter-full-screen', () => {
+        setTimeout(function(){
+            setMobilePreviewBounds(mainWindowState);
+        }, 200);
+    })
+    mainWindow.on('leave-full-screen', () => {
         setTimeout(function(){
             setMobilePreviewBounds(mainWindowState);
         }, 200);
