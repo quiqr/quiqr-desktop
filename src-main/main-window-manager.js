@@ -185,13 +185,37 @@ function createWindow () {
 
     getLocation();
 
-
     mainWindow.on('resize', () => {
         //Linux hack, Win and Mac should use will-resize with newBound
         setTimeout(function(){
-            setMobilePreviewBounds(mainWindowState);
+            setMobilePreviewBounds();
         }, 200);
     })
+
+    mainWindow.on('enter-full-screen', () => {
+        setTimeout(function(){
+            setMobilePreviewBounds();
+        }, 200);
+    })
+    mainWindow.on('leave-full-screen', () => {
+        setTimeout(function(){
+            setMobilePreviewBounds();
+        }, 200);
+    })
+
+    mainWindow.on('enter-html-full-screen', () => {
+        console.log('videofull');
+        setTimeout(function(){
+            mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        }, 200);
+    })
+
+    mainWindow.on('leave-html-full-screen', () => {
+        setTimeout(function(){
+            setMobilePreviewBounds();
+        }, 200);
+    })
+
 
     mainWindow.on('closed', function () {
         mainWindow = undefined; //clear reference
@@ -209,15 +233,17 @@ function createWindow () {
 
 }
 
-async function setMobilePreviewBounds(newBounds){
+async function setMobilePreviewBounds(){
     let mobwidth = 340;
+
+    let view = mainWindow.getBounds();
 
     if(mobilePreviewViewActive){
         mobilePreviewView.setBounds({
-            x: (newBounds.width-mobwidth),
+            x: (view.width-mobwidth),
             y: 0,
             width: mobwidth,
-            height: newBounds.height
+            height: view.height
         });
     }
 
@@ -236,7 +262,7 @@ module.exports = {
 
 
         mainWindow.webContents.send("setMobileBrowserOpen");
-        setMobilePreviewBounds(mainWindowState);
+        setMobilePreviewBounds();
     },
 
     closeMobilePreview: function(){
