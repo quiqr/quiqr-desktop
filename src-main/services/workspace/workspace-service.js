@@ -1,6 +1,9 @@
 // @flow
 
 const fs = require('fs-extra');
+const fssimple = require('fs');
+const fm = require('front-matter')
+
 const path = require('path');
 const glob = require('glob');
 const { nativeImage } = require('electron');
@@ -219,11 +222,27 @@ class WorkspaceService{
             //let globExpression = path.join(folder, `**/index.{${supportedContentExt.join(',')}}`);
             let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
             let files = await globJob(globExpression, {});
-            return files.map(function(item){
+            let retFiles = files.map(function(item){
+
                 let key = item.replace(folder,'').replace(/^\//,'');
                 let label = key.replace(/^\/?(.+)\/[^\/]+$/,'$1');
-                return {key, label};
+
+                let sortval = null;
+                if ('sortkey' in collection){
+                    let data = fssimple.readFileSync(item, 'utf8')
+                    let content = fm(data)
+                    if (collection['sortkey'] in content['attributes']){
+                        sortval = content['attributes'][collection['sortkey']];
+                    }
+                }
+                else{
+                    sortval = label
+                }
+
+                return {key, label, sortval};
             });
+
+            return retFiles
         }
         else{ //data folder and everything else
             let globExpression = path.join(folder, `**/*.{${formatProviderResolver.allFormatsExt().join(',')}}`);
