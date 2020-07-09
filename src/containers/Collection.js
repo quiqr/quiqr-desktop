@@ -6,7 +6,7 @@ import { Route } from 'react-router-dom';
 import service from './../services/service'
 import Spinner from './../components/Spinner'
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import { Chip, Divider, Dialog, FlatButton, IconButton, IconMenu, List, ListItem, MenuItem, Paper, RaisedButton, TextField } from 'material-ui';
+import { Toggle, Chip, Divider, Dialog, FlatButton, IconButton, IconMenu, List, ListItem, MenuItem, Paper, RaisedButton, TextField } from 'material-ui';
 import { Debounce } from './../utils/debounce';
 
 const Fragment = React.Fragment;
@@ -225,7 +225,23 @@ class CollectionListItems extends React.PureComponent<{
     onMakePageBundleItemClick: (item: any)=>void,
 }> {
     render(){
-        let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick, onMakePageBundleItemClick } = this.props;
+        let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
+
+        filteredItems.sort(function(a, b){
+            let keyA = a.sortval;
+            let keyB = b.sortval;
+
+            if(sortDescending){
+                if (keyA < keyB) return 1;
+                if (keyA > keyB) return -1;
+            }
+            else{
+                if (keyA < keyB) return -1;
+                if (keyA > keyB) return 1;
+            }
+            return 0;
+        });
+
         return (<React.Fragment>
             { filteredItems.map((item, index) => {
 
@@ -247,10 +263,15 @@ class CollectionListItems extends React.PureComponent<{
                     </IconMenu>
                 );
 
+                let text = item.label||item.key;
+                if(this.props.showSortValue){
+                    text = text + " ("+item.sortval+ ")"
+                }
+
                 return (<Fragment key={item.key}>
                     {index!==0?<Divider />:undefined}
                     <ListItem
-                        primaryText={item.label||item.key}
+                        primaryText={text}
                         onClick={ ()=>{ onItemClick(item) }}
                         rightIconButton={rightIconMenu}
                     />
@@ -536,17 +557,49 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                     <RaisedButton label='New Section' onClick={ this.setCreateSectionView.bind(this) } /> */}
                 </div>
                 <br />
+
                 <TextField
                     floatingLabelText="Filter"
                     onChange={this.handleFilterChange}
                     fullWidth={true}
                     value={this.state.filter}
                     hintText="Item name" />
+
                 <div style={{display: 'flex', flexWrap: 'wrap', padding: '10px 0'}}>
                     { this.state.dirs.map((dir)=>{
                         return (<Chip key={dir} style={{marginRight:'5px'}} onClick={this.handleDirClick} data-dir={dir}>/{dir}</Chip>);
                     }) }
+                    </div>
+
+                <div style={{backgroundColor: "#eee",display: 'flex',justifyContent: "flex-start", flexWrap: 'no-wrap', padding: '10px 10px'}}>
+
+                <Toggle
+                label="Sort descending"
+                toggled={this.state.sortDescending}
+                onToggle={function(e,value){
+                    if(this.state.sortDescending){
+                        this.setState({sortDescending: false});
+                    }
+                    else{
+                        this.setState({sortDescending: true});
+                    }
+                }.bind(this)}
+                labelPosition='right' />
+
+                <Toggle
+                label="Show sorting value"
+                toggled={this.state.showSortValue}
+                onToggle={function(e,value){
+                    if(this.state.showSortValue){
+                        this.setState({showSortValue: false});
+                    }
+                    else{
+                        this.setState({showSortValue: true});
+                    }
+                }.bind(this)}
+                labelPosition='right' />
                 </div>
+
                 <Paper>
                     <List>
                         <CollectionListItems
@@ -555,6 +608,8 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                             onRenameItemClick={this.handleRenameItemClick}
                             onDeleteItemClick={this.handleDeleteItemClick}
                             onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
+                            sortDescending={this.state.sortDescending}
+                            showSortValue={this.state.showSortValue}
                         />
                         { trunked ? (
                             <React.Fragment>

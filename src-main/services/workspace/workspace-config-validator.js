@@ -93,7 +93,8 @@ class WorkspaceConfigValidator {
                 itemtitle: joi.string().trim().min(3).max(30).error(new Error('The itemtitle value is invalid.')),
                 extension: joi.string().regex(validationUtils.allFormatsReg).required().error(new Error('The extension value is invalid.')),
                 dataformat: joi.string().trim().error(new Error('The dataformat value is invalid.')), //is not required here
-                fields: joi.array().min(1).required().error(new Error('The fields value is invalid.'))
+                fields: joi.array().min(1).required().error(new Error('The fields value is invalid.')),
+                sortkey: joi.string().trim().alphanum().min(3).max(30).error(new Error('The sortkey value is invalid.')),
             })
         ).error;
 

@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.5.5
+- new confkey for collections: sortkey
+- interface in collection listing to sort values
+
 ## v0.5.4
 - hide previewwindow when video's are played full screen
 - position previewwindow correctly when app is fullscreen
