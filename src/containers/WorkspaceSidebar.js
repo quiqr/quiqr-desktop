@@ -6,6 +6,8 @@ import {List, ListItem } from 'material-ui/List';
 import { FlatButton, Subheader, Toggle } from 'material-ui';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
 import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
+import IconHome from 'material-ui/svg-icons/action/home';
+import IconPhone from 'material-ui/svg-icons/hardware/smartphone';
 //import IconActionList from 'material-ui/svg-icons/action/list';
 //import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 //import IconMenu from 'material-ui/svg-icons/navigation/menu';
@@ -112,6 +114,68 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
             this.setState({hugoRunning: false});
         }
     }
+    renderSiteMounted(){
+
+        let {
+            onClick,
+            siteConfig,
+            workspaceConfig,
+        } = this.props;
+
+
+        let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
+
+        return (
+                <div style={{paddingLeft:'0px'}}>
+
+                    <List style={{padding: 0}}>
+                        <ListItem primaryText={siteConfig.name} onClick={onClick} leftIcon={<IconHome color="white" style={{}} />} />
+                    </List>
+                    <hr/>
+                    <List style={{padding: 0}}>
+                     <ListItem leftIcon={<IconPhone color="white"  />}>
+                        <Toggle
+                        label="Mobile preview"
+                        toggled={this.state.mobilePreviewActive}
+                        onToggle={function(e,value){
+                            this.toggleMobilePreview();
+                        }.bind(this)}
+                        labelPosition='left' />
+                      </ListItem>
+                      <ListItem primaryText="Open in Browser" onClick={
+    function(){
+                                if(!this.state.hugoRunning){
+                                    service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace");
+                                }
+                                window.require('electron').shell.openExternal('http://localhost:1313');
+
+                            }.bind(this)
+                        } leftIcon={<IconOpenBrowser color="white" style={{marginRight:0}} />} />
+                    </List>
+                    <hr/>
+
+
+                </div>
+        );
+    }
+    renderSelectSite(){
+
+        let {
+            onClick,
+            siteConfig,
+            workspaceConfig,
+        } = this.props;
+
+        return (
+            <List>
+                <ListItem
+                secondaryText={'select a website'}
+                onClick={onClick}
+                rightIcon={<IconActionSetting color={translucentColor} />}
+            />) }
+                </List>
+            )
+        }
 
     render(){
         let {
@@ -120,100 +184,22 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
             workspaceConfig,
         } = this.props;
 
-        let previewButton;
-        let mobileButton;
-
-        if(this.state.hugoRunning){
-            previewButton = <FlatButton
-            onClick=
-
-            {function(){
-                //service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
-                window.require('electron').shell.openExternal('http://localhost:1313');
-            }
-            }
-
-            style={{flex:1, minWidth:40}}
-            icon={<IconOpenBrowser color="white" style={{opacity:.8}} />} />
-
-                mobileButton = <Toggle
-                label="Mobile preview"
-                toggled={true}
-                onToggle={function(e,value){
-                    this.toggleMobilePreview();
-                }.bind(this)}
-                labelPosition='right' />
-        }
-        else{
-            previewButton = <FlatButton
-            onClick={function(){
-                service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace"/*serveKey*/);
-                window.require('electron').shell.openExternal('http://localhost:1313');
-            }
-            }
-            style={{flex:1, minWidth:40}}
-            icon={<IconOpenBrowser color="white" style={{opacity:.2}} />} />
-
-                mobileButton = <Toggle
-                label="Mobile preview"
-                toggled={true}
-                onToggle={function(e,value){
-                    window.require('electron').shell.openExternal('http://localhost:1313');
-                }}
-                labelPosition='right' />
-
-        }
 
         let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
-        return (<div>
-            <List style={{padding: 0}}>
-                { siteConfig!=null && workspaceConfig!=null ? (<ListItem
-                primaryText={siteConfig.name}
-                //secondaryText={workspaceConfig.key}
-                    onClick={onClick}
-                //rightIcon={<IconActionSetting color={translucentColor} />}
-                    />) : (<ListItem
-                        //primaryText={'Please'}
-                        secondaryText={'select a website'}
-                    onClick={onClick}
-                    rightIcon={<IconActionSetting color={translucentColor} />}
-                />) }
-                    </List>
-
-                    { siteConfig!=null && workspaceConfig!=null ? (
-
-                        <div style={{paddingLeft:'15px'}}>
-                            <div style={{margin:'10px',color:'white'}}>
-                                <Toggle
-                                label="Mobile preview"
-                                toggled={this.state.mobilePreviewActive}
-                                onToggle={function(e,value){
-                                    this.toggleMobilePreview();
-                                }.bind(this)}
-                                labelPosition='right' />
-                            </div>
-                            <div style={{margin:'5px',color:'white'}}>{previewButton} Open in browser</div>
-
-                            </div>) : (null) }
-
-
-                            </div>);
+        if(siteConfig!=null && workspaceConfig!=null){
+            return this.renderSiteMounted();
+        }
+        else{
+            return this.renderSelectSite();
+        }
     }
 }
-
-// type ListItemCustomProps = {
-//   label : string,
-//   pathname: string,
-//   history : any,
-//   location: {pathname:string}
-// };
 
 type WorkspaceSidebarProps = {
     siteKey : ?string,
     workspaceKey : ?string,
     history: any,
-    //menuIsLocked: bool,
     onLockMenuClicked: ()=> void,
     onToggleItemVisibility: ()=> void,
     hideItems : bool
