@@ -31,7 +31,10 @@ class MenuManager {
         mainWindow.webContents.send("disableMobilePreview");
         if(global.hugoServer){
             global.hugoServer.stopIfRunning(function(err, stdout, stderr){
-                if(err) reject(err);
+                if(err){
+                    console.log(err)
+                }
+
                 else{ resolve(); }
             });
         }
@@ -39,8 +42,9 @@ class MenuManager {
     startServer() {
         if(global.hugoServer){
             global.hugoServer.serve(function(err, stdout, stderr){
-                if(err) reject(err);
-                //   else{ resolve(); }
+                if(err){
+                    console.log(err)
+                }
             });
         }
     }
@@ -68,7 +72,6 @@ class MenuManager {
             });
 
             mainWindow.webContents.send("unselectSite");
-            //this.updateMenu(null);
         }
         else{
             dialog.showMessageBox(mainWindow, {
