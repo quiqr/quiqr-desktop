@@ -76,10 +76,7 @@ class HugoServer{
                 exec,
                 hugoArgs,
                 {
-                    cwd: workspacePath,
-                    windowsHide: true,
-                    timeout: undefined,
-                    env: {}
+                    cwd: workspacePath
                 }
             );
             let {stdout, stderr} = global.currentServerProccess;
