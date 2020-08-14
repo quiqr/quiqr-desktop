@@ -172,8 +172,8 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
                 secondaryText={'select a website'}
                 onClick={onClick}
                 rightIcon={<IconActionSetting color={translucentColor} />}
-            />) }
-                </List>
+                />
+            </List>
             )
         }
 
