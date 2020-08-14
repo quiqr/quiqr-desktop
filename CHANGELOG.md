@@ -1,5 +1,10 @@
 # PoppyGo App CHANGELOG
 
+## v0.6.0
+- Official Windows support
+- Fix Windows installer
+- Fix hugo server running on Windows
+
 ## v0.5.5
 - new confkey for collections: sortkey
 - interface in collection listing to sort values
