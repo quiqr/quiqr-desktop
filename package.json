@@ -43,14 +43,14 @@
     "cross-env": "5.1.3",
     "dotenv": "^8.2.0",
     "electron": "5.0.13",
-    "electron-builder": "^22.4.1",
+    "electron-builder": "^22.8.0",
     "electron-notarize": "^0.2.1",
     "flow-bin": "0.75.0",
     "flow-typed": "2.4.0",
     "markdown-it": "8.4.1",
     "material-ui": "0.20.0",
     "mocha": "5.0.2",
-    "node-abi": "2.5.0",
+    "node-abi": "^2.8.0",
     "node-pre-gyp": "0.11.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -108,7 +108,27 @@
       }
     ],
     "win": {
-      "icon": "public/icon"
+      "icon": "public/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsisWeb": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": true,
+      "unicode": true,
+      "installerIcon": "public/icon.ico",
+      "differentialPackage": true,
+      "appPackageUrl": "https://someurl.tld/apps/win/web"
     },
     "mac": {
       "icon": "public/icon",
