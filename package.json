@@ -98,10 +98,10 @@
         ]
       }
     ],
-    "extraFiles": [
+    "extraResources": [
       {
         "from": "resources/${os}",
-        "to": "Resources/bin",
+        "to": "bin",
         "filter": [
           "**/*"
         ]
