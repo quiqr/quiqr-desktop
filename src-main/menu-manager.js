@@ -49,6 +49,16 @@ class MenuManager {
         }
     }
 
+    showVersion(){
+        const dialog = electron.dialog;
+
+        let options  = {
+            buttons: ["Close"],
+            message: "PoppyGo Version " + app.getVersion()
+        }
+        dialog.showMessageBox(options)
+    }
+
     deleteSite() {
         mainWindow.webContents.send("disableMobilePreview");
         let dir;
@@ -441,6 +451,15 @@ class MenuManager {
             {
                 role: 'help',
                 submenu: [
+                    isMac ? { } :
+                    {
+                        label: 'Show PoppyGo version',
+                        click: async () => {
+                            this.showVersion();
+                        }
+                    },
+
+
                     {
                         label: 'PoppyGo Introduction',
                         click: async () => {
