@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.6.1
+- fix embgit.exe location on Windows
+- show version in help menu on Windows
+
 ## v0.6.0
 - Official Windows support
 - Fix Windows installer
