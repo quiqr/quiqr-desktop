@@ -451,15 +451,12 @@ class MenuManager {
             {
                 role: 'help',
                 submenu: [
-                    isMac ? { } :
                     {
                         label: 'Show PoppyGo version',
                         click: async () => {
                             this.showVersion();
                         }
                     },
-
-
                     {
                         label: 'PoppyGo Introduction',
                         click: async () => {
