@@ -37,8 +37,8 @@ end
 desc "release_win"
 task :release_win do
   data = getmeta
-  p "copy dist\\poppygo_win.exe #{BIN_PATHWIN}\\poppygo_win-#{data['version']}.exe"
-  sh "cd #{BIN_PATHWIN} && git add .\\poppygo_win-#{data['version']}.exe"
+  sh "copy dist\\poppygo_win.exe #{BIN_PATHWIN}\\poppygo_win-#{data['version']}.exe"
+  sh "cd #{BIN_PATHWIN} && git add poppygo_win-#{data['version']}.exe"
   sh "cd #{BIN_PATHWIN} && git commit -m \"win release #{ data['version']}\""
   sh "cd #{BIN_PATHWIN} && git push"
 end
