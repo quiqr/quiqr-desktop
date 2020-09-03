@@ -252,14 +252,11 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     refresh = ()=>{
         let {siteKey, workspaceKey } = this.props;
 
-        service.api.logToConsole("currentSiteKey:"+siteKey);
-        service.api.logToConsole("xcurrentWorkspaceKey: "+workspaceKey);
         if(siteKey && workspaceKey){
             let stateUpdate = {};
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 stateUpdate.site = bundle.site;
                 stateUpdate.workspace = bundle.workspaceDetails;
-        service.api.logToConsole("XXXXCURRENTWORKSPACEKEY: "+workspaceKey);
                 if(this._ismounted){
                     this.setState(stateUpdate);
                 }

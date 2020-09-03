@@ -134,7 +134,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey != siteKey){
-                service.api.logToConsole("one time only?");
+                //service.api.logToConsole("one time only?");
                 // Serve the workspace at selection of the workspace right after mounting the workspace
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
             }
@@ -246,7 +246,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
 
-        //        service.api.logToConsole("workspace:"+thiscurrentWorkspaceKey);
         return (
             <Route render={({history})=>{
 
@@ -255,8 +254,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 if(this.state.currentWorkspaceKey==null)
                     return (<Wrapper></Wrapper>);
 
-                //                service.api.logToConsole("currentWorkspaceKey: "+this.state.currentSiteKey);
-                //service.api.logToConsole("currentWorkspaceKey: "+this.state.currentWorkspaceKey);
                 return (
                     <WorkspacesSimple
                         getWorkspaceDetails={this.getWorkspaceDetails}
