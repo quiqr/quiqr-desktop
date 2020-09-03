@@ -157,7 +157,7 @@ class MenuManager {
         }
     }
 
-    createSelectSiteWindow () {
+    async createSelectSiteWindow () {
 
         pogoconf.setLastOpenedSite(null, null, null);
         pogoconf.saveState();
@@ -165,10 +165,13 @@ class MenuManager {
         global.currentSitePath = null;
         global.currentSiteKey = null;
         global.currentWorkspaceKey = null;
+
         mainWindow.webContents.send("disableMobilePreview");
         mainWindow.webContents.send("redirectHome");
         mainWindow.webContents.send("unselectSite");
+
         mainWindow.setTitle("PoppyGo");
+
         this.updateMenu(null);
 
         return;
@@ -457,7 +460,6 @@ class MenuManager {
             {
                 role: 'help',
                 submenu: [
-                    isMac ? { } :
                     {
                         label: 'Show PoppyGo version',
                         click: async () => {

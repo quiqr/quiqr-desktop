@@ -168,15 +168,20 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     selectSite(site : SiteConfig ){
+
+        //this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
         this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
+        this.setState({currentSiteKey: site.key});
+
         //load all site configuration to enforce validation
         service.api.listWorkspaces(site.key).then((workspaces)=>{
 
+            this.setState({selectedSiteWorkspaces: workspaces});
             if(workspaces.length === 1){
-              this.selectWorkspace(site.key, workspaces[0]);
+                this.selectWorkspace(site.key, workspaces[0]);
             }
 
-            this.setState({selectedSiteWorkspaces: workspaces});
+
         });
     }
 
@@ -213,16 +218,19 @@ class Home extends React.Component<HomeProps, HomeState>{
     };
 
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-        let activeWorkspaceKey = this.state.currentWorkspaceKey;
-        let activeSiteKey = this.state.currentSiteKey;
 
-        let select = (
-            activeWorkspaceKey==null ||
-            activeSiteKey==null ||
-            activeWorkspaceKey!==workspace.key ||
-            activeSiteKey!==siteKey
-        );
 
+        //let activeWorkspaceKey = this.state.currentWorkspaceKey;
+        this.setState({currentWorkspaceKey: workspace.key});
+
+        //      let select = (
+            //            activeWorkspaceKey==null ||
+            //            activeWorkspaceKey!==workspace.key
+        //        );
+        let        select = true;
+
+            //    activeSiteKey!==siteKey
+            //            activeSiteKey==null ||
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
             this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
@@ -234,18 +242,21 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             this.history.push(`/`);
         }
-        //console.log(window.location.toString());
     }
 
     renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
+
+        //        service.api.logToConsole("workspace:"+thiscurrentWorkspaceKey);
         return (
             <Route render={({history})=>{
 
                 this.history = history; //ugly
 
-                if(workspaces==null)
+                if(this.state.currentWorkspaceKey==null)
                     return (<Wrapper></Wrapper>);
 
+                //                service.api.logToConsole("currentWorkspaceKey: "+this.state.currentSiteKey);
+                //service.api.logToConsole("currentWorkspaceKey: "+this.state.currentWorkspaceKey);
                 return (
                     <WorkspacesSimple
                         getWorkspaceDetails={this.getWorkspaceDetails}
