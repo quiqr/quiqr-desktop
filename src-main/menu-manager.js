@@ -4,6 +4,7 @@ const mainWindowManager = require('./main-window-manager');
 const prefsWindowManager = require('./prefs-window-manager');
 const logWindowManager = require('./log-window-manager');
 const pogozipper = require('./pogozipper');
+const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const rimraf = require("rimraf");
 const pathHelper = require('./path-helper');
@@ -14,6 +15,7 @@ const app = electron.app
 let mainWindow = null;
 let logWindow = null;
 let menu = null;
+let pogoconf = PoppyGoAppConfig();
 
 class MenuManager {
 
@@ -90,7 +92,6 @@ class MenuManager {
             });
         }
     }
-
     createPrefsWindow () {
         prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
         if (prefsWindow) {
@@ -156,13 +157,21 @@ class MenuManager {
         }
     }
 
-    createSelectSiteWindow () {
+    async createSelectSiteWindow () {
+
+        pogoconf.setLastOpenedSite(null, null, null);
+        pogoconf.saveState();
 
         global.currentSitePath = null;
         global.currentSiteKey = null;
+        global.currentWorkspaceKey = null;
+
         mainWindow.webContents.send("disableMobilePreview");
         mainWindow.webContents.send("redirectHome");
         mainWindow.webContents.send("unselectSite");
+
+        mainWindow.setTitle("PoppyGo");
+
         this.updateMenu(null);
 
         return;

@@ -60,7 +60,9 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
 }
 
 
-function getWorkspaceService(siteKey/*: string*/, workspaceKey/*: string*/, callback/*: CallbackTyped<{siteService: SiteService, workspaceService: WorkspaceService}>*/){
+function getWorkspaceService(siteKey/*: string*/, 
+    workspaceKey/*: string*/, 
+    callback/*: CallbackTyped<{siteService: SiteService, workspaceService: WorkspaceService}>*/){
     return getWorkspaceServicePromise(siteKey, workspaceKey).then((data)=>{
         callback(null, data);
     },(e)=>{
@@ -110,6 +112,7 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
 
 }
 
+/*
 api.unselectSite = async function(){
     global.currentSiteKey = null;
     global.currentWorkspaceKey = null;
@@ -118,8 +121,12 @@ api.unselectSite = async function(){
     pogoconf.setLastOpenedSite(null, null, null);
     pogoconf.saveState();
 
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.setTitle("PoppyGo");
+
     menuManager.updateMenu(null);
 }
+*/
 
 api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
     let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
@@ -163,6 +170,8 @@ api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*:
         context
     );
 
+    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow.setTitle(siteKey.toUpperCase() + " - PoppyGo");
     menuManager.updateMenu(siteKey);
 }
 
@@ -197,6 +206,10 @@ api.closeMobilePreview = function(context){
     });
 }
 
+api.logToConsole = function({message}, context){
+    console.log(message);
+}
+
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
 
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
@@ -205,6 +218,7 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
 
         if(!workspaceService){ return; }
 
+        console.log("serve:"+serveKey);
         workspaceService.serve(serveKey).then(()=>{
             context.resolve();
         }, ()=>{

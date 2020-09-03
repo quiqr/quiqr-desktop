@@ -1,5 +1,10 @@
 # PoppyGo App CHANGELOG
 
+## v0.6.2
+
+- fix unstable select site task
+- fix hugo not starting after returning to poppygo
+
 ## v0.6.1
 - fix embgit.exe location on Windows
 - show version in help menu on Windows

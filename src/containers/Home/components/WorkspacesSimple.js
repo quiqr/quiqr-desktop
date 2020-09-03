@@ -11,6 +11,7 @@ import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import { InfoLine } from './shared';
 import type { WorkspaceConfig } from './../../../types';
+import service from './../../../services/service';
 
 type WorkspaceProps = {
     site: SiteConfig,

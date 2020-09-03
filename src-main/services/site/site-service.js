@@ -29,10 +29,8 @@ class SiteService{
     }
 
     async mountWorkspace(workspaceKey/*: string*/)/*: Promise<void>*/{
-        console.log(this._getSiteSource().mountWorkspace(workspaceKey));
+        console.log("mount workspace:"+workspaceKey);
         await this._getSiteSource().mountWorkspace(workspaceKey);
-
-        //menuManager.updateMenu(global.currentSiteKey);
     }
 
     async getCreatorMessage(){

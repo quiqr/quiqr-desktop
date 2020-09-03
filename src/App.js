@@ -6,7 +6,7 @@ import { Switch, Route } from 'react-router-dom'
 //CONTAINERS
 import Home from './containers/Home'
 import Prefs from './containers/Prefs'
-import SelectSite from './containers/SelectSite'
+//import SelectSite from './containers/SelectSite'
 import Collection from './containers/Collection';
 import CollectionItem from './containers/CollectionItem';
 import Single from './containers/Single';
@@ -259,7 +259,11 @@ class App extends React.Component<AppProps,AppState>{
       }} />
     </Switch>);
   }
-
+        /*
+      <Route path='/selectsite' exact render={ () => {
+        return <SelectSite />
+      }} />
+        */
   getContentSwitch(){
     return (<Switch>
       <Route path='/' exact render={ () => {
@@ -267,9 +271,6 @@ class App extends React.Component<AppProps,AppState>{
       }} />
       <Route path='/prefs' exact render={ () => {
         return <Prefs />
-      }} />
-      <Route path='/selectsite' exact render={ () => {
-        return <SelectSite />
       }} />
       <Route path='/console' exact render={ () => {
         return <Console />

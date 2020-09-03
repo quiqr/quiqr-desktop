@@ -8,6 +8,8 @@ const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
 
+const WorkspaceService = require('./services/workspace/workspace-service')
+
 let mainWindow;
 //let previewWindowl;
 let mainWindowState;
@@ -77,13 +79,7 @@ function getLocation(locPath = ''){
                 client.end();
                 if(mainWindow){
                     mainWindow.loadURL(url);
-
-                    mainWindow.webContents.once('dom-ready', () => {
-                        if(global.currentSiteKey && global.currentWorkspaceKey){
-                            mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
-                            //console.log(`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
-                        }
-                    });
+                    getOpenedLastSite();
                 }
             }
             );
@@ -114,19 +110,26 @@ function getLocation(locPath = ''){
             mainWindow.loadURL(
                 url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
-            mainWindow.webContents.once('dom-ready', () => {
-                if(global.currentSiteKey && global.currentWorkspaceKey){
-                    mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
-                    //console.log(`/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`);
-                }
-            });
-
+            getOpenedLastSite();
         }
         else{
             showNotFound(mainWindow, lookups);
         }
     }
+}
 
+function getOpenedLastSite(){
+    mainWindow.webContents.once('dom-ready', async () => {
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let newScreen = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+            mainWindow.webContents.send("redirectMountSite",newScreen);
+            console.log(newScreen);
+
+            //let workspaceService = new WorkspaceService(global.currentSitePath, global.currentWorkspaceKey, global.currentSiteKey );
+            //workspaceService.serve('');
+
+        }
+    });
 }
 
 function createWindow () {

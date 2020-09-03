@@ -1,10 +1,11 @@
 const { spawn } = require('child_process');
 const pathHelper = require('./../path-helper');
 const fs = require('fs-extra');
-const outputConsole = require('./../output-console');
-const mainWindowManager = require('../main-window-manager');
+//const outputConsole = require('./../output-console');
 
 global.currentServerProccess = undefined;
+let mainWindowManager;
+let mainWindow;
 
 class HugoServer{
 
@@ -33,8 +34,8 @@ class HugoServer{
 
     stopIfRunning(callback){
       if(global.currentServerProccess){
-        outputConsole.appendLine('Stopping Hugo Server...');
-        outputConsole.appendLine('');
+        global.outputConsole.appendLine('Stopping Hugo Server...');
+        global.outputConsole.appendLine('');
 
             global.currentServerProccess.kill();
             global.currentServerProccess = undefined;
@@ -46,14 +47,22 @@ class HugoServer{
 
         let {config, workspacePath, hugover} = this.config;
 
-        let mainWindow = mainWindowManager.getCurrentInstance();
-
-        if(mainWindow){
-            outputConsole.appendLine('Sending serverDown.');
-            mainWindow.webContents.send("serverDown")
+        try{
+            mainWindowManager = require('../main-window-manager');
+            mainWindow = mainWindowManager.getCurrentInstance();
+            if(mainWindow){
+                global.outputConsole.appendLine('Sending serverDown.');
+                mainWindow.webContents.send("serverDown")
+            }
+            else{
+                console.log('No mainWindow.2');
+            }
         }
-        else{
-            outputConsole.appendLine('No mainWindow.');
+        catch(e){
+
+            console.log('No mainWindow.');
+            console.log(e.message);
+
         }
 
         this.stopIfRunning();
@@ -83,11 +92,11 @@ class HugoServer{
             this.emitLines(stdout);
 
             global.currentServerProccess.stderr.on('data', (data) => {
-                outputConsole.appendLine('Hugo Server Error: '+data);
+                global.outputConsole.appendLine('Hugo Server Error: '+data);
             });
 
             global.currentServerProccess.on('close', (code) => {
-                outputConsole.appendLine('Hugo Server Closed: '+code);
+                global.outputConsole.appendLine('Hugo Server Closed: '+code);
             });
 
             stdout.setEncoding('utf8');
@@ -97,33 +106,34 @@ class HugoServer{
             stdout.on('line', function (line) {
                 if(isFirst){
                     isFirst=false;
-                    outputConsole.appendLine('Starting Hugo Server...');
-                    outputConsole.appendLine('');
+                    global.outputConsole.appendLine('Starting Hugo Server...');
+                    global.outputConsole.appendLine('');
+                    mainWindow = mainWindowManager.getCurrentInstance();
                     if(mainWindow){
-                        outputConsole.appendLine('Sending serverLive.');
+                        global.outputConsole.appendLine('Sending serverLive.');
                         mainWindow.webContents.send("serverLive")
                     }
                     else{
-                        outputConsole.appendLine('No mainWindow.');
+                        global.outputConsole.appendLine('No mainWindow.');
                     }
 
                     return;
                 }
-                outputConsole.appendLine(line);
+                global.outputConsole.appendLine(line);
             });
 
 
         }
         catch(e){
-            outputConsole.appendLine('Hugo Server failed to start.');
-            outputConsole.appendLine(e.message);
-                    if(mainWindow){
-                        outputConsole.appendLine('Sending serverDown.');
-                        mainWindow.webContents.send("serverDown")
-                    }
-                    else{
-                        outputConsole.appendLine('No mainWindow.');
-                    }
+            global.outputConsole.appendLine('Hugo Server failed to start.');
+            global.outputConsole.appendLine(e.message);
+            if(mainWindow){
+                global.outputConsole.appendLine('Sending serverDown.');
+                mainWindow.webContents.send("serverDown")
+            }
+            else{
+                global.outputConsole.appendLine('No mainWindow.');
+            }
             callback(e);
         }
         callback(null);
