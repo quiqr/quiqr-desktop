@@ -115,8 +115,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     componentDidMount(){
         this.checkSiteInProps();
-
-
         this._ismounted = true;
     }
 
@@ -134,6 +132,13 @@ class Home extends React.Component<HomeProps, HomeState>{
     checkSiteInProps(){
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
+
+            if(this.state.currentSiteKey != siteKey){
+                service.api.logToConsole("one time only?");
+                // Serve the workspace at selection of the workspace right after mounting the workspace
+                service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
+            }
+
             this.setState({currentSiteKey: siteKey});
             this.setState({currentWorkspaceKey: workspaceKey});
 
@@ -141,7 +146,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 let siteCreatorMessage = md.render(message);
                 this.setState({siteCreatorMessage:siteCreatorMessage});
             });
-
 
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
                 var stateUpdate  = {};
@@ -186,6 +190,8 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
+
+
         return (
             <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
 
@@ -221,8 +227,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             await service.api.mountWorkspace(siteKey, workspace.key);
             this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
 
-            // Serve the workspace at selection of the workspace right after mounting the workspace
-            await service.api.serveWorkspace(siteKey, workspace.key, "instantly serve at selectWorkspace"/*serveKey*/);
 
             // Open a new window with the served site.
             //window.require('electron').shell.openExternal('http://localhost:1313');

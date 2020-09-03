@@ -14,6 +14,8 @@ const fileDirUtils = require('./file-dir-utils');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 const ProgressBar = require('electron-progressbar');
 
+const outputConsole = require('./output-console');
+
 unhandled();
 
 // Module to control application life.
@@ -24,15 +26,17 @@ if(app.isPackaged) {
     console.log('production!');
 }
 
+require('events').EventEmitter.prototype._maxListeners = 15;
+
 //console.log(process.argv);
 let pogoconf = PoppyGoAppConfig();
+global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
 global.currentWorkspaceKey = pogoconf.lastOpenedSite.workspaceKey;
 
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -47,7 +51,6 @@ function createWindow () {
     })
 
     contextMenu(mainWindow);
-
 }
 
 function downloadFile(file_url , targetPath){
@@ -118,9 +121,6 @@ app.on('ready', function () {
     menuManager.createMainMenu();
     createWindow();
     menuManager.init();
-
-    //console.log('process args ' + process.argv.join(','))
-
 })
 
 app.on('before-quit', function () {

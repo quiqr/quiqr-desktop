@@ -21,6 +21,10 @@ export class API {
     serveWorkspace(siteKey: string, workspaceKey: string, serveKey: string){
         return mainProcessBridge.request('serveWorkspace', {siteKey, workspaceKey, serveKey});
     }
+    logToConsole( message: string){
+        return mainProcessBridge.request('logToConsole', {message});
+    }
+
 
     openMobilePreview(){
         return mainProcessBridge.request('openMobilePreview');
