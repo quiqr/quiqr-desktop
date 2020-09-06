@@ -24,12 +24,14 @@ class MenuManager {
     }
 
     openCookbooks() {
+        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         if (mainWindow) {
             mainWindow.webContents.send("redirectCookbook")
         }
     }
     stopServer() {
+        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         if(global.hugoServer){
             global.hugoServer.stopIfRunning(function(err, stdout, stderr){
@@ -62,6 +64,7 @@ class MenuManager {
     }
 
     deleteSite() {
+        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         let dir;
 
@@ -166,6 +169,7 @@ class MenuManager {
         global.currentSiteKey = null;
         global.currentWorkspaceKey = null;
 
+        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         mainWindow.webContents.send("redirectHome");
         mainWindow.webContents.send("unselectSite");
