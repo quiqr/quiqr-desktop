@@ -1,7 +1,6 @@
 import React from 'react';
 import Snackbar from 'material-ui/Snackbar';
 import { consoleService, snackMessageService } from '../services/ui-service';
-//import ConsoleIcon from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 
 const consoleStyle ={
   pre: {

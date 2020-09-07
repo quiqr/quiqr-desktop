@@ -44,4 +44,12 @@ describe('Application launch', function () {
       // assert.equal(count, 2)
     })
   })
+
+  it('shows an initial window', function () {
+    return this.app.client.getWindowCount().then(function (count) {
+      assert.equal(count, 1)
+      // Please note that getWindowCount() will return 2 if `dev tools` are opened.
+      // assert.equal(count, 2)
+    })
+  })
 })

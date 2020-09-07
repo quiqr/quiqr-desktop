@@ -116,6 +116,7 @@ class MenuManager {
 
     createLogWindow () {
         logWindow = logWindowManager.getCurrentInstanceOrNew();
+
         if (logWindow) {
             logWindow.webContents.send("redirectConsole")
         }
@@ -171,8 +172,8 @@ class MenuManager {
 
         mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
-        mainWindow.webContents.send("redirectHome");
-        mainWindow.webContents.send("unselectSite");
+        mainWindow.webContents.send("redirectHome"); //(App.js)
+        mainWindow.webContents.send("unselectSite"); //(Home.js/Sidebar.js)
 
         mainWindow.setTitle("PoppyGo");
 

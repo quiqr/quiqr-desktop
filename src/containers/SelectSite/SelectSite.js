@@ -68,13 +68,13 @@ const styles = {
     }
 }
 
-type HomeProps = {
+type SelectSiteProps = {
     muiTheme : any,
     siteKey : string,
     workspaceKey : string
 }
 
-type HomeState = {
+type SelectSiteState = {
     configurations?: Configurations | EmptyConfigurations,
     selectedSite?: SiteConfig,
     selectedSiteWorkspaces?: Array<any>,
@@ -85,9 +85,8 @@ type HomeState = {
     blockingOperation: ?string //this should be moved to a UI service
 }
 
-class Home extends React.Component<HomeProps, HomeState>{
+class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
-    history: any;
 
     constructor(props){
         super(props);
@@ -100,91 +99,23 @@ class Home extends React.Component<HomeProps, HomeState>{
         };
     }
 
-    componentDidUpdate(preProps: HomeProps){
-        if(this._ismounted && preProps.siteKey !== this.props.siteKey){
-            this.checkSiteInProps();
-            //service.api.serveWorkspace(this.props.siteKey, this.props.workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
-        }
-        else if(this._ismounted && !preProps.siteKey){
-            //this.checkSiteInProps();
-            //this.setState({currentSiteKey: null});
-            //this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
-        }
-    }
-
     componentWillMount(){
-        //        window.require('electron').ipcRenderer.on('refreshSites', this.checkSiteInProps.bind(this));
-        //window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
-        service.registerListener(this);
-    }
-
-    componentDidMount(){
-        this.checkSiteInProps();
-        this._ismounted = true;
-    }
-    /*
-
-    unselectSite(){
-        return;
-        this.setState({currentSiteKey: null});
-        this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
-
         service.getConfigurations(true).then((c)=>{
             var stateUpdate  = {};
             stateUpdate.configurations = c;
             this.setState(stateUpdate);
         });
     }
-    */
 
-    checkSiteInProps(){
-        service.api.logToConsole("checkSiteInProps");
-        var { siteKey, workspaceKey } = this.props;
-        service.api.logToConsole('siteKey from homesimple:'+ siteKey);
-        if(siteKey && workspaceKey){
-
-            if(this.state.currentSiteKey != siteKey){
-                service.api.logToConsole("one time only?");
-                // Serve the workspace at selection of the workspace right after mounting the workspace
-                service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
-            }
-
-            this.setState({currentSiteKey: siteKey});
-            this.setState({currentWorkspaceKey: workspaceKey});
-
-            service.getSiteCreatorMessage(siteKey, workspaceKey).then((message)=>{
-                let siteCreatorMessage = md.render(message);
-                this.setState({siteCreatorMessage:siteCreatorMessage});
-            });
-
-            service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-                var stateUpdate  = {};
-                stateUpdate.configurations = bundle.configurations;
-                stateUpdate.selectedSite = bundle.site;
-                stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
-                stateUpdate.selectedWorkspace = bundle.workspace;
-                stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
-                this.setState(stateUpdate);
-                return service.getWorkspaceDetails(siteKey, workspaceKey);
-            })
-        }
-        else{
-            service.getConfigurations(true).then((c)=>{
-                var stateUpdate  = {};
-                stateUpdate.configurations = c;
-                this.setState(stateUpdate);
-            })
-        }
-    }
-
-    /*
-    selectSite(site : SiteConfig ){
+    mountSite(site : SiteConfig ){
 
         //this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
         this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
         this.setState({currentSiteKey: site.key});
 
         //load all site configuration to enforce validation
+
+        service.api.logToConsole("mount :"+site.key);
         service.api.listWorkspaces(site.key).then((workspaces)=>{
 
             this.setState({selectedSiteWorkspaces: workspaces});
@@ -195,34 +126,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         });
     }
-    */
-
-    getWorkspaceDetails = (workspace: WorkspaceHeader)=> {
-        if(this.state.selectedSite==null) throw new Error('Invalid operation.');
-        return service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
-    }
-
-    componentWillUnmount(){
-        service.unregisterListener(this);
-    }
-
-    renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
-
-
-        return (
-            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
-
-                <InfoLine label="Name">{site.name}</InfoLine>
-
-                { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
-
-                <div className="markdown"
-                style={ styles.creatorMessage }
-                dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}}></div>
-
-            </Wrapper>
-        );
-    }
 
     handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
         e.stopPropagation();
@@ -231,25 +134,12 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
 
-
-        //let activeWorkspaceKey = this.state.currentWorkspaceKey;
         this.setState({currentWorkspaceKey: workspace.key});
 
-        //      let select = (
-            //            activeWorkspaceKey==null ||
-            //            activeWorkspaceKey!==workspace.key
-        //        );
-        let        select = true;
-
-            //    activeSiteKey!==siteKey
-            //            activeSiteKey==null ||
+        let select = true;
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
             this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
-
-
-            // Open a new window with the served site.
-            //window.require('electron').shell.openExternal('http://localhost:1313');
         }
         else{
             this.history.push(`/`);
@@ -261,7 +151,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         return (
             <Route render={({history})=>{
 
-                this.history = history; //ugly
+                this.history = history;
 
                 if(this.state.currentWorkspaceKey==null)
                     return (<Wrapper></Wrapper>);
@@ -326,10 +216,48 @@ class Home extends React.Component<HomeProps, HomeState>{
         })
     }
 
+    renderSelectSites(){
+        //let { siteKey } = this.props;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+
+        let _configurations = ((configurations: any): Configurations);
+
+        if(configurations==null){
+            return <Spinner />
+        }
+        //rightIcon={<IconNavigationCheck color={active?this.props.muiTheme.palette.primary1Color:undefined}  />}
+        return (
+                <div style={ styles.sitesCol }>
+                    <List>
+                        <Subheader>All Sites</Subheader>
+                        { (_configurations.sites||[]).map((item, index)=>{
+                            let selected = item===selectedSite;
+                            //let active = selectedSite && siteKey===item.key;
+                            return (<ListItem
+                                key={index}
+                                style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
+                                onClick={ ()=>{ this.mountSite(item); } }
+                                primaryText={ item.name }
+                            />);
+                        })}
+                        { configurations.empty || _configurations.global.siteManagementEnabled ? (
+                            <ListItem
+                                key="add-site"
+                                style={ styles.siteInactiveStyle }
+                                rightIcon={<IconAdd />}
+                                onClick={ this.handleAddSiteClick.bind(this) }
+                                primaryText="New"
+                            />
+                        ) : ( null ) }
+                    </List>
+                </div>
+        );
+
+    }
+
     render(){
 
         let { siteKey } = this.props;
-        //let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
 
         let _configurations = ((configurations: any): Configurations);
@@ -339,39 +267,35 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
 
         return (
-            <div style={ styles.container }>
+            <Route render={({history})=>{
 
-                <div style={styles.selectedSiteCol}>
-                    { selectedSite==null ? (
-                        <Wrapper title="Site Management">
-                            <MessageBlock>Please, select a site.</MessageBlock>
-                        </Wrapper>
-                    ) : (
-                        this.renderSelectedSiteContent(_configurations, selectedSite)
-                    ) }
-                </div>
-                <CreateSiteDialog
-                    open={createSiteDialog}
-                    onCancelClick={()=>this.setState({createSiteDialog:false})}
-                    onSubmitClick={this.handleCreateSiteSubmit}
-                />
-                { selectedSite!=null && this.state.publishSiteDialog!=null ? (
-                    <PublishSiteDialog
-                        site={selectedSite}
-                        workspace={this.state.publishSiteDialog.workspace}
-                        workspaceHeader={this.state.publishSiteDialog.workspaceHeader}
-                        onCancelClick={this.handlePublishSiteCancelClick}
-                        onBuildAndPublishClick={this.handleBuildAndPublishClick}
-                        open={publishSiteDialog!=null&&publishSiteDialog.open}
+                this.history = history;
+                return (
+
+                    <div style={ styles.container }>
+
+                        {this.renderSelectSites()}
+
+                        <div style={styles.selectedSiteCol}>
+                            <Wrapper title="Site Management">
+                                <MessageBlock>Please, select a site.</MessageBlock>
+                            </Wrapper>
+                        </div>
+                        <CreateSiteDialog
+                        open={createSiteDialog}
+                        onCancelClick={()=>this.setState({createSiteDialog:false})}
+                        onSubmitClick={this.handleCreateSiteSubmit}
                     />
-                ):(null) }
 
-                {/*this should be moved to a UI service*/}
-                <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
-            </div>
+                        {/*this should be moved to a UI service*/}
+                        <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
+                    </div>
+                );
+            }}
+                />
         );
     }
 
 }
 
-export default muiThemeable()(Home);
+export default muiThemeable()(SelectSite);

@@ -244,13 +244,18 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     }
 
     unselectSite(){
+        return;
+
+        service.api.logToConsole("unselect from sidebar:") ;
         if(this._ismounted){
+
             this.setState({site: null, workspace: null});
         }
     }
 
     refresh = ()=>{
         let {siteKey, workspaceKey } = this.props;
+        service.api.logToConsole("sitekey:" + siteKey);
 
         if(siteKey && workspaceKey){
             let stateUpdate = {};

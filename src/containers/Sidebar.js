@@ -1,16 +1,11 @@
 //@flow
 
 import React from 'react';
-//import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import IconActionList from 'material-ui/svg-icons/action/list';
-//import IconActionSetting from 'material-ui/svg-icons/action/settings';
-//import IconPlay from 'material-ui/svg-icons/av/play-arrow';
 import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 import IconMenu from 'material-ui/svg-icons/navigation/menu';
-//import IconMore from 'material-ui/svg-icons/navigation/more-vert';
-//import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import Border from './../components/Border';
 
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
@@ -99,33 +94,12 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
             <React.Fragment>
                 <div className={'slideFadeInRight animated'}  style={{position:'relative', opacity: 1}}>
 
-              {/*}<IconMenu style={{ position: 'absolute', right: '21px', top:'15px' }} />
-
-                    <FlatButton
-                    style={Object.assign({},
-                        { height:'calc(100vh - 42px)',width:'100%', position:'absolute'},
-                        { transition: menuIsLocked? undefined: 'opacity 1s linear' },
-                        hideItems? { opacity:1 } : { opacity:0, pointerEvents:'none' }
-                    )}
-                    label=" " onClick={()=>{onToggleItemVisibility()}}/>
-                    */}
-
                     <div style={ Object.assign({},
                         { width:'280px', transition: 'all .2s' },
                         hideItems? { opacity:0, pointerEvents:'none' } : { opacity:1 }
                     )}>
 
-
-{/*
-                        <IconButton
-                            onClick={()=>this.props.onLockMenuClicked()}
-                            style={{ position: 'absolute', right: '48px', top:'3px' }}
-                            iconStyle={{opacity: (menuIsLocked?'1':'.2')  }}>
-                            <IconLockMenu />}
-                        </IconButton>
-                      */}
-
-                        { menusNodes }
+                    { menusNodes }
 
                         <br />
                     </div>

@@ -123,11 +123,6 @@ function getOpenedLastSite(){
         if(global.currentSiteKey && global.currentWorkspaceKey){
             let newScreen = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
             mainWindow.webContents.send("redirectMountSite",newScreen);
-            console.log(newScreen);
-
-            //let workspaceService = new WorkspaceService(global.currentSitePath, global.currentWorkspaceKey, global.currentSiteKey );
-            //workspaceService.serve('');
-
         }
     });
 }

@@ -11,9 +11,12 @@ import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import { InfoLine } from './shared';
 import type { WorkspaceConfig } from './../../../types';
+import service from './../../../services/service';
 
 type WorkspaceProps = {
     site: SiteConfig,
+    siteKey:siteKey,
+    workspaceKey: workspaceKey,
     header: WorkspaceHeader,
     active: bool,
     onLocationClick: (location: string)=>void,
@@ -29,11 +32,16 @@ type WorkspaceState = {
     refreshing: bool
 }
 
-export class Workspace extends React.Component<WorkspaceProps,WorkspaceState> {
+export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceState> {
 
     constructor(props: WorkspaceProps){
         super(props);
-        this.state = { config: null, error: null, refreshing: false };
+        this.state = {
+            config: null,
+            error: null,
+            siteCreatorMessage: null,
+            refreshing: false
+        };
     }
 
     handleOnStartServerOptionClick = (index: number)=>{
@@ -68,51 +76,28 @@ export class Workspace extends React.Component<WorkspaceProps,WorkspaceState> {
     }
 
     render(){
-        //let {active, header, onLocationClick, onPublishClick, onSelectWorkspaceClick, site} = this.props;
         let {active, header, site} = this.props;
         let { config, error } = this.state;
         let publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
         let startServerDisabled = config===null||config.serve===null||config.serve.length===0;
 
-        return (<div style={{opacity: this.state.refreshing?.5:1}}>
-            <InfoLine label="Location">
-                <TextField id="location" value={header.path} readOnly={true} />
-                <FlatButton
-                    style={{minWidth:'40px'}}
-                    icon={<IconFileFolder />}
-                    onClick={this.handleOpenLocation}
-                />
-            </InfoLine>
-            { error != null && (<InfoLine label="Validation Error">
-                <p style={{color:'#EC407A'}}>{error}</p>
-                <FlatButton primary={true} label="Refresh" onClick={this.handleRefreshClick} />
-            </InfoLine>) }
-            <InfoLine childrenWrapperStyle={{marginTop:'8px'}} label="Actions">
-                <RaisedButton
-                    label="Select"
-                    disabled={config==null}
-                    primary={active}
-                    onClick={ this.handleWorkspaceSelect }
-                />
-                &nbsp;
-                <TriggerWithOptions
-                    triggerType={FlatButton}
-                    triggerProps={{
-                        label:"Start Server",
-                        disabled:startServerDisabled
-                    }}
-                    options={ config!=null&&config.serve!=null?config.serve.map(x => x.key||'default') : [] }
-                    onOptionClick={this.handleOnStartServerOptionClick}
-                />
-                &nbsp;
-                <FlatButton label="Publish" disabled={publishDisabled} onClick={this.handlePublishClick} />
-            </InfoLine>
-        </div>);
+        return (
+            <div style={{opacity: this.state.refreshing?.5:1}}>
+                { error != null && (<InfoLine label="Validation Error">
+                    <p style={{color:'#EC407A'}}>{error}</p>
+                    <FlatButton primary={true} label="Refresh" onClick={this.handleRefreshClick} />
+                    </InfoLine>) }
+                    <InfoLine childrenWrapperStyle={{marginTop:'8px'}} label="Actions">
+                        &nbsp;
+                        <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={this.handlePublishClick} />
+                    </InfoLine>
+
+                </div>);
     }
 
 }
 
-export function Workspaces(
+export function WorkspacesSimple(
     props: {
         site: SiteConfig,
         activeSiteKey: string,
@@ -135,27 +120,20 @@ export function Workspaces(
             { (workspaces||[]).map((workspace,i) => {
                 let active = activeSiteKey === site.key && workspace.key===activeWorkspaceKey;
                 return (
-                <AccordionItem key={i} label={ workspace.key } headStyle={{paddingLeft:'8px', paddingRight:'8px', fontWeight:active?'bold':undefined }}
-                    headerLeftItems = {[
-                        <FlatButton
-                            style={{minWidth: '40px'}}
-                            icon={<IconNavigationCheck />}
-                            primary={active}
-                            onClick={ (e)=>onSelectWorkspaceClick(e, site.key, workspace) }
-                            />
-                    ]}
-                    body={(<Workspace
-                            site={site}
-                            active={active}
-                            header={workspace}
-                            onLocationClick={onLocationClick}
-                            onPublishClick={onPublishClick}
-                            onStartServerClick={onStartServerClick}
-                            onSelectWorkspaceClick={onSelectWorkspaceClick}
-                            getWorkspaceDetails={getWorkspaceDetails}
-                        />
-                    )}
+                    <WorkspaceSimple
+                    key={'key'+1}
+                    site={site}
+                    workspaceKey={activeWorkspaceKey}
+                    siteKey={activeSiteKey}
+                    active={active}
+                    header={workspace}
+                    onLocationClick={onLocationClick}
+                    onPublishClick={onPublishClick}
+                    onStartServerClick={onStartServerClick}
+                    onSelectWorkspaceClick={onSelectWorkspaceClick}
+                    getWorkspaceDetails={getWorkspaceDetails}
                 />
+
             )})}
         </Accordion>
     )

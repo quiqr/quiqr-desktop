@@ -92,9 +92,7 @@ function createWindow () {
 
         //let url = process.env.REACT_DEV_URL+'/console';
         let url = process.env.REACT_DEV_URL;
-        console.log(url)
         const urlWithPortMatch = url.match(/:([0-9]{4})/);
-        console.log(urlWithPortMatch)
         if(urlWithPortMatch==null){
             showInvalidDevelopmentUrl(url);
         }
@@ -106,8 +104,7 @@ function createWindow () {
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
                 client.end();
-                if(logWindow)
-                    logWindow.loadURL(url);
+                if(logWindow) logWindow.loadURL(url);
             }
             );
             client.on('error', (error) => {

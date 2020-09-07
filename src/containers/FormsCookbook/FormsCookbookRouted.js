@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import { FormsCookbook } from './FormsCookbook';
 
 export class FormsCookbookRouted extends React.Component<any, any>{
-    
+
     render(){
         return (<Route
             path={'/forms-cookbook/:sampleKey'}
@@ -14,5 +14,5 @@ export class FormsCookbookRouted extends React.Component<any, any>{
                 />);
             }}
         />);
-    }    
+    }
 }
