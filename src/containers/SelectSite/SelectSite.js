@@ -146,38 +146,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
         }
     }
 
-    renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
-
-        return (
-            <Route render={({history})=>{
-
-                this.history = history;
-
-                if(this.state.currentWorkspaceKey==null)
-                    return (<Wrapper></Wrapper>);
-
-                return (
-                    <WorkspacesSimple
-                        getWorkspaceDetails={this.getWorkspaceDetails}
-                        workspaces={workspaces}
-                        activeSiteKey={this.state.currentSiteKey}
-                        activeWorkspaceKey={this.state.currentWorkspaceKey}
-                        onLocationClick={(location)=>{
-                            service.api.openFileExplorer(location)
-                        }}
-                        onPublishClick={(workspaceHeader, workspace)=>{
-                            service.api.parentTempHideMobilePreview();
-                            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
-                        }}
-                        onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }
-                        onSelectWorkspaceClick={ this.handleSelectWorkspaceClick }
-                        site={site}
-                    />
-                )
-            }} />
-        );
-    }
-
     handleAddSiteClick(){
         this.setState({createSiteDialog: true});
     }
@@ -234,6 +202,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                             let selected = item===selectedSite;
                             //let active = selectedSite && siteKey===item.key;
                             return (<ListItem
+                                id={"siteselectable-"+item.name}
                                 key={index}
                                 style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
                                 onClick={ ()=>{ this.mountSite(item); } }

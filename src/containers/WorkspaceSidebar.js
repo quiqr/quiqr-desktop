@@ -142,7 +142,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
                         }.bind(this)}
                         labelPosition='left' />
                       </ListItem>
-                      <ListItem primaryText="Open in Browser" onClick={
+                      <ListItem id="sidebar-item-openinbrowser" primaryText="Open in Browser" onClick={
     function(){
                                 if(!this.state.hugoRunning){
                                     service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace");

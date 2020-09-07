@@ -15,6 +15,7 @@ e2e:
   stage: e2e
   image: tijnschmits/chromium-xvfb-js-java8
   script:
+    - npm run _react-build
     - npm run test
 
 warmup:

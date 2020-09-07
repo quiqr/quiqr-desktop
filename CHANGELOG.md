@@ -1,5 +1,9 @@
 # PoppyGo App CHANGELOG
 
+## v0.6.3
+- more fixes unstable select site task
+- add spectron e2e framework
+
 ## v0.6.2
 
 - fix unstable select site task

@@ -12,7 +12,10 @@ export const Wrapper = ({ title, style, children } : { title? : string, style? :
 
 export const InfoLine = ({label, children, childrenWrapperStyle} : {label: string, children : any, childrenWrapperStyle?: any}) =>{
 
-    return <div style={{ padding: '16px' }}><div style={{fontSize:'12px', lineHeight:'16px'}}>{label}</div><div style={childrenWrapperStyle}>{children}</div></div>;
+    return <div style={{ padding: '16px' }}>
+            <div style={{fontSize:'12px', lineHeight:'16px'}}>{label}</div>
+            <div style={childrenWrapperStyle}>{children}</div>
+        </div>;
 }
 
 export const InfoBlock = ({label, children}: {label: string, children: any}) =>{

@@ -16,7 +16,7 @@ describe('Application launch', function () {
 
   afterEach(function () {
     if (this.app && this.app.isRunning()) {
-      return this.app.stop()
+        return this.app.stop()
     }
   })
 
@@ -32,5 +32,36 @@ describe('Application launch', function () {
       return this.app.client.getText('#root > div > div > div.hideScrollbar > div > div > div:nth-child(1)').then(function (text) {
           return assert.equal(text, 'Forms Cookbook')
       })
+  })
+
+  it('opens test-website a few times end in site', async function () {
+
+      var times = 5;
+      for(var i=0; i < times; i++){
+          this.app.webContents.send("redirectHome");
+          this.app.client.click('#siteselectable-poppygo-test-website');
+          await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
+      }
+
+      this.app.client.getText("#sidebar-item-openinbrowser > div > div > div").then(function (text) {
+          return assert.equal(text, 'Open in Browser');
+      })
+
+  })
+  it('opens test-website a few times end in select', async function () {
+
+      var times = 5;
+      for(var i=0; i < times; i++){
+          this.app.webContents.send("redirectHome");
+          this.app.client.click('#siteselectable-poppygo-test-website');
+          await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
+      }
+      this.app.webContents.send("redirectHome");
+      await this.app.client.waitUntilTextExists('.App', 'select a website', 5000);
+
+      this.app.client.getText("#root > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div:nth-child(1)").then(function (text) {
+          return assert.equal(text, 'All Sites');
+      })
+
   })
 })
