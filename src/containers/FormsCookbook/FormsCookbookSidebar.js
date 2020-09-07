@@ -14,7 +14,7 @@ type FormsCookbookSidebarProps = {
 };
 
 type FormsCookbookSidebarState = {
-    
+
 }
 
 export class FormsCookbookSidebar extends React.Component<FormsCookbookSidebarProps, FormsCookbookSidebarState>{
