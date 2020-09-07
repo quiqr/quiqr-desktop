@@ -8,19 +8,19 @@ def getmeta
   JSON.load file
 end
 
-desc "tag_release"
+desc "tag_release (1)"
 task :tag_release do
   data = getmeta
   sh "git tag -a v#{data['version']}"
   sh "git push --follow-tags"
 end
 
-desc "buildmac"
+desc "buildmac (2)"
 task :buildmac do
   sh "npm run dist-mac && npm run dist-mac-notarize"
 end
 
-desc "release_mac"
+desc "release_mac (3)"
 task :release_mac do
   data = getmeta
   sh "cp dist/poppygo_mac.dmg #{BIN_PATH}/poppygo_mac-#{data['version']}.dmg"
