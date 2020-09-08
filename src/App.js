@@ -107,7 +107,7 @@ class App extends React.Component<AppProps,AppState>{
         window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
         window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
         window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
-            window.location.href=args;
+            this.history.push(args);
         }.bind(this));
     }
 

@@ -1,5 +1,10 @@
 # PoppyGo App CHANGELOG
 
+## v0.6.4
+- fix open last site ad startup
+- close app on last window closed (macos)
+- fix delete site action
+
 ## v0.6.3
 - more fixes unstable select site task
 - add spectron e2e framework
