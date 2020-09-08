@@ -24,6 +24,7 @@ desc "release_mac (3)"
 task :release_mac do
   data = getmeta
   sh "cp dist/poppygo_mac.dmg #{BIN_PATH}/poppygo_mac-#{data['version']}.dmg"
+  sh "cd #{BIN_PATH} && git pull"
   sh "cd #{BIN_PATH} && git add ./poppygo_mac-#{data['version']}.dmg"
   sh "cd #{BIN_PATH} && git commit -m 'mac release #{ data['version']}'"
   sh "cd #{BIN_PATH} && git push"
