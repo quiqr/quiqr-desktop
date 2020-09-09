@@ -64,4 +64,9 @@ describe('Application launch', function () {
       })
 
   })
+
+  it('create new site, open it and delete afterwards', async function () {
+      this.app.webContents.send("redirectHome");
+  })
+
 })

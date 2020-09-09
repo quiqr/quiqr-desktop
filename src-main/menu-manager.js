@@ -92,7 +92,8 @@ class MenuManager {
                 //console.log("rm done");
             });
 
-            mainWindow.webContents.send("unselectSite");
+            //mainWindow.webContents.send("unselectSite");
+            this.createSelectSiteWindow();
         }
         else{
             dialog.showMessageBox(mainWindow, {
