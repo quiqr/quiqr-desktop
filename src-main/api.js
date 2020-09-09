@@ -59,7 +59,6 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     });
 }
 
-
 function getWorkspaceService(siteKey/*: string*/, 
     workspaceKey/*: string*/, 
     callback/*: CallbackTyped<{siteService: SiteService, workspaceService: WorkspaceService}>*/){
@@ -135,7 +134,6 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
     });
 }
 
-
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
     let configuration /*: any */;
@@ -173,6 +171,9 @@ api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*:
     mainWindow = mainWindowManager.getCurrentInstanceOrNew();
     mainWindow.setTitle(siteKey.toUpperCase() + " - PoppyGo");
     menuManager.updateMenu(siteKey);
+    global.currentSiteKey = siteKey;
+    global.currentWorkspaceKey = workspaceKey;
+    menuManager.createMainMenu();
 }
 
 api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){

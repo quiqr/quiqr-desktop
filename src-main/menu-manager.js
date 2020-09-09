@@ -1,10 +1,16 @@
 const electron = require('electron')
 const Menu = electron.Menu
+const path = require("path");
+const { lstatSync, readdirSync } = require('fs')
 const mainWindowManager = require('./main-window-manager');
 const prefsWindowManager = require('./prefs-window-manager');
 const logWindowManager = require('./log-window-manager');
 const pogozipper = require('./pogozipper');
+const pogoversions = require('./pogo-site-version-helper');
 const PoppyGoAppConfig = require('./poppygo-app-config');
+
+const SiteService = require('./services/site/site-service')
+const configurationDataProvider = require('./configuration-data-provider')
 
 const rimraf = require("rimraf");
 const pathHelper = require('./path-helper');
@@ -178,6 +184,7 @@ class MenuManager {
         mainWindow.setTitle("PoppyGo");
 
         this.updateMenu(null);
+        this.createMainMenu();
 
         return;
     }
@@ -208,7 +215,6 @@ class MenuManager {
             'open-site-conf'
         ];
         siteRelatedMenuIds.forEach(function(id){
-            //console.log(id);
             let myItem = menu.getMenuItemById(id);
             myItem.enabled = (currentSiteKey?true:false);
         });
@@ -221,10 +227,62 @@ class MenuManager {
             mainWindow.webContents.send("redirectHome")
         }
     }
+    async selectSiteVersion(subdir){
+        console.log(subdir);
+    }
+
+    createVersionsMenu(){
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            configurationDataProvider.get(function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+                if(siteData==null) throw new Error('Could not find site is empty.');
+                siteService = new SiteService(siteData);
+            });
+
+            let currentPath = siteService._config.source.path;
+            let currentVersion = siteService._config.source.path.split("/").pop();
+
+
+            let versionsMenu = [];
+
+            if(path.resolve(currentPath, '..').split("/").pop()==='sources'){
+                let sources = path.resolve(currentPath, '..');
+                var files = fs.readdirSync(sources);
+                files.forEach(function(f){
+                    let label = "";
+                    let checked = false;
+                    if(lstatSync(path.join(sources,f)).isDirectory()){
+                        label = f;
+                        if(f == currentVersion){
+                            checked = true;
+                        }
+                        versionsMenu.push({
+                            id: f,
+                            type: "checkbox",
+                            label: label,
+                            checked: checked,
+                            click: async () => {
+                                pogoversions.setSiteVersion(f);
+                            }
+                        });
+                    }
+                });
+            }
+            return versionsMenu;
+        }
+        else {
+            return [];
+        }
+    }
 
     createMainMenu(){
 
         const isMac = process.platform === 'darwin'
+        const versionsMenu = this.createVersionsMenu();
 
         const template = [
             // { role: 'appMenu' }
@@ -264,6 +322,11 @@ class MenuManager {
                         click: async () => {
                             pogozipper.importSite()
                         }
+                    },
+                    {
+                        id: 'switch-version',
+                        label: 'Site versions',
+                        submenu: versionsMenu
                     },
                     {
                         id: 'export-site',

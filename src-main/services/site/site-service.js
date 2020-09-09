@@ -6,8 +6,6 @@ const path = require('path');
 const WorkspaceService = require('./../workspace/workspace-service');
 const publisherFactory = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
-const menuManager = require('./../../menu-manager');
-
 
 class SiteService{
     constructor(config/*: SiteConfig*/){
