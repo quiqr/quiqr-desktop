@@ -1,5 +1,8 @@
 # PoppyGo App CHANGELOG
 
+## v0.6.5
+- new feature: version switcher
+
 ## v0.6.4
 - fix open last site ad startup
 - close app on last window closed (macos)
@@ -59,6 +62,7 @@
 
 ## v0.4.2 [05.06.20 03.03]
 - Fix unknown host problem ssh/git
+
 - Upgrade to from electron 3.x to 5.x
 - Fix strange browserview HTML behaviour
 - Stop server is not defined
