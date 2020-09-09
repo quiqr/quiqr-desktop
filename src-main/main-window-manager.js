@@ -120,6 +120,7 @@ function getLocation(locPath = ''){
 function getOpenedLastSite(){
     mainWindow.webContents.once('dom-ready', async () => {
         if(global.currentSiteKey && global.currentWorkspaceKey){
+            console.log("switch to "+ global.currentSiteKey);
             let newScreen = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
             mainWindow.webContents.send("redirectMountSite",newScreen);
         }

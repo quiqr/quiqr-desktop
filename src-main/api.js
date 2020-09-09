@@ -161,6 +161,9 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 
 }
 
+api.getCurrentSiteKey = async function(){
+    return global.currentSiteKey;
+}
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
     bindResponseToContext(
