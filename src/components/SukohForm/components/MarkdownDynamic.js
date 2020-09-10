@@ -152,7 +152,6 @@ class MarkdownDynamic extends BaseDynamic<MarkdownDynamicField, MarkdownDynamicS
 
 
         return (
-        <DefaultWrapper style={{justifyContent: 'space-between'}}>
             <div
                 ref={(div) => { this.inputWrapper = div; }}
                 style={{ width:'100%' }}
@@ -169,22 +168,6 @@ class MarkdownDynamic extends BaseDynamic<MarkdownDynamicField, MarkdownDynamicS
                     style={{paddingRight, transition:'none', boxSizing:'border-box'}}
                     floatingLabelText={field.title} />
             </div>
-            {tip}
-            <div
-                ref={(div) => { this.markdownWrapper = div; }}
-                style={{ width: '100%', height:this.state.maxHeight, transition:'all .25s ease-in-out',}}
-            >
-                <Paper zDepth={1} rounded={false} style={{height:'100%', overflow:'auto'}}>
-                    <div className="markdown"
-                        style={{
-                            padding:20,
-                            paddingBottom: Math.max(20, this.state.maxHeight?this.state.maxHeight*2/3:0) }}
-                            ref={(div) => { this.previewContainer = div; }}
-                            dangerouslySetInnerHTML={{__html:this.state.preview}}>
-                    </div>
-                </Paper>
-            </div>
-        </DefaultWrapper>
         );
     }
 }
