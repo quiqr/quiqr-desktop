@@ -25,6 +25,9 @@ export class API {
     }
 
     importSite(){
+        return mainProcessBridge.request('selectSiteAction');
+    }
+    importSite(){
         return mainProcessBridge.request('importSiteAction');
     }
     getCurrentSiteKey(){
@@ -115,6 +118,9 @@ export class API {
         return mainProcessBridge.request('getThumbnailForCollectionItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
     }
 
+    getPogoConf(confkey: string){
+        return mainProcessBridge.request('getPogoConf', confkey);
+    }
     createSite(siteConfig: any){
         return mainProcessBridge.request('createSite', siteConfig);
     }

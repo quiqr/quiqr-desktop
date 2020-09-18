@@ -69,7 +69,9 @@ module.exports = function (options) {
 
     return {
         get lastOpenedSite() { return state.lastOpenedSite; },
+        get skipWelcomeScreen() { return state.skipWelcomeScreen; },
         setLastOpenedSite,
+        setSkipWelcomeScreen,
         saveState,
         resetStateToDefault
     };

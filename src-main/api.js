@@ -113,22 +113,6 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
 
 }
 
-/*
-api.unselectSite = async function(){
-    global.currentSiteKey = null;
-    global.currentWorkspaceKey = null;
-    global.currentSitePath = null;
-
-    pogoconf.setLastOpenedSite(null, null, null);
-    pogoconf.saveState();
-
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-    mainWindow.setTitle("PoppyGo");
-
-    menuManager.updateMenu(null);
-}
-*/
-
 api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
     let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
     siteService.getCreatorMessage().then(function(message){
@@ -165,6 +149,12 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 
 api.getCurrentSiteKey = async function(){
     return global.currentSiteKey;
+}
+
+api.getPogoConf = async function(key){
+    //if(key==='skipWelcomeScreen'){
+        return pogoconf.skipWelcomeScreen;
+    //}
 }
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
@@ -215,6 +205,7 @@ api.closeMobilePreview = function(context){
 api.logToConsole = function({message}, context){
     console.log(message);
 }
+
 api.importSiteAction = function(context){
     return new Promise((resolve, reject)=>{
         pogozipper.importSite()

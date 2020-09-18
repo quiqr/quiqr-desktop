@@ -282,14 +282,8 @@ class MenuManager {
 
     createDevMenu(){
         let devMenu = [];
-        devMenu.push({
-            id: 'welcome',
-            label: 'open welcome',
-            click: async () => {
-                mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-                mainWindow.webContents.send("redirectToGivenLocation","/welcome");
-            }
-        });
+        devMenu.push(
+        );
         return devMenu;
     }
 
@@ -565,6 +559,14 @@ class MenuManager {
                         label: 'FAQ',
                         click: async () => {
                             await shell.openExternal('https://poppygo.nl/docs/faq/')
+                        }
+                    },
+                    {
+                        id: 'welcome',
+                        label: 'Show welcome screen',
+                        click: async () => {
+                            mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+                            mainWindow.webContents.send("redirectToGivenLocation","/welcome");
                         }
                     },
                     {
