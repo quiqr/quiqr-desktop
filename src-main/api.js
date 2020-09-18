@@ -16,6 +16,8 @@ const mainWindowManager = require('./main-window-manager');
 const menuManager = require('./menu-manager');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
+const pogozipper = require('./pogozipper');
+
 /*::
 type APIContext = {
     resolve: (data: any) => void,
@@ -111,22 +113,6 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
 
 }
 
-/*
-api.unselectSite = async function(){
-    global.currentSiteKey = null;
-    global.currentWorkspaceKey = null;
-    global.currentSitePath = null;
-
-    pogoconf.setLastOpenedSite(null, null, null);
-    pogoconf.saveState();
-
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-    mainWindow.setTitle("PoppyGo");
-
-    menuManager.updateMenu(null);
-}
-*/
-
 api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
     let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
     siteService.getCreatorMessage().then(function(message){
@@ -163,6 +149,12 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 
 api.getCurrentSiteKey = async function(){
     return global.currentSiteKey;
+}
+
+api.getPogoConf = async function(key){
+    //if(key==='skipWelcomeScreen'){
+        return pogoconf.skipWelcomeScreen;
+    //}
 }
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
@@ -214,6 +206,11 @@ api.logToConsole = function({message}, context){
     console.log(message);
 }
 
+api.importSiteAction = function(context){
+    return new Promise((resolve, reject)=>{
+        pogozipper.importSite()
+    });
+}
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
 
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
