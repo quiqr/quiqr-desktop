@@ -26,10 +26,6 @@ module.exports = function (options) {
         }
     }
 
-    function setLastOpenedSite(siteKey,workspaceKey, sitePath){
-        state.lastOpenedSite = {siteKey: siteKey, workspaceKey: workspaceKey, sitePath: sitePath};
-    }
-
     function saveState() {
         try {
             mkdirp.sync(path.dirname(fullStoreFileName));
@@ -38,6 +34,22 @@ module.exports = function (options) {
             // Don't care
         }
     }
+
+    /*
+     * START SETTINGS METHODS
+     */
+    function setLastOpenedSite(siteKey,workspaceKey, sitePath){
+        state.lastOpenedSite = {siteKey: siteKey, workspaceKey: workspaceKey, sitePath: sitePath};
+    }
+
+    /* skip: bool */
+    function setSkipWelcomeScreen(skip){
+        state.skipWelcomeScreen = skip;
+    }
+
+    /*
+     * END SETTINGS METHODS
+     */
 
     // Load previous state
     try {
@@ -52,11 +64,14 @@ module.exports = function (options) {
     // Set state fallback values
     state = Object.assign({
         lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
+        skipWelcomeScreen: false,
     }, state);
 
     return {
         get lastOpenedSite() { return state.lastOpenedSite; },
+        get skipWelcomeScreen() { return state.skipWelcomeScreen; },
         setLastOpenedSite,
+        setSkipWelcomeScreen,
         saveState,
         resetStateToDefault
     };

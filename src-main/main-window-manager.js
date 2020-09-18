@@ -1,7 +1,4 @@
-//@flow
-
 const electron = require('electron');
-//const {BrowserWindow, BrowserView} = electron.BrowserWindow;
 const { BrowserView, BrowserWindow } = require('electron');
 const windowStateKeeper = require('electron-window-state');
 const url = require('url')
@@ -10,8 +7,8 @@ const fs = require('fs-extra')
 
 const WorkspaceService = require('./services/workspace/workspace-service')
 
+
 let mainWindow;
-//let previewWindowl;
 let mainWindowState;
 let mobilePreviewView;
 let mobilePreviewViewActive = false;
@@ -79,7 +76,7 @@ function getLocation(locPath = ''){
                 client.end();
                 if(mainWindow){
                     mainWindow.loadURL(url);
-                    getOpenedLastSite();
+                    getFirstScreenAfterStartup();
                 }
             }
             );
@@ -109,7 +106,7 @@ function getLocation(locPath = ''){
             mainWindow.loadURL(
                 url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
-            getOpenedLastSite();
+            getFirstScreenAfterStartup();
         }
         else{
             showNotFound(mainWindow, lookups);
@@ -117,13 +114,21 @@ function getLocation(locPath = ''){
     }
 }
 
-function getOpenedLastSite(){
+function getFirstScreenAfterStartup(){
     mainWindow.webContents.once('dom-ready', async () => {
-        if(global.currentSiteKey && global.currentWorkspaceKey){
-            console.log("switch to "+ global.currentSiteKey);
-            let newScreen = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-            mainWindow.webContents.send("redirectMountSite",newScreen);
-        }
+        const configurationDataProvider = require('./configuration-data-provider')
+        configurationDataProvider.get(function(err, configurations){
+            if(configurations.empty===true || configurations.sites.length ===0){
+                console.log("switch to welcomeScreen ");
+                mainWindow.webContents.send("redirectToGivenLocation", '/welcome');
+            }
+            else if(global.currentSiteKey && global.currentWorkspaceKey){
+                //TODO catch error when site does not exist
+                console.log("switch to "+ global.currentSiteKey);
+                let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+                mainWindow.webContents.send("redirectMountSite",newScreenURL);
+            }
+        });
     });
 }
 

@@ -103,18 +103,10 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentDidUpdate(preProps: HomeProps){
         if(this._ismounted && preProps.siteKey !== this.props.siteKey){
             this.checkSiteInProps();
-            //service.api.serveWorkspace(this.props.siteKey, this.props.workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
-        }
-        else if(this._ismounted && !preProps.siteKey){
-            //this.checkSiteInProps();
-            //this.setState({currentSiteKey: null});
-            //this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
         }
     }
 
     componentWillMount(){
-        //        window.require('electron').ipcRenderer.on('refreshSites', this.checkSiteInProps.bind(this));
-        //window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
         service.registerListener(this);
     }
 
@@ -122,20 +114,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.checkSiteInProps();
         this._ismounted = true;
     }
-    /*
-
-    unselectSite(){
-        return;
-        this.setState({currentSiteKey: null});
-        this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
-
-        service.getConfigurations(true).then((c)=>{
-            var stateUpdate  = {};
-            stateUpdate.configurations = c;
-            this.setState(stateUpdate);
-        });
-    }
-    */
 
     checkSiteInProps(){
         service.api.logToConsole("checkSiteInProps");
@@ -177,26 +155,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-    /*
-    selectSite(site : SiteConfig ){
-
-        //this.setState({selectedSite: null, selectedSiteWorkspaces:[]});
-        this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
-        this.setState({currentSiteKey: site.key});
-
-        //load all site configuration to enforce validation
-        service.api.listWorkspaces(site.key).then((workspaces)=>{
-
-            this.setState({selectedSiteWorkspaces: workspaces});
-            if(workspaces.length === 1){
-                this.selectWorkspace(site.key, workspaces[0]);
-            }
-
-
-        });
-    }
-    */
-
     getWorkspaceDetails = (workspace: WorkspaceHeader)=> {
         if(this.state.selectedSite==null) throw new Error('Invalid operation.');
         return service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
@@ -232,24 +190,11 @@ class Home extends React.Component<HomeProps, HomeState>{
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
 
 
-        //let activeWorkspaceKey = this.state.currentWorkspaceKey;
         this.setState({currentWorkspaceKey: workspace.key});
-
-        //      let select = (
-            //            activeWorkspaceKey==null ||
-            //            activeWorkspaceKey!==workspace.key
-        //        );
         let        select = true;
-
-            //    activeSiteKey!==siteKey
-            //            activeSiteKey==null ||
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
             this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
-
-
-            // Open a new window with the served site.
-            //window.require('electron').shell.openExternal('http://localhost:1313');
         }
         else{
             this.history.push(`/`);
@@ -329,7 +274,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     render(){
 
         let { siteKey } = this.props;
-        //let { selectedSite, selectedWorkspace, configurations, createSiteDialog, publishSiteDialog } = this.state;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
 
         let _configurations = ((configurations: any): Configurations);

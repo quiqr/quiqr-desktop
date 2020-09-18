@@ -11,6 +11,7 @@ import Home from './containers/Home'
 import Collection from './containers/Collection';
 import CollectionItem from './containers/CollectionItem';
 import Single from './containers/Single';
+import Welcome from './containers/Welcome';
 
 import WorkspaceSidebar from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
@@ -25,8 +26,6 @@ import Redirect from 'react-router-dom/Redirect';
 import service from './services/service';
 
 import type { EmptyConfigurations, Configurations } from './types';
-
-//const history = require("history").createBrowserHistory()
 
 type AppProps = {
 }
@@ -100,17 +99,17 @@ class App extends React.Component<AppProps,AppState>{
     }
 
     componentWillMount(){
-        window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
         window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
+        window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
         window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
         window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
         window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
         window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
         window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
-            //let sitekey=service.api.getCurrentSiteKey();
-            //service.api.logToConsole("switchto"+args);
-            //service.api.logToConsole("switchto"+sitekey);
             this.history.push(args);
+        }.bind(this));
+        window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
+            this.history.push(location);
         }.bind(this));
     }
 
@@ -160,15 +159,18 @@ class App extends React.Component<AppProps,AppState>{
 
   renderMenuSwitch(){
     return (<Switch>
-      <Route path="/" exact={true} render={ ({match, history})=> {
 
-            service.api.logToConsole("Matchsite: "+match.params.site);
-        return this.renderWorkspaceSidebar(history, match.url, null, null);
+      <Route path="/" exact={true} render={ ({match, history})=> {
+          service.api.logToConsole("Matchsite: "+match.params.site);
+          return this.renderWorkspaceSidebar(history, match.url, null, null);
+      }} />
+
+      <Route path="/welcome" exact={true} render={ ({match, history})=> {
+          return null;
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace' render={ ({match, history})=> {
-            service.api.logToConsole("Matchsite: "+match.params.site);
-            return this.renderWorkspaceSidebar(history, match.url, match.params.site, match.params.workspace);
+          return this.renderWorkspaceSidebar(history, match.url, match.params.site, match.params.workspace);
       }} />
 
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
@@ -189,9 +191,16 @@ class App extends React.Component<AppProps,AppState>{
           service.api.logToConsole("home -> /: ");
         return <SelectSite key={ 'selectSite' } />
       }} />
+
       <Route path='/selectsite' exact render={ () => {
         return <SelectSite key={ 'selectSite' } />
       }} />
+
+      <Route path='/welcome' exact render={ () => {
+            service.api.logToConsole("redirect to welcome");
+            return <Welcome key={ 'selectSite' } />
+      }} />
+
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
         //$FlowFixMe
         return <Home key={ 'home' } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
@@ -212,7 +221,6 @@ class App extends React.Component<AppProps,AppState>{
         return <FormsCookbookRouted />;
       }} />
       <Route path="*" component={(data)=>{
-        console.log('Redirecting...',data);
         return <Redirect to='/' />
       }} />
     </Switch>);

@@ -216,7 +216,7 @@ pogoform:\n\
 
                                 var spawn = require("child_process").spawn;
                                 let clonecmd4 = spawn( git_bin, [ "push","-s", "-i", tmpkeypath, full_gh_dest ]);
-                                //outputConsole.appendLine(git_bin+" push -i "+ tmpkeypath +" "+ full_gh_dest);
+                                outputConsole.appendLine(git_bin+" push -i "+ tmpkeypath +" "+ full_gh_dest);
 
                                 clonecmd4.stdout.on("data", (data) => {
                                 });

@@ -12,11 +12,6 @@ type AccordionHeaderProps = {
 }
 
 class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
-    
-    // shouldComponentUpdate(props, state){
-    //     return props.label != this.props.label
-    //         || props.active != this.props.active;
-    // }
 
     render(){
         let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
