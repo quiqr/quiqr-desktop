@@ -16,6 +16,8 @@ const mainWindowManager = require('./main-window-manager');
 const menuManager = require('./menu-manager');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
+const pogozipper = require('./pogozipper');
+
 /*::
 type APIContext = {
     resolve: (data: any) => void,
@@ -213,7 +215,11 @@ api.closeMobilePreview = function(context){
 api.logToConsole = function({message}, context){
     console.log(message);
 }
-
+api.importSiteAction = function(context){
+    return new Promise((resolve, reject)=>{
+        pogozipper.importSite()
+    });
+}
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
 
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){

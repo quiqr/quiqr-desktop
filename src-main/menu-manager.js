@@ -280,13 +280,25 @@ class MenuManager {
         }
     }
 
+    createDevMenu(){
+        let devMenu = [];
+        devMenu.push({
+            id: 'welcome',
+            label: 'open welcome',
+            click: async () => {
+                mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+                mainWindow.webContents.send("redirectToGivenLocation","/welcome");
+            }
+        });
+        return devMenu;
+    }
+
     createMainMenu(){
 
         const isMac = process.platform === 'darwin'
         const versionsMenu = this.createVersionsMenu();
 
         const template = [
-            // { role: 'appMenu' }
             ...(isMac ? [{
                 label: app.name,
                 submenu: [
@@ -307,7 +319,6 @@ class MenuManager {
                     { role: 'quit' }
                 ]
             }] : []),
-            // { role: 'fileMenu' }
             {
                 label: 'File',
                 submenu: [
@@ -400,7 +411,6 @@ class MenuManager {
                     isMac ? { role: 'close' } : { role: 'quit' }
                 ]
             },
-            // { role: 'editMenu' }
             {
                 label: 'Edit',
                 submenu: [
@@ -437,7 +447,6 @@ class MenuManager {
                     ])
                 ]
             },
-            // { role: 'viewMenu' }
             {
                 label: 'View',
                 submenu: [
@@ -453,7 +462,6 @@ class MenuManager {
                     { role: 'togglefullscreen' }
                 ]
             },
-            // { role: 'windowMenu' }
             {
                 label: 'Window',
                 submenu: [
@@ -526,6 +534,12 @@ class MenuManager {
                     { role: 'toggledevtools' },
                 ]
             },
+
+            ...(process.env.REACT_DEV_URL ? [{
+                label: 'DevMenu',
+                submenu: this.createDevMenu()
+            }] : []),
+
             {
                 role: 'help',
                 submenu: [

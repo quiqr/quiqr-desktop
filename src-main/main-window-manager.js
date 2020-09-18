@@ -79,7 +79,7 @@ function getLocation(locPath = ''){
                 client.end();
                 if(mainWindow){
                     mainWindow.loadURL(url);
-                    getOpenedLastSite();
+                    getFirstScreenAfterStartup();
                 }
             }
             );
@@ -109,7 +109,7 @@ function getLocation(locPath = ''){
             mainWindow.loadURL(
                 url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
-            getOpenedLastSite();
+            getFirstScreenAfterStartup();
         }
         else{
             showNotFound(mainWindow, lookups);
@@ -117,12 +117,18 @@ function getLocation(locPath = ''){
     }
 }
 
-function getOpenedLastSite(){
+function getFirstScreenAfterStartup(){
     mainWindow.webContents.once('dom-ready', async () => {
-        if(global.currentSiteKey && global.currentWorkspaceKey){
+
+        if(!global.skipWelcomeScreen){
+            console.log("switch to welcomeScreen ");
+            mainWindow.webContents.send("redirectToGivenLocation", '/welcome');
+        }
+        else if(global.currentSiteKey && global.currentWorkspaceKey){
+            //TODO catch error when site does not exist
             console.log("switch to "+ global.currentSiteKey);
-            let newScreen = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-            mainWindow.webContents.send("redirectMountSite",newScreen);
+            let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+            mainWindow.webContents.send("redirectMountSite",newScreenURL);
         }
     });
 }

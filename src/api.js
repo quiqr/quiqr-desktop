@@ -24,6 +24,9 @@ export class API {
         return mainProcessBridge.request('logToConsole', {message});
     }
 
+    importSite(){
+        return mainProcessBridge.request('importSiteAction');
+    }
     getCurrentSiteKey(){
         return mainProcessBridge.request('getCurrentSiteKey');
     }
