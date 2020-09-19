@@ -239,10 +239,11 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
         }
     }
     componentWillMount(){
-        window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
+        //window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
         service.registerListener(this);
     }
 
+    /*
     unselectSite(){
         return;
 
@@ -252,6 +253,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
             this.setState({site: null, workspace: null});
         }
     }
+    */
 
     refresh = ()=>{
         let {siteKey, workspaceKey } = this.props;
@@ -275,7 +277,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
     componentWillUnmount(){
         service.unregisterListener(this);
-        window.require('electron').ipcRenderer.removeListener('unselectSite', this.unselectSite.bind(this));
+        //window.require('electron').ipcRenderer.removeListener('unselectSite', this.unselectSite.bind(this));
         this._ismounted = false;
     }
 

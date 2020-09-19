@@ -6,12 +6,15 @@ const path = require('path')
 const fs = require('fs-extra')
 
 const WorkspaceService = require('./services/workspace/workspace-service')
+const PoppyGoAppConfig = require('./poppygo-app-config');
 
+const menuManager = require('./menu-manager');
 
 let mainWindow;
 let mainWindowState;
 let mobilePreviewView;
 let mobilePreviewViewActive = false;
+let pogoconf = PoppyGoAppConfig();
 
 function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -131,6 +134,7 @@ function getFirstScreenAfterStartup(){
         });
     });
 }
+
 
 function createWindow () {
 
@@ -253,9 +257,26 @@ async function setMobilePreviewBounds(){
 }
 
 module.exports = {
-
-    getCurrentInstance: function(){
+   getCurrentInstance: function(){
         return mainWindow;
+    },
+
+    closeSiteAndShowSelectSites: function(){
+        pogoconf.setLastOpenedSite(null, null, null);
+        pogoconf.saveState();
+
+        global.currentSitePath = null;
+        global.currentSiteKey = null;
+        global.currentWorkspaceKey = null;
+
+        mainWindow.webContents.send("disableMobilePreview");
+        mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
+        mainWindow.webContents.send("redirectToGivenLocation", '/');
+
+        mainWindow.setTitle("PoppyGo");
+
+        menuManager.updateMenu(null);
+        menuManager.createMainMenu();
     },
 
     openMobilePreview: function(){

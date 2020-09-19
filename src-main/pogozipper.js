@@ -4,7 +4,7 @@
  *
  */
 const electron = require('electron')
-const mainWindowManager = require('./main-window-manager');
+let mainWindowManager = require('./main-window-manager');
 
 //const rimraf = require("rimraf");
 
@@ -20,7 +20,7 @@ const PogoThemeExtension = "pogotheme";
 const PogoPassExtension = "pogopass";
 const PogoContentExtension = "pogocontent";
 const dialog = electron.dialog;
-const outputConsole = require('./output-console');
+let outputConsole = require('./output-console');
 const app = electron.app
 
 class Pogozipper{
@@ -97,6 +97,8 @@ class Pogozipper{
 
     async importSite(path=null) {
 
+        let outputConsole = require('./output-console');
+        let mainWindowManager = require('./main-window-manager');
         const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
 
         if(!path){
@@ -176,7 +178,7 @@ class Pogozipper{
             message: "Site has been imported.",
         });
 
-        mainWindow.webContents.send("unselectSite");
+        mainWindowManager.closeSiteAndShowSelectSites();
 
     }
 
@@ -248,9 +250,6 @@ class Pogozipper{
             type: 'info',
             message: "Theme has been imported.",
         });
-
-        //start server
-        //mainWindow.webContents.send("unselectSite");
     }
 
     checkCurrentSiteKey(){
@@ -447,8 +446,6 @@ class Pogozipper{
             message: "Passport has been imported.",
         });
 
-        //start server
-        //mainWindow.webContents.send("unselectSite");
     }
 
     async exportContent() {
@@ -569,10 +566,6 @@ class Pogozipper{
             type: 'info',
             message: "Content has been imported.",
         });
-
-        //start server
-        //mainWindow.webContents.send("unselectSite");
-
     }
 
 

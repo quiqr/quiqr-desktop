@@ -35,7 +35,6 @@ global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
 global.currentWorkspaceKey = pogoconf.lastOpenedSite.workspaceKey;
 global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
-global.pogoconf = pogoconf
 
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
@@ -122,7 +121,7 @@ function showProgress(progressBar,received,total){
 app.on('ready', function () {
     menuManager.createMainMenu();
     createWindow();
-    menuManager.init();
+    //menuManager.init();
 })
 
 app.on('before-quit', function () {

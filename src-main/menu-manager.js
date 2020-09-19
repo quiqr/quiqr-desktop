@@ -2,7 +2,7 @@ const electron = require('electron')
 const Menu = electron.Menu
 const path = require("path");
 const { lstatSync, readdirSync } = require('fs')
-const mainWindowManager = require('./main-window-manager');
+let mainWindowManager = require('./main-window-manager');
 const prefsWindowManager = require('./prefs-window-manager');
 const logWindowManager = require('./log-window-manager');
 const pogozipper = require('./pogozipper');
@@ -10,7 +10,7 @@ const pogoversions = require('./pogo-site-version-helper');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const SiteService = require('./services/site/site-service')
-const configurationDataProvider = require('./configuration-data-provider')
+let configurationDataProvider = require('./configuration-data-provider')
 
 const rimraf = require("rimraf");
 const pathHelper = require('./path-helper');
@@ -70,6 +70,7 @@ class MenuManager {
     }
 
     deleteSite() {
+        let mainWindowManager = require('./main-window-manager');
         mainWindow = mainWindowManager.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         let dir;
@@ -92,8 +93,7 @@ class MenuManager {
                 //console.log("rm done");
             });
 
-            //mainWindow.webContents.send("unselectSite");
-            this.createSelectSiteWindow();
+            this.selectSitesWindow();
         }
         else{
             dialog.showMessageBox(mainWindow, {
@@ -168,25 +168,9 @@ class MenuManager {
         }
     }
 
-    async createSelectSiteWindow () {
-
-        pogoconf.setLastOpenedSite(null, null, null);
-        pogoconf.saveState();
-
-        global.currentSitePath = null;
-        global.currentSiteKey = null;
-        global.currentWorkspaceKey = null;
-
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-        mainWindow.webContents.send("disableMobilePreview");
-        mainWindow.webContents.send("redirectHome"); //(App.js)
-        mainWindow.webContents.send("unselectSite"); //(Home.js/Sidebar.js)
-
-        mainWindow.setTitle("PoppyGo");
-
-        this.updateMenu(null);
-        this.createMainMenu();
-
+    async selectSitesWindow () {
+        const mainWindowManager = require('./main-window-manager');
+        mainWindowManager.closeSiteAndShowSelectSites();
         return;
     }
 
@@ -236,6 +220,7 @@ class MenuManager {
         if(global.currentSiteKey && global.currentWorkspaceKey){
             let siteKey = global.currentSiteKey;
             let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
             configurationDataProvider.get(function(err, configurations){
                 if(configurations.empty===true) throw new Error('Configurations is empty.');
                 if(err) { reject(err); return; }
@@ -319,7 +304,7 @@ class MenuManager {
                     {
                         label: 'Select website',
                         click: async () => {
-                            this.createSelectSiteWindow()
+                            this.selectSitesWindow()
                         }
                     },
                     { type: 'separator' },
