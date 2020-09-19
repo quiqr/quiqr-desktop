@@ -1,5 +1,12 @@
 # PoppyGo App CHANGELOG
 
+
+## vNEXT
+- move to expert: version switcher
+- remove markdown preview
+- welcome screen
+- refresh sites after import
+
 ## v0.6.5
 - new feature: version switcher
 
