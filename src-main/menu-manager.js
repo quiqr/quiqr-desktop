@@ -92,7 +92,6 @@ class MenuManager {
                 //console.log("rm done");
             });
 
-            //mainWindow.webContents.send("unselectSite");
             this.createSelectSiteWindow();
         }
         else{
@@ -330,11 +329,6 @@ class MenuManager {
                         }
                     },
                     {
-                        id: 'switch-version',
-                        label: 'Site versions',
-                        submenu: versionsMenu
-                    },
-                    {
                         id: 'export-site',
                         label: 'Export website',
                         enabled: this.siteSelected(),
@@ -522,6 +516,11 @@ class MenuManager {
                         click: async () => {
                             this.openWorkSpaceConfig()
                         }
+                    },
+                    {
+                        id: 'switch-version',
+                        label: 'Site versions',
+                        submenu: versionsMenu
                     },
                     { type: 'separator' },
                     { role: 'forcereload' },
