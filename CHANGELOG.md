@@ -1,5 +1,11 @@
 # PoppyGo App CHANGELOG
 
+
+## v0.6.6
+- move to expert: version switcher
+- remove markdown preview
+- welcome screen
+
 ## v0.6.5
 - new feature: version switcher
 

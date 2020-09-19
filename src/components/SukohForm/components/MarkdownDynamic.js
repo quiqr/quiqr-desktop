@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Tip from '../../Tip';
+import FormItemWrapper from './shared/FormItemWrapper';
 import DefaultWrapper from './shared/DefaultWrapper';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
@@ -142,49 +143,34 @@ class MarkdownDynamic extends BaseDynamic<MarkdownDynamicField, MarkdownDynamicS
             return (null);
         }
 
-        let tip = undefined;
         let paddingRight = 0;
-        if(field.tip){
-            tip = <Tip horizontalAlign='left' markdown={field.tip} style={{position:'absolute', right:0, top:20, zIndex:2}} />;
-            paddingRight = 50;
-        }
         let multiLine = field.multiLine===undefined?true:field.multiLine;
-
+        let iconButtons = [];
+        if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
         return (
-        <DefaultWrapper style={{justifyContent: 'space-between'}}>
             <div
                 ref={(div) => { this.inputWrapper = div; }}
                 style={{ width:'100%' }}
             >
-                <TextField
-                    onChange={this.onChange.bind(this)}
-                    value={this.state.value}
-                    floatingLabelFixed={true}
-                    multiLine={multiLine}
-                    fullWidth={true}
-                    rowsMax={30}
-                    underlineShow={true}
-                    textareaStyle={{minHeight: '80px'}}
-                    style={{paddingRight, transition:'none', boxSizing:'border-box'}}
-                    floatingLabelText={field.title} />
+
+            <FormItemWrapper
+            control={<TextField
+            onChange={this.onChange.bind(this)}
+            value={this.state.value}
+            floatingLabelFixed={true}
+            multiLine={multiLine}
+            fullWidth={true}
+            rowsMax={30}
+            underlineShow={true}
+            textareaStyle={{minHeight: '80px'}}
+            style={{paddingRight, transition:'none', boxSizing:'border-box'}}
+            floatingLabelText={field.title} />
+            }
+            iconButtons={iconButtons}
+        />
+
             </div>
-            {tip}
-            <div
-                ref={(div) => { this.markdownWrapper = div; }}
-                style={{ width: '100%', height:this.state.maxHeight, transition:'all .25s ease-in-out',}}
-            >
-                <Paper zDepth={1} rounded={false} style={{height:'100%', overflow:'auto'}}>
-                    <div className="markdown"
-                        style={{
-                            padding:20,
-                            paddingBottom: Math.max(20, this.state.maxHeight?this.state.maxHeight*2/3:0) }}
-                            ref={(div) => { this.previewContainer = div; }}
-                            dangerouslySetInnerHTML={{__html:this.state.preview}}>
-                    </div>
-                </Paper>
-            </div>
-        </DefaultWrapper>
         );
     }
 }
