@@ -10,7 +10,6 @@ const pathHelper = require('./../path-helper');
 const outputConsole = require('./../output-console');
 
 const ProgressBar = require('electron-progressbar');
-const mainWindowManager = require('../main-window-manager');
 const rimraf = require("rimraf");
 const spawn = require("child_process").spawn;
 //const spawnAw = require('await-spawn')
@@ -62,7 +61,7 @@ class PogoPublisher {
 
     async publish(context){
 
-        let mainWindow = mainWindowManager.getCurrentInstance();
+        let mainWindow = global.mainWM.getCurrentInstance();
         const dialog = electron.dialog;
 
         var progressBar = new ProgressBar({

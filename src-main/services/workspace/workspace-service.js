@@ -14,14 +14,12 @@ const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builde
 
 const contentFormats = require('./../../content-formats');
 const { promisify } = require('util');
-const mainWindowManager = require('./../../main-window-manager');
 const Jimp = require("jimp");
 const { createThumbnailJob, globJob } = require('./../../jobs');
 const HugoBuilder = require('./../../hugo/hugo-builder');
 const HugoServer = require('./../../hugo/hugo-server');
 const pathHelper = require('./../../path-helper');
 const workspaceConfigProvider = new WorkspaceConfigProvider();
-/*:: import type { WorkspaceConfig } from './../../../global-types.js'; */
 
 class WorkspaceService{
     constructor(workspacePath/* : string */, workspaceKey/*: string*/, siteKey/*: string*/){

@@ -9,7 +9,6 @@ const pathHelper = require('./../path-helper');
 const outputConsole = require('./../output-console');
 
 const ProgressBar = require('electron-progressbar');
-const mainWindowManager = require('../main-window-manager');
 
 class GithubPublisher {
     constructor(config){
@@ -59,7 +58,7 @@ class GithubPublisher {
     async publish(context){
 
         const dialog = electron.dialog;
-        let mainWindow = mainWindowManager.getCurrentInstance();
+        let mainWindow = global.mainWM.getCurrentInstance();
 
         var tmpkeypath = pathHelper.getRoot()+'ghkey';
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/githubrepo/';

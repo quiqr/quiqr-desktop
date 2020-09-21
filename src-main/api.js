@@ -12,7 +12,6 @@ const hugoDownloader = require('./hugo/hugo-downloader')
 const fs = require('fs-extra');
 const {dirname} = require('path');
 const {shell} = require('electron');
-const mainWindowManager = require('./main-window-manager');
 const menuManager = require('./menu-manager');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
@@ -163,7 +162,7 @@ api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*:
         context
     );
 
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.setTitle(siteKey.toUpperCase() + " - PoppyGo");
     menuManager.updateMenu(siteKey);
     global.currentSiteKey = siteKey;
@@ -172,33 +171,33 @@ api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*:
 }
 
 api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
 api.parentCloseMobilePreview = function(context){
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview")
 }
 
 api.parentTempHideMobilePreview = function(context){
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("tempHideMobilePreview")
 }
 
 api.parentTempUnHideMobilePreview = function(context){
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("tempUnHideMobilePreview")
 }
 
 api.openMobilePreview = function(context){
     return new Promise((resolve, reject)=>{
-        mainWindowManager.openMobilePreview();
+        global.mainWM.openMobilePreview();
     });
 }
 api.closeMobilePreview = function(context){
     return new Promise((resolve, reject)=>{
-        mainWindowManager.closeMobilePreview();
+        global.mainWM.closeMobilePreview();
     });
 }
 
@@ -231,7 +230,7 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
     });
 
     return new Promise((resolve, reject)=>{
-        mainWindowManager.closeMobilePreview();
+        global.mainWM.closeMobilePreview();
     });
 }
 

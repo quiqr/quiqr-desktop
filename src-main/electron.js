@@ -38,6 +38,7 @@ global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
 
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
+global.mainWM = mainWindowManager;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -46,7 +47,7 @@ let previewWindow;
 let logWindow;
 
 function createWindow () {
-    mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.on('closed', function () {
         mainWindow = null
     })
@@ -119,9 +120,8 @@ function showProgress(progressBar,received,total){
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-    menuManager.createMainMenu();
     createWindow();
-    //menuManager.init();
+    menuManager.createMainMenu();
 })
 
 app.on('before-quit', function () {

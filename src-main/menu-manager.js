@@ -2,7 +2,6 @@ const electron = require('electron')
 const Menu = electron.Menu
 const path = require("path");
 const { lstatSync, readdirSync } = require('fs')
-let mainWindowManager = require('./main-window-manager');
 const prefsWindowManager = require('./prefs-window-manager');
 const logWindowManager = require('./log-window-manager');
 const pogozipper = require('./pogozipper');
@@ -25,19 +24,15 @@ let pogoconf = PoppyGoAppConfig();
 
 class MenuManager {
 
-    init(){
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
-    }
-
     openCookbooks() {
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        mainWindow = global.mainWM.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         if (mainWindow) {
             mainWindow.webContents.send("redirectCookbook")
         }
     }
     stopServer() {
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        mainWindow = global.mainWM.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         if(global.hugoServer){
             global.hugoServer.stopIfRunning(function(err, stdout, stderr){
@@ -70,8 +65,7 @@ class MenuManager {
     }
 
     deleteSite() {
-        let mainWindowManager = require('./main-window-manager');
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        mainWindow = global.mainWM.getCurrentInstanceOrNew();
         mainWindow.webContents.send("disableMobilePreview");
         let dir;
 
@@ -169,8 +163,9 @@ class MenuManager {
     }
 
     async selectSitesWindow () {
-        const mainWindowManager = require('./main-window-manager');
-        mainWindowManager.closeSiteAndShowSelectSites();
+        console.log(global.mainWM);
+        global.mainWM.closeSiteAndShowSelectSites();
+
         return;
     }
 
@@ -207,7 +202,7 @@ class MenuManager {
     }
 
     openHome() {
-        mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        mainWindow = global.mainWM.getCurrentInstanceOrNew();
         if (mainWindow) {
             mainWindow.webContents.send("redirectHome")
         }
@@ -304,7 +299,7 @@ class MenuManager {
                     {
                         label: 'Select website',
                         click: async () => {
-                            this.selectSitesWindow()
+                            this.selectSitesWindow();
                         }
                     },
                     { type: 'separator' },
@@ -550,7 +545,7 @@ class MenuManager {
                         id: 'welcome',
                         label: 'Show welcome screen',
                         click: async () => {
-                            mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+                            mainWindow = global.mainWM.getCurrentInstanceOrNew();
                             mainWindow.webContents.send("redirectToGivenLocation","/welcome");
                         }
                     },

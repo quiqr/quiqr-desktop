@@ -4,12 +4,6 @@
  *
  */
 const electron = require('electron')
-let mainWindowManager = require('./main-window-manager');
-
-//const rimraf = require("rimraf");
-
-//const ProgressBar = require('electron-progressbar');
-
 const pathHelper = require('./path-helper');
 const fileDirUtils = require('./file-dir-utils');
 const fs = require('fs-extra');
@@ -26,8 +20,10 @@ const app = electron.app
 class Pogozipper{
 
 
+
+
     async exportSite() {
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -98,8 +94,7 @@ class Pogozipper{
     async importSite(path=null) {
 
         let outputConsole = require('./output-console');
-        let mainWindowManager = require('./main-window-manager');
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
@@ -178,7 +173,7 @@ class Pogozipper{
             message: "Site has been imported.",
         });
 
-        mainWindowManager.closeSiteAndShowSelectSites();
+        global.mainWM.closeSiteAndShowSelectSites();
 
     }
 
@@ -188,7 +183,7 @@ class Pogozipper{
         //stop preview
 
         if(!this.checkCurrentSiteKey()) {return;}
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
@@ -253,7 +248,7 @@ class Pogozipper{
     }
 
     checkCurrentSiteKey(){
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(global.currentSiteKey){
             return true;
@@ -269,7 +264,7 @@ class Pogozipper{
     }
 
     async exportTheme() {
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -324,7 +319,7 @@ class Pogozipper{
     }
 
     async exportPass() {
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -366,7 +361,7 @@ class Pogozipper{
         //stop preview
 
         if(!this.checkCurrentSiteKey()) {return;}
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
@@ -449,7 +444,7 @@ class Pogozipper{
     }
 
     async exportContent() {
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -505,7 +500,7 @@ class Pogozipper{
         //stop preview
 
         if(!this.checkCurrentSiteKey()) {return;}
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {

@@ -20,14 +20,6 @@ function showNotFound(logWindow/*: any*/, lookups/*: Array<string>*/){
 </html>`));
 }
 
-function showTesting(logWindow/*: any*/){
-    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
-<body style="font-family: sans-serif; padding: 2em">
-<h1>Testing</h1>
-<p>Testing...</p>
-</body>
-</html>`));
-}
 
 function showLookingForServer(logWindow/*: any*/, port/*: string*/){
     logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>

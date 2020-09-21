@@ -7,7 +7,6 @@ const electron = require('electron')
 const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
 const dialog = electron.dialog;
-const mainWindowManager = require('./main-window-manager');
 const fssimple = require('fs');
 const outputConsole = require('./output-console');
 const path = require("path");
@@ -16,7 +15,7 @@ const { lstatSync } = require('fs')
 class PogoSiteVersionHelper{
 
     async setSiteVersion(versionDir){
-        const mainWindow = mainWindowManager.getCurrentInstanceOrNew();
+        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         let siteKey = global.currentSiteKey;
         if(siteKey==""){

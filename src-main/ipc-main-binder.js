@@ -1,5 +1,3 @@
-//@flow
-
 let { ipcMain } = require('electron');
 let api = require('./api');
 

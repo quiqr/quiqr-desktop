@@ -1,10 +1,8 @@
 const { spawn } = require('child_process');
 const pathHelper = require('./../path-helper');
 const fs = require('fs-extra');
-//const outputConsole = require('./../output-console');
 
 global.currentServerProccess = undefined;
-let mainWindowManager;
 let mainWindow;
 
 class HugoServer{
@@ -48,8 +46,7 @@ class HugoServer{
         let {config, workspacePath, hugover} = this.config;
 
         try{
-            mainWindowManager = require('../main-window-manager');
-            mainWindow = mainWindowManager.getCurrentInstance();
+            mainWindow = global.mainWM.getCurrentInstance();
             if(mainWindow){
                 global.outputConsole.appendLine('Sending serverDown.');
                 mainWindow.webContents.send("serverDown")
@@ -108,7 +105,7 @@ class HugoServer{
                     isFirst=false;
                     global.outputConsole.appendLine('Starting Hugo Server...');
                     global.outputConsole.appendLine('');
-                    mainWindow = mainWindowManager.getCurrentInstance();
+                    mainWindow = global.mainWM.getCurrentInstance();
                     if(mainWindow){
                         global.outputConsole.appendLine('Sending serverLive.');
                         mainWindow.webContents.send("serverLive")

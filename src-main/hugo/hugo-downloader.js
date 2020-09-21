@@ -11,7 +11,6 @@ const outputConsole = require('./../output-console');
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
 
 const ProgressBar = require('electron-progressbar');
-const mainWindowManager = require('../main-window-manager');
 
 class OfficialHugoSourceUrlBuilder{
     build(enviromnent, version){
@@ -140,7 +139,7 @@ class HugoDownloader{
                 await fs.unlink(tempDest)
             }
 
-            let mainWindow = mainWindowManager.getCurrentInstance();
+            let mainWindow = global.mainWM.getCurrentInstance();
             var progressBar = new ProgressBar({
                 indeterminate: false,
                 text: 'Downloading PoppyGo Components, ..',
@@ -189,7 +188,7 @@ class HugoDownloader{
         catch(e){
             outputConsole.appendLine(`Hugo installation failed.`);
             const dialog = electron.dialog;
-            let mainWindow = mainWindowManager.getCurrentInstance();
+            let mainWindow = global.mainWM.getCurrentInstance();
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
                 message: "Hugo installation failed. Please contact your developer",

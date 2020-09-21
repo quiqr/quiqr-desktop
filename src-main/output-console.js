@@ -1,4 +1,3 @@
-const mainWindowManager = require('./main-window-manager');
 const logWindowManager = require('./log-window-manager');
 
 class OutputConsole{
@@ -15,7 +14,7 @@ class OutputConsole{
         if(logWindow)
             logWindow.webContents.send('message',{ type:'console', data:{ line }});
 
-        let mainWindow = mainWindowManager.getCurrentInstance();
+        let mainWindow = global.mainWM.getCurrentInstance();
         if(mainWindow)
             mainWindow.webContents.send('message',{ type:'console', data:{ line }});
 
