@@ -1,13 +1,20 @@
 //@flow
 
 import * as React from 'react';
+import { Route } from 'react-router-dom'
 import { ComponentContext } from './component-context';
 import { Debounce } from './debounce';
 //import type { FieldBase, FieldBaseGroup, DynamicFormNode, ComponentProps, BreadcumbComponentType } from './types';
 import type { FieldBase, FieldBaseGroup, DynamicFormNode, BreadcumbComponentType } from './types';
 import { ComponentRegistry } from './component-registry';
 import { FormStateBuilder } from './form-state-builder';
+import service from '../../services/service';
 import { FieldsExtender } from './fields-extender';
+import IconView from 'material-ui/svg-icons/action/visibility';
+import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
+import IconBack from 'material-ui/svg-icons/navigation/arrow-back';
+import { FlatButton, IconButton } from 'material-ui';
+
 
 const Fragment = React.Fragment;
 const componentMarginTop = '16px';
@@ -100,9 +107,22 @@ class Form extends React.Component<FormProps,FormState> {
     }
 
     setPath(node : DynamicFormNode<FieldBase>){
-        window.scrollTo(0,0);
-        this.currentNode = node;
-        this.setState({path: this.buildPath(node)});
+
+        if(this.props.collectionItemKey){
+            let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
+            let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
+            let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+            let itemType = "collections";
+
+            let newPath = `${basePath}/${itemType}/${encodeURIComponent(this.props.collectionKey)}`;
+            service.api.logToConsole(newPath);
+            this.history.push(newPath);
+        }
+        else{
+            window.scrollTo(0,0);
+            this.currentNode = node;
+            this.setState({path: this.buildPath(node)});
+        }
     }
 
     buildPath(currentNode : ?DynamicFormNode<FieldBase>) : string{
@@ -214,7 +234,12 @@ class Form extends React.Component<FormProps,FormState> {
             do{
                 nodes.push(currentNode);
                 if(currentNode===this.root){
-                    items.push({label: this.props.rootName||'ROOT', node:currentNode});
+                    if(this.props.collectionItemKey){
+                        items.push({label: this.props.rootName||'ROOT', node:currentNode});
+                    }
+                    else{
+                        items.push({label: this.props.rootName||'ROOT', node:null});
+                    }
                 }
                 else{
                     let componentPropslessInstace = this.props.componentRegistry.getProplessInstance(currentNode.field.type);
@@ -233,6 +258,11 @@ class Form extends React.Component<FormProps,FormState> {
         }
 
         items.reverse();
+
+        if(this.props.collectionItemKey){
+            items.push({label: this.props.collectionItemKey, node:null});
+        }
+
 
         let Breadcumb = this.props.breadcumbComponentType;
         return <Breadcumb items={items} onNodeSelected={this.setPath.bind(this)} />;
@@ -258,7 +288,24 @@ class Form extends React.Component<FormProps,FormState> {
 
         let form = (<div key={'dynamic-form'} style={{padding:'20px'}}>
 
-            {breadcumb}
+            <div
+            style={Object.assign({position : 'relative', paddingBottom: '16px', width:'100%', display:'flex'})}>
+            <IconButton touch={true} onclick="{}">
+                <IconBack color="" style={{}} />
+            </IconButton>
+           <div
+            style={Object.assign({flexGrow:1})}>
+                {breadcumb}
+            </div>
+            <IconButton touch={true} onclick="{}">
+                <IconOpenBrowser color="" style={{}} />
+            </IconButton>
+           <IconButton touch={true} onclick="{}">
+                <IconView color="" style={{}} />
+            </IconButton>
+         </div>
+
+
 
             {this.renderLevel({
                 field: {fields: this.state.fields, key:'root', compositeKey:'root', type:'root' },
@@ -281,7 +328,13 @@ class Form extends React.Component<FormProps,FormState> {
 
         </div>);
 
-        return form;
+        return (<Route render={({history})=>{ 
+
+          this.history = history;
+            return form }} 
+         />);
+
+
     }
 }
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
-import { FlatButton, Subheader, Toggle } from 'material-ui';
+import { Divider, FlatButton, Subheader, Toggle } from 'material-ui';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
 import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
 import IconHome from 'material-ui/svg-icons/action/home';
@@ -19,7 +19,6 @@ import service from './../services/service'
 import type { SiteConfig, WorkspaceConfig } from './../types'
 import * as Sidebar from './Sidebar';
 
-//const Fragment = React.Fragment;
 const translucentColor = 'RGBA(255,255,255,.8)';
 //const translucentColorSubtle = 'RGBA(255,255,255,.05)';
 
@@ -128,19 +127,16 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         return (
                 <div style={{paddingLeft:'0px'}}>
 
-                    <List style={{padding: 0}}>
-                        <ListItem primaryText={siteConfig.name} onClick={onClick} leftIcon={<IconHome color="white" style={{}} />} />
-                    </List>
-                    <hr/>
-                    <List style={{padding: 0}}>
-                     <ListItem leftIcon={<IconPhone color="white"  />}>
-                        <Toggle
-                        label="Mobile preview"
-                        toggled={this.state.mobilePreviewActive}
-                        onToggle={function(e,value){
-                            this.toggleMobilePreview();
-                        }.bind(this)}
-                        labelPosition='left' />
+                    <List style={{padding: 0}} dense={true}>
+                        <ListItem secondaryText="Dashboard, options and help" primaryText={siteConfig.name} onClick={onClick} leftIcon={<IconHome color="white" style={{}} />} />
+                        <ListItem leftIcon={<IconPhone color="white"  />}>
+                            <Toggle
+                            label="Mobile preview"
+                            toggled={this.state.mobilePreviewActive}
+                            onToggle={function(e,value){
+                                this.toggleMobilePreview();
+                            }.bind(this)}
+                            labelPosition='left' />
                       </ListItem>
                       <ListItem id="sidebar-item-openinbrowser" primaryText="Open in Browser" onClick={
     function(){
@@ -151,9 +147,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
                             }.bind(this)
                         } leftIcon={<IconOpenBrowser color="white" style={{marginRight:0}} />} />
-                    </List>
-                    <hr/>
+                </List>
 
+                    <Divider/>
 
                 </div>
         );

@@ -549,7 +549,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
             this.history = history;
             return (
             <div style={{padding:'20px'}}>
-                <Breadcumb items={[<BreadcumbItem label={collection.title} />]} />
+                <Breadcumb items={[<BreadcumbItem disabled={true} label={collection.title} />]} />
                 <br />
                 <div>
                     <RaisedButton label='New Item' onClick={ this.setCreateItemView.bind(this) /* function(){ history.push('/collections/'+encodeURIComponent(collectionKey)+'/new') */ } />

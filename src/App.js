@@ -21,11 +21,21 @@ import { MenuItem } from 'material-ui/';
 import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+
 import Redirect from 'react-router-dom/Redirect';
-
 import service from './services/service';
-
 import type { EmptyConfigurations, Configurations } from './types';
+
+const pogoTheme = getMuiTheme(lightBaseTheme, {
+    palette: {
+    },
+    props: {
+    },
+    overrides: {
+    },
+});
+
+
 
 type AppProps = {
 }
@@ -267,7 +277,7 @@ class App extends React.Component<AppProps,AppState>{
           this.history = history;
 
        return (
-         <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+         <MuiThemeProvider muiTheme={pogoTheme}>
            <div className="App">
              <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
                  <Console />
@@ -282,7 +292,7 @@ class App extends React.Component<AppProps,AppState>{
           this.history = history;
 
        return (
-         <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+         <MuiThemeProvider muiTheme={pogoTheme}>
            <div className="App">
              <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
 
@@ -306,7 +316,7 @@ class App extends React.Component<AppProps,AppState>{
 
             this.history = history;
             return (
-                <MuiThemeProvider muiTheme={getMuiTheme(lightBaseTheme)}>
+                <MuiThemeProvider muiTheme={pogoTheme}>
 
                         <div className="App" style={marginStyles}>
 

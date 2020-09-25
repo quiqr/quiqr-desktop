@@ -82,14 +82,18 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
         if(collection==null)return null;
 
         let fields = collection.fields.slice(0);
-        fields.unshift({key:'__item', type:'readonly', title:'Item'});
-
-        let values =  Object.assign({__item: collectionItemKey}, this.state.collectionItemValues)
+        //fields.unshift({key:'__item', type:'readonly', title:'Item'});
+        //let values =  Object.assign({__item: collectionItemKey}, this.state.collectionItemValues)
+        let values =  Object.assign(this.state.collectionItemValues)
 
         return(<SukohForm
             debug={false}
-            rootName={collection.itemtitle || collection.title}
+            rootName={collection.title}
             fields={fields}
+            siteKey={siteKey}
+            workspaceKey={workspaceKey}
+            collectionKey={collectionKey}
+            collectionItemKey={collectionItemKey}
             values={values}
             trim={false}
             plugins={{

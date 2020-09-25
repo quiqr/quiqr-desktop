@@ -20,9 +20,8 @@ type BreadcumbItemState = {
 export class BreadcumbItem extends React.Component<BreadcumbItemProps,BreadcumbItemState>{
     render(){
         return (<FlatButton
-            primary={true}
+            primary={this.props.disabled?false:true}
             style={{minWidth:'30px', borderRadius:'0px'}}
-            disabled={this.props.disabled}
             label={this.props.label}
             onClick={this.props.onClick} />);
     }
@@ -39,10 +38,10 @@ type BreadcumbState = {
 
 export class Breadcumb extends React.Component<BreadcumbProps,BreadcumbState>{
     render(){
-        
+
         let { items } = this.props;
         let newItems = [];
-        
+
         for(let i = 0; i < items.length; i++){
             if(i > 0){
                 newItems.push(<FlatButton
@@ -51,7 +50,7 @@ export class Breadcumb extends React.Component<BreadcumbProps,BreadcumbState>{
                     icon={<IconChevronRight />}
                     style={{minWidth:'30px'}} />)
             }
-            
+
             newItems.push(React.cloneElement(items[i], {key:'breadcumb-item-'+i}));
         }
 
@@ -78,6 +77,6 @@ export class FormBreadcumb extends React.Component<HoForm.BreadcumbProps,{}>{
                 }
             })
         } />
-        );  
+        );
     }
 }
