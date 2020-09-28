@@ -4,13 +4,13 @@ import {BaseService} from './base-service';
 import mainProcessBridge from './../utils/main-process-bridge';
 
 class SnackMessageService extends BaseService {
-    
+
     /* :: _snackMessageQueue : Array<any> */
     /* :: _currentSnackMessage : any */
     /* :: _previousSnackMessage : any */
 
     constructor(){
-        
+
         super();
         this._snackMessageQueue = [];
         this._currentSnackMessage = undefined;
@@ -23,7 +23,7 @@ class SnackMessageService extends BaseService {
 
         let snackMessage = this._snackMessageQueue.shift();
         if(snackMessage){
-            this._currentSnackMessage = snackMessage;            
+            this._currentSnackMessage = snackMessage;
             return true;
         }
         return false;
@@ -55,14 +55,14 @@ class SnackMessageService extends BaseService {
 
 
 class ConsoleService extends BaseService {
-    
+
     /* :: _consoleIsHiddden : bool */
     /* :: _consoleTimeout : any */
     /* :: _consoleMessages : Array<{id: number, line:string}> */
     /* :: _consoleBuffer : Array<{id: number, line:string}> */
     /* :: consoleMessageLastId : number */
 
-    
+
     constructor(){
         super();
         this._consoleIsHiddden = true;

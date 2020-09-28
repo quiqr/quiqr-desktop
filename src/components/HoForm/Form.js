@@ -14,6 +14,7 @@ import IconView from 'material-ui/svg-icons/action/visibility';
 import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
 import IconBack from 'material-ui/svg-icons/navigation/arrow-back';
 import { FlatButton, IconButton } from 'material-ui';
+import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 
 
 const Fragment = React.Fragment;
@@ -106,17 +107,20 @@ class Form extends React.Component<FormProps,FormState> {
         return null;
     }
 
+    generateParentPath(){
+        let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
+        let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
+        let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+        let itemType = "collections";
+
+        let newPath = `${basePath}/${itemType}/${encodeURIComponent(this.props.collectionKey)}`;
+        return newPath;
+    }
+
     setPath(node : DynamicFormNode<FieldBase>){
 
         if(this.props.collectionItemKey){
-            let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
-            let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
-            let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
-            let itemType = "collections";
-
-            let newPath = `${basePath}/${itemType}/${encodeURIComponent(this.props.collectionKey)}`;
-            service.api.logToConsole(newPath);
-            this.history.push(newPath);
+            this.history.push(this.generateParentPath());
         }
         else{
             window.scrollTo(0,0);
@@ -182,6 +186,21 @@ class Form extends React.Component<FormProps,FormState> {
         }
     }
 
+    handleOpenPageInBrowser() {
+        if(this.props.pageUrl){
+            window.require('electron').shell.openExternal(this.props.pageUrl);
+        }
+    }
+    handleBackButton(){
+        this.history.push(this.generateParentPath());
+    }
+    handleAlignMobilePreview(){
+        if(this.props.pageUrl){
+            service.api.openMobilePreview();
+            service.api.updateMobilePreviewUrl(this.props.pageUrl);
+        }
+    }
+
     /**
      * Render a level of components
      * Can be used recursively when called by a component
@@ -235,6 +254,7 @@ class Form extends React.Component<FormProps,FormState> {
                 nodes.push(currentNode);
                 if(currentNode===this.root){
                     if(this.props.collectionItemKey){
+
                         items.push({label: this.props.rootName||'ROOT', node:currentNode});
                     }
                     else{
@@ -288,24 +308,26 @@ class Form extends React.Component<FormProps,FormState> {
 
         let form = (<div key={'dynamic-form'} style={{padding:'20px'}}>
 
-            <div
-            style={Object.assign({position : 'relative', paddingBottom: '16px', width:'100%', display:'flex'})}>
-            <IconButton touch={true} onclick="{}">
-                <IconBack color="" style={{}} />
-            </IconButton>
-           <div
-            style={Object.assign({flexGrow:1})}>
-                {breadcumb}
+            <div style={Object.assign({position : 'relative', paddingBottom: '16px', width:'100%', display:'flex'})}>
+                <IconButton touch={true} onClick={()=>{this.handleBackButton();}}>
+                    <IconBack color="" style={{}} />
+                </IconButton>
+                <div style={Object.assign({flexGrow:1})}>
+                    {breadcumb}
+                </div>
+                { this.props.pageUrl ?
+                <IconButton touch={true} onClick={()=>{this.handleOpenPageInBrowser();}}>
+                    <IconOpenBrowser color="" style={{}} />
+                </IconButton>
+                : undefined}
+
+                { this.props.pageUrl ?
+                        <IconButton touch={true} onClick={()=>{this.handleAlignMobilePreview();}}>
+                    <IconView color="" style={{}} />
+                </IconButton>
+                : undefined}
+
             </div>
-            <IconButton touch={true} onclick="{}">
-                <IconOpenBrowser color="" style={{}} />
-            </IconButton>
-           <IconButton touch={true} onclick="{}">
-                <IconView color="" style={{}} />
-            </IconButton>
-         </div>
-
-
 
             {this.renderLevel({
                 field: {fields: this.state.fields, key:'root', compositeKey:'root', type:'root' },
@@ -328,10 +350,10 @@ class Form extends React.Component<FormProps,FormState> {
 
         </div>);
 
-        return (<Route render={({history})=>{ 
+        return (<Route render={({history})=>{
 
           this.history = history;
-            return form }} 
+            return form }}
          />);
 
 

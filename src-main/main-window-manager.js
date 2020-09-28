@@ -187,6 +187,7 @@ function createWindow () {
         mainWindow.setBrowserView(mobilePreviewView);
         mainWindow.show();
 
+        //mobilePreviewView.webContents.loadURL('http://localhost:1313');
 
     });
 
@@ -279,11 +280,15 @@ module.exports = {
         menuManager.createMainMenu();
     },
 
+    setMobilePreviewUrl: function(url){
+        console.log(url);
+        mobilePreviewView.webContents.loadURL(url);
+        mobilePreviewView.webContents.session.clearCache(function(){return true});
+    },
+
     openMobilePreview: function(){
         mobilePreviewViewActive = true;
-        mobilePreviewView.webContents.loadURL('http://localhost:1313');
         mobilePreviewView.webContents.session.clearCache(function(){return true});
-
 
         mainWindow.webContents.send("setMobileBrowserOpen");
         setMobilePreviewBounds();

@@ -132,6 +132,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
                     fields={this.props.fields}
                     plugins={this.props.plugins}
                     rootName={this.props.rootName}
+                    pageUrl={this.props.pageUrl}
                     values={this.props.values}
                     onChange={this.handleFormChange.bind(this)}
                     />

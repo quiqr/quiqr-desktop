@@ -115,7 +115,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
         //load all site configuration to enforce validation
 
-        service.api.logToConsole("mount :"+site.key);
         service.api.listWorkspaces(site.key).then((workspaces)=>{
 
             this.setState({selectedSiteWorkspaces: workspaces});

@@ -134,6 +134,7 @@ class WorkspaceConfigValidator {
                 title: joi.string().trim().min(3).max(30).required().error(new Error('The singles.title value is invalid.')),
                 file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.')),
                 dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
+                previewUrl: joi.string().trim(),
                 fields: joi.array().min(1).required().error(new Error('The singles.fields value is invalid.'))
             })
         ).error;

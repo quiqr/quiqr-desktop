@@ -116,13 +116,10 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     checkSiteInProps(){
-        service.api.logToConsole("checkSiteInProps");
         var { siteKey, workspaceKey } = this.props;
-        service.api.logToConsole('siteKey from homesimple:'+ siteKey);
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey != siteKey){
-                service.api.logToConsole("one time only?");
                 // Serve the workspace at selection of the workspace right after mounting the workspace
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
             }

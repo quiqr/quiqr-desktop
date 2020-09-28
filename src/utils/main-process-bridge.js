@@ -1,9 +1,3 @@
- //@flow
-
-/*::
-    type MessageHandler = (eventData:any, arg:any) => void;
-*/
-
 export type AbortablePromise<T> = Promise<T> & { forceAbort: ()=>void };
 
 class MainProcessBridge{

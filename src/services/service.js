@@ -1,5 +1,3 @@
-//@flow
-
 import { BaseService } from './base-service';
 import * as api from './../api';
 import type { Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../types.js';

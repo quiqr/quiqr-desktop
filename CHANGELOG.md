@@ -7,6 +7,13 @@
 - welcome screen
 - refresh sites after import
 
+## v0.6.6
+- auto open preview url
+- add "previewUrl" property to singles
+- back button in collections breadcrum
+- preview icons in page editor
+- improve sidebar menu
+
 ## v0.6.5
 - new feature: version switcher
 

@@ -201,6 +201,11 @@ api.closeMobilePreview = function(context){
     });
 }
 
+api.updateMobilePreviewUrl = function({url}, context){
+    return new Promise((resolve, reject)=>{
+        global.mainWM.setMobilePreviewUrl(url);
+    });
+}
 api.logToConsole = function({message}, context){
     console.log(message);
 }

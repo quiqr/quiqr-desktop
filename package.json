@@ -6,7 +6,7 @@
     "email": "pim@lingewoud.nl"
   },
   "description": "The PoppyGo Hugo Publishing App.",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",

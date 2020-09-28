@@ -52,6 +52,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
             })
         ]).then(()=>{
             this.setState(stateUpdate);
+
         });
 
     }
@@ -66,6 +67,23 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
         }, function(){
             context.reject('Something went wrong.');
         })
+    }
+
+    generatePageUrl(collection){
+
+        let ItemPathElements = this.props.collectionItemKey.split("/");
+        let pageItem = ItemPathElements.pop();
+        if(pageItem !='index.md'){
+            ItemPathElements.push(pageItem.split('.').slice(0, -1).join('.'));
+        }
+
+        let CollectionPath = collection.folder.split("/")
+        CollectionPath.shift();
+
+        let path = CollectionPath.join("/")+ItemPathElements.join("/");
+        let url = 'http://localhost:1313/'+path.toLowerCase();
+
+        return url;
     }
 
 
@@ -86,9 +104,13 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
         //let values =  Object.assign({__item: collectionItemKey}, this.state.collectionItemValues)
         let values =  Object.assign(this.state.collectionItemValues)
 
+        let pageUrl = this.generatePageUrl(collection);
+        service.api.updateMobilePreviewUrl(pageUrl)
+
         return(<SukohForm
             debug={false}
             rootName={collection.title}
+            pageUrl={pageUrl}
             fields={fields}
             siteKey={siteKey}
             workspaceKey={workspaceKey}

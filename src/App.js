@@ -153,9 +153,7 @@ class App extends React.Component<AppProps,AppState>{
     }
 
     renderWorkspaceSidebar = (history : any, url : string, site : ?string, workspace : ?string)=>{
-        service.api.logToConsole(window.location.href);
 
-        service.api.logToConsole('url:'+url);
         return <WorkspaceSidebar
         key={ url }
         siteKey={ site ? decodeURIComponent(site) : null }
@@ -171,7 +169,6 @@ class App extends React.Component<AppProps,AppState>{
     return (<Switch>
 
       <Route path="/" exact={true} render={ ({match, history})=> {
-          service.api.logToConsole("Matchsite: "+match.params.site);
           return this.renderWorkspaceSidebar(history, match.url, null, null);
       }} />
 
@@ -198,7 +195,6 @@ class App extends React.Component<AppProps,AppState>{
   renderContentSwitch(){
     return (<Switch>
       <Route path='/' exact render={ () => {
-          service.api.logToConsole("home -> /: ");
         return <SelectSite key={ 'selectSite' } />
       }} />
 
@@ -207,7 +203,6 @@ class App extends React.Component<AppProps,AppState>{
       }} />
 
       <Route path='/welcome' exact render={ () => {
-            service.api.logToConsole("redirect to welcome");
             return <Welcome key={ 'selectSite' } />
       }} />
 
@@ -227,7 +222,6 @@ class App extends React.Component<AppProps,AppState>{
         //$FlowFixMe
         return <Single key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } singleKey={ decodeURIComponent(match.params.single) } /> }} />
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
-          service.api.logToConsole(window.location.href);
         return <FormsCookbookRouted />;
       }} />
       <Route path="*" component={(data)=>{

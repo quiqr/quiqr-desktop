@@ -79,6 +79,11 @@ class Single extends React.Component<SingleProps,SingleState>{
         let single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
         if(single==null) return null;
 
+        let previewUrl = null;
+        if(single.previewUrl){
+            previewUrl = 'http://localhost:1313'+single.previewUrl;
+            service.api.updateMobilePreviewUrl(previewUrl)
+        }
 
         var { siteKey, workspaceKey, singleKey } = this.props;
 
@@ -87,6 +92,7 @@ class Single extends React.Component<SingleProps,SingleState>{
             rootName={single.title}
             fields={single.fields}
             values={this.state.singleValues}
+            pageUrl={previewUrl}
             onSave={this.handleSave.bind(this)}
             plugins={{
                 openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){

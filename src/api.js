@@ -42,6 +42,10 @@ export class API {
         return mainProcessBridge.request('closeMobilePreview');
     }
 
+    updateMobilePreviewUrl( url: string){
+        return mainProcessBridge.request('updateMobilePreviewUrl', {url});
+    }
+
     buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string){
         return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey});
     }

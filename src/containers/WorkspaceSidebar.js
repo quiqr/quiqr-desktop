@@ -129,24 +129,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
                     <List style={{padding: 0}} dense={true}>
                         <ListItem secondaryText="Dashboard, options and help" primaryText={siteConfig.name} onClick={onClick} leftIcon={<IconHome color="white" style={{}} />} />
-                        <ListItem leftIcon={<IconPhone color="white"  />}>
-                            <Toggle
-                            label="Mobile preview"
-                            toggled={this.state.mobilePreviewActive}
-                            onToggle={function(e,value){
-                                this.toggleMobilePreview();
-                            }.bind(this)}
-                            labelPosition='left' />
-                      </ListItem>
-                      <ListItem id="sidebar-item-openinbrowser" primaryText="Open in Browser" onClick={
-    function(){
-                                if(!this.state.hugoRunning){
-                                    service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace");
-                                }
-                                window.require('electron').shell.openExternal('http://localhost:1313');
-
-                            }.bind(this)
-                        } leftIcon={<IconOpenBrowser color="white" style={{marginRight:0}} />} />
                 </List>
 
                     <Divider/>
@@ -239,22 +221,8 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
         service.registerListener(this);
     }
 
-    /*
-    unselectSite(){
-        return;
-
-        service.api.logToConsole("unselect from sidebar:") ;
-        if(this._ismounted){
-
-            this.setState({site: null, workspace: null});
-        }
-    }
-    */
-
     refresh = ()=>{
         let {siteKey, workspaceKey } = this.props;
-        service.api.logToConsole("sitekey:" + siteKey);
-
         if(siteKey && workspaceKey){
             let stateUpdate = {};
             service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
