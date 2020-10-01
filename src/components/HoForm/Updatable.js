@@ -8,11 +8,11 @@ type UpdatableProps = {
 }
 
 type UpdatableState = {
-    
+
 }
 
 export class Updatable extends React.Component<UpdatableProps, UpdatableState>{
-    
+
     shouldComponentUpdate(nextProps: UpdatableProps, nextState: UpdatableState){
         return nextProps.update;
     }

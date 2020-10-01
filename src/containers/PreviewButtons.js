@@ -12,7 +12,6 @@ class PreviewButtons extends React.Component{
     }
 
     setUrl(url){
-        service.api.logToConsole(url);
         let path = url.split('1313')[1];
         if(path == ''){
             path = "/";

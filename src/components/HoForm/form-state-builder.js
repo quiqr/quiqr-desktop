@@ -32,7 +32,7 @@ export class FormStateBuilder{
                     state: cState,
                     field,
                     stateBuilder:this
-                });               
+                });
             }
             else{
                 throw new Error('Could not find component of type '+field.type);
