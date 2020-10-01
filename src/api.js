@@ -62,6 +62,9 @@ export class API {
         return mainProcessBridge.request('getSingle', {siteKey, workspaceKey, singleKey});
     }
 
+    openSingleInEditor(siteKey: string, workspaceKey: string, singleKey: string){
+        return mainProcessBridge.request('openSingleInEditor', {siteKey, workspaceKey, singleKey});
+    }
     updateSingle(siteKey: string, workspaceKey: string, singleKey: string, document: any){
         return mainProcessBridge.request('updateSingle', {siteKey, workspaceKey, singleKey, document});
     }
@@ -72,6 +75,10 @@ export class API {
 
     getCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string){
         return mainProcessBridge.request('getCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey});
+    }
+
+    openCollectionItemInEditor(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string){
+        return mainProcessBridge.request('openFileDialogForCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey});
     }
 
     updateCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, document: any){

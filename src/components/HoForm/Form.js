@@ -9,6 +9,7 @@ import service from '../../services/service';
 import { FieldsExtender } from './fields-extender';
 import IconView from 'material-ui/svg-icons/action/visibility';
 import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
+import IconOpenEditor from 'material-ui/svg-icons/action/description';
 import IconBack from 'material-ui/svg-icons/navigation/arrow-back';
 import { FlatButton, IconButton } from 'material-ui';
 import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
@@ -179,6 +180,12 @@ class Form extends React.Component<FormProps,FormState> {
         }
     }
 
+    handleOpenFileInEditor() {
+        if(this.props.pageUrl){
+            window.require('electron').shell.openExternal(this.props.pageUrl);
+        }
+    }
+
     handleOpenPageInBrowser() {
         if(this.props.pageUrl){
             window.require('electron').shell.openExternal(this.props.pageUrl);
@@ -312,7 +319,11 @@ class Form extends React.Component<FormProps,FormState> {
                 <div style={Object.assign({flexGrow:1})}>
                     {breadcumb}
                 </div>
-                { this.props.pageUrl ?
+                 <IconButton touch={true} onClick={()=>{this.props.onOpenInEditor();}}>
+                    <IconOpenEditor color="" style={{}} />
+                </IconButton>
+
+               { this.props.pageUrl ?
                 <IconButton touch={true} onClick={()=>{this.handleOpenPageInBrowser();}}>
                     <IconOpenBrowser color="" style={{}} />
                 </IconButton>

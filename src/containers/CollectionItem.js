@@ -1,12 +1,8 @@
-//@flow
-
 import React from 'react';
 import service from './../services/service'
 import { snackMessageService } from './../services/ui-service'
-// import { Redirect } from 'react-router-dom'
 import { SukohForm } from './../components/SukohForm';
 import Spinner from './../components/Spinner'
-// import { FormBreadcumb } from './../components/Breadcumb'
 
 import type { WorkspaceConfig } from './../types';
 
@@ -55,6 +51,18 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
 
         });
 
+    }
+
+
+    handleOpenInEditor(context: any){
+        let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+
+        let promise = service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
+        promise.then(function(updatedValues){
+            //context.accept(updatedValues);
+        }, function(){
+            context.reject('Something went wrong.');
+        })
     }
 
     handleSave(context: any){
@@ -127,6 +135,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
                 }
             }}
             onSave={this.handleSave.bind(this)}
+            onOpenInEditor={this.handleOpenInEditor.bind(this)}
         />);
     }
 }

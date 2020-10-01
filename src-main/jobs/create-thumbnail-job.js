@@ -11,7 +11,9 @@ const action /* : ( params: { src: string, dest: string }) => Promise<void> */ =
         jimp.read(src, function (err, lenna) {
             if (err) reject(err);
             else{
-                lenna.resize(56, 56).write(dest, (err) =>{
+                //lenna.resize(56, 56).write(dest, (err) =>{
+
+                lenna.scaleToFit(300,100).write(dest, (err) =>{
                     if(err) reject();
                     else resolve();
                 });

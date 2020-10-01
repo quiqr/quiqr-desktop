@@ -1,4 +1,4 @@
-// @flow
+const {shell} = require('electron');
 
 const fs = require('fs-extra');
 const fssimple = require('fs');
@@ -124,6 +124,14 @@ class WorkspaceService{
         }
     }
 
+    //Update the single
+    async openSingleInEditor(singleKey){
+        let config = await this.getConfigurationsData();
+        let single = config.singles.find(x => x.key === singleKey);
+        if(single==null)throw new Error('Could not find single.');
+        let filePath = path.join(this.workspacePath, single.file);
+        shell.openItem(filePath);
+    }
     //Update the single
     async updateSingle(singleKey /* : string */, document /* : any */ ){
         let config = await this.getConfigurationsData();
@@ -343,6 +351,16 @@ class WorkspaceService{
             return true;
         }
         return false;
+    }
+
+    async openCollectionItemInEditor(collectionKey , collectionItemKey){
+        let config = await this.getConfigurationsData();
+        let collection = config.collections.find(x => x.key === collectionKey);
+        if(collection==null)
+            throw new Error('Could not find collection.');
+        let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+
+        shell.openItem(filePath);
     }
 
     async updateCollectionItem(collectionKey /* : string */ , collectionItemKey /* : string */, document /* : any */){

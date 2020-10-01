@@ -1,15 +1,12 @@
-//@flow
-
 import React from 'react';
-//import Tip from '../../Tip';
-//import IconButtonGroup from '../../IconButtonGroup';
-import IconUpload from 'material-ui/svg-icons/file/file-upload';
+import IconUpload from 'material-ui/svg-icons/file/folder-open';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Accordion, AccordionItem } from '../../Accordion';
 import DangerButton from '../../DangerButton';
 import FlatButton from 'material-ui/FlatButton';
-import IconRemove from 'material-ui/svg-icons/content/clear';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+import Divider from 'material-ui/Divider';
+import IconRemove from 'material-ui/svg-icons/action/delete';
+//import IconRemove from 'material-ui/svg-icons/content/clear';
 import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
@@ -34,7 +31,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     extendField(field: BundleManagerDynamicField, fieldExtender : any){
         if(field.fields===undefined)
             field.fields = [];
-        field.fields.unshift({ key:'src', type:'readonly', title:'Source File' });
+        //field.fields.unshift({ key:'src', type:'readonly', title:'Source File' });
         fieldExtender.extendFields(field.fields);
     }
 
@@ -114,9 +111,11 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
 
 
         return (<React.Fragment>
-            {field.title?<div style={{padding:'16px 0'}}>{field.title}</div>:undefined}
-            <div style={{padding:'16px 16px 0px 16px', marginBottom:'16px', overflow:'auto', borderLeft: 'solid 10px #eee'}}>
-            <Accordion>
+            <Divider />
+            <div style={{padding:'16px 0'}}>
+            {field.title?field.title:"Page files"}
+            </div>
+            <Accordion forceActive={true}>
                 { (itemsStates).map((state,childIndex)=>{
                     let newNode = {
                         field,
@@ -128,6 +127,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
                         style={{marginTop:childIndex?'8px':undefined}}
                         bodyStyle={{padding:'16px 16px 0px 16px'}}
                         label={state.name||state.src}
+                        forceActive={true}
                         key={field.key+'-resource-'+childIndex}
                         body={context.renderLevel(newNode)}
                         headerRightItems={[
@@ -145,8 +145,12 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
                     />)
                 }) }
             </Accordion>
-            <RaisedButton style={{marginBottom:'16px', marginTop:itemsStates.length?'16px':undefined}} onClick={this.onButtonClick.bind(this)} icon={<IconUpload />} />
-            </div>
+            <RaisedButton
+            primary={true}
+            label="Add file"
+            style={{marginBottom:'16px', marginTop:itemsStates.length?'16px':undefined}}
+            onClick={this.onButtonClick.bind(this)}
+            icon={<IconUpload />} />
 
 
 
