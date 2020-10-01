@@ -5,6 +5,8 @@
 
 ## v0.6.6
 
+- don't bother users with valid keys, let them enter titles and auto generate key
+- delete directory too when deleting a pageBundle
 - open entry after creation collections
 - imrove texts in dialogs when publishing
 - improve preview user interface
