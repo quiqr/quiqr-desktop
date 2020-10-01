@@ -87,7 +87,7 @@ class PogoPublisher {
             .on('progress', function(value) {
             });
 
-        progressBar.value += 1;
+        progressBar.value += 10;
         progressBar.detail = 'Preparing upload';
 
 
@@ -147,7 +147,7 @@ pogoform:\n\
         //console.log(sshkeyscan.toString());
 
         progressBar.value += 10;
-        progressBar.detail = 'Get remote website for synchronizing (git-clone)';
+        progressBar.detail = 'Get remote website files for synchronization';
 
         outputConsole.appendLine('Start cloning from: ' + full_gh_url);
 
@@ -169,7 +169,7 @@ pogoform:\n\
                 outputConsole.appendLine('gitignore is: ' + gitignore);
 
                 progressBar.value += 10;
-                progressBar.detail = 'Synchronizing site with last changes (copy)';
+                progressBar.detail = 'Synchronizing last changes';
 
                 console.log(full_gh_dest + '/.git');
                 console.log(full_gh_dest + '/.gitmove');
@@ -185,7 +185,7 @@ pogoform:\n\
                 outputConsole.appendLine('copy finished, going to git-add ...');
 
                 progressBar.value += 10;
-                progressBar.detail = 'Registering changes with destination (git-add)';
+                progressBar.detail = 'Registering changes with destination';
 
                 var spawn = require("child_process").spawn;
                 let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
@@ -199,7 +199,7 @@ pogoform:\n\
 
                         outputConsole.appendLine('git-add finished, going to git-commit ...');
                         progressBar.value += 10;
-                        progressBar.detail = 'Commit changes (git-commit)';
+                        progressBar.detail = 'Apply changes';
 
                         var spawn = require("child_process").spawn;
                         let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n','sukoh','-e','sukoh@brepi.eu', '-m', 'publish from sukoh',full_gh_dest]);
@@ -232,7 +232,7 @@ pogoform:\n\
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
                                             type: 'info',
-                                            message: "Finished publishing. (git-push)",
+                                            message: "Your updates have been published. \n In a few minutes changes will be visible.",
                                         });
 
                                     }
