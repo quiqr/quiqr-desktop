@@ -4,6 +4,8 @@
 ## vNEXT
 
 ## v0.6.6
+
+- open entry after creation collections
 - imrove texts in dialogs when publishing
 - improve preview user interface
 - remove markdown preview
