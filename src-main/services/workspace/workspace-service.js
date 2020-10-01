@@ -2,6 +2,8 @@
 
 const fs = require('fs-extra');
 const fssimple = require('fs');
+const rimraf = require("rimraf");
+
 const fm = require('front-matter')
 
 const path = require('path');
@@ -178,7 +180,7 @@ class WorkspaceService{
         }
     }
 
-    async createCollectionItemKey(collectionKey /* : string */,  collectionItemKey /* : string */){
+    async createCollectionItemKey(collectionKey,  collectionItemKey, itemTitle){
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
         if(collection==null)
@@ -197,7 +199,7 @@ class WorkspaceService{
             return { unavailableReason:'already-exists' };
 
         await fs.ensureDir(path.dirname(filePath));
-        let stringData = await this._smartDump(filePath, [collection.dataformat], {});
+        let stringData = await this._smartDump(filePath, [collection.dataformat], {title:itemTitle});
         await fs.writeFile(filePath, stringData, {encoding:'utf8'});
 
         return { key: returnedKey.replace(/\\/g,'/') };
@@ -293,16 +295,24 @@ class WorkspaceService{
         return { renamed: true, item: { key:newFileKey.replace(/\\/g,'/'), label:collectionItemNewKey }};
     }
 
-    async deleteCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */){
+   async deleteCollectionItem(collectionKey, collectionItemKey){
         //TODO: only work with "label" of a collection item
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
         if(collection==null)
-            throw new Error('Could not find collection.');
-        let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+           throw new Error('Could not find collection.');
+
+       let filePath = ""
+       if(collectionItemKey.endsWith("/index.md")){
+           filePath = path.join(this.workspacePath, collection.folder, collectionItemKey.split("/")[0]);
+       }
+       else {
+           filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+       }
+
         if (fs.existsSync(filePath)){
             //TODO: use async await with a promise to test if deletion succeded
-            fs.unlink(filePath);
+            await rimraf.sync(filePath);
             return true;
         }
         return false;

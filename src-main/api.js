@@ -44,8 +44,8 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     });
 }
 
-function getWorkspaceService(siteKey/*: string*/, 
-    workspaceKey/*: string*/, 
+function getWorkspaceService(siteKey/*: string*/,
+    workspaceKey/*: string*/,
     callback/*: CallbackTyped<{siteService: SiteService, workspaceService: WorkspaceService}>*/){
     return getWorkspaceServicePromise(siteKey, workspaceKey).then((data)=>{
         callback(null, data);
@@ -287,12 +287,16 @@ api.getCollectionItem = function({siteKey, workspaceKey, collectionKey, collecti
     });
 }
 
-api.createCollectionItemKey = function({siteKey, workspaceKey, collectionKey, collectionItemKey}/*: any*/, context/*: any*/){
+api.createCollectionItemKey = function({siteKey, workspaceKey, collectionKey, collectionItemKey, itemTitle}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
-        workspaceService.createCollectionItemKey(collectionKey, collectionItemKey)
-        .then((result)=>{ context.resolve(result); })
-        .catch((error)=>{ context.reject(error); });
+        workspaceService.createCollectionItemKey(collectionKey, collectionItemKey, itemTitle)
+        .then((result)=>{
+            context.resolve(result);
+        })
+        .catch((error)=>{
+            context.reject(error);
+        });
     });
 }
 
@@ -308,20 +312,6 @@ api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
         });
     });
 }
-
-api.createCollectionItemKey = function({siteKey, workspaceKey, collectionKey, collectionItemKey}/*: any*/, context/*: any*/) {
-    getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
-        if(err){ context.reject(err); return; }
-        workspaceService.createCollectionItemKey(collectionKey, collectionItemKey)
-        .then((result)=>{
-            context.resolve(result);
-        })
-        .catch((error)=>{
-            context.reject(error);
-        });
-    });
-}
-
 api.copyFilesIntoCollectionItem = function ({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files }/*: any*/, context/*: any*/){
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
