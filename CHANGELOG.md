@@ -2,12 +2,14 @@
 
 
 ## vNEXT
-- move to expert: version switcher
+
+## v0.6.6
+- imrove texts in dialogs when publishing
+- improve preview user interface
 - remove markdown preview
 - welcome screen
 - refresh sites after import
-
-## v0.6.6
+- move to expert: version switcher
 - auto open preview url
 - add "previewUrl" property to singles
 - back button in collections breadcrum
