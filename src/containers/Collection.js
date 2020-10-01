@@ -425,17 +425,17 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
         service.api.createCollectionItemKey(siteKey, workspaceKey, collectionKey, itemKey)
             .then(({unavailableReason, key})=>{
                 if(unavailableReason){
-                    //TODO: display some warning
                     this.setState({modalBusy:false});
                 }
                 else{
-                    //refresh
                     this.refreshItems();
                 }
             }, (e)=>{
                 this.setState({modalBusy:false});
             }).then(()=>{
-                this.setRootView();
+
+                let path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`
+                this.history.push(path);
             });
 
         service.api.parentTempUnHideMobilePreview();
@@ -567,9 +567,12 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
                 <Breadcumb items={[<BreadcumbItem disabled={true} label={collection.title} />]} />
                 <br />
                 <div>
-                    <RaisedButton label='New Item' onClick={ this.setCreateItemView.bind(this) /* function(){ history.push('/collections/'+encodeURIComponent(collectionKey)+'/new') */ } />
-                    {/* <span> </span>
-                    <RaisedButton label='New Section' onClick={ this.setCreateSectionView.bind(this) } /> */}
+                    <RaisedButton
+                    label='New Item'
+                    onClick={ this.setCreateItemView.bind(this) 
+                    /* function(){ history.push('/collections/'+encodeURIComponent(collectionKey)+'/new') */ } />
+
+                    {/* <RaisedButton label='New Section' onClick={ this.setCreateSectionView.bind(this) } /> */}
                 </div>
                 <br />
 
