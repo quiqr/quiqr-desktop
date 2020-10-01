@@ -60,6 +60,16 @@ class Single extends React.Component<SingleProps,SingleState>{
         service.unregisterListener(this);
     }
 
+    handleOpenInEditor(context: any){
+        var { siteKey, workspaceKey, singleKey } = this.props;
+
+        let promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
+        promise.then(function(updatedValues){
+        }, function(){
+            context.reject('Something went wrong.');
+        })
+    }
+
     handleSave(context : any){
         var { siteKey, workspaceKey, singleKey } = this.props;
 
@@ -98,6 +108,7 @@ class Single extends React.Component<SingleProps,SingleState>{
             values={this.state.singleValues}
             pageUrl={previewUrl}
             onSave={this.handleSave.bind(this)}
+            onOpenInEditor={this.handleOpenInEditor.bind(this)}
             plugins={{
                 openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
                     return service.api.openFileDialogForCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions});

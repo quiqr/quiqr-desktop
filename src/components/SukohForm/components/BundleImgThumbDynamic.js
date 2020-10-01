@@ -33,11 +33,11 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
         //let {node} = this.props.context;
         //let {field, state} = node;
         return (
-        <div style={{ width:'64px', height:'64px', marginBottom:'16px', overflow:'hidden', background:'#16062f' }}>
+        <div style={{ width:'auto', height:'100px', marginBottom:'16px', overflow:'hidden' }}>
             {
                 this.state.src === undefined ? (<Spinner size={32} margin={16} color={ 'RGBA(255,255,255,.3)' } />)
                 : this.state.src === 'NOT_FOUND'? (<IconBroken className="fadeIn animated" style={{width:32, height:32, margin:16, color:'#e84b92'}} />)
-                : (<img src={this.state.src} className="fadeIn animated" style={{width:'64xp', height:'64px'}} /> )
+                : (<img src={this.state.src} className="fadeIn animated" style={{height:100}} /> )
             }
         </div>);
     }

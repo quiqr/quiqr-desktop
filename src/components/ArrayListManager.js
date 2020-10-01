@@ -80,7 +80,7 @@ class ArrayListManager extends React.Component {
                 <Border style={{marginTop: componentMarginTop}}>
                     <List>{items.map((data,i) =>{
                         if(this.state.edit){
-                            
+
                             //EDITABLE
                             let primaryText = `Item ${i}`;
                             let titleKey;
@@ -100,11 +100,11 @@ class ArrayListManager extends React.Component {
                                 primaryText={ <Fragment>
                                     { titleKey ?
                                         <TextField id={field.key+'-item-header-text'+i}
-                                        key={field.key+'-item-header-text'+i} 
+                                        key={field.key+'-item-header-text'+i}
                                         onChange={this.getOnItemTitleChangeValueHandler(i, titleKey)}
                                         value={data[titleKey]} /> :
                                         <TextField id={field.key+'-item-header-text'+i}
-                                        key={field.key+'-item-header-text'+i} 
+                                        key={field.key+'-item-header-text'+i}
                                         disabled={true}
                                         value={primaryText} /> }
                                     <FlatButton style={{minWidth:'40px'}} icon={<IconArrowUp />} onClick={ this.getOnItemsSwappedHandler(i, true) } />

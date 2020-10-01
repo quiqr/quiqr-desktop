@@ -2,10 +2,6 @@ import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import IconNavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
-// import Border from './Border';
-// import FlatButton from 'material-ui/FlatButton';
-// import Checkbox from 'material-ui/Checkbox';
-// import IconToggleRadioButtonChecked from 'material-ui/svg-icons/toggle/radio-button-checked';
 
 type AccordionHeaderProps = {
     active: bool, onClick: ()=>void, style: any, headerLeftItems: any, headerRightItems: any
@@ -25,10 +21,12 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
                 { headerRightItems.map((item, index) => { return  (
                     <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
                 )})}
+                {this.props.forceActive?undefined:
                 <FlatButton
                     style={{minWidth: '40px'}}
                     icon={active?<IconNavigationExpandLess />:<IconNavigationExpandMore />}
                 />
+                }
             </span>
             {label}
         </a>);
@@ -38,7 +36,7 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
 class AccordionItem extends React.Component{
     render(){
         let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bodyStyle, style, wrapperProps } = this.props;
- 
+
         let _headStyle = Object.assign({
             border: 'solid 1px #e8e8e8',
             padding: '16px',
@@ -47,20 +45,21 @@ class AccordionItem extends React.Component{
             marginTop:8,
             position:'relative'
         }, headStyle);
-        
+
         let _bodyStyle = Object.assign({
             display:active?'block':'none',
             padding:'8px 0',
             border: 'solid 1px #e8e8e8',
             borderTopWidth: 0
         },bodyStyle);
-        
+
         return <div style={style} className="accordion-item" {...wrapperProps} >
             <AccordionHeader
                 style={_headStyle}
                 onClick={onHeadClick}
                 headerLeftItems={headerLeftItems}
                 headerRightItems={headerRightItems}
+                forceActive={this.props.forceActive}
                 active={active}
                 label={label}
             />
@@ -105,7 +104,7 @@ class Accordion extends React.Component{
         let openedIndex = this.getOpenedIndex();
         return <div className="accordion" style={this.props.style}>
             { this.props.children.map(function(item, index){
-                let active = index === openedIndex;
+                let active = this.props.forceActive || index === openedIndex;
                 return React.cloneElement(item, {
                     active,
                     onHeadClick: this.getHandleChange(index),

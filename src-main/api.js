@@ -249,6 +249,17 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}/*: any*/, context/*:
     });
 }
 
+api.openSingleInEditor = function({siteKey, workspaceKey, singleKey}, context) {
+    getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+        if(err){ context.reject(err); return; }
+        workspaceService.openSingleInEditor(singleKey).then(r=>{
+            context.resolve(r);
+        })
+        .catch((error)=>{
+            context.reject(error);
+        });
+    });
+}
 api.updateSingle = function({siteKey, workspaceKey, singleKey, document}/*: any*/, context/*: any*/) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
@@ -291,6 +302,19 @@ api.createCollectionItemKey = function({siteKey, workspaceKey, collectionKey, co
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.createCollectionItemKey(collectionKey, collectionItemKey, itemTitle)
+        .then((result)=>{
+            context.resolve(result);
+        })
+        .catch((error)=>{
+            context.reject(error);
+        });
+    });
+}
+
+api.openFileDialogForCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}, context) {
+    getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+        if(err){ context.reject(err); return; }
+        workspaceService.openCollectionItemInEditor(collectionKey, collectionItemKey)
         .then((result)=>{
             context.resolve(result);
         })
