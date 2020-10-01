@@ -12,22 +12,22 @@ export class ComponentContext<Field: FieldBase>{
     proplessInstance : any;
 
     onValueChanged: ?(value: any)=> void;
-    
+
     form:Form;
     value:any;
-    
+
     //remove those?
     renderLevel: any;
     renderField: any;
     setLevelState: any;
-    
+
 
     constructor(form : any, node : DynamicFormNode<Field>, currentPath : string, parentPath : string,
         nodePath : string, proplessInstance : any, onValueChanged : ?(value: any)=>void
     ){
-        
+
         this.node = node;
-        
+
         //paths
         this.nodePath = nodePath;
         this.parentPath = parentPath;
@@ -40,12 +40,12 @@ export class ComponentContext<Field: FieldBase>{
 
         //need this to trigger updates
         this.form = form;
-        
+
         //functions borowed from the DynamicForm
         this.renderLevel = form.renderLevel.bind(form); //don't know why, but this solved a huge nasty bug!
         this.renderField = form.renderField.bind(form); //don't know why, but this solved a huge nasty bug!
         this.setLevelState = form.stateBuilder.setLevelState.bind(form.stateBuilder);
-        
+
         //it's a good ideia to resolve this as soon as possible to use it in the component shouldUpdate method
         this.value = this.proplessInstance.getValue(this);
     }
@@ -58,7 +58,7 @@ export class ComponentContext<Field: FieldBase>{
         }
         return cache;
     }
-    
+
     getValue(){
         return this.value;
     }
@@ -71,7 +71,7 @@ export class ComponentContext<Field: FieldBase>{
 
         this.proplessInstance.setValue(this, value);
         this.value = value;
-        this.form.handleChange(this.node, debounce);        
+        this.form.handleChange(this.node, debounce);
     }
 
     clearValue(){

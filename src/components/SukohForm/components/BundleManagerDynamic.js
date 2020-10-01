@@ -6,9 +6,9 @@ import DangerButton from '../../DangerButton';
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 import IconRemove from 'material-ui/svg-icons/action/delete';
-//import IconRemove from 'material-ui/svg-icons/content/clear';
 import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
+import service from '../../../services/service';
 
 const regExtractExt = /[.]([^.]+)$/
 const extractExt = (file) => {

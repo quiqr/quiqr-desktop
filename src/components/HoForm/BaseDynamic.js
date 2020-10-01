@@ -23,7 +23,7 @@ export class BaseDynamic<Field: FieldBase, State> extends React.Component<Compon
 
     // override this to set a initial value, a default value or a calculated value (e.g: "now" converts to a date).
     normalizeState({state, field, stateBuilder} : { state: any, field: Field, stateBuilder: any }): void{
-        
+
     }
 
     shouldComponentUpdate(nextProps: ComponentProps<Field>, nextState: State){
@@ -40,7 +40,7 @@ export class BaseDynamic<Field: FieldBase, State> extends React.Component<Compon
     //leaf components don't need to build a breadcumb fragment
     //but components that nest others must do
     buildBreadcumbFragment(currentNode: DynamicFormNode<Field>, items: Array<BreadcumbItem>): void{
-        
+
     }
 
     // overriding this you can reallocate the state level. e.g: set it to the rootState.
@@ -79,7 +79,7 @@ export class BaseDynamic<Field: FieldBase, State> extends React.Component<Compon
 
     componentDidCatch(error: Error , info: string) {
         // Display fallback UI
-        
+
         //$FlowFixMe
         this.setState({ hasError: true });
         console.warn(error, info);
@@ -112,7 +112,7 @@ export class BaseDynamic<Field: FieldBase, State> extends React.Component<Compon
 
     render() : React.Node {
         if (this.state && this.state.hasError) {
-            return this.getSomethingWentWrongMessage(); 
+            return this.getSomethingWentWrongMessage();
         }
         return this.renderComponent();
     }

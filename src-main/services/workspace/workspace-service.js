@@ -100,8 +100,13 @@ class WorkspaceService{
         let filePath = path.join(this.workspacePath, single.file);
 
         if(fs.existsSync(filePath)){
-            let data = fs.readFileSync(filePath,'utf8');
-            return await this._smartParse(filePath, [path.extname(single.file).replace('.','')], data);
+            let data = await fs.readFileSync(filePath,'utf8');
+
+            let obj = await this._smartParse(filePath, [path.extname(single.file).replace('.','')], data);
+            if(contentFormats.isContentFile(filePath)){
+                obj.resources = await this.getResourcesFromContent(filePath, obj.resources);
+            }
+            return obj;
         }
         else{
             return {};
@@ -133,7 +138,7 @@ class WorkspaceService{
         shell.openItem(filePath);
     }
     //Update the single
-    async updateSingle(singleKey /* : string */, document /* : any */ ){
+    async updateSingle(singleKey, document ){
         let config = await this.getConfigurationsData();
         let single = config.singles.find(x => x.key === singleKey);
         if(single==null)throw new Error('Could not find single.');
@@ -144,14 +149,27 @@ class WorkspaceService{
         if (!fs.existsSync(directory))
             fs.mkdirSync(directory);//ensure directory existence
 
-        this._stripNonDocumentData(document);
+        let documentClone =  JSON.parse(JSON.stringify(document));
+        this._stripNonDocumentData(documentClone);
 
-        let stringData = await this._smartDump(filePath, [path.extname(single.file).replace('.','')], document);
+        let stringData = await this._smartDump(filePath, [path.extname(single.file).replace('.','')], documentClone);
         fs.writeFileSync(filePath, stringData);
+
+        if(document.resources){
+            for(let r = 0; r < document.resources.length; r++){
+                let resource = document.resources[r];
+                if(resource.__deleted){
+                    let fullSrc = path.join(directory, resource.src);
+                    await fs.remove(fullSrc);
+                }
+            }
+            document.resources = document.resources.filter(x => x.__deleted!==true);
+        }
+
         return document;
     }
 
-    async getResourcesFromContent(filePath/* : string */, currentResources /* : Array<any> */ = []){
+    async getResourcesFromContent(filePath, currentResources = []){
         filePath = path.normalize(filePath);
         let directory = path.dirname(filePath);
         let globExp = '**/*';
@@ -440,7 +458,7 @@ class WorkspaceService{
         });
     }
 
-    async getThumbnailForCollectionItemImage(collectionKey /* : string */, collectionItemKey /* : string */, targetPath /* : string */){
+    async getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath){
 
         let config = await this.getConfigurationsData();
 

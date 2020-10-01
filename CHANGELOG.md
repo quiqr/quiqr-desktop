@@ -4,6 +4,7 @@
 
 ## v0.6.6
 
+- fix image previews in Singles
 - improve bundle-manager and image thumb layout
 - open single item in editor
 - open collection item in editor
