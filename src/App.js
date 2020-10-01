@@ -5,6 +5,7 @@ import { Switch, Route } from 'react-router-dom'
 //CONTAINERS
 import SelectSite from './containers/SelectSite'
 import Console from './containers/Console';
+import PreviewButtons from './containers/PreviewButtons';
 import Prefs from './containers/Prefs'
 
 import Home from './containers/Home'
@@ -19,6 +20,7 @@ import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCoo
 //MATERIAL UI
 import { MenuItem } from 'material-ui/';
 import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
@@ -28,6 +30,19 @@ import type { EmptyConfigurations, Configurations } from './types';
 
 const pogoTheme = getMuiTheme(lightBaseTheme, {
     palette: {
+        background: {
+        },
+    },
+    props: {
+    },
+    overrides: {
+    },
+});
+
+const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
+    palette: {
+        background: {
+        },
     },
     props: {
     },
@@ -237,6 +252,7 @@ class App extends React.Component<AppProps,AppState>{
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
         return <FormsCookbookRouted />;
       }} />
+
       <Route path="*" component={(data)=>{
         return <Redirect to='/' />
       }} />
@@ -265,7 +281,13 @@ class App extends React.Component<AppProps,AppState>{
 
       if(!this.state.menuIsLocked){
           contentContainerStyle = Object.assign({}, contentContainerStyle, {display: 'block', paddingLeft:'66px' });
-      menuContainerStyle = Object.assign({}, menuContainerStyle, { position: 'absolute', zIndex: '2', height:'100%', width:'280px', transform: 'translateX(-214px)' } )
+          menuContainerStyle = Object.assign({}, menuContainerStyle, {
+              position: 'absolute',
+              zIndex: '2',
+              height:'100%',
+              width:'280px',
+              transform: 'translateX(-214px)' } )
+
       if(this.state.forceShowMenu){
         menuContainerStyle.transform='translateX(0px)';
         contentContainerStyle.transform='translateX(214px)';
@@ -311,6 +333,18 @@ class App extends React.Component<AppProps,AppState>{
           )
 
       }} />
+
+          <Route path='/preview-buttons' exact render={ ({match, history}) => {
+              this.history = history;
+              return (
+                  <MuiThemeProvider muiTheme={pogoDarkTheme}>
+                      <div style={{backgroundColor:"#606060"}}>
+                          <PreviewButtons />
+                      </div>
+                  </MuiThemeProvider>
+              )
+      }} />
+
 
       <Route
         path="*"

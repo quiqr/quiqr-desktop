@@ -13,6 +13,7 @@ const menuManager = require('./menu-manager');
 let mainWindow;
 let mainWindowState;
 let mobilePreviewView;
+
 let mobilePreviewViewActive = false;
 let pogoconf = PoppyGoAppConfig();
 
@@ -61,9 +62,7 @@ function showInvalidDevelopmentUrl(mainWindow/*: any*/, url/*: ?string*/){
 function getLocation(locPath = ''){
 
     if(process.env.REACT_DEV_URL){
-
         //DEVELOPMENT SERVER
-
         let url = process.env.REACT_DEV_URL+locPath;
         const urlWithPortMatch = url.match(/:([0-9]{4})$/);
         if(urlWithPortMatch==null){
@@ -77,9 +76,13 @@ function getLocation(locPath = ''){
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
                 client.end();
+
                 if(mainWindow){
                     mainWindow.loadURL(url);
                     getFirstScreenAfterStartup();
+                }
+                if(mobilePreviewTopBarView){
+                    mobilePreviewTopBarView.webContents.loadURL(url);
                 }
             }
             );
@@ -109,6 +112,9 @@ function getLocation(locPath = ''){
             mainWindow.loadURL(
                 url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
+            if(mobilePreviewTopBarView){
+                mobilePreviewTopBarView.webContents.loadURL(url);
+            }
             getFirstScreenAfterStartup();
         }
         else{
@@ -183,11 +189,14 @@ function createWindow () {
         }
 
         mobilePreviewView = new BrowserView();
-
-        mainWindow.setBrowserView(mobilePreviewView);
+        mobilePreviewTopBarView = new BrowserView({
+            webPreferences: {
+                nodeIntegration: true,
+            },
+        });
+        mainWindow.addBrowserView(mobilePreviewView);
+        mainWindow.addBrowserView(mobilePreviewTopBarView);
         mainWindow.show();
-
-        //mobilePreviewView.webContents.loadURL('http://localhost:1313');
 
     });
 
@@ -215,6 +224,7 @@ function createWindow () {
         console.log('videofull');
         setTimeout(function(){
             mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+            mobilePreviewTopBarView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
         }, 200);
     })
 
@@ -243,18 +253,28 @@ function createWindow () {
 
 async function setMobilePreviewBounds(){
     let mobwidth = 340;
+    let topheight = 83;
 
     let view = mainWindow.getBounds();
 
     if(mobilePreviewViewActive){
-        mobilePreviewView.setBounds({
+        mobilePreviewTopBarView.setBounds({
             x: (view.width-mobwidth),
             y: 0,
             width: mobwidth,
-            height: view.height
+            height:topheight
+        });
+        mobilePreviewView.setBounds({
+            x: (view.width-mobwidth),
+            y: topheight,
+            width: mobwidth,
+            height: view.height-topheight
         });
     }
-
+    else{
+        mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        mobilePreviewTopBarView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+    }
 }
 
 module.exports = {
@@ -282,21 +302,24 @@ module.exports = {
 
     setMobilePreviewUrl: function(url){
         mobilePreviewView.webContents.loadURL(url);
+        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+        mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
         mobilePreviewView.webContents.session.clearCache(function(){return true});
     },
 
     openMobilePreview: function(){
         mobilePreviewViewActive = true;
+        mobilePreviewView.webContents.loadURL('http://localhost:1313');
+        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
         mobilePreviewView.webContents.session.clearCache(function(){return true});
-
         mainWindow.webContents.send("setMobileBrowserOpen");
         setMobilePreviewBounds();
     },
 
     closeMobilePreview: function(){
         mobilePreviewViewActive = false;
-        mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
         mainWindow.webContents.send("setMobileBrowserClose");
+        setMobilePreviewBounds();
     },
 
     getCurrentInstanceOrNew: function(){
