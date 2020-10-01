@@ -154,7 +154,6 @@ class MenuManager {
     }
     openWorkSpaceConfig(){
         let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
-        //console.log(path);
         try{
             shell.openItem(path);
         }
@@ -163,7 +162,6 @@ class MenuManager {
     }
 
     async selectSitesWindow () {
-        console.log(global.mainWM);
         global.mainWM.closeSiteAndShowSelectSites();
 
         return;
@@ -518,41 +516,31 @@ class MenuManager {
                 role: 'help',
                 submenu: [
                     {
+                        id: 'welcome',
+                        label: 'Show welcome screen',
+                        click: async () => {
+                            mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                            mainWindow.webContents.send("disableMobilePreview");
+                            mainWindow.webContents.send("redirectToGivenLocation","/welcome");
+                        }
+                    },
+                    {
+                        label: 'Getting started',
+                        click: async () => {
+                            await shell.openExternal("https://router.poppygo.app/getting-started");
+                        }
+                    },
+                    { type: 'separator' },
+                    {
                         label: 'Show PoppyGo version',
                         click: async () => {
                             this.showVersion();
                         }
                     },
                     {
-                        label: 'PoppyGo Introduction',
-                        click: async () => {
-                            await shell.openExternal('https://poppygo.nl/docs/introduction/')
-                        }
-                    },
-                    {
-                        label: 'Quick start',
-                        click: async () => {
-                            await shell.openExternal('https://poppygo.nl/docs/quickstart/')
-                        }
-                    },
-                    {
-                        label: 'FAQ',
-                        click: async () => {
-                            await shell.openExternal('https://poppygo.nl/docs/faq/')
-                        }
-                    },
-                    {
-                        id: 'welcome',
-                        label: 'Show welcome screen',
-                        click: async () => {
-                            mainWindow = global.mainWM.getCurrentInstanceOrNew();
-                            mainWindow.webContents.send("redirectToGivenLocation","/welcome");
-                        }
-                    },
-                    {
                         label: 'Release notes',
                         click: async () => {
-                            await shell.openExternal('https://poppygo.nl/releases/')
+                            await shell.openExternal("https://router.poppygo.app/release-notes");
                         }
                     }
                 ]
