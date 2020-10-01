@@ -1,10 +1,7 @@
-//@flow
-
 import * as React from 'react';
 import { Route } from 'react-router-dom'
 import { ComponentContext } from './component-context';
 import { Debounce } from './debounce';
-//import type { FieldBase, FieldBaseGroup, DynamicFormNode, ComponentProps, BreadcumbComponentType } from './types';
 import type { FieldBase, FieldBaseGroup, DynamicFormNode, BreadcumbComponentType } from './types';
 import { ComponentRegistry } from './component-registry';
 import { FormStateBuilder } from './form-state-builder';
@@ -101,9 +98,6 @@ class Form extends React.Component<FormProps,FormState> {
     }
 
     static getDerivedStateFromProps(props: FormProps, state: FormState){
-        //if(state==null||state.initialValues!=props.values){
-            //bool is
-        // }
         return null;
     }
 
@@ -118,7 +112,6 @@ class Form extends React.Component<FormProps,FormState> {
     }
 
     setPath(node : DynamicFormNode<FieldBase>){
-
         if(this.props.collectionItemKey){
             this.history.push(this.generateParentPath());
         }
@@ -309,9 +302,13 @@ class Form extends React.Component<FormProps,FormState> {
         let form = (<div key={'dynamic-form'} style={{padding:'20px'}}>
 
             <div style={Object.assign({position : 'relative', paddingBottom: '16px', width:'100%', display:'flex'})}>
+
+                { this.props.collectionKey ?
                 <IconButton touch={true} onClick={()=>{this.handleBackButton();}}>
                     <IconBack color="" style={{}} />
                 </IconButton>
+                    : undefined}
+
                 <div style={Object.assign({flexGrow:1})}>
                     {breadcumb}
                 </div>
@@ -321,11 +318,11 @@ class Form extends React.Component<FormProps,FormState> {
                 </IconButton>
                 : undefined}
 
-                { this.props.pageUrl ?
+                {/* this.props.pageUrl ?
                         <IconButton touch={true} onClick={()=>{this.handleAlignMobilePreview();}}>
                     <IconView color="" style={{}} />
                 </IconButton>
-                : undefined}
+                : undefined*/}
 
             </div>
 

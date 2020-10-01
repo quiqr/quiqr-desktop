@@ -44,6 +44,7 @@ class MakePageBundleItemKeyDialog extends React.Component<MakePageBundleItemKeyD
             this.props.handleConfirm(this.state.value);
     }
 
+
     render(){
         let { busy, itemLabel } = this.props;
 
@@ -490,6 +491,17 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
         });
     }
 
+    generatePageUrl(collection){
+
+        let CollectionPath = collection.folder.split("/")
+        CollectionPath.shift();
+
+        let path = CollectionPath.join("/");
+        let url = 'http://localhost:1313/'+path.toLowerCase();
+
+        return url;
+    }
+
     render(){
 
         //let { siteKey, workspaceKey, collectionKey } = this.props;
@@ -544,6 +556,9 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
         let collection = this.state.selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
         if(collection==null)
             return null;
+
+        let pageUrl = this.generatePageUrl(collection);
+        service.api.updateMobilePreviewUrl(pageUrl)
 
         return(<Route render={ ({history}) => {
             this.history = history;

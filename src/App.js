@@ -207,20 +207,33 @@ class App extends React.Component<AppProps,AppState>{
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-        //$FlowFixMe
         return <Home key={ 'home' } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
+
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {
-        //$FlowFixMe
-        return <Collection key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } collectionKey={ decodeURIComponent(match.params.collection) } />
+          return <Collection
+          key={ match.url }
+          siteKey={ decodeURIComponent(match.params.site) }
+          workspaceKey={ decodeURIComponent(match.params.workspace) }
+          collectionKey={ decodeURIComponent(match.params.collection) } />
       }} />
+
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item' exact render={ ({match})=> {
-        //$FlowFixMe
-        return <CollectionItem key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } collectionKey={ decodeURIComponent(match.params.collection) }           collectionItemKey={ decodeURIComponent(match.params.item) } />
+          return <CollectionItem
+          key={ match.url }
+          siteKey={ decodeURIComponent(match.params.site) }
+          workspaceKey={ decodeURIComponent(match.params.workspace) }
+          collectionKey={ decodeURIComponent(match.params.collection) }
+          collectionItemKey={ decodeURIComponent(match.params.item) } />
       }} />
+
       <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
-        //$FlowFixMe
-        return <Single key={ match.url } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } singleKey={ decodeURIComponent(match.params.single) } /> }} />
+          return <Single
+          key={ match.url }
+          siteKey={ decodeURIComponent(match.params.site) }
+          workspaceKey={ decodeURIComponent(match.params.workspace) }
+          singleKey={ decodeURIComponent(match.params.single) } /> }} />
+
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
         return <FormsCookbookRouted />;
       }} />
@@ -295,7 +308,6 @@ class App extends React.Component<AppProps,AppState>{
               </div>
             </div>
           </MuiThemeProvider>
-
           )
 
       }} />

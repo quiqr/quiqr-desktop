@@ -84,6 +84,10 @@ class Single extends React.Component<SingleProps,SingleState>{
             previewUrl = 'http://localhost:1313'+single.previewUrl;
             service.api.updateMobilePreviewUrl(previewUrl)
         }
+        else{
+            previewUrl = 'http://localhost:1313';
+            service.api.updateMobilePreviewUrl(previewUrl)
+        }
 
         var { siteKey, workspaceKey, singleKey } = this.props;
 

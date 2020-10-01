@@ -63,6 +63,20 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     }
 
 
+
+    handleOpenInBrowser(){
+        let {
+            onClick,
+            siteConfig,
+            workspaceConfig,
+        } = this.props;
+
+        if(!this.state.hugoRunning){
+            service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace");
+        }
+        window.require('electron').shell.openExternal('http://localhost:1313');
+    }
+
     toggleMobilePreview(){
         if(this.state.mobilePreviewActive){
             this.disableMobilePreview();
@@ -122,19 +136,52 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         } = this.props;
 
 
-        let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
+        let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
+        let mobilePreviewToggle = <Toggle
+            toggled={this.state.mobilePreviewActive}
+            onToggle={(e,value)=>{ this.toggleMobilePreview() }}
+            style={{marginRight: 24}}
+            labelPosition='right' />
+
+        return (
+                <div style={{paddingLeft:'0px'}}>
+                    <List style={{padding: 0}}>
+                        <ListItem
+                        primaryText={siteConfig.name}
+                        secondaryText="Dashboard, publish and help"
+                        onClick={onClick}
+                        leftIcon={<IconHome color="white" style={{}} />}
+                        />
+                        <ListItem
+                        primaryText="Mobile preview"
+                        onClick={(e,value)=>{ this.toggleMobilePreview() }}
+                        secondaryText="Open preview panel"
+                        rightIcon={mobilePreviewToggle}
+                        leftIcon={<IconPhone color="white"  />} />
+                        <ListItem
+                        primaryText="Browser preview"
+                        secondaryText="Preview in default browser"
+                        onClick={ ()=>{this.handleOpenInBrowser()} }
+                        leftIcon={<IconOpenBrowser color="white" style={{marginRight:0}} />} />
+                    </List>
+                    <Divider/>
+                </div>
+        );
+
+        /* activate later
         return (
                 <div style={{paddingLeft:'0px'}}>
 
                     <List style={{padding: 0}} dense={true}>
                         <ListItem secondaryText="Dashboard, options and help" primaryText={siteConfig.name} onClick={onClick} leftIcon={<IconHome color="white" style={{}} />} />
-                </List>
+                    </List>
 
                     <Divider/>
 
                 </div>
         );
+        */
     }
     renderSelectSite(){
 

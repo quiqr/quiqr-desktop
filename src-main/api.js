@@ -1,9 +1,3 @@
-/* @flow */
-
-/**
- * This is the main API.
- * It's consumed by the SPA.
- */
 const configurationDataProvider = require('./configuration-data-provider')
 const SiteService = require('./services/site/site-service')
 const WorkspaceService = require('./services/workspace/workspace-service')
@@ -17,17 +11,7 @@ const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const pogozipper = require('./pogozipper');
 
-/*::
-type APIContext = {
-    resolve: (data: any) => void,
-    reject: (error: any) => void
-}
-
-type Callback = (error: any, data: any)=>void
-type CallbackTyped<T> = (error: any, data: T)=>void
-*/
-
-let api/*: { [key: string]: ( payload: any, context: APIContext ) => (void|Promise<void>) }*/ = {};
+let api = {};
 let pogoconf = PoppyGoAppConfig();
 
 function bindResponseToContext(promise/*: Promise<any>*/, context/*: any*/){
