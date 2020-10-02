@@ -57,6 +57,12 @@ function createWindow () {
 
 function downloadFile(file_url , targetPath){
 
+    if(file_url.includes("picdrop.t3lab.com")){
+        let urlarr = file_url.split('picdrop.t3lab.com')
+        file_url = 'https://picdrop.t3lab.com'+urlarr[1];
+        console.log(file_url);
+    }
+
     let progressBar = new ProgressBar({
         indeterminate: false,
         text: 'Downloading '+file_url+' ..',
@@ -95,7 +101,6 @@ function downloadFile(file_url , targetPath){
         progressBar._window.hide();
         importPogoFile(targetPath);
     });
-
 }
 
 function formatBytes(bytes, decimals = 1) {
@@ -158,6 +163,33 @@ app.on('open-url', function(event, schemeData){
         });
     }
 });
+
+// Iterate over arguments and look out for uris
+function openUrlFromArgv(argv) {
+    for (let i = 1; i < argv.length; i++) {
+        let arg = argv[i]
+        if (!arg.startsWith('poppygo:') && !arg.startsWith('poppygo:')) {
+            console.log("open-url: URI doesn't start with poppygo:", arg)
+            continue
+        }
+
+        console.log('open-url: Detected URI: ', arg)
+        app.emit('open-url', null, arg)
+    }
+}
+
+openUrlFromArgv(process.argv)
+
+app.on('second-instance', function(event, argv){
+    console.log('Someone tried to run a second instance')
+    openUrlFromArgv(argv)
+        /*
+    if (window) {
+        if (window.isMinimized()) window.show()
+        window.focus()
+    }
+    */
+})
 
 async function handlePogoUrl(event, schemeData){
 

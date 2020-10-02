@@ -113,7 +113,7 @@ function getLocation(locPath = ''){
                 url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
             if(mobilePreviewTopBarView){
-                mobilePreviewTopBarView.webContents.loadURL(url);
+                mobilePreviewTopBarView.webContents.loadURL(url.format({ pathname: indexFile, protocol: 'file:', slashes: true }));
             }
             getFirstScreenAfterStartup();
         }
