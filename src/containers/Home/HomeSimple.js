@@ -1,26 +1,24 @@
-//@flow
-
-//import invariant from 'assert';
 import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
 import FlatButton from 'material-ui/FlatButton';
-//import RaisedButton from 'material-ui/RaisedButton';
-//import Paper from 'material-ui/Paper';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
-import IconAdd from 'material-ui/svg-icons/content/add';
-import IconFileFolder from 'material-ui/svg-icons/file/folder';
-//import {Accordion,AccordionItem} from './../../components/Accordion';
-//import DangerButton from './../../components/DangerButton';
+//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
+//import IconAdd from 'material-ui/svg-icons/content/add';
+//import IconFileFolder from 'material-ui/svg-icons/file/folder';
+import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
+import IconDomain from 'material-ui/svg-icons/social/domain';
+import IconPublish from 'material-ui/svg-icons/editor/publish';
+
 import TextField from 'material-ui/TextField';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, InfoLine, InfoBlock, MessageBlock } from './components/shared';
 import { WorkspacesSimple } from './components/WorkspacesSimple';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
+import RegisterDialog from './components/RegisterDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
 import MarkdownIt from 'markdown-it'
@@ -28,9 +26,6 @@ import MarkdownIt from 'markdown-it'
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
 const md = new MarkdownIt({html:true});
-
-//$FlowFixMe
-//const Fragment = React.Fragment;
 
 const styles = {
     container:{
@@ -82,6 +77,7 @@ type HomeState = {
     selectedWorkspaceDetails?: WorkspaceConfig,
     createSiteDialog: bool,
     publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
+    registerDialog?: { open: bool },
     blockingOperation: ?string //this should be moved to a UI service
 }
 
@@ -96,6 +92,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             currentSiteKey: null,
             createSiteDialog: false,
             publishSiteDialog: undefined,
+            registerDialog: {open: false},
             siteCreatorMessage: null
         };
     }
@@ -161,13 +158,45 @@ class Home extends React.Component<HomeProps, HomeState>{
         service.unregisterListener(this);
     }
 
+    handleRegisterNow(){
+        this.setState({registerDialog: { open: true}});
+        service.api.logToConsole('registerNow');
+    }
+
+    handleRegisterCancelClick(){
+        this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+    }
+
+    handleRegisterClick(username, email){
+        this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+        service.api.logToConsole(username);
+        service.api.logToConsole(email);
+    }
+
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
 
-
         return (
-            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
+            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
 
-                <InfoLine label="Name">{site.name}</InfoLine>
+                <InfoLine label="Site name">
+                    <h2 style={{padding:0, margin:0}}>{site.name}</h2>
+                </InfoLine>
+
+                <div style={{padding: "0px 16px"}}>
+                    <List>
+                        <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>register now!</a>
+                        </ListItem>
+
+                        <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>cleam domain!</a>
+                        </ListItem>
+
+                        <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>publish now!</a>
+                        </ListItem>
+                     </List>
+                </div>
 
                 { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
 
@@ -271,7 +300,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     render(){
 
         let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog } = this.state;
 
         let _configurations = ((configurations: any): Configurations);
 
@@ -281,7 +310,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         return (
             <div style={ styles.container }>
-
                 <div style={styles.selectedSiteCol}>
                     { selectedSite==null ? (
                         <Wrapper title="Site Management">
@@ -306,6 +334,18 @@ class Home extends React.Component<HomeProps, HomeState>{
                         open={publishSiteDialog!=null&&publishSiteDialog.open}
                     />
                 ):(null) }
+
+                { selectedSite!=null && this.state.registerDialog!=null ? (
+                    <RegisterDialog
+                        onCancelClick={()=>this.handleRegisterCancelClick()}
+                        onRegisterClick={({username, email})=>{
+                          this.handleRegisterClick(username, email)
+                        }}
+
+                        open={registerDialog!=null&&registerDialog.open}
+                    />
+                ):(null) }
+
 
                 {/*this should be moved to a UI service*/}
                 <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
