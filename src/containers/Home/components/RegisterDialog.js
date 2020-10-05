@@ -5,7 +5,8 @@ import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-u
 import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
 import { Accordion, AccordionItem } from './../../../components/Accordion';
 import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
-
+//import FormData, {getHeaders} from 'form-data';
+//import FormData from 'form-data';
 let net = window.require('electron').remote.net;
 
 export default class RegisterDialog extends React.Component{
@@ -40,9 +41,6 @@ export default class RegisterDialog extends React.Component{
 
             this.registerUserPost(this.state.username, this.state.email, pubkey);
 
-            this.setState({
-                busy: false
-            });
         }, (e)=>{
             service.api.logToConsole("frontend:" + e);
             this.setState({
@@ -62,6 +60,30 @@ export default class RegisterDialog extends React.Component{
     }
 
     registerUserPost(username, email, pubkey){
+        var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey });
+
+        service.api.logToConsole(postData);
+        const request = net.request({
+            method: 'POST',
+            protocol: 'http:',
+            hostname: 'localhost',
+            port: 9999,
+            path: '/user/new',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length
+            }
+        })
+
+        request.on('response', (response) => {
+            service.api.logToConsole(""+response.data);
+
+            this.setState({
+                busy: false
+            });
+        })
+        request.write(postData)
+        request.end()
 
     }
 
@@ -148,7 +170,8 @@ export default class RegisterDialog extends React.Component{
     }
 
     validate(){
-        return  this.state.username_err === '' &&
+        return !this.state.busy &&
+            this.state.username_err === '' &&
             this.state.email_err === '' &&
             this.state.username !== '' &&
             this.state.email !== '';
