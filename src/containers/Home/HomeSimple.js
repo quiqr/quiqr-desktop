@@ -93,6 +93,8 @@ class Home extends React.Component<HomeProps, HomeState>{
             createSiteDialog: false,
             publishSiteDialog: undefined,
             registerDialog: {open: false},
+            username: "",
+            poppygoProfile: null ,
             siteCreatorMessage: null
         };
     }
@@ -113,7 +115,13 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     checkSiteInProps(){
-        var { siteKey, workspaceKey } = this.props;
+        var { siteKey, workspaceKey, poppygoProfile } = this.props;
+        if(poppygoProfile) {
+            service.api.logToConsole(poppygoProfile.username);
+
+            this.setState({poppygoProfile: poppygoProfile});
+            this.setState({username: poppygoProfile.username});
+        }
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey != siteKey){
@@ -169,11 +177,27 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleRegisterClick(username, email){
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
-        service.api.logToConsole(username);
-        service.api.logToConsole(email);
+        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?=1")
+
+        //service.api.logToConsole(username);
+        //service.api.logToConsole(email);
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
+        let user = undefined;
+
+        if(this.state.username!==""){
+            user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
+                <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
+                </ListItem>
+            );
+        }
+        else{
+            user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>register now!</a>
+                        </ListItem>
+            );
+        }
 
         return (
             <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
@@ -184,9 +208,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                 <div style={{padding: "0px 16px"}}>
                     <List>
-                        <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>register now!</a>
-                        </ListItem>
+                        {user}
 
                         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
                             <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>cleam domain!</a>

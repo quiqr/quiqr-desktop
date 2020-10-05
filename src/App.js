@@ -98,6 +98,23 @@ class App extends React.Component<AppProps,AppState>{
             this.setState(stateUpdate);
 
         })
+
+
+
+    }
+
+    getProfile(){
+        let getProfile = service.api.getPoppyGoProfile();
+
+        getProfile.then((profile)=>{
+            this.setState({poppygoProfile:profile});
+
+        }, (e)=>{
+            this.setState({
+                poppygoProfile: false
+            });
+        })
+
     }
 
     //REDIRECTS FROM BACKGROUND
@@ -222,7 +239,8 @@ class App extends React.Component<AppProps,AppState>{
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-        return <Home key={ 'home' } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          this.getProfile();
+        return <Home key={ 'home' } poppygoProfile={this.state.poppygoProfile} siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {

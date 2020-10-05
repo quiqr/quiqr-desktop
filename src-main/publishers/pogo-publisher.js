@@ -74,18 +74,30 @@ class PogoPublisher {
             outputConsole.appendLine('keygen error ...:' + e);
         }
 
-        /*
-        gencmd.stderr.on("error", (err) => {
-        });
-        gencmd.on("exit", async (code) => {
-            if(code==0){
-            }
-        });
-        */
-
         console.log("infunc"+pubkey);
         return pubkey;
     }
+
+    async writeProfile(profile){
+        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+
+        await fs.writeFileSync(profilepath, JSON.stringify(profile), 'utf-8');
+        await fs.chmodSync(profilepath, '0600');
+        return true;
+    }
+    async readProfile(){
+        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+        var profile;
+        try {
+            const filecont = fs.readFileSync(profilepath, {encoding:'utf8', flag:'r'});
+            profile = JSON.parse(filecont);
+        } catch (e) {
+            profile = false;
+        }
+
+        return profile;
+    }
+
     async publish(context){
 
         let mainWindow = global.mainWM.getCurrentInstance();
@@ -167,8 +179,8 @@ pogoform:\n\
 
         outputConsole.appendLine('Writing temporaty key ' + tmpkeypath);
 
-        await fs.writeFileSync(tmpkeypath, this._config.privatekey, 'utf-8');
-        await fs.chmodSync(tmpkeypath, '0600');
+        await fs.writefilesync(tmpkeypath, this._config.privatekey, 'utf-8');
+        await fs.chmodsync(tmpkeypath, '0600');
 
         //const sshkeyscan = await spawnAw("ssh-keyscan" , ["-H", "gitlab.brepi.eu");
         //console.log(sshkeyscan.toString());

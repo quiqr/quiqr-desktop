@@ -130,14 +130,24 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     context.resolve(configuration);
 
 }
+
 api.createKeyPair = async function({},context){
-    //console.log("main:" + pubkey);
-    //return pubkey;
-    //return new Promise(async (resolve, reject)=>{
     let pogopubl = new PogoPublisher({});
     pubkey = await pogopubl.keygen();
     context.resolve(pubkey);
-    //});
+}
+
+api.createPogoProfile = function(profile){
+    let pogopubl = new PogoPublisher({});
+    pogopubl.writeProfile(profile)
+}
+
+api.getPoppyGoProfile = async function({},context){
+
+    let pogopubl = new PogoPublisher({});
+    profile = await pogopubl.readProfile();
+    if(profile) context.resolve(profile);
+
 }
 
 api.getCurrentSiteKey = async function(){

@@ -18,6 +18,7 @@ export default class RegisterDialog extends React.Component{
             email: "test@lkjflsdk.nl",
             username_err: "",
             email_err: "",
+            failure: false,
             busy: false,
          }
     }
@@ -48,21 +49,13 @@ export default class RegisterDialog extends React.Component{
             });
         })
 
-        //createkey
-        //post register request
-        //create profile.json
-
-        /*this.props.onRegisterClick({
-            username: this.state.username,
-            email: this.state.email
-        });
-        */
     }
 
     registerUserPost(username, email, pubkey){
         var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey });
 
-        service.api.logToConsole(postData);
+        let data='';
+        //service.api.logToConsole(postData);
         const request = net.request({
             method: 'POST',
             protocol: 'http:',
@@ -76,11 +69,37 @@ export default class RegisterDialog extends React.Component{
         })
 
         request.on('response', (response) => {
-            service.api.logToConsole(""+response.data);
 
-            this.setState({
-                busy: false
+            response.on('end', () => {
+                //service.api.logToConsole(""+data);
+                let obj = JSON.parse(data);
+                service.api.logToConsole(obj);
+                if(obj.hasOwnProperty('username')){
+
+                    service.api.createPogoProfile(obj);
+
+                    this.props.onRegisterClick({
+                        username: this.state.username,
+                        email: this.state.email
+                    });
+
+                }
+                else{
+                    this.setState({
+                        failure: true
+                    });
+                }
+                //service.api.logToConsole(""+response.code);
+
+                this.setState({
+                    busy: false
+                });
             });
+
+            response.on("data", chunk => {
+                data += chunk;
+            });
+
         })
         request.write(postData)
         request.end()
@@ -128,6 +147,16 @@ export default class RegisterDialog extends React.Component{
         });
 
     }
+
+    handleTryAgain(){
+        this.setState({
+            username: "",
+            email: "",
+            busy: false,
+            failure: false,
+        });
+
+    }
     handleEmailChange(e){
         let value = e.target.value;
         this.setState({
@@ -171,16 +200,37 @@ export default class RegisterDialog extends React.Component{
 
     validate(){
         return !this.state.busy &&
+            !this.state.failure &&
             this.state.username_err === '' &&
             this.state.email_err === '' &&
             this.state.username !== '' &&
             this.state.email !== '';
+    }
+    renderForm(){
+        let valid = this.validate();
+        let busy = this.state.busy;
+        return (
+            <div>
+                <TextField disabled={busy} errorText={this.state.username_err} floatingLabelText={'username'} value={this.state.username} onChange={(e)=>{this.handleUserNameChange(e)}} fullWidth />
+                <TextField disabled={busy} floatingLabelText={'email address'} value={this.state.email} onChange={(e)=>{this.handleEmailChange(e)}} fullWidth />
+            </div>
+        )
+
+    }
+
+    renderFailure(){
+        return (
+                <div>
+                    Something went wrong. Please <a href="#" onClick={()=>this.handleTryAgain()}>try again.</a>
+                </div>
+        )
     }
 
     render(){
         let { open } = this.props;
         let valid = this.validate();
         let busy = this.state.busy;
+        let failure = this.state.failure;
 
         const actions = [
             <FlatButton
@@ -196,18 +246,13 @@ export default class RegisterDialog extends React.Component{
             />,
         ];
 
-        let active=true;
-
         return (
             <Dialog
                 title="Sign up for free website publishing with PoppyGo Live"
                 open={open}
                 actions={actions}>
-                <div>
-                    <TextField disabled={busy} errorText={this.state.username_err} floatingLabelText={'username'} value={this.state.username} onChange={(e)=>{this.handleUserNameChange(e)}} fullWidth />
-                    <TextField disabled={busy} floatingLabelText={'email address'} value={this.state.email} onChange={(e)=>{this.handleEmailChange(e)}} fullWidth />
-                </div>
 
+                { failure? this.renderFailure() : this.renderForm() }
                 { busy? <Spinner /> : undefined }
             </Dialog>
         );
