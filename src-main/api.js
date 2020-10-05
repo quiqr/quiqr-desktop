@@ -44,6 +44,43 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     });
 }
 
+function pogoboardGet(url){
+    return new Promise((resolve, reject)=>{
+        let data;
+        const { net } = require('electron')
+        const request = net.request(url)
+        request.on('response', (response) => {
+            //console.log(`STATUS: ${response.statusCode}`)
+            //console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
+            response.on('data', (chunk) => {
+                //console.log(`BODY: ${chunk}`)
+                data += chunk;
+            })
+            response.on('error', (error) => {
+                console.log(error);
+                reject(error);
+            })
+            response.on('end', () => {
+                console.log(data);
+                //console.log('No more data in response.')
+                resolve(data);
+                //return data;
+
+            })
+        })
+        request.end()
+    });
+
+    return data;
+        /*
+
+        let data;
+        const { net } = require('electron')
+        const request = net.request(url)
+    });
+    */
+}
+
 function getWorkspaceService(siteKey/*: string*/,
     workspaceKey/*: string*/,
     callback/*: CallbackTyped<{siteService: SiteService, workspaceService: WorkspaceService}>*/){
@@ -129,6 +166,10 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     context.resolve(configuration);
 
 }
+api.pogoboardGet = async function(url, context){
+    context.resolve(pogoboardGet(url));
+        //return await pogoboardGet(url);
+}
 
 api.getCurrentSiteKey = async function(){
     return global.currentSiteKey;
@@ -139,6 +180,10 @@ api.getPogoConf = async function(key){
         return pogoconf.skipWelcomeScreen;
     //}
 }
+
+
+
+
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
     bindResponseToContext(
