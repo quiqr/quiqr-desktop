@@ -10,6 +10,7 @@ const menuManager = require('./menu-manager');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const pogozipper = require('./pogozipper');
+const PogoPublisher = require('./publishers/pogo-publisher');
 
 let api = {};
 let pogoconf = PoppyGoAppConfig();
@@ -42,43 +43,6 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
             resolve(siteService);
         });
     });
-}
-
-function pogoboardGet(url){
-    return new Promise((resolve, reject)=>{
-        let data;
-        const { net } = require('electron')
-        const request = net.request(url)
-        request.on('response', (response) => {
-            //console.log(`STATUS: ${response.statusCode}`)
-            //console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
-            response.on('data', (chunk) => {
-                //console.log(`BODY: ${chunk}`)
-                data += chunk;
-            })
-            response.on('error', (error) => {
-                console.log(error);
-                reject(error);
-            })
-            response.on('end', () => {
-                console.log(data);
-                //console.log('No more data in response.')
-                resolve(data);
-                //return data;
-
-            })
-        })
-        request.end()
-    });
-
-    return data;
-        /*
-
-        let data;
-        const { net } = require('electron')
-        const request = net.request(url)
-    });
-    */
 }
 
 function getWorkspaceService(siteKey/*: string*/,
@@ -166,15 +130,21 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     context.resolve(configuration);
 
 }
-api.pogoboardGet = async function(url, context){
-    context.resolve(pogoboardGet(url));
-        //return await pogoboardGet(url);
+api.createKeyPair = async function({},context){
+    //console.log("main:" + pubkey);
+    //return pubkey;
+    //return new Promise(async (resolve, reject)=>{
+    let pogopubl = new PogoPublisher({});
+    pubkey = await pogopubl.keygen();
+    context.resolve(pubkey);
+    //});
 }
 
 api.getCurrentSiteKey = async function(){
-    return global.currentSiteKey;
+    return await global.currentSiteKey;
 }
 
+//TODO USE KEY
 api.getPogoConf = async function(key){
     //if(key==='skipWelcomeScreen'){
         return pogoconf.skipWelcomeScreen;

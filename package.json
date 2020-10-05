@@ -11,7 +11,7 @@
   "dependencies": {
     "7zip-bin": "3.1.0",
     "adm-zip": "0.4.13",
-    "await-spawn": "3.0.0",
+    "await-spawn": "4.0.1",
     "electron-context-menu": "^0.10.1",
     "electron-is-dev": "^1.1.0",
     "electron-progressbar": "^1.2.0",
@@ -63,7 +63,6 @@
   "scripts": {
     "_react-dev": "cross-env APP_ENV=development cross-env BROWSER=none cross-env PORT=4000 cross-env react-scripts start",
     "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4000 cross-env  electron .",
-
     "_copy-electron-code": "copyfiles -u 1 -V \"./src-main/**/*\" \"./build/electron/\"",
     "_copy-ace": "copyfiles -u 3 -V \"./node_modules/ace-editor-builds/src-min-noconflict/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
     "_copy_ace_extras": "copyfiles -u 2 -V \"./extras/ace-editor/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
@@ -74,15 +73,12 @@
     "_electron-dist-linux": "npm run _copy-electron-code && electron-builder",
     "_electron-dist-linux-all": "npm run _electron-dist-linux && electron-builder --linux deb",
     "_electron-dist-mac": "npm run _copy-electron-code && electron-builder",
-
     "dist-win": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win",
     "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
     "dist-mac": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-mac",
     "dist-mac-unsigned": "CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist-mac",
     "dist-mac-notarize": "node scripts/notarize.js",
-
     "test": "./node_modules/.bin/mocha",
-
     "start": "npm run _copy-ace && concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
   },
   "build": {

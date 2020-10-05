@@ -19,9 +19,6 @@ const app = electron.app
 
 class Pogozipper{
 
-
-
-
     async exportSite() {
         const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 

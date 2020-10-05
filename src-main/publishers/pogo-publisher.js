@@ -12,7 +12,7 @@ const outputConsole = require('./../output-console');
 const ProgressBar = require('electron-progressbar');
 const rimraf = require("rimraf");
 const spawn = require("child_process").spawn;
-//const spawnAw = require('await-spawn')
+const spawnAw = require('await-spawn')
 
 class PogoPublisher {
     constructor(config){
@@ -59,6 +59,33 @@ class PogoPublisher {
         return cmd;
     }
 
+    async keygen(){
+
+        let pubkey = '';
+        var git_bin = this.getGitBin();
+        var sukohdir = pathHelper.getRoot();
+        console.log(git_bin);
+
+        try {
+            let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
+            outputConsole.appendLine('Keygen success ...');
+            pubkey = await fs.readFileSync(sukohdir+"/id_rsa_pogo.pub");
+        } catch (e) {
+            outputConsole.appendLine('keygen error ...:' + e);
+        }
+
+        /*
+        gencmd.stderr.on("error", (err) => {
+        });
+        gencmd.on("exit", async (code) => {
+            if(code==0){
+            }
+        });
+        */
+
+        console.log("infunc"+pubkey);
+        return pubkey;
+    }
     async publish(context){
 
         let mainWindow = global.mainWM.getCurrentInstance();

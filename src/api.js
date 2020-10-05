@@ -164,12 +164,8 @@ export class API {
         return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
     }
 
-    pogoboardGet(url){
-        return mainProcessBridge.request('pogoboardGet', url);
-    }
-
-    pogoboardPost(url, form){
-        return mainProcessBridge.request('pogoboardPost', url, form);
+    createKeyPair(){
+        return mainProcessBridge.request('createKeyPair',{});
     }
 
 }
