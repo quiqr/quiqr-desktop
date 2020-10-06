@@ -14,8 +14,8 @@ export default class RegisterDialog extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            username: "test3334",
-            email: "test@lkjflsdk.nl",
+            username: "",
+            email: "",
             username_err: "",
             email_err: "",
             failure: false,

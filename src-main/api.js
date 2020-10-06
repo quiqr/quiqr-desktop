@@ -156,7 +156,12 @@ api.reloadPoppyGoProfile = function(){
     ///mainWindow.webContents.send("reloadPoppyGoProfile");
     mainWindow.reload()
 }
-
+api.createPogoDomainConf = async function(domain,context){
+    console.log(domain.obj)
+    //let pogopubl = new PogoPublisher({});
+    //await pogopubl.writeProfile(profile.obj)
+    context.resolve(true);
+}
 api.getCurrentSiteKey = async function(){
     return await global.currentSiteKey;
 }

@@ -19,6 +19,7 @@ import { WorkspacesSimple } from './components/WorkspacesSimple';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
+import ClaimDomainDialog from './components/ClaimDomainDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
 import MarkdownIt from 'markdown-it'
@@ -78,6 +79,7 @@ type HomeState = {
     createSiteDialog: bool,
     publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
     registerDialog?: { open: bool },
+    claimDomainDialog?: { open: bool },
     blockingOperation: ?string //this should be moved to a UI service
 }
 
@@ -93,6 +95,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             createSiteDialog: false,
             publishSiteDialog: undefined,
             registerDialog: {open: false},
+            claimDomainDialog: {open: false},
             username: "",
             siteCreatorMessage: null
         };
@@ -181,6 +184,19 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
     }
 
+    handleClaimDomainNow(){
+        this.setState({claimDomainDialog: { open: true}});
+    }
+
+    handleClaimDomainCancelClick(){
+        this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+    }
+
+    handleClaimDomainClick(domain){
+        this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+    }
+
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
         let user = undefined;
 
@@ -209,7 +225,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                         {user}
 
                         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>cleam domain!</a>
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleClaimDomainNow()}}>cleam domain!</a>
                         </ListItem>
 
                         <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
@@ -320,7 +336,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     render(){
 
         let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog } = this.state;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog} = this.state;
 
         let _configurations = ((configurations: any): Configurations);
 
@@ -366,6 +382,17 @@ class Home extends React.Component<HomeProps, HomeState>{
                     />
                 ):(null) }
 
+                { selectedSite!=null && this.state.claimDomainDialog!=null ? (
+                    <ClaimDomainDialog
+                        onCancelClick={()=>this.handleClaimDomainClick()}
+                        onClaimDomainClick={({username, email})=>{
+                          this.handleClaimDomainClick(username, email)
+                        }}
+                        username={this.state.username}
+
+                        open={claimDomainDialog!=null&&claimDomainDialog.open}
+                    />
+                ):(null) }
 
                 {/*this should be moved to a UI service*/}
                 <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>

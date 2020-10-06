@@ -170,6 +170,9 @@ export class API {
     createPogoProfile(obj: any){
         return mainProcessBridge.request('createPogoProfile',{obj});
     }
+    createPogoDomainConf(obj: any){
+        return mainProcessBridge.request('createPogoDomainConf',{obj});
+    }
     getPoppyGoProfile(){
         return mainProcessBridge.request('getPoppyGoProfile',{});
     }
