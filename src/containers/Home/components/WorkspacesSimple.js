@@ -52,7 +52,11 @@ export class WorkspaceSimple extends React.Component<WorkspaceProps,WorkspaceSta
     }
     handleOpenLocation = ()=>{ this.props.onLocationClick(this.props.header.path); }
     handleWorkspaceSelect = (e: any)=>{ this.props.onSelectWorkspaceClick(e, this.props.site.key, this.props.header); }
-    handlePublishClick = ()=>{ if(this.state.config!=null) this.props.onPublishClick(this.props.header, this.state.config); }
+    handlePublishClick = ()=>{
+        if(this.state.config!=null)
+            this.props.onPublishClick(this.props.header, this.state.config);
+    }
+
     handleRefreshClick = ()=>{
         this.setState({config: null, error: null, refreshing: true});
         this.load();

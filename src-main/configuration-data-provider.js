@@ -30,7 +30,10 @@ function validateSite(site) {
         serve: Joi.array(),
         build: Joi.array(),
         publish: Joi.array(),
+        lastPublish: Joi.number().integer(),
+        lastEdit: Joi.number().integer(),
         transform: Joi.array()
+
     });
     const result = Joi.validate(site, schema);
     if(result.error)

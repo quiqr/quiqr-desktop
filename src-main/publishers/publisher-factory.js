@@ -16,6 +16,7 @@ const outputConsole = require('./../output-console');
 class PublisherFactory{
     getPublisher(publisherConfig/*: PublisherConfig<*>*/) /*: IPublisher*/{
         let type = publisherConfig.type;
+        console.log(publisherConfig);
         let genericPublisherConfig = (publisherConfig/*: any*/);
 
         outputConsole.appendLine(' about to start publisher with type: ' + type )
@@ -34,6 +35,7 @@ class PublisherFactory{
         }
         if(type==='poppygo'){
             let PogoPublisher = require('./pogo-publisher');
+            console.log(genericPublisherConfig);
             return new PogoPublisher(genericPublisherConfig);
         }
 

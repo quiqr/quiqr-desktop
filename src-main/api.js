@@ -138,29 +138,20 @@ api.createKeyPair = async function({},context){
 }
 
 api.createPogoProfile = async function(profile,context){
-    console.log(profile.obj)
     let pogopubl = new PogoPublisher({});
     await pogopubl.writeProfile(profile.obj)
     context.resolve(true);
 }
 
 api.getPoppyGoProfile = async function({},context){
-
     let pogopubl = new PogoPublisher({});
     profile = await pogopubl.readProfile();
     if(profile) context.resolve(profile);
-
 }
-api.reloadPoppyGoProfile = function(){
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    ///mainWindow.webContents.send("reloadPoppyGoProfile");
-    mainWindow.reload()
-}
-api.createPogoDomainConf = async function(domain,context){
-    console.log(domain.obj)
-    //let pogopubl = new PogoPublisher({});
-    //await pogopubl.writeProfile(profile.obj)
-    context.resolve(true);
+api.createPogoDomainConf = async function({path,domains},context){
+    let pogopubl = new PogoPublisher({});
+    await pogopubl.writeDomainInfo(path,domains)
+    context.resolve(path);
 }
 api.getCurrentSiteKey = async function(){
     return await global.currentSiteKey;
@@ -450,6 +441,7 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }
         siteService.publish(publishKey).then(()=>{
+            console.log("jhaallo");
             context.resolve();
         }, ()=>{
             context.reject(err);

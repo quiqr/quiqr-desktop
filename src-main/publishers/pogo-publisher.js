@@ -64,7 +64,7 @@ class PogoPublisher {
         let pubkey = '';
         var git_bin = this.getGitBin();
         var sukohdir = pathHelper.getRoot();
-        console.log(git_bin);
+        //console.log(git_bin);
 
         try {
             let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
@@ -95,6 +95,36 @@ class PogoPublisher {
         }
 
         return profile;
+    }
+
+    async writePublishStatus(){
+        let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
+        var newConf = JSON.parse(conftxt);
+        newConf.lastPublish = Date.now();
+        await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
+        console.log(newConf);
+        console.log(configJsonPath);
+        let mainWindow = global.mainWM.getCurrentInstance();
+        mainWindow.webContents.send("lastPublishedChanged");
+    }
+
+
+    async writeDomainInfo(pogoDomain, domains){
+        let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
+        var newConf = JSON.parse(conftxt);
+        newConf.publish = [];
+        newConf.publish.push({
+            key: 'poppygo-cloud',
+            config: {
+                path: pogoDomain,
+                type: 'poppygo',
+                domains: domains
+            }
+        });
+        //console.log(newConf);
+        await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
     }
 
     async publish(context){
@@ -128,11 +158,15 @@ class PogoPublisher {
         progressBar.value += 10;
         progressBar.detail = 'Preparing upload';
 
+        var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
-        var tmpkeypath = pathHelper.getRoot()+'ghkey';
+        //var profile = await this.readProfile();
+        var repository = this._config.path;
+        var group = "sites";
+
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
-        var full_gh_url = 'git@gitlab.brepi.eu:' + this._config.user + '/' + this._config.repo +'.git';
-        var full_gh_dest = resolvedDest + '' + this._config.repo;
+        var full_gh_url = 'git@gitlab.brepi.eu:' + group + '/' + repository +'.git';
+        var full_gh_dest = resolvedDest + '' + repository;
         var gitignore = "/public\n\
 .sukoh\n";
 
@@ -176,10 +210,10 @@ pogoform:\n\
         await fs.emptyDir(resolvedDest);
         await fs.ensureDir(resolvedDest);
 
-        outputConsole.appendLine('Writing temporaty key ' + tmpkeypath);
+        //outputConsole.appendLine('Writing temporaty key ' + pogokeypath);
 
-        await fs.writefilesync(tmpkeypath, this._config.privatekey, 'utf-8');
-        await fs.chmodsync(tmpkeypath, '0600');
+        //await fs.writefilesync(pogokeypath, this._config.privatekey, 'utf-8');
+        //await fs.chmodsync(pogokeypath, '0600');
 
         //const sshkeyscan = await spawnAw("ssh-keyscan" , ["-H", "gitlab.brepi.eu");
         //console.log(sshkeyscan.toString());
@@ -189,7 +223,7 @@ pogoform:\n\
 
         outputConsole.appendLine('Start cloning from: ' + full_gh_url);
 
-        let clonecmd = spawn( git_bin, [ "clone", "-s" ,"-i", tmpkeypath, full_gh_url , full_gh_dest ]);
+        let clonecmd = spawn( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
 
         clonecmd.stdout.on("data", (data) => {
         });
@@ -252,8 +286,8 @@ pogoform:\n\
                                 outputConsole.appendLine('git-commit finished, going to git-push ...');
 
                                 var spawn = require("child_process").spawn;
-                                let clonecmd4 = spawn( git_bin, [ "push","-s", "-i", tmpkeypath, full_gh_dest ]);
-                                outputConsole.appendLine(git_bin+" push -i "+ tmpkeypath +" "+ full_gh_dest);
+                                let clonecmd4 = spawn( git_bin, [ "push","-s", "-i", pogokeypath, full_gh_dest ]);
+                                outputConsole.appendLine(git_bin+" push -i "+ pogokeypath +" "+ full_gh_dest);
 
                                 clonecmd4.stdout.on("data", (data) => {
                                 });
@@ -268,6 +302,9 @@ pogoform:\n\
                                         progressBar.setCompleted();
                                         progressBar._window.hide();
                                         progressBar.close();
+
+                                        this.writePublishStatus();
+
                                         dialog.showMessageBox(mainWindow, {
                                             type: 'info',
                                             message: "Your updates have been published. \n In a few minutes changes will be visible.",
@@ -311,7 +348,7 @@ pogoform:\n\
             }
             else {
                 outputConsole.appendLine('Could not clone destination repository');
-                outputConsole.appendLine(`${git_bin} clone -i ${tmpkeypath} ${full_gh_url} ${full_gh_dest}`);
+                outputConsole.appendLine(`${git_bin} clone -i ${pogokeypath} ${full_gh_url} ${full_gh_dest}`);
                 progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {

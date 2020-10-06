@@ -112,6 +112,12 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     componentWillMount(){
+        //TODO remove when pogopublisher has been rewritten
+        window.require('electron').ipcRenderer.on('lastPublishedChanged', ()=>{
+            service.getConfigurations(true).then((c)=>{
+                this.checkSiteInProps();
+            });
+        });
         service.registerListener(this);
     }
 
@@ -149,6 +155,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
                 stateUpdate.selectedWorkspace = bundle.workspace;
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
+                service.api.logToConsole(stateUpdate.selectedSite);
                 this.setState(stateUpdate);
                 return service.getWorkspaceDetails(siteKey, workspaceKey);
             })
@@ -169,6 +176,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     componentWillUnmount(){
         service.unregisterListener(this);
+    }
+
+    handlePublishNow(){
+        return;
     }
 
     handleRegisterNow(){
@@ -192,13 +203,17 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
     }
 
-    handleClaimDomainClick(domain){
+    handleClaimDomainClick(obj){
+        service.getConfigurations(true).then((c)=>{
+            this.checkSiteInProps();
+        });
         this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
-        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
         let user = undefined;
+        let domain = undefined;
+        let published = undefined;
 
         if(this.state.username!==""){
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
@@ -213,6 +228,40 @@ class Home extends React.Component<HomeProps, HomeState>{
             );
         }
 
+        if(site.publish.length === 1 && site.publish[0].key == 'poppygo-cloud'){
+            domain = (
+                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site is linked to {site.publish[0].config.path}.pogosite.com</span>
+                </ListItem>
+            )
+        }
+        else{
+            domain = (
+                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleClaimDomainNow()}}>cleam domain!</a>
+                </ListItem>
+            )
+        }
+
+        if(site.hasOwnProperty('lastPublish')){
+            service.api.logToConsole(site.lastPublish);
+            var ts = new Date(site.lastPublish)
+
+            published = (
+                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Latest publication {ts.toUTCString()}{/* - All work is published!*/}</span>
+                </ListItem>
+            )
+        }
+        else{
+            published = (
+                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> {/*&nbsp;&nbsp;<a href="#" onClick={ ()=>{this.handlePublishNow()} } >publish now!</a>*/}
+                </ListItem>
+            )
+        }
+
+
         return (
             <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
 
@@ -223,15 +272,10 @@ class Home extends React.Component<HomeProps, HomeState>{
                 <div style={{padding: "0px 16px"}}>
                     <List>
                         {user}
+                        {domain}
+                        {published}
 
-                        <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleClaimDomainNow()}}>cleam domain!</a>
-                        </ListItem>
-
-                        <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>publish now!</a>
-                        </ListItem>
-                     </List>
+                    </List>
                 </div>
 
                 { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
@@ -250,7 +294,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     };
 
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-
 
         this.setState({currentWorkspaceKey: workspace.key});
         let        select = true;
@@ -320,12 +363,21 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
         service.api.parentTempUnHideMobilePreview();
+        service.api.logToConsole("fdsafds1");
+
         this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
         service.api.buildWorkspace(siteKey, workspaceKey, build).then(()=>{
             this.setState({blockingOperation: 'Publishing site...'});
-            return service.api.publishSite(siteKey, publish);
+
+            service.api.publishSite(siteKey, publish).then(()=>{
+                service.getConfigurations(true).then((c)=>{
+                    service.api.logToConsole("fdsafds2");
+                    snackMessageService.addSnackMessage('Site successfully published.');
+                    this.checkSiteInProps();
+                });
+            });
         }).then(()=>{
-            snackMessageService.addSnackMessage('Site successfully published.');
+
         }).catch(()=>{
             snackMessageService.addSnackMessage('Publish failed.');
         }).then(()=>{
@@ -355,6 +407,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                         this.renderSelectedSiteContent(_configurations, selectedSite)
                     ) }
                 </div>
+
                 <CreateSiteDialog
                     open={createSiteDialog}
                     onCancelClick={()=>this.setState({createSiteDialog:false})}
@@ -385,8 +438,10 @@ class Home extends React.Component<HomeProps, HomeState>{
                 { selectedSite!=null && this.state.claimDomainDialog!=null ? (
                     <ClaimDomainDialog
                         onCancelClick={()=>this.handleClaimDomainClick()}
-                        onClaimDomainClick={({username, email})=>{
-                          this.handleClaimDomainClick(username, email)
+                        onClaimDomainClick={(obj)=>{
+                            service.api.logToConsole("hallo?");
+                            service.api.logToConsole(obj);
+                          this.handleClaimDomainClick(obj)
                         }}
                         username={this.state.username}
 
