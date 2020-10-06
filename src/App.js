@@ -78,7 +78,8 @@ class App extends React.Component<AppProps,AppState>{
             menuIsLocked: true,
             forceShowMenu: false,
             mobileBrowserActive: false,
-            skipMenuTransition: false
+            skipMenuTransition: false,
+            poppygoUsername: ""
         };
 
         win.on('maximize', () => { this.setState({maximized: true}); });
@@ -96,25 +97,28 @@ class App extends React.Component<AppProps,AppState>{
             stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
 
             this.setState(stateUpdate);
-
         })
-
-
-
+        this.getProfile();
     }
 
     getProfile(){
         let getProfile = service.api.getPoppyGoProfile();
 
         getProfile.then((profile)=>{
-            this.setState({poppygoProfile:profile});
+            if(this.state.poppygoUsername !==profile.username){
+
+            service.api.logToConsole(profile.username);
+                this.setState({poppygoUsername: profile.username});
+            }
 
         }, (e)=>{
-            this.setState({
-                poppygoProfile: false
+            /*this.setState({
+                poppygoUsername: ""
             });
+            */
         })
 
+        return true;
     }
 
     //REDIRECTS FROM BACKGROUND
@@ -153,6 +157,10 @@ class App extends React.Component<AppProps,AppState>{
         window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
             this.history.push(location);
         }.bind(this));
+        window.require('electron').ipcRenderer.on('reloadPoppygoProfile', ()=>{
+            //service.api.logToConsole('reloadPoppygoProfile');
+            //this.getProfile();
+        });
     }
 
     minimizeWindow(){
@@ -238,9 +246,19 @@ class App extends React.Component<AppProps,AppState>{
             return <Welcome key={ 'selectSite' } />
       }} />
 
+       <Route path='/refresh/sites/:site/workspaces/:workspace' exact render={ async ({match})=> {
+
+           let siteKey = decodeURIComponent(match.params.site);
+           let workspaceKey = decodeURIComponent(match.params.workspace);
+           let newPath = `/sites/${siteKey}/workspaces/${workspaceKey}`;
+
+           return <Redirect to={newPath} />
+
+       }} />
+
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
           this.getProfile();
-        return <Home key={ 'home' } poppygoProfile={this.state.poppygoProfile} siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          return <Home key={ 'home' } poppygoUsername={this.state.poppygoUsername} siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {

@@ -168,10 +168,13 @@ export class API {
         return mainProcessBridge.request('createKeyPair',{});
     }
     createPogoProfile(obj: any){
-        return mainProcessBridge.request('createPogoProfile',obj);
+        return mainProcessBridge.request('createPogoProfile',{obj});
     }
     getPoppyGoProfile(){
         return mainProcessBridge.request('getPoppyGoProfile',{});
+    }
+    reloadPoppyGoProfile(){
+        return mainProcessBridge.request('reloadPoppyGoProfile',{});
     }
 
 }

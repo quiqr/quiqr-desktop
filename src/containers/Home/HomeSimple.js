@@ -94,7 +94,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             publishSiteDialog: undefined,
             registerDialog: {open: false},
             username: "",
-            poppygoProfile: null ,
             siteCreatorMessage: null
         };
     }
@@ -102,6 +101,10 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentDidUpdate(preProps: HomeProps){
         if(this._ismounted && preProps.siteKey !== this.props.siteKey){
             this.checkSiteInProps();
+        }
+
+        if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
+            this.setUserName(this.props.poppygoUsername);
         }
     }
 
@@ -112,16 +115,15 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentDidMount(){
         this.checkSiteInProps();
         this._ismounted = true;
+        this.setUserName(this.props.poppygoUsername);
+    }
+
+    setUserName(username){
+        this.setState({username: username});
     }
 
     checkSiteInProps(){
-        var { siteKey, workspaceKey, poppygoProfile } = this.props;
-        if(poppygoProfile) {
-            service.api.logToConsole(poppygoProfile.username);
-
-            this.setState({poppygoProfile: poppygoProfile});
-            this.setState({username: poppygoProfile.username});
-        }
+        var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey != siteKey){
@@ -168,7 +170,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleRegisterNow(){
         this.setState({registerDialog: { open: true}});
-        service.api.logToConsole('registerNow');
     }
 
     handleRegisterCancelClick(){
@@ -177,10 +178,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleRegisterClick(username, email){
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
-        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?=1")
-
-        //service.api.logToConsole(username);
-        //service.api.logToConsole(email);
+        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){

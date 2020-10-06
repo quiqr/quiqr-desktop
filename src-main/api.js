@@ -137,9 +137,11 @@ api.createKeyPair = async function({},context){
     context.resolve(pubkey);
 }
 
-api.createPogoProfile = function(profile){
+api.createPogoProfile = async function(profile,context){
+    console.log(profile.obj)
     let pogopubl = new PogoPublisher({});
-    pogopubl.writeProfile(profile)
+    await pogopubl.writeProfile(profile.obj)
+    context.resolve(true);
 }
 
 api.getPoppyGoProfile = async function({},context){
@@ -148,6 +150,11 @@ api.getPoppyGoProfile = async function({},context){
     profile = await pogopubl.readProfile();
     if(profile) context.resolve(profile);
 
+}
+api.reloadPoppyGoProfile = function(){
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    ///mainWindow.webContents.send("reloadPoppyGoProfile");
+    mainWindow.reload()
 }
 
 api.getCurrentSiteKey = async function(){

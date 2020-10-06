@@ -33,12 +33,10 @@ export default class RegisterDialog extends React.Component{
             busy: true
         });
 
-        //let pubkey = await service.api.createKeyPair();
-
         let promise = service.api.createKeyPair();
 
         promise.then((pubkey)=>{
-            service.api.logToConsole("frontend:" + pubkey);
+            service.api.logToConsole("frontend:pubkeyok");
 
             this.registerUserPost(this.state.username, this.state.email, pubkey);
 
@@ -55,7 +53,6 @@ export default class RegisterDialog extends React.Component{
         var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey });
 
         let data='';
-        //service.api.logToConsole(postData);
         const request = net.request({
             method: 'POST',
             protocol: 'http:',
@@ -76,12 +73,14 @@ export default class RegisterDialog extends React.Component{
                 service.api.logToConsole(obj);
                 if(obj.hasOwnProperty('username')){
 
-                    service.api.createPogoProfile(obj);
-
-                    this.props.onRegisterClick({
-                        username: this.state.username,
-                        email: this.state.email
+                    let promise = service.api.createPogoProfile(obj);
+                    promise.then(()=>{
+                        this.props.onRegisterClick({
+                            username: this.state.username,
+                            email: this.state.email
+                        });
                     });
+
 
                 }
                 else{

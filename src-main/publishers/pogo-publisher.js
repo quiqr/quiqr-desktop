@@ -74,7 +74,6 @@ class PogoPublisher {
             outputConsole.appendLine('keygen error ...:' + e);
         }
 
-        console.log("infunc"+pubkey);
         return pubkey;
     }
 
