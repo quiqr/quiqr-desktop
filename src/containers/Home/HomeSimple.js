@@ -228,7 +228,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             );
         }
 
-        if(site.publish.length === 1 && site.publish[0].key == 'poppygo-cloud'){
+        if(site.publish.length === 1 && site.publish[0].key == 'poppygo-cloud' && site.publish[0].config.hasOwnProperty('path')){
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
                     <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site is linked to {site.publish[0].config.path}.pogosite.com</span>
