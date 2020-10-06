@@ -16,8 +16,7 @@ export default class ClaimDomainDialog extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            pogourl: "test3334",
-            email: "test@lkjflsdk.nl",
+            pogourl: "",
             pogourl_err: "",
             email_err: "",
             failure: false,
@@ -56,9 +55,9 @@ export default class ClaimDomainDialog extends React.Component{
         let data='';
         const request = net.request({
             method: 'POST',
-            protocol: 'http:',
-            hostname: 'localhost',
-            port: 9999,
+            protocol: 'https:',
+            hostname: 'board.poppygo.io',
+            port: 443,
             path: '/site/new',
             headers: {
                 'Content-Type': 'application/json',
@@ -145,7 +144,6 @@ export default class ClaimDomainDialog extends React.Component{
     handleTryAgain(){
         this.setState({
             pogourl: "",
-            email: "",
             busy: false,
             failure: false,
         });

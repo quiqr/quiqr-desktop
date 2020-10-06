@@ -55,9 +55,9 @@ export default class RegisterDialog extends React.Component{
         let data='';
         const request = net.request({
             method: 'POST',
-            protocol: 'http:',
-            hostname: 'localhost',
-            port: 9999,
+            protocol: 'https:',
+            hostname: 'board.poppygo.io',
+            port: 443,
             path: '/user/new',
             headers: {
                 'Content-Type': 'application/json',
