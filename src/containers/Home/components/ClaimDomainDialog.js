@@ -35,13 +35,11 @@ export default class ClaimDomainDialog extends React.Component{
             busy: true
         });
 
-        service.api.logToConsole(this.props)
 
         this.registerDomain(this.state.pogourl, this.props.username);
     }
 
     registerDomain(pogourl, username){
-        service.api.logToConsole(pogourl + username)
         if(username===""){
             this.setState({
                 failure: true
@@ -53,17 +51,34 @@ export default class ClaimDomainDialog extends React.Component{
         var postData = JSON.stringify({sitename : pogourl, username: username});
 
         let data='';
-        const request = net.request({
-            method: 'POST',
-            protocol: 'https:',
-            hostname: 'board.poppygo.io',
-            port: 443,
-            path: '/site/new',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length
-            }
-        })
+        let localBoard=false;
+        let request=null;
+        if(localBoard){
+            request = net.request({
+                method: 'POST',
+                protocol: 'http:',
+                hostname: 'localhost',
+                port: 9999,
+                path: '/site/new',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': postData.length
+                }
+            })
+        }
+        else{
+            request = net.request({
+                method: 'POST',
+                protocol: 'https:',
+                hostname: 'board.poppygo.io',
+                port: 443,
+                path: '/site/new',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': postData.length
+                }
+            })
+        }
 
         request.on('response', (response) => {
 
@@ -73,7 +88,6 @@ export default class ClaimDomainDialog extends React.Component{
 
                     let promise = service.api.createPogoDomainConf(obj.path, obj.path+".pogosite.com");
                     promise.then((path)=>{
-                        service.api.logToConsole(path);
                         this.props.onClaimDomainClick({ pogourl: path });
                     });
 
@@ -84,7 +98,6 @@ export default class ClaimDomainDialog extends React.Component{
                         failure: true
                     });
                 }
-                //service.api.logToConsole(""+response.code);
 
                 this.setState({ busy: false });
             });
@@ -112,7 +125,6 @@ export default class ClaimDomainDialog extends React.Component{
             request.on('response', (response) => {
 
                 response.on('end', () => {
-                    service.api.logToConsole(data);
                     let obj = JSON.parse(data);
 
                     if(obj.status !== "free"){
@@ -126,7 +138,6 @@ export default class ClaimDomainDialog extends React.Component{
                         });
                     }
 
-                    service.api.logToConsole(obj);
                 });
                 response.on("data", chunk => {
                     data += chunk;

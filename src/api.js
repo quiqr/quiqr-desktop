@@ -165,7 +165,7 @@ export class API {
     }
 
     createKeyPair(){
-        return mainProcessBridge.request('createKeyPair',{});
+        return mainProcessBridge.request('createKeyPair',{}, {timeout:90000});
     }
     createPogoProfile(obj: any){
         return mainProcessBridge.request('createPogoProfile',{obj});

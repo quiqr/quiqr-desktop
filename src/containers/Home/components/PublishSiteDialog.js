@@ -55,6 +55,44 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
         return this.state.build!==''&&this.state.publish!=='';
     }
 
+    renderFieldsRemoveMe(){
+        let { open, workspace, site } = this.props;
+        let { build, publish } = this.state;
+        return (
+            <div>
+            <TextField floatingLabelText={'Site'} readOnly fullWidth value={this.props.site.key} />
+
+                <SelectField
+                    onChange={this.handleBuildChange}
+                    fullWidth
+                    value={workspace.build.findIndex(x => x.key===build)}
+                    floatingLabelText="Build Config *">
+                    {this.props.workspace.build.map((build, i)=>(
+                        <MenuItem
+                            key={`build-${i}`} value={i}
+                            primaryText={build.key}
+                          secondaryText={build.config}
+                        />
+                    ))}
+                </SelectField>
+                <SelectField
+                    onChange={this.handlePublishChange}
+                    fullWidth
+                    value={site.publish.findIndex(x => x.key===publish)}
+                    floatingLabelText="Publish Config *">
+                    {this.props.site.publish.map((publish, i)=>(
+                        <MenuItem
+                            key={`publish-${i}`} value={i}
+                            primaryText={publish.key||'default'}
+                            secondaryText={publish.config.type}
+                        />
+                    ))}
+                    </SelectField>
+                </div>
+        )
+
+    }
+
     render(){
 
         let { open, workspace, site } = this.props;
@@ -88,40 +126,13 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
 
         return (
             <Dialog
-                title="Publish Site"
-                open={open}
+            title={"Publish Site.. "+this.props.site.key}
+            open={open}
             actions={actions}>
             <div>
-
-                <TextField floatingLabelText={'Site'} readOnly fullWidth value={this.props.site.key} />
-                <SelectField
-                    onChange={this.handleBuildChange}
-                    fullWidth
-                    value={workspace.build.findIndex(x => x.key===build)}
-                    floatingLabelText="Build Config *">
-                    {this.props.workspace.build.map((build, i)=>(
-                        <MenuItem
-                            key={`build-${i}`} value={i}
-                            primaryText={build.key}
-                          secondaryText={build.config}
-                        />
-                    ))}
-                </SelectField>
-                <SelectField
-                    onChange={this.handlePublishChange}
-                    fullWidth
-                    value={site.publish.findIndex(x => x.key===publish)}
-                    floatingLabelText="Publish Config *">
-                    {this.props.site.publish.map((publish, i)=>(
-                        <MenuItem
-                            key={`publish-${i}`} value={i}
-                            primaryText={publish.key||'default'}
-                            secondaryText={publish.config.type}
-                        />
-                    ))}
-                    </SelectField>
-                </div>
-            </Dialog>
+                Publish changes to the PoppyGo Webservers.
+            </div>
+        </Dialog>
         );
     }
 

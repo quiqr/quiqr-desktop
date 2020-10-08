@@ -2,20 +2,15 @@ import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
-import FlatButton from 'material-ui/FlatButton';
+import { FlatButton, RaisedButton, TextField } from 'material-ui/';
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
-//import IconAdd from 'material-ui/svg-icons/content/add';
-//import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import IconDomain from 'material-ui/svg-icons/social/domain';
 import IconPublish from 'material-ui/svg-icons/editor/publish';
 
-import TextField from 'material-ui/TextField';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, InfoLine, InfoBlock, MessageBlock } from './components/shared';
-import { WorkspacesSimple } from './components/WorkspacesSimple';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
@@ -141,7 +136,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 && publ.config.hasOwnProperty('type') && publ.config.type == 'poppygo'){
 
                 if(!publ.config.hasOwnProperty('path')){
-                    service.api.logToConsole("MUST CONVERT");
                     service.api.convert07("MUST CONVERT");
                 }
             }
@@ -154,7 +148,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey != siteKey){
-                // Serve the workspace at selection of the workspace right after mounting the workspace
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
             }
 
@@ -176,8 +169,10 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
                 stateUpdate.selectedWorkspace = bundle.workspace;
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
+
                 this.setState(stateUpdate);
-                return service.getWorkspaceDetails(siteKey, workspaceKey);
+                let details = service.getWorkspaceDetails(siteKey, workspaceKey);
+
             })
         }
         else{
@@ -189,20 +184,40 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-    getWorkspaceDetails = (workspace: WorkspaceHeader)=> {
+    /*
+    getWorkspaceDetails = (workspace: WorkspaceHeader) => {
+
         if(this.state.selectedSite==null) throw new Error('Invalid operation.');
-        return service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
+        let ret = service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
+        return ret;
     }
+    */
 
     componentWillUnmount(){
         service.unregisterListener(this);
     }
 
     handlePublishNow(){
-        return;
+        let workspace = this.state.selectedWorkspaceDetails;
+        let workspaceHeader = this.state.selectedSiteWorkspaces[0];
+        service.api.parentTempHideMobilePreview();
+
+        this.setState({requestDialog:"publish"});
+
+        if(this.state.username==""){
+            this.handleRegisterNow();
+        }
+        else if(!this.checkLinkedDomain()){
+            this.handleClaimDomainNow();
+        }
+        else{
+            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
+        }
     }
 
     handleRegisterNow(){
+        this.setState({requestDialog:"register"});
+        service.api.parentTempHideMobilePreview();
         this.setState({registerDialog: { open: true}});
     }
 
@@ -213,9 +228,28 @@ class Home extends React.Component<HomeProps, HomeState>{
     handleRegisterClick(username, email){
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
         this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+        /*
+
+        this.setState({username:username},()=>{
+            if(this.state.requestDialog=="claim"){
+                this.handleClaimDomainNow();
+            }
+            else if(this.state.registerDialog=='publish' && !this.checkLinkedDomain()){
+                this.handleClaimDomainNow();
+            }
+            else if(this.state.registerDialog=='publish' && this.checkLinkedDomain()){
+                this.handlePublishNow();
+            }
+            else{
+            }
+
+        });
+        */
     }
 
     handleClaimDomainNow(){
+        this.setState({requestDialog:"claim"});
+        service.api.parentTempHideMobilePreview();
         this.setState({claimDomainDialog: { open: true}});
     }
 
@@ -228,6 +262,15 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.checkSiteInProps();
         });
         this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+    }
+
+    checkLinkedDomain(){
+        let site = this.state.selectedSite;
+        if(site.publish.length === 1 && site.publish[0].config.type == 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
+            return true;
+        }
+        return false;
+
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
@@ -258,10 +301,10 @@ class Home extends React.Component<HomeProps, HomeState>{
             );
         }
 
-        if(site.publish.length === 1 && site.publish[0].config.type == 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
+        if(this.checkLinkedDomain()){
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site is linked to <a href="#" onClick={()=>{
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>This site is linked to <a href="#" onClick={()=>{
                         window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
                     }}>{site.publish[0].config.defaultDomain}</a></span>
                 </ListItem>
@@ -283,7 +326,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             } else
             {
-                ts = new Date(site.lastPublish).toUTCString()
+                ts = new Date(site.lastPublish).toString().split("GMT")[0]
             }
 
             published = (
@@ -301,6 +344,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
 
 
+        let publishDisabled=true;
+        let config = this.state.selectedWorkspaceDetails;
+        publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
+
         return (
             <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
 
@@ -315,9 +362,13 @@ class Home extends React.Component<HomeProps, HomeState>{
                         {published}
 
                     </List>
+
+                </div>
+                <div style={{padding: "0px 16px 16px 30px"}}>
+                    <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={()=>{ this.handlePublishNow();}} />
                 </div>
 
-                { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
+                { /*this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) */}
 
                 <div className="markdown"
                 style={ styles.creatorMessage }
@@ -345,38 +396,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-    renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
-
-        return (
-            <Route render={({history})=>{
-
-                this.history = history; //ugly
-
-                if(this.state.currentWorkspaceKey==null)
-                    return (<Wrapper></Wrapper>);
-
-                return (
-                    <WorkspacesSimple
-                        getWorkspaceDetails={this.getWorkspaceDetails}
-                        workspaces={workspaces}
-                        activeSiteKey={this.state.currentSiteKey}
-                        activeWorkspaceKey={this.state.currentWorkspaceKey}
-                        onLocationClick={(location)=>{
-                            service.api.openFileExplorer(location)
-                        }}
-                        onPublishClick={(workspaceHeader, workspace)=>{
-                            service.api.parentTempHideMobilePreview();
-                            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
-                        }}
-                        onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }
-                        onSelectWorkspaceClick={ this.handleSelectWorkspaceClick }
-                        site={site}
-                    />
-                )
-            }} />
-        );
-    }
-
     handleAddSiteClick(){
         this.setState({createSiteDialog: true});
     }
@@ -402,7 +421,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
         service.api.parentTempUnHideMobilePreview();
-        service.api.logToConsole("fdsafds1");
 
         this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
         service.api.buildWorkspace(siteKey, workspaceKey, build).then(()=>{
@@ -410,8 +428,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             service.api.publishSite(siteKey, publish).then(()=>{
                 service.getConfigurations(true).then((c)=>{
-                    service.api.logToConsole("fdsafds2");
-                    snackMessageService.addSnackMessage('Site successfully published.');
+                    //snackMessageService.addSnackMessage('Site successfully published.');
                     this.checkSiteInProps();
                 });
             });
@@ -436,64 +453,77 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
 
         return (
-            <div style={ styles.container }>
-                <div style={styles.selectedSiteCol}>
-                    { selectedSite==null ? (
-                        <Wrapper title="Site Management">
-                            <MessageBlock>Please, select a site.</MessageBlock>
-                        </Wrapper>
-                    ) : (
-                        this.renderSelectedSiteContent(_configurations, selectedSite)
-                    ) }
-                </div>
+            <Route render={({history}) => {
+                this.history = history;
 
-                <CreateSiteDialog
-                    open={createSiteDialog}
-                    onCancelClick={()=>this.setState({createSiteDialog:false})}
-                    onSubmitClick={this.handleCreateSiteSubmit}
-                />
-                { selectedSite!=null && this.state.publishSiteDialog!=null ? (
-                    <PublishSiteDialog
-                        site={selectedSite}
-                        workspace={this.state.publishSiteDialog.workspace}
-                        workspaceHeader={this.state.publishSiteDialog.workspaceHeader}
-                        onCancelClick={this.handlePublishSiteCancelClick}
-                        onBuildAndPublishClick={this.handleBuildAndPublishClick}
-                        open={publishSiteDialog!=null&&publishSiteDialog.open}
-                    />
-                ):(null) }
+                let jeeworkspace = null;
+                let jeeworkspaceHeader = null;
+                if( selectedSite!=null && this.state.publishSiteDialog!=null){
+                    jeeworkspace = this.state.publishSiteDialog.workspace;
+                    jeeworkspaceHeader = this.state.publishSiteDialog.workspaceHeader;
+                }
 
-                { selectedSite!=null && this.state.registerDialog!=null ? (
-                    <RegisterDialog
-                        onCancelClick={()=>this.handleRegisterCancelClick()}
-                        onRegisterClick={({username, email})=>{
-                          this.handleRegisterClick(username, email)
-                        }}
+                return (
 
-                        open={registerDialog!=null&&registerDialog.open}
-                    />
-                ):(null) }
+                    <div style={ styles.container }>
+                        <div style={styles.selectedSiteCol}>
+                            { selectedSite==null ? (
+                                <Wrapper title="Site Management">
+                                    <MessageBlock>Please, select a site.</MessageBlock>
+                                </Wrapper>
+                            ) : (
+                                this.renderSelectedSiteContent(_configurations, selectedSite)
+                            ) }
+                        </div>
 
-                { selectedSite!=null && this.state.claimDomainDialog!=null ? (
-                    <ClaimDomainDialog
-                        onCancelClick={()=>this.handleClaimDomainClick()}
-                        onClaimDomainClick={(obj)=>{
-                            service.api.logToConsole("hallo?");
-                            service.api.logToConsole(obj);
-                          this.handleClaimDomainClick(obj)
-                        }}
-                        username={this.state.username}
+                        <CreateSiteDialog
+                            open={createSiteDialog}
+                            onCancelClick={()=>this.setState({createSiteDialog:false})}
+                            onSubmitClick={this.handleCreateSiteSubmit}
+                        />
 
-                        open={claimDomainDialog!=null&&claimDomainDialog.open}
-                    />
-                ):(null) }
+                        { selectedSite!=null && this.state.publishSiteDialog!=null ? (
+                                    <PublishSiteDialog
+                                    site={selectedSite}
+                                    workspace={jeeworkspace}
+                                    workspaceHeader={jeeworkspaceHeader}
+                                    onCancelClick={this.handlePublishSiteCancelClick}
+                                    onBuildAndPublishClick={this.handleBuildAndPublishClick}
+                                    open={publishSiteDialog!=null&&publishSiteDialog.open}
+                                />
+                        ):(null) }
 
-                {/*this should be moved to a UI service*/}
-                <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
-            </div>
-        );
+                        { selectedSite!=null && this.state.registerDialog!=null ? (
+                                       <RegisterDialog
+                                        onCancelClick={()=>this.handleRegisterCancelClick()}
+                                        onRegisterClick={({username, email})=>{
+                                            this.handleRegisterClick(username, email)
+                                        }}
+
+                                        open={registerDialog!=null&&registerDialog.open}
+                                    />
+                         ):(null) }
+
+                         { selectedSite!=null && this.state.claimDomainDialog!=null ? (
+                                           <ClaimDomainDialog
+                                            onCancelClick={()=>this.handleClaimDomainClick()}
+                                            onClaimDomainClick={(obj)=>{
+                                                this.handleClaimDomainClick(obj)
+                                            }}
+                                            username={this.state.username}
+
+                                            open={claimDomainDialog!=null&&claimDomainDialog.open}
+                                        />
+                         ):(null) }
+
+                       <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
+                     </div>
+                )
+            }}/>
+
+          );
+        }
+
     }
 
-}
-
-export default muiThemeable()(Home);
+                                        export default muiThemeable()(Home);

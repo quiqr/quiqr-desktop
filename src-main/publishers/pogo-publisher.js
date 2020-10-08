@@ -111,6 +111,7 @@ class PogoPublisher {
         let conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
         let newConf = JSON.parse(conftxt);
         let path = newConf.publish[0].config.repo
+        if(!path) return;
         let publickey = newConf.publish[0].config.publickey
         let privatekey = newConf.publish[0].config.privatekey
 
@@ -136,7 +137,6 @@ class PogoPublisher {
         //----------
         if(userTable.hasOwnProperty(path)){
             let newProfile = {"username":userTable[path]}
-            //console.log(newProfile);
             await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
             await fs.chmodSync(profilepath, '0600');
         }
@@ -150,7 +150,6 @@ class PogoPublisher {
 
         newConf.publish[0].config.path = path
         newConf.lastPublish = 1
-        //console.log(newConf);
 
         //----------
         if(err){

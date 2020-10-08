@@ -53,24 +53,40 @@ export default class RegisterDialog extends React.Component{
         var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey });
 
         let data='';
-        const request = net.request({
-            method: 'POST',
-            protocol: 'https:',
-            hostname: 'board.poppygo.io',
-            port: 443,
-            path: '/user/new',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length
-            }
-        })
+
+        let localBoard=false;
+        let request=null;
+        if(localBoard){
+            request = net.request({
+                method: 'POST',
+                protocol: 'http:',
+                hostname: 'localhost',
+                port: 9999,
+                path: '/user/new',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': postData.length
+                }
+            })
+        }
+        else{
+            request = net.request({
+                method: 'POST',
+                protocol: 'https:',
+                hostname: 'board.poppygo.io',
+                port: 443,
+                path: '/user/new',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': postData.length
+                }
+            })
+        }
 
         request.on('response', (response) => {
 
             response.on('end', () => {
-                //service.api.logToConsole(""+data);
                 let obj = JSON.parse(data);
-                service.api.logToConsole(obj);
                 if(obj.hasOwnProperty('username')){
 
                     let promise = service.api.createPogoProfile(obj);
@@ -88,7 +104,6 @@ export default class RegisterDialog extends React.Component{
                         failure: true
                     });
                 }
-                //service.api.logToConsole(""+response.code);
 
                 this.setState({
                     busy: false
@@ -118,7 +133,6 @@ export default class RegisterDialog extends React.Component{
             request.on('response', (response) => {
 
                 response.on('end', () => {
-                    service.api.logToConsole(data);
                     let obj = JSON.parse(data);
 
                     if(obj.status !== "free"){
@@ -132,7 +146,6 @@ export default class RegisterDialog extends React.Component{
                         });
                     }
 
-                    service.api.logToConsole(obj);
                 });
                 response.on("data", chunk => {
                     data += chunk;
@@ -247,7 +260,7 @@ export default class RegisterDialog extends React.Component{
 
         return (
             <Dialog
-                title="Sign up for free website publishing with PoppyGo Live"
+                title="Sign up for free publishing with PoppyGo Live"
                 open={open}
                 actions={actions}>
 
