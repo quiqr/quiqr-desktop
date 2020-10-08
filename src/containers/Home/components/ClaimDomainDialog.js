@@ -90,8 +90,6 @@ export default class ClaimDomainDialog extends React.Component{
                     promise.then((path)=>{
                         this.props.onClaimDomainClick({ pogourl: path });
                     });
-
-
                 }
                 else{
                     this.setState({
