@@ -114,8 +114,11 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentWillMount(){
         //TODO remove when pogopublisher has been rewritten
         window.require('electron').ipcRenderer.on('lastPublishedChanged', ()=>{
+            this.setState({'mustConvert':false});
             service.getConfigurations(true).then((c)=>{
                 this.checkSiteInProps();
+                this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+
             });
         });
         service.registerListener(this);
@@ -129,6 +132,21 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     setUserName(username){
         this.setState({username: username});
+    }
+
+    checkConvert07(site){
+        if(site.hasOwnProperty('publish') && site.publish.length === 1){
+            let publ = site.publish[0];
+            if(publ.hasOwnProperty('config')
+                && publ.config.hasOwnProperty('type') && publ.config.type == 'poppygo'){
+
+                if(!publ.config.hasOwnProperty('path')){
+                    service.api.logToConsole("MUST CONVERT");
+                    service.api.convert07("MUST CONVERT");
+                }
+            }
+
+        }
     }
 
     checkSiteInProps(){
@@ -152,10 +170,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = bundle.configurations;
                 stateUpdate.selectedSite = bundle.site;
+
+                this.checkConvert07(bundle.site)
+
                 stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
                 stateUpdate.selectedWorkspace = bundle.workspace;
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
-                service.api.logToConsole(stateUpdate.selectedSite);
                 this.setState(stateUpdate);
                 return service.getWorkspaceDetails(siteKey, workspaceKey);
             })
@@ -215,6 +235,16 @@ class Home extends React.Component<HomeProps, HomeState>{
         let domain = undefined;
         let published = undefined;
 
+        if(this.state.mustConvert){
+            return (
+                <Wrapper>
+                    <div>&nbsp;&nbsp;Converting data....</div>
+                </Wrapper>
+            )
+        }
+
+
+
         if(this.state.username!==""){
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
                 <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
@@ -228,28 +258,37 @@ class Home extends React.Component<HomeProps, HomeState>{
             );
         }
 
-        if(site.publish.length === 1 && site.publish[0].key == 'poppygo-cloud' && site.publish[0].config.hasOwnProperty('path')){
+        if(site.publish.length === 1 && site.publish[0].config.type == 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site is linked to {site.publish[0].config.path}.pogosite.com</span>
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site is linked to <a href="#" onClick={()=>{
+                        window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
+                    }}>{site.publish[0].config.defaultDomain}</a></span>
                 </ListItem>
             )
         }
         else{
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleClaimDomainNow()}}>cleam domain!</a>
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleClaimDomainNow()}}>claim domain!</a>
                 </ListItem>
             )
         }
 
         if(site.hasOwnProperty('lastPublish')){
-            service.api.logToConsole(site.lastPublish);
-            var ts = new Date(site.lastPublish)
+
+            let ts;
+            if(site.lastPublish === 1){
+                ts = "not registered";
+
+            } else
+            {
+                ts = new Date(site.lastPublish).toUTCString()
+            }
 
             published = (
                 <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Latest publication {ts.toUTCString()}{/* - All work is published!*/}</span>
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
                 </ListItem>
             )
         }

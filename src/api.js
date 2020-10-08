@@ -170,11 +170,14 @@ export class API {
     createPogoProfile(obj: any){
         return mainProcessBridge.request('createPogoProfile',{obj});
     }
-    createPogoDomainConf(path: string, domains: Array<string>){
-        return mainProcessBridge.request('createPogoDomainConf',{path, domains});
+    createPogoDomainConf(path: string, domain: string){
+        return mainProcessBridge.request('createPogoDomainConf',{path, domain});
     }
     getPoppyGoProfile(){
         return mainProcessBridge.request('getPoppyGoProfile',{});
+    }
+    convert07(){
+        return mainProcessBridge.request('convert07',{});
     }
 
 }

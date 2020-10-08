@@ -71,7 +71,7 @@ export default class ClaimDomainDialog extends React.Component{
                 let obj = JSON.parse(data);
                 if(obj.hasOwnProperty('path')){
 
-                    let promise = service.api.createPogoDomainConf(obj.path, [obj.path+"pogosite.com"]);
+                    let promise = service.api.createPogoDomainConf(obj.path, obj.path+".pogosite.com");
                     promise.then((path)=>{
                         service.api.logToConsole(path);
                         this.props.onClaimDomainClick({ pogourl: path });
