@@ -18,7 +18,7 @@ import WorkspaceSidebar from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 
 //MATERIAL UI
-import { MenuItem } from 'material-ui/';
+//import { MenuItem } from 'material-ui/';
 import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -314,7 +314,7 @@ class App extends React.Component<AppProps,AppState>{
         menuContainerStyle.transition = transition;
       }
 
-      this.state.skipMenuTransition = false ;
+      this.state.setState({skipMenuTransition: false});
      }
 
     return (<Switch>

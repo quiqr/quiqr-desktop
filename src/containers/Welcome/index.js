@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import service from './../../services/service'
 
-import Checkbox from 'material-ui/Checkbox';
+//import Checkbox from 'material-ui/Checkbox';
 import { RaisedButton } from 'material-ui/';
 
 const styles = {

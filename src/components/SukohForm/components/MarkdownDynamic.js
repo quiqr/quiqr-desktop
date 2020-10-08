@@ -1,10 +1,8 @@
-//@flow
-
 import React from 'react';
 import Tip from '../../Tip';
 import FormItemWrapper from './shared/FormItemWrapper';
-import DefaultWrapper from './shared/DefaultWrapper';
-import Paper from 'material-ui/Paper';
+//import DefaultWrapper from './shared/DefaultWrapper';
+//import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import MarkdownIt from 'markdown-it'
 import { BaseDynamic } from '../../HoForm';

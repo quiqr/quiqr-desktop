@@ -24,9 +24,10 @@ export class API {
         return mainProcessBridge.request('logToConsole', {message});
     }
 
-    importSite(){
+        /*importSite(){
         return mainProcessBridge.request('selectSiteAction');
     }
+    */
     importSite(){
         return mainProcessBridge.request('importSiteAction');
     }

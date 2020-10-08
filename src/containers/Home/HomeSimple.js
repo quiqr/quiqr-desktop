@@ -2,15 +2,15 @@ import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
-import { FlatButton, RaisedButton, TextField } from 'material-ui/';
+import { RaisedButton } from 'material-ui/';
 import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
+//import Subheader from 'material-ui/Subheader';
 import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import IconDomain from 'material-ui/svg-icons/social/domain';
 import IconPublish from 'material-ui/svg-icons/editor/publish';
 
 import muiThemeable from 'material-ui/styles/muiThemeable';
-import { Wrapper, InfoLine, InfoBlock, MessageBlock } from './components/shared';
+import { Wrapper, InfoLine, MessageBlock } from './components/shared';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
@@ -133,7 +133,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(site.hasOwnProperty('publish') && site.publish.length === 1){
             let publ = site.publish[0];
             if(publ.hasOwnProperty('config')
-                && publ.config.hasOwnProperty('type') && publ.config.type == 'poppygo'){
+                && publ.config.hasOwnProperty('type') && publ.config.type === 'poppygo'){
 
                 if(!publ.config.hasOwnProperty('path')){
                     service.api.convert07("MUST CONVERT");

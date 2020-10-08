@@ -1,10 +1,10 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import service from './../../../services/service';
-import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui';
-import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
-import { Accordion, AccordionItem } from './../../../components/Accordion';
-import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
+import { Dialog, FlatButton, TextField } from 'material-ui';
+//import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
+//import { Accordion, AccordionItem } from './../../../components/Accordion';
+//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 //import FormData, {getHeaders} from 'form-data';
 //import FormData from 'form-data';
 let net = window.require('electron').remote.net;
@@ -219,7 +219,7 @@ export default class RegisterDialog extends React.Component{
             this.state.email !== '';
     }
     renderForm(){
-        let valid = this.validate();
+        //let valid = this.validate();
         let busy = this.state.busy;
         return (
             <div>

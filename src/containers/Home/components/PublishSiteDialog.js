@@ -1,9 +1,8 @@
-//@flow
 import * as React from 'react';
-import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui';
+import { Dialog, FlatButton } from 'material-ui';
 import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
-import { Accordion, AccordionItem } from './../../../components/Accordion';
-import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
+//import { Accordion, AccordionItem } from './../../../components/Accordion';
+//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 
 type PublishSiteDialogProps = {
     site: SiteConfig,
@@ -55,6 +54,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
         return this.state.build!==''&&this.state.publish!=='';
     }
 
+    /*
     renderFieldsRemoveMe(){
         let { open, workspace, site } = this.props;
         let { build, publish } = this.state;
@@ -92,6 +92,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
         )
 
     }
+    */
 
     render(){
 

@@ -1,5 +1,3 @@
-//@flow
-
 import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
@@ -13,8 +11,8 @@ import IconAdd from 'material-ui/svg-icons/content/add';
 //import TextField from 'material-ui/TextField';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, MessageBlock } from './components/shared';
-import { WorkspacesSimple } from './components/WorkspacesSimple';
-//import CreateSiteDialog from './components/CreateSiteDialog';
+//import { WorkspacesSimple } from './components/WorkspacesSimple';
+import CreateSiteDialog from './components/CreateSiteDialog';
 //import PublishSiteDialog from './components/PublishSiteDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';

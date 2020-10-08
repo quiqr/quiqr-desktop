@@ -3,9 +3,9 @@
 import React from 'react';
 import {List, ListItem } from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
-import IconActionList from 'material-ui/svg-icons/action/list';
-import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
-import IconMenu from 'material-ui/svg-icons/navigation/menu';
+//import IconActionList from 'material-ui/svg-icons/action/list';
+//import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
+//import IconMenu from 'material-ui/svg-icons/navigation/menu';
 import Border from './../components/Border';
 
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';

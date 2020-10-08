@@ -1,10 +1,10 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import service from './../../../services/service';
-import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui';
-import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
-import { Accordion, AccordionItem } from './../../../components/Accordion';
-import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
+import { Dialog, FlatButton, TextField } from 'material-ui';
+//import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
+//import { Accordion, AccordionItem } from './../../../components/Accordion';
+//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 import IconHttps from 'material-ui/svg-icons/action/https';
 import Paper from 'material-ui/Paper';
 //import FormData, {getHeaders} from 'form-data';
@@ -167,7 +167,7 @@ export default class ClaimDomainDialog extends React.Component{
     }
 
     renderForm(){
-        let valid = this.validate();
+        //let valid = this.validate();
         let busy = this.state.busy;
         let previewUrl = this.state.pogourl.replace(/\./g,"-");
         return (
