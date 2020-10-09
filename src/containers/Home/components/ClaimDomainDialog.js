@@ -184,7 +184,7 @@ export default class ClaimDomainDialog extends React.Component{
     renderFailure(){
         return (
                 <div>
-                    Something went wrong. Please <a href="#" onClick={()=>this.handleTryAgain()}>try again.</a>
+                    Something went wrong. Please <button className="reglink" onClick={()=>this.handleTryAgain()}>try again.</button>
                 </div>
         )
     }

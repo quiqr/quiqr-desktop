@@ -178,7 +178,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
     renderSelectSites(){
         //let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        let { selectedSite, configurations } = this.state;
 
         let _configurations = ((configurations: any): Configurations);
 
@@ -218,10 +218,10 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
     render(){
 
-        let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        //let { siteKey } = this.props;
+        let { configurations, createSiteDialog } = this.state;
 
-        let _configurations = ((configurations: any): Configurations);
+        //let _configurations = ((configurations: any): Configurations);
 
         if(configurations==null){
             return <Spinner />

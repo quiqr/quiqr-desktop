@@ -123,7 +123,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
             />,
         ];
 
-        let active=true;
+        //let active=true;
 
         return (
             <Dialog

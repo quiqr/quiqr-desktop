@@ -216,9 +216,18 @@ class MenuManager {
                 if(configurations.empty===true) throw new Error('Configurations is empty.');
                 if(err) { reject(err); return; }
                 let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-                if(siteData==null) throw new Error('Could not find site is empty.');
-                siteService = new SiteService(siteData);
+
+                if(siteData==null) {
+                    //throw new Error('Could not find site is empty.');
+                }
+                else{
+                    siteService = new SiteService(siteData);
+                }
+
             });
+            if(siteService == null){
+                return;
+            }
 
             let currentPath = siteService._config.source.path;
             let currentVersion = siteService._config.source.path.split("/").pop();

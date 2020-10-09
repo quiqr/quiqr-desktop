@@ -147,7 +147,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
 
-            if(this.state.currentSiteKey != siteKey){
+            if(this.state.currentSiteKey !== siteKey){
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
             }
 
@@ -171,7 +171,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
 
                 this.setState(stateUpdate);
-                let details = service.getWorkspaceDetails(siteKey, workspaceKey);
+                //let details = service.getWorkspaceDetails(siteKey, workspaceKey);
 
             })
         }
@@ -204,7 +204,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         this.setState({requestDialog:"publish"});
 
-        if(this.state.username==""){
+        if(this.state.username === ""){
             this.handleRegisterNow();
         }
         else if(!this.checkLinkedDomain()){
@@ -266,7 +266,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     checkLinkedDomain(){
         let site = this.state.selectedSite;
-        if(site.publish.length === 1 && site.publish[0].config.type == 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
+        if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
             return true;
         }
         return false;
@@ -296,7 +296,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
         else{
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleRegisterNow()}}>register now!</a>
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>register now!</button>
                         </ListItem>
             );
         }
@@ -304,16 +304,16 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this.checkLinkedDomain()){
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>This site is linked to <a href="#" onClick={()=>{
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>This site is linked to <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
                         window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
-                    }}>{site.publish[0].config.defaultDomain}</a></span>
+                    }}>{site.publish[0].config.defaultDomain}</button></span>
                 </ListItem>
             )
         }
         else{
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<a href="#" onClick={()=>{this.handleClaimDomainNow()}}>claim domain!</a>
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow()}}>claim domain!</button>
                 </ListItem>
             )
         }
@@ -338,7 +338,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             published = (
                 <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> {/*&nbsp;&nbsp;<a href="#" onClick={ ()=>{this.handlePublishNow()} } >publish now!</a>*/}
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } >publish now!</button>}
                 </ListItem>
             )
         }
@@ -378,11 +378,14 @@ class Home extends React.Component<HomeProps, HomeState>{
         );
     }
 
+    /*
     handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
         e.stopPropagation();
         this.selectWorkspace(siteKey, workspace);
     };
+    */
 
+    /*
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
 
         this.setState({currentWorkspaceKey: workspace.key});
@@ -395,6 +398,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.history.push(`/`);
         }
     }
+    */
 
     handleAddSiteClick(){
         this.setState({createSiteDialog: true});
@@ -443,7 +447,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     render(){
 
-        let { siteKey } = this.props;
+        //let { siteKey } = this.props;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog} = this.state;
 
         let _configurations = ((configurations: any): Configurations);

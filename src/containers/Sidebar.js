@@ -11,11 +11,11 @@ import Border from './../components/Border';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { FlatButton, IconButton } from 'material-ui';
+//import { FlatButton, IconButton } from 'material-ui';
 
 const Fragment = React.Fragment;
 const translucentColor = 'RGBA(255,255,255,1)';
-const translucentColorSubtle = 'RGBA(255,0,255,1)';
+//const translucentColorSubtle = 'RGBA(255,0,255,1)';
 
 let MenuBorder = ({ children }) => {
   return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
@@ -41,9 +41,9 @@ export type SidebarMenu = {
 
 export type SidebarProps = {
     menus: Array<SidebarMenu>,
-    menuIsLocked: bool,
+    //    menuIsLocked: bool,
     onLockMenuClicked: ()=> void,
-    onToggleItemVisibility: ()=> void,
+    //onToggleItemVisibility: ()=> void,
     hideItems : bool
 }
 
@@ -63,7 +63,7 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
 
     render(){
 
-        let { hideItems, menus, menuIsLocked, onToggleItemVisibility } = this.props;
+        let { hideItems, menus } = this.props;
         let menusNodes = menus.map((menu,i)=>{
         return (
             <Fragment key={i+menu.key||i+menu.title}>

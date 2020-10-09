@@ -100,7 +100,8 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
                 }.bind(this),
                 data: Object.assign({}, this._valueFactory())
             }
-            let updatedValues = this.props.onSave.call(this, context);
+            this.props.onSave.call(this, context);
+            //let updatedValues = this.props.onSave.call(this, context);
         }
         else{
             this.setState({error: 'Save not implemented'});

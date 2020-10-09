@@ -65,7 +65,7 @@ class Welcome extends React.Component {
                         <h2>Useful links</h2>
                         <ul>
                             <li>
-                                <a href="#" onClick={this.handleLinkPoppyWebsite} >PoppyGo Website</a>
+                                <button className="reglink" onClick={this.handleLinkPoppyWebsite} >PoppyGo Website</button>
                             </li>
                         </ul>
                         <h2>Start right-away</h2>

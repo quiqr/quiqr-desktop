@@ -10,6 +10,16 @@ h1,h2,h3,h4,h5{
   font-weight: 400;
 }
 
+button.reglink {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: rgb(0, 188, 212);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+}
 
 ::-webkit-scrollbar {
   width: 12px;

@@ -11,7 +11,7 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
     render(){
         let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
-        return (<a style={style} onClick={onClick}>
+        return (<div style={style} onClick={onClick}>
             <span style={{ display:'inline-block', margin: '-10px 0px -10px -5px'}}>
                 { headerLeftItems.map((item, index) => { return  (
                     <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
@@ -29,7 +29,7 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
                 }
             </span>
             {label}
-        </a>);
+        </div>);
     }
 }
 
