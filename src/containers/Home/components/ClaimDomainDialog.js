@@ -24,6 +24,13 @@ export default class ClaimDomainDialog extends React.Component{
             username: this.props.username
          }
     }
+    componentDidMount(){
+        service.getConfigurations().then((c)=>{
+            var stateUpdate  = {};
+            stateUpdate.pogoboardConn = c.global.pogoboardConn;
+            this.setState(stateUpdate);
+        })
+    }
 
     handleCancelClick = () => {
         this.props.onCancelClick();
@@ -51,34 +58,17 @@ export default class ClaimDomainDialog extends React.Component{
         var postData = JSON.stringify({sitename : pogourl, username: username});
 
         let data='';
-        let localBoard=false;
-        let request=null;
-        if(localBoard){
-            request = net.request({
-                method: 'POST',
-                protocol: 'http:',
-                hostname: 'localhost',
-                port: 9999,
-                path: '/site/new',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': postData.length
-                }
-            })
-        }
-        else{
-            request = net.request({
-                method: 'POST',
-                protocol: 'https:',
-                hostname: 'board.poppygo.io',
-                port: 443,
-                path: '/site/new',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': postData.length
-                }
-            })
-        }
+        let request = net.request({
+            method: 'POST',
+            protocol: this.state.pogoboardconn.protocol,
+            hostname: this.state.pogoboardconn.host,
+            port: this.state.pogoboardconn.port,
+            path: '/site/new',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length
+            }
+        })
 
         request.on('response', (response) => {
 
@@ -116,7 +106,8 @@ export default class ClaimDomainDialog extends React.Component{
 
         if(value!==''){
 
-            let url = "https://board.poppygo.io/stat/site/"+value;
+            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/site/"+value;
+            service.api.logToConsole(url);
             let data='';
 
             const request = net.request(url);

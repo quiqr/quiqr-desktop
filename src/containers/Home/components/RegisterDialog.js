@@ -23,6 +23,14 @@ export default class RegisterDialog extends React.Component{
          }
     }
 
+    componentDidMount(){
+        service.getConfigurations().then((c)=>{
+            var stateUpdate  = {};
+            stateUpdate.pogoboardConn = c.global.pogoboardConn;
+            this.setState(stateUpdate);
+        })
+    }
+
     handleCancelClick = () => {
         this.props.onCancelClick();
     }
@@ -54,34 +62,17 @@ export default class RegisterDialog extends React.Component{
 
         let data='';
 
-        let localBoard=false;
-        let request=null;
-        if(localBoard){
-            request = net.request({
-                method: 'POST',
-                protocol: 'http:',
-                hostname: 'localhost',
-                port: 9999,
-                path: '/user/new',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': postData.length
-                }
-            })
-        }
-        else{
-            request = net.request({
-                method: 'POST',
-                protocol: 'https:',
-                hostname: 'board.poppygo.io',
-                port: 443,
-                path: '/user/new',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': postData.length
-                }
-            })
-        }
+        let request = net.request({
+            method: 'POST',
+            protocol: this.state.pogoboardConn.protocol,
+            hostname: this.state.pogoboardConn.host,
+            port: this.state.pogoboardConn.port,
+            path: '/user/new',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length
+            }
+        })
 
         request.on('response', (response) => {
 
@@ -126,7 +117,7 @@ export default class RegisterDialog extends React.Component{
 
         if(value!==''){
 
-            let url = "https://board.poppygo.io/stat/uname/"+value;
+            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/uname/"+value;
             let data='';
 
             const request = net.request(url);
@@ -175,9 +166,8 @@ export default class RegisterDialog extends React.Component{
             email: value,
         });
 
-        /*
         if(value!==''){
-            let url = "https://board.poppygo.io/stat/email/"+value;
+            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/email/"+value;
             let data='';
 
             const request = net.request(url);
@@ -186,19 +176,19 @@ export default class RegisterDialog extends React.Component{
                 response.on('end', () => {
                     service.api.logToConsole(data);
                     let obj = JSON.parse(data);
+                    service.api.logToConsole(obj.status);
 
                     if(obj.status !== "free"){
                         this.setState({
-                            username_err: "username is "+obj.status
+                            email_err: "email is "+obj.status
                         });
                     }
                     else{
                         this.setState({
-                            username_err: ""
+                            email_err: ""
                         });
                     }
 
-                    service.api.logToConsole(obj);
                 });
                 response.on("data", chunk => {
                     data += chunk;
@@ -206,7 +196,6 @@ export default class RegisterDialog extends React.Component{
             })
             request.end()
         }
-        */
 
     }
 
@@ -224,7 +213,7 @@ export default class RegisterDialog extends React.Component{
         return (
             <div>
                 <TextField disabled={busy} errorText={this.state.username_err} floatingLabelText={'username'} value={this.state.username} onChange={(e)=>{this.handleUserNameChange(e)}} fullWidth />
-                <TextField disabled={busy} floatingLabelText={'email address'} value={this.state.email} onChange={(e)=>{this.handleEmailChange(e)}} fullWidth />
+                <TextField disabled={busy} errorText={this.state.email_err} floatingLabelText={'email address'} value={this.state.email} onChange={(e)=>{this.handleEmailChange(e)}} fullWidth />
             </div>
         )
 
