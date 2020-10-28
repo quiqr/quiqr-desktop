@@ -246,7 +246,7 @@ class WorkspaceService{
         if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
             // TODO config for allowing all files
             //let globExpression = path.join(folder, `**/index.{${supportedContentExt.join(',')}}`);
-            let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
+            let globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
             let files = await globJob(globExpression, {});
             let retFiles = files.map(function(item){
 
