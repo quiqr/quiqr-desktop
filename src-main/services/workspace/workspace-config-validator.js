@@ -87,10 +87,10 @@ class WorkspaceConfigValidator {
         //validate all fields common to content or data files
         validationError = joi.validate(collection,
             joi.object().keys({
-                key: joi.string().trim().alphanum().min(3).max(30).required().error(new Error('The key value is invalid.')),
-                title: joi.string().trim().min(3).max(30).required().error(new Error('The title value is invalid.')),
+                key: joi.string().trim().alphanum().min(3).max(90).required().error(new Error('The key value is invalid.')),
+                title: joi.string().trim().min(3).max(90).required().error(new Error('The title value is invalid.')),
                 folder: joi.string().trim().regex(/^(content|data).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The folder value is invalid.')),
-                itemtitle: joi.string().trim().min(3).max(30).error(new Error('The itemtitle value is invalid.')),
+                itemtitle: joi.string().trim().min(3).max(90).error(new Error('The itemtitle value is invalid.')),
                 extension: joi.string().regex(validationUtils.allFormatsReg).required().error(new Error('The extension value is invalid.')),
                 dataformat: joi.string().trim().error(new Error('The dataformat value is invalid.')), //is not required here
                 fields: joi.array().min(1).required().error(new Error('The fields value is invalid.')),
@@ -130,8 +130,8 @@ class WorkspaceConfigValidator {
         //validate all fields common to content or data files
         validationError = joi.validate(single,
             joi.object().keys({
-                key: joi.string().trim().alphanum().min(3).max(30).required().error(new Error('The singles.key value is invalid.')),
-                title: joi.string().trim().min(3).max(30).required().error(new Error('The singles.title value is invalid.')),
+                key: joi.string().trim().alphanum().min(3).max(90).required().error(new Error('The singles.key value is invalid.')),
+                title: joi.string().trim().min(3).max(90).required().error(new Error('The singles.title value is invalid.')),
                 file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.')),
                 dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
                 previewUrl: joi.string().trim(),
