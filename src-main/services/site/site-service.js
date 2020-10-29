@@ -1,7 +1,7 @@
 const pathHelper = require('./../../path-helper');
 const fs = require('fs-extra');
 const path = require('path');
-const WorkspaceService = require('./../workspace/workspace-service');
+//const WorkspaceService = require('./../workspace/workspace-service');
 const publisherFactory = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 

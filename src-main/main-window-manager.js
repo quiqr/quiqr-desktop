@@ -5,7 +5,7 @@ const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
 
-const WorkspaceService = require('./services/workspace/workspace-service')
+//const WorkspaceService = require('./services/workspace/workspace-service')
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const menuManager = require('./menu-manager');

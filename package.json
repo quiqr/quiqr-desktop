@@ -104,6 +104,13 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "resources/all",
+        "to": "all",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "win": {

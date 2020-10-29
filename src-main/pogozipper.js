@@ -83,6 +83,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Finished site export. Check" + exportFilePath,
         });
     }
@@ -128,7 +130,9 @@ class Pogozipper{
         if(siteKey==""){
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                buttons: ["Close"],
                 message: "Failed to import site. Invalid site file 1, no siteKey",
+                title: "Failed task",
             });
             return;
         }
@@ -140,6 +144,8 @@ class Pogozipper{
         if(!conftxt){
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Failed task",
                 message: "Failed to import site. Invalid site file. 2, unreadable config."+siteKey+".json",
             });
             return;
@@ -166,6 +172,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Site has been imported.",
         });
 
@@ -217,6 +225,8 @@ class Pogozipper{
         if(siteKey == ""){
             dialog.showMessageBox(mainwindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Failed task",
                 message: "failed to import site. invalid site file 1, no sitekey",
             });
             return;
@@ -239,7 +249,9 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
             message: "Theme has been imported.",
+            title: "Finished task",
         });
     }
 
@@ -252,6 +264,8 @@ class Pogozipper{
         else {
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Warning",
                 message: "First, you need to select a site.",
             });
             return;
@@ -309,7 +323,9 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
             message: "Finished theme export. Check" + exportFilePath,
+            title: "Finished task",
         });
 
     }
@@ -362,6 +378,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Finished content export. Check" + exportFilePath,
         });
     }
@@ -409,6 +427,8 @@ class Pogozipper{
         if(siteKey == ""){
             dialog.showMessageBox(mainwindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Failed task",
                 message: "failed to import site. invalid site file 1, no sitekey",
             });
             return;
@@ -430,6 +450,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Content has been imported.",
         });
     }

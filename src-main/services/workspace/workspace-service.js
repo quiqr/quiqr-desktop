@@ -10,7 +10,7 @@ const path = require('path');
 const glob = require('glob');
 const { nativeImage } = require('electron');
 const formatProviderResolver = require('./../../format-provider-resolver');
-const WorkspaceConfigValidator = require('./workspace-config-validator');
+//const WorkspaceConfigValidator = require('./workspace-config-validator');
 const { WorkspaceConfigProvider } = require('./workspace-config-provider');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 
@@ -554,7 +554,7 @@ class WorkspaceService{
     }
 
     async build(buildKey/*: string*/) /*:Promise<void>*/{
-        let workspaceDetails = await  this.getConfigurationsData();
+        let workspaceDetails = await this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
 
             let buildConfig;

@@ -14,6 +14,7 @@ const fileDirUtils = require('./file-dir-utils');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 const ProgressBar = require('electron-progressbar');
 
+
 const outputConsole = require('./output-console');
 
 unhandled();

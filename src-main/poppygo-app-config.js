@@ -47,6 +47,11 @@ module.exports = function (options) {
         state.skipWelcomeScreen = skip;
     }
 
+    /* skip: bool */
+    function setExperimentalFeatures(toggle){
+        state.experimentalFeatures = toggle;
+    }
+
     /*
      * END SETTINGS METHODS
      */
@@ -65,13 +70,16 @@ module.exports = function (options) {
     state = Object.assign({
         lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
         skipWelcomeScreen: false,
+        experimentalFeatures: false,
     }, state);
 
     return {
         get lastOpenedSite() { return state.lastOpenedSite; },
         get skipWelcomeScreen() { return state.skipWelcomeScreen; },
+        get experimentalFeatures() { return state.experimentalFeatures; },
         setLastOpenedSite,
         setSkipWelcomeScreen,
+        setExperimentalFeatures,
         saveState,
         resetStateToDefault
     };
