@@ -1,9 +1,7 @@
-//@flow
-
 const pathHelper = require('./../../path-helper');
 const fs = require('fs-extra');
 const path = require('path');
-const WorkspaceService = require('./../workspace/workspace-service');
+//const WorkspaceService = require('./../workspace/workspace-service');
 const publisherFactory = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 
@@ -68,8 +66,7 @@ class SiteService{
         }
     }
 
-    publish(publishKey/*: string*/)/*: Promise<void>*/{
-
+    async publish(publishKey){
         let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
         if(publishConfig==null)
             throw new Error(`Could not find a publisher config for key '${publishKey}'.`);
@@ -81,7 +78,7 @@ class SiteService{
             throw new Error('Could not resolve the last build directory.');
 
         let publisher = publisherFactory.getPublisher(publishConfig.config);
-        return publisher.publish({siteKey: this._config.key, publishKey, from });
+        return await publisher.publish({siteKey: this._config.key, publishKey, from });
     }
 }
 

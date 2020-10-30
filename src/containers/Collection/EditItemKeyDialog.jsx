@@ -35,7 +35,7 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
 
   handleConfirm(){
 
-    if(this.props.viewKey == 'createItem'){
+    if(this.props.viewKey === 'createItem'){
       if(this.validate() && this.props.handleConfirm) {
         this.props.handleConfirm(this.state.titleToKey, this.state.value);
       }
@@ -51,7 +51,7 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
   validate(){
     let value = this.state.value||'';
 
-    if(this.props.viewKey == 'createItem'){
+    if(this.props.viewKey === 'createItem'){
       return value.length>0;
     }
     else{
@@ -72,7 +72,7 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
     let valid = this.validate();
     let errorText;
     let keyField = undefined;
-    if(this.props.viewKey == 'createItem'){
+    if(this.props.viewKey === 'createItem'){
       errorText = '';
       keyField = (
         <TextField

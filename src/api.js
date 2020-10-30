@@ -24,9 +24,10 @@ export class API {
         return mainProcessBridge.request('logToConsole', {message});
     }
 
-    importSite(){
+        /*importSite(){
         return mainProcessBridge.request('selectSiteAction');
     }
+    */
     importSite(){
         return mainProcessBridge.request('importSiteAction');
     }
@@ -163,6 +164,23 @@ export class API {
     parentMountWorkspace(siteKey: string, workspaceKey: string){
         return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
     }
+
+    createKeyPair(){
+        return mainProcessBridge.request('createKeyPair',{}, {timeout:90000});
+    }
+    createPogoProfile(obj: any){
+        return mainProcessBridge.request('createPogoProfile',{obj});
+    }
+    createPogoDomainConf(path: string, domain: string){
+        return mainProcessBridge.request('createPogoDomainConf',{path, domain});
+    }
+    getPoppyGoProfile(){
+        return mainProcessBridge.request('getPoppyGoProfile',{});
+    }
+    convert07(){
+        return mainProcessBridge.request('convert07',{});
+    }
+
 }
 
 export const instance = new API();

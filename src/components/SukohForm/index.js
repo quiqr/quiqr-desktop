@@ -4,7 +4,7 @@ import { FloatingActionButton } from 'material-ui/';
 import { FormBreadcumb } from '../Breadcumb';
 import IconCheck from 'material-ui/svg-icons/navigation/check';
 import dynamicFormComponents from './components/all'
-import service from '../../services/service';
+//import service from '../../services/service';
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
@@ -100,7 +100,8 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
                 }.bind(this),
                 data: Object.assign({}, this._valueFactory())
             }
-            let updatedValues = this.props.onSave.call(this, context);
+            this.props.onSave.call(this, context);
+            //let updatedValues = this.props.onSave.call(this, context);
         }
         else{
             this.setState({error: 'Save not implemented'});

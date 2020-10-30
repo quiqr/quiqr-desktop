@@ -3,7 +3,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom'
 import {List, ListItem } from 'material-ui/List';
-import { Divider, FlatButton, Subheader, Toggle } from 'material-ui';
+import { Divider, Toggle } from 'material-ui';
 import IconActionSetting from 'material-ui/svg-icons/action/settings';
 import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
 import IconHome from 'material-ui/svg-icons/action/home';
@@ -12,9 +12,9 @@ import IconPhone from 'material-ui/svg-icons/hardware/smartphone';
 //import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
 //import IconMenu from 'material-ui/svg-icons/navigation/menu';
 //import IconMore from 'material-ui/svg-icons/navigation/more-vert';
-import IconFileFolder from 'material-ui/svg-icons/file/folder';
-import Border from './../components/Border';
-import { TriggerWithOptions } from './../components/TriggerWithOptions';
+//import IconFileFolder from 'material-ui/svg-icons/file/folder';
+//import Border from './../components/Border';
+//import { TriggerWithOptions } from './../components/TriggerWithOptions';
 import service from './../services/service'
 import type { SiteConfig, WorkspaceConfig } from './../types'
 import * as Sidebar from './Sidebar';
@@ -22,11 +22,12 @@ import * as Sidebar from './Sidebar';
 const translucentColor = 'RGBA(255,255,255,.8)';
 //const translucentColorSubtle = 'RGBA(255,255,255,.05)';
 
-let MenuBorder = ({ children }) => {
+/*let MenuBorder = ({ children }) => {
     return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
         {children}
         </Border>;
 }
+*/
 
 type WorkspaceWidgetProps = {
     onClick : ()=> void,
@@ -66,7 +67,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     handleOpenInBrowser(){
         let {
-            onClick,
             siteConfig,
             workspaceConfig,
         } = this.props;
@@ -132,11 +132,10 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         let {
             onClick,
             siteConfig,
-            workspaceConfig,
         } = this.props;
 
 
-        let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
+        //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
         let mobilePreviewToggle = <Toggle
             toggled={this.state.mobilePreviewActive}
@@ -187,8 +186,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
         let {
             onClick,
-            siteConfig,
-            workspaceConfig,
         } = this.props;
 
         return (
@@ -204,13 +201,12 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     render(){
         let {
-            onClick,
             siteConfig,
             workspaceConfig,
         } = this.props;
 
 
-        let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
+        //let serverOptions = workspaceConfig!=null&&workspaceConfig.serve!=null?workspaceConfig.serve.map(x => x.key||'default') : [];
 
         if(siteConfig!=null && workspaceConfig!=null){
             return this.renderSiteMounted();
@@ -335,12 +331,12 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
                             let item = null;
                             let itemType = null;
 
-                            if(this.state.workspace.collections.some(e => e.key == menuitem.key)) {
-                                item = this.state.workspace.collections.find(e => e.key == menuitem.key);
+                            if(this.state.workspace.collections.some(e => e.key === menuitem.key)) {
+                                item = this.state.workspace.collections.find(e => e.key === menuitem.key);
                                 itemType = "collections";
                             }
-                            else if(this.state.workspace.singles.some(e => e.key == menuitem.key)) {
-                                item = this.state.workspace.singles.find(e => e.key == menuitem.key);
+                            else if(this.state.workspace.singles.some(e => e.key === menuitem.key)) {
+                                item = this.state.workspace.singles.find(e => e.key === menuitem.key);
                                 itemType = "singles";
                             }
 
@@ -363,6 +359,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
                         })
                     });
+                    return null;
 
                 });
 

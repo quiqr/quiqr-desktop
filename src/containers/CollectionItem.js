@@ -81,7 +81,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
 
         let ItemPathElements = this.props.collectionItemKey.split("/");
         let pageItem = ItemPathElements.pop();
-        if(pageItem !='index.md'){
+        if(pageItem !=='index.md'){
             ItemPathElements.push(pageItem.split('.').slice(0, -1).join('.'));
         }
 

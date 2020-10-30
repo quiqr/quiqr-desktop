@@ -1,6 +1,10 @@
 # PoppyGo App CHANGELOG
 
-## vNEXT
+## v0.7.0
+
+- become a PoppyGo member
+- claim a PoppyGo domain
+- new authentication flow for publishing sites
 
 ## v0.6.6
 

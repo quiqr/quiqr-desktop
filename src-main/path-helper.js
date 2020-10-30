@@ -1,4 +1,7 @@
+const path = require('path');
 const userHome = require('user-home');
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
+const rootPath = require('electron-root-path').rootPath;
 
 class PathHelper{
 
@@ -64,6 +67,23 @@ class PathHelper{
 
     getThemesDir(){
         return this.getRoot() + 'tools/hugothemes/';
+    }
+
+    getApplicationResourcesDir(){
+
+        let enviromnent = new EnvironmentResolver().resolve();
+
+        if(process.env.NODE_ENV === 'production'){
+            if(enviromnent.platform == PLATFORMS.macOS){
+                return path.join(rootPath, 'Contents','Resources','all');
+            }
+            else{
+                return path.join(rootPath, 'resources','all');
+            }
+        }
+        else{
+            return path.join(rootPath, 'resources','all');
+        }
     }
 }
 

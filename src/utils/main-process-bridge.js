@@ -100,11 +100,8 @@ class MainProcessBridge{
 
     }
 
-    request(
-        method /*: string */,
-        data /*: any */ ,
-        opts /* : {timeout:number} */ = {timeout:10000}
-    ) /*: AbortablePromise<*> */ {
+    request( method, data, opts = {timeout:10000}
+    ){
         let _reject;
         let token = this._createToken();
         let promise/*:any*/ = new Promise(function(resolve, reject){

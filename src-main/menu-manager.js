@@ -16,11 +16,18 @@ const pathHelper = require('./path-helper');
 const fs = require('fs-extra');
 const { shell } = require('electron')
 
+const hugoDownloader = require('./hugo/hugo-downloader')
+const HugoBuilder = require('./hugo/hugo-builder');
+const { WorkspaceConfigProvider } = require('./services/workspace/workspace-config-provider');
+
+
 const app = electron.app
 let mainWindow = null;
 let logWindow = null;
 let menu = null;
 let pogoconf = PoppyGoAppConfig();
+
+const workspaceConfigProvider = new WorkspaceConfigProvider();
 
 class MenuManager {
 
@@ -45,20 +52,79 @@ class MenuManager {
         }
     }
     startServer() {
-        if(global.hugoServer){
-            global.hugoServer.serve(function(err, stdout, stderr){
+        if(global.hugoserver){
+            global.hugoserver.serve(function(err, stdout, stderr){
                 if(err){
                     console.log(err)
                 }
             });
         }
     }
+    async generateModel() {
+
+        const dialog = electron.dialog;
+        let config = await workspaceConfigProvider.getConfig(global.currentSitePath, global.currentWorkspaceKey);
+        let hugover = 'extended_0.76.5';
+        let modelPath = path.join(pathHelper.getTempDir(),"model");
+        let modelFile = path.join(modelPath, "sukoh.json");
+        let hugoBuilderConfig = {
+            config: config.build[0]['config'],
+            workspacePath: global.currentSitePath,
+            destination: modelPath,
+            hugover: hugover
+        }
+
+        const exec = pathHelper.getHugoBinForVer(hugover);
+
+        if(!fs.existsSync(exec)){
+            const dialog = electron.dialog;
+            dialog.showMessageBox(mainWindow, {
+                buttons: ["Close"],
+                title: "Missing software",
+                message: "We need to download hugo "+hugover+" for this functionality. Try again when download has finished",
+            });
+
+            try{
+                hugoDownloader.downloader.download(hugover);
+            }
+            catch(e){
+                // warn about HugoDownloader error?
+            }
+        }
+        else{
+            let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
+            await hugoBuilder.buildModel();
+
+            if(!fs.existsSync(modelFile)){
+                dialog.showMessageBox(mainWindow, {
+                    type: 'error',
+                    buttons: ["Close"],
+                    title: "Warning",
+                    message: "Failed to generate sukoh.json.",
+                });
+            }
+            else{
+                let options  = {
+                    title: "Please confirm",
+                    buttons: ["Yes","Cancel"],
+                    message: "Copy sukoh.json to "+global.currentSitePath+"? (Old version will be overwritten)"
+                }
+                let response = dialog.showMessageBox(options)
+                if(response === 1) return;
+
+                fs.copySync(modelFile, path.join(global.currentSitePath, "sukoh.json"));
+
+            }
+        }
+    }
+
 
     showVersion(){
         const dialog = electron.dialog;
 
         let options  = {
             buttons: ["Close"],
+            title: "About",
             message: "PoppyGo Version " + app.getVersion()
         }
         dialog.showMessageBox(options)
@@ -72,8 +138,8 @@ class MenuManager {
         const dialog = electron.dialog;
 
         if(global.currentSiteKey){
-
             let options  = {
+                title: "Please confirm",
                 buttons: ["Yes","Cancel"],
                 message: "Do you really want to delete " + global.currentSiteKey
             }
@@ -92,12 +158,14 @@ class MenuManager {
         else{
             dialog.showMessageBox(mainWindow, {
                 type: 'error',
+                buttons: ["Close"],
+                title: "Warning",
                 message: "First, select a site to delete.",
             });
         }
     }
     createPrefsWindow () {
-        prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
+        let prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
         if (prefsWindow) {
             prefsWindow.webContents.send("redirectPrefs")
         }
@@ -136,16 +204,14 @@ class MenuManager {
     }
 
     openWorkSpaceDir(){
-        let path = global.currentSitePath;
-        //let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
-        //console.log(path);
+        let wspath = global.currentSitePath;
         try{
-            let lstat = fs.lstatSync(path);
+            let lstat = fs.lstatSync(wspath);
             if(lstat.isDirectory()){
-                shell.openItem(path);
+                shell.openItem(wspath);
             }
             else{
-                shell.openItem(dirname(path));
+                shell.openItem(dirname(wspath));
             }
         }
         catch(e){
@@ -153,9 +219,9 @@ class MenuManager {
         }
     }
     openWorkSpaceConfig(){
-        let path = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
+        let wspath = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
         try{
-            shell.openItem(path);
+            shell.openItem(wspath);
         }
         catch(e){
         }
@@ -177,20 +243,19 @@ class MenuManager {
     }
 
     updateMenu(currentSiteKey){
-        //console.log(currentSiteKey);
+        return;
 
         let siteRelatedMenuIds = [
             'export-site',
             'delete-site',
             'export-theme',
             'import-theme',
-            'export-pass',
-            'import-pass',
             'export-content',
             'import-content',
             'start-server',
             'open-site-dir',
-            'open-site-conf'
+            'open-site-conf',
+            'auto-create-model',
         ];
         siteRelatedMenuIds.forEach(function(id){
             let myItem = menu.getMenuItemById(id);
@@ -218,9 +283,18 @@ class MenuManager {
                 if(configurations.empty===true) throw new Error('Configurations is empty.');
                 if(err) { reject(err); return; }
                 let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-                if(siteData==null) throw new Error('Could not find site is empty.');
-                siteService = new SiteService(siteData);
+
+                if(siteData==null) {
+                    //throw new Error('Could not find site is empty.');
+                }
+                else{
+                    siteService = new SiteService(siteData);
+                }
+
             });
+            if(siteService == null){
+                return;
+            }
 
             let currentPath = siteService._config.source.path;
             let currentVersion = siteService._config.source.path.split("/").pop();
@@ -258,17 +332,69 @@ class MenuManager {
         }
     }
 
+    toggleExperimental(){
+
+        if(pogoconf.experimentalFeatures){
+            pogoconf.setExperimentalFeatures(false);
+        }
+        else{
+            pogoconf.setExperimentalFeatures(true);
+        }
+        pogoconf.saveState();
+        this.createMainMenu();
+
+    }
+    createExperimentalMenu(){
+        let expMenu = [
+            {
+                id: 'switch-version',
+                label: 'Site versions',
+                enabled: this.siteSelected(),
+                submenu: this.createVersionsMenu()
+            },
+            {
+                id: 'auto-create-model',
+                label: 'Generatate PoppyGo Model',
+                enabled: this.siteSelected(),
+                click: async () => {
+                    this.generateModel()
+                }
+            },
+            {
+                label: 'Preferences',
+                click: async () => {
+                    this.createPrefsWindow()
+                }
+            },
+        ];
+
+        return expMenu;
+    }
+
     createDevMenu(){
-        let devMenu = [];
-        devMenu.push(
-        );
+        let devMenu = [
+            { role: 'forcereload' },
+            { role: 'toggledevtools' },
+            {
+                label: 'Depreciated',
+                submenu: [
+                    {
+                        label: 'Front page',
+                        click: async () => {
+                            this.openHome()
+                        }
+                    },
+                ]
+            }
+
+        ];
+
         return devMenu;
     }
 
     createMainMenu(){
 
         const isMac = process.platform === 'darwin'
-        const versionsMenu = this.createVersionsMenu();
 
         const template = [
             ...(isMac ? [{
@@ -276,12 +402,6 @@ class MenuManager {
                 submenu: [
                     { role: 'about' },
                     { type: 'separator' },
-                    /*                {
-                    label: 'Preferences',
-                    click: async () => {
-                        createPrefsWindow()
-                    }
-                },*/
                     { role: 'services' },
                     { type: 'separator' },
                     { role: 'hide' },
@@ -358,23 +478,6 @@ class MenuManager {
                         }
                     },
                     { type: 'separator' },
-                    {
-                        id: 'import-pass',
-                        enabled: this.siteSelected(),
-                        label: 'Import passport',
-                        click: async () => {
-                            pogozipper.importPass()
-                        }
-                    },
-                    {
-                        id: 'export-pass',
-                        enabled: this.siteSelected(),
-                        label: 'Export passport',
-                        click: async () => {
-                            pogozipper.exportPass()
-                        }
-                    },
-                    { type: 'separator' },
                     isMac ? { role: 'close' } : { role: 'quit' }
                 ]
             },
@@ -440,31 +543,12 @@ class MenuManager {
                         { type: 'separator' },
                         { role: 'window' }
                     ] : [
-                        { role: 'close' }
                     ])
                 ]
             },
             {
                 label: 'Expert',
                 submenu: [
-                    {
-                        label: 'Front page',
-                        click: async () => {
-                            this.openHome()
-                        }
-                    },
-                    {
-                        label: 'Open Form Cookbooks',
-                        click: async () => {
-                            this.openCookbooks()
-                        }
-                    },
-                    {
-                        label: 'Show Log Window',
-                        click: async () => {
-                            this.createLogWindow()
-                        }
-                    },
                     {
                         label: 'Stop server',
                         click: async () => {
@@ -496,16 +580,36 @@ class MenuManager {
                             this.openWorkSpaceConfig()
                         }
                     },
+                    { type: 'separator' },
                     {
-                        id: 'switch-version',
-                        label: 'Site versions',
-                        submenu: versionsMenu
+                        label: 'Open Form Cookbooks',
+                        click: async () => {
+                            this.openCookbooks()
+                        }
                     },
                     { type: 'separator' },
-                    { role: 'forcereload' },
-                    { role: 'toggledevtools' },
+                    {
+                        label: 'Show Log Window',
+                        click: async () => {
+                            this.createLogWindow()
+                        }
+                    },
+                    { type: 'separator' },
+                    {
+                        label: 'Experimental features',
+                        type: "checkbox",
+                        checked: pogoconf.experimentalFeatures,
+                        click: async () => {
+                            this.toggleExperimental()
+                        }
+                    },
                 ]
             },
+
+            ...(pogoconf.experimentalFeatures ? [{
+                label: 'Experimental',
+                submenu: this.createExperimentalMenu()
+            }] : []),
 
             ...(process.env.REACT_DEV_URL ? [{
                 label: 'DevMenu',

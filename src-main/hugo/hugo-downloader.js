@@ -155,6 +155,8 @@ class HugoDownloader{
 
             });
 
+            progressBar.value = 0;
+            progressBar.value += 20;
             progressBar.on('completed', function() {
                 progressBar.detail = 'Hugo has been installed';
             })
@@ -164,7 +166,6 @@ class HugoDownloader{
                 .on('progress', function(value) {
                 });
 
-            progressBar.value += 20;
 
             outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);
             progressBar.value += 30;

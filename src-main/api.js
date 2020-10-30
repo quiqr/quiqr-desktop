@@ -10,6 +10,7 @@ const menuManager = require('./menu-manager');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const pogozipper = require('./pogozipper');
+const PogoPublisher = require('./publishers/pogo-publisher');
 
 let api = {};
 let pogoconf = PoppyGoAppConfig();
@@ -130,15 +131,49 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 
 }
 
-api.getCurrentSiteKey = async function(){
-    return global.currentSiteKey;
+
+api.createKeyPair = async function({},context){
+    let pogopubl = new PogoPublisher({});
+    pubkey = await pogopubl.keygen();
+    context.resolve(pubkey);
 }
 
+api.convert07 = async function({},context){
+    let pogopubl = new PogoPublisher({});
+    await pogopubl.conf07pogoprofile()
+    context.resolve(true);
+}
+
+api.createPogoProfile = async function(profile,context){
+    let pogopubl = new PogoPublisher({});
+    await pogopubl.writeProfile(profile.obj)
+    context.resolve(true);
+}
+
+api.getPoppyGoProfile = async function({},context){
+    let pogopubl = new PogoPublisher({});
+    profile = await pogopubl.readProfile();
+    if(profile) context.resolve(profile);
+}
+api.createPogoDomainConf = async function({path,domain},context){
+    let pogopubl = new PogoPublisher({});
+    await pogopubl.writeDomainInfo(path,domain)
+    context.resolve(path);
+}
+api.getCurrentSiteKey = async function(){
+    return await global.currentSiteKey;
+}
+
+//TODO USE KEY
 api.getPogoConf = async function(key){
     //if(key==='skipWelcomeScreen'){
         return pogoconf.skipWelcomeScreen;
     //}
 }
+
+
+
+
 api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
     let siteService = await getSiteServicePromise(siteKey);
     bindResponseToContext(
@@ -413,6 +448,7 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }
         siteService.publish(publishKey).then(()=>{
+            console.log("jhaallo");
             context.resolve();
         }, ()=>{
             context.reject(err);

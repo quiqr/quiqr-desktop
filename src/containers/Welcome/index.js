@@ -2,7 +2,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import service from './../../services/service'
 
-import Checkbox from 'material-ui/Checkbox';
+//import Checkbox from 'material-ui/Checkbox';
 import { RaisedButton } from 'material-ui/';
 
 const styles = {
@@ -65,7 +65,7 @@ class Welcome extends React.Component {
                         <h2>Useful links</h2>
                         <ul>
                             <li>
-                                <a href="#" onClick={this.handleLinkPoppyWebsite} >PoppyGo Website</a>
+                                <button className="reglink" onClick={this.handleLinkPoppyWebsite} >PoppyGo Website</button>
                             </li>
                         </ul>
                         <h2>Start right-away</h2>

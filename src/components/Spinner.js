@@ -10,7 +10,7 @@ class Spinner extends React.Component {
     spin(){
         let {time=3000} = this.props;
         this.timeout = setTimeout(()=>{
-            
+
             this.setState({rotated:!this.state.rotated});
 
             this.timeout = setTimeout(() => {

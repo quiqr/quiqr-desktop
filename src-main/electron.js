@@ -14,6 +14,7 @@ const fileDirUtils = require('./file-dir-utils');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 const ProgressBar = require('electron-progressbar');
 
+
 const outputConsole = require('./output-console');
 
 unhandled();
@@ -39,6 +40,7 @@ global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -120,6 +122,8 @@ function showProgress(progressBar,received,total){
     progressBar.value = percentage;
     progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
 }
+
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

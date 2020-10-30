@@ -10,7 +10,7 @@ const path = require('path');
 const glob = require('glob');
 const { nativeImage } = require('electron');
 const formatProviderResolver = require('./../../format-provider-resolver');
-const WorkspaceConfigValidator = require('./workspace-config-validator');
+//const WorkspaceConfigValidator = require('./workspace-config-validator');
 const { WorkspaceConfigProvider } = require('./workspace-config-provider');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 
@@ -246,7 +246,7 @@ class WorkspaceService{
         if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
             // TODO config for allowing all files
             //let globExpression = path.join(folder, `**/index.{${supportedContentExt.join(',')}}`);
-            let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
+            let globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
             let files = await globJob(globExpression, {});
             let retFiles = files.map(function(item){
 
@@ -554,7 +554,7 @@ class WorkspaceService{
     }
 
     async build(buildKey/*: string*/) /*:Promise<void>*/{
-        let workspaceDetails = await  this.getConfigurationsData();
+        let workspaceDetails = await this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
 
             let buildConfig;

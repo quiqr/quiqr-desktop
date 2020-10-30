@@ -25,6 +25,9 @@ class WorkspaceConfigProvider{
 
     async getConfig(workspacePath/*: string*/, workspaceKey/*: string*/)/*: Promise<WorkspaceConfig & { path: string, key: string }>*/{
 
+        console.log("workspacePath:"+workspacePath);
+        console.log("workspaceKey:"+workspaceKey);
+
         let filePath = this._getFilePath(workspacePath);
         let config/*: WorkspaceConfig*/;
 

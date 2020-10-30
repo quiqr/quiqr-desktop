@@ -1,26 +1,20 @@
-//@flow
-
-//import invariant from 'assert';
 import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
-import FlatButton from 'material-ui/FlatButton';
-//import RaisedButton from 'material-ui/RaisedButton';
-//import Paper from 'material-ui/Paper';
+import { RaisedButton } from 'material-ui/';
 import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
-import IconAdd from 'material-ui/svg-icons/content/add';
-import IconFileFolder from 'material-ui/svg-icons/file/folder';
-//import {Accordion,AccordionItem} from './../../components/Accordion';
-//import DangerButton from './../../components/DangerButton';
-import TextField from 'material-ui/TextField';
+//import Subheader from 'material-ui/Subheader';
+import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
+import IconDomain from 'material-ui/svg-icons/social/domain';
+import IconPublish from 'material-ui/svg-icons/editor/publish';
+
 import muiThemeable from 'material-ui/styles/muiThemeable';
-import { Wrapper, InfoLine, InfoBlock, MessageBlock } from './components/shared';
-import { WorkspacesSimple } from './components/WorkspacesSimple';
+import { Wrapper, InfoLine, MessageBlock } from './components/shared';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
+import RegisterDialog from './components/RegisterDialog';
+import ClaimDomainDialog from './components/ClaimDomainDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
 import MarkdownIt from 'markdown-it'
@@ -28,9 +22,6 @@ import MarkdownIt from 'markdown-it'
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
 const md = new MarkdownIt({html:true});
-
-//$FlowFixMe
-//const Fragment = React.Fragment;
 
 const styles = {
     container:{
@@ -82,6 +73,8 @@ type HomeState = {
     selectedWorkspaceDetails?: WorkspaceConfig,
     createSiteDialog: bool,
     publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
+    registerDialog?: { open: bool },
+    claimDomainDialog?: { open: bool },
     blockingOperation: ?string //this should be moved to a UI service
 }
 
@@ -96,6 +89,9 @@ class Home extends React.Component<HomeProps, HomeState>{
             currentSiteKey: null,
             createSiteDialog: false,
             publishSiteDialog: undefined,
+            registerDialog: {open: false},
+            claimDomainDialog: {open: false},
+            username: "",
             siteCreatorMessage: null
         };
     }
@@ -104,23 +100,54 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this._ismounted && preProps.siteKey !== this.props.siteKey){
             this.checkSiteInProps();
         }
+
+        if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
+            this.setUserName(this.props.poppygoUsername);
+        }
     }
 
     componentWillMount(){
+        //TODO remove when pogopublisher has been rewritten
+        window.require('electron').ipcRenderer.on('lastPublishedChanged', ()=>{
+            this.setState({'mustConvert':false});
+            service.getConfigurations(true).then((c)=>{
+                this.checkSiteInProps();
+                this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+
+            });
+        });
         service.registerListener(this);
     }
 
     componentDidMount(){
         this.checkSiteInProps();
         this._ismounted = true;
+        this.setUserName(this.props.poppygoUsername);
+    }
+
+    setUserName(username){
+        this.setState({username: username});
+    }
+
+    checkConvert07(site){
+        if(site.hasOwnProperty('publish') && site.publish.length === 1){
+            let publ = site.publish[0];
+            if(publ.hasOwnProperty('config')
+                && publ.config.hasOwnProperty('type') && publ.config.type === 'poppygo'){
+
+                if(!publ.config.hasOwnProperty('path')){
+                    service.api.convert07("MUST CONVERT");
+                }
+            }
+
+        }
     }
 
     checkSiteInProps(){
         var { siteKey, workspaceKey } = this.props;
         if(siteKey && workspaceKey){
 
-            if(this.state.currentSiteKey != siteKey){
-                // Serve the workspace at selection of the workspace right after mounting the workspace
+            if(this.state.currentSiteKey !== siteKey){
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
             }
 
@@ -136,11 +163,16 @@ class Home extends React.Component<HomeProps, HomeState>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = bundle.configurations;
                 stateUpdate.selectedSite = bundle.site;
+
+                this.checkConvert07(bundle.site)
+
                 stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
                 stateUpdate.selectedWorkspace = bundle.workspace;
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
+
                 this.setState(stateUpdate);
-                return service.getWorkspaceDetails(siteKey, workspaceKey);
+                //let details = service.getWorkspaceDetails(siteKey, workspaceKey);
+
             })
         }
         else{
@@ -152,24 +184,191 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-    getWorkspaceDetails = (workspace: WorkspaceHeader)=> {
+    /*
+    getWorkspaceDetails = (workspace: WorkspaceHeader) => {
+
         if(this.state.selectedSite==null) throw new Error('Invalid operation.');
-        return service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
+        let ret = service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
+        return ret;
     }
+    */
 
     componentWillUnmount(){
         service.unregisterListener(this);
     }
 
-    renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
+    handlePublishNow(){
+        let workspace = this.state.selectedWorkspaceDetails;
+        let workspaceHeader = this.state.selectedSiteWorkspaces[0];
+        service.api.parentTempHideMobilePreview();
 
+        this.setState({requestDialog:"publish"});
+
+        if(this.state.username === ""){
+            this.handleRegisterNow();
+        }
+        else if(!this.checkLinkedDomain()){
+            this.handleClaimDomainNow();
+        }
+        else{
+            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
+        }
+    }
+
+    handleRegisterNow(){
+        this.setState({requestDialog:"register"});
+        service.api.parentTempHideMobilePreview();
+        this.setState({registerDialog: { open: true}});
+    }
+
+    handleRegisterCancelClick(){
+        this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+    }
+
+    handleRegisterClick(username, email){
+        this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+        /*
+
+        this.setState({username:username},()=>{
+            if(this.state.requestDialog=="claim"){
+                this.handleClaimDomainNow();
+            }
+            else if(this.state.registerDialog=='publish' && !this.checkLinkedDomain()){
+                this.handleClaimDomainNow();
+            }
+            else if(this.state.registerDialog=='publish' && this.checkLinkedDomain()){
+                this.handlePublishNow();
+            }
+            else{
+            }
+
+        });
+        */
+    }
+
+    handleClaimDomainNow(){
+        this.setState({requestDialog:"claim"});
+        service.api.parentTempHideMobilePreview();
+        this.setState({claimDomainDialog: { open: true}});
+    }
+
+    handleClaimDomainCancelClick(){
+        this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+    }
+
+    handleClaimDomainClick(obj){
+        service.getConfigurations(true).then((c)=>{
+            this.checkSiteInProps();
+        });
+        this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+    }
+
+    checkLinkedDomain(){
+        let site = this.state.selectedSite;
+        if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
+            return true;
+        }
+        return false;
+
+    }
+
+    renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
+        let user = undefined;
+        let domain = undefined;
+        let published = undefined;
+
+        if(this.state.mustConvert){
+            return (
+                <Wrapper>
+                    <div>&nbsp;&nbsp;Converting data....</div>
+                </Wrapper>
+            )
+        }
+
+
+
+        if(this.state.username!==""){
+            user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
+                <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
+                </ListItem>
+            );
+        }
+        else{
+            user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>register now!</button>
+                        </ListItem>
+            );
+        }
+
+        if(this.checkLinkedDomain()){
+            domain = (
+                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>This site is linked to <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+                        window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
+                    }}>{site.publish[0].config.defaultDomain}</button></span>
+                </ListItem>
+            )
+        }
+        else{
+            domain = (
+                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow()}}>claim domain!</button>
+                </ListItem>
+            )
+        }
+
+        if(site.hasOwnProperty('lastPublish')){
+
+            let ts;
+            if(site.lastPublish === 1){
+                ts = "not registered";
+
+            } else
+            {
+                ts = new Date(site.lastPublish).toString().split("GMT")[0]
+            }
+
+            published = (
+                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
+                </ListItem>
+            )
+        }
+        else{
+            published = (
+                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } >publish now!</button>}
+                </ListItem>
+            )
+        }
+
+
+        let publishDisabled=true;
+        let config = this.state.selectedWorkspaceDetails;
+        publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
 
         return (
-            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="Site Information">
+            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
 
-                <InfoLine label="Name">{site.name}</InfoLine>
+                <InfoLine label="Site name">
+                    <h2 style={{padding:0, margin:0}}>{site.name}</h2>
+                </InfoLine>
 
-                { this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) }
+                <div style={{padding: "0px 16px"}}>
+                    <List>
+                        {user}
+                        {domain}
+                        {published}
+
+                    </List>
+
+                </div>
+                <div style={{padding: "0px 16px 16px 30px"}}>
+                    <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={()=>{ this.handlePublishNow();}} />
+                </div>
+
+                { /*this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) */}
 
                 <div className="markdown"
                 style={ styles.creatorMessage }
@@ -179,13 +378,15 @@ class Home extends React.Component<HomeProps, HomeState>{
         );
     }
 
+    /*
     handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
         e.stopPropagation();
         this.selectWorkspace(siteKey, workspace);
     };
+    */
 
+    /*
     async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-
 
         this.setState({currentWorkspaceKey: workspace.key});
         let        select = true;
@@ -197,38 +398,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.history.push(`/`);
         }
     }
-
-    renderWorkspaces(site: SiteConfig, selectedSiteActive : bool , workspaces : ?Array<WorkspaceHeader>){
-
-        return (
-            <Route render={({history})=>{
-
-                this.history = history; //ugly
-
-                if(this.state.currentWorkspaceKey==null)
-                    return (<Wrapper></Wrapper>);
-
-                return (
-                    <WorkspacesSimple
-                        getWorkspaceDetails={this.getWorkspaceDetails}
-                        workspaces={workspaces}
-                        activeSiteKey={this.state.currentSiteKey}
-                        activeWorkspaceKey={this.state.currentWorkspaceKey}
-                        onLocationClick={(location)=>{
-                            service.api.openFileExplorer(location)
-                        }}
-                        onPublishClick={(workspaceHeader, workspace)=>{
-                            service.api.parentTempHideMobilePreview();
-                            this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
-                        }}
-                        onStartServerClick={ (workspace, serveKey)=> { service.api.serveWorkspace(site.key, workspace.key, serveKey) } }
-                        onSelectWorkspaceClick={ this.handleSelectWorkspaceClick }
-                        site={site}
-                    />
-                )
-            }} />
-        );
-    }
+    */
 
     handleAddSiteClick(){
         this.setState({createSiteDialog: true});
@@ -255,12 +425,19 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
         service.api.parentTempUnHideMobilePreview();
+
         this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
         service.api.buildWorkspace(siteKey, workspaceKey, build).then(()=>{
             this.setState({blockingOperation: 'Publishing site...'});
-            return service.api.publishSite(siteKey, publish);
+
+            service.api.publishSite(siteKey, publish).then(()=>{
+                service.getConfigurations(true).then((c)=>{
+                    //snackMessageService.addSnackMessage('Site successfully published.');
+                    this.checkSiteInProps();
+                });
+            });
         }).then(()=>{
-            snackMessageService.addSnackMessage('Site successfully published.');
+
         }).catch(()=>{
             snackMessageService.addSnackMessage('Publish failed.');
         }).then(()=>{
@@ -270,8 +447,8 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     render(){
 
-        let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog } = this.state;
+        //let { siteKey } = this.props;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog} = this.state;
 
         let _configurations = ((configurations: any): Configurations);
 
@@ -280,39 +457,77 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
 
         return (
-            <div style={ styles.container }>
+            <Route render={({history}) => {
+                this.history = history;
 
-                <div style={styles.selectedSiteCol}>
-                    { selectedSite==null ? (
-                        <Wrapper title="Site Management">
-                            <MessageBlock>Please, select a site.</MessageBlock>
-                        </Wrapper>
-                    ) : (
-                        this.renderSelectedSiteContent(_configurations, selectedSite)
-                    ) }
-                </div>
-                <CreateSiteDialog
-                    open={createSiteDialog}
-                    onCancelClick={()=>this.setState({createSiteDialog:false})}
-                    onSubmitClick={this.handleCreateSiteSubmit}
-                />
-                { selectedSite!=null && this.state.publishSiteDialog!=null ? (
-                    <PublishSiteDialog
-                        site={selectedSite}
-                        workspace={this.state.publishSiteDialog.workspace}
-                        workspaceHeader={this.state.publishSiteDialog.workspaceHeader}
-                        onCancelClick={this.handlePublishSiteCancelClick}
-                        onBuildAndPublishClick={this.handleBuildAndPublishClick}
-                        open={publishSiteDialog!=null&&publishSiteDialog.open}
-                    />
-                ):(null) }
+                let jeeworkspace = null;
+                let jeeworkspaceHeader = null;
+                if( selectedSite!=null && this.state.publishSiteDialog!=null){
+                    jeeworkspace = this.state.publishSiteDialog.workspace;
+                    jeeworkspaceHeader = this.state.publishSiteDialog.workspaceHeader;
+                }
 
-                {/*this should be moved to a UI service*/}
-                <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
-            </div>
-        );
+                return (
+
+                    <div style={ styles.container }>
+                        <div style={styles.selectedSiteCol}>
+                            { selectedSite==null ? (
+                                <Wrapper title="Site Management">
+                                    <MessageBlock>Please, select a site.</MessageBlock>
+                                </Wrapper>
+                            ) : (
+                                this.renderSelectedSiteContent(_configurations, selectedSite)
+                            ) }
+                        </div>
+
+                        <CreateSiteDialog
+                            open={createSiteDialog}
+                            onCancelClick={()=>this.setState({createSiteDialog:false})}
+                            onSubmitClick={this.handleCreateSiteSubmit}
+                        />
+
+                        { selectedSite!=null && this.state.publishSiteDialog!=null ? (
+                                    <PublishSiteDialog
+                                    site={selectedSite}
+                                    workspace={jeeworkspace}
+                                    workspaceHeader={jeeworkspaceHeader}
+                                    onCancelClick={this.handlePublishSiteCancelClick}
+                                    onBuildAndPublishClick={this.handleBuildAndPublishClick}
+                                    open={publishSiteDialog!=null&&publishSiteDialog.open}
+                                />
+                        ):(null) }
+
+                        { selectedSite!=null && this.state.registerDialog!=null ? (
+                                       <RegisterDialog
+                                        onCancelClick={()=>this.handleRegisterCancelClick()}
+                                        onRegisterClick={({username, email})=>{
+                                            this.handleRegisterClick(username, email)
+                                        }}
+
+                                        open={registerDialog!=null&&registerDialog.open}
+                                    />
+                         ):(null) }
+
+                         { selectedSite!=null && this.state.claimDomainDialog!=null ? (
+                                           <ClaimDomainDialog
+                                            onCancelClick={()=>this.handleClaimDomainClick()}
+                                            onClaimDomainClick={(obj)=>{
+                                                this.handleClaimDomainClick(obj)
+                                            }}
+                                            username={this.state.username}
+
+                                            open={claimDomainDialog!=null&&claimDomainDialog.open}
+                                        />
+                         ):(null) }
+
+                       <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
+                     </div>
+                )
+            }}/>
+
+          );
+        }
+
     }
 
-}
-
-export default muiThemeable()(Home);
+                                        export default muiThemeable()(Home);

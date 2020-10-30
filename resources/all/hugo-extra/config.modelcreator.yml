@@ -1,0 +1,10 @@
+outputs:
+  home:
+    - HTML
+    - Sukoh
+    - JSON
+outputFormats:
+  Sukoh:
+    mediaType: "application/json"
+    baseName: "sukoh"
+    path: "/"

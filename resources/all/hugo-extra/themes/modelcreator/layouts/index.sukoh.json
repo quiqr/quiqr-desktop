@@ -1,0 +1,133 @@
+{{/* vim: set ft=go : */}}
+{{/*------------------------Collections------------------------ */}}
+{{- $collections := slice -}}
+{{- $collectionMenu := slice -}}
+{{- range .Site.Sections -}}
+    {{- $sectionKey := printf "collection%s" (anchorize .Title) -}}
+    {{- $sectionTitle :=  .Title -}}
+    {{- $itemTitle :=  .Title | singularize -}}
+    {{- range first 1 .Pages -}}
+        {{- $dir := printf "content/%s" (index (split .File.Dir "/") 0) -}}
+        {{- $extension := .File.Ext -}}
+        {{- $fields := slice -}}
+        {{- range $key, $value := .Params -}}
+            {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+            {{- $fields = $fields | append $field -}}
+        {{- end -}}
+        {{- $collection :=  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle  -}}
+        {{- $collections = $collections | append $collection }}
+        {{- $collectionMenu = $collectionMenu | append (dict "key" $sectionKey) }}
+    {{- end -}}
+{{- end -}}
+
+{{/*---------------------------Singles----------------------------- */}}
+{{- $singles := slice -}}
+{{- $singlesMenu := slice -}}
+
+{{- $pages := slice -}}
+{{- range .Site.Pages -}}
+    {{- if .IsHome -}}
+      {{- $pages = $pages | append . -}}
+    {{- end -}}
+{{- end -}}
+{{- range (where .Pages "Kind" "not in" .RegularPagesRecursive) -}}
+    {{- $pages = $pages | append . -}}
+{{- end -}}
+
+{{- range $pages -}}
+    {{- $pageKey := printf "single%s" (anchorize .Title) -}}
+
+    {{- $pageTitle := "" -}}
+    {{- if .IsSection -}}
+      {{- $pageTitle = printf "%s listpage" .Title -}}
+    {{- else -}}
+      {{- $pageTitle = .Title -}}
+    {{- end -}}
+
+    {{- $path := .RelPermalink }}
+    {{- $file := printf "content/%s" .File.Path -}}
+    {{- $fields := slice -}}
+    {{- range $key, $value := .Params -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+        {{- $fields = $fields | append $field -}}
+    {{- end -}}
+    {{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields -}}
+    {{- $singles = $singles | append $single }}
+    {{- $singlesMenu = $singlesMenu | append (dict "key" $pageKey) }}
+{{- end -}}
+
+{{/*---------------------------Menu----------------------------- */}}
+{{- $menu := slice -}}
+{{- $menu := $menu | append (dict "key" "singles" "title" "Singles" "menuItems" $singlesMenu) -}}
+{{- $menu := $menu | append (dict "key" "collections" "title" "Collections" "menuItems" $collectionMenu) -}}
+
+
+{{/*-----------------The core getting it all together------------- */}}
+
+
+{{- $hugover := printf "extended_%s" .Hugo.Version -}}
+{{- $serve := slice (dict "key" "default" "config" "config.toml") -}}
+{{- $build := slice (dict "key" "default" "config" "config.toml") -}}
+{{- dict "hugover" $hugover "serve" $serve "build" $build "menu" $menu "singles" $singles "collections" $collections  | jsonify (dict "prefix" " " "indent" "  ") -}}
+
+{{/*---------------------------Partials--------------------------- */}}
+
+
+{{- define "partials/createField" -}}
+    {{- $key := .key -}}
+    {{- $value := .value -}}
+
+    {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+
+    {{- $title := humanize $key -}}
+    {{- $field := dict "key" $key "title" $title "type" $pogoType -}}
+
+    {{- if (eq $pogoType "date") -}}
+        {{- $field = merge $field (dict "default" "now") -}}
+    {{- end -}}
+
+    {{- if (eq $pogoType "section") -}}
+        {{- $subfields := slice -}}
+
+        {{- range $key, $value := $value -}}
+                {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key "pogoType" $pogoType) -}}
+                {{- $subfields = $subfields | append $field}}
+        {{- end -}}
+
+        {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
+    {{- end -}}
+    {{- return $field -}}
+{{- end -}}
+
+{{- define "partials/pogoType" -}}
+    {{- $value := .value -}}
+    {{- $key := .key -}}
+    {{- $pogoType := "" -}}
+    {{- $type := (printf "%T" $value) -}}
+
+    {{- if (eq "bool" $type) -}}
+      {{- $pogoType = "boolean" -}}
+    {{- else if (or (eq "int" $type) (eq "int64" $type) (eq "float64" $type)) -}}
+      {{- $pogoType = "number" -}}
+    {{- else if (eq "string" $type) -}}
+      {{- $pogoType = "string" -}}
+    {{- else if (eq "time.Time" $type) -}}
+      {{- if (eq $value "Lastmod") -}}
+        {{- $pogoType = "info"}}
+      {{- else -}}
+        {{- $pogoType = "date"}}
+      {{- end -}}
+    {{- else if reflect.IsSlice $value -}}
+      {{- $pogoType = "chips" }}
+    {{- else if reflect.IsMap $value -}}
+      {{- $pogoType = "section" -}}
+    {{- end -}}
+
+    {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") -}}
+        {{- $pogoType = "hidden" -}}
+    {{- end -}}
+
+    {{- return $pogoType -}}
+{{- end -}}
+

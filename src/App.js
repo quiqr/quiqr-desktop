@@ -18,7 +18,7 @@ import WorkspaceSidebar from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 
 //MATERIAL UI
-import { MenuItem } from 'material-ui/';
+//import { MenuItem } from 'material-ui/';
 import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -78,7 +78,9 @@ class App extends React.Component<AppProps,AppState>{
             menuIsLocked: true,
             forceShowMenu: false,
             mobileBrowserActive: false,
-            skipMenuTransition: false
+            skipMenuTransition: false,
+            poppygoUsername: "",
+            poppygoDomain: "",
         };
 
         win.on('maximize', () => { this.setState({maximized: true}); });
@@ -96,8 +98,22 @@ class App extends React.Component<AppProps,AppState>{
             stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
 
             this.setState(stateUpdate);
-
         })
+        this.getProfile();
+    }
+
+    getProfile(){
+        let getProfile = service.api.getPoppyGoProfile();
+
+        getProfile.then((profile)=>{
+            if(this.state.poppygoUsername !==profile.username){
+                this.setState({poppygoUsername: profile.username});
+            }
+
+        }, (e)=>{
+        })
+
+        return true;
     }
 
     //REDIRECTS FROM BACKGROUND
@@ -136,10 +152,6 @@ class App extends React.Component<AppProps,AppState>{
         window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
             this.history.push(location);
         }.bind(this));
-    }
-
-    minimizeWindow(){
-        window.require('electron').remote.getCurrentWindow().minimize();
     }
 
     closeWindow(){
@@ -222,7 +234,11 @@ class App extends React.Component<AppProps,AppState>{
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-        return <Home key={ 'home' } siteKey={ decodeURIComponent(match.params.site) } workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          this.getProfile();
+          return <Home key={ 'home' }
+              poppygoUsername={this.state.poppygoUsername}
+              siteKey={ decodeURIComponent(match.params.site) }
+              workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {
@@ -298,7 +314,7 @@ class App extends React.Component<AppProps,AppState>{
         menuContainerStyle.transition = transition;
       }
 
-      this.state.skipMenuTransition = false ;
+      this.state.setState({skipMenuTransition: false});
      }
 
     return (<Switch>

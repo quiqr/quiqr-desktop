@@ -11,16 +11,12 @@ const fssimple = require('fs');
 const AdmZip = require('adm-zip');
 const PogoSiteExtension = "pogosite";
 const PogoThemeExtension = "pogotheme";
-const PogoPassExtension = "pogopass";
 const PogoContentExtension = "pogocontent";
 const dialog = electron.dialog;
 let outputConsole = require('./output-console');
 const app = electron.app
 
 class Pogozipper{
-
-
-
 
     async exportSite() {
         const mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -87,6 +83,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Finished site export. Check" + exportFilePath,
         });
     }
@@ -132,7 +130,9 @@ class Pogozipper{
         if(siteKey==""){
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                buttons: ["Close"],
                 message: "Failed to import site. Invalid site file 1, no siteKey",
+                title: "Failed task",
             });
             return;
         }
@@ -144,6 +144,8 @@ class Pogozipper{
         if(!conftxt){
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Failed task",
                 message: "Failed to import site. Invalid site file. 2, unreadable config."+siteKey+".json",
             });
             return;
@@ -170,6 +172,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Site has been imported.",
         });
 
@@ -221,6 +225,8 @@ class Pogozipper{
         if(siteKey == ""){
             dialog.showMessageBox(mainwindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Failed task",
                 message: "failed to import site. invalid site file 1, no sitekey",
             });
             return;
@@ -243,7 +249,9 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
             message: "Theme has been imported.",
+            title: "Finished task",
         });
     }
 
@@ -256,6 +264,8 @@ class Pogozipper{
         else {
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Warning",
                 message: "First, you need to select a site.",
             });
             return;
@@ -313,132 +323,9 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
             message: "Finished theme export. Check" + exportFilePath,
-        });
-
-    }
-
-    async exportPass() {
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
-
-        if(!this.checkCurrentSiteKey()) {return;}
-
-        let dirs = dialog.showOpenDialog(mainWindow,
-            { properties: ['openDirectory'] });
-        if (!dirs || dirs.length != 1) {
-            return;
-        }
-
-        let path = dirs[0];
-        let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
-
-        await fileDirUtils.recurForceRemove(tmppath);
-        await fs.ensureDir(tmppath);
-
-        var zip = new AdmZip();
-
-        let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
-        const newConfJson = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
-        await zip.addFile('config.'+global.currentSiteKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
-        await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
-
-        await zip.addLocalFolder(tmppath);
-        var willSendthis = zip.toBuffer();
-
-        var exportFilePath = path+"/"+global.currentSiteKey+"."+PogoPassExtension;
-        await zip.writeZip(exportFilePath);
-
-        dialog.showMessageBox(mainWindow, {
-            type: 'info',
-            message: "Finished pass export. Check" + exportFilePath,
-        });
-
-    }
-
-    async importPass(path=null) {
-
-        //stop server
-        //stop preview
-
-        if(!this.checkCurrentSiteKey()) {return;}
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
-
-        if(!path){
-            let files = dialog.showOpenDialog(mainWindow, {
-                filters: [
-                    { name: "PoppyGo Passports", extensions: [PogoPassExtension] }
-                ],
-                properties: ['openFile'] });
-
-            if (!files || files.length != 1) {
-                return;
-            }
-            path = files[0];
-        }
-        else {
-            let filename = path.split('/').pop();
-            let options  = {
-                buttons: ["Yes","Cancel"],
-                message: "You're about to import the passport "+filename+" into "+ global.currentSiteKey +". Do you like to continue?"
-            }
-            let response = dialog.showMessageBox(options)
-            if(response === 1) return;
-        }
-
-        var zip = new AdmZip(path);
-        var zipEntries = zip.getEntries();
-        var siteKey = "";
-
-        await zipEntries.forEach(function(zipEntry) {
-            if (zipEntry.entryName == "sitekey") {
-                siteKey = zip.readAsText("sitekey");
-                console.log("found sitekey:" + siteKey);
-            }
-        });
-
-        if(siteKey == ""){
-            dialog.showMessageBox(mainwindow, {
-                type: 'warning',
-                message: "failed to import site. invalid site file 1, no sitekey",
-            });
-            return;
-        }
-
-        if(siteKey != global.currentSiteKey){
-            let options  = {
-                buttons: ["Yes","Cancel"],
-                message: "The Sitekey of the passport does not match. Do you like to continue?"
-            }
-            let response = dialog.showMessageBox(options)
-            if(response === 1) return;
-        }
-
-        outputConsole.appendLine('Found a site with key ' + siteKey);
-
-        var confFileName = "config."+siteKey+".json";
-
-        var conftxt = zip.readAsText(confFileName);
-        if(!conftxt){
-            dialog.showMessageBox(mainWindow, {
-                type: 'warning',
-                message: "Failed to import site. Invalid site file. 2, unreadable config."+siteKey+".json",
-            });
-            return;
-        }
-
-        var newConf = JSON.parse(conftxt);
-        newConf.source.path = global.currentSitePath;
-        newConf.key = global.currentSiteKey;
-        newConf.name = global.currentSiteKey;
-
-        let newConfigJsobPath = pathHelper.getRoot()+'config.'+currentSiteKey+'.json';
-        await fssimple.writeFileSync(newConfigJsobPath, JSON.stringify(newConf), { encoding: "utf8"});
-
-        outputConsole.appendLine('replaced site configuration');
-
-        dialog.showMessageBox(mainWindow, {
-            type: 'info',
-            message: "Passport has been imported.",
+            title: "Finished task",
         });
 
     }
@@ -491,6 +378,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Finished content export. Check" + exportFilePath,
         });
     }
@@ -538,6 +427,8 @@ class Pogozipper{
         if(siteKey == ""){
             dialog.showMessageBox(mainwindow, {
                 type: 'warning',
+                buttons: ["Close"],
+                title: "Failed task",
                 message: "failed to import site. invalid site file 1, no sitekey",
             });
             return;
@@ -559,6 +450,8 @@ class Pogozipper{
 
         dialog.showMessageBox(mainWindow, {
             type: 'info',
+            buttons: ["Close"],
+            title: "Finished task",
             message: "Content has been imported.",
         });
     }

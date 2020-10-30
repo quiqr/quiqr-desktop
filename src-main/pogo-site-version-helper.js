@@ -21,6 +21,8 @@ class PogoSiteVersionHelper{
         if(siteKey==""){
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                title: 'Warning',
+                buttons: ["Close"],
                 message: "No site selected, cannot switch version.",
             });
         }
@@ -40,24 +42,14 @@ class PogoSiteVersionHelper{
             await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
             outputConsole.appendLine('linked to site version: '+versionDir);
-            /*dialog.showMessageBox(mainWindow, {
-                type: 'info',
-                message: "Linked to version "+versionDir,
-            });
-            */
 
             mainWindow.webContents.send("redirectHome");
-            //console.log("switch to "+ global.currentSiteKey);
-            //let newScreen = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-            //mainWindow.webContents.send("redirectMountSite",newScreen);
-
-            //const menuManager = require('./menu-manager');
-            //menuManager.createMainMenu();
-
         }
         else{
             dialog.showMessageBox(mainWindow, {
                 type: 'warning',
+                title: 'Warning',
+                buttons: ["Close"],
                 message: "version directory is not readable",
             });
         }

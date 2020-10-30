@@ -30,7 +30,10 @@ function validateSite(site) {
         serve: Joi.array(),
         build: Joi.array(),
         publish: Joi.array(),
+        lastPublish: Joi.number().integer(),
+        lastEdit: Joi.number().integer(),
         transform: Joi.array()
+
     });
     const result = Joi.validate(site, schema);
     if(result.error)
@@ -46,7 +49,9 @@ const GLOBAL_DEFAULTS = {
     hideWindowFrame: false,
     hideMenuBar: false,
     hideInlineMenus: true,
-    appTheme: "simple"
+    appTheme: "simple",
+    //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
+    pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
 }
 
 function invalidateCache(){
@@ -105,7 +110,9 @@ function get(callback, {invalidateCache} = {}){
                 hideMenuBar: false,
                 //hideMenuBar: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideMenuBar : global.hideMenuBar===true,
                 hideInlineMenus: global.hideInlineMenus == null ? GLOBAL_DEFAULTS.hideInlineMenus : global.hideInlineMenus===true,
-                appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme
+                appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme,
+
+
             }
 
             //settings overruled
