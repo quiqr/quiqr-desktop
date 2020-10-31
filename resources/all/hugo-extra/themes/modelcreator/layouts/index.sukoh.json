@@ -1,76 +1,199 @@
-{{/* vim: set ft=go : */}}
-{{/*------------------------Collections------------------------ */}}
+
+{{- $collectionPages := slice -}}
+{{- $singlePages := slice -}}
+{{- $singles := slice -}}
+{{- $singlesMenu := slice -}}
 {{- $collections := slice -}}
 {{- $collectionMenu := slice -}}
-{{- range .Site.Sections -}}
-    {{- $sectionKey := printf "collection%s" (anchorize .Title) -}}
-    {{- $sectionTitle :=  .Title -}}
-    {{- $itemTitle :=  .Title | singularize -}}
-    {{- range first 1 .Pages -}}
-        {{- $dir := printf "content/%s" (index (split .File.Dir "/") 0) -}}
+{{- $homeMenu := slice -}}
+
+
+{{/*------------------------ Home widgetpage ------------------------ */}}
+
+{{- $page := "/home/index.md" -}}
+{{- $homepage := site.GetPage $page -}}
+{{- $homeSinglePages := slice -}}
+{{- $homeCollections := dict -}}
+
+{{- range $index, $st :=  ($homepage.Resources.ByType "page") -}}
+  {{ if eq $st.File.Dir "home/" }}
+    {{- $homeSinglePages = $homeSinglePages | append . -}}
+  {{ else if eq (path.Dir (path.Dir $st.File.Dir)) "home" }}
+    {{- $homeSinglePages = $homeSinglePages | append . -}}
+  {{ else }}
+
+    {{- $path :=  path.Dir (path.Dir $st.File.Dir) -}}
+    {{- $pathDict := dict "page" $path }}
+
+    {{- if ne (index $homeCollections "page") ($path) -}}
+        {{- $homeCollections = $homeCollections | merge $pathDict -}}
+        {{- $sectionKey := path.Base $path -}}
+        {{- $sectionTitle :=  $sectionKey | humanize -}}
+        {{- $itemTitle :=  ( $sectionKey | humanize) | singularize -}}
+        {{- $dir := printf "content/%s/" $path -}}
         {{- $extension := .File.Ext -}}
         {{- $fields := slice -}}
+        {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
         {{- range $key, $value := .Params -}}
             {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
             {{- $fields = $fields | append $field -}}
         {{- end -}}
-        {{- $collection :=  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle  -}}
-        {{- $collections = $collections | append $collection }}
-        {{- $collectionMenu = $collectionMenu | append (dict "key" $sectionKey) }}
+        {{- $collection := dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle "previewUrl" "/" -}}
+        {{- $collections = $collections | append $collection -}}
+        {{- $homeMenu = $homeMenu | append (dict "key" (index $collection "key")) -}}
     {{- end -}}
+  {{- end -}}
 {{- end -}}
+
+{{- range $homeSinglePages -}}
+      {{- $single := (partial "createSingle" . ) -}}
+      {{- $singles = $singles | append $single -}}
+      {{- $homeMenu = $homeMenu | append (dict "key" (index $single "key")) -}}
+{{- end -}}
+
+{{/*------------------------Collections------------------------ */}}
+
+{{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
+    {{- $collectionPages = $collectionPages | append . -}}
+{{- end -}}
+
+{{- range $collectionPages -}}
+      {{- $collection := (partial "createCollection" . ) -}}
+      {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
+      {{- $collections = $collections | append $collection -}}
+{{- end -}}
+
 
 {{/*---------------------------Singles----------------------------- */}}
-{{- $singles := slice -}}
-{{- $singlesMenu := slice -}}
 
-{{- $pages := slice -}}
 {{- range .Site.Pages -}}
-    {{- if .IsHome -}}
-      {{- $pages = $pages | append . -}}
+    {{- if and (.IsHome) (.IsPage) -}}
+      {{- $singePages = $singlePages | append . -}}
     {{- end -}}
 {{- end -}}
+
 {{- range (where .Pages "Kind" "not in" .RegularPagesRecursive) -}}
-    {{- $pages = $pages | append . -}}
+    {{- $singlePages = $singlePages | append . -}}
 {{- end -}}
 
-{{- range $pages -}}
-    {{- $pageKey := printf "single%s" (anchorize .Title) -}}
-
-    {{- $pageTitle := "" -}}
-    {{- if .IsSection -}}
-      {{- $pageTitle = printf "%s listpage" .Title -}}
-    {{- else -}}
-      {{- $pageTitle = .Title -}}
-    {{- end -}}
-
-    {{- $path := .RelPermalink }}
-    {{- $file := printf "content/%s" .File.Path -}}
-    {{- $fields := slice -}}
-    {{- range $key, $value := .Params -}}
-        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
-        {{- $fields = $fields | append $field -}}
-    {{- end -}}
-    {{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields -}}
-    {{- $singles = $singles | append $single }}
-    {{- $singlesMenu = $singlesMenu | append (dict "key" $pageKey) }}
+{{- range $singlePages -}}
+    {{- $single := (partial "createSingle" . ) -}}
+    {{- $singles = $singles | append $single -}}
+    {{- $singlesMenu = $singlesMenu | append (dict "key" (index $single "key")) -}}
 {{- end -}}
 
 {{/*---------------------------Menu----------------------------- */}}
 {{- $menu := slice -}}
-{{- $menu := $menu | append (dict "key" "singles" "title" "Singles" "menuItems" $singlesMenu) -}}
-{{- $menu := $menu | append (dict "key" "collections" "title" "Collections" "menuItems" $collectionMenu) -}}
 
+{{- if gt (len $homeMenu) 1 }}
+    {{- $menu = $menu | append (dict "key" "home" "title" "Home" "menuItems" $homeMenu) -}}
+{{- end -}}
+
+{{- if gt (len $singlesMenu) 1 }}
+    {{- $menu = $menu | append (dict "key" "singles" "title" "Singles" "menuItems" $singlesMenu) -}}
+{{- end -}}
+
+{{- if gt (len $collectionMenu) 1 }}
+    {{- $menu = $menu | append (dict "key" "collections" "title" "Collections" "menuItems" $collectionMenu) -}}
+{{- end -}}
 
 {{/*-----------------The core getting it all together------------- */}}
 
 
 {{- $hugover := printf "extended_%s" .Hugo.Version -}}
-{{- $serve := slice (dict "key" "default" "config" "config.toml") -}}
-{{- $build := slice (dict "key" "default" "config" "config.toml") -}}
+{{- $serve := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
+{{- $build := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
 {{- dict "hugover" $hugover "serve" $serve "build" $build "menu" $menu "singles" $singles "collections" $collections  | jsonify (dict "prefix" " " "indent" "  ") -}}
 
+
+
 {{/*---------------------------Partials--------------------------- */}}
+
+
+{{- define "partials/configFile" -}}
+    {{- $configFile := "" -}}
+    {{- range readDir "/" -}}
+      {{- if eq .Name "config" -}}
+            {{- range readDir "/config/_default" -}}
+                {{- if or (eq .Name "config.yml") (eq .Name "config.toml") (eq .Name "config.json") (eq .Name "config.yaml") -}}
+                      {{ $configFile = printf "/config/_default/%s" .Name }}
+                {{- end -}}
+            {{- end -}}
+      {{- else if or (eq .Name "config.yml") (eq .Name "config.toml") (eq .Name "config.json") (eq .Name "config.yaml") -}}
+            {{ $configFile = .Name }}
+      {{- end -}}
+    {{- end -}}
+    {{- return $configFile -}}
+{{- end -}}
+
+{{- define "partials/createKey"}}
+    {{- if or (eq (path.Base .Path) "index.md") (eq (path.Base .Path) "_index.md") -}}
+       {{- path.Split (path.Base .File.Dir )| anchorize -}}
+    {{- else -}}
+        {{- if .File.TranslationBaseName -}}
+          {{- .File.TranslationBaseName -}}
+        {{- else -}}
+          {{-  (path.Base .Path)  -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- define "partials/createSingle" -}}
+    {{- $pageKey := printf "s_%s" (partial "createKey" . ) -}}
+    {{- $pageTitle := "" -}}
+    {{- if .IsSection -}}
+      {{- $pageTitle = printf "%s listpage" ((partial "createKey" . )  | humanize) -}}
+    {{- else -}}
+      {{- $pageTitle = (partial "createKey" . )  | humanize -}}
+    {{- end -}}
+
+    {{- $path := .RelPermalink }}
+    {{- $file := printf "content/%s" .File.Path -}}
+    {{- $fields := slice -}}
+
+    {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+
+    {{- range $key, $value := .Params -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+        {{- $fields = $fields | append $field -}}
+    {{- end -}}
+
+    {{- $previewUrl := "" -}}
+    {{- if .RelPermalink  -}}
+        {{- $previewUrl = .RelPermalink -}}
+    {{- else }}
+        {{- $previewUrl = "/" -}}
+    {{- end -}}
+
+
+    {{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields "previewUrl" $previewUrl -}}
+    {{- return $single -}}
+{{- end -}}
+
+{{- define "partials/createCollection" -}}
+
+    {{- $collection := "" -}}
+
+    {{- $sectionKey := printf "c_%s" (partial "createKey" . ) -}}
+    {{- $sectionTitle :=  (partial "createKey" . ) | humanize -}}
+    {{- $itemTitle :=  ( (partial "createKey" . ) | humanize) | singularize -}}
+    {{- range first 1 .Pages -}}
+
+          {{- $dir := printf "content/%s/" (index (split .File.Path "/") 0 ) -}}
+          {{- $extension := .File.Ext -}}
+          {{- $fields := slice -}}
+
+          {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+
+          {{- range $key, $value := .Params -}}
+              {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+              {{- $fields = $fields | append $field -}}
+          {{- end -}}
+
+          {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle "previewUrl" .Page.RelPermalink -}}
+          {{- return $collection -}}
+    {{- end -}}
+{{- end -}}
 
 
 {{- define "partials/createField" -}}
@@ -88,16 +211,30 @@
 
     {{- if (eq $pogoType "section") -}}
         {{- $subfields := slice -}}
-
         {{- range $key, $value := $value -}}
                 {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
                 {{- $field := partial "createField" (dict "value" $value "key" $key "pogoType" $pogoType) -}}
                 {{- $subfields = $subfields | append $field}}
         {{- end -}}
-
         {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
     {{- end -}}
+
+    {{- if (eq $pogoType "accordion") -}}
+        {{- $subfields := slice -}}
+        {{- range $key, $value := ( index $value 1 ) -}}
+                {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key "pogoType" $pogoType) -}}
+                {{ if or (eq $key "name") (eq $key "title")}}
+                    {{- $field = $field | merge (dict "arrayTitle" "true") -}}
+                {{- end -}}
+                {{- $subfields = $subfields | append $field}}
+
+        {{- end -}}
+        {{- $field = merge $field (dict "fields" $subfields ) -}}
+    {{- end -}}
+
     {{- return $field -}}
+
 {{- end -}}
 
 {{- define "partials/pogoType" -}}
@@ -112,6 +249,8 @@
       {{- $pogoType = "number" -}}
     {{- else if (eq "string" $type) -}}
       {{- $pogoType = "string" -}}
+    {{- else if or ( eq "template.HTML" $type ) -}}
+      {{- $pogoType = "markdown" -}}
     {{- else if (eq "time.Time" $type) -}}
       {{- if (eq $value "Lastmod") -}}
         {{- $pogoType = "info"}}
@@ -119,15 +258,24 @@
         {{- $pogoType = "date"}}
       {{- end -}}
     {{- else if reflect.IsSlice $value -}}
-      {{- $pogoType = "chips" }}
+      {{- if reflect.IsMap ( index $value 1 ) -}}
+          {{- $pogoType = "accordion" }}
+      {{- else -}}
+          {{- $pogoType = "chips" }}
+      {{- end -}}
     {{- else if reflect.IsMap $value -}}
       {{- $pogoType = "section" -}}
+    {{- else -}}
+      {{- $pogoType = "hidden" -}}
     {{- end -}}
 
-    {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") -}}
+    {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
+        {{- $pogoType = "hidden" -}}
+    {{- end -}}
+
+    {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
         {{- $pogoType = "hidden" -}}
     {{- end -}}
 
     {{- return $pogoType -}}
 {{- end -}}
-

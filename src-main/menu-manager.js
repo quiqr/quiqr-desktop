@@ -103,7 +103,7 @@ class MenuManager {
                     message: "Failed to generate sukoh.json.",
                 });
             }
-            else{
+            else {
                 let options  = {
                     title: "Please confirm",
                     buttons: ["Yes","Cancel"],
