@@ -51,6 +51,7 @@ function showLookingForServer(mainWindow/*: any*/, port/*: string*/){
 
 function showInvalidDevelopmentUrl(mainWindow/*: any*/, url/*: ?string*/){
     mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Invalid Development Server URL</h1>
 <p>The provided URL (${url||'EMPTY'}) does not match the required pattern.</p>
@@ -308,12 +309,59 @@ module.exports = {
     },
 
     openMobilePreview: function(){
+
+        console.log('preview');
+        console.log(global.hugoServer);
+        console.log(global.currentServerProccess);
+
         mobilePreviewViewActive = true;
-        mobilePreviewView.webContents.loadURL('http://localhost:1313');
-        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+
+        if(global.currentServerProccess){
+            mobilePreviewView.webContents.loadURL('http://localhost:1313');
+            mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+        }
+        else{
+            mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
+            mobilePreviewView.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`
+            <html>
+<body style="font-family: sans-serif; padding: 2em">
+<h1>Waiting for Hugo Server</h1>
+<p>Waiting for hugo server to start...</p>
+<p>Have you started it?</p>
+<p id="points"></p>
+<script>
+
+    function tryServer(){
+        setTimeout(function () {
+            var url = "http://localhost:1313";
+            var http = new XMLHttpRequest();
+            var points = document.getElementById("points").innerHTML;
+            document.getElementById("points").innerHTML = points+".";
+
+            http.open('HEAD', url, false);
+            http.send();
+
+            if (http.status === 200) {
+                window.location.href = url;
+            }
+            else{
+                tryServer();
+            }
+
+        }, 2000);
+    }
+
+ </script>
+
+</body>
+</html>`));
+        }
+
+
         mobilePreviewView.webContents.session.clearCache(function(){return true});
         mainWindow.webContents.send("setMobileBrowserOpen");
         setMobilePreviewBounds();
+
     },
 
     closeMobilePreview: function(){

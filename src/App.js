@@ -269,11 +269,19 @@ class App extends React.Component<AppProps,AppState>{
         return <FormsCookbookRouted />;
       }} />
 
+
       <Route path="*" component={(data)=>{
         return <Redirect to='/' />
       }} />
     </Switch>);
   }
+
+    tryServer(){
+        setTimeout(function () {
+            service.api.openMobilePreview();
+
+        }, 2000);
+    }
 
   render() {
 
@@ -361,6 +369,19 @@ class App extends React.Component<AppProps,AppState>{
               )
       }} />
 
+          <Route path='/preview-no-server' exact render={ ({match, history}) => {
+              this.history = history;
+
+              this.tryServer();
+              return (
+                  <MuiThemeProvider muiTheme={pogoDarkTheme}>
+                      <div style={{backgroundColor:"#606060"}}>
+                          <p id="points"></p>
+
+                      </div>
+                  </MuiThemeProvider>
+              )
+      }} />
 
       <Route
         path="*"

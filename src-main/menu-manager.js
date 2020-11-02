@@ -19,6 +19,7 @@ const { shell } = require('electron')
 const hugoDownloader = require('./hugo/hugo-downloader')
 const HugoBuilder = require('./hugo/hugo-builder');
 const { WorkspaceConfigProvider } = require('./services/workspace/workspace-config-provider');
+const PogoPublisher = require('./publishers/pogo-publisher');
 
 
 const app = electron.app
@@ -52,8 +53,9 @@ class MenuManager {
         }
     }
     startServer() {
-        if(global.hugoserver){
-            global.hugoserver.serve(function(err, stdout, stderr){
+        console.log(global.hugoServer);
+        if(global.hugoServer){
+            global.hugoServer.serve(function(err, stdout, stderr){
                 if(err){
                     console.log(err)
                 }
@@ -118,7 +120,6 @@ class MenuManager {
         }
     }
 
-
     showVersion(){
         const dialog = electron.dialog;
 
@@ -128,6 +129,32 @@ class MenuManager {
             message: "PoppyGo Version " + app.getVersion()
         }
         dialog.showMessageBox(options)
+    }
+
+    async unlinkSiteDomain(){
+        let pogopubl = new PogoPublisher({});
+        await pogopubl.UnlinkDomain();
+    }
+
+    deleteSukohFolder() {
+        mainWindow = global.mainWM.getCurrentInstanceOrNew();
+        mainWindow.webContents.send("disableMobilePreview");
+        let dir;
+
+        const dialog = electron.dialog;
+
+        let options  = {
+            title: "Please confirm",
+            buttons: ["Yes","Cancel"],
+            message: "Do you really want to purge all data?"
+        }
+        let response = dialog.showMessageBox(options)
+        if(response === 1) return;
+
+        var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
+
+        fs.renameSync(pathHelper.getRoot(),pathHelper.getRoot().replace(/\/$/, "")+"-bak-"+todayDate );
+        this.selectSitesWindow();
     }
 
     deleteSite() {
@@ -358,6 +385,14 @@ class MenuManager {
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.generateModel()
+                }
+            },
+            {
+                id: 'unlink-site-domain',
+                label: 'Unlink site domain',
+                enabled: this.siteSelected(),
+                click: async () => {
+                    this.unlinkSiteDomain()
                 }
             },
             {
@@ -592,6 +627,13 @@ class MenuManager {
                         label: 'Show Log Window',
                         click: async () => {
                             this.createLogWindow()
+                        }
+                    },
+                    { type: 'separator' },
+                    {
+                        label: 'Reset all (dangerous)',
+                        click: async () => {
+                            this.deleteSukohFolder()
                         }
                     },
                     { type: 'separator' },
