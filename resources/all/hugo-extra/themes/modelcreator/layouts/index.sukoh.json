@@ -5,6 +5,68 @@
 {{- $collections := slice -}}
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
+{{- $dataMenu := slice -}}
+
+{{/*------------------------------ Data -----------------------------*/}}
+
+{{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data)) }}
+{{- $singles = $singles | append (index $data "singles") }}
+{{- $dataMenu = $dataMenu | append (index $data "menu") }}
+
+{{- define "partials/createDataSingles" -}}
+      {{- $dir := .dir -}}
+
+      {{- $data := .data -}}
+      {{- $singles := slice -}}
+      {{- $menu := slice -}}
+
+      {{- range $index, $file := (partial "rangeDataFiles" (dict "dir" $dir )) -}}
+            {{- if .file }}
+                  {{- $fields := slice -}}
+                  {{- $path := printf "%s%s" .dir .file }}
+                  {{- $fileName := index (split .file ".") 0 -}}
+                  {{- $fileExt := index (split .file ".") 1 -}}
+                  {{- $title := $fileName | humanize -}}
+                  {{- $dataKey := printf "d_%s" $fileName -}}
+                  {{- $fields := slice -}}
+                  {{- range $key, $value := (index $data $fileName) -}}
+                      {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+                      {{- $fields = $fields | append $field -}}
+                  {{- end -}}
+
+                  {{- $single :=  dict "key" $dataKey "title" $title "file" $path "dataformat" $fileExt "fields" $fields "previewUrl" "/" -}}
+                  {{- $singles = $singles | append $single -}}
+                  {{- $menu = $menu | append (dict "key" (index $single "key")) -}}
+            {{ else }}
+                  {{- $data := partial "createDataSingles" (dict "dir" $file.dir "data" (index $data .node) ) -}}
+                  {{- $singles = $singles | append (index $data "singles") -}}
+                  {{- $menu = $menu | append (index $data "menu") -}}
+            {{ end }}
+      {{- end -}}
+
+      {{- return (dict "singles" $singles "menu" $menu  )}}
+
+{{- end -}}
+
+{{- define "partials/rangeDataFiles" -}}
+    {{ $dataFiles := slice }}
+    {{- $dataDir := .dir -}}
+    {{- range (readDir $dataDir ) -}}
+         {{- if .IsDir -}}
+              {{- $dir := printf "%s/" (printf "%s%s" $dataDir .Name ) -}}
+              {{- $dataFiles = $dataFiles | append (dict "dir" $dir "node" .Name ) -}}
+         {{- else -}}
+              {{- $dataFiles = $dataFiles | append (dict "dir" $dataDir "file" .Name ) -}}
+         {{- end -}}
+    {{- end -}}
+    {{- return $dataFiles -}}
+{{- end -}}
+
+
+{{/*------------------------------ Config -----------------------------*/}}
+
+
+
 
 
 {{/*------------------------ Home widgetpage ------------------------ */}}
@@ -105,6 +167,10 @@
     {{- $menu = $menu | append (dict "key" "collections" "title" "Collections" "menuItems" $collectionMenu) -}}
 {{- end -}}
 
+{{- if gt (len $dataMenu) 0 }}
+    {{- $menu = $menu | append (dict "key" "data" "title" "Data" "menuItems" $dataMenu) -}}
+{{- end -}}
+
 {{/*-----------------The core getting it all together------------- */}}
 
 
@@ -135,15 +201,20 @@
 {{- end -}}
 
 {{- define "partials/createKey"}}
-    {{- if or (eq (path.Base .File.Path) "index.md") (eq (path.Base .Path) "_index.md") -}}
+    {{- if in (path.Base .File.Path) "index" -}}
         {{- if eq .File.Dir "/" -}}
             {{- .Name | anchorize -}}
         {{- else -}}
             {{- path.Split (path.Base .File.Dir )| anchorize -}}
         {{- end -}}
     {{- else -}}
+
         {{- if .File.TranslationBaseName -}}
-          {{- .File.TranslationBaseName -}}
+          {{- if in .File.TranslationBaseName "index" -}}
+            {{- path.Split (path.Base .File.Dir )| anchorize -}}
+          {{- else -}}
+            {{- .File.TranslationBaseName -}}
+          {{- end -}}
         {{- else -}}
           {{-  (path.Base .Path)  -}}
         {{- end -}}
