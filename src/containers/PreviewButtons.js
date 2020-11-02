@@ -1,6 +1,6 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
-import service from './../services/service'
+//import service from './../services/service'
 
 class PreviewButtons extends React.Component{
 
@@ -12,7 +12,6 @@ class PreviewButtons extends React.Component{
     }
 
     setUrl(event,url){
-        service.api.logToConsole(url);
         let path = url.split('1313')[1];
         if(path === ''){
             path = "/";
@@ -21,11 +20,6 @@ class PreviewButtons extends React.Component{
         this.setState({previewPath: path});
     }
 
-    xcomponentWillMount(){
-        window.require('electron').ipcRenderer.on('previewButtonsShowingUrl',function(event, args){
-            this.setUrl(args);
-        }.bind(this));
-    }
     componentWillMount(){
         window.require('electron').ipcRenderer.on('previewButtonsShowingUrl', this.setUrl.bind(this));
     }
