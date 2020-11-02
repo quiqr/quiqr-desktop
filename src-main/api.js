@@ -35,10 +35,15 @@ function getSiteService(siteKey/*: string*/, callback/*: CallbackTyped<SiteServi
 function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     return new Promise((resolve, reject)=>{
         configurationDataProvider.get(function(err, configurations){
+
             if(configurations.empty===true) throw new Error('Configurations is empty.');
+
             if(err) { reject(err); return; }
+
             let siteData = configurations.sites.find((x)=>x.key===siteKey);
+
             if(siteData==null) throw new Error('Could not find site is empty.');
+
             let siteService = new SiteService(siteData);
             resolve(siteService);
         });

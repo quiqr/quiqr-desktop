@@ -318,7 +318,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             )
         }
 
-        if(site.hasOwnProperty('lastPublish')){
+        if(site.hasOwnProperty('lastPublish') && site.lastPublish !== 0){
 
             let ts;
             if(site.lastPublish === 1){

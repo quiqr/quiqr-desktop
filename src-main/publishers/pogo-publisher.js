@@ -199,6 +199,23 @@ class PogoPublisher {
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
     }
 
+    async UnlinkDomain(){
+        let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
+        var newConf = JSON.parse(conftxt);
+        newConf.lastPublish = 0,
+        newConf.publish = [];
+        newConf.publish.push({
+            key: 'poppygo-nocloud',
+            config: {
+                type: 'poppygo',
+            }
+        });
+        await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
+        let mainWindow = global.mainWM.getCurrentInstance();
+        mainWindow.webContents.send("lastPublishedChanged");
+    }
+
     async publish(context){
 
         let mainWindow = global.mainWM.getCurrentInstance();

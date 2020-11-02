@@ -60,9 +60,9 @@ export default class ClaimDomainDialog extends React.Component{
         let data='';
         let request = net.request({
             method: 'POST',
-            protocol: this.state.pogoboardconn.protocol,
-            hostname: this.state.pogoboardconn.host,
-            port: this.state.pogoboardconn.port,
+            protocol: this.state.pogoboardConn.protocol,
+            hostname: this.state.pogoboardConn.host,
+            port: this.state.pogoboardConn.port,
             path: '/site/new',
             headers: {
                 'Content-Type': 'application/json',
