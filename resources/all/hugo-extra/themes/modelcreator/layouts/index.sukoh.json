@@ -6,6 +6,7 @@
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
+{{- $generalMenu := slice -}}
 
 {{/*------------------------------ Data -----------------------------*/}}
 
@@ -15,25 +16,21 @@
 
 {{- define "partials/createDataSingles" -}}
       {{- $dir := .dir -}}
-
       {{- $data := .data -}}
       {{- $singles := slice -}}
       {{- $menu := slice -}}
-
-      {{- range $index, $file := (partial "rangeDataFiles" (dict "dir" $dir )) -}}
+      {{- range $index, $file := (partial "rangeFiles" (dict "dir" $dir )) -}}
             {{- if .file }}
                   {{- $fields := slice -}}
-                  {{- $path := printf "%s%s" .dir .file }}
+                  {{- $path := printf "%s%s" .dir .file -}}
                   {{- $fileName := index (split .file ".") 0 -}}
                   {{- $fileExt := index (split .file ".") 1 -}}
                   {{- $title := $fileName | humanize -}}
                   {{- $dataKey := printf "d_%s" $fileName -}}
-                  {{- $fields := slice -}}
                   {{- range $key, $value := (index $data $fileName) -}}
                       {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
                       {{- $fields = $fields | append $field -}}
                   {{- end -}}
-
                   {{- $single :=  dict "key" $dataKey "title" $title "file" $path "dataformat" $fileExt "fields" $fields "previewUrl" "/" -}}
                   {{- $singles = $singles | append $single -}}
                   {{- $menu = $menu | append (dict "key" (index $single "key")) -}}
@@ -43,31 +40,48 @@
                   {{- $menu = $menu | append (index $data "menu") -}}
             {{ end }}
       {{- end -}}
-
       {{- return (dict "singles" $singles "menu" $menu  )}}
-
 {{- end -}}
 
-{{- define "partials/rangeDataFiles" -}}
-    {{ $dataFiles := slice }}
-    {{- $dataDir := .dir -}}
-    {{- range (readDir $dataDir ) -}}
-         {{- if .IsDir -}}
-              {{- $dir := printf "%s/" (printf "%s%s" $dataDir .Name ) -}}
-              {{- $dataFiles = $dataFiles | append (dict "dir" $dir "node" .Name ) -}}
-         {{- else -}}
-              {{- $dataFiles = $dataFiles | append (dict "dir" $dataDir "file" .Name ) -}}
-         {{- end -}}
-    {{- end -}}
-    {{- return $dataFiles -}}
+{{/*------------------------------ Config, menus and params  -----------------------------*/}}
+
+
+{{- $configFilePath := partial "configFile" . -}}
+{{- $fileExt := last 1 (index (split $configFilePath ".")) -}}
+{{- $configDir := "config/_default/" -}}
+{{- if in $configFilePath $configDir }}
+      {{- range $index, $file := partial "rangeFiles"  (dict "dir" "config/_default/" ) -}}
+            {{- $path := path.Join $configDir .file -}}
+            {{- $ext := index (split .file ".") 1 -}}
+            {{- $name := index (split .file ".") 0 -}}
+            {{- $fields := slice -}}
+
+
+                {{- if in .file "params" -}}
+                    {{- range $key, $value := $.Site.Params -}}
+                        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+                        {{- $fields = $fields | append $field -}}
+                    {{- end -}}
+                    {{- $singles = $singles | append (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+                    {{- $generalMenu = $generalMenu | append (dict "key" $name ) -}}
+                {{- else if in .file "menu" -}}
+                    {{- range $key, $value := $.Site.Menus -}}
+                        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+                        {{- $fields = $fields | append $field -}}
+                    {{- end -}}
+                    {{- $singles = $singles | append (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+                    {{- $generalMenu = $generalMenu | append (dict "key" $name ) -}}
+                {{- end -}}
+
+      {{- end -}}
+{{- else -}}
+  {{/*
+          {{- range $key, $value := $.Site.Params -}}
+              {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+              {{- $fields = $fields | append $field -}}
+          {{- end -}}
+  */}}
 {{- end -}}
-
-
-{{/*------------------------------ Config -----------------------------*/}}
-
-
-
-
 
 {{/*------------------------ Home widgetpage ------------------------ */}}
 
@@ -155,6 +169,10 @@
 {{/*---------------------------Menu----------------------------- */}}
 {{- $menu := slice -}}
 
+{{- if gt (len $generalMenu) 0 }}
+    {{- $menu = $menu | append (dict "key" "general" "title" "General settings" "menuItems" $generalMenu) -}}
+{{- end -}}
+
 {{- if gt (len $homeMenu) 0 }}
     {{- $menu = $menu | append (dict "key" "home" "title" "Home" "menuItems" $homeMenu) -}}
 {{- end -}}
@@ -183,17 +201,32 @@
 
 {{/*---------------------------Partials--------------------------- */}}
 
+{{- define "partials/rangeFiles" -}}
+    {{- $files := slice -}}
+    {{- $fileDir := .dir -}}
+    {{- range (readDir $fileDir ) -}}
+         {{- if .IsDir -}}
+              {{- $dir := printf "%s/" (printf "%s%s" $fileDir .Name ) -}}
+              {{- $node :=  strings.TrimRight "." (replace (replace $dir "/data/" "") "/" ".") -}}
+              {{- $files = $files | append (dict "dir" $dir "node" $node ) -}}
+         {{- else -}}
+              {{- $files = $files | append (dict "dir" $fileDir "file" .Name ) -}}
+         {{- end -}}
+    {{- end -}}
+    {{- return $files -}}
+{{- end -}}
+
 
 {{- define "partials/configFile" -}}
     {{- $configFile := "" -}}
     {{- range readDir "/" -}}
-      {{- if eq .Name "config" -}}
+      {{- if and (eq .Name "config") .IsDir -}}
             {{- range readDir "/config/_default" -}}
-                {{- if or (eq .Name "config.yml") (eq .Name "config.toml") (eq .Name "config.json") (eq .Name "config.yaml") -}}
+                {{- if in .Name "config"  -}}
                       {{ $configFile = printf "/config/_default/%s" .Name }}
                 {{- end -}}
             {{- end -}}
-      {{- else if or (eq .Name "config.yml") (eq .Name "config.toml") (eq .Name "config.json") (eq .Name "config.yaml") -}}
+      {{- else if in .Name "config" -}}
             {{ $configFile = .Name }}
       {{- end -}}
     {{- end -}}
@@ -314,7 +347,7 @@
                 {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
                 {{- $field := partial "createField" (dict "value" $value "key" $key "pogoType" $pogoType) -}}
                 {{ if or (eq $key "name") (eq $key "title")}}
-                    {{- $field = $field | merge (dict "arrayTitle" "true") -}}
+                    {{- $field = $field | merge (dict "arrayTitle" true ) -}}
                 {{- end -}}
                 {{- $subfields = $subfields | append $field}}
 
@@ -347,7 +380,7 @@
         {{- $pogoType = "date"}}
       {{- end -}}
     {{- else if reflect.IsSlice $value -}}
-      {{- if reflect.IsMap ( index $value 1 ) -}}
+      {{- if  reflect.IsMap ( index $value 0 ) -}}
           {{- $pogoType = "accordion" }}
       {{- else -}}
           {{- $pogoType = "chips" }}

@@ -13,6 +13,7 @@ const menuManager = require('./menu-manager');
 let mainWindow;
 let mainWindowState;
 let mobilePreviewView;
+let mobilePreviewViewUrl;
 
 let mobilePreviewViewActive = false;
 let pogoconf = PoppyGoAppConfig();
@@ -27,6 +28,16 @@ function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
     <ul>${lookupsHtml}</ul>
 </body>
 </html>`));
+}
+
+function showPreviewWaitForServer(previewWindow){
+    previewWindow.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`
+    <html>
+        <body style="background-color:#ccc;font-family: sans-serif; padding: 2em">
+        <h3>Waiting for hugo server to start.</h3>
+        <p>When the site has just been imported, this can take a little a few minutes.</p>
+        </body>
+    </html>`));
 }
 
 
@@ -301,64 +312,82 @@ module.exports = {
         menuManager.createMainMenu();
     },
 
+    reloadMobilePreview: function(){
+        module.exports.setMobilePreviewUrl(mobilePreviewViewUrl);
+    },
+
     setMobilePreviewUrl: function(url){
-        mobilePreviewView.webContents.loadURL(url);
-        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
-        mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
+        mobilePreviewViewUrl = url;
         mobilePreviewView.webContents.session.clearCache(function(){return true});
+        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-empty');
+
+        if(global.currentServerProccess){
+            const net = require('net');
+            const client = new net.Socket();
+            const tryConnection = () => client.connect({port: 1313}, () => {
+
+                client.end();
+
+                console.log('previewurl');
+                mobilePreviewView.webContents.loadURL(url);
+                mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+                mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
+                //mobilePreviewView.webContents.loadURL('http://localhost:1313');
+                //mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+            }
+            );
+            client.on('error', (error) => {
+                mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
+                //setTimeout(tryConnection, 1000);
+           });
+            tryConnection();
+        }
+        else{
+            mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
+            showPreviewWaitForServer(mobilePreviewView);
+        }
+
     },
 
     openMobilePreview: function(){
 
-        console.log('preview');
-        console.log(global.hugoServer);
-        console.log(global.currentServerProccess);
+        //mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
+        //console.log(global.hugoServer);
+        //console.log(global.currentServerProccess);
 
-        mobilePreviewViewActive = true;
+        mobilePreviewView.webContents.session.clearCache(function(){return true});
+
+        //mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+        showPreviewWaitForServer(mobilePreviewView);
 
         if(global.currentServerProccess){
-            mobilePreviewView.webContents.loadURL('http://localhost:1313');
-            mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+            const net = require('net');
+            const client = new net.Socket();
+            const tryConnection = () => client.connect({port: 1313}, () => {
+
+                client.end();
+
+                console.log('preview');
+                mobilePreviewViewUrl = 'http://localhost:1313';
+                mobilePreviewView.webContents.loadURL(mobilePreviewViewUrl);
+                mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
+            }
+            );
+            client.on('error', (error) => {
+                mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
+                //setTimeout(tryConnection, 1000);
+            });
+            tryConnection();
+
         }
         else{
             mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
-            mobilePreviewView.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`
-            <html>
-<body style="font-family: sans-serif; padding: 2em">
-<h1>Waiting for Hugo Server</h1>
-<p>Waiting for hugo server to start...</p>
-<p>Have you started it?</p>
-<p id="points"></p>
-<script>
+            console.log(global.currentSitePath);
 
-    function tryServer(){
-        setTimeout(function () {
-            var url = "http://localhost:1313";
-            var http = new XMLHttpRequest();
-            var points = document.getElementById("points").innerHTML;
-            document.getElementById("points").innerHTML = points+".";
-
-            http.open('HEAD', url, false);
-            http.send();
-
-            if (http.status === 200) {
-                window.location.href = url;
-            }
-            else{
-                tryServer();
-            }
-
-        }, 2000);
-    }
-
- </script>
-
-</body>
-</html>`));
         }
 
 
-        mobilePreviewView.webContents.session.clearCache(function(){return true});
+        mobilePreviewViewActive = true;
         mainWindow.webContents.send("setMobileBrowserOpen");
         setMobilePreviewBounds();
 

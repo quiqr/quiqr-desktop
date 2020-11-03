@@ -41,7 +41,9 @@ class MenuManager {
     }
     stopServer() {
         mainWindow = global.mainWM.getCurrentInstanceOrNew();
-        mainWindow.webContents.send("disableMobilePreview");
+
+        //service.api.updateMobilePreviewUrl(previewUrl)
+        //mainWindow.webContents.send("disableMobilePreview");
         if(global.hugoServer){
             global.hugoServer.stopIfRunning(function(err, stdout, stderr){
                 if(err){
@@ -50,7 +52,10 @@ class MenuManager {
 
                 else{ resolve(); }
             });
+
+            global.mainWM.reloadMobilePreview();
         }
+
     }
     startServer() {
         console.log(global.hugoServer);
@@ -255,8 +260,17 @@ class MenuManager {
     }
 
     async selectSitesWindow () {
-        global.mainWM.closeSiteAndShowSelectSites();
+        if(global.hugoServer){
+            global.hugoServer.stopIfRunning(function(err, stdout, stderr){
+                if(err){
+                    console.log(err)
+                }
 
+                else{ resolve(); }
+            });
+        }
+
+        global.mainWM.closeSiteAndShowSelectSites();
         return;
     }
 
@@ -393,6 +407,12 @@ class MenuManager {
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.unlinkSiteDomain()
+                }
+            },
+            {
+                label: 'Reset all (dangerous)',
+                click: async () => {
+                    this.deleteSukohFolder()
                 }
             },
             {
@@ -585,17 +605,17 @@ class MenuManager {
                 label: 'Expert',
                 submenu: [
                     {
-                        label: 'Stop server',
-                        click: async () => {
-                            this.stopServer()
-                        }
-                    },
-                    {
                         id: 'start-server',
-                        label: 'Start server',
+                        label: 'Restart server',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.startServer()
+                        }
+                    },
+                    {
+                        label: 'Stop server',
+                        click: async () => {
+                            this.stopServer()
                         }
                     },
                     { type: 'separator' },
@@ -627,13 +647,6 @@ class MenuManager {
                         label: 'Show Log Window',
                         click: async () => {
                             this.createLogWindow()
-                        }
-                    },
-                    { type: 'separator' },
-                    {
-                        label: 'Reset all (dangerous)',
-                        click: async () => {
-                            this.deleteSukohFolder()
                         }
                     },
                     { type: 'separator' },

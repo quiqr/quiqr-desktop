@@ -64,6 +64,7 @@ type AppState = {
 }
 
 let style = require('./themes/default/style.js');
+let trySet = false;
 
 class App extends React.Component<AppProps,AppState>{
 
@@ -277,10 +278,16 @@ class App extends React.Component<AppProps,AppState>{
   }
 
     tryServer(){
-        setTimeout(function () {
-            service.api.openMobilePreview();
 
-        }, 2000);
+        if(!trySet){
+
+            trySet = true;
+            setTimeout(function () {
+                trySet = false;
+                service.api.openMobilePreview();
+
+            }, 2000);
+        }
     }
 
   render() {
@@ -358,6 +365,18 @@ class App extends React.Component<AppProps,AppState>{
 
       }} />
 
+          <Route path='/preview-empty' exact render={ ({match, history}) => {
+              this.history = history;
+
+              return (
+                  <MuiThemeProvider muiTheme={pogoDarkTheme}>
+                      <div style={{backgroundColor:"#ccc", height:"83px"}}>
+                      </div>
+                  </MuiThemeProvider>
+              )
+      }} />
+
+
           <Route path='/preview-buttons' exact render={ ({match, history}) => {
               this.history = history;
               return (
@@ -375,9 +394,7 @@ class App extends React.Component<AppProps,AppState>{
               this.tryServer();
               return (
                   <MuiThemeProvider muiTheme={pogoDarkTheme}>
-                      <div style={{backgroundColor:"#606060"}}>
-                          <p id="points"></p>
-
+                      <div style={{backgroundColor:"#ccc", height:"83px"}}>
                       </div>
                   </MuiThemeProvider>
               )
