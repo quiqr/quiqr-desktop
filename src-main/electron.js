@@ -27,6 +27,8 @@ if(app.isPackaged) {
     console.log('production!');
 }
 
+app.setAsDefaultProtocolClient('poppygo');
+
 require('events').EventEmitter.prototype._maxListeners = 15;
 
 //console.log(process.argv);
@@ -47,7 +49,6 @@ global.mainWM = mainWindowManager;
 let mainWindow;
 let previewWindow;
 let logWindow;
-
 function createWindow () {
     mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.on('closed', function () {

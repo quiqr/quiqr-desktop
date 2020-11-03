@@ -133,8 +133,7 @@
       "runAfterFinish": true,
       "unicode": true,
       "installerIcon": "public/icon.ico",
-      "differentialPackage": true,
-      "appPackageUrl": "https://someurl.tld/apps/win/web"
+      "differentialPackage": true
     },
     "mac": {
       "icon": "public/icon",
