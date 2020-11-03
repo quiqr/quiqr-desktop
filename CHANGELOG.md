@@ -1,5 +1,16 @@
 # PoppyGo App CHANGELOG
 
+## v0.7.2
+
+- detect if hugo server is running or not
+- show not running server in preview window
+- improve restart of hugo server
+
+## v0.7.1
+
+- auto generate menu
+- experimental menu
+
 ## v0.7.0
 
 - become a PoppyGo member
