@@ -44,6 +44,9 @@ class PogoPublisher {
             default:{ throw new Error('Not implemented.') }
         }
 
+        cmd = path.join(pathHelper.getApplicationResourcesDir, "bin", executable);
+        /*
+
         if(process.env.NODE_ENV === 'production'){
             if(enviromnent.platform == PLATFORMS.macOS){
                 cmd = path.join(rootPath, 'Contents','Resources','bin',executable);
@@ -55,6 +58,7 @@ class PogoPublisher {
         else{
             cmd = path.join(rootPath, 'resources',platform,executable);
         }
+        */
 
         return cmd;
     }

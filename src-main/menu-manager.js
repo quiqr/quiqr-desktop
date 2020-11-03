@@ -13,6 +13,7 @@ let configurationDataProvider = require('./configuration-data-provider')
 
 const rimraf = require("rimraf");
 const pathHelper = require('./path-helper');
+const fssimple = require('fs');
 const fs = require('fs-extra');
 const { shell } = require('electron')
 
@@ -126,12 +127,26 @@ class MenuManager {
     }
 
     showVersion(){
+        const idPath = path.join(pathHelper.getApplicationResourcesDir(),"all","build-git-id.txt");
+        const datePath = path.join(pathHelper.getApplicationResourcesDir(),"all", "build-date.txt");
+        let buildGitId = "";
+        let buildDate = "";
+        console.log(app.getAppPath());
+        console.log(datePath);
+
+        if(fs.existsSync(idPath)){
+            buildGitId = "\nBuild ID " + fssimple.readFileSync(idPath, {encoding:'utf8', flag:'r'}).replace("\n",'');
+        }
+        if(fs.existsSync(datePath)){
+            buildDate = "\nBuild Date " + fssimple.readFileSync(datePath, {encoding:'utf8', flag:'r'}).replace("\n",'');
+        }
+
         const dialog = electron.dialog;
 
         let options  = {
             buttons: ["Close"],
             title: "About",
-            message: "PoppyGo Version " + app.getVersion()
+            message: "PoppyGo Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate
         }
         dialog.showMessageBox(options)
     }
