@@ -35,6 +35,11 @@ task :buildwin do
   sh "npm run dist-win"
 end
 
+desc "buildlinux"
+task :buildlinux do
+  sh "BUILD_NUMBER=`git rev-parse --short HEAD` npm run dist-linux"
+end
+
 desc "release_win"
 task :release_win do
   data = getmeta
