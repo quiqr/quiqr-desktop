@@ -40,7 +40,7 @@ class GithubPublisher {
             default:{ throw new Error('Not implemented.') }
         }
 
-        cmd = path.join(pathHelper.getApplicationResourcesDir, "bin", executable);
+        cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
 
         return cmd;
     }
