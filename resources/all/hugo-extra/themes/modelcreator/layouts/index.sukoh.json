@@ -7,13 +7,18 @@
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
 {{- $generalMenu := slice -}}
+{{- $configItems := dict "title" "string" "description" "string" -}}
 
 {{/*------------------------------ Data -----------------------------*/}}
 
-{{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data)) }}
 
-{{- $singles = $singles | append (index $data "singles") }}
-{{- $dataMenu = $dataMenu | append (index $data "menu") }}
+{{- range $index, $file := readDir "/" -}}
+  {{- if eq $file "data" -}}
+      {{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data)) }}
+      {{- $singles = $singles | append (index $data "singles") }}
+      {{- $dataMenu = $dataMenu | append (index $data "menu") }}
+  {{- end -}}
+{{- end -}}
 
 {{- define "partials/createDataSingles" -}}
       {{- $dir := .dir -}}
@@ -62,24 +67,38 @@
             {{- end -}}
       {{- end -}}
 {{- else -}}
-      {{- $file := last (split $configFilePath "/") }}
-      {{- $file -}}
-      {{- if in .file "config" -}}
-          {{- partial "createParams" (dict "file" .file )}}
-          {{- partial "createMenus" (dict "file" .file )}}
+      {{ $config := readFile $configFilePath  }}
+      {{- if in $config "params" -}}
+          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $.Site.Params "configItems" $configItems) -}}
+          {{- $singles = $singles | append $single -}}
+          {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
       {{- end -}}
 {{- end -}}
 
 {{- define "partials/createParams" -}}
+
     {{- $path := path.Join .dir .file -}}
     {{- $ext := index (split .file ".") 1 -}}
     {{- $name := index (split .file ".") 0 -}}
     {{- $fields := slice -}}
-    {{- range $key, $value := .params -}}
-        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
-        {{- $fields = $fields | append $field -}}
+    {{- $single := dict -}}
+
+    {{- if eq .dir "/" -}}
+
+        {{- range $key, $value := .configItems -}}
+              {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+              {{- $fields = $fields | append $field -}}
+        {{- end -}}
+        {{- $fields = $fields | append (partial "createField" (dict "key" "params" "value" .params )) -}}
+        {{- $path = .file -}}
+    {{- else -}}
+        {{- range $key, $value := .params -}}
+              {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+              {{- $fields = $fields | append $field -}}
+        {{- end -}}
     {{- end -}}
-    {{- $single := (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+
+    {{- $single = (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
     {{- return $single -}}
 {{ end }}
 
@@ -330,7 +349,7 @@
             {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
 
             {{- range $key, $value := .Page.Params -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+                {{- $field := partial "createField" (dict "key" $key "value" $value ) -}}
                 {{- $fields = $fields | append $field -}}
             {{- end -}}
             {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle  -}}
