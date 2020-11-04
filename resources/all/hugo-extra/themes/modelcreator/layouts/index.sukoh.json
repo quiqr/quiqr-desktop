@@ -11,6 +11,7 @@
 {{/*------------------------------ Data -----------------------------*/}}
 
 {{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data)) }}
+
 {{- $singles = $singles | append (index $data "singles") }}
 {{- $dataMenu = $dataMenu | append (index $data "menu") }}
 
@@ -43,47 +44,68 @@
       {{- return (dict "singles" $singles "menu" $menu  )}}
 {{- end -}}
 
-{{/*------------------------------ Config, menus and params  -----------------------------*/}}
+{{/*------------------------------ Menus and Params  -----------------------------*/}}
 
 
 {{- $configFilePath := partial "configFile" . -}}
-{{- $fileExt := last 1 (index (split $configFilePath ".")) -}}
-{{- $configDir := "config/_default/" -}}
-{{- if in $configFilePath $configDir }}
+
+{{- if in $configFilePath "config/_default/" }}
       {{- range $index, $file := partial "rangeFiles"  (dict "dir" "config/_default/" ) -}}
-            {{- $path := path.Join $configDir .file -}}
-            {{- $ext := index (split .file ".") 1 -}}
-            {{- $name := index (split .file ".") 0 -}}
-            {{- $fields := slice -}}
-
-
-                {{- if in .file "params" -}}
-                    {{- range $key, $value := $.Site.Params -}}
-                        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
-                        {{- $fields = $fields | append $field -}}
-                    {{- end -}}
-                    {{- $singles = $singles | append (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
-                    {{- $generalMenu = $generalMenu | append (dict "key" $name ) -}}
-                {{- else if in .file "menu" -}}
-                    {{- range $key, $value := $.Site.Menus -}}
-                        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
-                        {{- $fields = $fields | append $field -}}
-                    {{- end -}}
-                    {{- $singles = $singles | append (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
-                    {{- $generalMenu = $generalMenu | append (dict "key" $name ) -}}
-                {{- end -}}
-
+            {{- if in .file "params" -}}
+                {{- $single := partial "createParams" (dict "file" .file  "dir" "config/_default/" "params" $.Site.Params) -}}
+                {{- $singles = $singles | append $single -}}
+                {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
+            {{- else if in .file "menu" -}}
+                {{- $single := partial "createMenus" (dict "file" .file  "dir" "config/_default/" "menus" $.Site.Menus) -}}
+                {{- $singles = $singles | append $single -}}
+                {{- $generalMenu = $generalMenu | append (dict "key" "menus" ) -}}
+            {{- end -}}
       {{- end -}}
 {{- else -}}
-  {{/*
-          {{- range $key, $value := $.Site.Params -}}
-              {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
-              {{- $fields = $fields | append $field -}}
-          {{- end -}}
-  */}}
+      {{- $file := last (split $configFilePath "/") }}
+      {{- $file -}}
+      {{- if in .file "config" -}}
+          {{- partial "createParams" (dict "file" .file )}}
+          {{- partial "createMenus" (dict "file" .file )}}
+      {{- end -}}
+{{- end -}}
+
+{{- define "partials/createParams" -}}
+    {{- $path := path.Join .dir .file -}}
+    {{- $ext := index (split .file ".") 1 -}}
+    {{- $name := index (split .file ".") 0 -}}
+    {{- $fields := slice -}}
+    {{- range $key, $value := .params -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
+        {{- $fields = $fields | append $field -}}
+    {{- end -}}
+    {{- $single := (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+    {{- return $single -}}
+{{ end }}
+
+
+{{- define "partials/createMenus" -}}
+    {{- $path := path.Join .dir .file -}}
+    {{- $ext := index (split .file ".") 1 -}}
+    {{- $name := index (split .file ".") 0 -}}
+    {{- $singles := slice -}}
+    {{- $fields := slice -}}
+    {{- range $menu, $items := .menus -}}
+          {{- $standardMenu := slice (dict "name" "string" "url" "string" "weight" 1 "parent" "string" "identifier" "string") -}}
+          {{- $fields = $fields | append (partial "createField" (dict "key" $menu "value" $standardMenu )) -}}
+    {{- end -}}
+    {{- $single := (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+    {{- return $single -}}
+{{- end -}}
+
+
+{{- define "partials/rangeMenu" -}}
+
+
 {{- end -}}
 
 {{/*------------------------ Home widgetpage ------------------------ */}}
+
 
 {{- $page := "/home/index.md" -}}
 {{- $homepage := site.GetPage $page -}}
@@ -335,7 +357,7 @@
         {{- $subfields := slice -}}
         {{- range $key, $value := $value -}}
                 {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "pogoType" $pogoType) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
                 {{- $subfields = $subfields | append $field}}
         {{- end -}}
         {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
@@ -343,14 +365,13 @@
 
     {{- if (eq $pogoType "accordion") -}}
         {{- $subfields := slice -}}
-        {{- range $key, $value := ( index $value 1 ) -}}
+        {{- range $key, $value := ( index $value 0 ) -}}
                 {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "pogoType" $pogoType) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
                 {{ if or (eq $key "name") (eq $key "title")}}
                     {{- $field = $field | merge (dict "arrayTitle" true ) -}}
                 {{- end -}}
-                {{- $subfields = $subfields | append $field}}
-
+                {{- $subfields = $subfields | append $field -}}
         {{- end -}}
         {{- $field = merge $field (dict "fields" $subfields ) -}}
     {{- end -}}
