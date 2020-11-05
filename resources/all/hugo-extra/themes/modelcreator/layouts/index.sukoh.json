@@ -76,15 +76,12 @@
 {{- end -}}
 
 {{- define "partials/createParams" -}}
-
     {{- $path := path.Join .dir .file -}}
     {{- $ext := index (split .file ".") 1 -}}
     {{- $name := index (split .file ".") 0 -}}
     {{- $fields := slice -}}
     {{- $single := dict -}}
-
     {{- if eq .dir "/" -}}
-
         {{- range $key, $value := .configItems -}}
               {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
               {{- $fields = $fields | append $field -}}
@@ -97,11 +94,9 @@
               {{- $fields = $fields | append $field -}}
         {{- end -}}
     {{- end -}}
-
     {{- $single = (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
     {{- return $single -}}
 {{ end }}
-
 
 {{- define "partials/createMenus" -}}
     {{- $path := path.Join .dir .file -}}
@@ -117,32 +112,24 @@
     {{- return $single -}}
 {{- end -}}
 
-
-{{- define "partials/rangeMenu" -}}
-
-
-{{- end -}}
-
 {{/*------------------------ Home widgetpage ------------------------ */}}
 
 
 {{- $page := "/home/index.md" -}}
 {{- $homepage := site.GetPage $page -}}
 {{- $homeSinglePages := slice -}}
-{{- $homeCollections := dict -}}
+{{- $homeCollections := slice -}}
 
 {{- range $index, $st :=  ($homepage.Resources.ByType "page") -}}
+  {{- $parentDir := (path.Dir (path.Dir $st.File.Dir)) -}}
   {{ if eq $st.File.Dir "home/" }}
     {{- $homeSinglePages = $homeSinglePages | append . -}}
-  {{ else if eq (path.Dir (path.Dir $st.File.Dir)) "home" }}
+  {{ else if eq $parentDir "home" }}
     {{- $homeSinglePages = $homeSinglePages | append . -}}
   {{ else }}
-
     {{- $path :=  path.Dir (path.Dir $st.File.Dir) -}}
-    {{- $pathDict := dict "page" $path }}
-
-    {{- if ne (index $homeCollections "page") ($path) -}}
-        {{- $homeCollections = $homeCollections | merge $pathDict -}}
+    {{- if not (in $homeCollections $path) -}}
+        {{- $homeCollections = $homeCollections | append $path -}}
         {{- $sectionKey := path.Base $path -}}
         {{- $sectionTitle :=  $sectionKey | humanize -}}
         {{- $itemTitle :=  ( $sectionKey | humanize) | singularize -}}
@@ -173,11 +160,8 @@
     {{- $collectionPages = $collectionPages | append . -}}
 {{- end -}}
 
-
-
 {{- range $collectionPages -}}
       {{- $collection := (partial "createCollection" . ) -}}
-
       {{- if gt (len $collection) 0 }}
           {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
           {{- $collections = $collections | append $collection -}}
@@ -193,11 +177,20 @@
     {{- end -}}
 {{- end -}}
 
-{{- range (where .Pages "Kind" "not in" .RegularPagesRecursive) -}}
-    {{- if .IsPage -}}
-      {{- $singlePages = $singlePages | append . -}}
+
+
+{{- if gt (len .RegularPagesRecursive) 0 -}}
+    {{- range (where .Pages "Kind" "not in" .RegularPagesRecursive) -}}
+        {{- if .IsPage -}}
+          {{- $singlePages = $singlePages | append . -}}
+        {{- end -}}
+    {{- end -}}
+{{- else -}}
+    {{- range .Pages -}}
+          {{- $singlePages = $singlePages | append . -}}
     {{- end -}}
 {{- end -}}
+
 
 {{- range $singlePages -}}
     {{- $single := (partial "createSingle" . ) -}}
@@ -282,7 +275,6 @@
             {{- path.Split (path.Base .File.Dir )| anchorize -}}
         {{- end -}}
     {{- else -}}
-
         {{- if .File.TranslationBaseName -}}
           {{- if in .File.TranslationBaseName "index" -}}
             {{- path.Split (path.Base .File.Dir )| anchorize -}}
@@ -303,34 +295,25 @@
     {{- else -}}
       {{- $pageTitle = (partial "createKey" . )  | humanize -}}
     {{- end -}}
-
     {{- $path := .RelPermalink }}
     {{- $file := printf "content/%s" .File.Path -}}
-    {{- $fields := slice -}}
-
-    {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
-
+    {{- $fields := slice (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
     {{- range $key, $value := .Params -}}
         {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
         {{- $fields = $fields | append $field -}}
     {{- end -}}
-
     {{- $previewUrl := "" -}}
     {{- if .RelPermalink  -}}
         {{- $previewUrl = .RelPermalink -}}
     {{- else }}
         {{- $previewUrl = "/" -}}
     {{- end -}}
-
-
     {{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields "previewUrl" $previewUrl -}}
     {{- return $single -}}
 {{- end -}}
 
 {{- define "partials/createCollection" -}}
-
     {{- $collection := "" -}}
-
     {{- $baseKey := (partial "createKey" . ) -}}
     {{- $sectionKey := printf "c_%s" $baseKey -}}
     {{- $sectionTitle :=  $baseKey| humanize -}}
@@ -338,16 +321,13 @@
     {{- $break := false }}
 
     {{- range .Pages -}}
-
         {{- if and .File (ne $break "true") -}}
             {{- $break = true -}}
             {{- $dir := printf "content/%s/" $baseKey  -}}
             {{/* - $extension := .File.Ext - */}}
             {{- $extension := .File.Ext -}}
             {{- $fields := slice -}}
-
             {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
-
             {{- range $key, $value := .Page.Params -}}
                 {{- $field := partial "createField" (dict "key" $key "value" $value ) -}}
                 {{- $fields = $fields | append $field -}}
@@ -362,12 +342,9 @@
 {{- define "partials/createField" -}}
     {{- $key := .key -}}
     {{- $value := .value -}}
-
     {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-
     {{- $title := humanize $key -}}
     {{- $field := dict "key" $key "title" $title "type" $pogoType -}}
-
     {{- if (eq $pogoType "date") -}}
         {{- $field = merge $field (dict "default" "now") -}}
     {{- end -}}
@@ -394,9 +371,7 @@
         {{- end -}}
         {{- $field = merge $field (dict "fields" $subfields ) -}}
     {{- end -}}
-
     {{- return $field -}}
-
 {{- end -}}
 
 {{- define "partials/pogoType" -}}
@@ -404,7 +379,6 @@
     {{- $key := .key -}}
     {{- $pogoType := "" -}}
     {{- $type := (printf "%T" $value) -}}
-
     {{- if (eq "bool" $type) -}}
       {{- $pogoType = "boolean" -}}
     {{- else if (or (eq "int" $type) (eq "int64" $type) (eq "float64" $type)) -}}
@@ -430,14 +404,8 @@
     {{- else -}}
       {{- $pogoType = "hidden" -}}
     {{- end -}}
-
     {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
         {{- $pogoType = "hidden" -}}
     {{- end -}}
-
-    {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
-        {{- $pogoType = "hidden" -}}
-    {{- end -}}
-
     {{- return $pogoType -}}
 {{- end -}}
