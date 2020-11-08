@@ -61,7 +61,7 @@
                 {{- $singles = $singles | append $single -}}
                 {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
             {{- else if in .file "menu" -}}
-                {{- $single := partial "createMenus" (dict "file" .file  "dir" "config/_default/" "menus" $.Site.Menus) -}}
+                {{- $single := partial "createMenus" (dict "file" .file  "dir" "config/_default/" "menus" $.Site.Menus "key" "menus") -}}
                 {{- $singles = $singles | append $single -}}
                 {{- $generalMenu = $generalMenu | append (dict "key" "menus" ) -}}
             {{- end -}}
@@ -70,6 +70,11 @@
       {{ $config := readFile $configFilePath  }}
       {{- if in $config "params" -}}
           {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $.Site.Params "configItems" $configItems) -}}
+          {{- $singles = $singles | append $single -}}
+          {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
+      {{- end -}}
+      {{- if in $config "menu" -}}
+          {{- $single := partial "createMenus" (dict "file" $configFilePath  "dir" "/" "menus" $.Site.Menus "key" "menus" ) -}}
           {{- $singles = $singles | append $single -}}
           {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
       {{- end -}}
@@ -94,21 +99,28 @@
               {{- $fields = $fields | append $field -}}
         {{- end -}}
     {{- end -}}
-    {{- $single = (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+    {{- $single = (dict "key" $name "title" "Settings" "file" $path "dataformat" $ext "fields" $fields) -}}
     {{- return $single -}}
 {{ end }}
 
 {{- define "partials/createMenus" -}}
     {{- $path := path.Join .dir .file -}}
     {{- $ext := index (split .file ".") 1 -}}
-    {{- $name := index (split .file ".") 0 -}}
     {{- $singles := slice -}}
     {{- $fields := slice -}}
-    {{- range $menu, $items := .menus -}}
-          {{- $standardMenu := slice (dict "name" "string" "url" "string" "weight" 1 "parent" "string" "identifier" "string") -}}
-          {{- $fields = $fields | append (partial "createField" (dict "key" $menu "value" $standardMenu )) -}}
+    {{- $standardMenu := slice (dict "name" "string" "url" "string" "weight" 1 "parent" "string" "identifier" "string") -}}
+    {{- if eq .dir "/" -}}
+        {{- $menus := dict}}
+        {{- range $menu, $items := .menus -}}
+              {{- $menus = $menus | merge (dict $menu $standardMenu) -}}
+        {{- end -}}
+        {{- $fields = $fields | append (partial "createField" (dict "key" "menu" "value" $menus )) -}}
+    {{- else -}}
+        {{- range $menu, $items := .menus -}}
+              {{- $fields = $fields | append (partial "createField" (dict "key" $menu "value" $standardMenu )) -}}
+        {{- end -}}
     {{- end -}}
-    {{- $single := (dict "key" $name "title" $name "file" $path "dataformat" $ext "fields" $fields) -}}
+    {{- $single := dict "key" .key "title" (.key | humanize) "file" $path "dataformat" $ext "fields" $fields -}}
     {{- return $single -}}
 {{- end -}}
 
