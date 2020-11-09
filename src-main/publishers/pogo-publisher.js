@@ -67,12 +67,13 @@ class PogoPublisher {
         let pubkey = '';
         var git_bin = this.getGitBin();
         var sukohdir = pathHelper.getRoot();
-        //console.log(git_bin);
 
         try {
             let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
             outputConsole.appendLine('Keygen success ...');
-            pubkey = await fs.readFileSync(sukohdir+"/id_rsa_pogo.pub");
+            pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+
+
         } catch (e) {
             outputConsole.appendLine('keygen error ...:' + e);
         }
@@ -81,7 +82,13 @@ class PogoPublisher {
     }
 
     async writeProfile(profile){
-        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+        var sukohdir = pathHelper.getRoot();
+        var profilepath = path.join(pathHelper.getRoot(), "poppygo-profile.json");
+        var profilepathDir = path.join(pathHelper.getRoot(),"profiles", profile.username);
+        var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
+
+        await fs.ensureDir(path.join(pathHelper.getRoot(),"profiles"))
+        await fs.ensureDir(profilepathDir)
 
         let newProfile={
             "username":profile.username
@@ -89,9 +96,29 @@ class PogoPublisher {
 
         await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
         await fs.chmodSync(profilepath, '0600');
+        await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
+        await fs.chmodSync(profilepath2, '0600');
+
+        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
+        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
+        await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
+
         return true;
     }
     async readProfile(){
+        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+        var profile;
+        try {
+            const filecont = fs.readFileSync(profilepath, {encoding:'utf8', flag:'r'});
+            profile = JSON.parse(filecont);
+        } catch (e) {
+            profile = false;
+        }
+
+        return profile;
+    }
+
+     readProfile2(){
         var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
         var profile;
         try {
@@ -167,8 +194,6 @@ class PogoPublisher {
 
         let mainWindow = global.mainWM.getCurrentInstance();
         mainWindow.webContents.send("lastPublishedChanged");
-
-
     }
 
     async writePublishStatus(){

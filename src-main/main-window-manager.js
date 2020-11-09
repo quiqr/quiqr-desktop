@@ -316,6 +316,7 @@ module.exports = {
         module.exports.setMobilePreviewUrl(mobilePreviewViewUrl);
     },
 
+
     setMobilePreviewUrl: function(url){
         mobilePreviewViewUrl = url;
         mobilePreviewView.webContents.session.clearCache(function(){return true});
