@@ -245,8 +245,11 @@ class WorkspaceService{
         let supportedContentExt = ['md','html','markdown'];
         if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
             // TODO config for allowing all files
-            //let globExpression = path.join(folder, `**/index.{${supportedContentExt.join(',')}}`);
-            let globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
+            let globExpression = path.join(folder, `**/?(_)index.{${supportedContentExt.join(',')}}`);
+
+            //WHEN WE WANT TO IGNORE _index.md front pages
+            //let globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
+
             let files = await globJob(globExpression, {});
             let retFiles = files.map(function(item){
 
