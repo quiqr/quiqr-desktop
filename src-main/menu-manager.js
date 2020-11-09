@@ -330,6 +330,67 @@ class MenuManager {
         console.log(subdir);
     }
 
+    createProfilesMenu(){
+
+        const profilesDir = path.join(pathHelper.getRoot(),"profiles")
+
+        let profilesMenu = [];
+
+        let currentProfile = ""
+        let pogopubl = new PogoPublisher({});
+        let readCurrentProfile = pogopubl.readProfile2()
+        if(readCurrentProfile){
+            currentProfile = readCurrentProfile.username;
+
+            profilesMenu.push({
+                id: 'rm-pogo-profile',
+                label: "Unset profile",
+                click: async function (){
+                    fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
+                    this.createMainMenu();
+                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                    mainWindow.reload();
+                }.bind(this)
+            });
+            profilesMenu.push( { type: 'separator' });
+        }
+
+        if(fs.existsSync(profilesDir)){
+            var files = fs.readdirSync(profilesDir);
+            files.forEach(function(f){
+                let label = "";
+                let checked = false;
+                if(lstatSync(path.join(profilesDir,f)).isDirectory()){
+                    label = f;
+                    if(f == currentProfile){
+                        checked = true;
+                    }
+                    profilesMenu.push({
+                        id: f,
+                        type: "checkbox",
+                        label: label,
+                        checked: checked,
+                        click: async function (){
+                            let key = path.join(profilesDir,f,"id_rsa_pogo");
+                            let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
+                            let profileJson= path.join(profilesDir,f,"poppygo-profile.json");
+                            fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
+                            fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
+                            fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
+                            await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
+                            this.createMainMenu();
+                            mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                            mainWindow.reload();
+                        }.bind(this)
+                    });
+                }
+            }.bind(this));
+            return profilesMenu;
+        }
+
+        return [];
+    }
+
     createVersionsMenu(){
         if(global.currentSiteKey && global.currentWorkspaceKey){
             let siteKey = global.currentSiteKey;
@@ -402,6 +463,11 @@ class MenuManager {
     }
     createExperimentalMenu(){
         let expMenu = [
+            {
+                id: 'switch-profile',
+                label: 'Switch profile',
+                submenu: this.createProfilesMenu()
+            },
             {
                 id: 'switch-version',
                 label: 'Site versions',
