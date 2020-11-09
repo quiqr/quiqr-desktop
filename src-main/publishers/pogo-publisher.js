@@ -44,16 +44,19 @@ class PogoPublisher {
             default:{ throw new Error('Not implemented.') }
         }
 
+
         if(process.env.NODE_ENV === 'production'){
-            if(enviromnent.platform == PLATFORMS.macOS){
+            cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
+            /*if(enviromnent.platform == PLATFORMS.macOS){
                 cmd = path.join(rootPath, 'Contents','Resources','bin',executable);
             }
             else{
                 cmd = path.join(rootPath, 'resources','bin',executable);
             }
+            */
         }
         else{
-            cmd = path.join(rootPath, 'resources',platform,executable);
+            cmd = path.join(rootPath, 'resources', platform, executable);
         }
 
         return cmd;
@@ -174,8 +177,6 @@ class PogoPublisher {
         var newConf = JSON.parse(conftxt);
         newConf.lastPublish = Date.now();
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        console.log(newConf);
-        console.log(configJsonPath);
         let mainWindow = global.mainWM.getCurrentInstance();
         mainWindow.webContents.send("lastPublishedChanged");
     }
@@ -195,7 +196,6 @@ class PogoPublisher {
                 defaultDomain: domain
             }
         });
-        //console.log(newConf);
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
     }
 
@@ -251,7 +251,7 @@ class PogoPublisher {
 
         //var profile = await this.readProfile();
         var repository = this._config.path;
-        var group = "sites";
+        var group = (this._config.group?this._config.group:"sites");
 
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
         var full_gh_url = 'git@gitlab.brepi.eu:' + group + '/' + repository +'.git';

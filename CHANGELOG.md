@@ -5,6 +5,7 @@
 - detect if hugo server is running or not
 - show not running server in preview window
 - improve restart of hugo server
+- autoimport by clicking link in browser for Windows & Linux (poppygo://)
 
 ## v0.7.1
 

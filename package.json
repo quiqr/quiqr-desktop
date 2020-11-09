@@ -66,15 +66,18 @@
     "_copy-electron-code": "copyfiles -u 1 -V \"./src-main/**/*\" \"./build/electron/\"",
     "_copy-ace": "copyfiles -u 3 -V \"./node_modules/ace-editor-builds/src-min-noconflict/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
     "_copy_ace_extras": "copyfiles -u 2 -V \"./extras/ace-editor/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
-    "_react-build": "cross-env CI=false react-scripts build",
+    "_react-build": "cross-env CI=false react-scripts build && npm run _set-build-git-id && npm run _set-build-date",
     "_rebuild-native": "cross-env VisualStudioVersion=15.0 npm install --build-from-source",
+    "_set-build-git-id": "echo `git rev-parse --short HEAD` > resources/all/build-git-id.txt",
+    "_set-build-date": "echo \"$(date +%F\\ %R) in Amsterdam\" > resources/all/build-date.txt",
     "_electron-dist-win": "npm run _copy-electron-code && electron-builder",
     "_electron-dist-linux-deb": "npm run _copy-electron-code && electron-builder --linux deb",
     "_electron-dist-linux": "npm run _copy-electron-code && electron-builder",
     "_electron-dist-linux-all": "npm run _electron-dist-linux && electron-builder --linux deb",
     "_electron-dist-mac": "npm run _copy-electron-code && electron-builder",
     "dist-win": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win",
-    "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
+    "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux",
+    "dist-linux-all": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
     "dist-mac": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-mac",
     "dist-mac-unsigned": "CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist-mac",
     "dist-mac-notarize": "node scripts/notarize.js",
@@ -141,6 +144,15 @@
       "entitlements": "build/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "linux": {
+      "icon": "public/icon",
+      "target": [
+        {
+          "target": "AppImage"
+        }
+      ],
+      "category": "office"
     },
     "fileAssociations": [
       {

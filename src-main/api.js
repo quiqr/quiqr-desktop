@@ -450,10 +450,10 @@ api.createSite = function(config/*: any*/, context/*: any*/){
 }
 
 api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
+    console.log("jhaallo");
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }
         siteService.publish(publishKey).then(()=>{
-            console.log("jhaallo");
             context.resolve();
         }, ()=>{
             context.reject(err);
