@@ -44,16 +44,8 @@ class PogoPublisher {
             default:{ throw new Error('Not implemented.') }
         }
 
-
         if(process.env.NODE_ENV === 'production'){
             cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
-            /*if(enviromnent.platform == PLATFORMS.macOS){
-                cmd = path.join(rootPath, 'Contents','Resources','bin',executable);
-            }
-            else{
-                cmd = path.join(rootPath, 'resources','bin',executable);
-            }
-            */
         }
         else{
             cmd = path.join(rootPath, 'resources', platform, executable);
@@ -274,7 +266,6 @@ class PogoPublisher {
 
         var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
-        //var profile = await this.readProfile();
         var repository = this._config.path;
         var group = (this._config.group?this._config.group:"sites");
 
@@ -284,37 +275,10 @@ class PogoPublisher {
         var gitignore = "/public\n\
 .sukoh\n";
 
-        var gitlabCi = "image: registry.gitlab.com/pages/hugo:latest\n\
-test:\n\
-  script:\n\
-  - hugo\n\
-  except:\n\
-  - master\n\
-pages:\n\
-  script:\n\
-  - hugo --minify\n\
-  - find public -type f -regex '.*\\.\\(htm\\|html\\|txt\\|text\\|js\\|css\\)$' -exec gzip -f -k {} \\;\n\
-  artifacts:\n\
-    paths:\n\
-    - public\n\
-  only:\n\
-  - master\n\
-pogoform:\n\
-  image: 'node:latest'\n\
-  script:\n\
-  - echo 'INSTALL SSH AUTH'\n\
-  - mkdir /root/.ssh\n\
-  - echo \"$SSH_PRIVATE_KEY\" > /root/.ssh/id_rsa\n\
-  - chmod 700 /root/.ssh\n\
-  - chmod 600 /root/.ssh/id_rsa\n\
-  - echo 'POPULATE KNOWN HOSTS'\n\
-  - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
-  - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
-  - scp -r poppygo/forms/* pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY/\n\
-  rules:\n\
-    - if: '$POGOFORM_GATEWAY'\n\
-      when: always\n\
-    - when: never\n";
+        var gitlabCi = "include:\n\
+  - project: 'platform/pogo-include'\n\
+    ref: master\n\
+    file: '/main.yml'\n";
 
         var git_bin = this.getGitBin();
 
@@ -323,14 +287,6 @@ pogoform:\n\
         await fs.ensureDir(resolvedDest);
         await fs.emptyDir(resolvedDest);
         await fs.ensureDir(resolvedDest);
-
-        //outputConsole.appendLine('Writing temporaty key ' + pogokeypath);
-
-        //await fs.writefilesync(pogokeypath, this._config.privatekey, 'utf-8');
-        //await fs.chmodsync(pogokeypath, '0600');
-
-        //const sshkeyscan = await spawnAw("ssh-keyscan" , ["-H", "gitlab.brepi.eu");
-        //console.log(sshkeyscan.toString());
 
         progressBar.value += 10;
         progressBar.detail = 'Get remote website files for synchronization';
@@ -420,6 +376,7 @@ pogoform:\n\
                                         this.writePublishStatus();
 
                                         dialog.showMessageBox(mainWindow, {
+											title: 'PoppyGo',
                                             type: 'info',
                                             message: "Your updates have been published. \n In a few minutes changes will be visible.",
                                         });
@@ -431,6 +388,7 @@ pogoform:\n\
                                         progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
+											title: 'PoppyGo',
                                             type: 'warning',
                                             message: "Publishing failed. (git-push)",
                                         });
@@ -442,6 +400,7 @@ pogoform:\n\
                                 progressBar._window.hide();
                                 progressBar.close();
                                 dialog.showMessageBox(mainWindow, {
+									title: 'PoppyGo',
                                     type: 'warning',
                                     message: "Publishing failed. (git-commit)",
                                 });
@@ -454,6 +413,7 @@ pogoform:\n\
                         progressBar._window.hide();
                         progressBar.close();
                         dialog.showMessageBox(mainWindow, {
+							title: 'PoppyGo',
                             type: 'warning',
                             message: "Publishing failed. (git-add)",
                         });
@@ -466,6 +426,7 @@ pogoform:\n\
                 progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {
+					title: 'PoppyGo',
                     type: 'warning',
                     message: "Publishing failed. (git-clone)",
                 });
