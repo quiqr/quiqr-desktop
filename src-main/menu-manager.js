@@ -326,6 +326,52 @@ class MenuManager {
             mainWindow.webContents.send("redirectHome")
         }
     }
+
+    async extractProfileFromOldSiteConf(){
+
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
+            configurationDataProvider.get(function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+                if(siteData==null) {
+                    //throw new Error('Could not find site is empty.');
+                }
+                else{
+                    siteService = new SiteService(siteData);
+                }
+
+            });
+            if(siteService == null){
+                return;
+            }
+
+            let key = siteService._config.publish[0].config.privatekey;
+            let pubkey = siteService._config.publish[0].config.privatekey;
+            let username = siteService._config.publish[0].config.path;
+            const profilesDir = path.join(pathHelper.getRoot(),"profiles");
+            const profilepathDir = path.join(pathHelper.getRoot(),"profiles",username);
+            await fs.ensureDir(profilepathDir);
+
+            var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
+            var profilepathKey= path.join(profilepathDir, "id_rsa_pogo");
+            var profilepathKeyPub= path.join(profilepathDir, "id_rsa_pogo.pub");
+
+            let newProfile={
+                "username": username
+            }
+
+            await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
+            await fs.chmodSync(profilepath2, '0600');
+            await fs.writeFileSync(profilepathKey, key, 'utf-8');
+            await fs.writeFileSync(profilepathKeyPub, pubkey, 'utf-8');
+            await fs.chmodSync(profilepathKey, '0600');
+        }
+    }
     async selectSiteVersion(subdir){
         console.log(subdir);
     }
@@ -518,6 +564,12 @@ class MenuManager {
                         label: 'Front page',
                         click: async () => {
                             this.openHome()
+                        }
+                    },
+                    {
+                        label: 'Extra profile from siteconf',
+                        click: async () => {
+                            this.extractProfileFromOldSiteConf()
                         }
                     },
                 ]
