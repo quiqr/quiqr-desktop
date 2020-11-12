@@ -13,7 +13,7 @@
 
 
 {{- range $index, $file := readDir "/" -}}
-  {{- if eq $file "data" -}}
+  {{- if eq $file.Name "data" -}}
       {{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data)) }}
       {{- $singles = $singles | append (index $data "singles") }}
       {{- $dataMenu = $dataMenu | append (index $data "menu") }}
@@ -37,9 +37,11 @@
                       {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
                       {{- $fields = $fields | append $field -}}
                   {{- end -}}
-                  {{- $single :=  dict "key" $dataKey "title" $title "file" $path "dataformat" $fileExt "fields" $fields "previewUrl" "/" -}}
-                  {{- $singles = $singles | append $single -}}
-                  {{- $menu = $menu | append (dict "key" (index $single "key")) -}}
+                  {{- if gt (len $fields) 0 -}}
+                      {{- $single :=  dict "key" $dataKey "title" $title "file" $path "dataformat" $fileExt "fields" $fields "previewUrl" "/" -}}
+                      {{- $singles = $singles | append $single -}}
+                      {{- $menu = $menu | append (dict "key" (index $single "key")) -}}
+                  {{- end -}}
             {{ else }}
                   {{- $data := partial "createDataSingles" (dict "dir" $file.dir "data" (index $data .node) ) -}}
                   {{- $singles = $singles | append (index $data "singles") -}}
@@ -125,6 +127,24 @@
     {{- $single := dict "key" .key "title" (.key | humanize) "file" $path "dataformat" $ext "fields" $fields -}}
     {{- return $single -}}
 {{- end -}}
+
+{{/*
+{{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static")) -}}
+{{- $generalMenu = $generalMenu | append (dict "key" "staticimages" ) -}}
+
+{{- define "partials/staticBundleManager" -}}
+        {{- $fields := slice -}}
+        {{- $dir := .dir -}}
+        {{- range (readDir $dir) -}}
+            {{- if .IsDir -}}
+                {{ $path := printf "%s/" .Name }}
+                  {{- $fields = $fields | append (partial "createField" (dict "key" .Name "value" $path "type" "bundle-manager")) -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $single := (dict "key" "staticimages" "title" "Site Images" "file" "static/poppygo.yml" "dataformat" "yml" "fields" $fields) -}}
+        {{- return $single -}}
+{{- end -}}
+*/}}
 
 {{/*------------------------ Home widgetpage ------------------------ */}}
 
@@ -432,12 +452,14 @@
         {{- range $key, $value := ( index $value 0 ) -}}
                 {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
                 {{- $field := partial "createField" (dict "value" $value "key" $key) -}}
-                {{ if or (eq $key "name") (eq $key "title")}}
+                {{ if or (eq $key "name") (eq $key "title") (eq $key "line")}}
                     {{- $field = $field | merge (dict "arrayTitle" true ) -}}
                 {{- end -}}
                 {{- $subfields = $subfields | append $field -}}
         {{- end -}}
-        {{- $field = merge $field (dict "fields" $subfields ) -}}
+        {{- if gt (len $subfields) 0 -}}
+            {{- $field = merge $field (dict "fields" $subfields ) -}}
+        {{- end -}}
     {{- end -}}
 
     {{- if (eq $pogoType "bundle-manager") -}}
