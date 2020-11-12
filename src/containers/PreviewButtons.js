@@ -33,7 +33,7 @@ class PreviewButtons extends React.Component{
             <div style={{padding:10 }}>
                 <TextField
                 value={this.state.previewPath}
-                errorText="previewing above path"
+                errorText="Preview"
                 errorStyle={{color:"#03DAC5"}}
                 disabled={false}
                 floatingLabelFixed={true}

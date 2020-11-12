@@ -31,7 +31,7 @@ const styles = {
         height: '100%'
     },
     sitesCol: {
-        flex: '0 0 280px',
+        flex: '0 0 100%',
         overflowY:'auto',
         overflowX:'hidden',
         userSelect:'none',
@@ -238,8 +238,8 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                         {this.renderSelectSites()}
 
                         <div style={styles.selectedSiteCol}>
-                            <Wrapper title="Site Management">
-                                <MessageBlock>Please, select a site.</MessageBlock>
+                            <Wrapper title="">
+                                <MessageBlock></MessageBlock>
                             </Wrapper>
                         </div>
                         <CreateSiteDialog

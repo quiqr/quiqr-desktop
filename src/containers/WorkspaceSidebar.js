@@ -148,19 +148,19 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
                     <List style={{padding: 0}}>
                         <ListItem
                         primaryText={siteConfig.name}
-                        secondaryText="Dashboard, publish and help"
+                        secondaryText="Publish and help"
                         onClick={onClick}
                         leftIcon={<IconHome color="white" style={{}} />}
                         />
                         <ListItem
-                        primaryText="Mobile preview"
+                        primaryText="Preview on the side"
                         onClick={(e,value)=>{ this.toggleMobilePreview() }}
-                        secondaryText="Open preview panel"
+                        secondaryText=""
                         rightIcon={mobilePreviewToggle}
                         leftIcon={<IconPhone color="white"  />} />
                         <ListItem
-                        primaryText="Browser preview"
-                        secondaryText="Preview in default browser"
+                        primaryText="Preview in browser"
+                        secondaryText=""
                         onClick={ ()=>{this.handleOpenInBrowser()} }
                         leftIcon={<IconOpenBrowser color="white" style={{marginRight:0}} />} />
                     </List>
@@ -191,7 +191,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         return (
             <List>
                 <ListItem
-                secondaryText={'select a website'}
+                secondaryText={'Select site'}
                 onClick={onClick}
                 rightIcon={<IconActionSetting color={translucentColor} />}
                 />

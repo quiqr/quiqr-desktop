@@ -240,9 +240,9 @@ class PogoPublisher {
 
         var progressBar = new ProgressBar({
             indeterminate: false,
-            text: 'Publishing website..',
+            text: 'Publishing your site..',
             abortOnError: true,
-            detail: 'Preparing upload..',
+            detail: 'Uploading to PoppyGo servers',
             browserWindow: {
                 frame: false,
                 parent: mainWindow,
@@ -253,7 +253,7 @@ class PogoPublisher {
         });
 
         progressBar.on('completed', function() {
-            progressBar.detail = 'The website has been uploaded.';
+            progressBar.detail = 'Your site has been uploaded.';
         })
             .on('aborted', function(value) {
                 console.info(`aborted... ${value}`);
@@ -289,9 +289,9 @@ class PogoPublisher {
         await fs.ensureDir(resolvedDest);
 
         progressBar.value += 10;
-        progressBar.detail = 'Get remote website files for synchronization';
+        progressBar.detail = 'Getting live site files for synchronization';
 
-        outputConsole.appendLine('Start cloning from: ' + full_gh_url);
+        outputConsole.appendLine('Cloning from: ' + full_gh_url);
 
         let clonecmd = spawn( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
 
@@ -305,7 +305,7 @@ class PogoPublisher {
                 outputConsole.appendLine('Clone succes ...');
 
                 progressBar.value += 10;
-                progressBar.detail = 'Synchronizing last changes';
+                progressBar.detail = 'Synchronizing your last changes';
 
                 //console.log(full_gh_dest + '/.git');
                 //console.log(full_gh_dest + '/.gitmove');
@@ -329,7 +329,7 @@ class PogoPublisher {
                 outputConsole.appendLine('copy finished, going to git-add ...');
 
                 progressBar.value += 10;
-                progressBar.detail = 'Registering changes with destination';
+                progressBar.detail = 'Copying your changes to PoppyGo servers';
 
                 var spawn = require("child_process").spawn;
                 let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
@@ -370,7 +370,7 @@ class PogoPublisher {
                                     if(code==0){
                                         outputConsole.appendLine('git-push finished ... changes are published.');
                                         progressBar.value = 100;
-                                        progressBar.detail = 'Uploading finished';
+                                        progressBar.detail = 'Successfully copied your changes';
                                         progressBar.setCompleted();
                                         progressBar._window.hide();
                                         progressBar.close();
@@ -380,7 +380,7 @@ class PogoPublisher {
                                         dialog.showMessageBox(mainWindow, {
 											title: 'PoppyGo',
                                             type: 'info',
-                                            message: "Your updates have been published. \n In a few minutes changes will be visible.",
+                                            message: "Succesfully published your changes. \n They will be visible in a minute or two.",
                                         });
 
                                     }
