@@ -56,7 +56,7 @@ class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps,Delet
       ]}
       >
           {this.state.valid? undefined :
-              <p>Do you really want to delete the item <b>"{itemLabel}"</b>?</p>}
+              <p>Do you really want to delete <b>"{itemLabel}"</b>?</p>}
 
           { busy ? <Spinner /> : undefined }
 

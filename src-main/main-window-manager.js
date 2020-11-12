@@ -34,8 +34,9 @@ function showPreviewWaitForServer(previewWindow){
     previewWindow.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`
     <html>
         <body style="background-color:#ccc;font-family: sans-serif; padding: 2em">
-        <h3>Waiting for hugo server to start.</h3>
-        <p>When the site has just been imported, this can take a little a few minutes.</p>
+        <h3>Starting preview..</h3>
+        <p>PoppyGo is building your site. </p>
+        <p>It can take a minute or two the first time.</p>
         </body>
     </html>`));
 }

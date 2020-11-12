@@ -163,7 +163,7 @@ export default class ClaimDomainDialog extends React.Component{
         let previewUrl = this.state.pogourl.replace(/\./g,"-");
         return (
             <div>
-                <TextField disabled={busy} errorText={this.state.pogourl_err} floatingLabelText={'PoppyGo Domain'} value={this.state.pogourl} onChange={(e)=>{this.handlepogourlChange(e)}} fullWidth />
+                <TextField disabled={busy} errorText={this.state.pogourl_err} floatingLabelText={'PoppyGo URL'} value={this.state.pogourl} onChange={(e)=>{this.handlepogourlChange(e)}} fullWidth />
                 <Paper style={{margin:10,padding:"0 7px 7px 7px"}}>
                     <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span>.pogosite.com</span>
                 </Paper>
@@ -202,7 +202,7 @@ export default class ClaimDomainDialog extends React.Component{
 
         return (
             <Dialog
-                title="Claim your PoppyGo domain for easy publishing to the web"
+                title="Claim your PoppyGo URL for easy publishing to the web"
                 open={open}
                 actions={actions}>
 

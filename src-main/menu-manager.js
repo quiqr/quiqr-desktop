@@ -88,8 +88,8 @@ class MenuManager {
             const dialog = electron.dialog;
             dialog.showMessageBox(mainWindow, {
                 buttons: ["Close"],
-                title: "Missing software",
-                message: "We need to download hugo "+hugover+" for this functionality. Try again when download has finished",
+                title: "PoppyGo will now download hugo " + hugover,
+                message: "Try again when download has finished",
             });
 
             try{
@@ -115,7 +115,7 @@ class MenuManager {
                 let options  = {
                     title: "Please confirm",
                     buttons: ["Yes","Cancel"],
-                    message: "Copy sukoh.json to "+global.currentSitePath+"? (Old version will be overwritten)"
+                    message: "Copy sukoh.json to "+global.currentSitePath+"? (Previous json will be overwritten)"
                 }
                 let response = dialog.showMessageBox(options)
                 if(response === 1) return;
@@ -465,7 +465,7 @@ class MenuManager {
         let expMenu = [
             {
                 id: 'switch-profile',
-                label: 'Switch profile',
+                label: 'Switch user',
                 submenu: this.createProfilesMenu()
             },
             {
@@ -476,7 +476,7 @@ class MenuManager {
             },
             {
                 id: 'auto-create-model',
-                label: 'Generatate PoppyGo Model',
+                label: 'Generate PoppyGo config',
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.generateModel()
@@ -551,21 +551,21 @@ class MenuManager {
                 label: 'File',
                 submenu: [
                     {
-                        label: 'Select website',
+                        label: 'Select site',
                         click: async () => {
                             this.selectSitesWindow();
                         }
                     },
                     { type: 'separator' },
                     {
-                        label: 'Import website',
+                        label: 'Import site',
                         click: async () => {
                             pogozipper.importSite()
                         }
                     },
                     {
                         id: 'export-site',
-                        label: 'Export website',
+                        label: 'Export site',
                         enabled: this.siteSelected(),
                         click: async () => {
                             pogozipper.exportSite()
@@ -574,7 +574,7 @@ class MenuManager {
                     {
                         id: 'delete-site',
                         enabled: this.siteSelected(),
-                        label: 'Delete Site',
+                        label: 'Delete site',
                         click: async () => {
                             this.deleteSite()
                         }
@@ -626,6 +626,7 @@ class MenuManager {
                     { role: 'cut' },
                     { role: 'copy' },
                     { role: 'paste' },
+                    /*
                     ...(isMac ? [
                         { role: 'pasteAndMatchStyle' },
                         { role: 'delete' },
@@ -642,15 +643,15 @@ class MenuManager {
                         { role: 'delete' },
                         { type: 'separator' },
                         { role: 'selectAll' },
-                        /*
+
                     {
                         label: 'Preferences',
                         click: async () => {
                             createPrefsWindow()
                         }
                     }
-                    */
-                    ])
+
+                  ])*/
                 ]
             },
             {
@@ -687,14 +688,14 @@ class MenuManager {
                 submenu: [
                     {
                         id: 'start-server',
-                        label: 'Restart server',
+                        label: 'Restart preview',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.startServer()
                         }
                     },
                     {
-                        label: 'Stop server',
+                        label: 'Stop preview',
                         click: async () => {
                             this.stopServer()
                         }
@@ -702,7 +703,7 @@ class MenuManager {
                     { type: 'separator' },
                     {
                         id: 'open-site-dir',
-                        label: 'Open Site Directory',
+                        label: 'Open site directory',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.openWorkSpaceDir()
@@ -710,7 +711,7 @@ class MenuManager {
                     },
                     {
                         id: 'open-site-conf',
-                        label: 'Open Workspace Config',
+                        label: 'Open workspace config',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.openWorkSpaceConfig()
@@ -718,21 +719,21 @@ class MenuManager {
                     },
                     { type: 'separator' },
                     {
-                        label: 'Open Form Cookbooks',
+                        label: 'Config docs',
                         click: async () => {
                             this.openCookbooks()
                         }
                     },
                     { type: 'separator' },
                     {
-                        label: 'Show Log Window',
+                        label: 'Show Logs',
                         click: async () => {
                             this.createLogWindow()
                         }
                     },
                     { type: 'separator' },
                     {
-                        label: 'Experimental features',
+                        label: 'Enable experimental',
                         type: "checkbox",
                         checked: pogoconf.experimentalFeatures,
                         click: async () => {
