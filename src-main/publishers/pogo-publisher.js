@@ -303,25 +303,27 @@ class PogoPublisher {
         clonecmd.on("exit", async (code) => {
             if(code==0){
                 outputConsole.appendLine('Clone succes ...');
+
+                progressBar.value += 10;
+                progressBar.detail = 'Synchronizing last changes';
+
+                //console.log(full_gh_dest + '/.git');
+                //console.log(full_gh_dest + '/.gitmove');
+                await fs.moveSync(full_gh_dest + '/.git', full_gh_dest + '/.gitmove');
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/content');
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/themes');
+                await fs.copySync(context.from, full_gh_dest);
+
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/.git');
+                await fs.moveSync(full_gh_dest + '/.gitmove', full_gh_dest + '/.git');
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/public');
+
                 await fileDirUtils.fileRegexRemove(full_gh_dest, /.gitlab-ci.yml/);
                 fs.writeFileSync(full_gh_dest + "/.gitlab-ci.yml" , gitlabCi , 'utf-8');
                 fs.writeFileSync(full_gh_dest + "/.gitignore" , gitignore , 'utf-8');
                 outputConsole.appendLine('copy gitlab ci to: ' + full_gh_dest);
                 outputConsole.appendLine('gitlabCi is: ' + gitlabCi);
                 outputConsole.appendLine('gitignore is: ' + gitignore);
-
-                progressBar.value += 10;
-                progressBar.detail = 'Synchronizing last changes';
-
-                console.log(full_gh_dest + '/.git');
-                console.log(full_gh_dest + '/.gitmove');
-                await fs.moveSync(full_gh_dest + '/.git', full_gh_dest + '/.gitmove');
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/content');
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/themes');
-                await fs.copySync(context.from, full_gh_dest);
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/.git');
-                await fs.moveSync(full_gh_dest + '/.gitmove', full_gh_dest + '/.git');
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/public');
 
                 outputConsole.appendLine('context.from is: ' + context.from);
                 outputConsole.appendLine('copy finished, going to git-add ...');
