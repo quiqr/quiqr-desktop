@@ -107,15 +107,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     componentWillMount(){
-        //TODO remove when pogopublisher has been rewritten
-        window.require('electron').ipcRenderer.on('lastPublishedChanged', ()=>{
-            this.setState({'mustConvert':false});
-            service.getConfigurations(true).then((c)=>{
-                this.checkSiteInProps();
-                this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
-
-            });
-        });
         service.registerListener(this);
     }
 
