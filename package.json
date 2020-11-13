@@ -74,7 +74,8 @@
     "_electron-dist-linux-all": "npm run _electron-dist-linux && electron-builder --linux deb",
     "_electron-dist-mac": "npm run _copy-electron-code && electron-builder",
     "dist-win": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win",
-    "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
+    "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux",
+    "dist-linux-all": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
     "dist-mac": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-mac",
     "dist-mac-unsigned": "CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist-mac",
     "dist-mac-notarize": "node scripts/notarize.js",
@@ -141,6 +142,15 @@
       "entitlements": "build/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "linux": {
+      "icon": "public/icon",
+      "target": [
+        {
+          "target": "AppImage"
+        }
+      ],
+      "category": "office"
     },
     "fileAssociations": [
       {

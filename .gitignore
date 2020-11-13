@@ -24,3 +24,5 @@ yarn-error.log*
 /somefile.log
 /public/ace-editor-min-noconflict
 package-lock.json
+/resources/all/build-git-id.txt
+/resources/all/build-date.txt

@@ -45,15 +45,10 @@ class PogoPublisher {
         }
 
         if(process.env.NODE_ENV === 'production'){
-            if(enviromnent.platform == PLATFORMS.macOS){
-                cmd = path.join(rootPath, 'Contents','Resources','bin',executable);
-            }
-            else{
-                cmd = path.join(rootPath, 'resources','bin',executable);
-            }
+            cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
         }
         else{
-            cmd = path.join(rootPath, 'resources',platform,executable);
+            cmd = path.join(rootPath, 'resources', platform, executable);
         }
 
         return cmd;
@@ -64,12 +59,13 @@ class PogoPublisher {
         let pubkey = '';
         var git_bin = this.getGitBin();
         var sukohdir = pathHelper.getRoot();
-        //console.log(git_bin);
 
         try {
             let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
             outputConsole.appendLine('Keygen success ...');
-            pubkey = await fs.readFileSync(sukohdir+"/id_rsa_pogo.pub");
+            pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+
+
         } catch (e) {
             outputConsole.appendLine('keygen error ...:' + e);
         }
@@ -78,7 +74,13 @@ class PogoPublisher {
     }
 
     async writeProfile(profile){
-        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+        var sukohdir = pathHelper.getRoot();
+        var profilepath = path.join(pathHelper.getRoot(), "poppygo-profile.json");
+        var profilepathDir = path.join(pathHelper.getRoot(),"profiles", profile.username);
+        var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
+
+        await fs.ensureDir(path.join(pathHelper.getRoot(),"profiles"))
+        await fs.ensureDir(profilepathDir)
 
         let newProfile={
             "username":profile.username
@@ -86,9 +88,29 @@ class PogoPublisher {
 
         await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
         await fs.chmodSync(profilepath, '0600');
+        await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
+        await fs.chmodSync(profilepath2, '0600');
+
+        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
+        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
+        await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
+
         return true;
     }
     async readProfile(){
+        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+        var profile;
+        try {
+            const filecont = fs.readFileSync(profilepath, {encoding:'utf8', flag:'r'});
+            profile = JSON.parse(filecont);
+        } catch (e) {
+            profile = false;
+        }
+
+        return profile;
+    }
+
+     readProfile2(){
         var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
         var profile;
         try {
@@ -164,8 +186,6 @@ class PogoPublisher {
 
         let mainWindow = global.mainWM.getCurrentInstance();
         mainWindow.webContents.send("lastPublishedChanged");
-
-
     }
 
     async writePublishStatus(){
@@ -174,8 +194,6 @@ class PogoPublisher {
         var newConf = JSON.parse(conftxt);
         newConf.lastPublish = Date.now();
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        console.log(newConf);
-        console.log(configJsonPath);
         let mainWindow = global.mainWM.getCurrentInstance();
         mainWindow.webContents.send("lastPublishedChanged");
     }
@@ -195,7 +213,6 @@ class PogoPublisher {
                 defaultDomain: domain
             }
         });
-        //console.log(newConf);
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
     }
 
@@ -223,9 +240,9 @@ class PogoPublisher {
 
         var progressBar = new ProgressBar({
             indeterminate: false,
-            text: 'Publishing website..',
+            text: 'Publishing your site..',
             abortOnError: true,
-            detail: 'Preparing upload..',
+            detail: 'Uploading to PoppyGo servers',
             browserWindow: {
                 frame: false,
                 parent: mainWindow,
@@ -236,7 +253,7 @@ class PogoPublisher {
         });
 
         progressBar.on('completed', function() {
-            progressBar.detail = 'The website has been uploaded.';
+            progressBar.detail = 'Your site has been uploaded.';
         })
             .on('aborted', function(value) {
                 console.info(`aborted... ${value}`);
@@ -249,9 +266,8 @@ class PogoPublisher {
 
         var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
-        //var profile = await this.readProfile();
         var repository = this._config.path;
-        var group = "sites";
+        var group = (this._config.group?this._config.group:"sites");
 
         var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
         var full_gh_url = 'git@gitlab.brepi.eu:' + group + '/' + repository +'.git';
@@ -259,37 +275,10 @@ class PogoPublisher {
         var gitignore = "/public\n\
 .sukoh\n";
 
-        var gitlabCi = "image: registry.gitlab.com/pages/hugo:latest\n\
-test:\n\
-  script:\n\
-  - hugo\n\
-  except:\n\
-  - master\n\
-pages:\n\
-  script:\n\
-  - hugo --minify\n\
-  - find public -type f -regex '.*\\.\\(htm\\|html\\|txt\\|text\\|js\\|css\\)$' -exec gzip -f -k {} \\;\n\
-  artifacts:\n\
-    paths:\n\
-    - public\n\
-  only:\n\
-  - master\n\
-pogoform:\n\
-  image: 'node:latest'\n\
-  script:\n\
-  - echo 'INSTALL SSH AUTH'\n\
-  - mkdir /root/.ssh\n\
-  - echo \"$SSH_PRIVATE_KEY\" > /root/.ssh/id_rsa\n\
-  - chmod 700 /root/.ssh\n\
-  - chmod 600 /root/.ssh/id_rsa\n\
-  - echo 'POPULATE KNOWN HOSTS'\n\
-  - ssh-keyscan -H gitlab.lingewoud.net > /root/.ssh/known_hosts\n\
-  - ssh-keyscan -H droste.node.lingewoud.net > /root/.ssh/known_hosts\n\
-  - scp -r poppygo/forms/* pim@droste.node.lingewoud.net:/home/pim/RnD/pogoform-handler/forms/$POGOFORM_GATEWAY/\n\
-  rules:\n\
-    - if: '$POGOFORM_GATEWAY'\n\
-      when: always\n\
-    - when: never\n";
+        var gitlabCi = "include:\n\
+  - project: 'platform/pogo-include'\n\
+    ref: master\n\
+    file: '/main.yml'\n";
 
         var git_bin = this.getGitBin();
 
@@ -299,18 +288,10 @@ pogoform:\n\
         await fs.emptyDir(resolvedDest);
         await fs.ensureDir(resolvedDest);
 
-        //outputConsole.appendLine('Writing temporaty key ' + pogokeypath);
-
-        //await fs.writefilesync(pogokeypath, this._config.privatekey, 'utf-8');
-        //await fs.chmodsync(pogokeypath, '0600');
-
-        //const sshkeyscan = await spawnAw("ssh-keyscan" , ["-H", "gitlab.brepi.eu");
-        //console.log(sshkeyscan.toString());
-
         progressBar.value += 10;
-        progressBar.detail = 'Get remote website files for synchronization';
+        progressBar.detail = 'Getting live site files for synchronization';
 
-        outputConsole.appendLine('Start cloning from: ' + full_gh_url);
+        outputConsole.appendLine('Cloning from: ' + full_gh_url);
 
         let clonecmd = spawn( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
 
@@ -322,6 +303,21 @@ pogoform:\n\
         clonecmd.on("exit", async (code) => {
             if(code==0){
                 outputConsole.appendLine('Clone succes ...');
+
+                progressBar.value += 10;
+                progressBar.detail = 'Synchronizing your last changes';
+
+                //console.log(full_gh_dest + '/.git');
+                //console.log(full_gh_dest + '/.gitmove');
+                await fs.moveSync(full_gh_dest + '/.git', full_gh_dest + '/.gitmove');
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/content');
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/themes');
+                await fs.copySync(context.from, full_gh_dest);
+
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/.git');
+                await fs.moveSync(full_gh_dest + '/.gitmove', full_gh_dest + '/.git');
+                await fileDirUtils.recurForceRemove(full_gh_dest+'/public');
+
                 await fileDirUtils.fileRegexRemove(full_gh_dest, /.gitlab-ci.yml/);
                 fs.writeFileSync(full_gh_dest + "/.gitlab-ci.yml" , gitlabCi , 'utf-8');
                 fs.writeFileSync(full_gh_dest + "/.gitignore" , gitignore , 'utf-8');
@@ -329,24 +325,11 @@ pogoform:\n\
                 outputConsole.appendLine('gitlabCi is: ' + gitlabCi);
                 outputConsole.appendLine('gitignore is: ' + gitignore);
 
-                progressBar.value += 10;
-                progressBar.detail = 'Synchronizing last changes';
-
-                console.log(full_gh_dest + '/.git');
-                console.log(full_gh_dest + '/.gitmove');
-                await fs.moveSync(full_gh_dest + '/.git', full_gh_dest + '/.gitmove');
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/content');
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/themes');
-                await fs.copySync(context.from, full_gh_dest);
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/.git');
-                await fs.moveSync(full_gh_dest + '/.gitmove', full_gh_dest + '/.git');
-                await fileDirUtils.recurForceRemove(full_gh_dest+'/public');
-
                 outputConsole.appendLine('context.from is: ' + context.from);
                 outputConsole.appendLine('copy finished, going to git-add ...');
 
                 progressBar.value += 10;
-                progressBar.detail = 'Registering changes with destination';
+                progressBar.detail = 'Copying your changes to PoppyGo servers';
 
                 var spawn = require("child_process").spawn;
                 let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
@@ -387,7 +370,7 @@ pogoform:\n\
                                     if(code==0){
                                         outputConsole.appendLine('git-push finished ... changes are published.');
                                         progressBar.value = 100;
-                                        progressBar.detail = 'Uploading finished';
+                                        progressBar.detail = 'Successfully copied your changes';
                                         progressBar.setCompleted();
                                         progressBar._window.hide();
                                         progressBar.close();
@@ -395,8 +378,9 @@ pogoform:\n\
                                         this.writePublishStatus();
 
                                         dialog.showMessageBox(mainWindow, {
+											title: 'PoppyGo',
                                             type: 'info',
-                                            message: "Your updates have been published. \n In a few minutes changes will be visible.",
+                                            message: "Succesfully published your changes. \n They will be visible in a minute or two.",
                                         });
 
                                     }
@@ -406,6 +390,7 @@ pogoform:\n\
                                         progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
+											title: 'PoppyGo',
                                             type: 'warning',
                                             message: "Publishing failed. (git-push)",
                                         });
@@ -417,6 +402,7 @@ pogoform:\n\
                                 progressBar._window.hide();
                                 progressBar.close();
                                 dialog.showMessageBox(mainWindow, {
+									title: 'PoppyGo',
                                     type: 'warning',
                                     message: "Publishing failed. (git-commit)",
                                 });
@@ -429,6 +415,7 @@ pogoform:\n\
                         progressBar._window.hide();
                         progressBar.close();
                         dialog.showMessageBox(mainWindow, {
+							title: 'PoppyGo',
                             type: 'warning',
                             message: "Publishing failed. (git-add)",
                         });
@@ -441,6 +428,7 @@ pogoform:\n\
                 progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {
+					title: 'PoppyGo',
                     type: 'warning',
                     message: "Publishing failed. (git-clone)",
                 });

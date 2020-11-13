@@ -1,3 +1,4 @@
+const electron = require('electron')
 const path = require('path');
 const userHome = require('user-home');
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
@@ -69,20 +70,28 @@ class PathHelper{
         return this.getRoot() + 'tools/hugothemes/';
     }
 
+    isLinuxAppImage(){
+        return electron.app.getAppPath().indexOf("/tmp/.mount_") === 0
+    }
+
     getApplicationResourcesDir(){
 
         let enviromnent = new EnvironmentResolver().resolve();
 
         if(process.env.NODE_ENV === 'production'){
             if(enviromnent.platform == PLATFORMS.macOS){
-                return path.join(rootPath, 'Contents','Resources','all');
+                return path.join(rootPath, 'Contents','Resources');
+            }
+            else if(this.isLinuxAppImage()){
+                const appPath = electron.app.getAppPath();
+                return path.join(appPath.substring(0, appPath.lastIndexOf('/')));
             }
             else{
-                return path.join(rootPath, 'resources','all');
+                return path.join(rootPath, 'resources');
             }
         }
         else{
-            return path.join(rootPath, 'resources','all');
+            return path.join(rootPath, 'resources');
         }
     }
 }

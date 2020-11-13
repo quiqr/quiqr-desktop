@@ -40,17 +40,7 @@ class GithubPublisher {
             default:{ throw new Error('Not implemented.') }
         }
 
-        if(process.env.NODE_ENV === 'production'){
-            if(enviromnent.platform == PLATFORMS.macOS){
-                cmd = path.join(rootPath, 'Contents','Resources','bin',executable);
-            }
-            else{
-                cmd = path.join(rootPath, 'resources','bin',executable);
-            }
-        }
-        else{
-            cmd = path.join(rootPath, 'resources',platform,executable);
-        }
+        cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
 
         return cmd;
     }

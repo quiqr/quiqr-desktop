@@ -35,7 +35,7 @@ class PublisherFactory{
         }
         if(type==='poppygo'){
             let PogoPublisher = require('./pogo-publisher');
-            console.log(genericPublisherConfig);
+            //console.log(genericPublisherConfig);
             return new PogoPublisher(genericPublisherConfig);
         }
 

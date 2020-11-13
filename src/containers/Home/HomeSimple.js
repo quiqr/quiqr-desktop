@@ -296,7 +296,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
         else{
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>You are using Poppygo anonymously</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>register now!</button>
+                            <span style={{fontWeight: "bold", fontSize:"110%"}}>Create an account for publishing</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>Register now!</button>
                         </ListItem>
             );
         }
@@ -304,7 +304,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this.checkLinkedDomain()){
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>This site is linked to <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{site.name} is linked to <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
                         window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
                     }}>{site.publish[0].config.defaultDomain}</button></span>
                 </ListItem>
@@ -313,32 +313,30 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>You haven’t linked your site {site.name} to a poppygo Domain</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow()}}>claim domain!</button>
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Claim a poppygo live URL for {site.name} </span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow()}}>claim now!</button>
                 </ListItem>
             )
         }
 
         if(site.hasOwnProperty('lastPublish') && site.lastPublish !== 0){
 
-            let ts;
-            if(site.lastPublish === 1){
-                ts = "not registered";
-
+        let ts;
+        if(site.lastPublish === 1){
+                ts = "";
             } else
             {
-                ts = new Date(site.lastPublish).toString().split("GMT")[0]
-            }
-
+            ts = new Date(site.lastPublish).toString().split("GMT")[0]
             published = (
                 <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
                     <span style={{fontWeight: "bold", fontSize:"110%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
                 </ListItem>
             )
+            }
         }
         else{
             published = (
                 <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Your site {site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } >publish now!</button>}
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } ></button>}
                 </ListItem>
             )
         }
@@ -351,7 +349,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         return (
             <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
 
-                <InfoLine label="Site name">
+                <InfoLine label="">
                     <h2 style={{padding:0, margin:0}}>{site.name}</h2>
                 </InfoLine>
 

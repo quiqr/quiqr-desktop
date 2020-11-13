@@ -382,14 +382,22 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     let { filteredItems, trunked } = this.state;
     let dialog = undefined;
 
+    if(this.state.selectedWorkspaceDetails==null){
+      return (<Spinner />);
+    }
+    let collection = this.state.selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
+    if(collection==null)
+      return null;
+
+
     if(this.state.view){
       let view = this.state.view;
       if(view.key==='createItem'){
         dialog = (<EditItemKeyDialog
         value=""
         viewKey={view.key}
-        title="New Item"
-        textfieldlabel="Title of new item"
+        title= {"New " + collection.itemtitle }
+        textfieldlabel="Title"
         busy={this.state.modalBusy}
         handleClose={this.setRootView.bind(this)}
         handleConfirm={this.createCollectionItemKey.bind(this)}
@@ -426,13 +434,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
       }
     }
 
-    if(this.state.selectedWorkspaceDetails==null){
-      return (<Spinner />);
-    }
 
-    let collection = this.state.selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
-    if(collection==null)
-      return null;
 
     let pageUrl = this.generatePageUrl(collection);
     service.api.updateMobilePreviewUrl(pageUrl)
@@ -445,7 +447,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
           <br />
           <div>
             <RaisedButton
-            label='New Item'
+            label={'New '+ collection.itemtitle }
             onClick={ this.setCreateItemView.bind(this)
             /* function(){ history.push('/collections/'+encodeURIComponent(collectionKey)+'/new') */ } />
 

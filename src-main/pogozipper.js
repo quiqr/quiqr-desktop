@@ -84,8 +84,8 @@ class Pogozipper{
         dialog.showMessageBox(mainWindow, {
             type: 'info',
             buttons: ["Close"],
-            title: "Finished task",
-            message: "Finished site export. Check" + exportFilePath,
+            title: "Finished site export",
+            message: "Check" + exportFilePath,
         });
     }
 

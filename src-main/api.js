@@ -453,7 +453,6 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }
         siteService.publish(publishKey).then(()=>{
-            console.log("jhaallo");
             context.resolve();
         }, ()=>{
             context.reject(err);

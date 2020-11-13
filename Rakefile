@@ -1,4 +1,5 @@
 require "json"
+require "date"
 
 BIN_PATH = "../poppygo.app-site/public"
 BIN_PATHWIN = "..\\poppygo.app-site\\public"
@@ -6,6 +7,22 @@ BIN_PATHWIN = "..\\poppygo.app-site\\public"
 def getmeta
   file = File.open "package.json"
   JSON.load file
+end
+
+def set_build_info
+  sh "git rev-parse --short HEAD > resources/all/build-git-id.txt"
+
+  d=DateTime.now()
+  sh "echo \""+d.strftime("%m-%d-%Y at %I:%M%p in Amsterdam") + "\" > resources/all/build-date.txt"
+end
+
+task :default => [:help]
+
+desc "show options and tasts"
+task :help do
+  print "\n"
+  system "rake --tasks"
+  print "\n"
 end
 
 desc "tag_release (1)"
@@ -17,6 +34,7 @@ end
 
 desc "buildmac (2)"
 task :buildmac do
+  set_build_info
   sh "npm run dist-mac && npm run dist-mac-notarize"
 end
 
@@ -32,12 +50,14 @@ end
 
 desc "buildwin"
 task :buildwin do
+  set_build_info
   sh "npm run dist-win"
 end
 
 desc "buildlinux"
 task :buildlinux do
-  sh "BUILD_NUMBER=`git rev-parse --short HEAD` npm run dist-linux"
+  set_build_info
+  sh "npm run dist-linux"
 end
 
 desc "release_win"

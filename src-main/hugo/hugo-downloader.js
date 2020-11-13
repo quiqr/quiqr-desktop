@@ -169,7 +169,7 @@ class HugoDownloader{
 
             outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);
             progressBar.value += 30;
-            progressBar.detail = `Hugo installation started. Downloading...`
+            progressBar.detail = `Getting Hugo version...`
 
             await this._downloadToFile(url, tempDest);
 
@@ -180,7 +180,7 @@ class HugoDownloader{
             await fs.unlink(tempDest);
 
             progressBar.value = 100;
-            progressBar.detail = `Hugo installation completed.`
+            progressBar.detail = `Hugo version installed.`
             progressBar.setCompleted();
             progressBar._window.hide();
             outputConsole.appendLine(`Hugo installation completed.`);

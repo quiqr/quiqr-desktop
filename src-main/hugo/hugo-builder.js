@@ -62,12 +62,12 @@ class HugoBuilder{
             config +=","
         }
 
-        config += path.join(pathHelper.getApplicationResourcesDir(),"hugo-extra","config.modelcreator.yml");
+        config += path.join(pathHelper.getApplicationResourcesDir(),"all","hugo-extra","config.modelcreator.yml");
         hugoArgs.push('--config');
         hugoArgs.push(config);
 
         //extraThemesDir
-        let layoutDir = path.join(pathHelper.getApplicationResourcesDir(),"hugo-extra","themes","modelcreator","layouts");
+        let layoutDir = path.join(pathHelper.getApplicationResourcesDir(),"all","hugo-extra","themes","modelcreator","layouts");
         hugoArgs.push('--layoutDir');
         hugoArgs.push(layoutDir);
 

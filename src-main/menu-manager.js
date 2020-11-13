@@ -13,6 +13,7 @@ let configurationDataProvider = require('./configuration-data-provider')
 
 const rimraf = require("rimraf");
 const pathHelper = require('./path-helper');
+const fssimple = require('fs');
 const fs = require('fs-extra');
 const { shell } = require('electron')
 
@@ -87,8 +88,8 @@ class MenuManager {
             const dialog = electron.dialog;
             dialog.showMessageBox(mainWindow, {
                 buttons: ["Close"],
-                title: "Missing software",
-                message: "We need to download hugo "+hugover+" for this functionality. Try again when download has finished",
+                title: "PoppyGo will now download hugo " + hugover,
+                message: "Try again when download has finished",
             });
 
             try{
@@ -114,7 +115,7 @@ class MenuManager {
                 let options  = {
                     title: "Please confirm",
                     buttons: ["Yes","Cancel"],
-                    message: "Copy sukoh.json to "+global.currentSitePath+"? (Old version will be overwritten)"
+                    message: "Copy sukoh.json to "+global.currentSitePath+"? (Previous json will be overwritten)"
                 }
                 let response = dialog.showMessageBox(options)
                 if(response === 1) return;
@@ -126,12 +127,26 @@ class MenuManager {
     }
 
     showVersion(){
+        const idPath = path.join(pathHelper.getApplicationResourcesDir(),"all","build-git-id.txt");
+        const datePath = path.join(pathHelper.getApplicationResourcesDir(),"all", "build-date.txt");
+        let buildGitId = "";
+        let buildDate = "";
+        console.log(app.getAppPath());
+        console.log(datePath);
+
+        if(fs.existsSync(idPath)){
+            buildGitId = "\nBuild ID " + fssimple.readFileSync(idPath, {encoding:'utf8', flag:'r'}).replace("\n",'');
+        }
+        if(fs.existsSync(datePath)){
+            buildDate = "\nBuild Date " + fssimple.readFileSync(datePath, {encoding:'utf8', flag:'r'}).replace("\n",'');
+        }
+
         const dialog = electron.dialog;
 
         let options  = {
             buttons: ["Close"],
             title: "About",
-            message: "PoppyGo Version " + app.getVersion()
+            message: "PoppyGo Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate
         }
         dialog.showMessageBox(options)
     }
@@ -311,8 +326,115 @@ class MenuManager {
             mainWindow.webContents.send("redirectHome")
         }
     }
+
+    async extractProfileFromOldSiteConf(){
+
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
+            configurationDataProvider.get(function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+                if(siteData==null) {
+                    //throw new Error('Could not find site is empty.');
+                }
+                else{
+                    siteService = new SiteService(siteData);
+                }
+
+            });
+            if(siteService == null){
+                return;
+            }
+
+            let key = siteService._config.publish[0].config.privatekey;
+            let pubkey = siteService._config.publish[0].config.privatekey;
+            let username = siteService._config.publish[0].config.path;
+            const profilesDir = path.join(pathHelper.getRoot(),"profiles");
+            const profilepathDir = path.join(pathHelper.getRoot(),"profiles",username);
+            await fs.ensureDir(profilepathDir);
+
+            var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
+            var profilepathKey= path.join(profilepathDir, "id_rsa_pogo");
+            var profilepathKeyPub= path.join(profilepathDir, "id_rsa_pogo.pub");
+
+            let newProfile={
+                "username": username
+            }
+
+            await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
+            await fs.chmodSync(profilepath2, '0600');
+            await fs.writeFileSync(profilepathKey, key, 'utf-8');
+            await fs.writeFileSync(profilepathKeyPub, pubkey, 'utf-8');
+            await fs.chmodSync(profilepathKey, '0600');
+        }
+    }
     async selectSiteVersion(subdir){
         console.log(subdir);
+    }
+
+    createProfilesMenu(){
+
+        const profilesDir = path.join(pathHelper.getRoot(),"profiles")
+
+        let profilesMenu = [];
+
+        let currentProfile = ""
+        let pogopubl = new PogoPublisher({});
+        let readCurrentProfile = pogopubl.readProfile2()
+        if(readCurrentProfile){
+            currentProfile = readCurrentProfile.username;
+
+            profilesMenu.push({
+                id: 'rm-pogo-profile',
+                label: "Unset profile",
+                click: async function (){
+                    fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
+                    this.createMainMenu();
+                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                    mainWindow.reload();
+                }.bind(this)
+            });
+            profilesMenu.push( { type: 'separator' });
+        }
+
+        if(fs.existsSync(profilesDir)){
+            var files = fs.readdirSync(profilesDir);
+            files.forEach(function(f){
+                let label = "";
+                let checked = false;
+                if(lstatSync(path.join(profilesDir,f)).isDirectory()){
+                    label = f;
+                    if(f == currentProfile){
+                        checked = true;
+                    }
+                    profilesMenu.push({
+                        id: f,
+                        type: "checkbox",
+                        label: label,
+                        checked: checked,
+                        click: async function (){
+                            let key = path.join(profilesDir,f,"id_rsa_pogo");
+                            let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
+                            let profileJson= path.join(profilesDir,f,"poppygo-profile.json");
+                            fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
+                            fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
+                            fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
+                            await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
+                            this.createMainMenu();
+                            mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                            mainWindow.reload();
+                        }.bind(this)
+                    });
+                }
+            }.bind(this));
+            return profilesMenu;
+        }
+
+        return [];
     }
 
     createVersionsMenu(){
@@ -388,6 +510,11 @@ class MenuManager {
     createExperimentalMenu(){
         let expMenu = [
             {
+                id: 'switch-profile',
+                label: 'Switch user',
+                submenu: this.createProfilesMenu()
+            },
+            {
                 id: 'switch-version',
                 label: 'Site versions',
                 enabled: this.siteSelected(),
@@ -395,7 +522,7 @@ class MenuManager {
             },
             {
                 id: 'auto-create-model',
-                label: 'Generatate PoppyGo Model',
+                label: 'Generate PoppyGo config',
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.generateModel()
@@ -439,6 +566,12 @@ class MenuManager {
                             this.openHome()
                         }
                     },
+                    {
+                        label: 'Extra profile from siteconf',
+                        click: async () => {
+                            this.extractProfileFromOldSiteConf()
+                        }
+                    },
                 ]
             }
 
@@ -470,21 +603,21 @@ class MenuManager {
                 label: 'File',
                 submenu: [
                     {
-                        label: 'Select website',
+                        label: 'Select site',
                         click: async () => {
                             this.selectSitesWindow();
                         }
                     },
                     { type: 'separator' },
                     {
-                        label: 'Import website',
+                        label: 'Import site',
                         click: async () => {
                             pogozipper.importSite()
                         }
                     },
                     {
                         id: 'export-site',
-                        label: 'Export website',
+                        label: 'Export site',
                         enabled: this.siteSelected(),
                         click: async () => {
                             pogozipper.exportSite()
@@ -493,7 +626,7 @@ class MenuManager {
                     {
                         id: 'delete-site',
                         enabled: this.siteSelected(),
-                        label: 'Delete Site',
+                        label: 'Delete site',
                         click: async () => {
                             this.deleteSite()
                         }
@@ -545,6 +678,7 @@ class MenuManager {
                     { role: 'cut' },
                     { role: 'copy' },
                     { role: 'paste' },
+                    /*
                     ...(isMac ? [
                         { role: 'pasteAndMatchStyle' },
                         { role: 'delete' },
@@ -561,15 +695,15 @@ class MenuManager {
                         { role: 'delete' },
                         { type: 'separator' },
                         { role: 'selectAll' },
-                        /*
+
                     {
                         label: 'Preferences',
                         click: async () => {
                             createPrefsWindow()
                         }
                     }
-                    */
-                    ])
+
+                  ])*/
                 ]
             },
             {
@@ -606,14 +740,14 @@ class MenuManager {
                 submenu: [
                     {
                         id: 'start-server',
-                        label: 'Restart server',
+                        label: 'Restart preview',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.startServer()
                         }
                     },
                     {
-                        label: 'Stop server',
+                        label: 'Stop preview',
                         click: async () => {
                             this.stopServer()
                         }
@@ -621,7 +755,7 @@ class MenuManager {
                     { type: 'separator' },
                     {
                         id: 'open-site-dir',
-                        label: 'Open Site Directory',
+                        label: 'Open site directory',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.openWorkSpaceDir()
@@ -629,7 +763,7 @@ class MenuManager {
                     },
                     {
                         id: 'open-site-conf',
-                        label: 'Open Workspace Config',
+                        label: 'Open workspace config',
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.openWorkSpaceConfig()
@@ -637,21 +771,21 @@ class MenuManager {
                     },
                     { type: 'separator' },
                     {
-                        label: 'Open Form Cookbooks',
+                        label: 'Config docs',
                         click: async () => {
                             this.openCookbooks()
                         }
                     },
                     { type: 'separator' },
                     {
-                        label: 'Show Log Window',
+                        label: 'Show Logs',
                         click: async () => {
                             this.createLogWindow()
                         }
                     },
                     { type: 'separator' },
                     {
-                        label: 'Experimental features',
+                        label: 'Enable experimental',
                         type: "checkbox",
                         checked: pogoconf.experimentalFeatures,
                         click: async () => {
