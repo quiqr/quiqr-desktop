@@ -184,8 +184,7 @@ class PogoPublisher {
             await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
         }
 
-        let mainWindow = global.mainWM.getCurrentInstance();
-        mainWindow.webContents.send("lastPublishedChanged");
+        global.mainWM.remountSite();
     }
 
     async writePublishStatus(){
@@ -194,8 +193,8 @@ class PogoPublisher {
         var newConf = JSON.parse(conftxt);
         newConf.lastPublish = Date.now();
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        let mainWindow = global.mainWM.getCurrentInstance();
-        mainWindow.webContents.send("lastPublishedChanged");
+
+        global.mainWM.remountSite();
     }
 
 
@@ -203,7 +202,6 @@ class PogoPublisher {
         let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
         const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
-        //newConf.lastPublish = null,
         newConf.publish = [];
         newConf.publish.push({
             key: 'poppygo-cloud',
@@ -229,8 +227,7 @@ class PogoPublisher {
             }
         });
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        let mainWindow = global.mainWM.getCurrentInstance();
-        mainWindow.webContents.send("lastPublishedChanged");
+        global.mainWM.remountSite();
     }
 
     async publish(context){
