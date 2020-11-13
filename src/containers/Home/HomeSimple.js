@@ -92,6 +92,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
+            buttonPressed: "",
             siteCreatorMessage: null
         };
     }
@@ -188,18 +189,21 @@ class Home extends React.Component<HomeProps, HomeState>{
         service.unregisterListener(this);
     }
 
-    handlePublishNow(){
+    handlePublishNow(pressed){
         let workspace = this.state.selectedWorkspaceDetails;
         let workspaceHeader = this.state.selectedSiteWorkspaces[0];
         service.api.parentTempHideMobilePreview();
 
+        if(pressed){
+            this.setState({buttonPressed:"publish"});
+        }
         this.setState({requestDialog:"publish"});
 
         if(this.state.username === ""){
             this.handleRegisterNow();
         }
         else if(!this.checkLinkedDomain()){
-            this.handleClaimDomainNow();
+            this.handleClaimDomainNow(false);
         }
         else{
             this.setState({publishSiteDialog: {workspace, workspaceHeader, open: true}});
@@ -217,31 +221,37 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     handleRegisterClick(username, email){
-        this.setState({registerDialog: {...this.state.registerDialog, open:false}});
-        this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
-        /*
 
-        this.setState({username:username},()=>{
-            if(this.state.requestDialog=="claim"){
-                this.handleClaimDomainNow();
-            }
-            else if(this.state.registerDialog=='publish' && !this.checkLinkedDomain()){
-                this.handleClaimDomainNow();
-            }
-            else if(this.state.registerDialog=='publish' && this.checkLinkedDomain()){
-                this.handlePublishNow();
-            }
-            else{
-            }
+        this.setState({
+            username: username,
+            registerDialog: {...this.state.registerDialog, open:false
+            }},()=>{
+                if(this.state.buttonPressed === 'publish'){
+                    this.handlePublishNow(false);
+                }
+                else if(this.state.buttonPressed === 'claim'){
+                    this.handleClaimDomainNow(false);
+                }
+                else{
+                    this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+                }
 
-        });
-        */
+            });
     }
 
-    handleClaimDomainNow(){
+    handleClaimDomainNow(pressed){
         this.setState({requestDialog:"claim"});
-        service.api.parentTempHideMobilePreview();
-        this.setState({claimDomainDialog: { open: true}});
+
+        if(pressed){
+            this.setState({buttonPressed:"claim"});
+        }
+        if(this.state.username === ""){
+            this.handleRegisterNow();
+        }
+        else{
+            service.api.parentTempHideMobilePreview();
+            this.setState({claimDomainDialog: { open: true}});
+        }
     }
 
     handleClaimDomainCancelClick(){
@@ -249,10 +259,28 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     handleClaimDomainClick(obj){
+
         service.getConfigurations(true).then((c)=>{
-            this.checkSiteInProps();
+
+            service.getSiteAndWorkspaceData(this.state.currentSiteKey, this.state.currentWorkspaceKey).then((bundle)=>{
+                var stateUpdate  = {};
+                stateUpdate.configurations = bundle.configurations;
+                stateUpdate.selectedSite = bundle.site;
+                stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
+                stateUpdate.selectedWorkspace = bundle.workspace;
+                stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
+
+                stateUpdate.claimDomainDialog = {...this.state.claimDomainDialog, open:false};
+
+                this.setState(stateUpdate,()=>{
+                    if(this.state.buttonPressed === 'publish'){
+                        this.handlePublishNow(false);
+                    }
+                });
+
+            })
+
         });
-        this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
     }
 
     checkLinkedDomain(){
@@ -262,6 +290,9 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
         return false;
 
+    }
+    handleOpenTerms(){
+        window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
@@ -304,7 +335,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Claim a poppygo live URL for {site.name} </span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow()}}>claim now!</button>
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Claim a poppygo live URL for {site.name} </span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
                 </ListItem>
             )
         }
@@ -353,8 +384,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                     </List>
 
                 </div>
-                <div style={{padding: "0px 16px 16px 30px"}}>
-                    <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={()=>{ this.handlePublishNow();}} />
+                <div style={Object.assign({position : 'relative',padding: "0px 16px 16px 30px", width:'100%', display:'flex'})}>
+                    <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={()=>{ this.handlePublishNow(true);}} />
+                    <div style={{ border: 'solid 0px green', marginLeft: 'auto', marginTop: 13 }}>
+                        <button className="reglink" onClick={()=>{this.handleOpenTerms()}}>Terms and Conditions</button>
+
+                    </div>
                 </div>
 
                 { /*this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) */}
