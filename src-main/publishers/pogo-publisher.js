@@ -184,8 +184,9 @@ class PogoPublisher {
             await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
         }
 
-        let mainWindow = global.mainWM.getCurrentInstance();
-        mainWindow.webContents.send("lastPublishedChanged");
+        global.mainWM.remountSite();
+        //let mainWindow = global.mainWM.getCurrentInstance();
+        //mainWindow.webContents.send("lastPublishedChanged");
     }
 
     async writePublishStatus(){
@@ -194,8 +195,10 @@ class PogoPublisher {
         var newConf = JSON.parse(conftxt);
         newConf.lastPublish = Date.now();
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        let mainWindow = global.mainWM.getCurrentInstance();
-        mainWindow.webContents.send("lastPublishedChanged");
+
+        global.mainWM.remountSite();
+        //let mainWindow = global.mainWM.getCurrentInstance();
+        //mainWindow.webContents.send("lastPublishedChanged");
     }
 
 
@@ -229,8 +232,9 @@ class PogoPublisher {
             }
         });
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        let mainWindow = global.mainWM.getCurrentInstance();
-        mainWindow.webContents.send("lastPublishedChanged");
+        global.mainWM.remountSite();
+        //let mainWindow = global.mainWM.getCurrentInstance();
+        //mainWindow.webContents.send("lastPublishedChanged");
     }
 
     async publish(context){

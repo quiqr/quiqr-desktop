@@ -313,6 +313,12 @@ module.exports = {
         menuManager.createMainMenu();
     },
 
+    remountSite: function(){
+        mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
+        var newURL='/sites/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
+        mainWindow.webContents.send("redirectToGivenLocation", newURL);
+    },
+
     reloadMobilePreview: function(){
         module.exports.setMobilePreviewUrl(mobilePreviewViewUrl);
     },
