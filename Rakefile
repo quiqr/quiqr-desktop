@@ -38,6 +38,11 @@ task :buildmac do
   sh "npm run dist-mac && npm run dist-mac-notarize"
 end
 
+desc "macoscodesigninfo"
+task :macoscodesigninfo do
+  sh "security find-identity -v -p codesigning"
+end
+
 desc "release_mac (3)"
 task :release_mac do
   data = getmeta
