@@ -353,16 +353,18 @@
 
 {{- define "partials/createResourceBundleManagers" -}}
         {{- $fields := slice -}}
-        {{- if .page.Resources -}}
-            {{- $hasResourceDir := false -}}
-            {{- range (readDir .dir) -}}
-                {{- if .IsDir -}}
-                      {{- $hasResourceDir = true -}}
-                      {{- $fields = $fields | append (partial "createField" (dict "key" .Name "value" .Name "type" "bundle-manager")) -}}
+        {{- if not (path.Ext .dir) -}}
+            {{- if .page.Resources -}}
+                {{- $hasResourceDir := false -}}
+                {{- range (readDir .dir) -}}
+                    {{- if .IsDir -}}
+                          {{- $hasResourceDir = true -}}
+                          {{- $fields = $fields | append (partial "createField" (dict "key" .Name "value" .Name "type" "bundle-manager")) -}}
+                    {{- end -}}
                 {{- end -}}
-            {{- end -}}
-            {{- if eq $hasResourceDir false -}}
-                {{- $fields = $fields | append (partial "createField" (dict "key" "images" "value" "" "type" "bundle-manager")) -}}
+                {{- if eq $hasResourceDir false -}}
+                    {{- $fields = $fields | append (partial "createField" (dict "key" "images" "value" "" "type" "bundle-manager")) -}}
+                {{- end -}}
             {{- end -}}
         {{- end -}}
         {{- return $fields -}}
