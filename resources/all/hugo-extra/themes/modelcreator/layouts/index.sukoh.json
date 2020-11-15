@@ -181,8 +181,9 @@
             {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 1).Name -}}
         {{- end -}}
         {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $st.Parent "dir" $resourceDir)) -}}
-        {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
-
+        {{- if not (in .Params "mainContent") -}}
+            {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+        {{- end -}}
         {{- range $key, $value := .Params -}}
             {{- $field := partial "createField" (dict "value" $value "key" $key "file" $st.File.Path ) -}}
             {{- $fields = $fields | append $field -}}
@@ -379,7 +380,9 @@
       {{- $file := printf "content/%s" .page.File.Path -}}
       {{- $fields := slice -}}
       {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
-      {{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
+      {{- if not (in .page.Params "mainContent") -}}
+          {{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
+      {{- end -}}
       {{- $page := .page}}
       {{- range $key, $value := .page.Params -}}
           {{- $field := partial "createField" (dict "value" $value "key" $key "file" $page.File.Path) -}}
@@ -417,7 +420,9 @@
             {{- end -}}
             {{- $page := . -}}
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $page "dir" $resourceDir )) -}}
-            {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+            {{- if not (in .Page.Params "mainContent") -}}
+                {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+            {{- end -}}
             {{- range $key, $value := .Page.Params -}}
                 {{- $field := partial "createField" (dict "key" $key "value" $value "file" $page.File.Path) -}}
                 {{- $fields = $fields | append $field -}}
