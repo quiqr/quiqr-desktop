@@ -55,9 +55,9 @@ export class Breadcumb extends React.Component<BreadcumbProps,BreadcumbState>{
         }
 
         return (
-            <Border style={Object.assign({borderRadius:'2px'}, this.props.style)}>
+            <div style={Object.assign({borderRadius:'2px'}, this.props.style)}>
                 {newItems}
-            </Border>
+            </div>
         );
     }
 }

@@ -258,7 +258,7 @@ class Form extends React.Component<FormProps,FormState> {
                         items.push({label: this.props.rootName||'ROOT', node:currentNode});
                     }
                     else{
-                        items.push({label: this.props.rootName||'ROOT', node:null});
+                        items.push({label: this.props.rootName||'ROOT', node:currentNode});
                     }
                 }
                 else{
