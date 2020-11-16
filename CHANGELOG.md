@@ -1,5 +1,8 @@
 # PoppyGo App CHANGELOG
 
+## v0.7.4
+- fix accordion
+
 ## v0.7.2
 
 - detect if hugo server is running or not
