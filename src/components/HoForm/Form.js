@@ -113,7 +113,7 @@ class Form extends React.Component<FormProps,FormState> {
     }
 
     setPath(node : DynamicFormNode<FieldBase>){
-        if(this.props.collectionItemKey){
+        if(this.props.collectionItemKey && node.field.compositeKey === 'root'){
             this.history.push(this.generateParentPath());
         }
         else{
