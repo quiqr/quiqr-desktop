@@ -66,6 +66,12 @@ function downloadFile(file_url , targetPath){
         console.log(file_url);
     }
 
+    if(file_url.includes("download.pogotheme.com")){
+        let urlarr = file_url.split('download.pogotheme.com')
+        file_url = 'https://download.pogotheme.com'+urlarr[1];
+        console.log(file_url);
+    }
+
     let progressBar = new ProgressBar({
         indeterminate: false,
         text: 'Downloading '+file_url+' ..',
