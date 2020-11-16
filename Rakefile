@@ -35,6 +35,7 @@ end
 desc "buildmac (2)"
 task :buildmac do
   set_build_info
+  sh "npm install"
   sh "npm run dist-mac && npm run dist-mac-notarize"
 end
 
@@ -56,6 +57,7 @@ end
 desc "buildwin"
 task :buildwin do
   set_build_info
+  sh "npm install"
   sh "npm run dist-win"
 end
 
