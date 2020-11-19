@@ -154,22 +154,25 @@
     {{- end -}}
 {{- end -}}
 
-
 {{- if gt (len .RegularPagesRecursive) 0 -}}
-    {{- range (where .Pages "Kind" "not in" .RegularPagesRecursive) -}}
-        {{- range .AllTranslations -}}
-              {{- if .File -}}
-                {{- $singlePages = $singlePages | append . -}}
-              {{- end -}}
-         {{- end -}}
+    {{- range .Pages -}}
+      {{- if .File -}}
+        {{- if .IsTranslated -}}
+            {{- range .AllTranslations -}}
+                  {{- $singlePages = $singlePages | append . -}}
+            {{- end -}}
+        {{- else -}}
+              {{- $singlePages = $singlePages | append . -}}
+        {{- end -}}
+      {{- end -}}
     {{- end -}}
 {{- else -}}
-    {{- range .Pages -}}
-        {{- range .AllTranslations -}}
+    {{- range .Site.Pages -}}
+        {{- if .IsTranslated -}}{{- range .AllTranslations -}} {{- end -}}
             {{- if .File -}}
                 {{- $singlePages = $singlePages | append . -}}
             {{- end -}}
-        {{- end -}}
+        {{- if .IsTranslated -}}{{- end -}}{{- end -}}
     {{- end -}}
 {{- end -}}
 
