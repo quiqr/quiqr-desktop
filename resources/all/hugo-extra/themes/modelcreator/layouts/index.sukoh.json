@@ -1,4 +1,4 @@
-{{/* version 18 November */}}
+{{/* version 21 November */}}
 {{- $collectionPages := slice -}}
 {{- $singlePages := slice -}}
 {{- $singles := slice -}}
@@ -154,26 +154,16 @@
     {{- end -}}
 {{- end -}}
 
-{{- if gt (len .RegularPagesRecursive) 0 -}}
-    {{- range .Pages -}}
-      {{- if .File -}}
-        {{- if .IsTranslated -}}
-            {{- range .AllTranslations -}}
-                  {{- $singlePages = $singlePages | append . -}}
-            {{- end -}}
-        {{- else -}}
+{{- range .Pages -}}
+  {{- if .File -}}
+    {{- if .IsTranslated -}}
+        {{- range .AllTranslations -}}
               {{- $singlePages = $singlePages | append . -}}
         {{- end -}}
-      {{- end -}}
+    {{- else -}}
+          {{- $singlePages = $singlePages | append . -}}
     {{- end -}}
-{{- else -}}
-    {{- range .Site.Pages -}}
-        {{- if .IsTranslated -}}{{- range .AllTranslations -}} {{- end -}}
-            {{- if .File -}}
-                {{- $singlePages = $singlePages | append . -}}
-            {{- end -}}
-        {{- if .IsTranslated -}}{{- end -}}{{- end -}}
-    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- range $singlePages -}}
