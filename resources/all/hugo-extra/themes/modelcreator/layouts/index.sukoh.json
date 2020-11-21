@@ -15,9 +15,7 @@
 {{- $translations := slice -}}
 {{- range .Site.AllPages -}}
     {{- range .AllTranslations -}}
-        {{- if not (in $translations .Language.Lang) }}
             {{- $translations = $translations | append .Language.Lang -}}
-        {{- end -}}
     {{- end -}}
 {{- end -}}
 
@@ -30,7 +28,6 @@
 {{- end -}}
 
 {{/*------------------------------ Menus and Params  -----------------------------*/}}
-
 
 {{- $configFilePath := partial "configFile" . -}}
 
@@ -83,10 +80,7 @@
 
 {{- range $index, $st :=  ($homepage.Resources.ByType "page") -}}
   {{- $contentDir := (partial "getContentDir" . ) -}}
-  {{- $language := "" -}}
-  {{- with .page.Language.Lang -}}
-      {{- $language = . -}}
-  {{- end -}}
+  {{- $language := partial "getLanguage" . -}}
 
   {{- $parentDir := (path.Dir (path.Dir $st.File.Dir)) -}}
   {{ if eq $st.File.Dir "home/" }}
@@ -98,7 +92,8 @@
     {{- if not (in $homeCollections $path) -}}
         {{- $homeCollections = $homeCollections | append $path -}}
         {{- $sectionKey := printf "%s_%s" (path.Base $path) $language -}}
-        {{- $sectionTitle :=  printf "%s | %s" $language ($sectionKey | humanize) -}}
+        {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
+        {{- $sectionTitle :=  printf "%s%s" $language ($sectionKey | humanize) -}}
         {{- $itemTitle :=  ( $sectionKey | humanize) | singularize -}}
         {{- $dir := printf "%s%s/" $contentDir $path -}}
         {{- $extension := .File.Ext -}}
@@ -132,8 +127,19 @@
 
 {{/*------------------------Collections------------------------ */}}
 
+
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
     {{- $collectionPages = $collectionPages | append . -}}
+{{- end -}}
+
+{{- $additionalCollections := slice -}}
+{{- range .Site.AllPages -}}
+    {{ with .Parent }}
+        {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) -}}
+            {{- $additionalCollections = $additionalCollections | append .Path -}}
+            {{- $collectionPages = $collectionPages | append . -}}
+        {{- end -}}
+    {{ end }}
 {{- end -}}
 
 {{- range $collectionPages -}}
@@ -154,11 +160,14 @@
     {{- end -}}
 {{- end -}}
 
+
 {{- range .Pages -}}
   {{- if .File -}}
     {{- if .IsTranslated -}}
         {{- range .AllTranslations -}}
-              {{- $singlePages = $singlePages | append . -}}
+            {{- if not (eq .Language.Lang "" ) -}}
+                  {{- $singlePages = $singlePages | append . -}}
+            {{- end -}}
         {{- end -}}
     {{- else -}}
           {{- $singlePages = $singlePages | append . -}}
