@@ -1,0 +1,48 @@
+{{- $file := .file -}}
+{{- $key := .key -}}
+{{- if .file -}}
+    {{- $key = partial "getRealKey" (dict "key" .key "file" .file ) -}}
+{{- end -}}
+{{- $value := .value -}}
+{{- $pogoType := "" -}}
+{{- if .type -}}
+    {{- $pogoType = .type -}}
+{{- else -}}
+    {{- $pogoType = partial "pogoType" (dict "value" $value "key" $key) -}}
+{{- end -}}
+{{- $title := humanize $key -}}
+{{- $field := dict "key" $key "title" $title "type" $pogoType -}}
+{{- if (eq $pogoType "date") -}}
+    {{- $field = merge $field (dict "default" "now") -}}
+{{- end -}}
+
+{{- if (eq $pogoType "section") -}}
+    {{- $subfields := slice -}}
+    {{- range $key, $value := $value -}}
+            {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file) -}}
+            {{- $subfields = $subfields | append $field}}
+    {{- end -}}
+    {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
+{{- end -}}
+
+{{- if (eq $pogoType "accordion") -}}
+    {{- $subfields := slice -}}
+    {{- range $key, $value := ( index $value 0 ) -}}
+            {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file) -}}
+            {{ if or (eq $key "name") (eq $key "title") (eq $key "line")}}
+                {{- $field = $field | merge (dict "arrayTitle" true ) -}}
+            {{- end -}}
+            {{- $subfields = $subfields | append $field -}}
+    {{- end -}}
+    {{- $field = merge $field (dict "fields" $subfields ) -}}
+{{- end -}}
+
+{{- if (eq $pogoType "bundle-manager") -}}
+{{- $bundleFields :=  slice (partial "createField" (dict "key" "thumb" "type" "bundle-image-thumbnail")) -}}
+{{- $extensions := (slice "jpg" "png" "jpeg" "pdf" ) -}}
+{{- $field = merge $field (dict "path" $value "extensions" $extensions "fields" $bundleFields ) -}}
+{{- end -}}
+
+{{- return $field -}}

@@ -1,0 +1,9 @@
+{{- $subPageLang := slice -}}
+
+{{- $language := "" -}}
+{{- if and .IsTranslated  -}}
+  {{- with .Language.Lang -}}
+      {{- $language = . -}}
+  {{- end -}}
+{{- end -}}
+{{- return $language -}}

@@ -1,0 +1,7 @@
+{{- $contentDir := "" -}}
+{{- with .Site.Language.ContentDir -}}
+    {{- $contentDir = printf "%s/" . -}}
+{{ else }}
+    {{- $contentDir = "content/" -}}
+{{- end -}}
+{{- return $contentDir -}}

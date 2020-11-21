@@ -1,0 +1,12 @@
+{{- $files := slice -}}
+{{- $fileDir := .dir -}}
+{{- range (readDir $fileDir ) -}}
+     {{- if .IsDir -}}
+          {{- $dir := printf "%s/" (printf "%s%s" $fileDir .Name ) -}}
+          {{- $node :=  strings.TrimRight "." (replace (replace $dir "/data/" "") "/" ".") -}}
+          {{- $files = $files | append (dict "dir" $dir "node" $node ) -}}
+     {{- else -}}
+          {{- $files = $files | append (dict "dir" $fileDir "file" .Name ) -}}
+     {{- end -}}
+{{- end -}}
+{{- return $files -}}

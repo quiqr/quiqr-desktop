@@ -1,0 +1,30 @@
+{{- $contentDir := (partial "getContentDir" .page ) -}}
+{{- $language := partial "getLanguage" .page -}}
+{{- $baseKey := partial "createKey" .page  -}}
+{{- $pageKey := printf "%s%s_%s" .prefix $baseKey $language -}}
+{{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
+{{- $pageTitle := printf "%s%s"  $language ($baseKey | humanize) -}}
+{{- if and (.page.IsSection) (gt (len .page.RegularPages) 0 ) -}}
+  {{- $pageTitle = printf "%s listpage" $pageTitle  -}}
+{{- end -}}
+
+{{- $path := .page.RelPermalink }}
+{{- $file := printf "%s%s" $contentDir .page.File.Path -}}
+{{- $fields := slice -}}
+{{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
+{{- if not (in .page.Params "mainContent") -}}
+    {{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
+{{- end -}}
+{{- $page := .page}}
+{{- range $key, $value := .page.Params -}}
+    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $page.File.Path) -}}
+    {{- $fields = $fields | append $field -}}
+{{- end -}}
+{{- $previewUrl := "" -}}
+{{- if .RelPermalink  -}}
+    {{- $previewUrl = .page.RelPermalink -}}
+{{- else }}
+    {{- $previewUrl = "/" -}}
+{{- end -}}
+{{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields "previewUrl" $previewUrl -}}
+{{- return $single -}}
