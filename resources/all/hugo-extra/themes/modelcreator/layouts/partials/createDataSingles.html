@@ -8,26 +8,26 @@
       {{- $language := "" -}}
       {{- if .file }}
             {{- $lang := (path.Base $dir) -}}
-            {{- if in $translations $lang -}}
-                {{- $language = printf "%s | " $lang -}}
+            {{- if or (in $translations $lang) (not $translations) -}}
+                {{- if not (eq $lang "data") -}}
+                    {{- $language = printf "%s | " $lang -}}
+                {{- end -}}
+                {{- $fields := slice -}}
+                {{- $path := printf "%s%s" .dir .file -}}
+                {{- $fileName := index (split .file ".") 0 -}}
+                {{- $fileExt := index (split .file ".") 1 -}}
+                {{- $title := printf "%s%s" $language ($fileName | humanize) -}}
+                {{- $dataKey := printf "d_%s_%s" $lang $fileName -}}
+                {{- range $key, $value := (index $data $fileName) -}}
+                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
+                    {{- $fields = $fields | append $field -}}
+                {{- end -}}
+                {{- if gt (len $fields) 0 -}}
+                    {{- $single :=  dict "key" $dataKey "title" $title "file" $path "dataformat" $fileExt "fields" $fields "previewUrl" "/" -}}
+                    {{- $singles = $singles | append $single -}}
+                    {{- $menu = $menu | append (dict "key" (index $single "key")) -}}
+                {{- end -}}
             {{- end -}}
-
-            {{- $fields := slice -}}
-            {{- $path := printf "%s%s" .dir .file -}}
-            {{- $fileName := index (split .file ".") 0 -}}
-            {{- $fileExt := index (split .file ".") 1 -}}
-            {{- $title := printf "%s%s" $language ($fileName | humanize) -}}
-            {{- $dataKey := printf "d_%s_%s" $fileName $language -}}
-            {{- range $key, $value := (index $data $fileName) -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
-                {{- $fields = $fields | append $field -}}
-            {{- end -}}
-            {{- if gt (len $fields) 0 -}}
-                {{- $single :=  dict "key" $dataKey "title" $title "file" $path "dataformat" $fileExt "fields" $fields "previewUrl" "/" -}}
-                {{- $singles = $singles | append $single -}}
-                {{- $menu = $menu | append (dict "key" (index $single "key")) -}}
-            {{- end -}}
-
       {{ else }}
             {{- $data := partial "createDataSingles" (dict "dir" $file.dir "data" (index $data .node) "translations" $translations) -}}
             {{- $singles = $singles | append (index $data "singles") -}}
