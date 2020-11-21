@@ -1,0 +1,17 @@
+{{- if in (path.Base .File.Path) "index" -}}
+    {{- if eq .File.Dir "/" -}}
+        {{- .Name | anchorize -}}
+    {{- else -}}
+        {{- path.Split (path.Base .File.Dir )| anchorize -}}
+    {{- end -}}
+{{- else -}}
+    {{- if .File.TranslationBaseName -}}
+      {{- if in .File.TranslationBaseName "index" -}}
+        {{- path.Split (path.Base .File.Dir )| anchorize -}}
+      {{- else -}}
+        {{- .File.TranslationBaseName -}}
+      {{- end -}}
+    {{- else -}}
+      {{-  path.Base .Path  -}}
+    {{- end -}}
+{{- end -}}
