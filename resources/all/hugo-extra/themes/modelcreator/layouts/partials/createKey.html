@@ -1,15 +1,19 @@
-{{- if in (path.Base .File.Path) "index" -}}
+
+{{- $filePath := "" -}}
+{{- with .File -}} {{$filePath = .Path -}} {{- end -}}
+
+{{- if in (path.Base $filePath) "index" -}}
     {{- if eq .File.Dir "/" -}}
         {{- .Name | anchorize -}}
     {{- else -}}
         {{- path.Split (path.Base .File.Dir )| anchorize -}}
     {{- end -}}
 {{- else -}}
-    {{- if .File.TranslationBaseName -}}
-      {{- if in .File.TranslationBaseName "index" -}}
+    {{- with .File -}}
+      {{- if in .TranslationBaseName "index" -}}
         {{- path.Split (path.Base .File.Dir )| anchorize -}}
       {{- else -}}
-        {{- .File.TranslationBaseName -}}
+        {{- .TranslationBaseName -}}
       {{- end -}}
     {{- else -}}
       {{-  path.Base .Path  -}}

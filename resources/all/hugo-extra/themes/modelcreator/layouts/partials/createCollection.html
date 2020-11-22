@@ -16,18 +16,20 @@
         {{- $extension := .File.Ext -}}
         {{- $fields := slice -}}
         {{- $resourceDir := "" -}}
+        {{- $page := . -}}
+        {{- $filePath := "" -}}
+        {{- with $page.File -}}{{- $filePath = .Path -}}{{- end -}}
         {{- if (index (readDir $dir) 0).IsDir -}}
             {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 0).Name -}}
         {{- else -}}
             {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 1).Name -}}
         {{- end -}}
-        {{- $page := . -}}
         {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $page "dir" $resourceDir )) -}}
         {{- if not (in .Page.Params "mainContent") -}}
             {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
         {{- end -}}
         {{- range $key, $value := .Page.Params -}}
-            {{- $field := partial "createField" (dict "key" $key "value" $value "file" $page.File.Path) -}}
+            {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath) -}}
             {{- $fields = $fields | append $field -}}
         {{- end -}}
         {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle  -}}

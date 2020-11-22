@@ -5,7 +5,6 @@
 {{- else -}}
     {{- $language = partial "getLanguage" .page -}}
 {{- end -}}
-
 {{- $baseKey := partial "createKey" .page  -}}
 {{- $pageKey := printf "%s%s_%s" .prefix $language $baseKey  -}}
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
@@ -17,15 +16,20 @@
 {{- end -}}
 
 {{- $path := .page.RelPermalink }}
-{{- $file := printf "%s%s" $contentDir .page.File.Path -}}
+{{- $file := "" -}}
+{{- with .page.File -}}
+    {{- $file = printf "%s%s" $contentDir .Path -}}
+{{- end -}}
 {{- $fields := slice -}}
 {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
 {{- if not (in .page.Params "mainContent") -}}
     {{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
 {{- end -}}
 {{- $page := .page}}
+{{- $filePath := "" -}}
+{{- with $page.File -}} {{ $filePath = .Path -}} {{- end -}}
 {{- range $key, $value := .page.Params -}}
-    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $page.File.Path) -}}
+    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath) -}}
     {{- $fields = $fields | append $field -}}
 {{- end -}}
 {{- $previewUrl := "" -}}
