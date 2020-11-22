@@ -83,12 +83,13 @@
     {{- $homepages = $homepage.AllTranslations }}
 {{- end -}}
 {{- range $homepages -}}
+    {{- $currentHomepage := . -}}
     {{- range $index, $st :=  (.Resources.ByType "page") -}}
       {{- $contentDir := (partial "getContentDir" . ) -}}
       {{- $parentDir := (path.Dir (path.Dir $st.File.Dir)) -}}
       {{- $language := "" -}}
       {{- if $homepage.IsTranslated -}}
-          {{- $language := .Language.Lang -}}
+          {{- $language = $currentHomepage.Language.Lang -}}
       {{- end -}}
       {{- if or (eq $st.File.Dir "home/") (eq $parentDir "home") -}}
           {{- $homeSinglePages = $homeSinglePages | append . -}}
@@ -104,6 +105,8 @@
             {{- $extension := .File.Ext -}}
             {{- $fields := slice -}}
             {{- $resourceDir := "" -}}
+            {{- $filePath := "" -}}
+            {{- with $st.File -}} {{- $filePath = .Path -}} {{- end -}}
             {{- if (index (readDir $dir) 0).IsDir -}}
                 {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 0).Name -}}
             {{- else -}}
@@ -114,7 +117,7 @@
                 {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
             {{- end -}}
             {{- range $key, $value := .Params -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $st.File.Path ) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath ) -}}
                 {{- $fields = $fields | append $field -}}
             {{- end -}}
             {{- $collection := dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle "previewUrl" "/" -}}
@@ -171,7 +174,6 @@
     {{- end -}}
 {{- end -}}
 
-
 {{- range .Pages -}}
   {{- if .File -}}
     {{- if .IsTranslated -}}
@@ -220,7 +222,7 @@
 {{/*-----------------The core getting it all together------------- */}}
 
 
-{{- $hugover := printf "extended_%s" .Hugo.Version -}}
+{{- $hugover := printf "extended_%s" hugo.Version -}}
 {{- $serve := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
 {{- $build := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
 {{- dict "hugover" $hugover "serve" $serve "build" $build "menu" $menu "singles" $singles "collections" $collections  | jsonify (dict "prefix" " " "indent" "  ") -}}
