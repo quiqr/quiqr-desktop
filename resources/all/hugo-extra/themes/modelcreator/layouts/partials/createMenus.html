@@ -1,5 +1,5 @@
 {{- $path := path.Join .dir .file -}}
-{{- $ext := replace (path.Ext .file) "." "" 1 -}}
+{{- $ext := replace (path.Ext .file) "." "" -}}
 {{- $language := "" -}}
 {{- $key := .key -}}
 {{- $title := .key | humanize -}}

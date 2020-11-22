@@ -77,12 +77,19 @@
 {{- $page := "/home/index.md" -}}
 
 {{- $homepage := site.GetPage $page -}}
-{{- range $homepage.AllTranslations -}}
 
+{{- $homepages := slice $homepage -}}
+{{- if $homepage.IsTranslated -}}
+    {{- $homepages = $homepage.AllTranslations }}
+{{- end -}}
+{{- range $homepages -}}
     {{- range $index, $st :=  (.Resources.ByType "page") -}}
       {{- $contentDir := (partial "getContentDir" . ) -}}
       {{- $parentDir := (path.Dir (path.Dir $st.File.Dir)) -}}
-      {{- $language := .Language.Lang -}}
+      {{- $language := "" -}}
+      {{- if $homepage.IsTranslated -}}
+          {{- $language := .Language.Lang -}}
+      {{- end -}}
       {{- if or (eq $st.File.Dir "home/") (eq $parentDir "home") -}}
           {{- $homeSinglePages = $homeSinglePages | append . -}}
       {{ else }}
@@ -120,7 +127,10 @@
 
 
 {{- range $homeSinglePages -}}
-      {{- $language := .Language.Lang -}}
+      {{- $language := "" -}}
+      {{- if and .Language.Lang  $homepage.IsTranslated -}}
+          {{- $language = .Language.Lang -}}
+      {{- end -}}
       {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language )) -}}
       {{- $singles = $singles | append $single -}}
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
