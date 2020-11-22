@@ -1,11 +1,19 @@
 {{- $contentDir := (partial "getContentDir" .page ) -}}
-{{- $language := partial "getLanguage" .page -}}
+{{- $language := "" -}}
+{{- if .language -}}
+    {{- $language = .language -}}
+{{- else -}}
+    {{- $language = partial "getLanguage" .page -}}
+{{- end -}}
+
 {{- $baseKey := partial "createKey" .page  -}}
-{{- $pageKey := printf "%s%s_%s" .prefix $baseKey $language -}}
+{{- $pageKey := printf "%s%s_%s" .prefix $language $baseKey  -}}
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
 {{- $pageTitle := printf "%s%s"  $language ($baseKey | humanize) -}}
-{{- if and (.page.IsSection) (gt (len .page.RegularPages) 0 ) -}}
-  {{- $pageTitle = printf "%s listpage" $pageTitle  -}}
+{{- if .File -}}
+    {{- if and (.page.IsSection) (gt (len .page.RegularPages) 0 ) -}}
+      {{- $pageTitle = printf "%s listpage" $pageTitle  -}}
+    {{- end -}}
 {{- end -}}
 
 {{- $path := .page.RelPermalink }}
@@ -27,4 +35,5 @@
     {{- $previewUrl = "/" -}}
 {{- end -}}
 {{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields "previewUrl" $previewUrl -}}
+
 {{- return $single -}}
