@@ -1,5 +1,14 @@
 {{- $path := path.Join .dir .file -}}
-{{- $ext := index (split .file ".") 1 -}}
+{{- $ext := replace (path.Ext .file) "." "" 1 -}}
+{{- $language := "" -}}
+{{- $key := .key -}}
+{{- $title := .key | humanize -}}
+{{- if eq (len (split .file ".")) 3 -}}
+        {{- $language = index (split .file "." ) 1  -}}
+        {{- $key = printf "%s-%s" $language $key -}}
+        {{- $title = printf "%s | %s" $language $title -}}
+{{- end -}}
+
 {{- $singles := slice -}}
 {{- $fields := slice -}}
 {{- $standardMenu := slice (dict "name" "string" "url" "string" "weight" 1 "parent" "string" "identifier" "string") -}}
@@ -14,5 +23,5 @@
           {{- $fields = $fields | append (partial "createField" (dict "key" $menu "value" $standardMenu "file" $path )) -}}
     {{- end -}}
 {{- end -}}
-{{- $single := dict "key" .key "title" (.key | humanize) "file" $path "dataformat" $ext "fields" $fields -}}
+{{- $single := dict "key" $key "title" $title "file" $path "dataformat" $ext "fields" $fields -}}
 {{- return $single -}}
