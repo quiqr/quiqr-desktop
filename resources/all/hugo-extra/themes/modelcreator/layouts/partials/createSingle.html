@@ -22,15 +22,15 @@
 {{- end -}}
 {{- $fields := slice -}}
 {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
-{{- if not (in .page.Params "mainContent") -}}
-    {{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
-{{- end -}}
+{{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
 {{- $page := .page}}
 {{- $filePath := "" -}}
 {{- with $page.File -}} {{ $filePath = .Path -}} {{- end -}}
 {{- range $key, $value := .page.Params -}}
-    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath) -}}
-    {{- $fields = $fields | append $field -}}
+    {{- if ne $key "mainContent" -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath) -}}
+        {{- $fields = $fields | append $field -}}
+    {{- end -}}
 {{- end -}}
 {{- $previewUrl := "" -}}
 {{- if .RelPermalink  -}}
@@ -38,6 +38,7 @@
 {{- else }}
     {{- $previewUrl = "/" -}}
 {{- end -}}
+{{- $fields = partial "sortFields" $fields -}}
 {{- $single :=  dict "key" $pageKey "title" $pageTitle "file" $file "dataformat" "yaml" "fields" $fields "previewUrl" $previewUrl -}}
 
 {{- return $single -}}

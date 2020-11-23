@@ -120,6 +120,7 @@
                 {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath ) -}}
                 {{- $fields = $fields | append $field -}}
             {{- end -}}
+            {{- $fields = partial "sortFields" $fields -}}
             {{- $collection := dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle "previewUrl" "/" -}}
             {{- $collections = $collections | append $collection -}}
             {{- $homeMenu = $homeMenu | append (dict "key" (index $collection "key")) -}}
@@ -200,19 +201,23 @@
 {{- $menu := slice -}}
 
 {{- if gt (len $homeMenu) 0 }}
-    {{- $menu = $menu | append (dict "key" "home" "title" "Home" "menuItems" $homeMenu) -}}
+    {{- $sortedHomeMenu := sort $homeMenu "value" "desc" -}}
+    {{- $menu = $menu | append (dict "key" "home" "title" "Home" "menuItems" $sortedHomeMenu) -}}
 {{- end -}}
 
 {{- if gt (len $singlesMenu) 0 }}
-    {{- $menu = $menu | append (dict "key" "pages" "title" "Pages" "menuItems" $singlesMenu) -}}
+    {{- $sortedSinglesMenu := sort $singlesMenu "key" "asc" -}}
+    {{- $menu = $menu | append (dict "key" "pages" "title" "Pages" "menuItems" $sortedSinglesMenu) -}}
 {{- end -}}
 
 {{- if gt (len $collectionMenu) 0 }}
-    {{- $menu = $menu | append (dict "key" "groups" "title" "Groups" "menuItems" $collectionMenu) -}}
+    {{- $sortedCollectionMenu := sort $collectionMenu "key" "asc" -}}
+    {{- $menu = $menu | append (dict "key" "groups" "title" "Groups" "menuItems" $sortedCollectionMenu) -}}
 {{- end -}}
 
 {{- if gt (len $dataMenu) 0 }}
-    {{- $menu = $menu | append (dict "key" "Other content" "title" "Other content" "menuItems" $dataMenu) -}}
+    {{- $sortedDataMenu := sort $dataMenu "key" "asc" -}}
+    {{- $menu = $menu | append (dict "key" "Other content" "title" "Other content" "menuItems" $sortedDataMenu) -}}
 {{- end -}}
 
 {{- if gt (len $generalMenu) 0 }}
