@@ -1,0 +1,31 @@
+{{- $unsorted := . -}}
+{{- $sorted := slice -}}
+{{- $order := slice -}}
+
+{{- range . }}
+    {{ if or (in .type "bundle-image") -}}
+        {{- $order = $order | append .key -}}
+    {{- end -}}
+{{- end -}}
+{{- $order := $order | append (slice "draft" "active" "title" "subtitle" "description" ) -}}
+{{- range . }}
+    {{ if or (in .key "image") (in .key "Image") -}}
+        {{- $order = $order | append .key -}}
+    {{- end -}}
+{{- end -}}
+{{- range . }}
+    {{ if or (in .key "price") (in .key "Price") -}}
+        {{- $order = $order | append .key -}}
+    {{- end -}}
+{{- end -}}
+{{- $order = $order | append "mainContent" -}}
+
+{{- range $order -}}
+    {{- $sorted = $sorted | append (where $unsorted "key" "eq" . ) -}}
+{{- end -}}
+
+{{- range where . "key" "not in" $order -}}
+    {{- $sorted = $sorted | append . -}}
+{{- end -}}
+
+{{- return $sorted -}}

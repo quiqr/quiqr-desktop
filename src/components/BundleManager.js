@@ -3,11 +3,11 @@ import FlatButton from 'material-ui/FlatButton';
 import IconNavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
 
-type AccordionHeaderProps = {
+type BundleManagerHeaderProps = {
     active: bool, onClick: ()=>void, style: any, headerLeftItems: any, headerRightItems: any
 }
 
-class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
+class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
     render(){
         let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
@@ -17,7 +17,7 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
                     <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
                 )})}
             </span>
-            <span style={{ position:'absolute', top:'8px', right: '5px'}}>
+            <span style={{ position:'absolute', top:'0px', right: '-5px'}}>
                 { headerRightItems.map((item, index) => { return  (
                     <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
                 )})}
@@ -33,44 +33,55 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
     }
 }
 
-class AccordionItem extends React.Component{
+class BundleManagerItem extends React.Component{
     render(){
-        let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bodyStyle, style, wrapperProps } = this.props;
+        let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
 
         let _headStyle = Object.assign({
-            border: 'solid 1px #e8e8e8',
-            padding: '16px',
+            border: 'solid 0px #e8e8e8',
+            padding: '12px 0px 12px 8px',
             display:'block',
             cursor:'pointer',
-            marginTop:8,
-            position:'relative'
+            position:'relative',
+            fontSize: 12,
+            color: 'rgba(0, 0, 0, 0.47)'
         }, headStyle);
 
         let _bodyStyle = Object.assign({
             display:active?'block':'none',
-            padding:'16px 0',
-            border: 'solid 1px #e8e8e8',
-            borderTopWidth: 0
+            padding:'8px 0',
+            border: 'solid 0px #e8e8e8',
+            borderTopWidth: 0,
+            width: '100%',
         },bodyStyle);
 
-        return <div style={style} className="accordion-item" {...wrapperProps} >
-            <AccordionHeader
-                style={_headStyle}
-                onClick={onHeadClick}
-                headerLeftItems={headerLeftItems}
-                headerRightItems={headerRightItems}
-                forceActive={this.props.forceActive}
-                active={active}
-                label={label}
-            />
-            <div style={_bodyStyle}>
-                { active? body : ( null ) }
-            </div>
-        </div>;
+        let _bundleStyle = Object.assign({
+            margin: '8px',
+            padding:'8px',
+            border: 'solid 0px #e8e8e8',
+            boxShadow: '1px 1px 4px RGBA(0,0,0,.2)'
+        },bundleStyle);
+
+        return <div style={style} className="BundleManager-item col-xl-4 col-lg-6 col-12" {...wrapperProps} >
+              <div style={_bundleStyle}>
+                <BundleManagerHeader
+                    style={_headStyle}
+                    onClick={onHeadClick}
+                    headerLeftItems={headerLeftItems}
+                    headerRightItems={headerRightItems}
+                    forceActive={this.props.forceActive}
+                    active={active}
+                    label={label}
+                />
+                  <div  style={_bodyStyle}>
+                      { active? body : ( null ) }
+                  </div>
+                </div>
+              </div>
     }
 }
 
-class Accordion extends React.Component{
+class BundleManager extends React.Component{
 
     constructor(props){
         super(props);
@@ -102,7 +113,7 @@ class Accordion extends React.Component{
 
     render(){
         let openedIndex = this.getOpenedIndex();
-        return <div className="accordion" style={this.props.style}>
+        return <div className="BundleManager row" style={this.props.style}>
             { this.props.children.map(function(item, index){
                 let active = this.props.forceActive || index === openedIndex;
                 return React.cloneElement(item, {
@@ -114,4 +125,4 @@ class Accordion extends React.Component{
     }
 }
 
-export { Accordion, AccordionItem };
+export { BundleManager, BundleManagerItem };
