@@ -2,13 +2,20 @@
 {{- $key := .key -}}
 {{- $pogoType := "" -}}
 {{- $type := (printf "%T" $value) -}}
+{{- $stringLen := 0 -}}
+
 {{- if (eq "bool" $type) -}}
   {{- $pogoType = "boolean" -}}
 {{- else if (or (eq "int" $type) (eq "int64" $type) (eq "float64" $type)) -}}
   {{- $pogoType = "number" -}}
 {{- else if (eq "string" $type) -}}
   {{- $pogoType = "string" -}}
-{{- else if or ( eq "template.HTML" $type ) -}}
+  {{- $stringLen = len $value -}}
+  {{- warnf ( string $stringLen) -}}
+  {{- if gt $stringLen 40}}
+      {{- $pogoType = "markdown" -}}
+  {{- end -}}
+{{- else if (eq "template.HTML" $type ) -}}
   {{- $pogoType = "markdown" -}}
 {{- else if (eq "time.Time" $type) -}}
   {{- if (eq $value "Lastmod") -}}

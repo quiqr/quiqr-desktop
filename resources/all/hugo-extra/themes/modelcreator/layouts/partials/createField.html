@@ -28,10 +28,22 @@
 
 {{- if (eq $pogoType "accordion") -}}
     {{- $subfields := slice -}}
-    {{- range $key, $value := ( index $value 0 ) -}}
+    {{- $arrayTitle := "" -}}
+    {{- $accordionKeys := slice -}}
+    {{- $accordionItems := ( index $value 0 ) -}}
+    {{- range $key, $value := $accordionItems -}}
+        {{- $accordionKeys = $accordionKeys | append $key -}}
+        {{- if or (eq $key "name") (eq $key "title") (eq $key "line") -}}
+            {{- $arrayTitle = $key -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if eq $arrayTitle "" -}}
+        {{ $arrayTitle = index $accordionKeys 0 -}}
+    {{- end -}}
+    {{- range $key, $value := $accordionItems -}}
             {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
             {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file) -}}
-            {{ if or (eq $key "name") (eq $key "title") (eq $key "line")}}
+            {{- if eq $key $arrayTitle -}}
                 {{- $field = $field | merge (dict "arrayTitle" true ) -}}
             {{- end -}}
             {{- $subfields = $subfields | append $field -}}
