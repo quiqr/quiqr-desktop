@@ -24,7 +24,7 @@ let MenuBorder = ({ children }) => {
 }
 
 let WhiteSubHeader = ({children}) => {
-  return <Subheader style={{color: translucentColor, fontWeight:300}}>{children}</Subheader>
+  return <Subheader style={{color: translucentColor, fontWeight:300,}}>{children}</Subheader>
 };
 
 
@@ -72,11 +72,11 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
                 { menu.items ? (<MenuBorder>
                     <List style={{padding: 0}}>
                         { menu.items.map((item, index)=>{
-                            let style = item.active ? {background: translucentColor}:{};
+                            let style = item.active ? {background: translucentColor, padding:8}:{};
                             return (
                                 <ListItem
                                     key={index}
-                                    innerDivStyle={style}
+                                    innerDivStyle={{paddingTop:12,paddingBottom:12 }}
                                     onClick={item.onClick}
                                     primaryText={item.label}
                                     //leftIcon={<IconActionList color={translucentColor} />}

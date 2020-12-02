@@ -77,7 +77,7 @@ type CollectionProps = {
 type CollectionState = {
   selectedWorkspaceDetails: null,
   filter: string,
-  items: ?Array<{key:string, label:string}>,
+  items: ?Array<{label:string, key:string }>,
   filteredItems: Array<{key:string, label:string}>,
   trunked: bool,
   view: ?{ key: ?string, item: any },
