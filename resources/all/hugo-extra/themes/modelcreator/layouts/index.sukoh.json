@@ -10,12 +10,11 @@
 {{- $generalMenu := slice -}}
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
-{{- range .Site.AllPages -}}
-    {{- range .AllTranslations -}}
-          {{- if not ( in $translations .Language.Lang ) -}}
-            {{- $translations = $translations | append .Language.Lang -}}
-          {{- end -}}
-    {{- end -}}
+
+{{- range .Site.Languages -}}
+      {{- if not ( in $translations .Lang ) -}}
+        {{- $translations = $translations | append .Lang -}}
+      {{- end -}}
 {{- end -}}
 
 
