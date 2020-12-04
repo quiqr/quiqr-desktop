@@ -136,7 +136,15 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     checkSiteInProps(){
+
         var { siteKey, workspaceKey } = this.props;
+
+        service.getConfigurations(true).then((c)=>{
+            var stateUpdate  = {};
+            stateUpdate.pogoboardConn = c.global.pogoboardConn;
+            this.setState(stateUpdate);
+        });
+
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey !== siteKey){
@@ -289,8 +297,34 @@ class Home extends React.Component<HomeProps, HomeState>{
             return true;
         }
         return false;
-
     }
+
+    upgradeLinkedSite(){
+
+        let upgradeVars = {
+            username: this.state.username,
+            projectPath:  this.state.selectedSite.publish[0].config.path,
+            plan: "basic"
+        };
+
+        service.api.logToConsole(upgradeVars);
+        service.api.logToConsole(btoa(JSON.stringify(upgradeVars)));
+        let requestVars =btoa(JSON.stringify(upgradeVars));
+
+
+        /*
+        /upgrade1 -> store req. ask conf term (post) /request
+        /upgrade2 -> ask conf /termsget
+        /upgrade3 ->  /termspost
+        /dispatch
+        */
+
+        let url = this.state.pogoboardConn.protocol+"//"+
+            this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/upgrade/request/"+requestVars;
+        window.require('electron').shell.openExternal(url);
+    }
+
+
     handleOpenTerms(){
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
@@ -326,9 +360,18 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this.checkLinkedDomain()){
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{site.name} is linked to <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{site.name} is linked to&nbsp;
+                        <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
                         window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
-                    }}>{site.publish[0].config.defaultDomain}</button></span>
+                        }}>{site.publish[0].config.defaultDomain}</button>
+
+                        &nbsp;
+
+                        <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+                            this.upgradeLinkedSite();
+                        }}>Upgrade</button>
+
+                     </span>
                 </ListItem>
             )
         }
