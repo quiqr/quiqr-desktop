@@ -114,9 +114,7 @@
                 {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 1).Name -}}
             {{- end -}}
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $st.Parent "dir" $resourceDir)) -}}
-            {{- if not (in .Params "mainContent") -}}
-                {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
-            {{- end -}}
+            {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
             {{- range $key, $value := .Params -}}
                 {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath ) -}}
                 {{- $fields = $fields | append $field -}}
