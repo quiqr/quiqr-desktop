@@ -8,8 +8,8 @@
       {{- $language := "" -}}
       {{- if .file }}
             {{- $lang := (path.Base $dir) -}}
-            {{- if or (in $translations $lang) (not $translations) -}}
-                {{- if not (eq $lang "data") -}}
+            {{- if or (in $translations $lang) (le (len $translations) 1) -}}
+                {{- if and (not (eq $lang "data")) (gt (len $translations) 1) -}}
                     {{- $language = printf "%s | " $lang -}}
                 {{- end -}}
                 {{- $fields := slice -}}
