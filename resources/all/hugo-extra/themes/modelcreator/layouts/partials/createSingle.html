@@ -33,7 +33,7 @@
     {{- end -}}
 {{- end -}}
 {{- $previewUrl := "" -}}
-{{- if .RelPermalink  -}}
+{{- if .page.RelPermalink  -}}
     {{- $previewUrl = .page.RelPermalink -}}
 {{- else }}
     {{- $previewUrl = "/" -}}
