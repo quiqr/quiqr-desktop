@@ -1,7 +1,6 @@
 //@flow
 
 import * as React from 'react';
-import Border from './Border';
 import FlatButton from 'material-ui/FlatButton';
 import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import * as HoForm from './HoForm';

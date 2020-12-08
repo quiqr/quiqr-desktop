@@ -1,4 +1,3 @@
-{{/* version 22 November */}}
 {{- $collectionPages := slice -}}
 {{- $singlePages := slice -}}
 {{- $singles := slice -}}
@@ -17,15 +16,14 @@
       {{- end -}}
 {{- end -}}
 
-
-
 {{/*------------------------------ Data -----------------------------*/}}
 
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "data" -}}
-      {{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations )) }}
-      {{- $singles = $singles | append (index $data "singles") }}
-      {{- $dataMenu = $dataMenu | append (index $data "menu") }}
+      {{- $data := (partial "createDataItems" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations )) -}}
+      {{- $singles = $singles | append (index $data "singles") -}}
+      {{- $collections = $collections | append (index $data "collections") -}}
+      {{- $dataMenu = $dataMenu | append (index $data "menu") -}}
   {{- end -}}
 {{- end -}}
 
@@ -64,12 +62,10 @@
       {{- end -}}
 {{- end -}}
 
-
 {{/*
 {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static")) -}}
 {{- $generalMenu = $generalMenu | append (dict "key" "staticimages" ) -}}
 */}}
-
 
 {{/*------------------------ Home widgetpage ------------------------ */}}
 

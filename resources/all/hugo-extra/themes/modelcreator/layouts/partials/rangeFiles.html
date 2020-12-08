@@ -4,9 +4,9 @@
      {{- if .IsDir -}}
           {{- $dir := printf "%s/" (printf "%s%s" $fileDir .Name ) -}}
           {{- $node :=  strings.TrimRight "." (replace (replace $dir "/data/" "") "/" ".") -}}
-          {{- $files = $files | append (dict "dir" $dir "node" $node ) -}}
+          {{- $files = $files | append (dict "dir" $dir "node" $node "isdir" true ) -}}
      {{- else -}}
-          {{- $files = $files | append (dict "dir" $fileDir "file" .Name ) -}}
+          {{- $files = $files | append (dict "dir" $fileDir "file" .Name "isfile" true ) -}}
      {{- end -}}
 {{- end -}}
 {{- return $files -}}
