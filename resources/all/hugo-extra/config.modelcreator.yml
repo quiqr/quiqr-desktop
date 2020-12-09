@@ -1,3 +1,4 @@
+buildDrafts: true
 outputs:
   home:
     - Sukoh
