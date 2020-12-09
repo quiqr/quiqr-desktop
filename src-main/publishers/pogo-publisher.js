@@ -61,6 +61,7 @@ class PogoPublisher {
         var sukohdir = pathHelper.getRoot();
 
         try {
+            console.log(git_bin);
             let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
             outputConsole.appendLine('Keygen success ...');
             pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
