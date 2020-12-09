@@ -10,7 +10,15 @@
             {{- path.Base .File.BaseFileName }}
         {{- end -}}
     {{- else -}}
-        {{- path.Split (path.Base .File.Dir )| anchorize -}}
+
+        {{- with .File.Dir -}}
+          {{- if in (partial "langCodes" .) (path.Dir .) -}}
+              {{- path.Split (path.Base . )| anchorize -}}
+          {{- else -}}
+              {{- (replace . "/" "-") | anchorize -}}
+          {{- end -}}
+
+        {{- end -}}
     {{- end -}}
 {{- else -}}
     {{- with .File -}}
