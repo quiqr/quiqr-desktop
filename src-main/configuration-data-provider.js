@@ -51,6 +51,7 @@ const GLOBAL_DEFAULTS = {
     hideInlineMenus: true,
     appTheme: "simple",
     pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
+    pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
     //pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
 }
 

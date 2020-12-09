@@ -141,7 +141,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         service.getConfigurations(true).then((c)=>{
             var stateUpdate  = {};
-            stateUpdate.pogoboardConn = c.global.pogoboardConn;
+            stateUpdate.pogostripeConn = c.global.pogostripeConn;
             this.setState(stateUpdate);
         });
 
@@ -319,8 +319,8 @@ class Home extends React.Component<HomeProps, HomeState>{
         /dispatch
         */
 
-        let url = this.state.pogoboardConn.protocol+"//"+
-            this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/upgrade/request/"+requestVars;
+        let url = this.state.pogostripeConn.protocol+"//"+
+            this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/request/"+requestVars;
         window.require('electron').shell.openExternal(url);
     }
 
