@@ -2,8 +2,8 @@
   "homepage": "./",
   "name": "poppygo",
   "author": {
-    "name": "Pim Snel",
-    "email": "pim@lingewoud.nl"
+    "name": "Pim Snel, Brecht Swanenberg",
+    "email": "info@poppygo.io"
   },
   "description": "The PoppyGo Hugo Publishing App.",
   "version": "0.7.4",

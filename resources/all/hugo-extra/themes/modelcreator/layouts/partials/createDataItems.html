@@ -9,10 +9,7 @@
       {{- $language := "" -}}
       {{- $langCodes := partial "langCodes" . -}}
       {{- $subDir := (path.Base $dir) -}}
-      {{- warnf (printf "Subdir is %s" $subDir) }}
       {{- if .isfile -}}
-            {{- warnf "isFile" }}
-            {{- warnf .file }}
             {{- if or ( in $translations $subDir) (not ( in $langCodes $subDir)) -}}
                 {{- if and (in $langCodes $subDir) (gt (len $translations) 1) -}}
                     {{- $language = printf "%s | " $subDir -}}
@@ -35,14 +32,11 @@
             {{- end -}}
 
       {{- else if and .isdir (in $langCodes (path.Base .dir)) -}}
-            {{- warnf "in langcodes subdir" }}
             {{- $data := partial "createDataItems" (dict "dir" $file.dir "data" (index $data .node) "translations" $translations) -}}
             {{- $singles = $singles | append (index $data "singles") -}}
             {{- $menu = $menu | append (index $data "menu") -}}
 
       {{- else if .isdir -}}
-            {{ warnf (printf "%s %s" "isDir" $index) }}
-            {{ warnf .dir }}
             {{- $node := .node -}}
             {{- range first 1 (partial "rangeFiles" (dict "dir" .dir )) -}}
                 {{- $name := (path.Base .dir) -}}
