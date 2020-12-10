@@ -53,7 +53,7 @@
 
 {{- if (eq $pogoType "bundle-manager") -}}
 {{- $bundleFields :=  slice (partial "createField" (dict "key" "thumb" "type" "bundle-image-thumbnail")) -}}
-{{- $extensions := (slice "jpg" "png" "jpeg" "pdf" ) -}}
+{{- $extensions := (slice "jpg" "png" "jpeg" "pdf" "svg" ) -}}
 {{- $field = merge $field (dict "path" $value "extensions" $extensions "fields" $bundleFields ) -}}
 {{- end -}}
 

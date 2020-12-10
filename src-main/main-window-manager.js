@@ -335,8 +335,6 @@ module.exports = {
             const tryConnection = () => client.connect({port: 1313}, () => {
 
                 client.end();
-
-                console.log('previewurl');
                 mobilePreviewView.webContents.loadURL(url);
                 mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
                 mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
