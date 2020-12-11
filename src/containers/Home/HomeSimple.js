@@ -299,7 +299,22 @@ class Home extends React.Component<HomeProps, HomeState>{
         return false;
     }
 
-    upgradeLinkedSite(){
+    handleManageSubscriptions(){
+
+        let userVars = {
+            username: this.state.username,
+        };
+
+        service.api.logToConsole(userVars);
+        service.api.logToConsole(btoa(JSON.stringify(userVars)));
+        let requestVars =btoa(JSON.stringify(userVars));
+
+        let url = this.state.pogostripeConn.protocol+"//"+
+            this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/myaccount/"+requestVars;
+        window.require('electron').shell.openExternal(url);
+    }
+
+    handleUpgradeLinkedSite(){
 
         let upgradeVars = {
             username: this.state.username,
@@ -320,7 +335,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         */
 
         let url = this.state.pogostripeConn.protocol+"//"+
-            this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/request/"+requestVars;
+            this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/"+requestVars;
         window.require('electron').shell.openExternal(url);
     }
 
@@ -347,6 +362,8 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this.state.username!==""){
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
                 <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
+                <br/><button className="reglink" onClick={()=>{this.handleManageSubscriptions()}}>Manage Subscriptions</button>
+
                 </ListItem>
             );
         }
@@ -365,13 +382,11 @@ class Home extends React.Component<HomeProps, HomeState>{
                         window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
                         }}>{site.publish[0].config.defaultDomain}</button>
 
-                        &nbsp;
 
-                        <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
-                            this.upgradeLinkedSite();
-                        }}>Upgrade</button>
+                </span>
+                <br/>
+                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
 
-                     </span>
                 </ListItem>
             )
         }
