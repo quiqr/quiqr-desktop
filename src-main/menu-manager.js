@@ -100,6 +100,24 @@ class MenuManager {
             }
         }
         else{
+            // write .images.md for managing images in static folder
+            const staticDir = path.join(global.currentSitePath, "static");
+            const imageDir =  path.join(global.currentSitePath, "static", "images");
+            const imageFile = path.join(global.currentSitePath, "static", "images", ".pogo-images.md");
+            const imageFile2 = path.join(global.currentSitePath, "static", ".pogo-images.md");
+            const imageFileContent = "---\n\
+description: this file is a helper file for the PoppyGo asset manager\n\
+resources: []\n\
+---\n\
+\n";
+
+            if (fs.existsSync (imageDir)){
+                fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
+            } else {
+                fs.ensureDirSync(staticDir);
+                fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');
+            };
+
             let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
             await hugoBuilder.buildModel();
 

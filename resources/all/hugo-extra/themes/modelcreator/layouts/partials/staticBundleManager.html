@@ -6,5 +6,5 @@
           {{- $fields = $fields | append (partial "createField" (dict "key" .Name "value" $path "type" "bundle-manager")) -}}
     {{- end -}}
 {{- end -}}
-{{- $single := (dict "key" "staticimages" "title" "Site Images" "file" "static/images/images.md" "dataformat" "md" "fields" $fields) -}}
+{{- $single := (dict "key" "staticimages" "title" "Site Images" "file" "static/images/.pogo-images.md" "dataformat" "md" "fields" $fields) -}}
 {{- return $single -}}

@@ -22,7 +22,7 @@
 {{- end -}}
 {{- $fields := slice -}}
 {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
-{{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
+{{/*- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -*/}}
 {{- $page := .page}}
 {{- $filePath := "" -}}
 {{- with $page.File -}} {{ $filePath = .Path -}} {{- end -}}
