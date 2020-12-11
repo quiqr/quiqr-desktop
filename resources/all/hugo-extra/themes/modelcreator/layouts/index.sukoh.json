@@ -64,7 +64,7 @@
 
 {{/*------------------------Static Image bundle manager --------------*/}}
 
-{{- range where (readDir "static/images") ".Name" "images.md" -}}
+{{- range where (readDir "static/images") ".Name" ".pogo-images.md" -}}
     {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static/images")) -}}
     {{- $generalMenu = $generalMenu | append (dict "key" "staticimages" ) -}}
 {{- end -}}
