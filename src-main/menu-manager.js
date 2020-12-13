@@ -111,10 +111,10 @@ resources: []\n\
 ---\n\
 \n";
             if (fs.existsSync (imageDir)){
-                fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
-            } else {
-                fs.ensureDirSync(staticDir);
-                fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');
+              fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
+            }
+            if (fs.existsSync(staticDir)){
+              fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');
             };
 
             let hugoBuilder = new HugoBuilder(hugoBuilderConfig);

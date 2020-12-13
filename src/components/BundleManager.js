@@ -32,7 +32,7 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
 
 class BundleManagerItem extends React.Component{
     render(){
-        let {active, path, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
+        let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
 
         let _headStyle = Object.assign({
             border: 'solid 0px #e8e8e8',
@@ -109,11 +109,9 @@ class BundleManager extends React.Component{
     }
 
     render(){
-        console.log ('render BundleManager');
         let openedIndex = this.getOpenedIndex();
         return <div className="BundleManager row" style={this.props.style}>
             { this.props.children.map(function(item, index){
-                console.log ( item.props.path );
                 let active = this.props.forceActive || index === openedIndex;
                 let splitPath = (item.props.path).split("/");
                 if (splitPath.length < 3 ){
