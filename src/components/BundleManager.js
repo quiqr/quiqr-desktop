@@ -3,9 +3,6 @@ import FlatButton from 'material-ui/FlatButton';
 import IconNavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
 
-type BundleManagerHeaderProps = {
-    active: bool, onClick: ()=>void, style: any, headerLeftItems: any, headerRightItems: any
-}
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
@@ -35,7 +32,7 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
 
 class BundleManagerItem extends React.Component{
     render(){
-        let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
+        let {active, path, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
 
         let _headStyle = Object.assign({
             border: 'solid 0px #e8e8e8',
@@ -112,14 +109,19 @@ class BundleManager extends React.Component{
     }
 
     render(){
+        console.log ('render BundleManager');
         let openedIndex = this.getOpenedIndex();
         return <div className="BundleManager row" style={this.props.style}>
             { this.props.children.map(function(item, index){
+                console.log ( item.props.path );
                 let active = this.props.forceActive || index === openedIndex;
-                return React.cloneElement(item, {
-                    active,
-                    onHeadClick: this.getHandleChange(index),
-                });
+                let splitPath = (item.props.path).split("/");
+                if (splitPath.length < 3 ){
+                  return React.cloneElement(item, {
+                      active,
+                      onHeadClick: this.getHandleChange(index),
+                  });
+                }
             }.bind(this)) }
         </div>
     }
