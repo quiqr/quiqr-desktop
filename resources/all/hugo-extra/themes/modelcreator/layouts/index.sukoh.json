@@ -64,11 +64,32 @@
 
 {{/*------------------------Static Image bundle manager --------------*/}}
 
+
 {{- range where (readDir "/") ".Name" "static" -}}
   {{- range where (readDir "static/") ".Name" "images" -}}
-    {{- range where (readDir "static/images") ".Name" ".pogo-images.md" -}}
-        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static/images")) -}}
-        {{- $generalMenu = $generalMenu | append (dict "key" "staticimages" ) -}}
+    {{- $imagesInRoot := false -}}
+    {{- $imagesInSubFolder := false -}}
+
+    {{- range (readDir "static/images") -}}
+        {{- $ext := path.Ext .Name }}
+        {{- if and (not .IsDir) (in (slice ".jpg" ".jpeg" ".png" ".gif" "webp") $ext) -}}
+            {{- $imagesInRoot = true -}}
+
+        {{- else if .IsDir -}}
+            {{- $imagesInSubFolder = true -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if $imagesInRoot -}}
+        {{- $key := "img_static" -}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static" "title" "General images" "key" $key "file" "static/.pogo-images.md" )) -}}
+        {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
+    {{- end -}}
+
+    {{- if $imagesInSubFolder -}}
+        {{ $key := "img_static_image"}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static/images" "title" "Grouped images" "key" $key "file" "static/images/.pogo-images.md")) -}}
+        {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}

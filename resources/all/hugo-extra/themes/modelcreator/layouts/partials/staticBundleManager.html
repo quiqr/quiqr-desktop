@@ -1,11 +1,9 @@
 {{- $fields := slice -}}
-{{- $dir := .dir -}}
-{{- $fields = $fields | append (partial "createField" (dict "key" "root" "value" "/" "type" "bundle-manager")) -}}
-{{- range (readDir $dir) -}}
+{{- range (readDir .dir) -}}
     {{- if .IsDir -}}
         {{ $path := printf "%s/" .Name }}
           {{- $fields = $fields | append (partial "createField" (dict "key" .Name "value" $path "type" "bundle-manager")) -}}
     {{- end -}}
 {{- end -}}
-{{- $single := (dict "key" "staticimages" "title" "Site Images" "file" "static/images/.pogo-images.md" "dataformat" "md" "fields" $fields) -}}
+{{- $single := (dict "key" .key "title" .title "file" .file "dataformat" "md" "fields" $fields) -}}
 {{- return $single -}}
