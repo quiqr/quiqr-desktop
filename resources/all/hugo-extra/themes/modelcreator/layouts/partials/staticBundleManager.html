@@ -1,5 +1,6 @@
 {{- $fields := slice -}}
 {{- $dir := .dir -}}
+{{- $fields = $fields | append (partial "createField" (dict "key" "root" "value" "/" "type" "bundle-manager")) -}}
 {{- range (readDir $dir) -}}
     {{- if .IsDir -}}
         {{ $path := printf "%s/" .Name }}

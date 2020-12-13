@@ -110,7 +110,6 @@ description: this file is a helper file for the PoppyGo asset manager\n\
 resources: []\n\
 ---\n\
 \n";
-
             if (fs.existsSync (imageDir)){
                 fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
             } else {
