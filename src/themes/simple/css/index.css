@@ -2,12 +2,17 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
-  /* overflow-x: hidden; */
+  color: #2f343c;
 }
 
 h1,h2,h3,h4,h5{
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
+  color: #2f343c;
+}
+
+span {
+  color: #2f343c;
 }
 
 button.reglink {
@@ -35,8 +40,8 @@ background-color: darkgrey;
 outline: 1px solid slategrey;
 }
 
-.hideScrollbar::-webkit-scrollbar { 
-  display: none; 
+.hideScrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* ==== MARKDOWN CONTAINER ==== */
@@ -108,7 +113,7 @@ outline: 1px solid slategrey;
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 100;
-  
+
   src: local('Roboto Thin'), local('Roboto-Thin'),
        url('../fonts/roboto-v18-latin-100.woff2') format('woff2');
 }
@@ -119,7 +124,7 @@ outline: 1px solid slategrey;
   font-weight: 100;
   src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
        url('../fonts/roboto-v18-latin-100italic.woff2') format('woff2');
-       
+
 }
 /* roboto-300 - latin */
 @font-face {
@@ -209,7 +214,7 @@ outline: 1px solid slategrey;
 .animated-faster { animation-duration: .15s; animation-fill-mode: both; }
 .animated.infinite { animation-iteration-count: infinite; }
 
-@keyframes fadeIn { 
+@keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
@@ -236,13 +241,13 @@ outline: 1px solid slategrey;
 }
 .slideInDown { animation-name: slideInDown; }
 
-@keyframes slideInLeft { 
+@keyframes slideInLeft {
   from { transform: translate3d(-100%, 0, 0); visibility: visible; }
   to { transform: translate3d(0, 0, 0); }
 }
 .slideInLeft { animation-name: slideInLeft; }
 
-@keyframes slideFadeInLeft { 
+@keyframes slideFadeInLeft {
   from { transform: translate3d(-100%, 0, 0); opacity:0; visibility: visible; }
   to { transform: translate3d(0, 0, 0); opacity:1; }
 }

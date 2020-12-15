@@ -1,0 +1,23 @@
+---
+subject: Contactformulier op hanskoning.com
+from: you-have-mail@pogoform.com
+to: info@hanskoning.com
+redirect_to: contact/contactformulier-verzonden
+validations:
+  fields:
+    email:
+      type: email
+      empty: false
+      mandatory: true
+    name:
+      type: string
+      empty: false
+      mandatory: true
+    lastName:
+      type: string
+      empty: true
+      mandatory: true
+    message:
+      type: string
+      empty: false
+      mandatory: true
