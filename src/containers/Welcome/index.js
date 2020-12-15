@@ -60,7 +60,6 @@ class Welcome extends React.Component {
                         <h1>Congratulations: You installed PoppyGo, The app for Hugo</h1>
                         <h3>You now have a publishing platform and CMS for your websites</h3>
                         <p>
-                          You can:
                             <ul>
                                 <li>Manage your content</li>
                                 <li>Preview your updates</li>
