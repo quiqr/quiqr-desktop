@@ -3,6 +3,7 @@
 {{- with .File -}} {{$filePath = .Path -}} {{- end -}}
 
 {{- if in (path.Base $filePath) "index" -}}
+
     {{- if eq .File.Dir "/" -}}
         {{- if .Name -}}
             {{- .Name | anchorize -}}
@@ -14,7 +15,7 @@
           {{- if in (partial "langCodes" .) (path.Dir .) -}}
               {{- path.Split (path.Base . )| anchorize -}}
           {{- else -}}
-              {{- (replace . "/" "-") | anchorize -}}
+              {{- path.Split (path.Base . )| anchorize -}}
           {{- end -}}
         {{- end -}}
     {{- end -}}

@@ -4,8 +4,14 @@
 {{ else }}
     {{- $subDir := "" -}}
     {{- with .File.Dir }}
-      {{- $subDir = path.Dir (path.Dir .) -}}
+      {{- if in . "data"}}
+          {{- $subDir = path.Dir (path.Dir .) -}}
+      {{- end -}}
     {{- end -}}
-    {{- $contentDir = printf "content/%s/" $subDir -}}
+    {{- if or (eq $subDir ".") (eq $subDir "") -}}
+        {{- $contentDir = "content/" -}}
+    {{- else -}}
+        {{- $contentDir = printf "content/%s/" $subDir -}}
+    {{- end -}}
 {{- end -}}
 {{- return $contentDir -}}

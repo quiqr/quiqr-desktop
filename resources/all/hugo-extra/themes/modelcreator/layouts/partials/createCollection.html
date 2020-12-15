@@ -9,14 +9,17 @@
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
 
 {{- $sectionTitle := printf "%s%s" $language ($baseKey | humanize) -}}
-
 {{- range .Pages -}}
     {{- if and .File (ne $break "true") -}}
         {{- $break = true -}}
-        {{- $subDir := path.Base .File.Dir -}}
-        {{ if (in $baseKey $subDir) }}
+        {{- $subDir := $baseKey -}}
+        {{- if in .File.Dir "data"}}
+            {{- $subDir = path.Base .File.Dir -}}
+        {{- end -}}
+        {{ if or (in $baseKey $subDir) (in $contentDir $baseKey) }}
             {{- $dir := printf "%s%s/" $contentDir $subDir -}}
             {{- $extension := .File.Ext -}}
+            {{- $dataFormat := "yaml" -}}
             {{- $fields := slice -}}
             {{- $resourceDir := "" -}}
             {{- $page := . -}}
@@ -30,13 +33,14 @@
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $page "dir" $resourceDir )) -}}
             {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
             {{- range $key, $value := .Page.Params -}}
-            {{- if ne $key "mainContent" -}}
+            {{- warnf $key -}}
+            {{- if ne $key "maincontent" -}}
                     {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath) -}}
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
             {{- end -}}
             {{- $fields = partial "sortFields" $fields -}}
-            {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle  -}}
+            {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" $dataFormat "fields" $fields "itemtitle" $itemTitle  -}}
         {{- end -}}
     {{- end -}}
 {{- end -}}

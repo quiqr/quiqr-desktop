@@ -53,7 +53,7 @@
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
                 {{- if gt (len $fields) 0 -}}
-                    {{- $collection :=  dict "key" $dataKey "title" $dataTitle "folder" $folder "extension" $fileExt "dataformat" "yaml" "fields" $fields "itemtitle" $itemTitle  -}}
+                    {{- $collection :=  dict "key" $dataKey "title" $dataTitle "folder" $folder "extension" $fileExt "dataformat" $fileExt "fields" $fields "itemtitle" $itemTitle  -}}
                     {{- $collections = $collections | append $collection -}}
                     {{- $menu = $menu | append (dict "key" (index $collection "key")) -}}
                 {{- end -}}
