@@ -125,7 +125,7 @@
             {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
             {{- $sectionTitle :=  printf "%s%s" $language ((path.Base $path)| humanize) -}}
             {{- $itemTitle :=   $sectionTitle  | singularize -}}
-            {{- $dir := printf "%s%s/" $contentDir $path -}}
+            {{- $dir := printf "%s%s/" $contentDir $parentDir -}}
             {{- $extension := .File.Ext -}}
             {{- $fields := slice -}}
             {{- $resourceDir := "" -}}
