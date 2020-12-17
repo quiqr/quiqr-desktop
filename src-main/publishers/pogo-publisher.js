@@ -71,7 +71,29 @@ class PogoPublisher {
             outputConsole.appendLine('keygen error ...:' + e);
         }
 
+        await fs.unlinkSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
         return pubkey;
+    }
+
+    async getKeyFingerprint(){
+        //let pubkey = '';
+        var git_bin = this.getGitBin();
+        var sukohdir = pathHelper.getRoot();
+        let fingerprint = null;
+
+        try {
+            //console.log(git_bin);
+            let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
+            fingerprint = gencmd.toString().replace(/\n/g,"");
+            //pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+
+
+        } catch (e) {
+            outputConsole.appendLine('fingerprint error ...:' + e);
+        }
+
+        return fingerprint;
+
     }
 
     async writeProfile(profile){
@@ -93,7 +115,7 @@ class PogoPublisher {
         await fs.chmodSync(profilepath2, '0600');
 
         await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
-        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
+        //await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
         await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
 
         return true;
@@ -111,6 +133,7 @@ class PogoPublisher {
         return profile;
     }
 
+    //FIXME why this is the same?
      readProfile2(){
         var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
         var profile;

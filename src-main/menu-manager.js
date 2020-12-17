@@ -418,10 +418,10 @@ class MenuManager {
                         checked: checked,
                         click: async function (){
                             let key = path.join(profilesDir,f,"id_rsa_pogo");
-                            let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
+                            //let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
                             let profileJson= path.join(profilesDir,f,"poppygo-profile.json");
                             fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
-                            fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
+                            //fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
                             fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
                             await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
                             this.createMainMenu();

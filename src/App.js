@@ -81,6 +81,7 @@ class App extends React.Component<AppProps,AppState>{
             mobileBrowserActive: false,
             skipMenuTransition: false,
             poppygoUsername: "",
+            poppygoFingerprint: "",
             poppygoDomain: "",
         };
 
@@ -106,9 +107,10 @@ class App extends React.Component<AppProps,AppState>{
     getProfile(){
         let getProfile = service.api.getPoppyGoProfile();
 
-        getProfile.then((profile)=>{
-            if(this.state.poppygoUsername !==profile.username){
-                this.setState({poppygoUsername: profile.username});
+        getProfile.then((profileAndFingerprint)=>{
+            service.api.logToConsole(profileAndFingerprint)
+            if(this.state.poppygoUsername !== profileAndFingerprint.profile.username){
+                this.setState({poppygoUsername: profileAndFingerprint.profile.username, poppygoFingerprint:profileAndFingerprint.fingerprint});
             }
 
         }, (e)=>{
@@ -238,6 +240,7 @@ class App extends React.Component<AppProps,AppState>{
           this.getProfile();
           return <Home key={ 'home' }
               poppygoUsername={this.state.poppygoUsername}
+              poppygoFingerprint={this.state.poppygoFingerprint}
               siteKey={ decodeURIComponent(match.params.site) }
               workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />

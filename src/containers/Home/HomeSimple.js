@@ -92,6 +92,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
+            fingerprint: "",
             buttonPressed: "",
             siteCreatorMessage: null
         };
@@ -103,7 +104,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
 
         if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
-            this.setUserName(this.props.poppygoUsername);
+            this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
+        }
+        if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
+            this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
         }
     }
 
@@ -114,11 +118,12 @@ class Home extends React.Component<HomeProps, HomeState>{
     componentDidMount(){
         this.checkSiteInProps();
         this._ismounted = true;
-        this.setUserName(this.props.poppygoUsername);
+        this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
     }
 
-    setUserName(username){
-        this.setState({username: username});
+    setUser(username,fingerprint){
+        service.api.logToConsole(fingerprint);
+        this.setState({username: username, fingerprint: fingerprint});
     }
 
     checkConvert07(site){
@@ -303,10 +308,11 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let userVars = {
             username: this.state.username,
+            fingerprint: this.state.fingerprint,
         };
 
-        service.api.logToConsole(userVars);
-        service.api.logToConsole(btoa(JSON.stringify(userVars)));
+        //service.api.logToConsole(userVars);
+        //service.api.logToConsole(btoa(JSON.stringify(userVars)));
         let requestVars =btoa(JSON.stringify(userVars));
 
         let url = this.state.pogostripeConn.protocol+"//"+
@@ -318,6 +324,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let upgradeVars = {
             username: this.state.username,
+            fingerprint: this.state.fingerprint,
             projectPath:  this.state.selectedSite.publish[0].config.path,
             plan: "basic"
         };
@@ -328,13 +335,13 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         //service.api.logToConsole(this.state.currentSiteKey);
 
-        service.api.upgradePending(this.state.currentSiteKey, this.state.selectedSite.publish[0].key).then(()=>{
-            service.getConfigurations(true).then((c)=>{
-                //snackMessageService.addSnackMessage('Site successfully published.');
-                this.checkSiteInProps();
-                service.api.logToConsole(this.state.selectedSite.publish[0]);
-            });
-        });
+        //        service.api.upgradePending(this.state.currentSiteKey, this.state.selectedSite.publish[0].key).then(()=>{
+        //            service.getConfigurations(true).then((c)=>{
+        //                //snackMessageService.addSnackMessage('Site successfully published.');
+        //                this.checkSiteInProps();
+        //                service.api.logToConsole(this.state.selectedSite.publish[0]);
+        //            });
+        //        });
 
         /*
         /upgrade1 -> store req. ask conf term (post) /request
@@ -383,8 +390,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 </Wrapper>
             )
         }
-
-
 
         if(this.state.username!==""){
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
@@ -626,6 +631,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                                                 this.handleClaimDomainClick(obj)
                                             }}
                                             username={this.state.username}
+                                            fingerprint={this.state.fingerprint}
 
                                             open={claimDomainDialog!=null&&claimDomainDialog.open}
                                         />
