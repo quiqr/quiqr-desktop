@@ -376,7 +376,7 @@ class PogoPublisher {
                                         this.writePublishStatus();
 
                                         dialog.showMessageBox(mainWindow, {
-											title: 'PoppyGo',
+                                            title: 'PoppyGo',
                                             type: 'info',
                                             message: "Succesfully published your changes. \n They will be visible in a minute or two.",
                                         });
@@ -388,7 +388,7 @@ class PogoPublisher {
                                         progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
-											title: 'PoppyGo',
+                                            title: 'PoppyGo',
                                             type: 'warning',
                                             message: "Publishing failed. (git-push)",
                                         });
@@ -400,7 +400,7 @@ class PogoPublisher {
                                 progressBar._window.hide();
                                 progressBar.close();
                                 dialog.showMessageBox(mainWindow, {
-									title: 'PoppyGo',
+                                    title: 'PoppyGo',
                                     type: 'warning',
                                     message: "Publishing failed. (git-commit)",
                                 });
@@ -413,7 +413,7 @@ class PogoPublisher {
                         progressBar._window.hide();
                         progressBar.close();
                         dialog.showMessageBox(mainWindow, {
-							title: 'PoppyGo',
+                            title: 'PoppyGo',
                             type: 'warning',
                             message: "Publishing failed. (git-add)",
                         });
@@ -426,7 +426,7 @@ class PogoPublisher {
                 progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {
-					title: 'PoppyGo',
+                    title: 'PoppyGo',
                     type: 'warning',
                     message: "Publishing failed. (git-clone)",
                 });
@@ -434,6 +434,17 @@ class PogoPublisher {
         });
 
         return true;
+    }
+
+    async upgradePending(context){
+        let configJsonPath = pathHelper.getRoot() + 'config.'+context.siteKey+'.json';
+        const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
+        var newConf = JSON.parse(conftxt);
+        //console.log(newConf.publish[0]);
+        newConf.publish[0] = context.publishConfig;
+        newConf.publish[0].upgrade = { state: "pending", reqDate: Date.now() };
+        //console.log(newConf.publish[0]);
+        await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
     }
 
 }

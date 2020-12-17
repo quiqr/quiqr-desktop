@@ -322,10 +322,19 @@ class Home extends React.Component<HomeProps, HomeState>{
             plan: "basic"
         };
 
-        service.api.logToConsole(upgradeVars);
-        service.api.logToConsole(btoa(JSON.stringify(upgradeVars)));
+        //service.api.logToConsole(upgradeVars);
+        //service.api.logToConsole(btoa(JSON.stringify(upgradeVars)));
         let requestVars =btoa(JSON.stringify(upgradeVars));
 
+        //service.api.logToConsole(this.state.currentSiteKey);
+
+        service.api.upgradePending(this.state.currentSiteKey, this.state.selectedSite.publish[0].key).then(()=>{
+            service.getConfigurations(true).then((c)=>{
+                //snackMessageService.addSnackMessage('Site successfully published.');
+                this.checkSiteInProps();
+                service.api.logToConsole(this.state.selectedSite.publish[0]);
+            });
+        });
 
         /*
         /upgrade1 -> store req. ask conf term (post) /request
@@ -343,6 +352,24 @@ class Home extends React.Component<HomeProps, HomeState>{
     handleOpenTerms(){
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
+    renderUpgadeLink(){
+        //service.api.logToConsole(this.state.selectedSite.publish[0]);
+        if(this.state.selectedSite.publish[0].hasOwnProperty('upgrade')){
+            let upgrade = this.state.selectedSite.publish[0].upgrade
+            if(upgrade.state === "pending"){
+                return (
+                    <span>Upgrade pending. Finish upgrade in browser.</span>
+                )
+            }
+        }
+        else{
+            return (
+                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
+            )
+
+        }
+    }
+
 
     renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
         let user = undefined;
@@ -385,7 +412,9 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                 </span>
                 <br/>
-                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
+
+                { this.renderUpgadeLink() }
+
 
                 </ListItem>
             )

@@ -460,5 +460,17 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     });
 }
 
+api.upgradePending = function({siteKey, publishKey}/*: any*/, context/*: any*/){
+    getSiteService(siteKey, function(err, siteService){
+        if(err){ context.reject(err); return; }
+        siteService.upgradePending(publishKey).then(()=>{
+            context.resolve();
+        }, ()=>{
+            //console.log(siteKey)
+            // console.log(publishKey)
+            context.reject(err);
+        });
+    });
+}
 
 module.exports = api;
