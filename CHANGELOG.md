@@ -1,5 +1,12 @@
 # PoppyGo App CHANGELOG
 
+## v0.7.5
+- static imagebundles
+- image thumb sizes smaller
+- small styling improvements
+- updated sukoh generator
+- homescreen improved with themes overview
+
 ## v0.7.4
 - fix accordion
 
@@ -205,5 +212,3 @@
 - editorconfig
 - maak page bundle
 - select site, direct vanuit het menu
-
-
