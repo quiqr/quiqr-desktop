@@ -103,7 +103,9 @@ class MenuManager {
             // write .images.md for managing images in static folder
             const staticDir = path.join(global.currentSitePath, "static");
             const imageDir =  path.join(global.currentSitePath, "static", "images");
+            const imgDir =  path.join(global.currentSitePath, "static", "img");
             const imageFile = path.join(global.currentSitePath, "static", "images", ".pogo-images.md");
+            const imgFile = path.join(global.currentSitePath, "static", "img", ".pogo-images.md");
             const imageFile2 = path.join(global.currentSitePath, "static", ".pogo-images.md");
             const imageFileContent = "---\n\
 description: this file is a helper file for the PoppyGo asset manager\n\
@@ -112,6 +114,9 @@ resources: []\n\
 \n";
             if (fs.existsSync (imageDir)){
               fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
+            }
+            if (fs.existsSync (imgDir)){
+              fs.writeFileSync(imgFile , imageFileContent , 'utf-8');
             }
             if (fs.existsSync(staticDir)){
               fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');

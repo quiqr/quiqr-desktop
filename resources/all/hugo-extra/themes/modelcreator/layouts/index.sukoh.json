@@ -66,11 +66,13 @@
 
 
 {{- range where (readDir "/") ".Name" "static" -}}
-  {{- range where (readDir "static/") ".Name" "images" -}}
+  {{- range where (readDir "static/") ".Name" "in" (slice "images" "img") -}}
     {{- $imagesInRoot := false -}}
     {{- $imagesInSubFolder := false -}}
 
-    {{- range (readDir "static/images") -}}
+    {{- $imageDir := printf "static/%s" .Name -}}
+    {{- warnf $imageDir -}}
+    {{- range (readDir $imageDir) -}}
         {{- $ext := path.Ext .Name }}
         {{- if and (not .IsDir) (in (slice ".jpg" ".jpeg" ".png" ".gif" "webp") $ext) -}}
             {{- $imagesInRoot = true -}}
@@ -88,7 +90,7 @@
 
     {{- if $imagesInSubFolder -}}
         {{ $key := "img_static_image"}}
-        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static/images" "title" "Grouped images" "key" $key "file" "static/images/.pogo-images.md")) -}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" $imageDir "title" "Grouped images" "key" $key "file" (printf "%s/.pogo-images.md" $imageDir))) -}}
         {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
     {{- end -}}
   {{- end -}}
@@ -213,8 +215,10 @@
 {{- range $singlePages -}}
     {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_") ) -}}
     {{ if gt (len $single) 0 }}
-        {{- $singles = $singles | append $single -}}
-        {{- $singlesMenu = $singlesMenu | append (dict "key" $single.key ) -}}
+        {{- if ne $single.file "" -}}
+          {{- $singles = $singles | append $single -}}
+          {{- $singlesMenu = $singlesMenu | append (dict "key" $single.key ) -}}
+        {{- end -}}
     {{- end -}}
 {{- end -}}
 
