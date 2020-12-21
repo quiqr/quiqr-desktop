@@ -33,7 +33,6 @@
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $page "dir" $resourceDir )) -}}
             {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
             {{- range $key, $value := .Page.Params -}}
-            {{- warnf $key -}}
             {{- if ne $key "maincontent" -}}
                     {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath) -}}
                     {{- $fields = $fields | append $field -}}

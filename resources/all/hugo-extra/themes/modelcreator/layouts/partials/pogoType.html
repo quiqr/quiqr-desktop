@@ -36,4 +36,7 @@
 {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
     {{- $pogoType = "hidden" -}}
 {{- end -}}
+{{- if eq $key "key" -}}
+    {{- $pogoType = "readonly" -}}
+{{- end -}}
 {{- return $pogoType -}}

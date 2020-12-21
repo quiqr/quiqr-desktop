@@ -75,6 +75,7 @@ class MenuManager {
         let hugover = 'extended_0.76.5';
         let modelPath = path.join(pathHelper.getTempDir(),"model");
         let modelFile = path.join(modelPath, "sukoh.json");
+        let menuFile = path.join(modelPath, "zpogomenu.json");
         let hugoBuilderConfig = {
             config: config.build[0]['config'],
             workspacePath: global.currentSitePath,
@@ -94,6 +95,7 @@ class MenuManager {
 
             try{
                 hugoDownloader.downloader.download(hugover);
+                this.generateModel();
             }
             catch(e){
                 // warn about HugoDownloader error?
@@ -143,7 +145,9 @@ resources: []\n\
                 if(response === 1) return;
 
                 fs.copySync(modelFile, path.join(global.currentSitePath, "sukoh.json"));
-
+                if (fs.existsSync(menuFile)){
+                  fs.copySync(menuFile, path.join(global.currentSitePath, "zpogomenu.json"));
+                }
             }
         }
     }
@@ -547,6 +551,7 @@ resources: []\n\
                 label: 'Generate PoppyGo config',
                 enabled: this.siteSelected(),
                 click: async () => {
+                    await this.generateModel();
                     this.generateModel()
                 }
             },

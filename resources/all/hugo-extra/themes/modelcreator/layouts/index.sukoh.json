@@ -10,6 +10,8 @@
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
 
+{{- warnf "sukoh" -}}
+
 {{- range .Site.Languages -}}
       {{- if not ( in $translations .Lang ) -}}
         {{- $translations = $translations | append .Lang -}}
@@ -71,7 +73,6 @@
     {{- $imagesInSubFolder := false -}}
 
     {{- $imageDir := printf "static/%s" .Name -}}
-    {{- warnf $imageDir -}}
     {{- range (readDir $imageDir) -}}
         {{- $ext := path.Ext .Name }}
         {{- if and (not .IsDir) (in (slice ".jpg" ".jpeg" ".png" ".gif" "webp") $ext) -}}
@@ -224,30 +225,81 @@
 
 {{/*---------------------------Menu----------------------------- */}}
 {{- $menu := slice -}}
+{{- $sukohMenu := slice -}}
+{{- $pogoMenu := dict -}}
+{{- $pogoKeys := slice -}}
+
+{{- range $index, $file := readDir "/" -}}
+  {{- if eq $file.Name "zpogomenu.json" -}}
+      {{- $pogoMenu = getJSON "/zpogomenu.json" -}}
+  {{- end -}}
+{{- end -}}
 
 {{- if gt (len $homeMenu) 0 }}
-    {{- $sortedHomeMenu := sort $homeMenu "value" "desc" -}}
-    {{- $menu = $menu | append (dict "key" "home" "title" "Home" "menuItems" $sortedHomeMenu) -}}
+      {{- $sortedHomeMenu := sort $homeMenu "value" "desc" -}}
+      {{- $sukohMenu = $sukohMenu | append (dict "key" "home" "title" "Home" "menuItems" $sortedHomeMenu) -}}
 {{- end -}}
 
 {{- if gt (len $singlesMenu) 0 }}
     {{- $sortedSinglesMenu := sort $singlesMenu "key" "asc" -}}
-    {{- $menu = $menu | append (dict "key" "pages" "title" "Pages" "menuItems" $sortedSinglesMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "singles" "title" "Pages" "menuItems" $sortedSinglesMenu) -}}
 {{- end -}}
 
 {{- if gt (len $collectionMenu) 0 }}
     {{- $sortedCollectionMenu := sort $collectionMenu "key" "asc" -}}
-    {{- $menu = $menu | append (dict "key" "groups" "title" "Groups" "menuItems" $sortedCollectionMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Groups" "menuItems" $sortedCollectionMenu) -}}
 {{- end -}}
 
 {{- if gt (len $dataMenu) 0 }}
     {{- $sortedDataMenu := sort $dataMenu "key" "asc" -}}
-    {{- $menu = $menu | append (dict "key" "Other content" "title" "Other content" "menuItems" $sortedDataMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "data" "title" "Other content" "menuItems" $sortedDataMenu) -}}
 {{- end -}}
 
 {{- if gt (len $generalMenu) 0 }}
-    {{- $menu = $menu | append (dict "key" "general" "title" "General" "menuItems" $generalMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "general" "title" "General" "menuItems" $generalMenu) -}}
 {{- end -}}
+
+{{- if $pogoMenu.menu -}}
+    {{- $singles = $singles | append (partial "createPogoMenuSingle" $pogoMenu ) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "poppygo" "title" "PoppyGo" "menuItems" (slice (dict "key" "pogomenu")) ) -}}
+{{- end -}}
+
+{{- range $pogoMenu.menu -}}
+    {{ $pogoKeys = $pogoKeys | append .key -}}
+{{- end -}}
+
+{{- if $pogoMenu.menu -}}
+    {{- range where $pogoMenu.menu "visible" "eq" true -}}
+        {{- $itemKeys := slice -}}
+        {{- $items := slice -}}
+        {{- range .menuItems -}}
+          {{ $itemKeys = $itemKeys | append .key -}}
+        {{- end -}}
+
+        {{- range where .menuItems "visible" "eq" true -}}
+          {{- $items = $items | append (dict "key" .key ) -}}
+        {{- end -}}
+
+        {{- range where $sukohMenu "key" "eq" .key -}}
+          {{- range .menuItems -}}
+            {{- if not (in $itemKeys .key) -}}
+                {{- $items = $items | append (dict "key" .key )}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- $menu = $menu | append (dict "key" .key "title" .title "menuItems" $items) -}}
+    {{- end -}}
+{{- end -}}
+
+{{- range $sukohMenu -}}
+  {{ if not (in $pogoKeys .key) -}}
+    {{- $menu = $menu | append (dict "key" .key "title" .title "menuItems" .menuItems ) -}}
+  {{- end -}}
+{{- end -}}
+
+
+
 
 {{/*-----------------The core getting it all together------------- */}}
 
