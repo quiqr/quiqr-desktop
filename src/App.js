@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Switch, Route } from 'react-router-dom'
 
@@ -108,7 +107,7 @@ class App extends React.Component<AppProps,AppState>{
         let getProfile = service.api.getPoppyGoProfile();
 
         getProfile.then((profileAndFingerprint)=>{
-            service.api.logToConsole(profileAndFingerprint)
+            //service.api.logToConsole(profileAndFingerprint)
             if(this.state.poppygoUsername !== profileAndFingerprint.profile.username){
                 this.setState({poppygoUsername: profileAndFingerprint.profile.username, poppygoFingerprint:profileAndFingerprint.fingerprint});
             }

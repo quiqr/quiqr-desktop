@@ -22,6 +22,7 @@ import MarkdownIt from 'markdown-it'
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
 const md = new MarkdownIt({html:true});
+let net = window.require('electron').remote.net;
 
 const styles = {
     container:{
@@ -92,6 +93,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
+            pogo_account_status: "no_member",
             fingerprint: "",
             buttonPressed: "",
             siteCreatorMessage: null
@@ -122,7 +124,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     setUser(username,fingerprint){
-        service.api.logToConsole(fingerprint);
+        //service.api.logToConsole(fingerprint);
         this.setState({username: username, fingerprint: fingerprint});
     }
 
@@ -147,13 +149,21 @@ class Home extends React.Component<HomeProps, HomeState>{
         service.getConfigurations(true).then((c)=>{
             var stateUpdate  = {};
             stateUpdate.pogostripeConn = c.global.pogostripeConn;
-            this.setState(stateUpdate);
+
+            this.setState(stateUpdate,function(){
+            });
         });
 
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey !== siteKey){
+
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
+
+                //get status of user (pogoboard)
+                //get status of website
+
+
             }
 
             this.setState({currentSiteKey: siteKey});
@@ -176,7 +186,9 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
 
                 this.setState(stateUpdate);
-                //let details = service.getWorkspaceDetails(siteKey, workspaceKey);
+
+                this.getRemoteUserStatus();
+                this.getRemoteSiteStatus();
 
             })
         }
@@ -233,12 +245,28 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
     }
 
+    startUnconfirmedUserPolling(){
+
+        if(this.state.pogo_account_status === "unconfirmed_member"){
+
+            let time=3000;
+            this.timeout = setTimeout(() => {
+                this.getRemoteUserStatus();
+            }, time)
+        }
+    }
+
     handleRegisterClick(username, email){
 
         this.setState({
             username: username,
             registerDialog: {...this.state.registerDialog, open:false
             }},()=>{
+
+                this.setState({pogo_account_status: "unconfirmed_member"},function(){
+                    this.startUnconfirmedUserPolling();
+                })
+
                 if(this.state.buttonPressed === 'publish'){
                     this.handlePublishNow(false);
                 }
@@ -304,6 +332,80 @@ class Home extends React.Component<HomeProps, HomeState>{
         return false;
     }
 
+    getRemoteUserStatus(){
+
+        let userVars = {
+            username: this.state.username,
+            fingerprint: this.state.fingerprint,
+        };
+
+        let requestVars =btoa(JSON.stringify(userVars));
+
+        let url = this.state.pogostripeConn.protocol+"//"+
+            this.state.pogostripeConn.host+":"+
+            this.state.pogostripeConn.port+"/myaccount-status/"+requestVars;
+
+        let data='';
+        const request = net.request(url);
+        request.on('response', (response) => {
+            response.on('end', () => {
+                let obj = JSON.parse(data);
+
+                this.setState({stripe_customer_id: obj.stripe_customer_id});
+
+                if( obj.hasOwnProperty('pogo_account_status') && obj.pogo_account_status !== ""){
+                    this.setState({pogo_account_status: obj.pogo_account_status});
+                }
+                else if (obj.hasOwnProperty('pogo_email')){
+                    this.setState({pogo_account_status: "unconfirmed_member"})
+                    this.startUnconfirmedUserPolling();
+                }
+                //service.api.logToConsole(obj);
+                //service.api.logToConsole(this.state.pogo_account_status);
+
+            });
+            response.on("data", chunk => {
+                data += chunk;
+            });
+        })
+        request.end()
+    }
+
+    getRemoteSiteStatus(){
+
+        let userVars = {
+            username: this.state.username,
+            fingerprint: this.state.fingerprint,
+            projectPath:  this.state.selectedSite.publish[0].config.path,
+        };
+
+        let requestVars =btoa(JSON.stringify(userVars));
+
+        let url = this.state.pogostripeConn.protocol+"//"+
+            this.state.pogostripeConn.host+":"+
+            this.state.pogostripeConn.port+"/project-status/"+requestVars;
+
+
+        let data='';
+        const request = net.request(url);
+        request.on('response', (response) => {
+            response.on('end', () => {
+                if(response.statusCode == 403){
+                    service.api.logToConsole("forbidden");
+                    //linked path not owned by user
+                }
+                else{
+                    let obj = JSON.parse(data);
+                    service.api.logToConsole(obj);
+                }
+
+            });
+            response.on("data", chunk => {
+                data += chunk;
+            });
+        })
+        request.end()
+    }
     handleManageSubscriptions(){
 
         let userVars = {
@@ -311,8 +413,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             fingerprint: this.state.fingerprint,
         };
 
-        //service.api.logToConsole(userVars);
-        //service.api.logToConsole(btoa(JSON.stringify(userVars)));
         let requestVars =btoa(JSON.stringify(userVars));
 
         let url = this.state.pogostripeConn.protocol+"//"+
@@ -359,22 +459,40 @@ class Home extends React.Component<HomeProps, HomeState>{
     handleOpenTerms(){
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
+
     renderUpgadeLink(){
-        //service.api.logToConsole(this.state.selectedSite.publish[0]);
-        if(this.state.selectedSite.publish[0].hasOwnProperty('upgrade')){
-            let upgrade = this.state.selectedSite.publish[0].upgrade
-            if(upgrade.state === "pending"){
-                return (
-                    <span>Upgrade pending. Finish upgrade in browser.</span>
-                )
-            }
+
+        if(this.state.siteStatus === "ownerIncorrect"){
+
         }
-        else{
+        else if(this.state.siteStatus === "linkedNoSubscription"){
             return (
                 <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
             )
+        }
+        else if(this.state.siteStatus === "linkedPendingSubscription"){
+            return (
+                <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
+            )
+        }
+        else if(this.state.siteStatus === "linkedHasSubscription"){
 
         }
+        else {
+
+        }
+
+        //service.api.logToConsole(this.state.selectedSite.publish[0]);
+        /*
+        if(this.state.selectedSite.publish[0].hasOwnProperty('upgrade')){
+            let upgrade = this.state.selectedSite.publish[0].upgrade
+            if(upgrade.state === "pending"){
+            }
+        }
+        else{
+
+        }
+        */
     }
 
 
@@ -391,10 +509,31 @@ class Home extends React.Component<HomeProps, HomeState>{
             )
         }
 
+        //service.api.logToConsole(this.state.pogo_account_status);
         if(this.state.username!==""){
+
+            let accountStatusMsg = ""
+            let handleSubscriptions = ""
+            if(this.state.pogo_account_status === "unconfirmed_member"){
+                accountStatusMsg = (
+                    <span><br/>
+                        You have not confirmed you're email address. Check you're email for a confirmation mail or
+                        <button className="reglink" onClick={()=>{this.handleResendConfirmationMail()}}>Resend confirmation mail</button>
+                    </span>
+                )
+            }
+            else if(this.state.pogo_account_status === "confirmed_member"){
+
+                if(this.state.stripe_customer_id !== ""){
+                    handleSubscriptions = <span><br/><button className="reglink" onClick={()=>{this.handleManageSubscriptions()}}>Manage Subscriptions</button></span>
+                }
+            }
+
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
                 <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
-                <br/><button className="reglink" onClick={()=>{this.handleManageSubscriptions()}}>Manage Subscriptions</button>
+                {accountStatusMsg}
+                {handleSubscriptions}
+
 
                 </ListItem>
             );

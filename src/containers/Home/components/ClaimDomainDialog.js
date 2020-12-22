@@ -109,7 +109,6 @@ export default class ClaimDomainDialog extends React.Component{
             let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/site/"+value;
             service.api.logToConsole(url);
             let data='';
-
             const request = net.request(url);
             request.on('response', (response) => {
 
