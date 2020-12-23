@@ -3,10 +3,11 @@ import FlatButton from 'material-ui/FlatButton';
 import IconNavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
 
+/*
 type BundleManagerHeaderProps = {
     active: bool, onClick: ()=>void, style: any, headerLeftItems: any, headerRightItems: any
 }
-
+*/
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
     render(){
