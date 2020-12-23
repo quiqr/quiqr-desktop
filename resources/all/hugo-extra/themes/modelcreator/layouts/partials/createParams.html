@@ -3,16 +3,19 @@
 {{- $name := index (split .file ".") 0 -}}
 {{- $fields := slice -}}
 {{- $single := dict -}}
+{{- $params := dict -}}
+{{- with .params }} {{$params = . }}{{- end -}}
+
 {{- if eq .dir "/" -}}
     {{- range $key, $value := .configItems -}}
-          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
+          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" $params ) -}}
           {{- $fields = $fields | append $field -}}
     {{- end -}}
-    {{- $fields = $fields | append (partial "createField" (dict "key" .paramsKey "value" .params "file" $path )) -}}
+    {{- $fields = $fields | append (partial "createField" (dict "key" .paramsKey "value" .params "file" $path "params" $params )) -}}
     {{- $path = .file -}}
 {{- else -}}
     {{- range $key, $value := .params -}}
-          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
+          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" $params ) -}}
           {{- $fields = $fields | append $field -}}
     {{- end -}}
 {{- end -}}

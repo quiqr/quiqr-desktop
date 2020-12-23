@@ -22,7 +22,7 @@
 
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "data" -}}
-      {{- $data := (partial "createDataItems" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations )) -}}
+      {{- $data := (partial "createDataItems" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations "params" $.Site.Params)) -}}
       {{- $singles = $singles | append (index $data "singles") -}}
       {{- $collections = $collections | append (index $data "collections") -}}
       {{- $dataMenu = $dataMenu | append (index $data "menu") -}}
@@ -140,9 +140,9 @@
                 {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 1).Name -}}
             {{- end -}}
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $st.Parent "dir" $resourceDir)) -}}
-            {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+            {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent" "params" )) -}}
             {{- range $key, $value := .Params -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath ) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $.Site.Params ) -}}
                 {{- $fields = $fields | append $field -}}
             {{- end -}}
             {{- $fields = partial "sortFields" $fields -}}
@@ -160,7 +160,7 @@
       {{- if and .Language.Lang  $homepage.IsTranslated -}}
           {{- $language = .Language.Lang -}}
       {{- end -}}
-      {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language )) -}}
+      {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language "params" $.Site.Params )) -}}
       {{- $singles = $singles | append $single -}}
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
 {{- end -}}
@@ -183,7 +183,7 @@
 {{- end -}}
 
 {{- range $collectionPages -}}
-      {{- $collection := (partial "createCollection" . ) -}}
+      {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
       {{- if gt (len $collection) 0 }}
           {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
           {{- $collections = $collections | append $collection -}}
@@ -214,7 +214,7 @@
 {{- end -}}
 
 {{- range $singlePages -}}
-    {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_") ) -}}
+    {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_" "params" $.Site.Params) ) -}}
     {{ if gt (len $single) 0 }}
         {{- if ne $single.file "" -}}
           {{- $singles = $singles | append $single -}}

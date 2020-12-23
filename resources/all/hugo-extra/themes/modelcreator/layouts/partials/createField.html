@@ -1,5 +1,7 @@
 {{- $file := .file -}}
 {{- $key := .key -}}
+{{- $params := dict -}}
+{{- with .params }} {{$params = . }}{{- end -}}
 {{- if .file -}}
     {{- $key = partial "getRealKey" (dict "key" .key "file" .file ) -}}
 {{- end -}}
@@ -20,7 +22,7 @@
     {{- $subfields := slice -}}
     {{- range $key, $value := $value -}}
             {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file) -}}
+            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $params) -}}
             {{- $subfields = $subfields | append $field}}
     {{- end -}}
     {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
@@ -42,7 +44,7 @@
     {{- end -}}
     {{- range $key, $value := $accordionItems -}}
             {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file) -}}
+            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $params) -}}
             {{- if eq $key $arrayTitle -}}
                 {{- $field = $field | merge (dict "arrayTitle" true ) -}}
             {{- end -}}
@@ -52,9 +54,29 @@
 {{- end -}}
 
 {{- if (eq $pogoType "bundle-manager") -}}
-{{- $bundleFields :=  slice (partial "createField" (dict "key" "thumb" "type" "bundle-image-thumbnail")) -}}
-{{- $extensions := (slice "jpg" "png" "jpeg" "pdf" "svg" ) -}}
-{{- $field = merge $field (dict "path" $value "extensions" $extensions "fields" $bundleFields ) -}}
+    {{- $bundleFields :=  slice (partial "createField" (dict "key" "thumb" "type" "bundle-image-thumbnail")) -}}
+    {{- $extensions := (slice "jpg" "png" "jpeg" "pdf" "svg" ) -}}
+    {{- $field = merge $field (dict "path" $value "extensions" $extensions "fields" $bundleFields ) -}}
+{{- end -}}
+
+{{- if eq $pogoType "string" -}}
+    {{- $selectKeys := slice -}}
+    {{- with .params -}}
+      {{- with .pogoselect -}}
+          {{- range $selectKey, $value := . -}}
+            {{- if eq $selectKey $key -}}
+                {{- $field = dict "key" $key "title" $title "type" "select" -}}
+                {{- $subfields := slice -}}
+                {{- range $value -}}
+                        {{ warnf . }}
+                        {{- $field := dict "text" . "value" ( . | anchorize )  -}}
+                        {{- $subfields = $subfields | append $field}}
+                {{- end -}}
+                {{- $field = merge $field (dict "multiple" false "options" $subfields) -}}
+            {{- end -}}
+          {{- end -}}
+      {{- end -}}
+    {{- end -}}
 {{- end -}}
 
 {{- return $field -}}

@@ -21,7 +21,7 @@
                 {{- $dataKey := printf "ds_%s_%s" $subDir $fileName -}}
                 {{- $fields := slice -}}
                 {{- range $key, $value := (index $data $fileName) -}}
-                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
+                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" .params ) -}}
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
                 {{- if gt (len $fields) 0 -}}
@@ -32,7 +32,7 @@
             {{- end -}}
 
       {{- else if and .isdir (in $langCodes (path.Base .dir)) -}}
-            {{- $data := partial "createDataItems" (dict "dir" $file.dir "data" (index $data .node) "translations" $translations) -}}
+            {{- $data := partial "createDataItems" (dict "dir" $file.dir "data" (index $data .node) "translations" $translations "params" .params) -}}
             {{- $singles = $singles | append (index $data "singles") -}}
             {{- $menu = $menu | append (index $data "menu") -}}
 
@@ -49,7 +49,7 @@
                 {{- $fileName := index (split .file ".") 0 -}}
                 {{- $fields := slice -}}
                 {{- range $key, $value := index (index $data $node) $fileName -}}
-                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
+                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" .params ) -}}
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
                 {{- if gt (len $fields) 0 -}}
