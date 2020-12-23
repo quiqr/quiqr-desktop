@@ -94,7 +94,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             claimDomainDialog: {open: false},
             username: "",
             pogoAccountStatus: "no_member",
-            oneTimeOnlyConfirmed: false,
+            oneTimeOnlyUserConfirmed: false,
             fingerprint: "",
             buttonPressed: "",
             siteCreatorMessage: null
@@ -125,7 +125,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     setUser(username,fingerprint){
-        //service.api.logToConsole(fingerprint);
         this.setState({username: username, fingerprint: fingerprint});
     }
 
@@ -139,7 +138,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                     service.api.convert07("MUST CONVERT");
                 }
             }
-
         }
     }
 
@@ -360,7 +358,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     this.setState({pogoAccountStatus: obj.pogo_account_status});
 
                     if(this.state.pogoAccountStatus === "confirmed_member" && celebrate){
-                        this.setState({oneTimeOnlyConfirmed: true});
+                        this.setState({oneTimeOnlyUserConfirmed: true});
                     }
                 }
                 else if (obj.hasOwnProperty('pogo_email')){
@@ -378,7 +376,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     getRemoteSiteStatus(celebrate){
 
         if(!this.checkLinkedDomain()){
-            //service.api.logToConsole("no Link")
             return
         }
         service.api.logToConsole("getRemoteUserStatus")
@@ -408,8 +405,18 @@ class Home extends React.Component<HomeProps, HomeState>{
                 else{
                     let obj = JSON.parse(data);
                     service.api.logToConsole(obj);
-                    if(obj["pogo_plan_active"]){
 
+                    this.setState({
+                        pogoSiteStatus: obj.pogo_plan_status,
+                        pogoSitePlan: obj.pogo_plan_name,
+                    },function(){
+                        service.api.logToConsole(this.state.pogoSiteStatus);
+                    }
+
+                    );
+
+                    if(this.state.pogoSiteStatus === "active" && celebrate){
+                        this.setState({oneTimeOnlySiteActive: true});
                     }
                 }
 
@@ -443,11 +450,8 @@ class Home extends React.Component<HomeProps, HomeState>{
             plan: "basic"
         };
 
-        //service.api.logToConsole(upgradeVars);
-        //service.api.logToConsole(btoa(JSON.stringify(upgradeVars)));
         let requestVars =btoa(JSON.stringify(upgradeVars));
 
-        //service.api.logToConsole(this.state.currentSiteKey);
 
         //        service.api.upgradePending(this.state.currentSiteKey, this.state.selectedSite.publish[0].key).then(()=>{
         //            service.getConfigurations(true).then((c)=>{
@@ -491,7 +495,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             response.on('end', () => {
                 let obj = JSON.parse(data);
-                service.api.logToConsole(obj);
             });
 
             response.on("data", chunk => {
@@ -515,34 +518,35 @@ class Home extends React.Component<HomeProps, HomeState>{
                 <span>You're not the owner of this domain.</span>
             )
         }
-        else if(this.state.pogoSiteStatus === "linkedNoSubscription"){
+        else if(this.state.pogoSiteStatus === "no_plan"){
             return (
                 <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
             )
         }
-        else if(this.state.pogoSiteStatus === "linkedPendingSubscription"){
+        else if(this.state.pogoSiteStatus === "pending_subscription"){
             return (
                 <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
             )
         }
-        else if(this.state.pogoSiteStatus === "linkedHasSubscription"){
-
+        else if(this.state.pogoSiteStatus === "active"){
+            return (
+                <span>Plan: {this.state.pogoSitePlan}</span>
+            )
+        }
+        else if(this.state.pogoSiteStatus === "expired_soon"){
+            return (
+                <span>Plan: {this.state.pogoSitePlan}, will expire soon</span>
+            )
+        }
+        else if(this.state.pogoSiteStatus === "expired"){
+            return (
+                <span>Plan: {this.state.pogoSitePlan}, subscription has expired<br/>
+                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>activate subscription PoppyGo Basic</button></span>
+            )
         }
         else {
 
         }
-
-        //service.api.logToConsole(this.state.selectedSite.publish[0]);
-        /*
-        if(this.state.selectedSite.publish[0].hasOwnProperty('upgrade')){
-            let upgrade = this.state.selectedSite.publish[0].upgrade
-            if(upgrade.state === "pending"){
-            }
-        }
-        else{
-
-        }
-        */
     }
 
 
@@ -564,7 +568,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             let accountStatusMsg = ""
             let handleSubscriptions = ""
             let confirmedMailSuccess = ""
-            if(this.state.oneTimeOnlyConfirmed){
+            if(this.state.oneTimeOnlyUserConfirmed){
                 confirmedMailSuccess = (
                     <span><br/>Well done.. you confirmed you're email address succesfully</span>
                 )
