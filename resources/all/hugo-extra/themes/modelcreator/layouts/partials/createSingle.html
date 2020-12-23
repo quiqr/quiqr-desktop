@@ -1,4 +1,6 @@
 {{- $contentDir := (partial "getContentDir" .page ) -}}
+{{- $params := dict -}}
+{{- with .params }} {{$params = . }}{{- end -}}
 {{- $language := "" -}}
 {{- if .language -}}
     {{- $language = .language -}}
@@ -22,13 +24,13 @@
 {{- end -}}
 {{- $fields := slice -}}
 {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
-{{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent"))) -}}
+{{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent" ))) -}}
 {{- $page := .page}}
 {{- $filePath := "" -}}
 {{- with $page.File -}} {{ $filePath = .Path -}} {{- end -}}
 {{- range $key, $value := .page.Params -}}
     {{- if ne $key "maincontent" -}}
-        {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath) -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $params ) -}}
         {{- $fields = $fields | append $field -}}
     {{- end -}}
 {{- end -}}

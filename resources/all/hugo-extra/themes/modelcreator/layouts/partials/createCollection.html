@@ -1,15 +1,17 @@
 {{- $collection := "" -}}
-{{- $contentDir := (partial "getContentDir" . ) -}}
-{{- $baseKey := partial "createKey" .  -}}
+{{- $params := dict -}}
+{{- with .params }} {{$params = . }}{{- end -}}
+{{- $contentDir := (partial "getContentDir" .page ) -}}
+{{- $baseKey := partial "createKey" .page  -}}
 {{- $itemTitle :=  ( $baseKey | humanize) | singularize -}}
 {{- $break := false }}
-{{- $language := partial "getLanguage" . -}}
+{{- $language := partial "getLanguage" .page -}}
 {{- $sectionKey := printf "c_%s_%s" $language $baseKey -}}
 
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
 
 {{- $sectionTitle := printf "%s%s" $language ($baseKey | humanize) -}}
-{{- range .Pages -}}
+{{- range .page.Pages -}}
     {{- if and .File (ne $break "true") -}}
         {{- $break = true -}}
         {{- $subDir := $baseKey -}}
@@ -34,7 +36,7 @@
             {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
             {{- range $key, $value := .Page.Params -}}
             {{- if ne $key "maincontent" -}}
-                    {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath) -}}
+                    {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath "params" $params) -}}
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
             {{- end -}}
