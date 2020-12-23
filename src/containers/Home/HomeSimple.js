@@ -93,7 +93,8 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
-            pogo_account_status: "no_member",
+            pogoAccountStatus: "no_member",
+            oneTimeOnlyConfirmed: false,
             fingerprint: "",
             buttonPressed: "",
             siteCreatorMessage: null
@@ -149,6 +150,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         service.getConfigurations(true).then((c)=>{
             var stateUpdate  = {};
             stateUpdate.pogostripeConn = c.global.pogostripeConn;
+            stateUpdate.pogoboardConn = c.global.pogoboardConn;
 
             this.setState(stateUpdate,function(){
             });
@@ -187,8 +189,8 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                 this.setState(stateUpdate);
 
-                this.getRemoteUserStatus();
-                this.getRemoteSiteStatus();
+                this.getRemoteUserStatus(false);
+                this.getRemoteSiteStatus(false);
 
             })
         }
@@ -245,13 +247,14 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
     }
 
-    startUnconfirmedUserPolling(){
+    startUnconfirmedUserPolling(celebrate){
+        service.api.logToConsole("user status poll");
 
-        if(this.state.pogo_account_status === "unconfirmed_member"){
+        if(this.state.pogoAccountStatus === "unconfirmed_member"){
 
             let time=3000;
             this.timeout = setTimeout(() => {
-                this.getRemoteUserStatus();
+                this.getRemoteUserStatus(celebrate);
             }, time)
         }
     }
@@ -263,8 +266,8 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {...this.state.registerDialog, open:false
             }},()=>{
 
-                this.setState({pogo_account_status: "unconfirmed_member"},function(){
-                    this.startUnconfirmedUserPolling();
+                this.setState({pogoAccountStatus: "unconfirmed_member"},function(){
+                    this.startUnconfirmedUserPolling(true);
                 })
 
                 if(this.state.buttonPressed === 'publish'){
@@ -332,7 +335,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         return false;
     }
 
-    getRemoteUserStatus(){
+    getRemoteUserStatus(celebrate){
 
         let userVars = {
             username: this.state.username,
@@ -354,15 +357,16 @@ class Home extends React.Component<HomeProps, HomeState>{
                 this.setState({stripe_customer_id: obj.stripe_customer_id});
 
                 if( obj.hasOwnProperty('pogo_account_status') && obj.pogo_account_status !== ""){
-                    this.setState({pogo_account_status: obj.pogo_account_status});
+                    this.setState({pogoAccountStatus: obj.pogo_account_status});
+
+                    if(this.state.pogoAccountStatus === "confirmed_member" && celebrate){
+                        this.setState({oneTimeOnlyConfirmed: true});
+                    }
                 }
                 else if (obj.hasOwnProperty('pogo_email')){
-                    this.setState({pogo_account_status: "unconfirmed_member"})
-                    this.startUnconfirmedUserPolling();
+                    this.setState({pogoAccountStatus: "unconfirmed_member"})
+                    this.startUnconfirmedUserPolling(true);
                 }
-                //service.api.logToConsole(obj);
-                //service.api.logToConsole(this.state.pogo_account_status);
-
             });
             response.on("data", chunk => {
                 data += chunk;
@@ -371,7 +375,13 @@ class Home extends React.Component<HomeProps, HomeState>{
         request.end()
     }
 
-    getRemoteSiteStatus(){
+    getRemoteSiteStatus(celebrate){
+
+        if(!this.checkLinkedDomain()){
+            //service.api.logToConsole("no Link")
+            return
+        }
+        service.api.logToConsole("getRemoteUserStatus")
 
         let userVars = {
             username: this.state.username,
@@ -390,13 +400,17 @@ class Home extends React.Component<HomeProps, HomeState>{
         const request = net.request(url);
         request.on('response', (response) => {
             response.on('end', () => {
-                if(response.statusCode == 403){
+
+                if(response.statusCode === 403){
+                    this.setState({pogoSiteStatus: "ownerIncorrect"});
                     service.api.logToConsole("forbidden");
-                    //linked path not owned by user
                 }
                 else{
                     let obj = JSON.parse(data);
                     service.api.logToConsole(obj);
+                    if(obj["pogo_plan_active"]){
+
+                    }
                 }
 
             });
@@ -456,26 +470,62 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
 
+    handleResendConfirmationMail(){
+
+        var postData = JSON.stringify({ username: this.state.username, fingerprint: this.state.fingerprint});
+
+        let data='';
+        let request = net.request({
+            method: 'POST',
+            protocol: this.state.pogoboardConn.protocol,
+            hostname: this.state.pogoboardConn.host,
+            port: this.state.pogoboardConn.port,
+            path: '/resend-confirmation-link',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': postData.length
+            }
+        })
+
+        request.on('response', (response) => {
+
+            response.on('end', () => {
+                let obj = JSON.parse(data);
+                service.api.logToConsole(obj);
+            });
+
+            response.on("data", chunk => {
+                data += chunk;
+            });
+
+        })
+        request.write(postData)
+        request.end()
+
+    }
+
     handleOpenTerms(){
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
 
     renderUpgadeLink(){
 
-        if(this.state.siteStatus === "ownerIncorrect"){
-
+        if(this.state.pogoSiteStatus === "ownerIncorrect"){
+            return (
+                <span>You're not the owner of this domain.</span>
+            )
         }
-        else if(this.state.siteStatus === "linkedNoSubscription"){
+        else if(this.state.pogoSiteStatus === "linkedNoSubscription"){
             return (
                 <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
             )
         }
-        else if(this.state.siteStatus === "linkedPendingSubscription"){
+        else if(this.state.pogoSiteStatus === "linkedPendingSubscription"){
             return (
                 <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
             )
         }
-        else if(this.state.siteStatus === "linkedHasSubscription"){
+        else if(this.state.pogoSiteStatus === "linkedHasSubscription"){
 
         }
         else {
@@ -509,12 +559,17 @@ class Home extends React.Component<HomeProps, HomeState>{
             )
         }
 
-        //service.api.logToConsole(this.state.pogo_account_status);
         if(this.state.username!==""){
 
             let accountStatusMsg = ""
             let handleSubscriptions = ""
-            if(this.state.pogo_account_status === "unconfirmed_member"){
+            let confirmedMailSuccess = ""
+            if(this.state.oneTimeOnlyConfirmed){
+                confirmedMailSuccess = (
+                    <span><br/>Well done.. you confirmed you're email address succesfully</span>
+                )
+            }
+            if(this.state.pogoAccountStatus === "unconfirmed_member"){
                 accountStatusMsg = (
                     <span><br/>
                         You have not confirmed you're email address. Check you're email for a confirmation mail or
@@ -522,7 +577,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     </span>
                 )
             }
-            else if(this.state.pogo_account_status === "confirmed_member"){
+            else if(this.state.pogoAccountStatus === "confirmed_member"){
 
                 if(this.state.stripe_customer_id !== ""){
                     handleSubscriptions = <span><br/><button className="reglink" onClick={()=>{this.handleManageSubscriptions()}}>Manage Subscriptions</button></span>
@@ -531,6 +586,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
                 <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
+                {confirmedMailSuccess}
                 {accountStatusMsg}
                 {handleSubscriptions}
 
