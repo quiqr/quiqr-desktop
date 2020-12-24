@@ -502,6 +502,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             response.on('end', () => {
                 let obj = JSON.parse(data);
+                service.api.logToConsole( obj)
             });
 
             response.on("data", chunk => {
