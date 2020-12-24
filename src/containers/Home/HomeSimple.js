@@ -327,6 +327,9 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.claimDomainDialog = {...this.state.claimDomainDialog, open:false};
 
                 this.setState(stateUpdate,()=>{
+                    service.api.logToConsole("start checking once")
+                    this.getRemoteSiteStatus(false);
+
                     if(this.state.buttonPressed === 'publish'){
                         this.handlePublishNow(false);
                     }
@@ -340,6 +343,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     checkLinkedDomain(){
         let site = this.state.selectedSite;
         if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
+            service.api.logToConsole(site.publish[0].config);
             return true;
         }
         return false;
@@ -359,38 +363,48 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.state.pogostripeConn.port+"/myaccount-status/"+requestVars;
 
         let data='';
-        const request = net.request(url);
-        request.on('response', (response) => {
-            response.on('end', () => {
-                let obj = JSON.parse(data);
 
-                this.setState({stripe_customer_id: obj.stripe_customer_id});
+        try {
+            const request = net.request(url);
+            request.on('error', (err) => {
+            });
 
-                if( obj.hasOwnProperty('pogo_account_status') && obj.pogo_account_status !== ""){
-                    this.setState({pogoAccountStatus: obj.pogo_account_status});
+            request.on('response', (response) => {
+                response.on('end', () => {
+                    let obj = JSON.parse(data);
 
-                    if(obj.pogoAccountStatus === "confirmed_member" && celebrate){
-                        this.setState({oneTimeOnlyUserConfirmed: true});
+                    this.setState({stripe_customer_id: obj.stripe_customer_id});
+
+                    if( obj.hasOwnProperty('pogo_account_status') && obj.pogo_account_status !== ""){
+                        this.setState({pogoAccountStatus: obj.pogo_account_status});
+
+                        if(obj.pogoAccountStatus === "confirmed_member" && celebrate){
+                            this.setState({oneTimeOnlyUserConfirmed: true});
+                        }
                     }
-                }
-                else if (obj.hasOwnProperty('pogo_email')){
-                    this.setState({pogoAccountStatus: "unconfirmed_member"})
-                    this.startUnconfirmedUserPolling(true);
-                }
-            });
-            response.on("data", chunk => {
-                data += chunk;
-            });
-        })
-        request.end()
+                    else if (obj.hasOwnProperty('pogo_email')){
+                        this.setState({pogoAccountStatus: "unconfirmed_member"})
+                        this.startUnconfirmedUserPolling(true);
+                    }
+                });
+                response.on("data", chunk => {
+                    data += chunk;
+                });
+            })
+            request.end()
+
+        } catch (e) {
+            console.log('catch', e);
+        }
     }
 
     getRemoteSiteStatus(celebrate){
 
+        service.api.logToConsole("getRemoteSiteStatus")
         if(!this.checkLinkedDomain()){
+            service.api.logToConsole("notLinked :(")
             return
         }
-        service.api.logToConsole("getRemoteUserStatus")
 
         let userVars = {
             username: this.state.username,
@@ -405,49 +419,64 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.state.pogostripeConn.port+"/project-status/"+requestVars;
 
 
+
         let data='';
-        const request = net.request(url);
-        request.on('response', (response) => {
-            response.on('end', () => {
 
-                if(response.statusCode === 403){
-                    this.setState({pogoSiteStatus: "ownerIncorrect"});
-                    service.api.logToConsole("forbidden");
-                }
-                else{
-                    let obj = JSON.parse(data);
-                    service.api.logToConsole(obj);
 
-                    this.setState({
-                        pogoSiteStatus: obj.pogo_plan_status,
-                        pogoSitePlan: obj.pogo_plan_name,
-                    },function(){
+        try {
+            const request = net.request(url);
+            request.on('error', (err) => {
+            });
+
+            request.on('response', (response) => {
+                response.on('end', () => {
+
+                    if(response.statusCode === 403){
+                        this.setState({pogoSiteStatus: "ownerIncorrect"});
+                        service.api.logToConsole("forbidden");
+                    }
+                    else{
+                        let obj = JSON.parse(data);
+                        service.api.logToConsole(obj);
+
+                        this.setState({
+                            pogoSiteStatus: obj.pogo_plan_status,
+                            pogoSitePlan: obj.pogo_plan_name,
+                        },function(){
+
+                            if(this.state.pogoSiteStatus === "active" && celebrate){
+                                this.setState({oneTimeOnlySiteActive: true});
+                            }
+                            else if (this.state.pogoSiteStatus === 'pending_subscription'){
+
+                                service.api.logToConsole(this.state.pogoSiteStatus);
+                                this.startPendingUpgradePolling(true);
+                            }
+
+                        }
+
+                        );
 
                         if(this.state.pogoSiteStatus === "active" && celebrate){
                             this.setState({oneTimeOnlySiteActive: true});
                         }
-                        else if (this.state.pogoSiteStatus === 'pending_subscription'){
-
-                            service.api.logToConsole(this.state.pogoSiteStatus);
-                            this.startPendingUpgradePolling(true);
-                        }
-
                     }
 
-                    );
+                });
+                response.on("data", chunk => {
+                    data += chunk;
+                });
+            })
 
-                    if(this.state.pogoSiteStatus === "active" && celebrate){
-                        this.setState({oneTimeOnlySiteActive: true});
-                    }
-                }
+            request.end()
 
-            });
-            response.on("data", chunk => {
-                data += chunk;
-            });
-        })
-        request.end()
+        } catch (e) {
+            service.api.logToConsole.log('catch', e);
+        }
+
     }
+
+
     handleManageSubscriptions(){
 
         let userVars = {
