@@ -459,16 +459,6 @@ class PogoPublisher {
         return true;
     }
 
-    async upgradePending(context){
-        let configJsonPath = pathHelper.getRoot() + 'config.'+context.siteKey+'.json';
-        const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
-        var newConf = JSON.parse(conftxt);
-        //console.log(newConf.publish[0]);
-        newConf.publish[0] = context.publishConfig;
-        newConf.publish[0].upgrade = { state: "pending", reqDate: Date.now() };
-        //console.log(newConf.publish[0]);
-        await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-    }
 
 }
 

@@ -245,6 +245,18 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
     }
 
+    startPendingUpgradePolling(celebrate){
+        service.api.logToConsole("site upgrade status poll");
+        service.api.logToConsole(this.state.pogoSiteStatus);
+
+        if(this.state.pogoSiteStatus === "pending_subscription"){
+            let time=3000;
+            this.timeout = setTimeout(() => {
+                this.getRemoteSiteStatus(celebrate);
+            }, time)
+        }
+    }
+
     startUnconfirmedUserPolling(celebrate){
         service.api.logToConsole("user status poll");
 
@@ -357,7 +369,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 if( obj.hasOwnProperty('pogo_account_status') && obj.pogo_account_status !== ""){
                     this.setState({pogoAccountStatus: obj.pogo_account_status});
 
-                    if(this.state.pogoAccountStatus === "confirmed_member" && celebrate){
+                    if(obj.pogoAccountStatus === "confirmed_member" && celebrate){
                         this.setState({oneTimeOnlyUserConfirmed: true});
                     }
                 }
@@ -410,7 +422,16 @@ class Home extends React.Component<HomeProps, HomeState>{
                         pogoSiteStatus: obj.pogo_plan_status,
                         pogoSitePlan: obj.pogo_plan_name,
                     },function(){
-                        service.api.logToConsole(this.state.pogoSiteStatus);
+
+                        if(this.state.pogoSiteStatus === "active" && celebrate){
+                            this.setState({oneTimeOnlySiteActive: true});
+                        }
+                        else if (this.state.pogoSiteStatus === 'pending_subscription'){
+
+                            service.api.logToConsole(this.state.pogoSiteStatus);
+                            this.startPendingUpgradePolling(true);
+                        }
+
                     }
 
                     );
@@ -443,6 +464,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handleUpgradeLinkedSite(){
 
+        this.setState({pogoSiteStatus: "pending_subscription"},function(){
+            this.startPendingUpgradePolling(true);
+        })
+
         let upgradeVars = {
             username: this.state.username,
             fingerprint: this.state.fingerprint,
@@ -451,25 +476,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         };
 
         let requestVars =btoa(JSON.stringify(upgradeVars));
-
-
-        //        service.api.upgradePending(this.state.currentSiteKey, this.state.selectedSite.publish[0].key).then(()=>{
-        //            service.getConfigurations(true).then((c)=>{
-        //                //snackMessageService.addSnackMessage('Site successfully published.');
-        //                this.checkSiteInProps();
-        //                service.api.logToConsole(this.state.selectedSite.publish[0]);
-        //            });
-        //        });
-
-        /*
-        /upgrade1 -> store req. ask conf term (post) /request
-        /upgrade2 -> ask conf /termsget
-        /upgrade3 ->  /termspost
-        /dispatch
-        */
-
-        let url = this.state.pogostripeConn.protocol+"//"+
-            this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/"+requestVars;
+        let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/"+requestVars;
         window.require('electron').shell.openExternal(url);
     }
 

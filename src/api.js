@@ -137,9 +137,6 @@ export class API {
         return mainProcessBridge.request('createSite', siteConfig);
     }
 
-    upgradePending(siteKey: string, publishKey: string){
-        return mainProcessBridge.request('upgradePending', {siteKey, publishKey});
-    }
     publishSite(siteKey: string, publishKey: string){
         return mainProcessBridge.request('publishSite', {siteKey, publishKey});
     }

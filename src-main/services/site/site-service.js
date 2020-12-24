@@ -80,17 +80,6 @@ class SiteService{
         let publisher = publisherFactory.getPublisher(publishConfig.config);
         return await publisher.publish({siteKey: this._config.key, publishKey, from });
     }
-    async upgradePending(publishKey){
-        let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
-        //console.log(publishConfig);
-        if(publishConfig==null)
-            throw new Error(`Could not find a publisher config for key '${publishKey}'.`);
-        if(publishConfig.config==null)
-            throw new Error(`The matcher publisher config does not have a property config.`);
-
-        let publisher = publisherFactory.getPublisher(publishConfig.config);
-        return await publisher.upgradePending({siteKey: this._config.key, publishConfig: publishConfig });
-    }
 }
 
 module.exports = SiteService;
