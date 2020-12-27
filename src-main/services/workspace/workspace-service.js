@@ -493,7 +493,7 @@ class WorkspaceService{
         let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
         let thumbSrcExists = await this.existsPromise(thumbSrc);
         let targetExt = path.extname(targetPath)
-        if (targetExt != ".svg"){
+        if (targetExt != ".svg" && targetExt != ".md" && targetExt != ".pdf" ){
           if(!thumbSrcExists){
               try{
                   await createThumbnailJob(src, thumbSrc);
