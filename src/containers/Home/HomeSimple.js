@@ -15,9 +15,19 @@ import CreateSiteDialog from './components/CreateSiteDialog';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
 import ClaimDomainDialog from './components/ClaimDomainDialog';
+import ConnectDomainDialog from './components/ConnectDomainDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
 import MarkdownIt from 'markdown-it'
+
+import {
+  Table,
+  TableBody,
+  TableHeader,
+  TableHeaderColumn,
+  TableRow,
+  TableRowColumn,
+} from 'material-ui/Table';
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
@@ -94,6 +104,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             claimDomainDialog: {open: false},
             username: "",
             pogoAccountStatus: "no_member",
+            customDomain: "not set",
             oneTimeOnlyUserConfirmed: false,
             fingerprint: "",
             buttonPressed: "",
@@ -241,6 +252,11 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({registerDialog: { open: true}});
     }
 
+    handleConnectDomain(){
+        service.api.parentTempHideMobilePreview();
+        this.setState({connectDomainDialog: { open: true}});
+    }
+
     handleRegisterCancelClick(){
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
     }
@@ -311,6 +327,9 @@ class Home extends React.Component<HomeProps, HomeState>{
     handleClaimDomainCancelClick(){
         this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
     }
+    handleConnectDomainCancelClick(){
+        this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
+    }
 
     handleClaimDomainClick(obj){
 
@@ -333,6 +352,31 @@ class Home extends React.Component<HomeProps, HomeState>{
                     if(this.state.buttonPressed === 'publish'){
                         this.handlePublishNow(false);
                     }
+                });
+
+            })
+
+        });
+    }
+
+    handleConnectDomainClick(obj){
+
+        service.getConfigurations(true).then((c)=>{
+
+            service.getSiteAndWorkspaceData(this.state.currentSiteKey, this.state.currentWorkspaceKey).then((bundle)=>{
+                var stateUpdate  = {};
+                stateUpdate.configurations = bundle.configurations;
+                stateUpdate.selectedSite = bundle.site;
+                stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
+                stateUpdate.selectedWorkspace = bundle.workspace;
+                stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
+
+                stateUpdate.customDomain = obj.domain;
+
+                stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
+
+                this.setState(stateUpdate,()=>{
+                    service.api.logToConsole("finished connecting domain")
                 });
 
             })
@@ -548,6 +592,14 @@ class Home extends React.Component<HomeProps, HomeState>{
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
 
+    hasActivePlan(pogoSiteStatus){
+
+        if(pogoSiteStatus === "active" || pogoSiteStatus === "expired_soon"){
+            return true;
+        }
+        return false;
+    }
+
     renderUpgadeLink(){
 
         if(this.state.pogoSiteStatus === "ownerIncorrect"){
@@ -584,6 +636,55 @@ class Home extends React.Component<HomeProps, HomeState>{
         else {
 
         }
+    }
+
+    domainlist(){
+        if(! this.hasActivePlan(this.state.pogoSiteStatus)){
+            return;
+        }
+
+        let site = this.state.selectedSite;
+        let autoDomain = "";
+        if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
+           autoDomain = site.publish[0].config.path + ".pogosite.com";
+        }
+
+        return (
+            <Table selectable={false} >
+                <TableHeader
+                displaySelectAll={false}
+                adjustForCheckbox={false}
+            >
+                    <TableRow>
+                        <TableHeaderColumn
+                        style={{
+                            width: '120px',
+                        }}
+                    >status</TableHeaderColumn>
+                    <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
+                </TableRow>
+            </TableHeader>
+            <TableBody displayRowCheckbox={false}>
+                <TableRow>
+                    <TableRowColumn
+                    style={{
+                        width: '120px',
+                    }}
+
+                >connected</TableRowColumn>
+                <TableRowColumn>{autoDomain}</TableRowColumn>
+            </TableRow>
+            <TableRow>
+                <TableRowColumn>
+<button className="reglink" onClick={()=>{this.handleConnectDomain(true)}}>connect custom domain!</button>
+            </TableRowColumn>
+                <TableRowColumn>{this.state.customDomain}</TableRowColumn>
+            </TableRow>
+        </TableBody>
+    </Table>
+
+        )
+
     }
 
 
@@ -655,6 +756,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 <br/>
 
                 { this.renderUpgadeLink() }
+                { this.domainlist() }
 
 
                 </ListItem>
@@ -800,7 +902,12 @@ class Home extends React.Component<HomeProps, HomeState>{
     render(){
 
         //let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog} = this.state;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog, connectDomainDialog} = this.state;
+
+        let pogoSitePath = "";
+        if(selectedSite!=null && selectedSite.hasOwnProperty('publish') && selectedSite.publish.length === 1 && selectedSite.publish[0].config.type === 'poppygo' && selectedSite.publish[0].config.hasOwnProperty('path')){
+           pogoSitePath = selectedSite.publish[0].config.path;
+        }
 
         let _configurations = ((configurations: any): Configurations);
 
@@ -862,7 +969,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                          { selectedSite!=null && this.state.claimDomainDialog!=null ? (
                                            <ClaimDomainDialog
-                                            onCancelClick={()=>this.handleClaimDomainClick()}
+                                            onCancelClick={()=>this.handleClaimDomainCancelClick()}
                                             onClaimDomainClick={(obj)=>{
                                                 this.handleClaimDomainClick(obj)
                                             }}
@@ -870,6 +977,20 @@ class Home extends React.Component<HomeProps, HomeState>{
                                             fingerprint={this.state.fingerprint}
 
                                             open={claimDomainDialog!=null&&claimDomainDialog.open}
+                                        />
+                         ):(null) }
+
+                         { selectedSite!=null && this.state.connectDomainDialog!=null ? (
+                                           <ConnectDomainDialog
+                                            onCancelClick={()=>this.handleConnectDomainCancelClick()}
+                                            onConnectDomainClick={(obj)=>{
+                                                this.handleConnectDomainClick(obj)
+                                            }}
+                                            username={this.state.username}
+                                            sitePath={pogoSitePath}
+                                            fingerprint={this.state.fingerprint}
+
+                                            open={connectDomainDialog!=null&&connectDomainDialog.open}
                                         />
                          ):(null) }
 
