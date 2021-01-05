@@ -151,6 +151,62 @@ class MenuManager {
         dialog.showMessageBox(options)
     }
 
+    async renameSite(){
+
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
+            configurationDataProvider.get(async function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+                if(siteData=siteService = new SiteService(siteData)){
+                    let newConf = siteService._config;
+                    let currentName = siteService._config.name;
+
+                    delete newConf['configPath']
+
+                    const prompt = require('electron-prompt');
+                    var newName = await prompt({
+                        title: 'New site name',
+                        label: 'key:',
+                        value: currentName,
+                        inputAttrs: {
+                            type: 'text',
+                            required: true
+                        },
+                        type: 'input'
+                    }, mainWindow);
+
+                    console.log(newName);
+
+                    let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+                    newConf.name = newName;
+                    await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
+
+                    outputConsole.appendLine('rename site to: '+newName);
+
+                    let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                    mainWindow.webContents.send("redirectToGivenLocation","/");
+                    mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
+                    mainWindow.webContents.send("redirectMountSite",newScreenURL);
+
+
+                }
+
+            });
+
+        }
+
+
+
+        //writeNewName
+        //Reload Site
+    }
+
     async unlinkSiteDomain(){
         let pogopubl = new PogoPublisher({});
         await pogopubl.UnlinkDomain();
@@ -526,6 +582,14 @@ class MenuManager {
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.generateModel()
+                }
+            },
+            {
+                id: 'rename-site',
+                label: 'Rename site',
+                enabled: this.siteSelected(),
+                click: async () => {
+                    this.renameSite()
                 }
             },
             {
