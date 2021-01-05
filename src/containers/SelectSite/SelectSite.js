@@ -181,24 +181,34 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
         let { selectedSite, configurations } = this.state;
 
         let _configurations = ((configurations: any): Configurations);
-
+        let sites = _configurations.sites || [];
         if(configurations==null){
             return <Spinner />
         }
-        //rightIcon={<IconNavigationCheck color={active?this.props.muiTheme.palette.primary1Color:undefined}  />}
+
+        sites.sort(function(a, b){
+            var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
+            if (nameA < nameB) //sort string ascending
+                return -1
+            if (nameA > nameB)
+                return 1
+            return 0 //default return value (no sorting)
+        })
+
         return (
                 <div style={ styles.sitesCol }>
                     <List>
                         <Subheader>All Sites</Subheader>
-                        { (_configurations.sites||[]).map((item, index)=>{
-                            let selected = item===selectedSite;
-                            //let active = selectedSite && siteKey===item.key;
+                        { (sites).map((site, index)=>{
+                            let selected = site===selectedSite;
+
+
                             return (<ListItem
-                                id={"siteselectable-"+item.name}
+                                id={"siteselectable-"+site.name}
                                 key={index}
                                 style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
-                                onClick={ ()=>{ this.mountSite(item); } }
-                                primaryText={ item.name }
+                                onClick={ ()=>{ this.mountSite(site) } }
+                                primaryText={ site.name }
                             />);
                         })}
                         { configurations.empty || _configurations.global.siteManagementEnabled ? (
