@@ -181,6 +181,10 @@ class MenuManager {
                     }, mainWindow);
 
                     console.log(newName);
+                    if(!newName || newName===""){
+                        return;
+                    }
+
 
                     let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
                     newConf.name = newName;
