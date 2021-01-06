@@ -6,6 +6,7 @@ const electron = require('electron')
 const fileDirUtils = require('./../file-dir-utils');
 
 const fs = require('fs-extra');
+const fssimple = require('fs');
 const pathHelper = require('./../path-helper');
 const outputConsole = require('./../output-console');
 
@@ -64,8 +65,6 @@ class PogoPublisher {
             let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
             outputConsole.appendLine('Keygen success ...');
             pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
-
-
         } catch (e) {
             outputConsole.appendLine('keygen error ...:' + e);
         }
@@ -110,7 +109,7 @@ class PogoPublisher {
         return profile;
     }
 
-     readProfile2(){
+    readProfile2(){
         var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
         var profile;
         try {
@@ -219,7 +218,7 @@ class PogoPublisher {
         const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
         newConf.lastPublish = 0,
-        newConf.publish = [];
+            newConf.publish = [];
         newConf.publish.push({
             key: 'poppygo-nocloud',
             config: {
@@ -228,6 +227,165 @@ class PogoPublisher {
         });
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
         global.mainWM.remountSite();
+    }
+
+
+    isNumber(n) { return /^-?[\d.]+(?:e-?\d+)?$/.test(n); } 
+
+    async siteFromPogoUrl(){
+
+
+        let mainWindow = global.mainWM.getCurrentInstance();
+
+        const prompt = require('electron-prompt');
+        let full_gh_url = await prompt({
+            title: 'Enter git url',
+            label: 'url:',
+            value: "",
+            inputAttrs: {
+                type: 'text',
+                required: true
+            },
+            type: 'input'
+        }, mainWindow);
+
+        if(!full_gh_url || full_gh_url===""){
+            return;
+        }
+
+        const dialog = electron.dialog;
+
+        var progressBar = new ProgressBar({
+            indeterminate: false,
+            text: 'Publishing your site..',
+            abortOnError: true,
+            detail: 'Uploading to PoppyGo servers',
+            browserWindow: {
+                frame: false,
+                parent: mainWindow,
+                webPreferences: {
+                    nodeIntegration: true
+                }
+            }
+        });
+
+        progressBar.on('completed', function() {
+            progressBar.detail = 'Site has been imported.';
+        })
+            .on('aborted', function(value) {
+                console.info(`aborted... ${value}`);
+            })
+            .on('progress', function(value) {
+            });
+
+        progressBar.value += 10;
+        progressBar.detail = 'Preparing download';
+
+        var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
+
+        var resolvedDest = pathHelper.getRoot()+'temp/siteFromUrl/';
+        var full_gh_dest = resolvedDest;
+
+        var git_bin = this.getGitBin();
+
+        outputConsole.appendLine('Creating empty directory at: ' + resolvedDest);
+
+        await fs.ensureDir(resolvedDest);
+        await fs.emptyDir(resolvedDest);
+        await fs.ensureDir(resolvedDest);
+
+        progressBar.value += 10;
+        progressBar.detail = 'Getting live site files for synchronization';
+
+        await outputConsole.appendLine('Cloning from: ' + full_gh_url);
+
+        try {
+            let clonecmd = await spawnAw( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
+            outputConsole.appendLine('Clone success ...');
+        } catch (e) {
+            await outputConsole.appendLine(git_bin+ " clone -s -i " + pogokeypath + " " + full_gh_url + " " + full_gh_dest );
+            await outputConsole.appendLine('Clone error ...:' + e);
+        }
+
+        progressBar.value = 100;
+        progressBar.setCompleted();
+        progressBar._window.hide();
+        progressBar.close();
+
+        let siteKey = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
+        console.log("guesedKey:"+siteKey);
+
+        if(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+            const options = {
+                type: 'question',
+                buttons: ['Cancel', 'Overwrite', 'Keep both'],
+                defaultId: 2,
+                title: 'Site key exist',
+                message: 'A site with this key exists.',
+                detail: 'Do you want to overwrite this site or keep both?',
+            };
+
+            dialog.showMessageBox(null, options, async (response) => {
+                if(response === 1){
+
+                }
+                else if(response ===2){
+
+                    let extraPlus = 0
+                    while(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+                        extraPlus = extraPlus++;
+
+                        let numLength = 0;
+                        while(this.isNumber(siteKey.slice(-numLength+1))){
+                            numLength = numLength++;
+                        }
+
+                        if(numLength>0){
+                            keyNumpart = Number(siteKey.slice(-numLength));
+                            keyNumpart = keyNumpart+extraPlus;
+                            siteKey = siteKey.substring(0, siteKey.length - numLength)+keyNumpart.toString();
+                        }
+                        else{
+                            siteKey = siteKey+".1"
+                        }
+                    }
+
+                    await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
+                }
+                else{
+                    return;
+                }
+            });
+        }
+        else{
+            await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
+        }
+    }
+
+    async createNewWithTempDirAndKey(siteKey, full_gh_dest){
+        let newPath = '';
+
+        var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
+        var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
+        var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
+        var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
+        await fs.ensureDir(pathSite);
+        await fs.ensureDir(pathSiteSources);
+        await fs.moveSync(full_gh_dest, pathSource);
+
+        let newConf = {};
+        newConf.key = siteKey;
+        newConf.name = siteKey;
+        newConf.source = {};
+        newConf.source.type = 'folder';
+        newConf.source.path = pathSource;
+        newConf.publish = [];
+        newConf.publish.push({});
+        newConf.publish[0].key = 'poppygo-nocloud';
+        newConf.publish[0].config = {};
+        newConf.publish[0].config.type = "poppygo";
+        newConf.lastPublish = 0;
+        await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
     }
 
     async publish(context){
@@ -375,7 +533,7 @@ class PogoPublisher {
                                         this.writePublishStatus();
 
                                         dialog.showMessageBox(mainWindow, {
-											title: 'PoppyGo',
+                                            title: 'PoppyGo',
                                             type: 'info',
                                             message: "Succesfully published your changes. \n They will be visible in a minute or two.",
                                         });
@@ -387,7 +545,7 @@ class PogoPublisher {
                                         progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
-											title: 'PoppyGo',
+                                            title: 'PoppyGo',
                                             type: 'warning',
                                             message: "Publishing failed. (git-push)",
                                         });
@@ -399,7 +557,7 @@ class PogoPublisher {
                                 progressBar._window.hide();
                                 progressBar.close();
                                 dialog.showMessageBox(mainWindow, {
-									title: 'PoppyGo',
+                                    title: 'PoppyGo',
                                     type: 'warning',
                                     message: "Publishing failed. (git-commit)",
                                 });
@@ -412,7 +570,7 @@ class PogoPublisher {
                         progressBar._window.hide();
                         progressBar.close();
                         dialog.showMessageBox(mainWindow, {
-							title: 'PoppyGo',
+                            title: 'PoppyGo',
                             type: 'warning',
                             message: "Publishing failed. (git-add)",
                         });
@@ -425,7 +583,7 @@ class PogoPublisher {
                 progressBar._window.hide();
                 progressBar.close();
                 dialog.showMessageBox(mainWindow, {
-					title: 'PoppyGo',
+                    title: 'PoppyGo',
                     type: 'warning',
                     message: "Publishing failed. (git-clone)",
                 });

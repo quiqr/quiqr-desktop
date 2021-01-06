@@ -68,6 +68,17 @@ class MenuManager {
             });
         }
     }
+
+    async importSiteFromUrl(){
+
+
+        let pogopubl = new PogoPublisher({});
+        await pogopubl.siteFromPogoUrl();
+
+    }
+
+
+
     async generateModel() {
 
         const dialog = electron.dialog;
@@ -553,6 +564,13 @@ resources: []\n\
                 click: async () => {
                     await this.generateModel();
                     this.generateModel()
+                }
+            },
+            {
+                id: 'import-site-from-url',
+                label: 'Import site from PogoURL',
+                click: async () => {
+                    this.importSiteFromUrl()
                 }
             },
             {

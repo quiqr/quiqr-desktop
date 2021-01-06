@@ -22,6 +22,10 @@ class PathHelper{
         return this.getRoot()+ `sites/${siteKey}/`;
     }
 
+    getKeyPath(siteKey){
+        return this.getRoot()+'config.'+siteKey+'.json';
+    }
+
     getSiteWorkspacesRoot(siteKey/*: string*/){
         return this.getSiteRoot(siteKey) + 'workspaces/';
     }
