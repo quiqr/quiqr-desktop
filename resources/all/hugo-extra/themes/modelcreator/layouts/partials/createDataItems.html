@@ -4,6 +4,8 @@
 {{- $collections := slice -}}
 {{- $singles := slice -}}
 {{- $menu := slice -}}
+{{- $params := dict -}}
+{{- with .params }} {{$params = . }}{{- end -}}
 
 {{- range $index, $file := (partial "rangeFiles" (dict "dir" $dir )) -}}
       {{- $language := "" -}}
@@ -21,7 +23,7 @@
                 {{- $dataKey := printf "ds_%s_%s" $subDir $fileName -}}
                 {{- $fields := slice -}}
                 {{- range $key, $value := (index $data $fileName) -}}
-                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" .params ) -}}
+                    {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" $params ) -}}
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
                 {{- if gt (len $fields) 0 -}}

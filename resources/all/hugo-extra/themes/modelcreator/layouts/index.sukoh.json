@@ -32,6 +32,12 @@
 {{/*------------------------------ Menus and Params  -----------------------------*/}}
 
 {{- $configFilePath := partial "configFile" . -}}
+{{- $configParams := dict -}}
+{{ range $key, $value := $.Site.Params }}
+    {{- if not (or (eq $key "mainsections") (eq $key "mainSections") ) -}}
+        {{ $configParams = $configParams | merge (dict $key $value) -}}
+    {{- end -}}
+{{ end }}
 
 {{- if in $configFilePath "config/_default/" }}
       {{- range $index, $file := partial "rangeFiles"  (dict "dir" "config/_default/" ) -}}
@@ -48,11 +54,11 @@
 {{- else -}}
       {{ $config := readFile $configFilePath  }}
       {{- if in $config "params" -}}
-          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $.Site.Params "configItems" $configItems "paramsKey" "params") -}}
+          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $configParams "configItems" $configItems "paramsKey" "params") -}}
           {{- $singles = $singles | append $single -}}
           {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
       {{- else if in $config "Params" -}}
-          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $.Site.Params "configItems" $configItems "paramsKey" "Params") -}}
+          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $configParams "configItems" $configItems "paramsKey" "Params") -}}
           {{- $singles = $singles | append $single -}}
           {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
       {{- end -}}
