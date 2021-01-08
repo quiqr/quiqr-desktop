@@ -14,6 +14,10 @@ const ProgressBar = require('electron-progressbar');
 const rimraf = require("rimraf");
 const spawn = require("child_process").spawn;
 const spawnAw = require('await-spawn')
+const hugoDownloader = require('../hugo/hugo-downloader')
+const HugoBuilder = require('../hugo/hugo-builder');
+const formatProviderResolver = require('../format-provider-resolver');
+const toml = require('toml');
 
 class PogoPublisher {
     constructor(config){
@@ -229,8 +233,206 @@ class PogoPublisher {
         global.mainWM.remountSite();
     }
 
-
     isNumber(n) { return /^-?[\d.]+(?:e-?\d+)?$/.test(n); } 
+
+    async createSiteFromThemeGitUrl(){
+        //check hugo
+        //create new site with hugo
+        //clone theme into new site
+        //copy exampleSite
+        //run brechts wunder script
+
+        let mainWindow = global.mainWM.getCurrentInstance();
+        let hugover = 'extended_0.77.0';
+        const exec = pathHelper.getHugoBinForVer(hugover);
+
+        if(!fs.existsSync(exec)){
+            const dialog = electron.dialog;
+            dialog.showMessageBox(mainWindow, {
+                buttons: ["Close"],
+                title: "PoppyGo will now download hugo " + hugover,
+                message: "Try again when download has finished",
+            });
+
+            try{
+                hugoDownloader.downloader.download(hugover);
+                this.generateModel();
+            }
+            catch(e){
+                // warn about HugoDownloader error?
+            }
+        }
+        else{
+
+
+            const prompt = require('electron-prompt');
+            let full_gh_url = await prompt({
+                title: 'Enter theme git url',
+                label: 'url:',
+                value: "",
+                inputAttrs: {
+                    type: 'text',
+                    required: true
+                },
+                type: 'input'
+            }, mainWindow);
+
+            if(!full_gh_url || full_gh_url===""){
+                return;
+            }
+
+            let siteKey = await prompt({
+                title: 'Enter new site name',
+                label: 'name:',
+                value: "",
+                inputAttrs: {
+                    type: 'text',
+                    required: true
+                },
+                type: 'input'
+            }, mainWindow);
+
+            if(!siteKey || siteKey===""){
+                return;
+            }
+
+            const dialog = electron.dialog;
+
+            var progressBar = new ProgressBar({
+                indeterminate: false,
+                text: 'Creating your site..',
+                abortOnError: true,
+                detail: 'Creating poppygo website',
+                browserWindow: {
+                    frame: false,
+                    parent: mainWindow,
+                    webPreferences: {
+                        nodeIntegration: true
+                    }
+                }
+            });
+
+            progressBar.on('completed', function() {
+                progressBar.detail = 'Site has been created.';
+            })
+                .on('aborted', function(value) {
+                    console.info(`aborted... ${value}`);
+                })
+                .on('progress', function(value) {
+                });
+
+            progressBar.value += 10;
+            progressBar.detail = 'Preparing download';
+
+            var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
+
+            let themeName = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
+            console.log("guesedKey:"+themeName);
+
+            var temp_gh_dest = pathHelper.getRoot()+'temp/';
+            var full_gh_dest = pathHelper.getRoot()+'temp/siteFromTheme/';
+            var full_gh_themes_dest = pathHelper.getRoot()+'temp/siteFromTheme/themes/'+themeName;
+
+            await fs.ensureDir(full_gh_dest);
+            await fs.emptyDir(full_gh_dest);
+            //await fs.ensureDir(full_gh_dest);
+
+            let hugoBuilderConfig = {
+                hugover: hugover
+            }
+
+            let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
+            await hugoBuilder.create('siteFromTheme', temp_gh_dest);
+
+            var git_bin = this.getGitBin();
+
+            outputConsole.appendLine('Creating empty directory at: ' + full_gh_dest);
+
+
+            progressBar.value += 10;
+            progressBar.detail = 'Getting live site files for synchronization';
+
+            await outputConsole.appendLine('Cloning from: ' + full_gh_url);
+
+            try {
+                let clonecmd = await spawnAw( git_bin, [ "clone", full_gh_url , full_gh_themes_dest ]);
+                outputConsole.appendLine('Clone success ...');
+            } catch (e) {
+                await outputConsole.appendLine(git_bin+ " clone " + full_gh_url + " " + full_gh_themes_dest );
+                await outputConsole.appendLine('Clone error ...:' + e);
+                return;
+            }
+
+            await fs.emptyDir(full_gh_dest+"/content");
+            await fs.copySync(full_gh_themes_dest+"/exampleSite/content", full_gh_dest+"/content");
+            await fs.removeSync(full_gh_dest+'/config.toml');
+            await fs.copySync(full_gh_themes_dest+"/exampleSite/config.toml", full_gh_dest+"/config.toml");
+
+            let strData = fs.readFileSync(full_gh_dest+"/config.toml", {encoding: 'utf-8'});
+            let formatProvider = formatProviderResolver.resolveForFilePath(full_gh_dest+"/config.toml");
+            let hconfig = formatProvider.parse(strData);
+            hconfig.theme = themeName;
+            fs.writeFileSync(
+                full_gh_dest+"/config.toml",
+                formatProvider.dump(hconfig)
+            );
+
+            progressBar.value = 100;
+            progressBar.setCompleted();
+            progressBar._window.hide();
+            progressBar.close();
+
+            if(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+                const options = {
+                    type: 'question',
+                    buttons: ['Cancel', 'Overwrite', 'Keep both'],
+                    defaultId: 2,
+                    title: 'Site key exist',
+                    message: 'A site with this key exists.',
+                    detail: 'Do you want to overwrite this site or keep both?',
+                };
+
+                dialog.showMessageBox(null, options, async (response) => {
+                    if(response === 1){
+
+                    }
+                    else if(response ===2){
+
+                        let extraPlus = 0
+                        while(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+                            extraPlus = extraPlus++;
+
+                            let numLength = 0;
+                            while(this.isNumber(siteKey.slice(-numLength+1))){
+                                numLength = numLength++;
+                            }
+
+                            if(numLength>0){
+                                keyNumpart = Number(siteKey.slice(-numLength));
+                                keyNumpart = keyNumpart+extraPlus;
+                                siteKey = siteKey.substring(0, siteKey.length - numLength)+keyNumpart.toString();
+                            }
+                            else{
+                                siteKey = siteKey+".1"
+                            }
+                        }
+
+                        await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
+                    }
+                    else{
+                        return;
+                    }
+                });
+            }
+            else{
+                await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
+            }
+
+
+        }
+        return;
+    }
+
 
     async siteFromPogoUrl(){
 
@@ -283,16 +485,16 @@ class PogoPublisher {
 
         var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
-        var resolvedDest = pathHelper.getRoot()+'temp/siteFromUrl/';
-        var full_gh_dest = resolvedDest;
+        var full_gh_dest = pathHelper.getRoot()+'temp/siteFromUrl/';
+        var full_gh_dest = full_gh_dest;
 
         var git_bin = this.getGitBin();
 
-        outputConsole.appendLine('Creating empty directory at: ' + resolvedDest);
+        outputConsole.appendLine('Creating empty directory at: ' + full_gh_dest);
 
-        await fs.ensureDir(resolvedDest);
-        await fs.emptyDir(resolvedDest);
-        await fs.ensureDir(resolvedDest);
+        await fs.ensureDir(full_gh_dest);
+        await fs.emptyDir(full_gh_dest);
+        await fs.ensureDir(full_gh_dest);
 
         progressBar.value += 10;
         progressBar.detail = 'Getting live site files for synchronization';
@@ -364,7 +566,6 @@ class PogoPublisher {
 
     async createNewWithTempDirAndKey(siteKey, full_gh_dest){
         let newPath = '';
-
         var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
         var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
         var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
@@ -372,7 +573,11 @@ class PogoPublisher {
         await fs.ensureDir(pathSite);
         await fs.ensureDir(pathSiteSources);
         await fs.moveSync(full_gh_dest, pathSource);
+        let newConf = this.createConf(siteKey, pathSource);
+        await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+    }
 
+    createConf(siteKey, pathSource){
         let newConf = {};
         newConf.key = siteKey;
         newConf.name = siteKey;
@@ -385,7 +590,7 @@ class PogoPublisher {
         newConf.publish[0].config = {};
         newConf.publish[0].config.type = "poppygo";
         newConf.lastPublish = 0;
-        await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+        return newConf;
     }
 
     async publish(context){
