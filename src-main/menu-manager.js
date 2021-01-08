@@ -70,14 +70,13 @@ class MenuManager {
     }
 
     async importSiteFromUrl(){
-
-
         let pogopubl = new PogoPublisher({});
         await pogopubl.siteFromPogoUrl();
-
     }
-
-
+    async createSiteFromThemeGitUrl(){
+        let pogopubl = new PogoPublisher({});
+        await pogopubl.createSiteFromThemeGitUrl();
+    }
 
     async generateModel() {
 
@@ -571,6 +570,13 @@ resources: []\n\
                 label: 'Import site from PogoURL',
                 click: async () => {
                     this.importSiteFromUrl()
+                }
+            },
+            {
+                id: 'create-new-from-hugo-theme-url',
+                label: 'Create new from Hugo theme git URL',
+                click: async () => {
+                    this.createSiteFromThemeGitUrl();
                 }
             },
             {
