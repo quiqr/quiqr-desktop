@@ -76,6 +76,7 @@ class MenuManager {
     async createSiteFromThemeGitUrl(){
         let pogopubl = new PogoPublisher({});
         await pogopubl.createSiteFromThemeGitUrl();
+        //this.generateModel();
     }
 
     async generateModel() {
