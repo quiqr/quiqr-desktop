@@ -263,8 +263,6 @@ class PogoPublisher {
             }
         }
         else{
-
-
             const prompt = require('electron-prompt');
             let full_gh_url = await prompt({
                 title: 'Enter theme git url',
@@ -335,19 +333,19 @@ class PogoPublisher {
 
             await fs.ensureDir(full_gh_dest);
             await fs.emptyDir(full_gh_dest);
-            //await fs.ensureDir(full_gh_dest);
+            await fs.ensureDir(full_gh_dest);
+            await fs.ensureDir(full_gh_dest + '/themes');
 
             let hugoBuilderConfig = {
                 hugover: hugover
             }
 
-            let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
-            await hugoBuilder.create('siteFromTheme', temp_gh_dest);
+            //            let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
+            //await hugoBuilder.create('siteFromTheme', temp_gh_dest);
 
             var git_bin = this.getGitBin();
 
             outputConsole.appendLine('Creating empty directory at: ' + full_gh_dest);
-
 
             progressBar.value += 10;
             progressBar.detail = 'Getting live site files for synchronization';
@@ -363,15 +361,18 @@ class PogoPublisher {
                 return;
             }
 
-            await fs.emptyDir(full_gh_dest+"/content");
-            await fs.copySync(full_gh_themes_dest+"/exampleSite/content", full_gh_dest+"/content");
-            await fs.removeSync(full_gh_dest+'/config.toml');
-            await fs.copySync(full_gh_themes_dest+"/exampleSite/config.toml", full_gh_dest+"/config.toml");
+//            await fs.emptyDir(full_gh_dest+"/data");
+//            await fs.copySync(full_gh_themes_dest+"/exampleSite/data", full_gh_dest+"/data");
+//            await fs.emptyDir(full_gh_dest+"/content");
+//            await fs.copySync(full_gh_themes_dest+"/exampleSite/content", full_gh_dest+"/content");
+//            await fs.removeSync(full_gh_dest+'/config.toml');
+            await fs.copySync(full_gh_themes_dest+"/exampleSite", full_gh_dest);
 
             let strData = fs.readFileSync(full_gh_dest+"/config.toml", {encoding: 'utf-8'});
             let formatProvider = formatProviderResolver.resolveForFilePath(full_gh_dest+"/config.toml");
             let hconfig = formatProvider.parse(strData);
             hconfig.theme = themeName;
+            hconfig.baseURL = "/"
             fs.writeFileSync(
                 full_gh_dest+"/config.toml",
                 formatProvider.dump(hconfig)
