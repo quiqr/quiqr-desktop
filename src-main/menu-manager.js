@@ -532,7 +532,7 @@ resources: []\n\
         }
     }
 
-    async addProjectPath(){
+    async editProjectPath(){
 
         if(global.currentSiteKey && global.currentWorkspaceKey){
             let siteKey = global.currentSiteKey;
@@ -576,7 +576,7 @@ resources: []\n\
                     newConf.publish[0].config = {}
                     newConf.publish[0].config.path = newPath
                     newConf.publish[0].config.type = "poppygo"
-                    newConf.publish[0].config.defaultDomain = newPath + ".pogosite.com"
+                    newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
 
                     await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
@@ -658,7 +658,7 @@ resources: []\n\
                 label: 'Edit project path',
                 enabled: this.siteSelected(),
                 click: async () => {
-                    this.addProjectPath()
+                    this.editProjectPath()
                 }
             },
             {
