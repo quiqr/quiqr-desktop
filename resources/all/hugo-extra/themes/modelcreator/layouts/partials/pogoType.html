@@ -15,7 +15,6 @@
     {{- if gt $stringLen 40}}
         {{- $pogoType = "markdown" -}}
     {{- end -}}
-
 {{- else if (eq "template.HTML" $type ) -}}
     {{- $pogoType = "markdown" -}}
 {{- else if (eq "time.Time" $type) -}}
