@@ -532,6 +532,71 @@ resources: []\n\
         }
     }
 
+    async addProjectPath(){
+
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
+            configurationDataProvider.get(async function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+                if(siteData=siteService = new SiteService(siteData)){
+                    let newConf = siteService._config;
+                    console.log(newConf);
+
+                    let currentPath = "";
+                    if(newConf.hasOwnProperty("publish") && newConf.publish[0].hasOwnProperty("config") &&  newConf.publish[0].config.hasOwnProperty("path")){
+                        currentPath = newConf.publish[0].config.path
+                    }
+
+                    delete newConf.configPath
+                    const prompt = require('electron-prompt');
+                    var newPath = await prompt({
+                        title: 'project path',
+                        label: 'key:',
+                        value: currentPath,
+                        inputAttrs: {
+                            type: 'text',
+                            required: true
+                        },
+                        type: 'input'
+                    }, mainWindow);
+
+                    console.log(newPath);
+                    if(!newPath || newPath===""){
+                        return;
+                    }
+
+                    let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+
+                    newConf.publish[0].key = "poppygo-cloud"
+                    newConf.publish[0].config = {}
+                    newConf.publish[0].config.path = newPath
+                    newConf.publish[0].config.type = "poppygo"
+                    newConf.publish[0].config.defaultDomain = newPath + ".pogosite.com"
+
+                    await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
+
+                    outputConsole.appendLine('rename projectpath to: '+newPath);
+
+                    let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                    mainWindow.webContents.send("redirectToGivenLocation","/");
+                    mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
+                    mainWindow.webContents.send("redirectMountSite",newScreenURL);
+
+
+                }
+
+            });
+
+        }
+
+    }
+
     toggleExperimental(){
 
         if(pogoconf.experimentalFeatures){
@@ -586,6 +651,14 @@ resources: []\n\
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.unlinkSiteDomain()
+                }
+            },
+            {
+                id: 'add-project-path',
+                label: 'Edit project path',
+                enabled: this.siteSelected(),
+                click: async () => {
+                    this.addProjectPath()
                 }
             },
             {
