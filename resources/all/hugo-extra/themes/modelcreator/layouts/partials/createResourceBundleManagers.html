@@ -1,5 +1,8 @@
+
 {{- $fields := slice -}}
+{{ warnf .dir }}
 {{- if not (path.Ext .dir) -}}
+    {{- if .page.Resources -}}
         {{- $hasResourceDir := false -}}
         {{- range (readDir .dir) -}}
             {{- if .IsDir -}}
@@ -10,5 +13,10 @@
         {{- if eq $hasResourceDir false -}}
             {{- $fields = $fields | append (partial "createField" (dict "key" "page_related_images" "value" "" "type" "bundle-manager")) -}}
         {{- end -}}
+    {{- else if .page.IsPage -}}
+      {{- $fields = $fields | append (partial "createField" (dict "key" "page_related_images" "value" "images/" "type" "bundle-manager")) -}}
+    {{- else if .page.IsSection -}}
+      {{- $fields = $fields | append (partial "createField" (dict "key" "page_related_images" "value" "images/" "type" "bundle-manager")) -}}
+    {{- end -}}
 {{- end -}}
 {{- return $fields -}}
