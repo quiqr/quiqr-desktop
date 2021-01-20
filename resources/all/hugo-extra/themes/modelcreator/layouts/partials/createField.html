@@ -59,6 +59,10 @@
     {{- $field = merge $field (dict "path" $value "extensions" $extensions "fields" $bundleFields ) -}}
 {{- end -}}
 
+{{- if (eq $pogoType "info") -}}
+    {{- $field = merge $field (dict "content" $value "theme" "gray-bare" ) -}}
+{{- end -}}
+
 {{- if eq $pogoType "string" -}}
     {{- $selectKeys := slice -}}
     {{- with .params -}}
