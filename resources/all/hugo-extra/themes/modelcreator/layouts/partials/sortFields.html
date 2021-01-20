@@ -3,6 +3,11 @@
 {{- $order := slice -}}
 
 {{- range . }}
+    {{ if or (in .type "info") -}}
+        {{- $order = $order | append .key -}}
+    {{- end -}}
+{{- end -}}
+{{- range . }}
     {{ if or (in .type "bundle-image") -}}
         {{- $order = $order | append .key -}}
     {{- end -}}

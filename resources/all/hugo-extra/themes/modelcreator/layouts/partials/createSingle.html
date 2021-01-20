@@ -23,6 +23,8 @@
     {{- $file = printf "%s%s" $contentDir .Path -}}
 {{- end -}}
 {{- $fields := slice -}}
+{{- $linkInfo := printf "Relative link of this page: %s" .page.Permalink -}}
+{{- $fields = $fields | append (slice (partial "createField" (dict "value" $linkInfo "key" (printf "info-%s" $pageKey) "type" "info"))) -}}
 {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" .page "dir" (path.Dir $file))) -}}
 {{- $fields = $fields | append (slice (partial "createField" (dict "value" .page.Content "key" "mainContent" ))) -}}
 {{- $page := .page}}

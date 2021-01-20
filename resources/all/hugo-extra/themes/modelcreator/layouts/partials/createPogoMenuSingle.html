@@ -3,5 +3,5 @@
     {{- $field := partial "createField" (dict "value" $value "key" $key ) -}}
     {{- $fields = $fields | append $field -}}
 {{- end -}}
-{{- $single := dict "key" "pogomenu" "title" "Menu" "file" "/zpogomenu.json" "dataformat" "json" "fields" $fields "previewUrl" "/" -}}
+{{- $single := dict "key" "pogomenu" "title" "CMS" "file" "/zpogomenu.json" "dataformat" "json" "fields" $fields "previewUrl" "/" -}}
 {{- return $single  -}}

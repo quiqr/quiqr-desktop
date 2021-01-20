@@ -4,16 +4,13 @@
 {{- $contentDir := (partial "getContentDir" .page ) -}}
 {{- $baseKey := partial "createKey" .page  -}}
 {{- $itemTitle :=  ( $baseKey | humanize) | singularize -}}
-{{- $break := false }}
 {{- $language := partial "getLanguage" .page -}}
 {{- $sectionKey := printf "c_%s_%s" $language $baseKey -}}
-
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
 
 {{- $sectionTitle := printf "%s%s" $language ($baseKey | humanize) -}}
-{{- range .page.Pages -}}
-    {{- if and .File (ne $break "true") -}}
-        {{- $break = true -}}
+{{- range first 1 .page.Pages -}}
+    {{- if .File -}}
         {{- $subDir := $baseKey -}}
         {{- if in .File.Dir "data"}}
             {{- $subDir = path.Base .File.Dir -}}

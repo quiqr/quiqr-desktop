@@ -1,6 +1,5 @@
 
 {{- $fields := slice -}}
-{{ warnf .dir }}
 {{- if not (path.Ext .dir) -}}
     {{- if .page.Resources -}}
         {{- $hasResourceDir := false -}}
