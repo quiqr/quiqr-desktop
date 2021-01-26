@@ -243,9 +243,13 @@
   {{- if eq $file.Name "poppygo" -}}
     {{- range $index, $file := readDir "poppygo/"}}
         {{- if eq $file.Name "forms" -}}
-            {{- $pogoFORM = partial "readYML" "poppygo/forms/default.yml" -}}
-            {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoFORM "key" "pogoform" "file" "poppygo/forms/default.yml" "title" "Form" "dataformat" "yml")) -}}
-            {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoform") -}}
+            {{- range $index, $file := readDir "poppygo/forms/" -}}
+                {{- if eq $file.Name "default.json" -}}
+                    {{- $pogoFORM = getJSON "poppygo/forms/default.json" -}}
+                    {{- $collections = $collections | append (partial "createPogoMenuCollection" (dict "item" $pogoFORM "key" "pogoform" "dir" "/poppygo/forms/" "title" "Form" "ext" "json" "dataformat" "json" "itemTitle" "Form")) -}}
+                    {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoform") -}}
+                {{- end -}}
+            {{- end -}}
         {{- end -}}
     {{- end -}}
   {{- end -}}
