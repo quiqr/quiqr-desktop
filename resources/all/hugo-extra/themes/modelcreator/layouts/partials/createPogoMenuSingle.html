@@ -1,7 +1,7 @@
 {{- $fields := slice -}}
-{{- range $key, $value := . -}}
+{{- range $key, $value := .item -}}
     {{- $field := partial "createField" (dict "value" $value "key" $key ) -}}
     {{- $fields = $fields | append $field -}}
 {{- end -}}
-{{- $single := dict "key" "pogomenu" "title" "CMS" "file" "/zpogomenu.json" "dataformat" "json" "fields" $fields "previewUrl" "/" -}}
+{{- $single := dict "key" .key "title" .title "file" .file "dataformat" .dataformat "fields" $fields "previewUrl" "/" -}}
 {{- return $single  -}}
