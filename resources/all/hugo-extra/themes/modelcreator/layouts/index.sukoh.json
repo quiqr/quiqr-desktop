@@ -251,6 +251,15 @@
                 {{- end -}}
             {{- end -}}
         {{- end -}}
+        {{- if eq $file.Name "home" -}}
+            {{- range $index, $file := readDir "poppygo/home/" -}}
+                {{- if eq $file.Name "index.md" -}}
+                    {{- $pogoHOME := dict "mainContent" (readFile "poppygo/home/index.md") -}}
+                    {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoHOME "key" "pogohome" "file" "poppygo/home/index.md" "title" "Home" "dataformat" "md")) -}}
+                    {{- $pogoMenu = $pogoMenu | append (dict "key" "pogohome") -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
     {{- end -}}
   {{- end -}}
   {{- if eq $file.Name "static" -}}
@@ -263,6 +272,7 @@
       {{- end -}}
   {{- end -}}
 {{- end -}}
+
 
 
 {{/*---------------------------Menu based----------------------------- */}}
