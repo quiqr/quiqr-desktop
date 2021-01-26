@@ -68,6 +68,17 @@ class MenuManager {
             });
         }
     }
+
+    async importSiteFromUrl(){
+        let pogopubl = new PogoPublisher({});
+        await pogopubl.siteFromPogoUrl();
+    }
+    async createSiteFromThemeGitUrl(){
+        let pogopubl = new PogoPublisher({});
+        await pogopubl.createSiteFromThemeGitUrl();
+        //this.generateModel();
+    }
+
     async generateModel() {
 
         const dialog = electron.dialog;
@@ -75,6 +86,7 @@ class MenuManager {
         let hugover = 'extended_0.76.5';
         let modelPath = path.join(pathHelper.getTempDir(),"model");
         let modelFile = path.join(modelPath, "sukoh.json");
+        let menuFile = path.join(modelPath, "zpogomenu.json");
         let hugoBuilderConfig = {
             config: config.build[0]['config'],
             workspacePath: global.currentSitePath,
@@ -94,12 +106,35 @@ class MenuManager {
 
             try{
                 hugoDownloader.downloader.download(hugover);
+                this.generateModel();
             }
             catch(e){
                 // warn about HugoDownloader error?
             }
         }
         else{
+            // write .images.md for managing images in static folder
+            const staticDir = path.join(global.currentSitePath, "static");
+            const imageDir =  path.join(global.currentSitePath, "static", "images");
+            const imgDir =  path.join(global.currentSitePath, "static", "img");
+            const imageFile = path.join(global.currentSitePath, "static", "images", ".pogo-images.md");
+            const imgFile = path.join(global.currentSitePath, "static", "img", ".pogo-images.md");
+            const imageFile2 = path.join(global.currentSitePath, "static", ".pogo-images.md");
+            const imageFileContent = "---\n\
+description: this file is a helper file for the PoppyGo asset manager\n\
+resources: []\n\
+---\n\
+\n";
+            if (fs.existsSync (imageDir)){
+              fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
+            }
+            if (fs.existsSync (imgDir)){
+              fs.writeFileSync(imgFile , imageFileContent , 'utf-8');
+            }
+            if (fs.existsSync(staticDir)){
+              fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');
+            };
+
             let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
             await hugoBuilder.buildModel();
 
@@ -121,7 +156,9 @@ class MenuManager {
                 if(response === 1) return;
 
                 fs.copySync(modelFile, path.join(global.currentSitePath, "sukoh.json"));
-
+                if (fs.existsSync(menuFile)){
+                  fs.copySync(menuFile, path.join(global.currentSitePath, "zpogomenu.json"));
+                }
             }
         }
     }
@@ -555,6 +592,71 @@ class MenuManager {
         }
     }
 
+    async editProjectPath(){
+
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
+            configurationDataProvider.get(async function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+                if(siteData=siteService = new SiteService(siteData)){
+                    let newConf = siteService._config;
+                    console.log(newConf);
+
+                    let currentPath = "";
+                    if(newConf.hasOwnProperty("publish") && newConf.publish[0].hasOwnProperty("config") &&  newConf.publish[0].config.hasOwnProperty("path")){
+                        currentPath = newConf.publish[0].config.path
+                    }
+
+                    delete newConf.configPath
+                    const prompt = require('electron-prompt');
+                    var newPath = await prompt({
+                        title: 'project path',
+                        label: 'key:',
+                        value: currentPath,
+                        inputAttrs: {
+                            type: 'text',
+                            required: true
+                        },
+                        type: 'input'
+                    }, mainWindow);
+
+                    console.log(newPath);
+                    if(!newPath || newPath===""){
+                        return;
+                    }
+
+                    let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+
+                    newConf.publish[0].key = "poppygo-cloud"
+                    newConf.publish[0].config = {}
+                    newConf.publish[0].config.path = newPath
+                    newConf.publish[0].config.type = "poppygo"
+                    newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
+
+                    await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
+
+                    outputConsole.appendLine('rename projectpath to: '+newPath);
+
+                    let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                    mainWindow.webContents.send("redirectToGivenLocation","/");
+                    mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
+                    mainWindow.webContents.send("redirectMountSite",newScreenURL);
+
+
+                }
+
+            });
+
+        }
+
+    }
+
     toggleExperimental(){
 
         if(pogoconf.experimentalFeatures){
@@ -585,6 +687,7 @@ class MenuManager {
                 label: 'Generate PoppyGo config',
                 enabled: this.siteSelected(),
                 click: async () => {
+                    await this.generateModel();
                     this.generateModel()
                 }
             },
@@ -597,11 +700,33 @@ class MenuManager {
                 }
             },
             {
+                id: 'import-site-from-url',
+                label: 'Import site from PogoURL',
+                click: async () => {
+                    this.importSiteFromUrl()
+                }
+            },
+            {
+                id: 'create-new-from-hugo-theme-url',
+                label: 'Create new from Hugo theme git URL',
+                click: async () => {
+                    this.createSiteFromThemeGitUrl();
+                }
+            },
+            {
                 id: 'unlink-site-domain',
                 label: 'Unlink site domain',
                 enabled: this.siteSelected(),
                 click: async () => {
                     this.unlinkSiteDomain()
+                }
+            },
+            {
+                id: 'add-project-path',
+                label: 'Edit project path',
+                enabled: this.siteSelected(),
+                click: async () => {
+                    this.editProjectPath()
                 }
             },
             {

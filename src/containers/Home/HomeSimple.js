@@ -4,7 +4,6 @@ import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
 import { RaisedButton } from 'material-ui/';
 import {List, ListItem} from 'material-ui/List';
-//import Subheader from 'material-ui/Subheader';
 import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import IconDomain from 'material-ui/svg-icons/social/domain';
 import IconPublish from 'material-ui/svg-icons/editor/publish';
@@ -732,13 +731,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                 {accountStatusMsg}
                 {handleSubscriptions}
 
-
                 </ListItem>
             );
         }
         else{
-            user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "bold", fontSize:"110%"}}>Create an account for publishing</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>Register now!</button>
+            user = ( <ListItem leftIcon={<IconAccountCircle color="#49545" style={{}} />} disabled={true} >
+                            <span style={{fontWeight: "normal", fontSize:"100%"}}>Create an account for publishing</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>Register now!</button>
                         </ListItem>
             );
         }
@@ -750,13 +748,11 @@ class Home extends React.Component<HomeProps, HomeState>{
                         <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
                         window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
                         }}>{site.publish[0].config.defaultDomain}</button>
+                    </span>
+                    <br/>
 
-
-                </span>
-                <br/>
-
-                { this.renderUpgadeLink() }
-                { this.domainlist() }
+                    { this.renderUpgadeLink() }
+                    { this.domainlist() }
 
 
                 </ListItem>
@@ -765,7 +761,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             domain = (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Claim a poppygo live URL for {site.name} </span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
+                    <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {site.name} </span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
                 </ListItem>
             )
         }
@@ -780,7 +776,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             ts = new Date(site.lastPublish).toString().split("GMT")[0]
             published = (
                 <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
+                    <span style={{fontWeight: "normal", fontSize:"100%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
                 </ListItem>
             )
             }
@@ -788,7 +784,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         else{
             published = (
                 <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } ></button>}
+                    <span style={{fontWeight: "normal", fontSize:"100%"}}>{site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } ></button>}
                 </ListItem>
             )
         }
@@ -1004,4 +1000,4 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     }
 
-                                        export default muiThemeable()(Home);
+export default muiThemeable()(Home);

@@ -4,7 +4,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { BundleManager, BundleManagerItem } from '../../BundleManager';
 import DangerButton from '../../DangerButton';
 import FlatButton from 'material-ui/FlatButton';
-//import Divider from 'material-ui/Divider';
 import IconRemove from 'material-ui/svg-icons/action/delete';
 import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
@@ -45,6 +44,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         }
         for(let r = 0; r < state['resources'].length; r++){
             let resource = state['resources'][r];
+
             if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
                 stateBuilder.setLevelState(resource, field.fields);
             }
@@ -128,6 +128,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
                         bodyStyle={{padding:'0px 0px 0px 0px'}}
                         label={state.name||state.src}
                         forceActive={true}
+                        path={state.src}
                         key={field.key+'-resource-'+childIndex}
                         body={context.renderLevel(newNode)}
                         headerRightItems={[

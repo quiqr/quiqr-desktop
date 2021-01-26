@@ -3,38 +3,43 @@
 {{- $pogoType := "" -}}
 {{- $type := (printf "%T" $value) -}}
 {{- $stringLen := 0 -}}
+{{- $selectKeys := slice -}}
 
 {{- if (eq "bool" $type) -}}
-  {{- $pogoType = "boolean" -}}
+    {{- $pogoType = "boolean" -}}
 {{- else if (or (eq "int" $type) (eq "int64" $type) (eq "float64" $type)) -}}
-  {{- $pogoType = "number" -}}
+    {{- $pogoType = "number" -}}
 {{- else if (eq "string" $type) -}}
-  {{- $pogoType = "string" -}}
-  {{- $stringLen = len $value -}}
-  {{- warnf ( string $stringLen) -}}
-  {{- if gt $stringLen 40}}
-      {{- $pogoType = "markdown" -}}
-  {{- end -}}
+    {{- $pogoType = "string" -}}
+    {{- $stringLen = len $value -}}
+    {{- if gt $stringLen 40}}
+        {{- $pogoType = "markdown" -}}
+    {{- end -}}
 {{- else if (eq "template.HTML" $type ) -}}
-  {{- $pogoType = "markdown" -}}
+    {{- $pogoType = "markdown" -}}
 {{- else if (eq "time.Time" $type) -}}
-  {{- if (eq $value "Lastmod") -}}
-    {{- $pogoType = "info"}}
-  {{- else -}}
-    {{- $pogoType = "date"}}
-  {{- end -}}
+    {{- if (eq $value "Lastmod") -}}
+      {{- $pogoType = "info"}}
+    {{- else -}}
+      {{- $pogoType = "date"}}
+    {{- end -}}
 {{- else if reflect.IsSlice $value -}}
-  {{- if  reflect.IsMap ( index $value 0 ) -}}
-      {{- $pogoType = "accordion" }}
-  {{- else -}}
-      {{- $pogoType = "chips" }}
-  {{- end -}}
+    {{- if  reflect.IsMap ( index $value 0 ) -}}
+        {{- $pogoType = "accordion" }}
+    {{- else -}}
+        {{- $pogoType = "chips" }}
+    {{- end -}}
 {{- else if reflect.IsMap $value -}}
-  {{- $pogoType = "section" -}}
+    {{- $pogoType = "section" -}}
 {{- else -}}
-  {{- $pogoType = "hidden" -}}
+    {{- $pogoType = "hidden" -}}
 {{- end -}}
+
 {{- if or (eq $key "publishdate") (eq $key "lastmod") (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
     {{- $pogoType = "hidden" -}}
 {{- end -}}
+{{- if eq $key "key" -}}
+    {{- $pogoType = "readonly" -}}
+{{- end -}}
+
 {{- return $pogoType -}}

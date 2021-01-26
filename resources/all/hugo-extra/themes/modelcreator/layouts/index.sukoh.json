@@ -1,4 +1,3 @@
-{{/* version 22 November */}}
 {{- $collectionPages := slice -}}
 {{- $singlePages := slice -}}
 {{- $singles := slice -}}
@@ -7,32 +6,37 @@
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
+{{- $pogoMenu := slice -}}
 {{- $generalMenu := slice -}}
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
-{{- range .Site.AllPages -}}
-    {{- range .AllTranslations -}}
-          {{- if not ( in $translations .Language.Lang ) -}}
-            {{- $translations = $translations | append .Language.Lang -}}
-          {{- end -}}
-    {{- end -}}
+
+{{- range .Site.Languages -}}
+      {{- if not ( in $translations .Lang ) -}}
+        {{- $translations = $translations | append .Lang -}}
+      {{- end -}}
 {{- end -}}
-
-
 
 {{/*------------------------------ Data -----------------------------*/}}
 
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "data" -}}
-      {{- $data := (partial "createDataSingles" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations )) }}
-      {{- $singles = $singles | append (index $data "singles") }}
-      {{- $dataMenu = $dataMenu | append (index $data "menu") }}
+      {{- $data := (partial "createDataItems" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations "params" $.Site.Params)) -}}
+      {{- $singles = $singles | append (index $data "singles") -}}
+      {{- $collections = $collections | append (index $data "collections") -}}
+      {{- $dataMenu = $dataMenu | append (index $data "menu") -}}
   {{- end -}}
 {{- end -}}
 
 {{/*------------------------------ Menus and Params  -----------------------------*/}}
 
 {{- $configFilePath := partial "configFile" . -}}
+{{- $configParams := dict -}}
+{{ range $key, $value := $.Site.Params }}
+    {{- if not (or (eq $key "mainsections") (eq $key "mainSections") ) -}}
+        {{ $configParams = $configParams | merge (dict $key $value) -}}
+    {{- end -}}
+{{ end }}
 
 {{- if in $configFilePath "config/_default/" }}
       {{- range $index, $file := partial "rangeFiles"  (dict "dir" "config/_default/" ) -}}
@@ -49,11 +53,11 @@
 {{- else -}}
       {{ $config := readFile $configFilePath  }}
       {{- if in $config "params" -}}
-          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $.Site.Params "configItems" $configItems "paramsKey" "params") -}}
+          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $configParams "configItems" $configItems "paramsKey" "params") -}}
           {{- $singles = $singles | append $single -}}
           {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
       {{- else if in $config "Params" -}}
-          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $.Site.Params "configItems" $configItems "paramsKey" "Params") -}}
+          {{- $single := partial "createParams" (dict "file" $configFilePath  "dir" "/" "params" $configParams "configItems" $configItems "paramsKey" "Params") -}}
           {{- $singles = $singles | append $single -}}
           {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
       {{- end -}}
@@ -65,12 +69,38 @@
       {{- end -}}
 {{- end -}}
 
+{{/*------------------------Static Image bundle manager --------------*/}}
 
-{{/*
-{{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static")) -}}
-{{- $generalMenu = $generalMenu | append (dict "key" "staticimages" ) -}}
-*/}}
 
+{{- range where (readDir "/") ".Name" "static" -}}
+  {{- range where (readDir "static/") ".Name" "in" (slice "images" "img") -}}
+    {{- $imagesInRoot := false -}}
+    {{- $imagesInSubFolder := false -}}
+
+    {{- $imageDir := printf "static/%s" .Name -}}
+    {{- range (readDir $imageDir) -}}
+        {{- $ext := path.Ext .Name }}
+        {{- if and (not .IsDir) (in (slice ".jpg" ".jpeg" ".png" ".gif" "webp") $ext) -}}
+            {{- $imagesInRoot = true -}}
+
+        {{- else if .IsDir -}}
+            {{- $imagesInSubFolder = true -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if $imagesInRoot -}}
+        {{- $key := "img_static" -}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static" "title" "General images" "key" $key "file" "static/.pogo-images.md" )) -}}
+        {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
+    {{- end -}}
+
+    {{- if $imagesInSubFolder -}}
+        {{ $key := "img_static_image"}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" $imageDir "title" "Grouped images" "key" $key "file" (printf "%s/.pogo-images.md" $imageDir))) -}}
+        {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
 
 {{/*------------------------ Home widgetpage ------------------------ */}}
 
@@ -103,7 +133,7 @@
             {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
             {{- $sectionTitle :=  printf "%s%s" $language ((path.Base $path)| humanize) -}}
             {{- $itemTitle :=   $sectionTitle  | singularize -}}
-            {{- $dir := printf "%s%s/" $contentDir $path -}}
+            {{- $dir := printf "%s%s/" $contentDir $parentDir -}}
             {{- $extension := .File.Ext -}}
             {{- $fields := slice -}}
             {{- $resourceDir := "" -}}
@@ -115,11 +145,9 @@
                 {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 1).Name -}}
             {{- end -}}
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $st.Parent "dir" $resourceDir)) -}}
-            {{- if not (in .Params "mainContent") -}}
-                {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
-            {{- end -}}
+            {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent" )) -}}
             {{- range $key, $value := .Params -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath ) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $.Site.Params ) -}}
                 {{- $fields = $fields | append $field -}}
             {{- end -}}
             {{- $fields = partial "sortFields" $fields -}}
@@ -137,7 +165,7 @@
       {{- if and .Language.Lang  $homepage.IsTranslated -}}
           {{- $language = .Language.Lang -}}
       {{- end -}}
-      {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language )) -}}
+      {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language "params" $.Site.Params )) -}}
       {{- $singles = $singles | append $single -}}
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
 {{- end -}}
@@ -160,7 +188,7 @@
 {{- end -}}
 
 {{- range $collectionPages -}}
-      {{- $collection := (partial "createCollection" . ) -}}
+      {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
       {{- if gt (len $collection) 0 }}
           {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
           {{- $collections = $collections | append $collection -}}
@@ -191,38 +219,130 @@
 {{- end -}}
 
 {{- range $singlePages -}}
-    {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_") ) -}}
+    {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_" "params" $.Site.Params) ) -}}
     {{ if gt (len $single) 0 }}
-        {{- $singles = $singles | append $single -}}
-        {{- $singlesMenu = $singlesMenu | append (dict "key" $single.key ) -}}
+        {{- if ne $single.file "" -}}
+          {{- $singles = $singles | append $single -}}
+          {{- $singlesMenu = $singlesMenu | append (dict "key" $single.key ) -}}
+        {{- end -}}
     {{- end -}}
 {{- end -}}
 
-{{/*---------------------------Menu----------------------------- */}}
-{{- $menu := slice -}}
+{{/*--------------------pogoMenu items --------------------*/}}
+
+{{- $pogoCMS := dict -}}
+
+{{- range $index, $file := readDir "/" -}}
+  {{- if eq $file.Name "zpogomenu.json" -}}
+      {{- $pogoCMS = getJSON "/zpogomenu.json" -}}
+      {{- if $pogoCMS.menu -}}
+          {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoCMS "key" "pogocms" "file" "/zpogomenu.json" "title" "CMS" "dataformat" "json")) -}}
+          {{- $pogoMenu = $pogoMenu | append (dict "key" "pogocms") -}}
+      {{- end -}}
+  {{- end -}}
+  {{- if eq $file.Name "poppygo" -}}
+    {{- range $index, $file := readDir "poppygo/"}}
+        {{- if eq $file.Name "forms" -}}
+            {{- range $index, $file := readDir "poppygo/forms/" -}}
+                {{- if eq $file.Name "default.json" -}}
+                    {{- $pogoFORM := getJSON "poppygo/forms/default.json" -}}
+                    {{- $collections = $collections | append (partial "createPogoMenuCollection" (dict "item" $pogoFORM "key" "pogoform" "dir" "poppygo/forms/" "title" "Forms" "ext" "json" "dataformat" "json" "itemTitle" "Form")) -}}
+                    {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoform") -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+        {{- if eq $file.Name "home" -}}
+            {{- range $index, $file := readDir "poppygo/home/" -}}
+                {{- if eq $file.Name "index.md" -}}
+                    {{- $pogoHOME := dict "mainContent" (readFile "poppygo/home/index.md") -}}
+                    {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoHOME "key" "pogohome" "file" "poppygo/home/index.md" "title" "Home" "dataformat" "md")) -}}
+                    {{- $pogoMenu = $pogoMenu | append (dict "key" "pogohome") -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if eq $file.Name "static" -}}
+      {{- range $index, $file := readDir "static/" -}}
+          {{- if eq $file.Name "_redirects.json" -}}
+              {{- $pogoREDIRECTS := getJSON "static/_redirects.json" -}}
+              {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoREDIRECTS "key" "pogoredirects" "file" "static/_redirects.json" "title" "Redirects" "dataformat" "json")) -}}
+              {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoredirects") -}}
+          {{- end -}}
+      {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+
+
+{{/*---------------------------Menu based----------------------------- */}}
+{{- $sukohMenu := slice -}}
 
 {{- if gt (len $homeMenu) 0 }}
-    {{- $sortedHomeMenu := sort $homeMenu "value" "desc" -}}
-    {{- $menu = $menu | append (dict "key" "home" "title" "Home" "menuItems" $sortedHomeMenu) -}}
+      {{- $sortedHomeMenu := sort $homeMenu "value" "desc" -}}
+      {{- $sukohMenu = $sukohMenu | append (dict "key" "home" "title" "Home" "menuItems" $sortedHomeMenu) -}}
 {{- end -}}
 
 {{- if gt (len $singlesMenu) 0 }}
     {{- $sortedSinglesMenu := sort $singlesMenu "key" "asc" -}}
-    {{- $menu = $menu | append (dict "key" "pages" "title" "Pages" "menuItems" $sortedSinglesMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "singles" "title" "Pages" "menuItems" $sortedSinglesMenu) -}}
 {{- end -}}
 
 {{- if gt (len $collectionMenu) 0 }}
     {{- $sortedCollectionMenu := sort $collectionMenu "key" "asc" -}}
-    {{- $menu = $menu | append (dict "key" "groups" "title" "Groups" "menuItems" $sortedCollectionMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Groups" "menuItems" $sortedCollectionMenu) -}}
 {{- end -}}
 
 {{- if gt (len $dataMenu) 0 }}
     {{- $sortedDataMenu := sort $dataMenu "key" "asc" -}}
-    {{- $menu = $menu | append (dict "key" "Other content" "title" "Other content" "menuItems" $sortedDataMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "data" "title" "Other content" "menuItems" $sortedDataMenu) -}}
 {{- end -}}
 
 {{- if gt (len $generalMenu) 0 }}
-    {{- $menu = $menu | append (dict "key" "general" "title" "General" "menuItems" $generalMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "general" "title" "General" "menuItems" $generalMenu) -}}
+{{- end -}}
+
+{{- if gt (len $pogoMenu) 0 }}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "poppygo" "title" "PoppyGo" "menuItems" $pogoMenu) -}}
+{{- end -}}
+
+{{/* -------------------- Determine final Menu based on $pogoCMS customised ------------*/}}
+
+{{- $menu := slice -}}
+{{- $pogoKeys := slice -}}
+
+{{- range $pogoCMS.menu -}}
+    {{ $pogoKeys = $pogoKeys | append .key -}}
+{{- end -}}
+
+{{- if $pogoCMS.menu -}}
+    {{- range where $pogoCMS.menu "visible" "eq" true -}}
+        {{- $itemKeys := slice -}}
+        {{- $items := slice -}}
+        {{- range .menuItems -}}
+          {{ $itemKeys = $itemKeys | append .key -}}
+        {{- end -}}
+
+        {{- range where .menuItems "visible" "eq" true -}}
+          {{- $items = $items | append (dict "key" .key ) -}}
+        {{- end -}}
+
+        {{- range where $sukohMenu "key" "eq" .key -}}
+          {{- range .menuItems -}}
+            {{- if not (in $itemKeys .key) -}}
+                {{- $items = $items | append (dict "key" .key )}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- $menu = $menu | append (dict "key" .key "title" .title "menuItems" $items) -}}
+    {{- end -}}
+{{- end -}}
+
+{{- range $sukohMenu -}}
+  {{ if not (in $pogoKeys .key) -}}
+    {{- $menu = $menu | append (dict "key" .key "title" .title "menuItems" .menuItems ) -}}
+  {{- end -}}
 {{- end -}}
 
 {{/*-----------------The core getting it all together------------- */}}

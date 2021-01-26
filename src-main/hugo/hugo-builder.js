@@ -11,6 +11,39 @@ class HugoBuilder{
         this.config = config;
     }
 
+    async create(name, directory) {
+
+        let hugoArgs = ['new', 'site' , name];
+
+        const exec = pathHelper.getHugoBinForVer(this.config.hugover);
+        if(!fs.existsSync(exec)){
+            Promise.reject(new Error(`Could not find hugo.exe for version ${this.config.hugover}.`));
+            return;
+        }
+
+        //await fs.ensureDir(this.config.destination);
+        //await rimraf.sync(this.config.destination);
+
+        return new Promise((resolve, reject)=>{
+            execFile(
+                exec,
+                hugoArgs,
+                {
+                    cwd: directory,
+                    windowsHide: true,
+                    timeout: 60000, //1 minute
+                },
+                (error, stdout, stderr) => {
+                    if(error){
+                        reject(error);
+                        return;
+                    }
+                    resolve();
+                }
+            );
+        })
+    }
+
     async build() {
 
         let hugoArgs = ['--destination', this.config.destination ];

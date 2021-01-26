@@ -3,10 +3,16 @@
 {{- $order := slice -}}
 
 {{- range . }}
+    {{ if eq .type "info" -}}
+        {{- $order = $order | append .key -}}
+    {{- end -}}
+{{- end -}}
+{{- range . }}
     {{ if or (in .type "bundle-image") -}}
         {{- $order = $order | append .key -}}
     {{- end -}}
 {{- end -}}
+
 {{- $order := $order | append (slice "draft" "active" "title" "subtitle" "description" ) -}}
 {{- range . }}
     {{ if or (in .key "image") (in .key "Image") -}}

@@ -1,10 +1,14 @@
+buildDrafts: true
 outputs:
   home:
-    - HTML
     - Sukoh
-    - JSON
+    - Zpogomenu
 outputFormats:
   Sukoh:
     mediaType: "application/json"
     baseName: "sukoh"
+    path: "/"
+  Zpogomenu:
+    mediaType: "application/json"
+    baseName: "zpogomenu"
     path: "/"

@@ -2,6 +2,16 @@
 {{- with .Site.Language.ContentDir -}}
     {{- $contentDir = printf "%s/" . -}}
 {{ else }}
-    {{- $contentDir = "content/" -}}
+    {{- $subDir := "" -}}
+    {{- with .File.Dir }}
+      {{- if in . "data"}}
+          {{- $subDir = path.Dir (path.Dir .) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if or (eq $subDir ".") (eq $subDir "") -}}
+        {{- $contentDir = "content/" -}}
+    {{- else -}}
+        {{- $contentDir = printf "content/%s/" $subDir -}}
+    {{- end -}}
 {{- end -}}
 {{- return $contentDir -}}

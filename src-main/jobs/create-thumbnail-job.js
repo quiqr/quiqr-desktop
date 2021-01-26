@@ -6,7 +6,7 @@ const path = require('path');
 
 const action /* : ( params: { src: string, dest: string }) => Promise<void> */ = async ({src , dest}) => {
     await fs.ensureDir(path.dirname(dest));
-
+    console.log ("thumbnailJob");
     let resizePromise = new Promise((resolve, reject)=>{
         jimp.read(src, function (err, lenna) {
             if (err) reject(err);

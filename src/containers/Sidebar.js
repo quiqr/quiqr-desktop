@@ -72,7 +72,6 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
                 { menu.items ? (<MenuBorder>
                     <List style={{padding: 0}}>
                         { menu.items.map((item, index)=>{
-                            //let style = item.active ? {background: translucentColor, padding:8}:{};
                             return (
                                 <ListItem
                                     key={index}

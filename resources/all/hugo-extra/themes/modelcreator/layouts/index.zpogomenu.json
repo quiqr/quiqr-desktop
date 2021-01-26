@@ -1,0 +1,67 @@
+{{- $menu := slice -}}
+
+{{- $pogoMenu := dict -}}
+{{- $sukoh := dict -}}
+{{- $pogoKeys := slice -}}
+{{- $sukohKeys := slice "home" "singles" "collections" "data" "general" "poppygo" }}
+
+{{- range $index, $file := readDir "/" -}}
+  {{- if eq $file.Name "zpogomenu.json" -}}
+      {{- $pogoMenu = getJSON "/zpogomenu.json" -}}
+  {{- end -}}
+  {{- if eq $file.Name "sukoh.json" -}}
+      {{- $sukoh = getJSON "/sukoh.json" -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range $pogoMenu.menu -}}
+    {{ $pogoKeys = $pogoKeys | append .key -}}
+{{- end -}}
+
+{{- if $pogoMenu -}}
+
+  {{- range $pogoMenu.menu -}}
+      {{ $items := .menuItems -}}
+      {{ $itemKeys := slice -}}
+
+      {{- range $items -}}
+        {{ $itemKeys = $itemKeys | append .key -}}
+      {{- end -}}
+
+      {{- range where $sukoh.menu "key" "eq" .key -}}
+        {{- range .menuItems -}}
+          {{- if not (in $itemKeys .key) -}}
+              {{- $items = $items | append (dict "key" .key "visible" true )}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{ $menu = $menu | append (dict "visible" .visible "key" .key "title" .title "menuItems" $items ) -}}
+  {{- end -}}
+
+  {{- range $sukoh.menu -}}
+
+    {{- if and (not (in $pogoKeys .key)) (in $sukohKeys .key) -}}
+        {{ $items := slice -}}
+        {{- range .menuItems -}}
+            {{- $items = $items | append (dict "key" .key "visible" true ) -}}
+        {{- end -}}
+      {{- $menu = $menu | append (dict "visible" true "key" .key "title" .title "menuItems" $items ) -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- range $sukoh.menu -}}
+    {{- if (in $sukohKeys .key) -}}
+      {{ $items := slice -}}
+      {{- range .menuItems -}}
+          {{- $items = $items | append (dict "key" .key "visible" true ) -}}
+      {{- end -}}
+      {{- $menu = $menu | append (dict "visible" true "key" .key "title" .title "menuItems" $items ) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+
+{{/*-----------------writing MenuFile------------- */}}
+
+{{- dict "menu" $menu | jsonify (dict "prefix" " " "indent" "  ") -}}

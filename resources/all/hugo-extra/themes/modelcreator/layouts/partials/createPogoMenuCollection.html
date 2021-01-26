@@ -1,0 +1,7 @@
+{{- $fields := slice -}}
+{{- range $key, $value := .item -}}
+    {{- $field := partial "createField" (dict "value" $value "key" $key ) -}}
+    {{- $fields = $fields | append $field -}}
+{{- end -}}
+{{- $collection := dict "key" .key "title" .title "folder" .dir "extension" .ext "dataformat" .dataformat "fields" $fields "previewUrl" "/" "itemtitle" .itemTitle -}}
+{{- return $collection  -}}
