@@ -6,11 +6,10 @@
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
+{{- $pogoMenu := slice -}}
 {{- $generalMenu := slice -}}
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
-
-{{- warnf "sukoh" -}}
 
 {{- range .Site.Languages -}}
       {{- if not ( in $translations .Lang ) -}}
@@ -229,17 +228,32 @@
     {{- end -}}
 {{- end -}}
 
-{{/*---------------------------Menu----------------------------- */}}
-{{- $menu := slice -}}
-{{- $sukohMenu := slice -}}
-{{- $pogoMenu := dict -}}
-{{- $pogoKeys := slice -}}
+{{/*--------------------pogoMenu items --------------------*/}}
 
+{{- $pogoCMS := dict -}}
+{{- $pogoFORM := dict -}}
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "zpogomenu.json" -}}
-      {{- $pogoMenu = getJSON "/zpogomenu.json" -}}
+      {{- $pogoCMS = getJSON "/zpogomenu.json" -}}
+      {{- if $pogoCMS.menu -}}
+          {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoCMS "key" "pogocms" "file" "/zpogomenu.json" "title" "CMS" "dataformat" "json")) -}}
+          {{- $pogoMenu = $pogoMenu | append (dict "key" "pogocms") -}}
+      {{- end -}}
+  {{- end -}}
+  {{- if eq $file.Name "poppygo" -}}
+    {{- range $index, $file := readDir "poppygo/"}}
+        {{- if eq $file.Name "forms" -}}
+            {{- $pogoFORM = partial "readYML" "poppygo/forms/default.yml" -}}
+            {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoFORM "key" "pogoform" "file" "poppygo/forms/default.yml" "title" "Form" "dataformat" "yml")) -}}
+            {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoform") -}}
+        {{- end -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
+
+
+{{/*---------------------------Menu based----------------------------- */}}
+{{- $sukohMenu := slice -}}
 
 {{- if gt (len $homeMenu) 0 }}
       {{- $sortedHomeMenu := sort $homeMenu "value" "desc" -}}
@@ -265,17 +279,21 @@
     {{- $sukohMenu = $sukohMenu | append (dict "key" "general" "title" "General" "menuItems" $generalMenu) -}}
 {{- end -}}
 
-{{- if $pogoMenu.menu -}}
-    {{- $singles = $singles | append (partial "createPogoMenuSingle" $pogoMenu ) -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "poppygo" "title" "PoppyGo" "menuItems" (slice (dict "key" "pogomenu")) ) -}}
+{{- if gt (len $pogoMenu) 0 }}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "poppygo" "title" "PoppyGo" "menuItems" $pogoMenu) -}}
 {{- end -}}
 
-{{- range $pogoMenu.menu -}}
+{{/* -------------------- Determine final Menu based on $pogoCMS customised ------------*/}}
+
+{{- $menu := slice -}}
+{{- $pogoKeys := slice -}}
+
+{{- range $pogoCMS.menu -}}
     {{ $pogoKeys = $pogoKeys | append .key -}}
 {{- end -}}
 
-{{- if $pogoMenu.menu -}}
-    {{- range where $pogoMenu.menu "visible" "eq" true -}}
+{{- if $pogoCMS.menu -}}
+    {{- range where $pogoCMS.menu "visible" "eq" true -}}
         {{- $itemKeys := slice -}}
         {{- $items := slice -}}
         {{- range .menuItems -}}
@@ -303,9 +321,6 @@
     {{- $menu = $menu | append (dict "key" .key "title" .title "menuItems" .menuItems ) -}}
   {{- end -}}
 {{- end -}}
-
-
-
 
 {{/*-----------------The core getting it all together------------- */}}
 

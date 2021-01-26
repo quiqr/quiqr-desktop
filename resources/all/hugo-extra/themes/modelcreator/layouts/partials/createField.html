@@ -72,7 +72,6 @@
                 {{- $field = dict "key" $key "title" $title "type" "select" -}}
                 {{- $subfields := slice -}}
                 {{- range $value -}}
-                        {{ warnf . }}
                         {{- $field := dict "text" . "value" ( . | anchorize )  -}}
                         {{- $subfields = $subfields | append $field}}
                 {{- end -}}
