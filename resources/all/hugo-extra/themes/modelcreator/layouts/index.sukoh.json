@@ -231,7 +231,7 @@
 {{/*--------------------pogoMenu items --------------------*/}}
 
 {{- $pogoCMS := dict -}}
-{{- $pogoFORM := dict -}}
+
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "zpogomenu.json" -}}
       {{- $pogoCMS = getJSON "/zpogomenu.json" -}}
@@ -245,13 +245,22 @@
         {{- if eq $file.Name "forms" -}}
             {{- range $index, $file := readDir "poppygo/forms/" -}}
                 {{- if eq $file.Name "default.json" -}}
-                    {{- $pogoFORM = getJSON "poppygo/forms/default.json" -}}
-                    {{- $collections = $collections | append (partial "createPogoMenuCollection" (dict "item" $pogoFORM "key" "pogoform" "dir" "/poppygo/forms/" "title" "Form" "ext" "json" "dataformat" "json" "itemTitle" "Form")) -}}
+                    {{- $pogoFORM := getJSON "poppygo/forms/default.json" -}}
+                    {{- $collections = $collections | append (partial "createPogoMenuCollection" (dict "item" $pogoFORM "key" "pogoform" "dir" "poppygo/forms/" "title" "Forms" "ext" "json" "dataformat" "json" "itemTitle" "Form")) -}}
                     {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoform") -}}
                 {{- end -}}
             {{- end -}}
         {{- end -}}
     {{- end -}}
+  {{- end -}}
+  {{- if eq $file.Name "static" -}}
+      {{- range $index, $file := readDir "static/" -}}
+          {{- if eq $file.Name "_redirects.json" -}}
+              {{- $pogoREDIRECTS := getJSON "static/_redirects.json" -}}
+              {{- $singles = $singles | append (partial "createPogoMenuSingle" (dict "item" $pogoREDIRECTS "key" "pogoredirects" "file" "static/_redirects.json" "title" "Redirects" "dataformat" "json")) -}}
+              {{- $pogoMenu = $pogoMenu | append (dict "key" "pogoredirects") -}}
+          {{- end -}}
+      {{- end -}}
   {{- end -}}
 {{- end -}}
 
