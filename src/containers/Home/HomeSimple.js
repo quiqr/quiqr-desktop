@@ -15,6 +15,7 @@ import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
 import ClaimDomainDialog from './components/ClaimDomainDialog';
 import ConnectDomainDialog from './components/ConnectDomainDialog';
+import DisconnectDomainDialog from './components/DisconnectDomainDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
 import MarkdownIt from 'markdown-it'
@@ -103,7 +104,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             claimDomainDialog: {open: false},
             username: "",
             pogoAccountStatus: "no_member",
-            customDomain: "not set",
+            pogoCustomDomain: "not set",
             oneTimeOnlyUserConfirmed: false,
             fingerprint: "",
             buttonPressed: "",
@@ -255,6 +256,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         service.api.parentTempHideMobilePreview();
         this.setState({connectDomainDialog: { open: true}});
     }
+    handleDisconnectDomain(){
+        service.api.parentTempHideMobilePreview();
+        this.setState({disconnectDomainDialog: { open: true}});
+    }
 
     handleRegisterCancelClick(){
         this.setState({registerDialog: {...this.state.registerDialog, open:false}});
@@ -329,6 +334,9 @@ class Home extends React.Component<HomeProps, HomeState>{
     handleConnectDomainCancelClick(){
         this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
     }
+    handleDisconnectDomainCancelClick(){
+        this.setState({disconnectDomainDialog: {...this.state.disconnectDomainDialog, open:false}});
+    }
 
     handleClaimDomainClick(obj){
 
@@ -357,7 +365,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         });
     }
-
     handleConnectDomainClick(obj){
 
         service.getConfigurations(true).then((c)=>{
@@ -370,12 +377,38 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.selectedWorkspace = bundle.workspace;
                 stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
 
-                stateUpdate.customDomain = obj.domain;
+                //stateUpdate.pogoCustomDomain = obj.domain;
 
                 stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
 
                 this.setState(stateUpdate,()=>{
                     service.api.logToConsole("finished connecting domain")
+                });
+
+            })
+
+        });
+    }
+
+
+    handleDisconnectDomainClick(){
+
+        service.getConfigurations(true).then((c)=>{
+
+            service.getSiteAndWorkspaceData(this.state.currentSiteKey, this.state.currentWorkspaceKey).then((bundle)=>{
+                var stateUpdate  = {};
+                stateUpdate.configurations = bundle.configurations;
+                stateUpdate.selectedSite = bundle.site;
+                stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
+                stateUpdate.selectedWorkspace = bundle.workspace;
+                stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
+
+                stateUpdate.pogoCustomDomain = "not set";
+
+                stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
+
+                this.setState(stateUpdate,()=>{
+                    service.api.logToConsole("finished disconnecting domain")
                 });
 
             })
@@ -480,11 +513,17 @@ class Home extends React.Component<HomeProps, HomeState>{
                     }
                     else{
                         let obj = JSON.parse(data);
+                        let custom_domain = "not set"
                         service.api.logToConsole(obj);
+
+                        if (obj.hasOwnProperty('pogo_custom_domain')){
+                            custom_domain = obj.pogo_custom_domain;
+                        }
 
                         this.setState({
                             pogoSiteStatus: obj.pogo_plan_status,
                             pogoSitePlan: obj.pogo_plan_name,
+                            pogoCustomDomain: custom_domain,
                         },function(){
 
                             if(this.state.pogoSiteStatus === "active" && celebrate){
@@ -657,7 +696,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     <TableRow>
                         <TableHeaderColumn
                         style={{
-                            width: '120px',
+                            width: '180px',
                         }}
                     >status</TableHeaderColumn>
                     <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
@@ -667,7 +706,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 <TableRow>
                     <TableRowColumn
                     style={{
-                        width: '120px',
+                        width: '180px',
                     }}
 
                 >connected</TableRowColumn>
@@ -675,9 +714,13 @@ class Home extends React.Component<HomeProps, HomeState>{
             </TableRow>
             <TableRow>
                 <TableRowColumn>
-<button className="reglink" onClick={()=>{this.handleConnectDomain(true)}}>connect custom domain!</button>
-            </TableRowColumn>
-                <TableRowColumn>{this.state.customDomain}</TableRowColumn>
+                    {this.state.pogoCustomDomain == "not set"?
+                            <button className="reglink" onClick={()=>{this.handleConnectDomain()}}>connect custom domain</button>
+                            :
+                            <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
+                    }
+                </TableRowColumn>
+                <TableRowColumn>{this.state.pogoCustomDomain}</TableRowColumn>
             </TableRow>
         </TableBody>
     </Table>
@@ -898,7 +941,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     render(){
 
         //let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog, connectDomainDialog} = this.state;
+        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog, connectDomainDialog, disconnectDomainDialog} = this.state;
 
         let pogoSitePath = "";
         if(selectedSite!=null && selectedSite.hasOwnProperty('publish') && selectedSite.publish.length === 1 && selectedSite.publish[0].config.type === 'poppygo' && selectedSite.publish[0].config.hasOwnProperty('path')){
@@ -987,6 +1030,20 @@ class Home extends React.Component<HomeProps, HomeState>{
                                             fingerprint={this.state.fingerprint}
 
                                             open={connectDomainDialog!=null&&connectDomainDialog.open}
+                                        />
+                         ):(null) }
+
+                         { selectedSite!=null && this.state.disconnectDomainDialog!=null ? (
+                                           <DisconnectDomainDialog
+                                            onCancelClick={()=>this.handleDisconnectDomainCancelClick()}
+                                            onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
+                                            username={this.state.username}
+                                            pogoCustomDomain={this.state.pogoCustomDomain}
+
+                                            sitePath={pogoSitePath}
+                                            fingerprint={this.state.fingerprint}
+
+                                            open={disconnectDomainDialog!=null&&disconnectDomainDialog.open}
                                         />
                          ):(null) }
 
