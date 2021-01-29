@@ -494,6 +494,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.state.pogostripeConn.host+":"+
             this.state.pogostripeConn.port+"/project-status/"+requestVars;
 
+        service.api.logToConsole(url);
 
 
         let data='';

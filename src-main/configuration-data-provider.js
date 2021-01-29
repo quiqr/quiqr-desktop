@@ -50,9 +50,11 @@ const GLOBAL_DEFAULTS = {
     hideMenuBar: false,
     hideInlineMenus: true,
     appTheme: "simple",
-    pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
-    pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
-    //pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
+    //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
+    //pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
+
+    pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
+    pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
 }
 
 function invalidateCache(){
