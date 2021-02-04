@@ -833,6 +833,26 @@ class Home extends React.Component<HomeProps, HomeState>{
             )
         }
 
+        let notificationPanel = "";
+
+        if(this.state.pogoAccountStatus === "unconfirmed_member"){
+          notificationPanel = this.renderNotificationPanel("Unconfimed member")
+        }
+        else if (this.state.oneTimeOnlySiteActive === true) {
+          notificationPanel = this.renderNotificationPanel("Configurations, You just upgaded to basic.")
+        }
+
+        let actionPanel = "";
+
+        if (this.state.pogoSiteStatus === "no_plan") {
+          actionPanel = this.renderActionUpgadePanel();
+        }
+        else if (this.state.pogoCustomDomain === "not set") {
+          actionPanel = this.renderActionConnectDomainPanel();
+        }
+        else if (this.state.pogoCustomDomain !== "not set" && this.state.popCustomDomainVerified === false ) {
+          actionPanel = this.renderActionAdviseDNSPanel();
+        }
 
         let publishDisabled=true;
         let config = this.state.selectedWorkspaceDetails;
@@ -860,6 +880,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                         <button className="reglink" onClick={()=>{this.handleOpenTerms()}}>Terms and Conditions</button>
 
                     </div>
+                </div>
+                {notificationPanel}
+                {actionPanel}
+
+
+                <div style={{padding: "0px 16px",backgroundColor:"#666"}}>
                 </div>
 
                 { /*this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) */}
@@ -939,6 +965,24 @@ class Home extends React.Component<HomeProps, HomeState>{
         })
     }
 
+    renderNotificationPanel(message){
+       return (
+          <div style={{color: "white", padding: "0px 16px",backgroundColor:"#333"}}>
+          {message}
+        </div>
+      )
+
+    }
+    renderActionAdviseDNSPanel(){}
+    renderActionConnectDomainPanel(){}
+    renderActionAdviseDNSPanel(message){
+       return (
+          <div style={{color: "white", padding: "0px 16px",backgroundColor:"#333"}}>
+          {message}
+        </div>
+      )
+    }
+
     render(){
 
         //let { siteKey } = this.props;
@@ -970,6 +1014,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                     <div style={ styles.container }>
                         <div style={styles.selectedSiteCol}>
+
                             { selectedSite==null ? (
                                 <Wrapper title="Site Management">
                                     <MessageBlock>Please, select a site.</MessageBlock>
