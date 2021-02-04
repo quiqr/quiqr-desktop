@@ -7,6 +7,7 @@ import {List, ListItem} from 'material-ui/List';
 import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import IconDomain from 'material-ui/svg-icons/social/domain';
 import IconPublish from 'material-ui/svg-icons/editor/publish';
+import ActionThumbUp from 'material-ui/svg-icons/action/thumb-up'
 
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, InfoLine, MessageBlock } from './components/shared';
@@ -103,8 +104,9 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
-            pogoAccountStatus: "no_member",
+            pogoAccountStatus: "",
             pogoCustomDomain: "not set",
+            pogoSiteStatus: "",
             oneTimeOnlyUserConfirmed: false,
             fingerprint: "",
             buttonPressed: "",
@@ -631,6 +633,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
 
+    handleOpenPro(){
+        window.require('electron').shell.openExternal('https://poppygo.io/plans/poppygo-pro/');
+    }
+
     hasActivePlan(pogoSiteStatus){
 
         if(pogoSiteStatus === "active" || pogoSiteStatus === "expired_soon"){
@@ -835,24 +841,35 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let notificationPanel = "";
 
-        if(this.state.pogoAccountStatus === "unconfirmed_member"){
+        if (this.state.pogoAccountStatus === "no_member") {
+          notificationPanel = this.renderNotificationPanel("Register with you email to claim a pogosite domain")
+        } else if(this.state.pogoAccountStatus === "unconfirmed_member"){
           notificationPanel = this.renderNotificationPanel("Unconfimed member")
+        } else if(this.state.pogoSiteStatus === "pending_subscription"){
+          notificationPanel = this.renderNotificationPanel(<span style={{color:"white"}}>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>)
         }
-        else if (this.state.oneTimeOnlySiteActive === true) {
+
+        if (this.state.oneTimeOnlySiteActive === true) {
           notificationPanel = this.renderNotificationPanel("Configurations, You just upgaded to basic.")
         }
 
+
         let actionPanel = "";
 
-        if (this.state.pogoSiteStatus === "no_plan") {
+        if(this.checkLinkedDomain() && this.state.pogoSiteStatus !== "no_plan"){
           actionPanel = this.renderActionUpgadePanel();
-        }
-        else if (this.state.pogoCustomDomain === "not set") {
-          actionPanel = this.renderActionConnectDomainPanel();
-        }
-        else if (this.state.pogoCustomDomain !== "not set" && this.state.popCustomDomainVerified === false ) {
-          actionPanel = this.renderActionAdviseDNSPanel();
-        }
+        } else {
+
+          if (this.state.pogoCustomDomain === "not set" && this.state.pogoCustomDomainVerified) {
+            actionPanel = this.renderActionAdviseDNSPanel();
+
+          }
+          else {
+            actionPanel = this.renderActionConnectDomainPanel();
+         }
+       }
+
+
 
         let publishDisabled=true;
         let config = this.state.selectedWorkspaceDetails;
@@ -967,24 +984,54 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderNotificationPanel(message){
        return (
-          <div style={{color: "white", padding: "0px 16px",backgroundColor:"#333"}}>
+          <div  class="notificationPanel" style={{color: "white", padding: "0px 32px",backgroundColor:"rgb(0, 188, 212)"}}>
           {message}
         </div>
       )
-
     }
-    renderActionAdviseDNSPanel(){}
-    renderActionConnectDomainPanel(){}
-    renderActionAdviseDNSPanel(message){
-       return (
-          <div style={{color: "white", padding: "0px 16px",backgroundColor:"#333"}}>
-          {message}
-        </div>
-      )
+
+    renderActionUpgadePanel(){
+      return (
+         <div class="row" style={{color: "white", padding: "0px 28px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-6 actionpanel" style={{width:"30%",minWidth:"100px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="" style={{}} />} disabled={false} >
+                     <span>
+                     <h2>Upgrade to PoppyGo Pro</h2>
+                     <ul>
+                       <li>Use your own domain</li>
+                       <li>Secure your site hosting</li>
+                     </ul>
+                     </span>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-6" style={{width:"30%",minWidth:"100px"}}>
+                <h2>€3,- per month</h2>
+                <p></p>
+                <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} />
+                <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+             </div>
+           </div>
+     )
+    }
+
+    renderActionAdviseDNSPanel(){
+      return (
+         <div style={{color: "white", padding: "0px 16px",height:"150px",backgroundColor:"red"}}>
+         <p>Advise DNS</p>
+       </div>
+     )
+    }
+
+    renderActionConnectDomainPanel(){
+      return (
+         <div style={{color: "white", padding: "0px 16px",height:"150px",backgroundColor:"#FF0000"}}>
+         <p>Connect Domain</p>
+       </div>
+     )
     }
 
     render(){
-
         //let { siteKey } = this.props;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog, connectDomainDialog, disconnectDomainDialog} = this.state;
 
