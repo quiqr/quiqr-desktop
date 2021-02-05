@@ -7,6 +7,7 @@ import {List, ListItem} from 'material-ui/List';
 import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import IconDomain from 'material-ui/svg-icons/social/domain';
 import IconPublish from 'material-ui/svg-icons/editor/publish';
+import ActionThumbUp from 'material-ui/svg-icons/action/thumb-up'
 
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { Wrapper, InfoLine, MessageBlock } from './components/shared';
@@ -103,8 +104,9 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
-            pogoAccountStatus: "no_member",
+            pogoAccountStatus: "",
             pogoCustomDomain: "not set",
+            pogoSiteStatus: "",
             oneTimeOnlyUserConfirmed: false,
             fingerprint: "",
             buttonPressed: "",
@@ -627,8 +629,16 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     }
 
+    handleOpenCustomDomainDocs(){
+      window.require('electron').shell.openExternal('https://poppygo.io/documentation/custom-domain/');
+    }
+
     handleOpenTerms(){
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
+    }
+
+    handleOpenPro(){
+        window.require('electron').shell.openExternal('https://poppygo.io/plans/poppygo-pro/');
     }
 
     hasActivePlan(pogoSiteStatus){
@@ -643,18 +653,18 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         if(this.state.pogoSiteStatus === "ownerIncorrect"){
             return (
-                <span>You're not the owner of this domain.</span>
+                <span>This domain is owned by somebody else</span>
             )
         }
         else if(this.state.pogoSiteStatus === "no_plan"){
-            return (
-                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
-            )
+            // return (
+            //     <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
+            // )
         }
         else if(this.state.pogoSiteStatus === "pending_subscription"){
-            return (
-                <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
-            )
+            // return (
+            //     <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
+            // )
         }
         else if(this.state.pogoSiteStatus === "active"){
             return (
@@ -662,15 +672,16 @@ class Home extends React.Component<HomeProps, HomeState>{
             )
         }
         else if(this.state.pogoSiteStatus === "expired_soon"){
-            return (
-                <span>Plan: {this.state.pogoSitePlan}, will expire soon</span>
-            )
+            // return (
+            //     <span>Plan: {this.state.pogoSitePlan}, will expire soon</span>
+            // )
         }
         else if(this.state.pogoSiteStatus === "expired"){
-            return (
-                <span>Plan: {this.state.pogoSitePlan}, subscription has expired<br/>
-                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>activate subscription PoppyGo Basic</button></span>
-            )
+
+            // return (
+            //     <span>Plan: {this.state.pogoSitePlan}, subscription has expired<br/>
+            //     <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>activate subscription PoppyGo Basic</button></span>
+            // )
         }
         else {
 
@@ -688,45 +699,45 @@ class Home extends React.Component<HomeProps, HomeState>{
            autoDomain = site.publish[0].config.path + ".pogosite.com";
         }
 
-        return (
-            <Table selectable={false} >
-                <TableHeader
-                displaySelectAll={false}
-                adjustForCheckbox={false}
-            >
-                    <TableRow>
-                        <TableHeaderColumn
-                        style={{
-                            width: '180px',
-                        }}
-                    >status</TableHeaderColumn>
-                    <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
-                </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
-                <TableRow>
-                    <TableRowColumn
-                    style={{
-                        width: '180px',
-                    }}
-
-                >connected</TableRowColumn>
-                <TableRowColumn>{autoDomain}</TableRowColumn>
-            </TableRow>
-            <TableRow>
-                <TableRowColumn>
-                    {this.state.pogoCustomDomain == "not set"?
-                            <button className="reglink" onClick={()=>{this.handleConnectDomain()}}>connect custom domain</button>
-                            :
-                            <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
-                    }
-                </TableRowColumn>
-                <TableRowColumn>{this.state.pogoCustomDomain}</TableRowColumn>
-            </TableRow>
-        </TableBody>
-    </Table>
-
-        )
+    //     return (
+    //         <Table selectable={false} >
+    //             <TableHeader
+    //             displaySelectAll={false}
+    //             adjustForCheckbox={false}
+    //         >
+    //                 <TableRow>
+    //                     <TableHeaderColumn
+    //                     style={{
+    //                         width: '180px',
+    //                     }}
+    //                 >status</TableHeaderColumn>
+    //                 <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
+    //             </TableRow>
+    //         </TableHeader>
+    //         <TableBody displayRowCheckbox={false}>
+    //             <TableRow>
+    //                 <TableRowColumn
+    //                 style={{
+    //                     width: '180px',
+    //                 }}
+    //
+    //             >connected</TableRowColumn>
+    //             <TableRowColumn>{autoDomain}</TableRowColumn>
+    //         </TableRow>
+    //         <TableRow>
+    //             <TableRowColumn>
+    //                 {this.state.pogoCustomDomain == "not set"?
+    //                         <button className="reglink" onClick={()=>{this.handleConnectDomain()}}>connect custom domain</button>
+    //                         :
+    //                         <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
+    //                 }
+    //             </TableRowColumn>
+    //             <TableRowColumn>{this.state.pogoCustomDomain}</TableRowColumn>
+    //         </TableRow>
+    //     </TableBody>
+    // </Table>
+    //
+    //     )
 
     }
 
@@ -835,31 +846,58 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let notificationPanel = "";
 
-        if(this.state.pogoAccountStatus === "unconfirmed_member"){
+        if (this.state.pogoAccountStatus === "no_member") {
+          notificationPanel = this.renderNotificationPanel("Register with you email to claim a pogosite domain")
+        } else if(this.state.pogoAccountStatus === "unconfirmed_member"){
           notificationPanel = this.renderNotificationPanel("Unconfimed member")
+        } else if(this.state.pogoSiteStatus === "pending_subscription"){
+          notificationPanel = this.renderNotificationPanel(<span style={{color:"white"}}>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>)
         }
-        else if (this.state.oneTimeOnlySiteActive === true) {
+
+        if (this.state.oneTimeOnlySiteActive === true) {
           notificationPanel = this.renderNotificationPanel("Configurations, You just upgaded to basic.")
         }
 
+
         let actionPanel = "";
 
-        if (this.state.pogoSiteStatus === "no_plan") {
-          actionPanel = this.renderActionUpgadePanel();
-        }
-        else if (this.state.pogoCustomDomain === "not set") {
-          actionPanel = this.renderActionConnectDomainPanel();
-        }
-        else if (this.state.pogoCustomDomain !== "not set" && this.state.popCustomDomainVerified === false ) {
-          actionPanel = this.renderActionAdviseDNSPanel();
-        }
+
+
+        if(this.checkLinkedDomain() && this.state.pogoSiteStatus !== ""){
+            if(this.state.pogoSiteStatus === "ownerIncorrect"){
+                //Don't show actionpanel
+            } else if (!this.checkLinkedDomain()){
+                // Don't show actionpanel
+            }
+            else if(this.state.pogoSiteStatus === "no_plan"){
+                actionPanel = this.renderActionUpgadePanel();
+            }
+            else if(this.state.pogoSiteStatus === "pending_subscription"){
+                actionPanel = this.renderActionUpgadePanel();
+            }
+            else if(this.state.pogoSiteStatus === "active"){
+
+               if(this.state.pogoCustomDomain === "not set" &&  !this.state.pogoCustomDomainVerified) {
+                actionPanel = this.renderActionConnectDomainPanel();
+               }
+               if (this.state.pogoCustomDomainVerified) {
+                  actionPanel = this.renderActionAdviseDNSPanel();
+               }
+            }
+            else if(this.state.pogoSiteStatus === "expired_soon"){
+                actionPanel = this.renderActionExtendPanel();
+            }
+            else if(this.state.pogoSiteStatus === "expired"){
+                actionPanel = this.renderActionUpgadePanel();
+            }
+          }
 
         let publishDisabled=true;
         let config = this.state.selectedWorkspaceDetails;
         publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
 
         return (
-            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
+            <Wrapper key={site.key} title="">
 
                 <InfoLine label="">
                     <h2 style={{padding:0, margin:0}}>{site.name}</h2>
@@ -967,24 +1005,112 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderNotificationPanel(message){
        return (
-          <div style={{color: "white", padding: "0px 16px",backgroundColor:"#333"}}>
+          <div  class="notificationPanel row" style={{color: "white", padding: "10px 44px",backgroundColor:"rgb(0, 188, 212)"}}>
           {message}
         </div>
       )
+    }
 
+    renderActionUpgadePanel(){
+      return (
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <span>
+                     <h2>Upgrade to PoppyGo Pro</h2>
+                     <ul>
+                       <li>Use your own domain</li>
+                       <li>Secure your site hosting</li>
+                     </ul>
+                     </span>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <h3>€3,- per month</h3>
+                  <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                </ListItem>
+             </div>
+           </div>
+     )
     }
-    renderActionAdviseDNSPanel(){}
-    renderActionConnectDomainPanel(){}
-    renderActionAdviseDNSPanel(message){
-       return (
-          <div style={{color: "white", padding: "0px 16px",backgroundColor:"#333"}}>
-          {message}
-        </div>
-      )
+
+    renderActionConnectDomainPanel(){
+      return (
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<IconDomain color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <h3>Connect your custom domain</h3>
+                     <p> With PoppyGo Pro now you can </p>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <h2> </h2>
+                  <RaisedButton primary={true} label="Connect now" disabled={false} onClick={()=>{ this.handleConnectDomain();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>See the documentation</button>
+                </ListItem>
+             </div>
+           </div>
+     )
     }
+
+    renderActionAdviseDNSPanel(){
+      return (
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <span>
+                     <h2>You're almost there! Change your DNS settings </h2>
+
+                     <ul>
+                       <li>A-record: 123456789 </li>
+                       <li>AAAA-record: 123456789</li>
+                     </ul>
+                     </span>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                </ListItem>
+             </div>
+           </div>
+     )
+    }
+
+    renderActionExtendPanel(){
+      return (
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <span>
+                     <h2>Upgrade to PoppyGo Pro</h2>
+                     <ul>
+                       <li>Use your own domain</li>
+                       <li>Secure your site hosting</li>
+                     </ul>
+                     </span>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <h3>€3,- per month</h3>
+                  <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                </ListItem>
+             </div>
+           </div>
+     )
+    }
+
 
     render(){
-
         //let { siteKey } = this.props;
         let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog, connectDomainDialog, disconnectDomainDialog} = this.state;
 

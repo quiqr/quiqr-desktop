@@ -209,6 +209,8 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                                 style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
                                 onClick={ ()=>{ this.mountSite(site) } }
                                 primaryText={ site.name }
+                                secondaryText=""
+
                             />);
                         })}
                         { configurations.empty || _configurations.global.siteManagementEnabled ? (
