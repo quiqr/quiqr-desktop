@@ -629,6 +629,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     }
 
+    handleOpenCustomDomainDocs(){
+      window.require('electron').shell.openExternal('https://poppygo.io/documentation/custom-domain/');
+    }
+
     handleOpenTerms(){
         window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
     }
@@ -649,18 +653,18 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         if(this.state.pogoSiteStatus === "ownerIncorrect"){
             return (
-                <span>You're not the owner of this domain.</span>
+                <span>This domain is owned by somebody else</span>
             )
         }
         else if(this.state.pogoSiteStatus === "no_plan"){
-            return (
-                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
-            )
+            // return (
+            //     <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
+            // )
         }
         else if(this.state.pogoSiteStatus === "pending_subscription"){
-            return (
-                <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
-            )
+            // return (
+            //     <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
+            // )
         }
         else if(this.state.pogoSiteStatus === "active"){
             return (
@@ -668,15 +672,16 @@ class Home extends React.Component<HomeProps, HomeState>{
             )
         }
         else if(this.state.pogoSiteStatus === "expired_soon"){
-            return (
-                <span>Plan: {this.state.pogoSitePlan}, will expire soon</span>
-            )
+            // return (
+            //     <span>Plan: {this.state.pogoSitePlan}, will expire soon</span>
+            // )
         }
         else if(this.state.pogoSiteStatus === "expired"){
-            return (
-                <span>Plan: {this.state.pogoSitePlan}, subscription has expired<br/>
-                <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>activate subscription PoppyGo Basic</button></span>
-            )
+
+            // return (
+            //     <span>Plan: {this.state.pogoSitePlan}, subscription has expired<br/>
+            //     <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>activate subscription PoppyGo Basic</button></span>
+            // )
         }
         else {
 
@@ -694,45 +699,45 @@ class Home extends React.Component<HomeProps, HomeState>{
            autoDomain = site.publish[0].config.path + ".pogosite.com";
         }
 
-        return (
-            <Table selectable={false} >
-                <TableHeader
-                displaySelectAll={false}
-                adjustForCheckbox={false}
-            >
-                    <TableRow>
-                        <TableHeaderColumn
-                        style={{
-                            width: '180px',
-                        }}
-                    >status</TableHeaderColumn>
-                    <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
-                </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
-                <TableRow>
-                    <TableRowColumn
-                    style={{
-                        width: '180px',
-                    }}
-
-                >connected</TableRowColumn>
-                <TableRowColumn>{autoDomain}</TableRowColumn>
-            </TableRow>
-            <TableRow>
-                <TableRowColumn>
-                    {this.state.pogoCustomDomain == "not set"?
-                            <button className="reglink" onClick={()=>{this.handleConnectDomain()}}>connect custom domain</button>
-                            :
-                            <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
-                    }
-                </TableRowColumn>
-                <TableRowColumn>{this.state.pogoCustomDomain}</TableRowColumn>
-            </TableRow>
-        </TableBody>
-    </Table>
-
-        )
+    //     return (
+    //         <Table selectable={false} >
+    //             <TableHeader
+    //             displaySelectAll={false}
+    //             adjustForCheckbox={false}
+    //         >
+    //                 <TableRow>
+    //                     <TableHeaderColumn
+    //                     style={{
+    //                         width: '180px',
+    //                     }}
+    //                 >status</TableHeaderColumn>
+    //                 <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
+    //             </TableRow>
+    //         </TableHeader>
+    //         <TableBody displayRowCheckbox={false}>
+    //             <TableRow>
+    //                 <TableRowColumn
+    //                 style={{
+    //                     width: '180px',
+    //                 }}
+    //
+    //             >connected</TableRowColumn>
+    //             <TableRowColumn>{autoDomain}</TableRowColumn>
+    //         </TableRow>
+    //         <TableRow>
+    //             <TableRowColumn>
+    //                 {this.state.pogoCustomDomain == "not set"?
+    //                         <button className="reglink" onClick={()=>{this.handleConnectDomain()}}>connect custom domain</button>
+    //                         :
+    //                         <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
+    //                 }
+    //             </TableRowColumn>
+    //             <TableRowColumn>{this.state.pogoCustomDomain}</TableRowColumn>
+    //         </TableRow>
+    //     </TableBody>
+    // </Table>
+    //
+    //     )
 
     }
 
@@ -872,15 +877,12 @@ class Home extends React.Component<HomeProps, HomeState>{
             }
             else if(this.state.pogoSiteStatus === "active"){
 
-               if (this.state.pogoCustomDomain === "not set" && this.state.pogoCustomDomainVerified) {
+               if(this.state.pogoCustomDomain === "not set" &&  !this.state.pogoCustomDomainVerified) {
+                actionPanel = this.renderActionConnectDomainPanel();
+               }
+               if (this.state.pogoCustomDomainVerified) {
                   actionPanel = this.renderActionAdviseDNSPanel();
                }
-               else if(this.state.pogoCustomDomain !== "not set" &&  this.state.pogoCustomDomainVerified) {
-                actionPanel = this.renderActionConnectDomainPanel();
-               } else {
-                 // Don't show actionpanel
-               }
-
             }
             else if(this.state.pogoSiteStatus === "expired_soon"){
                 actionPanel = this.renderActionExtendPanel();
@@ -1039,13 +1041,14 @@ class Home extends React.Component<HomeProps, HomeState>{
       return (
          <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
              <div class="col-12 col-lg-8" style={{padding:"0px"}}>
-                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
-                     <h2>Connect your custom domain</h2>
-                     <br/>
+                 <ListItem leftIcon={<IconDomain color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <h3>Connect your custom domain</h3>
+                     <p> With PoppyGo Pro now you can </p>
                  </ListItem>
              </div>
              <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
                 <ListItem disabled={true} class="actionpanel"  >
+                  <h2> </h2>
                   <RaisedButton primary={true} label="Connect now" disabled={false} onClick={()=>{ this.handleConnectDomain();}} /><br/>
                   <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>See the documentation</button>
                 </ListItem>
