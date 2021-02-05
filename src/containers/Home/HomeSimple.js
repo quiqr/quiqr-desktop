@@ -856,27 +856,46 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let actionPanel = "";
 
-        if(this.checkLinkedDomain() && this.state.pogoSiteStatus !== "no_plan"){
-          actionPanel = this.renderActionUpgadePanel();
-        } else {
 
-          if (this.state.pogoCustomDomain === "not set" && this.state.pogoCustomDomainVerified) {
-            actionPanel = this.renderActionAdviseDNSPanel();
 
+        if(this.checkLinkedDomain() && this.state.pogoSiteStatus !== ""){
+            if(this.state.pogoSiteStatus === "ownerIncorrect"){
+                //Don't show actionpanel
+            } else if (!this.checkLinkedDomain()){
+                // Don't show actionpanel
+            }
+            else if(this.state.pogoSiteStatus === "no_plan"){
+                actionPanel = this.renderActionUpgadePanel();
+            }
+            else if(this.state.pogoSiteStatus === "pending_subscription"){
+                actionPanel = this.renderActionUpgadePanel();
+            }
+            else if(this.state.pogoSiteStatus === "active"){
+
+               if (this.state.pogoCustomDomain === "not set" && this.state.pogoCustomDomainVerified) {
+                  actionPanel = this.renderActionAdviseDNSPanel();
+               }
+               else if(this.state.pogoCustomDomain !== "not set" &&  this.state.pogoCustomDomainVerified) {
+                actionPanel = this.renderActionConnectDomainPanel();
+               } else {
+                 // Don't show actionpanel
+               }
+
+            }
+            else if(this.state.pogoSiteStatus === "expired_soon"){
+                actionPanel = this.renderActionExtendPanel();
+            }
+            else if(this.state.pogoSiteStatus === "expired"){
+                actionPanel = this.renderActionUpgadePanel();
+            }
           }
-          else {
-            actionPanel = this.renderActionConnectDomainPanel();
-         }
-       }
-
-
 
         let publishDisabled=true;
         let config = this.state.selectedWorkspaceDetails;
         publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
 
         return (
-            <Wrapper style={{maxWidth:'1000px'}} key={site.key} title="">
+            <Wrapper key={site.key} title="">
 
                 <InfoLine label="">
                     <h2 style={{padding:0, margin:0}}>{site.name}</h2>
@@ -984,7 +1003,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderNotificationPanel(message){
        return (
-          <div  class="notificationPanel" style={{color: "white", padding: "0px 32px",backgroundColor:"rgb(0, 188, 212)"}}>
+          <div  class="notificationPanel row" style={{color: "white", padding: "10px 44px",backgroundColor:"rgb(0, 188, 212)"}}>
           {message}
         </div>
       )
@@ -992,9 +1011,9 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderActionUpgadePanel(){
       return (
-         <div class="row" style={{color: "white", padding: "0px 28px",backgroundColor:"#b6b6b6"}}>
-             <div class="col-12 col-lg-6 actionpanel" style={{width:"30%",minWidth:"100px"}}>
-                 <ListItem leftIcon={<ActionThumbUp color="" style={{}} />} disabled={false} >
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
                      <span>
                      <h2>Upgrade to PoppyGo Pro</h2>
                      <ul>
@@ -1005,11 +1024,31 @@ class Home extends React.Component<HomeProps, HomeState>{
                      <br/>
                  </ListItem>
              </div>
-             <div class="col-6" style={{width:"30%",minWidth:"100px"}}>
-                <h2>€3,- per month</h2>
-                <p></p>
-                <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} />
-                <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <h3>€3,- per month</h3>
+                  <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                </ListItem>
+             </div>
+           </div>
+     )
+    }
+
+    renderActionConnectDomainPanel(){
+      return (
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <h2>Connect your custom domain</h2>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <RaisedButton primary={true} label="Connect now" disabled={false} onClick={()=>{ this.handleConnectDomain();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>See the documentation</button>
+                </ListItem>
              </div>
            </div>
      )
@@ -1017,19 +1056,56 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     renderActionAdviseDNSPanel(){
       return (
-         <div style={{color: "white", padding: "0px 16px",height:"150px",backgroundColor:"red"}}>
-         <p>Advise DNS</p>
-       </div>
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <span>
+                     <h2>You're almost there! Change your DNS settings </h2>
+
+                     <ul>
+                       <li>A-record: 123456789 </li>
+                       <li>AAAA-record: 123456789</li>
+                     </ul>
+                     </span>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                </ListItem>
+             </div>
+           </div>
      )
     }
 
-    renderActionConnectDomainPanel(){
+    renderActionExtendPanel(){
       return (
-         <div style={{color: "white", padding: "0px 16px",height:"150px",backgroundColor:"#FF0000"}}>
-         <p>Connect Domain</p>
-       </div>
+         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                     <span>
+                     <h2>Upgrade to PoppyGo Pro</h2>
+                     <ul>
+                       <li>Use your own domain</li>
+                       <li>Secure your site hosting</li>
+                     </ul>
+                     </span>
+                     <br/>
+                 </ListItem>
+             </div>
+             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                <ListItem disabled={true} class="actionpanel"  >
+                  <h3>€3,- per month</h3>
+                  <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
+                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                </ListItem>
+             </div>
+           </div>
      )
     }
+
 
     render(){
         //let { siteKey } = this.props;
