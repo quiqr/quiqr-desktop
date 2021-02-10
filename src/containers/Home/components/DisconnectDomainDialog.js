@@ -1,14 +1,9 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import service from './../../../services/service';
-import { Dialog, FlatButton, TextField } from 'material-ui';
-//import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
-//import { Accordion, AccordionItem } from './../../../components/Accordion';
-//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
+import { Dialog, FlatButton } from 'material-ui';
 import IconHttps from 'material-ui/svg-icons/action/https';
 import Paper from 'material-ui/Paper';
-//import FormData, {getHeaders} from 'form-data';
-//import FormData from 'form-data';
 let net = window.require('electron').remote.net;
 
 export default class DisconnectDomainDialog extends React.Component{
@@ -147,7 +142,6 @@ export default class DisconnectDomainDialog extends React.Component{
 
 
     renderForm(){
-        let busy = this.state.busy;
         let previewUrl = this.props.pogoCustomDomain;
         return (
             <div>

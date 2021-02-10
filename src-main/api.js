@@ -450,6 +450,12 @@ api.createSite = function(config/*: any*/, context/*: any*/){
     });
 }
 
+api.setPublishStatus = async function({status}/*: any*/, context/*: any*/){
+    let pogopubl = new PogoPublisher({});
+    await pogopubl.writePublishStatus(status)
+    context.resolve(true);
+}
+
 api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }

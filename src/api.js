@@ -140,6 +140,9 @@ export class API {
     publishSite(siteKey: string, publishKey: string){
         return mainProcessBridge.request('publishSite', {siteKey, publishKey});
     }
+    setPublishStatus(status){
+        return mainProcessBridge.request('setPublishStatus', {status});
+    }
     parentCloseMobilePreview(){
         return mainProcessBridge.request('parentCloseMobilePreview', {})
     }

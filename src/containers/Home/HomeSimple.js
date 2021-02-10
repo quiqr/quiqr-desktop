@@ -8,27 +8,18 @@ import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import IconDomain from 'material-ui/svg-icons/social/domain';
 import IconPublish from 'material-ui/svg-icons/editor/publish';
 import ActionThumbUp from 'material-ui/svg-icons/action/thumb-up'
-
 import muiThemeable from 'material-ui/styles/muiThemeable';
-import { Wrapper, InfoLine, MessageBlock } from './components/shared';
-import CreateSiteDialog from './components/CreateSiteDialog';
+import { Wrapper, InfoLine } from './components/shared';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
 import ClaimDomainDialog from './components/ClaimDomainDialog';
 import ConnectDomainDialog from './components/ConnectDomainDialog';
 import DisconnectDomainDialog from './components/DisconnectDomainDialog';
+import EditPlanDialog from './components/EditPlanDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
+import SnackbarManager from './../../components/SnackbarManager';
 import MarkdownIt from 'markdown-it'
-
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
@@ -83,11 +74,18 @@ type HomeState = {
     selectedSiteWorkspaces?: Array<any>,
     selectedWorkspace?: WorkspaceHeader,
     selectedWorkspaceDetails?: WorkspaceConfig,
-    createSiteDialog: bool,
     publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
     registerDialog?: { open: bool },
     claimDomainDialog?: { open: bool },
     blockingOperation: ?string //this should be moved to a UI service
+}
+
+function NotificationPanel(props){
+    return (
+        <div class="notificationPanel row" style={{color: "white", padding: "10px 44px",backgroundColor:"rgb(0, 188, 212)"}}>
+           {props.children}
+        </div>
+    )
 }
 
 class Home extends React.Component<HomeProps, HomeState>{
@@ -99,15 +97,18 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.state = {
             blockingOperation: null,
             currentSiteKey: null,
-            createSiteDialog: false,
             publishSiteDialog: undefined,
             registerDialog: {open: false},
+            editPlanDialog: {open: false},
             claimDomainDialog: {open: false},
             username: "",
             pogoAccountStatus: "",
             pogoCustomDomain: "not set",
+            pogoCustomDomainVerified: "unknown",
             pogoSiteStatus: "",
-            oneTimeOnlyUserConfirmed: false,
+            pogoPublishStatus: "",
+            oneTimeOnlySiteActive: false,
+            oneTimeOnlyPublishFinished: false,
             fingerprint: "",
             buttonPressed: "",
             siteCreatorMessage: null
@@ -122,14 +123,13 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
             this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
         }
-        if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
-            this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
-        }
     }
 
+    /*
     componentWillMount(){
         service.registerListener(this);
     }
+    */
 
     componentDidMount(){
         this.checkSiteInProps();
@@ -139,19 +139,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     setUser(username,fingerprint){
         this.setState({username: username, fingerprint: fingerprint});
-    }
-
-    checkConvert07(site){
-        if(site.hasOwnProperty('publish') && site.publish.length === 1){
-            let publ = site.publish[0];
-            if(publ.hasOwnProperty('config')
-                && publ.config.hasOwnProperty('type') && publ.config.type === 'poppygo'){
-
-                if(!publ.config.hasOwnProperty('path')){
-                    service.api.convert07("MUST CONVERT");
-                }
-            }
-        }
     }
 
     checkSiteInProps(){
@@ -170,13 +157,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(siteKey && workspaceKey){
 
             if(this.state.currentSiteKey !== siteKey){
-
                 service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
-
-                //get status of user (pogoboard)
-                //get status of website
-
-
             }
 
             this.setState({currentSiteKey: siteKey});
@@ -192,7 +173,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.configurations = bundle.configurations;
                 stateUpdate.selectedSite = bundle.site;
 
-                this.checkConvert07(bundle.site)
 
                 stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
                 stateUpdate.selectedWorkspace = bundle.workspace;
@@ -202,6 +182,9 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                 this.getRemoteUserStatus(false);
                 this.getRemoteSiteStatus(false);
+
+                this.getRemotePublishStatus(false);
+                this.getRemoteDomainVerification(false);
 
             })
         }
@@ -215,19 +198,16 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     /*
-    getWorkspaceDetails = (workspace: WorkspaceHeader) => {
-
-        if(this.state.selectedSite==null) throw new Error('Invalid operation.');
-        let ret = service.getWorkspaceDetails(this.state.selectedSite.key, workspace.key);
-        return ret;
-    }
-    */
-
     componentWillUnmount(){
         service.unregisterListener(this);
     }
+    */
 
     handlePublishNow(pressed){
+
+        //EXAMPLE Snack Message
+        //snackMessageService.addSnackMessage('Site successfully published.');
+
         let workspace = this.state.selectedWorkspaceDetails;
         let workspaceHeader = this.state.selectedSiteWorkspaces[0];
         service.api.parentTempHideMobilePreview();
@@ -240,7 +220,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         if(this.state.username === ""){
             this.handleRegisterNow();
         }
-        else if(!this.checkLinkedDomain()){
+        else if(!this.checkLinkedPogoCloudPath()){
             this.handleClaimDomainNow(false);
         }
         else{
@@ -263,13 +243,37 @@ class Home extends React.Component<HomeProps, HomeState>{
         this.setState({disconnectDomainDialog: { open: true}});
     }
 
-    handleRegisterCancelClick(){
-        this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+    handleEditPlan(){
+        service.api.parentTempHideMobilePreview();
+        this.setState({editPlanDialog: { open: true}});
     }
+
+
+    startDomVerificationPolling(celebrate){
+        service.api.logToConsole("domainVerification status poll");
+        let site = this.state.selectedSite;
+        if(site.hasOwnProperty('publishStatus') && site.publishStatus === 1){
+            let time=3000;
+            this.timeout = setTimeout(() => {
+                this.getRemotePublishStatus(celebrate);
+            }, time)
+        }
+    }
+
+    startPublishPolling(celebrate){
+        service.api.logToConsole("site publish status poll");
+        let site = this.state.selectedSite;
+        if(site.hasOwnProperty('publishStatus') && site.publishStatus === 2){
+            let time=3000;
+            this.timeout = setTimeout(() => {
+                this.getRemotePublishStatus(celebrate);
+            }, time)
+        }
+    }
+
 
     startPendingUpgradePolling(celebrate){
         service.api.logToConsole("site upgrade status poll");
-        service.api.logToConsole(this.state.pogoSiteStatus);
 
         if(this.state.pogoSiteStatus === "pending_subscription"){
             let time=3000;
@@ -311,7 +315,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 else{
                     this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
                 }
-
             });
     }
 
@@ -328,16 +331,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             service.api.parentTempHideMobilePreview();
             this.setState({claimDomainDialog: { open: true}});
         }
-    }
-
-    handleClaimDomainCancelClick(){
-        this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
-    }
-    handleConnectDomainCancelClick(){
-        this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
-    }
-    handleDisconnectDomainCancelClick(){
-        this.setState({disconnectDomainDialog: {...this.state.disconnectDomainDialog, open:false}});
     }
 
     handleClaimDomainClick(obj){
@@ -367,6 +360,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         });
     }
+
     handleConnectDomainClick(obj){
 
         service.getConfigurations(true).then((c)=>{
@@ -386,12 +380,9 @@ class Home extends React.Component<HomeProps, HomeState>{
                 this.setState(stateUpdate,()=>{
                     service.api.logToConsole("finished connecting domain")
                 });
-
             })
-
         });
     }
-
 
     handleDisconnectDomainClick(){
 
@@ -418,13 +409,20 @@ class Home extends React.Component<HomeProps, HomeState>{
         });
     }
 
-    checkLinkedDomain(){
+    checkLinkedPogoCloudPath(){
         let site = this.state.selectedSite;
         if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
-            service.api.logToConsole(site.publish[0].config);
             return true;
         }
         return false;
+    }
+
+    getPogoCloudPath(){
+        let site = this.state.selectedSite;
+        if(this.checkLinkedPogoCloudPath()){
+            return site.publish[0].config.path;
+        }
+        return ""
     }
 
     getRemoteUserStatus(celebrate){
@@ -457,7 +455,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                         this.setState({pogoAccountStatus: obj.pogo_account_status});
 
                         if(obj.pogoAccountStatus === "confirmed_member" && celebrate){
-                            this.setState({oneTimeOnlyUserConfirmed: true});
+                            snackMessageService.addSnackMessage('Well done.. you confirmed you\'re email address succesfully.');
                         }
                     }
                     else if (obj.hasOwnProperty('pogo_email')){
@@ -476,10 +474,100 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
+    getRemoteDomainVerification(celebrate){
+
+        service.api.logToConsole("getRemotePublishStatus")
+
+
+        if(this.state.pogoCustomDomain === "not set"){
+            service.api.logToConsole("nocustomdomain")
+            return
+        }
+
+        let projectPath = this.state.selectedSite.publish[0].config.path;
+        let url = "http://"+this.state.pogoCustomDomain+"/.pogo_with_me"
+
+        service.api.logToConsole(url);
+
+        try {
+
+            let data='';
+            const request = net.request(url);
+            request.on('response', (response) => {
+
+                response.on('end', () => {
+                    let obj = JSON.parse(data);
+                    service.api.setPublishStatus(1)
+
+                    if (obj.path === projectPath){
+                        service.api.logToConsole( obj);
+                        this.setState({oneTimeOnlyPublishFinished: true});
+                    }
+                    else{
+                        this.startDomVerificationPolling(true);
+                    }
+                });
+                response.on("data", chunk => {
+                    data += chunk;
+                });
+            })
+            request.end()
+
+
+        } catch (e) {
+            service.api.logToConsole('catch');
+        }
+
+    }
+
+    getRemotePublishStatus(celebrate){
+
+        service.api.logToConsole("getRemotePublishStatus")
+        if(!this.checkLinkedPogoCloudPath()){
+            service.api.logToConsole("notLinked :(")
+            return
+        }
+
+        let projectPath = this.state.selectedSite.publish[0].config.path;
+        let url = "http://"+projectPath+".pogosite.com/.pogo_with_me"
+
+        service.api.logToConsole(url);
+
+
+        try {
+
+            let data='';
+            const request = net.request(url);
+            request.on('response', (response) => {
+
+                response.on('end', () => {
+                    let obj = JSON.parse(data);
+                    service.api.setPublishStatus(1)
+
+                    if (obj.path === projectPath){
+                        service.api.logToConsole( obj);
+                        this.setState({oneTimeOnlyPublishFinished: true});
+                    }
+                    else{
+                        this.startPublishPolling(true);
+                    }
+                });
+                response.on("data", chunk => {
+                    data += chunk;
+                });
+            })
+            request.end()
+
+        } catch (e) {
+            service.api.logToConsole('catch');
+        }
+
+    }
+
     getRemoteSiteStatus(celebrate){
 
         service.api.logToConsole("getRemoteSiteStatus")
-        if(!this.checkLinkedDomain()){
+        if(!this.checkLinkedPogoCloudPath()){
             service.api.logToConsole("notLinked :(")
             return
         }
@@ -492,15 +580,9 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let requestVars =btoa(JSON.stringify(userVars));
 
-        let url = this.state.pogostripeConn.protocol+"//"+
-            this.state.pogostripeConn.host+":"+
-            this.state.pogostripeConn.port+"/project-status/"+requestVars;
-
-        service.api.logToConsole(url);
-
+        let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+ this.state.pogostripeConn.port+"/project-status/"+requestVars;
 
         let data='';
-
 
         try {
             const request = net.request(url);
@@ -512,12 +594,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
                     if(response.statusCode === 403){
                         this.setState({pogoSiteStatus: "ownerIncorrect"});
-                        service.api.logToConsole("forbidden");
                     }
                     else{
                         let obj = JSON.parse(data);
                         let custom_domain = "not set"
-                        service.api.logToConsole(obj);
 
                         if (obj.hasOwnProperty('pogo_custom_domain')){
                             custom_domain = obj.pogo_custom_domain;
@@ -534,7 +614,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                             }
                             else if (this.state.pogoSiteStatus === 'pending_subscription'){
 
-                                service.api.logToConsole(this.state.pogoSiteStatus);
                                 this.startPendingUpgradePolling(true);
                             }
 
@@ -561,7 +640,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     }
 
-
+    /*
     handleManageSubscriptions(){
 
         let userVars = {
@@ -575,31 +654,42 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/myaccount/"+requestVars;
         window.require('electron').shell.openExternal(url);
     }
+    */
 
-    handleUpgradeLinkedSite(){
+    handleUpgradeLinkedSite(pressed){
 
-        this.setState({pogoSiteStatus: "pending_subscription"},function(){
-            this.startPendingUpgradePolling(true);
-        })
+        let site = this.state.selectedSite;
+        service.api.logToConsole(site);
+        if(site.hasOwnProperty('publishStatus') && site.publishStatus === 1){
+            this.setState({pogoSiteStatus: "pending_subscription"},function(){
+                this.startPendingUpgradePolling(true);
+            })
 
-        let upgradeVars = {
-            username: this.state.username,
-            fingerprint: this.state.fingerprint,
-            projectPath:  this.state.selectedSite.publish[0].config.path,
-            plan: "basic"
-        };
+            let upgradeVars = {
+                username: this.state.username,
+                fingerprint: this.state.fingerprint,
+                projectPath:  this.state.selectedSite.publish[0].config.path,
+                plan: "basic"
+            };
 
-        let requestVars =btoa(JSON.stringify(upgradeVars));
-        let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/"+requestVars;
-        window.require('electron').shell.openExternal(url);
+            let requestVars =btoa(JSON.stringify(upgradeVars));
+            let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/"+requestVars;
+            window.require('electron').shell.openExternal(url);
+
+        }
+        else{
+            if(pressed){
+                this.setState({buttonPressed:"upgrade"},function(){
+                    this.handlePublishNow(false);
+                });
+            }
+        }
     }
-
 
     handleResendConfirmationMail(){
 
         var postData = JSON.stringify({ username: this.state.username, fingerprint: this.state.fingerprint});
 
-        let data='';
         let request = net.request({
             method: 'POST',
             protocol: this.state.pogoboardConn.protocol,
@@ -613,16 +703,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         })
 
         request.on('response', (response) => {
-
             response.on('end', () => {
-                let obj = JSON.parse(data);
-                service.api.logToConsole( obj)
             });
-
             response.on("data", chunk => {
-                data += chunk;
             });
-
         })
         request.write(postData)
         request.end()
@@ -649,351 +733,18 @@ class Home extends React.Component<HomeProps, HomeState>{
         return false;
     }
 
-    renderUpgadeLink(){
-
-        if(this.state.pogoSiteStatus === "ownerIncorrect"){
-            return (
-                <span>This domain is owned by somebody else</span>
-            )
-        }
-        else if(this.state.pogoSiteStatus === "no_plan"){
-            // return (
-            //     <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Upgrade to PoppyGo Basic</button>
-            // )
-        }
-        else if(this.state.pogoSiteStatus === "pending_subscription"){
-            // return (
-            //     <span>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>
-            // )
-        }
-        else if(this.state.pogoSiteStatus === "active"){
-            return (
-                <span>Plan: {this.state.pogoSitePlan}</span>
-            )
-        }
-        else if(this.state.pogoSiteStatus === "expired_soon"){
-            // return (
-            //     <span>Plan: {this.state.pogoSitePlan}, will expire soon</span>
-            // )
-        }
-        else if(this.state.pogoSiteStatus === "expired"){
-
-            // return (
-            //     <span>Plan: {this.state.pogoSitePlan}, subscription has expired<br/>
-            //     <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>activate subscription PoppyGo Basic</button></span>
-            // )
-        }
-        else {
-
-        }
-    }
-
-    domainlist(){
-        if(! this.hasActivePlan(this.state.pogoSiteStatus)){
-            return;
-        }
-
-        let site = this.state.selectedSite;
-        let autoDomain = "";
-        if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
-           autoDomain = site.publish[0].config.path + ".pogosite.com";
-        }
-
-    //     return (
-    //         <Table selectable={false} >
-    //             <TableHeader
-    //             displaySelectAll={false}
-    //             adjustForCheckbox={false}
-    //         >
-    //                 <TableRow>
-    //                     <TableHeaderColumn
-    //                     style={{
-    //                         width: '180px',
-    //                     }}
-    //                 >status</TableHeaderColumn>
-    //                 <TableHeaderColumn style="text-align:left" >Domain/URL</TableHeaderColumn>
-    //             </TableRow>
-    //         </TableHeader>
-    //         <TableBody displayRowCheckbox={false}>
-    //             <TableRow>
-    //                 <TableRowColumn
-    //                 style={{
-    //                     width: '180px',
-    //                 }}
-    //
-    //             >connected</TableRowColumn>
-    //             <TableRowColumn>{autoDomain}</TableRowColumn>
-    //         </TableRow>
-    //         <TableRow>
-    //             <TableRowColumn>
-    //                 {this.state.pogoCustomDomain == "not set"?
-    //                         <button className="reglink" onClick={()=>{this.handleConnectDomain()}}>connect custom domain</button>
-    //                         :
-    //                         <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
-    //                 }
-    //             </TableRowColumn>
-    //             <TableRowColumn>{this.state.pogoCustomDomain}</TableRowColumn>
-    //         </TableRow>
-    //     </TableBody>
-    // </Table>
-    //
-    //     )
-
-    }
-
-
-    renderSelectedSiteContent(configurations: Configurations, site: SiteConfig ){
-        let user = undefined;
-        let domain = undefined;
-        let published = undefined;
-
-        if(this.state.mustConvert){
-            return (
-                <Wrapper>
-                    <div>&nbsp;&nbsp;Converting data....</div>
-                </Wrapper>
-            )
-        }
-
-        if(this.state.username!==""){
-
-            let accountStatusMsg = ""
-            let handleSubscriptions = ""
-            let confirmedMailSuccess = ""
-            if(this.state.oneTimeOnlyUserConfirmed){
-                confirmedMailSuccess = (
-                    <span><br/>Well done.. you confirmed you're email address succesfully</span>
-                )
-            }
-            if(this.state.pogoAccountStatus === "unconfirmed_member"){
-                accountStatusMsg = (
-                    <span><br/>
-                        You have not confirmed you're email address. Check you're email for a confirmation mail or
-                        <button className="reglink" onClick={()=>{this.handleResendConfirmationMail()}}>Resend confirmation mail</button>
-                    </span>
-                )
-            }
-            else if(this.state.pogoAccountStatus === "confirmed_member"){
-
-                if(this.state.stripe_customer_id !== ""){
-                    handleSubscriptions = <span><br/><button className="reglink" onClick={()=>{this.handleManageSubscriptions()}}>Manage Subscriptions</button></span>
-                }
-            }
-
-            user = ( <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
-                <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
-                {confirmedMailSuccess}
-                {accountStatusMsg}
-                {handleSubscriptions}
-
-                </ListItem>
-            );
-        }
-        else{
-            user = ( <ListItem leftIcon={<IconAccountCircle color="#49545" style={{}} />} disabled={true} >
-                            <span style={{fontWeight: "normal", fontSize:"100%"}}>Create an account for publishing</span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>Register now!</button>
-                        </ListItem>
-            );
-        }
-
-        if(this.checkLinkedDomain()){
-            domain = (
-                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{site.name} is linked to&nbsp;
-                        <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
-                        window.require('electron').shell.openExternal("http://"+site.publish[0].config.defaultDomain);
-                        }}>{site.publish[0].config.defaultDomain}</button>
-                    </span>
-                    <br/>
-
-                    { this.renderUpgadeLink() }
-                    { this.domainlist() }
-
-
-                </ListItem>
-            )
-        }
-        else{
-            domain = (
-                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {site.name} </span> &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
-                </ListItem>
-            )
-        }
-
-        if(site.hasOwnProperty('lastPublish') && site.lastPublish !== 0){
-
-        let ts;
-        if(site.lastPublish === 1){
-                ts = "";
-            } else
-            {
-            ts = new Date(site.lastPublish).toString().split("GMT")[0]
-            published = (
-                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "normal", fontSize:"100%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
-                </ListItem>
-            )
-            }
-        }
-        else{
-            published = (
-                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "normal", fontSize:"100%"}}>{site.name} is not yet published</span> {<button className="reglink" onClick={ ()=>{this.handlePublishNow()} } ></button>}
-                </ListItem>
-            )
-        }
-
-        let notificationPanel = "";
-
-        if (this.state.pogoAccountStatus === "no_member") {
-          notificationPanel = this.renderNotificationPanel("Register with you email to claim a pogosite domain")
-        } else if(this.state.pogoAccountStatus === "unconfirmed_member"){
-          notificationPanel = this.renderNotificationPanel("Unconfimed member")
-        } else if(this.state.pogoSiteStatus === "pending_subscription"){
-          notificationPanel = this.renderNotificationPanel(<span style={{color:"white"}}>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(); }}>Finish upgrade in browser.</button></span>)
-        }
-
-        if (this.state.oneTimeOnlySiteActive === true) {
-          notificationPanel = this.renderNotificationPanel("Configurations, You just upgaded to basic.")
-        }
-
-
-        let actionPanel = "";
-
-
-
-        if(this.checkLinkedDomain() && this.state.pogoSiteStatus !== ""){
-            if(this.state.pogoSiteStatus === "ownerIncorrect"){
-                //Don't show actionpanel
-            } else if (!this.checkLinkedDomain()){
-                // Don't show actionpanel
-            }
-            else if(this.state.pogoSiteStatus === "no_plan"){
-                actionPanel = this.renderActionUpgadePanel();
-            }
-            else if(this.state.pogoSiteStatus === "pending_subscription"){
-                actionPanel = this.renderActionUpgadePanel();
-            }
-            else if(this.state.pogoSiteStatus === "active"){
-
-               if(this.state.pogoCustomDomain === "not set" &&  !this.state.pogoCustomDomainVerified) {
-                actionPanel = this.renderActionConnectDomainPanel();
-               }
-               if (this.state.pogoCustomDomainVerified) {
-                  actionPanel = this.renderActionAdviseDNSPanel();
-               }
-            }
-            else if(this.state.pogoSiteStatus === "expired_soon"){
-                actionPanel = this.renderActionExtendPanel();
-            }
-            else if(this.state.pogoSiteStatus === "expired"){
-                actionPanel = this.renderActionUpgadePanel();
-            }
-          }
-
-        let publishDisabled=true;
-        let config = this.state.selectedWorkspaceDetails;
-        publishDisabled = config==null||config.build===null||config.build.length===0||site.publish===null||site.publish.length===0;
-
-        return (
-            <Wrapper key={site.key} title="">
-
-                <InfoLine label="">
-                    <h2 style={{padding:0, margin:0}}>{site.name}</h2>
-                </InfoLine>
-
-                <div style={{padding: "0px 16px"}}>
-                    <List>
-                        {user}
-                        {domain}
-                        {published}
-
-                    </List>
-
-                </div>
-                <div style={Object.assign({position : 'relative',padding: "0px 16px 16px 30px", width:'100%', display:'flex'})}>
-                    <RaisedButton primary={true} label="Publish" disabled={publishDisabled} onClick={()=>{ this.handlePublishNow(true);}} />
-                    <div style={{ border: 'solid 0px green', marginLeft: 'auto', marginTop: 13 }}>
-                        <button className="reglink" onClick={()=>{this.handleOpenTerms()}}>Terms and Conditions</button>
-
-                    </div>
-                </div>
-                {notificationPanel}
-                {actionPanel}
-
-
-                <div style={{padding: "0px 16px",backgroundColor:"#666"}}>
-                </div>
-
-                { /*this.renderWorkspaces(site, site.key===this.state.currentSiteKey, this.state.selectedSiteWorkspaces) */}
-
-                <div className="markdown"
-                style={ styles.creatorMessage }
-                dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}}></div>
-
-            </Wrapper>
-        );
-    }
-
-    /*
-    handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
-        e.stopPropagation();
-        this.selectWorkspace(siteKey, workspace);
-    };
-    */
-
-    /*
-    async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-
-        this.setState({currentWorkspaceKey: workspace.key});
-        let        select = true;
-        if(select){
-            await service.api.mountWorkspace(siteKey, workspace.key);
-            this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
-        }
-        else{
-            this.history.push(`/`);
-        }
-    }
-    */
-
-    handleAddSiteClick(){
-        this.setState({createSiteDialog: true});
-    }
-
-    handleCreateSiteSubmit = (data)=>{
-        this.setState({createSiteDialog:false, blockingOperation:'Creating site...'})
-
-        service.api.createSite(data).then(()=>{
-            return service.getConfigurations(true);
-        }).then(configurations=>{
-            this.setState({configurations});
-        }).catch((e)=>{
-            alert('Failed to create site');
-        }).then(()=>{
-            this.setState({ blockingOperation:null})
-        });
-    }
-
-    handlePublishSiteCancelClick = () => {
-        service.api.parentTempUnHideMobilePreview();
-        this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
-    }
-
     handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
         service.api.parentTempUnHideMobilePreview();
 
         this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
+
         service.api.buildWorkspace(siteKey, workspaceKey, build).then(()=>{
             this.setState({blockingOperation: 'Publishing site...'});
 
             service.api.publishSite(siteKey, publish).then(()=>{
-                service.getConfigurations(true).then((c)=>{
-                    //snackMessageService.addSnackMessage('Site successfully published.');
-                    this.checkSiteInProps();
-                });
+                this.startPublishPolling(true);
             });
+
         }).then(()=>{
 
         }).catch(()=>{
@@ -1003,230 +754,418 @@ class Home extends React.Component<HomeProps, HomeState>{
         })
     }
 
-    renderNotificationPanel(message){
-       return (
-          <div  class="notificationPanel row" style={{color: "white", padding: "10px 44px",backgroundColor:"rgb(0, 188, 212)"}}>
-          {message}
-        </div>
-      )
+    renderNotificationPanel(){
+
+        if(this.state.pogoAccountStatus === "no_member") {
+
+            return <NotificationPanel>Register with you email to claim a pogosite domain</NotificationPanel>
+
+        }
+        else if(this.state.pogoAccountStatus === "unconfirmed_member"){
+            return <NotificationPanel>Unconfimed member</NotificationPanel>
+
+        }
+        else if(this.state.pogoSiteStatus === "pending_subscription"){
+            return (
+                <NotificationPanel>
+                    <span style={{color:"white"}}>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(true); }}>Finish upgrade in browser.</button></span>
+                </NotificationPanel>
+            )
+        }
+        else if (this.state.oneTimeOnlySiteActive === true) {
+            return (
+                <NotificationPanel>
+                    Great! You just upgaded to basic.
+                </NotificationPanel>
+            )
+        }
+    }
+
+    renderActionPanel(){
+        if(this.checkLinkedPogoCloudPath() && this.state.pogoSiteStatus !== ""){
+
+            if(this.state.pogoSiteStatus === "no_plan"){
+                return this.renderActionUpgadePanel();
+            }
+            else if(this.state.pogoSiteStatus === "pending_subscription"){
+                return this.renderActionUpgadePanel();
+            }
+
+            else if(this.state.pogoSiteStatus === "active"){
+
+                if(this.state.pogoCustomDomain === "not set" &&  !this.state.pogoCustomDomainVerified) {
+                    return this.renderActionConnectDomainPanel();
+                }
+                if (this.state.pogoCustomDomainVerified) {
+                    return this.renderActionAdviseDNSPanel();
+                }
+            }
+            else if(this.state.pogoSiteStatus === "expired_soon"){
+                return this.renderActionExtendPanel();
+            }
+            else if(this.state.pogoSiteStatus === "expired"){
+                return this.renderActionUpgadePanel();
+            }
+        }
     }
 
     renderActionUpgadePanel(){
-      return (
-         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
-             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
-                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
-                     <span>
-                     <h2>Upgrade to PoppyGo Pro</h2>
-                     <ul>
-                       <li>Use your own domain</li>
-                       <li>Secure your site hosting</li>
-                     </ul>
-                     </span>
-                     <br/>
-                 </ListItem>
-             </div>
-             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
-                <ListItem disabled={true} class="actionpanel"  >
-                  <h3>€3,- per month</h3>
-                  <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
-                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
-                </ListItem>
-             </div>
-           </div>
-     )
+        return (
+            <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+                <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                    <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                        <span>
+                            <h2>Upgrade to PoppyGo Pro</h2>
+                            <ul>
+                                <li>Use your own domain</li>
+                                <li>Secure your site hosting</li>
+                            </ul>
+                        </span>
+                        <br/>
+                    </ListItem>
+                </div>
+                <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                    <ListItem disabled={true} class="actionpanel"  >
+                        <h3>€3,- per month</h3>
+                        <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite(true);}} /><br/>
+                        <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                    </ListItem>
+                </div>
+            </div>
+        )
     }
 
     renderActionConnectDomainPanel(){
-      return (
-         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
-             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
-                 <ListItem leftIcon={<IconDomain color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
-                     <h3>Connect your custom domain</h3>
-                     <p> With PoppyGo Pro now you can </p>
-                 </ListItem>
-             </div>
-             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
-                <ListItem disabled={true} class="actionpanel"  >
-                  <h2> </h2>
-                  <RaisedButton primary={true} label="Connect now" disabled={false} onClick={()=>{ this.handleConnectDomain();}} /><br/>
-                  <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>See the documentation</button>
-                </ListItem>
-             </div>
-           </div>
-     )
+        return (
+            <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+                <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                    <ListItem leftIcon={<IconDomain color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                        <h3>Connect your custom domain</h3>
+                        <p> With PoppyGo Pro now you can </p>
+                    </ListItem>
+                </div>
+                <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                    <ListItem disabled={true} class="actionpanel"  >
+                        <h2> </h2>
+                        <RaisedButton primary={true} label="Connect now" disabled={false} onClick={()=>{ this.handleConnectDomain();}} /><br/>
+                        <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>See the documentation</button>
+                    </ListItem>
+                </div>
+            </div>
+        )
     }
 
     renderActionAdviseDNSPanel(){
-      return (
-         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
-             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
-                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
-                     <span>
-                     <h2>You're almost there! Change your DNS settings </h2>
+        return (
+            <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+                <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                    <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                        <span>
+                            <h2>You're almost there! Change your DNS settings </h2>
 
-                     <ul>
-                       <li>A-record: 123456789 </li>
-                       <li>AAAA-record: 123456789</li>
-                     </ul>
-                     </span>
-                     <br/>
-                 </ListItem>
-             </div>
-             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
-                <ListItem disabled={true} class="actionpanel"  >
-                  <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
-                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
-                </ListItem>
-             </div>
-           </div>
-     )
+                            <ul>
+                                <li>A-record: 123456789 </li>
+                                <li>AAAA-record: 123456789</li>
+                            </ul>
+                        </span>
+                        <br/>
+                    </ListItem>
+                </div>
+                <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                    <ListItem disabled={true} class="actionpanel"  >
+                        <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite(true);}} /><br/>
+                        <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                    </ListItem>
+                </div>
+            </div>
+        )
     }
 
     renderActionExtendPanel(){
-      return (
-         <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
-             <div class="col-12 col-lg-8" style={{padding:"0px"}}>
-                 <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
-                     <span>
-                     <h2>Upgrade to PoppyGo Pro</h2>
-                     <ul>
-                       <li>Use your own domain</li>
-                       <li>Secure your site hosting</li>
-                     </ul>
-                     </span>
-                     <br/>
-                 </ListItem>
-             </div>
-             <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
-                <ListItem disabled={true} class="actionpanel"  >
-                  <h3>€3,- per month</h3>
-                  <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite();}} /><br/>
-                  <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
-                </ListItem>
-             </div>
-           </div>
-     )
+        return (
+            <div class="row" style={{color: "white", padding: "0px 24px",backgroundColor:"#b6b6b6"}}>
+                <div class="col-12 col-lg-8" style={{padding:"0px"}}>
+                    <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
+                        <span>
+                            <h2>Upgrade to PoppyGo Pro</h2>
+                            <ul>
+                                <li>Use your own domain</li>
+                                <li>Secure your site hosting</li>
+                            </ul>
+                        </span>
+                        <br/>
+                    </ListItem>
+                </div>
+                <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
+                    <ListItem disabled={true} class="actionpanel"  >
+                        <h3>€3,- per month</h3>
+                        <RaisedButton primary={true} label="Upgrade now" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite(true);}} /><br/>
+                        <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                    </ListItem>
+                </div>
+            </div>
+        )
     }
 
+    renderUpgadeLink(){
+
+    }
+
+    renderUserInfoActions(){
+        if(this.state.username!==""){
+
+            let accountStatusMsg = ""
+
+            if(this.state.pogoAccountStatus === "unconfirmed_member"){
+                accountStatusMsg = (
+                    <span><br/>
+                        You have not confirmed you're email address.<br/>
+                        Check your email for a confirmation mail or <button className="reglink" onClick={()=>{this.handleResendConfirmationMail()}}>resend confirmation mail</button>
+                    </span>
+                )
+            }
+
+            return (
+                <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
+                    {accountStatusMsg}
+                </ListItem>
+            );
+        }
+        else {
+            return (
+                <ListItem leftIcon={<IconAccountCircle color="#49545" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "normal", fontSize:"100%"}}>Create an account for publishing</span>
+                    &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleRegisterNow()}}>Register now!</button>
+                </ListItem>
+            )
+        }
+    }
+
+    renderPogoCloudPathInfo(){
+
+        if(this.checkLinkedPogoCloudPath()){
+
+            let disconnectButton = ""
+            if( this.state.pogoCustomDomain !== "not set"){
+                disconnectButton = <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
+            }
+
+            let editPlanButton = ""
+            if(this.state.pogoSiteStatus === "active"){
+                editPlanButton = <button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button>
+            }
+
+            let ownerInfo = ""
+            if(this.state.pogoSiteStatus === "ownerIncorrect"){
+                ownerInfo = <div>This domain is owned by somebody else</div>
+            }
+
+            let planInfo = ""
+            if(this.state.pogoSiteStatus === "active"){
+                planInfo = <div>Plan: {this.state.pogoSitePlan}</div>
+            }
+
+            return (
+                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{this.state.selectedSite.name} is linked to&nbsp;
+
+                        <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+                            window.require('electron').shell.openExternal("http://"+this.state.selectedSite.publish[0].config.defaultDomain);
+                        }}>{this.state.selectedSite.publish[0].config.defaultDomain}</button>
+                        &nbsp;
+                        {disconnectButton}
+                        &nbsp;
+                        {editPlanButton}
+
+                    </span>
+
+                    { ownerInfo }
+                    { planInfo }
+
+                </ListItem>
+            )
+        }
+        else{
+            return  (
+                <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {this.state.selectedSite.name} </span>
+                    &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
+                </ListItem>
+            )
+        }
+    }
+
+    renderPublishInfo(){
+
+        if(this.state.selectedSite.hasOwnProperty('publishStatus') && this.state.selectedSite.publishStatus === 2){
+
+        }
+
+        if(this.state.selectedSite.hasOwnProperty('lastPublish') && this.state.selectedSite.lastPublish !== 0){
+
+            let ts;
+            if(this.state.selectedSite.lastPublish === 1){
+                ts = "";
+            }
+            else {
+                ts = new Date(this.state.selectedSite.lastPublish).toString().split("GMT")[0]
+                return (
+                    <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                        <span style={{fontWeight: "normal", fontSize:"100%"}}>Latest publication {ts}{/* - All work is published!*/}</span>
+                    </ListItem>
+                )
+            }
+        }
+        else{
+            return (
+                <ListItem leftIcon={<IconPublish color="" style={{}} />} disabled={true} >
+                    <span style={{fontWeight: "normal", fontSize:"100%"}}>{this.state.selectedSite.name} is not yet published</span>
+                </ListItem>
+            )
+        }
+    }
 
     render(){
-        //let { siteKey } = this.props;
-        let { selectedSite, configurations, createSiteDialog, publishSiteDialog, registerDialog, claimDomainDialog, connectDomainDialog, disconnectDomainDialog} = this.state;
 
-        let pogoSitePath = "";
-        if(selectedSite!=null && selectedSite.hasOwnProperty('publish') && selectedSite.publish.length === 1 && selectedSite.publish[0].config.type === 'poppygo' && selectedSite.publish[0].config.hasOwnProperty('path')){
-           pogoSitePath = selectedSite.publish[0].config.path;
-        }
+        let { configurations } = this.state;
 
-        let _configurations = ((configurations: any): Configurations);
-
-        if(configurations==null){
+        if( configurations == null || this.state.selectedSite == null ){
             return <Spinner />
         }
+
+        let pogoCloudPath = this.getPogoCloudPath();
 
         return (
             <Route render={({history}) => {
                 this.history = history;
 
-                let jeeworkspace = null;
-                let jeeworkspaceHeader = null;
-                if( selectedSite!=null && this.state.publishSiteDialog!=null){
-                    jeeworkspace = this.state.publishSiteDialog.workspace;
-                    jeeworkspaceHeader = this.state.publishSiteDialog.workspaceHeader;
-                }
-
                 return (
-
                     <div style={ styles.container }>
-                        <div style={styles.selectedSiteCol}>
 
-                            { selectedSite==null ? (
-                                <Wrapper title="Site Management">
-                                    <MessageBlock>Please, select a site.</MessageBlock>
-                                </Wrapper>
-                            ) : (
-                                this.renderSelectedSiteContent(_configurations, selectedSite)
-                            ) }
+                        <div style={styles.selectedSiteCol}>
+                            <Wrapper key={this.state.selectedSite.key}>
+                                <InfoLine label="">
+                                    <h2 style={{padding:0, margin:0}}>{this.state.selectedSite.name}</h2>
+                                </InfoLine>
+
+                                <div style={{padding: "0px 16px"}}>
+                                    <List>
+                                        {this.renderUserInfoActions()}
+                                        {this.renderPogoCloudPathInfo()}
+                                        {this.renderPublishInfo()}
+                                    </List>
+                                </div>
+
+                                <div style={Object.assign({position : 'relative',padding: "0px 16px 16px 30px", width:'100%', display:'flex'})}>
+                                    <RaisedButton primary={true} label="Publish" onClick={()=>{ this.handlePublishNow(true) }} />
+                                    <div style={{ border: 'solid 0px green', marginLeft: 'auto', marginTop: 13 }}>
+                                        <button className="reglink" onClick={()=>{this.handleOpenTerms()}}>Terms and Conditions</button>
+                                    </div>
+                                </div>
+
+                                { this.renderNotificationPanel() }
+                                { this.renderActionPanel() }
+
+                                <div className="markdown" style={ styles.creatorMessage } dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}} />
+
+                            </Wrapper>
                         </div>
 
-                        <CreateSiteDialog
-                            open={createSiteDialog}
-                            onCancelClick={()=>this.setState({createSiteDialog:false})}
-                            onSubmitClick={this.handleCreateSiteSubmit}
+                        {/* HIDDEN DIALOGS BELOW */}
+
+                        <SnackbarManager />
+
+                        <BlockDialog open={this.state.blockingOperation != null }> {this.state.blockingOperation} </BlockDialog>
+
+                        {this.renderPublishSiteDialog()}
+
+                        <RegisterDialog
+                            onCancelClick={()=>{
+                                this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+                                service.api.parentTempUnHideMobilePreview();
+                            }}
+                            onRegisterClick={({username, email})=>{ this.handleRegisterClick(username, email) }}
+                            open={this.state.registerDialog != null && this.state.registerDialog.open}
                         />
 
-                        { selectedSite!=null && this.state.publishSiteDialog!=null ? (
-                                    <PublishSiteDialog
-                                    site={selectedSite}
-                                    workspace={jeeworkspace}
-                                    workspaceHeader={jeeworkspaceHeader}
-                                    onCancelClick={this.handlePublishSiteCancelClick}
-                                    onBuildAndPublishClick={this.handleBuildAndPublishClick}
-                                    open={publishSiteDialog!=null&&publishSiteDialog.open}
-                                />
-                        ):(null) }
+                        <ClaimDomainDialog
+                            onCancelClick={()=>{
+                                this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+                                service.api.parentTempUnHideMobilePreview();
+                            }}
+                            onClaimDomainClick={(obj)=>{ this.handleClaimDomainClick(obj) }}
+                            username={this.state.username}
+                            fingerprint={this.state.fingerprint}
+                            open={this.state.claimDomainDialog != null && this.state.claimDomainDialog.open}
+                        />
 
-                        { selectedSite!=null && this.state.registerDialog!=null ? (
-                                       <RegisterDialog
-                                        onCancelClick={()=>this.handleRegisterCancelClick()}
-                                        onRegisterClick={({username, email})=>{
-                                            this.handleRegisterClick(username, email)
-                                        }}
+                        <ConnectDomainDialog
+                            onCancelClick={()=>{
+                                this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
+                                service.api.parentTempUnHideMobilePreview();
+                            }}
+                            onConnectDomainClick={(obj)=>{ this.handleConnectDomainClick(obj) }}
+                            username={this.state.username}
+                            sitePath={pogoCloudPath}
+                            fingerprint={this.state.fingerprint}
+                            open={this.state.connectDomainDialog != null && this.state.connectDomainDialog.open}
+                        />
 
-                                        open={registerDialog!=null&&registerDialog.open}
-                                    />
-                         ):(null) }
+                        <DisconnectDomainDialog
+                            onCancelClick={
+                                ()=>{
+                                    this.setState({disconnectDomainDialog: {...this.state.disconnectDomainDialog, open:false}});
+                                    service.api.parentTempUnHideMobilePreview();
+                                }
+                            }
+                            onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
+                            username={this.state.username}
+                            pogoCustomDomain={this.state.pogoCustomDomain}
+                            sitePath={pogoCloudPath}
+                            fingerprint={this.state.fingerprint}
+                            open={this.state.disconnectDomainDialog != null && this.state.disconnectDomainDialog.open}
+                        />
 
-                         { selectedSite!=null && this.state.claimDomainDialog!=null ? (
-                                           <ClaimDomainDialog
-                                            onCancelClick={()=>this.handleClaimDomainCancelClick()}
-                                            onClaimDomainClick={(obj)=>{
-                                                this.handleClaimDomainClick(obj)
-                                            }}
-                                            username={this.state.username}
-                                            fingerprint={this.state.fingerprint}
+                        <EditPlanDialog
+                            onCancelClick={()=>{
+                                this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
+                                service.api.parentTempUnHideMobilePreview();
+                            }}
+                            onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
+                            username={this.state.username}
+                            pogoCustomDomain={this.state.pogoCustomDomain}
+                            sitePath={pogoCloudPath}
+                            fingerprint={this.state.fingerprint}
+                            open={this.state.editPlanDialog!=null&&this.state.editPlanDialog.open}
+                        />
 
-                                            open={claimDomainDialog!=null&&claimDomainDialog.open}
-                                        />
-                         ):(null) }
-
-                         { selectedSite!=null && this.state.connectDomainDialog!=null ? (
-                                           <ConnectDomainDialog
-                                            onCancelClick={()=>this.handleConnectDomainCancelClick()}
-                                            onConnectDomainClick={(obj)=>{
-                                                this.handleConnectDomainClick(obj)
-                                            }}
-                                            username={this.state.username}
-                                            sitePath={pogoSitePath}
-                                            fingerprint={this.state.fingerprint}
-
-                                            open={connectDomainDialog!=null&&connectDomainDialog.open}
-                                        />
-                         ):(null) }
-
-                         { selectedSite!=null && this.state.disconnectDomainDialog!=null ? (
-                                           <DisconnectDomainDialog
-                                            onCancelClick={()=>this.handleDisconnectDomainCancelClick()}
-                                            onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
-                                            username={this.state.username}
-                                            pogoCustomDomain={this.state.pogoCustomDomain}
-
-                                            sitePath={pogoSitePath}
-                                            fingerprint={this.state.fingerprint}
-
-                                            open={disconnectDomainDialog!=null&&disconnectDomainDialog.open}
-                                        />
-                         ):(null) }
-
-                       <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
                      </div>
                 )
             }}/>
 
           );
-        }
-
     }
+
+    renderPublishSiteDialog(){
+        if ( this.state.publishSiteDialog != null ){
+            return (
+
+                <PublishSiteDialog
+                site={this.state.selectedSite}
+                workspace={this.state.publishSiteDialog.workspace}
+                workspaceHeader={this.state.publishSiteDialog.workspaceHeader}
+                onCancelClick={()=>{
+                    this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
+                    service.api.parentTempUnHideMobilePreview();
+                }}
+                onBuildAndPublishClick={this.handleBuildAndPublishClick}
+                open={this.state.publishSiteDialog!=null&&this.state.publishSiteDialog.open}
+            />
+
+            )
+        }
+    }
+}
 
 export default muiThemeable()(Home);

@@ -219,7 +219,7 @@ class PogoPublisher {
         const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
         newConf.lastPublish = publDate;
-        newConf.publishStatus = 1; // finished
+        newConf.publishStatus = 2; // remote pending
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
 
         global.mainWM.remountSite();

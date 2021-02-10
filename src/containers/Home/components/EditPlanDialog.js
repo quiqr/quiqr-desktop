@@ -1,17 +1,11 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import service from './../../../services/service';
-import { Dialog, FlatButton, TextField } from 'material-ui';
-//import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
-//import { Accordion, AccordionItem } from './../../../components/Accordion';
-//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
-import IconHttps from 'material-ui/svg-icons/action/https';
-import Paper from 'material-ui/Paper';
-//import FormData, {getHeaders} from 'form-data';
-//import FormData from 'form-data';
+import { Dialog, FlatButton } from 'material-ui';
+
 let net = window.require('electron').remote.net;
 
-export default class ConnectDomainDialog extends React.Component{
+export default class EditPlanDialog extends React.Component{
 
     constructor(props){
         super(props);
@@ -37,16 +31,16 @@ export default class ConnectDomainDialog extends React.Component{
         this.props.onCancelClick();
     }
 
-    handleConnectDomainClick = async (context) => {
+    handleDisconnectDomainClick = async (context) => {
 
         this.setState({
             busy: true
         });
 
-        this.connectDomain(this.props.sitePath, this.props.username, this.props.fingerprint, this.state.pogoCustomDomain);
+        this.disconnectDomain(this.props.sitePath, this.props.username, this.props.fingerprint, this.props.pogoCustomDomain);
     }
 
-    connectDomain(sitePath, username, fingerprint, connectDomainString){
+    disconnectDomain(sitePath, username, fingerprint, disconnectDomainString){
         if(username===""){
             this.setState({
                 failure: true
@@ -55,7 +49,7 @@ export default class ConnectDomainDialog extends React.Component{
             this.setState({ busy: false });
             return
         }
-        var postData = JSON.stringify({sitePath : sitePath, username: username, fingerprint: fingerprint, connectDomainString});
+        var postData = JSON.stringify({sitePath : sitePath, username: username, fingerprint: fingerprint, disconnectDomainString: disconnectDomainString});
 
         let data='';
         let request = net.request({
@@ -63,7 +57,7 @@ export default class ConnectDomainDialog extends React.Component{
             protocol: this.state.pogoboardConn.protocol,
             hostname: this.state.pogoboardConn.host,
             port: this.state.pogoboardConn.port,
-            path: '/site/connect-domain',
+            path: '/site/disconnect-domain',
             headers: {
                 'Content-Type': 'application/json',
                 'Content-Length': postData.length
@@ -75,12 +69,8 @@ export default class ConnectDomainDialog extends React.Component{
             response.on('end', () => {
                 let obj = JSON.parse(data);
                 service.api.logToConsole(obj);
-                if(obj.hasOwnProperty('domain')){
-
-                    let promise = service.api.createPogoDomainConf(sitePath, obj.domain);
-                    promise.then((path)=>{
-                        this.props.onConnectDomainClick({ domain: obj.domain });
-                    });
+                if(obj === true){
+                    this.props.onDisconnectDomainClick();
                 }
                 else{
                     this.setState({
@@ -149,23 +139,15 @@ export default class ConnectDomainDialog extends React.Component{
 
     }
 
-    validate(){
-        return !this.state.busy &&
-            !this.state.failure &&
-            this.state.pogoCustomDomain_err === '' &&
-            this.state.pogoCustomDomain !== ''
-    }
 
     renderForm(){
-        //let valid = this.validate();
-        let busy = this.state.busy;
-        let previewUrl = this.state.pogoCustomDomain;
         return (
             <div>
-                <TextField disabled={busy} errorText={this.state.pogoCustomDomain_err} floatingLabelText={'Custom domain'} value={this.state.pogoCustomDomain} onChange={(e)=>{this.handlepogoCustomDomainChange(e)}} fullWidth />
-                <Paper style={{margin:10,padding:"0 7px 7px 7px"}}>
-                    <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span></span>
-                </Paper>
+                <FlatButton
+                    label="Unsubscribe"
+                    primary={false}
+                    onClick={()=>this.handleUnsubscribe()}
+                />
             </div>
         )
 
@@ -181,7 +163,6 @@ export default class ConnectDomainDialog extends React.Component{
 
     render(){
         let { open } = this.props;
-        let valid = this.validate();
         let busy = this.state.busy;
         let failure = this.state.failure;
 
@@ -191,17 +172,11 @@ export default class ConnectDomainDialog extends React.Component{
                 primary={false}
                 onClick={this.handleCancelClick.bind(this)}
             />,
-            <FlatButton
-                disabled={!valid}
-                label="Add custom domain"
-                primary={true}
-                onClick={this.handleConnectDomainClick}
-            />,
         ];
 
         return (
             <Dialog
-                title="Connect this website to your custom domain"
+                title="Edit plan"
                 open={open}
                 actions={actions}>
 

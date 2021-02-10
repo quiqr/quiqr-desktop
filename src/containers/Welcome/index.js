@@ -1,35 +1,31 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import service from './../../services/service';
-import CreateSiteDialog from '../SelectSite/components/CreateSiteDialog';
 
-//import Checkbox from 'material-ui/Checkbox';
 import { RaisedButton } from 'material-ui/';
 
 const styles = {
     container:{
         padding: '20px',
-        //        display:'flex',
         height: '100%'
     },
 }
 
 class Welcome extends React.Component {
+
     constructor(props){
         super(props);
         this.state = {};
     }
-    componentWillMount(){
-    }
-
-
 
     handleLinkThemeGallery = ()=>{
         window.require('electron').shell.openExternal("https://router.poppygo.app/theme-gallery");
     }
+
     handleLinkPoppyWebsite = ()=>{
         window.require('electron').shell.openExternal("https://poppygo.io/documentation/");
     }
+
     handleImportClick = ()=>{
         service.api.importSite();
     }
@@ -41,6 +37,7 @@ class Welcome extends React.Component {
     handleCloseClick = ()=>{
         this.history.push('/');
     }
+
     handleShowWelcomeCheck = ()=>{
         if(this.state.showWelcome){
             this.setState({showWelcome: false});
@@ -48,8 +45,8 @@ class Welcome extends React.Component {
         else{
             this.setState({showWelcome: true});
         }
-
     }
+
     render(){
         return(
             <Route render={({history})=>{
@@ -57,6 +54,9 @@ class Welcome extends React.Component {
                 this.history = history;
                 return (
                     <div style={ styles.container }>
+                        <div style={{ border: 'solid 0px green', marginLeft: 'auto', marginTop: 13 }}>
+                            <RaisedButton primary={true} label="Close and continue" disabled={false} onClick={this.handleCloseClick} />
+                        </div>
                         <h1>Congratulations: You installed PoppyGo, The app for Hugo</h1>
                         <h3>You now have a publishing platform and CMS for your websites</h3>
                         <p>
@@ -80,21 +80,19 @@ class Welcome extends React.Component {
                         <br/>
                         <strong><p>Are you developing a Hugo site on your local machine?</p></strong>
                         <p>
-                          Then open your existing site folder in PoppyGo to start content management and publishing right away.
+                            Then open your existing site folder in PoppyGo to start content management and publishing right away.
                         </p>
                         <p>
-                          <RaisedButton primary={true} label="Open site" disabled={false} onClick={this.handleNewSiteClick} />
+                            <RaisedButton primary={true} label="Open site" disabled={false} onClick={this.handleNewSiteClick} />
                         </p>
                         <br/>
                         <strong><p>Are you new to Hugo sites, and do you want to start with an existing template?</p></strong>
-                          <p>
-                            Then select a template below to start and experience PoppyGo right away.
-                          </p>
-                        <object data="https://poppygo.io/themes/iframe.html" width="100%" height="3000px" scroll="no" type="text/html"></object>
-
                         <p>
-                            <RaisedButton primary={true} label="Close and continue" disabled={false} onClick={this.handleCloseClick} />
+                            Then select a template below to start and experience PoppyGo right away.
                         </p>
+
+                        <object data="https://poppygo.io/themes/iframe.html" width="100%" height="2000px" scroll="no" type="text/html">...</object>
+
                     </div>
                 );
             }}/>

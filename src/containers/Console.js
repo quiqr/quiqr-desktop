@@ -1,6 +1,5 @@
 import React from 'react';
-import Snackbar from 'material-ui/Snackbar';
-import { consoleService, snackMessageService } from '../services/ui-service';
+import { consoleService } from '../services/ui-service';
 
 const consoleStyle ={
   pre: {
@@ -28,34 +27,13 @@ class ConsoleOutput extends React.Component{
     this.closeTimeout = undefined;
 
   }
+
   componentWillMount(){
     consoleService.registerListener(this);
   }
 
   componentWillUnmount(){
     consoleService.unregisterListener(this);
-  }
-
-  handleMouseEnter(e){
-    return;
-   // if(this.closeTimeout) {
-   //   clearTimeout(this.closeTimeout);
-   //
-   // if(consoleService.getConsoleIsHidden()){
-   //    consoleService.toggleConsoleVisibility();
-   //  }
-  }
-
-  handleMouseLeave(e){
-    return;
-    // if(this.closeTimeout)
-    //   clearTimeout(this.closeTimeout);
-    //
-    //   this.closeTimeout = setTimeout(()=>{
-    //     if(!consoleService.getConsoleIsHidden()){
-    //       consoleService.toggleConsoleVisibility();
-    //     }
-    //   }, 10);
   }
 
   render(){
@@ -77,53 +55,10 @@ class ConsoleOutput extends React.Component{
   }
 }
 
-class SnackbarManager extends React.Component{
-
-  componentWillMount(){
-    snackMessageService.registerListener(this);
-  }
-
-  componentWillUnmount(){
-    snackMessageService.unregisterListener(this);
-  }
-
-  render(){
-    let snackMessage = snackMessageService.getCurrentSnackMessage();
-    let previousSnackMessage = snackMessageService.getPreviousSnackMessage();
-    let snackbar = undefined;
-    if(snackMessage){
-      snackbar = <Snackbar
-        key="snack-message"
-        open={ true }
-        action={ snackMessage.action }
-        onActionClick={ snackMessage.onActionClick }
-        message={ snackMessage.message }
-        autoHideDuration={ snackMessage.autoHideDuration }
-        onRequestClose={ function(){
-          snackMessageService.reportSnackDismiss()
-        }}
-      />;
-    }
-    else{
-      snackbar = <Snackbar
-        key="snack-message"
-        open={ false }
-        action={ previousSnackMessage?previousSnackMessage.action:'' }
-        message={ previousSnackMessage?previousSnackMessage.message:'' }
-      />;
-    }
-
-    return <React.Fragment>
-      {snackbar}
-    </React.Fragment>;
-  }
-}
-
 class Console extends React.Component{
 
   render(){
       return (<React.Fragment>
-        <SnackbarManager />
         <ConsoleOutput />
       </React.Fragment>);
     }
