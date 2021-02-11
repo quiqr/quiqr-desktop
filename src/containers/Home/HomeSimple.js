@@ -654,7 +654,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 username: this.state.username,
                 fingerprint: this.state.fingerprint,
                 projectPath:  this.state.selectedSite.publish[0].config.path,
-                plan: "basic"
+                plan: "PoppyGo Pro"
             };
 
             let requestVars =btoa(JSON.stringify(upgradeVars));
@@ -757,7 +757,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         else if (this.state.oneTimeOnlySiteActive === true) {
             return (
                 <NotificationPanel>
-                    Great! You just upgaded to basic.
+                    Congratulations, you just upgraded your website to &nbsp;<strong>{this.state.pogoSitePlan}</strong>
                 </NotificationPanel>
             )
         }
@@ -931,7 +931,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             let editPlanButton = ""
             if(this.state.pogoSiteStatus === "active"){
-                editPlanButton = <button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button>
+                editPlanButton = <span style={{marginLeft:"50px"}}><button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button></span>
             }
 
             let ownerInfo = ""
@@ -941,22 +941,20 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             let planInfo = ""
             if(this.state.pogoSiteStatus === "active"){
-                planInfo = <div>Plan: {this.state.pogoSitePlan}</div>
+                planInfo = <span>with <strong>{this.state.pogoSitePlan}</strong></span>
+            } else if (this.state.pogoSiteStatus !== "active") {
+                planInfo = <strong>as a temporary URL</strong>
             }
+
 
             return (
                 <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-                    <span style={{fontWeight: "bold", fontSize:"110%"}}>{this.state.selectedSite.name} is linked to&nbsp;
-
+                    <span style={{fontWeight: "normal", fontSize:"110%"}}>Your site is live at &nbsp;
                         <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
                             window.require('electron').shell.openExternal("http://"+this.state.selectedSite.publish[0].config.defaultDomain);
-                        }}>{this.state.selectedSite.publish[0].config.defaultDomain}</button>
-
+                        }}>{this.state.selectedSite.publish[0].config.defaultDomain}</button> &nbsp;
+                        {planInfo}{editPlanButton}
                     </span>
-                    <div>PoppyPot: {this.getPogoCloudPath()}</div>
-                    { ownerInfo }
-                    { planInfo }
-                    <div>{disconnectButton} &nbsp; {editPlanButton}</div>
 
                 </ListItem>
             )

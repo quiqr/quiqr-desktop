@@ -1,6 +1,13 @@
 import React from 'react';
 import Snackbar from 'material-ui/Snackbar';
 import { snackMessageService } from './../services/ui-service';
+const styles = {
+  snackbarStyleViaContentProps: {
+    backgroundColor: "orange",
+    color: "white",
+    width: "100%"
+  }
+};
 
 class SnackbarManager extends React.Component{
 
@@ -23,6 +30,10 @@ class SnackbarManager extends React.Component{
         action={ snackMessage.action }
         onActionClick={ snackMessage.onActionClick }
         message={ snackMessage.message }
+        ContentProps={{
+          "aria-describedby": "message-id",
+          className: styles.snackbarStyleViaContentProps
+      }}
         autoHideDuration={ snackMessage.autoHideDuration }
         onRequestClose={ function(){
           snackMessageService.reportSnackDismiss()
