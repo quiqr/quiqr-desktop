@@ -74,7 +74,12 @@ class PogoPublisher {
             outputConsole.appendLine('keygen error ...:' + e);
         }
 
-        await fs.unlinkSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+        try {
+            await fs.unlinkSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+        } catch (e) {
+            outputConsole.appendLine('no key were there ...:' + e);
+        }
+
         return pubkey;
     }
 
