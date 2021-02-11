@@ -104,7 +104,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             username: "",
             pogoAccountStatus: "",
             pogoCustomDomain: "not set",
-            pogoCustomDomainVerified: "",
+            pogoCustomDomainDNSStatus: "unknown", //unknown/reachable/unreachable
             pogoSiteStatus: "",
             pogoPublishStatus: "",
             oneTimeOnlySiteActive: false,
@@ -128,6 +128,10 @@ class Home extends React.Component<HomeProps, HomeState>{
     /*
     componentWillMount(){
         service.registerListener(this);
+    }
+
+    componentWillUnmount(){
+        service.unregisterListener(this);
     }
     */
 
@@ -183,7 +187,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 this.getRemoteSiteStatus(false);
 
                 this.getRemotePublishStatus(false);
-                this.getRemoteDomainVerification(false);
+                //this.getRemoteDomainVerification(false);
 
             })
         }
@@ -196,11 +200,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-    /*
-    componentWillUnmount(){
-        service.unregisterListener(this);
-    }
-    */
 
     handlePublishNow(pressed){
 
@@ -250,11 +249,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     startDomVerificationPolling(celebrate){
         service.api.logToConsole("domainVerification status poll");
-        let site = this.state.selectedSite;
-        if(site.hasOwnProperty('publishStatus') && site.publishStatus === 1){
+        if(this.state.pogoCustomDomainDNSStatus === "reachable"){
             let time=3000;
             this.timeout = setTimeout(() => {
-                this.getRemotePublishStatus(celebrate);
+                this.getRemoteDomainVerification(celebrate);
             }, time)
         }
     }
@@ -444,8 +442,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     getRemoteDomainVerification(celebrate){
 
-        service.api.logToConsole("getRemotePublishStatus")
-
+        service.api.logToConsole("getRemoteVerificationStatus")
 
         if(this.state.pogoCustomDomain === "not set"){
             service.api.logToConsole("nocustomdomain")
@@ -457,35 +454,41 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         service.api.logToConsole(url);
 
-        try {
-
             let data='';
             const request = net.request(url);
+
+            request.on('error', (err) => {
+                    service.api.logToConsole("eerrrr");
+                this.setState({pogoCustomDomainDNSStatus:"unreachable"});
+                this.startDomVerificationPolling(true);
+            });
+
             request.on('response', (response) => {
+                response.on('error', (error) => {
+                    service.api.logToConsole("eerrrr");
+                })
 
                 response.on('end', () => {
                     let obj = JSON.parse(data);
-                    service.api.setPublishStatus(1)
 
                     if (obj.path === projectPath){
                         service.api.logToConsole( obj);
                         this.setState({oneTimeOnlyPublishFinished: true});
+                        this.setState({pogoCustomDomainDNSStatus:"reachable"});
                     }
                     else{
+                        this.setState({pogoCustomDomainDNSStatus:"unreachable"});
                         this.startDomVerificationPolling(true);
                     }
+                });
+                response.on("close", () => {
+                    service.api.logToConsole("close");
                 });
                 response.on("data", chunk => {
                     data += chunk;
                 });
             })
             request.end()
-
-
-        } catch (e) {
-            service.api.logToConsole('catch');
-        }
-
     }
 
     getRemotePublishStatus(celebrate){
@@ -582,8 +585,10 @@ class Home extends React.Component<HomeProps, HomeState>{
                             pogoCustomDomain: custom_domain,
                         },function(){
 
-                            if(this.state.pogoSiteStatus === "active" && celebrate){
-                                this.setState({oneTimeOnlySiteActive: true});
+                            if(this.state.pogoSiteStatus === "active"){
+                                if(celebrate) this.setState({oneTimeOnlySiteActive: true});
+                                this.getRemoteDomainVerification(false);
+
                             }
                             else if (this.state.pogoSiteStatus === 'pending_subscription'){
 
@@ -767,10 +772,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             else if(this.state.pogoSiteStatus === "active"){
 
-                if(this.state.pogoCustomDomain === "not set" &&  !this.state.pogoCustomDomainVerified) {
+                if(this.state.pogoCustomDomain === "not set") {
                     return this.renderActionConnectDomainPanel();
                 }
-                if (this.state.pogoCustomDomainVerified) {
+                if (this.state.pogoCustomDomainDNSStatus === "unreachable") {
                     return this.renderActionAdviseDNSPanel();
                 }
             }
@@ -835,19 +840,20 @@ class Home extends React.Component<HomeProps, HomeState>{
                 <div class="col-12 col-lg-8" style={{padding:"0px"}}>
                     <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
                         <span>
-                            <h2>You're almost there! Change your DNS settings </h2>
-
-                            <ul>
-                                <li>A-record: 123456789 </li>
-                                <li>AAAA-record: 123456789</li>
-                            </ul>
+                            <h2>You're almost there!</h2><h3>Change your DNS settings </h3>
+                            <pre>
+                                A-record        54.155.245.139<br/>
+                                AAAA-record:    54.155.245.139
+                            </pre>
                         </span>
                         <br/>
                     </ListItem>
                 </div>
                 <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
                     <ListItem disabled={true} class="actionpanel"  >
-                        <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{ this.handleUpgradeLinkedSite(true);}} /><br/>
+                        <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{
+                            this.setState({pogoCustomDomainDNSStatus:'unknown'});
+                        }} /><br/>
                         <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
                     </ListItem>
                 </div>
@@ -879,10 +885,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 </div>
             </div>
         )
-    }
-
-    renderUpgadeLink(){
-
     }
 
     renderUserInfoActions(){
@@ -946,15 +948,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                         <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
                             window.require('electron').shell.openExternal("http://"+this.state.selectedSite.publish[0].config.defaultDomain);
                         }}>{this.state.selectedSite.publish[0].config.defaultDomain}</button>
-                        &nbsp;
-                        {disconnectButton}
-                        &nbsp;
-                        {editPlanButton}
 
                     </span>
-
+                    <div>PoppyPot: {this.getPogoCloudPath()}</div>
                     { ownerInfo }
                     { planInfo }
+                    <div>{disconnectButton} &nbsp; {editPlanButton}</div>
 
                 </ListItem>
             )
