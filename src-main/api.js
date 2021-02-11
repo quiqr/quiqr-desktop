@@ -158,7 +158,8 @@ api.createPogoProfile = async function(profile,context){
 api.getPoppyGoProfile = async function({},context){
     let pogopubl = new PogoPublisher({});
     profile = await pogopubl.readProfile();
-    if(profile) context.resolve(profile);
+    fingerprint = await pogopubl.getKeyFingerprint();
+    if(profile && fingerprint) context.resolve({profile,fingerprint})
 }
 api.createPogoDomainConf = async function({path,domain},context){
     let pogopubl = new PogoPublisher({});
@@ -449,6 +450,12 @@ api.createSite = function(config/*: any*/, context/*: any*/){
     });
 }
 
+api.setPublishStatus = async function({status}/*: any*/, context/*: any*/){
+    let pogopubl = new PogoPublisher({});
+    await pogopubl.writePublishStatus(status)
+    context.resolve(true);
+}
+
 api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }
@@ -459,6 +466,5 @@ api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
         });
     });
 }
-
 
 module.exports = api;

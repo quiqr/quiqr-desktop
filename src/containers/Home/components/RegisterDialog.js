@@ -113,7 +113,6 @@ export default class RegisterDialog extends React.Component{
         if(value!==''){
 
             let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/uname/"+value;
-            service.api.logToConsole(url);
             let data='';
 
             const request = net.request(url);
@@ -170,9 +169,7 @@ export default class RegisterDialog extends React.Component{
             request.on('response', (response) => {
 
                 response.on('end', () => {
-                    service.api.logToConsole(data);
                     let obj = JSON.parse(data);
-                    service.api.logToConsole(obj.status);
 
                     if(obj.status !== "free"){
                         this.setState({

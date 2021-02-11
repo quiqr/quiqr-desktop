@@ -1,5 +1,8 @@
 # PoppyGo App CHANGELOG
 
+## v0.8.1
+- all subscription stuff
+
 ## v0.7.5
 - static imagebundles
 - image thumb sizes smaller

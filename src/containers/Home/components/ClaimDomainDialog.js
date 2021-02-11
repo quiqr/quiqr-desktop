@@ -21,7 +21,8 @@ export default class ClaimDomainDialog extends React.Component{
             email_err: "",
             failure: false,
             busy: false,
-            username: this.props.username
+            username: this.props.username,
+            fingerprint: this.props.fingerprint
          }
     }
     componentDidMount(){
@@ -42,11 +43,10 @@ export default class ClaimDomainDialog extends React.Component{
             busy: true
         });
 
-
-        this.registerDomain(this.state.pogourl, this.props.username);
+        this.registerDomain(this.state.pogourl, this.props.username, this.props.fingerprint);
     }
 
-    registerDomain(pogourl, username){
+    registerDomain(pogourl, username, fingerprint){
         if(username===""){
             this.setState({
                 failure: true
@@ -55,7 +55,7 @@ export default class ClaimDomainDialog extends React.Component{
             this.setState({ busy: false });
             return
         }
-        var postData = JSON.stringify({sitename : pogourl, username: username});
+        var postData = JSON.stringify({sitename : pogourl, username: username, fingerprint: fingerprint});
 
         let data='';
         let request = net.request({
@@ -107,9 +107,7 @@ export default class ClaimDomainDialog extends React.Component{
         if(value!==''){
 
             let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/site/"+value;
-            service.api.logToConsole(url);
             let data='';
-
             const request = net.request(url);
             request.on('response', (response) => {
 

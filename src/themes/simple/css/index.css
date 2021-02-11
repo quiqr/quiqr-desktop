@@ -5,7 +5,24 @@ body {
   color: #2f343c;
 }
 
-h1,h2,h3,h4,h5{
+.actionpanel li {
+  color: #2f343c;
+}
+
+listItem{
+  padding: 5px;
+}
+
+.actionpanel button {
+  margin: 5px;
+  color: white !important;
+}
+
+.notificationPanel button {
+  color: white !important;
+}
+
+h1,h2,h3,h4,h5,p{
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
   color: #2f343c;
@@ -13,6 +30,10 @@ h1,h2,h3,h4,h5{
 
 span {
   color: #2f343c;
+}
+
+ul {
+  padding-inline-start: 16px;
 }
 
 button.reglink {

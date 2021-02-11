@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Dialog, FlatButton } from 'material-ui';
 import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
-//import { Accordion, AccordionItem } from './../../../components/Accordion';
-//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
 
 type PublishSiteDialogProps = {
     site: SiteConfig,
@@ -28,7 +26,6 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
         }
     }
 
-
     handleCancelClick = () => {
         this.props.onCancelClick();
     }
@@ -53,47 +50,6 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
     validate(){
         return this.state.build!==''&&this.state.publish!=='';
     }
-
-    /*
-    renderFieldsRemoveMe(){
-        let { open, workspace, site } = this.props;
-        let { build, publish } = this.state;
-        return (
-            <div>
-            <TextField floatingLabelText={'Site'} readOnly fullWidth value={this.props.site.key} />
-
-                <SelectField
-                    onChange={this.handleBuildChange}
-                    fullWidth
-                    value={workspace.build.findIndex(x => x.key===build)}
-                    floatingLabelText="Build Config *">
-                    {this.props.workspace.build.map((build, i)=>(
-                        <MenuItem
-                            key={`build-${i}`} value={i}
-                            primaryText={build.key}
-                          secondaryText={build.config}
-                        />
-                    ))}
-                </SelectField>
-                <SelectField
-                    onChange={this.handlePublishChange}
-                    fullWidth
-                    value={site.publish.findIndex(x => x.key===publish)}
-                    floatingLabelText="Publish Config *">
-                    {this.props.site.publish.map((publish, i)=>(
-                        <MenuItem
-                            key={`publish-${i}`} value={i}
-                            primaryText={publish.key||'default'}
-                            secondaryText={publish.config.type}
-                        />
-                    ))}
-                    </SelectField>
-                </div>
-        )
-
-    }
-    */
-
     render(){
 
         let { open, workspace, site } = this.props;
@@ -123,15 +79,16 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
             />,
         ];
 
-        //let active=true;
+        let title = "Publish "+this.props.site.key + " to PoppyGo Cloud"
+        let text = "Publish changes to the PoppyGo Webservers.";
 
         return (
             <Dialog
-            title={"Publish Site.. "+this.props.site.key}
+            title={title}
             open={open}
             actions={actions}>
             <div>
-                Publish changes to the PoppyGo Webservers.
+                {text}
             </div>
         </Dialog>
         );

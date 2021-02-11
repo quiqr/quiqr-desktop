@@ -66,6 +66,7 @@ class PogoPublisher {
         var sukohdir = pathHelper.getRoot();
 
         try {
+            console.log(git_bin);
             let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
             outputConsole.appendLine('Keygen success ...');
             pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
@@ -73,7 +74,34 @@ class PogoPublisher {
             outputConsole.appendLine('keygen error ...:' + e);
         }
 
+        try {
+            await fs.unlinkSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+        } catch (e) {
+            outputConsole.appendLine('no key were there ...:' + e);
+        }
+
         return pubkey;
+    }
+
+    async getKeyFingerprint(){
+        //let pubkey = '';
+        var git_bin = this.getGitBin();
+        var sukohdir = pathHelper.getRoot();
+        let fingerprint = null;
+
+        try {
+            //console.log(git_bin);
+            let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
+            fingerprint = gencmd.toString().replace(/\n/g,"");
+            //pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+
+
+        } catch (e) {
+            outputConsole.appendLine('fingerprint error ...:' + e);
+        }
+
+        return fingerprint;
+
     }
 
     async writeProfile(profile){
@@ -95,7 +123,7 @@ class PogoPublisher {
         await fs.chmodSync(profilepath2, '0600');
 
         await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
-        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
+        //await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
         await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
 
         return true;
@@ -113,6 +141,7 @@ class PogoPublisher {
         return profile;
     }
 
+    //FIXME why this is the same?
     readProfile2(){
         var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
         var profile;
@@ -190,14 +219,23 @@ class PogoPublisher {
         global.mainWM.remountSite();
     }
 
-    async writePublishStatus(){
+    async writePublishDate(publDate){
         let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
         const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
-        newConf.lastPublish = Date.now();
+        newConf.lastPublish = publDate;
+        newConf.publishStatus = 2; // remote pending
         await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
 
         global.mainWM.remountSite();
+    }
+
+    async writePublishStatus(status){
+        let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
+        var newConf = JSON.parse(conftxt);
+        newConf.publishStatus = status;
+        await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
     }
 
 
@@ -599,6 +637,8 @@ class PogoPublisher {
         let mainWindow = global.mainWM.getCurrentInstance();
         const dialog = electron.dialog;
 
+        this.writePublishStatus(2); // publication Pending
+
         var progressBar = new ProgressBar({
             indeterminate: false,
             text: 'Publishing your site..',
@@ -643,6 +683,13 @@ class PogoPublisher {
 
         var git_bin = this.getGitBin();
 
+        let publDate = Date.now();
+
+        let pogoWithMe = {
+            lastPublish: publDate,
+            path: repository
+        }
+
         outputConsole.appendLine('Creating empty directory at: ' + resolvedDest);
 
         await fs.ensureDir(resolvedDest);
@@ -685,6 +732,9 @@ class PogoPublisher {
                 outputConsole.appendLine('copy gitlab ci to: ' + full_gh_dest);
                 outputConsole.appendLine('gitlabCi is: ' + gitlabCi);
                 outputConsole.appendLine('gitignore is: ' + gitignore);
+
+                await fs.ensureDir(path.join(full_gh_dest,"static"))
+                fs.writeFileSync(path.join(full_gh_dest, "static", ".pogo_with_me"), JSON.stringify(pogoWithMe) ,'utf-8');
 
                 outputConsole.appendLine('context.from is: ' + context.from);
                 outputConsole.appendLine('copy finished, going to git-add ...');
@@ -736,7 +786,7 @@ class PogoPublisher {
                                         progressBar._window.hide();
                                         progressBar.close();
 
-                                        this.writePublishStatus();
+                                        this.writePublishDate(publDate);
 
                                         dialog.showMessageBox(mainWindow, {
                                             title: 'PoppyGo',
@@ -746,8 +796,8 @@ class PogoPublisher {
 
                                     }
                                     else{
+                                        this.writePublishStatus(7);
                                         outputConsole.appendLine('ERROR: Could not git-push ...');
-
                                         progressBar._window.hide();
                                         progressBar.close();
                                         dialog.showMessageBox(mainWindow, {
@@ -759,6 +809,7 @@ class PogoPublisher {
                                 });
                             }
                             else {
+                                this.writePublishStatus(8);
                                 outputConsole.appendLine('ERROR: Could not git-commit ...');
                                 progressBar._window.hide();
                                 progressBar.close();
@@ -798,6 +849,7 @@ class PogoPublisher {
 
         return true;
     }
+
 
 }
 

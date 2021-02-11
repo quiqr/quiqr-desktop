@@ -30,7 +30,20 @@ function validateSite(site) {
         serve: Joi.array(),
         build: Joi.array(),
         publish: Joi.array(),
+
+        //0 = never published
+        //1 = publication time unknown
+        //other = publication time stamp (end polling)
         lastPublish: Joi.number().integer(),
+
+        //0 = never published
+        //1 = publication finished
+        //2 = publication pending (start polling)
+        //6 = publication timeout (error end polling)
+        //7 = publication failed could not push(error end polling)
+        //8 = publication failed could not commit(error end polling)
+        publishStatus: Joi.number().integer(),
+
         lastEdit: Joi.number().integer(),
         transform: Joi.array()
 
@@ -50,8 +63,12 @@ const GLOBAL_DEFAULTS = {
     hideMenuBar: false,
     hideInlineMenus: true,
     appTheme: "simple",
+
     //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
     pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
+
+    //pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
+    pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
 }
 
 function invalidateCache(){

@@ -204,13 +204,17 @@ app.on('second-instance', function(event, argv){
 
 async function handlePogoUrl(event, schemeData){
 
-    await fs.ensureDir(pathHelper.getTempDir());
-
     const remoteFileURL = schemeData.substr(10);
-    const remoteFileName = remoteFileURL.split('/').pop();
-    const tmppath = pathHelper.getTempDir() + remoteFileName;
-
-    downloadFile(remoteFileURL, tmppath);
+    console.log(remoteFileURL);
+    if(remoteFileURL === "continue"){
+        // do nothing just get focus back
+    }
+    else{
+        const remoteFileName = remoteFileURL.split('/').pop();
+        await fs.ensureDir(pathHelper.getTempDir());
+        const tmppath = pathHelper.getTempDir() + remoteFileName;
+        downloadFile(remoteFileURL, tmppath);
+    }
 }
 
 function importPogoFile(path){

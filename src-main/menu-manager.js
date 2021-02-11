@@ -188,6 +188,66 @@ resources: []\n\
         dialog.showMessageBox(options)
     }
 
+    async renameSite(){
+
+        if(global.currentSiteKey && global.currentWorkspaceKey){
+            let siteKey = global.currentSiteKey;
+            let siteService = null;
+            let configurationDataProvider = require('./configuration-data-provider')
+            configurationDataProvider.get(async function(err, configurations){
+                if(configurations.empty===true) throw new Error('Configurations is empty.');
+                if(err) { reject(err); return; }
+                let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+                if(siteData=siteService = new SiteService(siteData)){
+                    let newConf = siteService._config;
+                    let currentName = siteService._config.name;
+
+                    delete newConf['configPath']
+
+                    const prompt = require('electron-prompt');
+                    var newName = await prompt({
+                        title: 'New site name',
+                        label: 'key:',
+                        value: currentName,
+                        inputAttrs: {
+                            type: 'text',
+                            required: true
+                        },
+                        type: 'input'
+                    }, mainWindow);
+
+                    console.log(newName);
+                    if(!newName || newName===""){
+                        return;
+                    }
+
+
+                    let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+                    newConf.name = newName;
+                    await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
+
+                    outputConsole.appendLine('rename site to: '+newName);
+
+                    let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                    mainWindow.webContents.send("redirectToGivenLocation","/");
+                    mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
+                    mainWindow.webContents.send("redirectMountSite",newScreenURL);
+
+
+                }
+
+            });
+
+        }
+
+
+
+        //writeNewName
+        //Reload Site
+    }
+
     async unlinkSiteDomain(){
         let pogopubl = new PogoPublisher({});
         await pogopubl.UnlinkDomain();
@@ -455,10 +515,10 @@ resources: []\n\
                         checked: checked,
                         click: async function (){
                             let key = path.join(profilesDir,f,"id_rsa_pogo");
-                            let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
+                            //let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
                             let profileJson= path.join(profilesDir,f,"poppygo-profile.json");
                             fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
-                            fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
+                            //fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
                             fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
                             await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
                             this.createMainMenu();
@@ -629,6 +689,14 @@ resources: []\n\
                 click: async () => {
                     await this.generateModel();
                     this.generateModel()
+                }
+            },
+            {
+                id: 'rename-site',
+                label: 'Rename site',
+                enabled: this.siteSelected(),
+                click: async () => {
+                    this.renameSite()
                 }
             },
             {

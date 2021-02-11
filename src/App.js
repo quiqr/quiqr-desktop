@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Switch, Route } from 'react-router-dom'
 
@@ -81,6 +80,7 @@ class App extends React.Component<AppProps,AppState>{
             mobileBrowserActive: false,
             skipMenuTransition: false,
             poppygoUsername: "",
+            poppygoFingerprint: "",
             poppygoDomain: "",
         };
 
@@ -106,9 +106,10 @@ class App extends React.Component<AppProps,AppState>{
     getProfile(){
         let getProfile = service.api.getPoppyGoProfile();
 
-        getProfile.then((profile)=>{
-            if(this.state.poppygoUsername !==profile.username){
-                this.setState({poppygoUsername: profile.username});
+        getProfile.then((profileAndFingerprint)=>{
+            //service.api.logToConsole(profileAndFingerprint)
+            if(this.state.poppygoUsername !== profileAndFingerprint.profile.username){
+                this.setState({poppygoUsername: profileAndFingerprint.profile.username, poppygoFingerprint:profileAndFingerprint.fingerprint});
             }
 
         }, (e)=>{
@@ -236,8 +237,22 @@ class App extends React.Component<AppProps,AppState>{
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
           this.getProfile();
-          return <Home key={ 'home' }
+          return <Home 
+              xkey={ 'home' }
+              key={ match.url }
               poppygoUsername={this.state.poppygoUsername}
+              poppygoFingerprint={this.state.poppygoFingerprint}
+              siteKey={ decodeURIComponent(match.params.site) }
+              workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
+          this.getProfile();
+          return <Home 
+              xkey={ 'home' }
+              key={ match.url }
+              poppygoUsername={this.state.poppygoUsername}
+              poppygoFingerprint={this.state.poppygoFingerprint}
               siteKey={ decodeURIComponent(match.params.site) }
               workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
