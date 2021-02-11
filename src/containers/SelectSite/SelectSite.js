@@ -131,7 +131,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
         let select = true;
         if(select){
             await service.api.mountWorkspace(siteKey, workspace.key);
-            this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}`);
+            this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
         }
         else{
             this.history.push(`/`);

@@ -237,7 +237,20 @@ class App extends React.Component<AppProps,AppState>{
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
           this.getProfile();
-          return <Home key={ 'home' }
+          return <Home 
+              xkey={ 'home' }
+              key={ match.url }
+              poppygoUsername={this.state.poppygoUsername}
+              poppygoFingerprint={this.state.poppygoFingerprint}
+              siteKey={ decodeURIComponent(match.params.site) }
+              workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
+          this.getProfile();
+          return <Home 
+              xkey={ 'home' }
+              key={ match.url }
               poppygoUsername={this.state.poppygoUsername}
               poppygoFingerprint={this.state.poppygoFingerprint}
               siteKey={ decodeURIComponent(match.params.site) }

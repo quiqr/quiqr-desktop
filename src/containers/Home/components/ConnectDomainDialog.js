@@ -79,7 +79,7 @@ export default class ConnectDomainDialog extends React.Component{
 
                     let promise = service.api.createPogoDomainConf(sitePath, obj.domain);
                     promise.then((path)=>{
-                        this.props.onConnectDomainClick({ domain: obj.domain });
+                        this.props.onConnectDomainClick();
                     });
                 }
                 else{

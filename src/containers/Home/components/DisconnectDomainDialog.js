@@ -71,7 +71,11 @@ export default class DisconnectDomainDialog extends React.Component{
                 let obj = JSON.parse(data);
                 service.api.logToConsole(obj);
                 if(obj === true){
-                    this.props.onDisconnectDomainClick();
+
+                    let promise = service.api.createPogoDomainConf(sitePath, sitePath+".pogosite.com");
+                    promise.then((path)=>{
+                        this.props.onDisconnectDomainClick();
+                    });
                 }
                 else{
                     this.setState({
@@ -92,45 +96,6 @@ export default class DisconnectDomainDialog extends React.Component{
 
     }
 
-    handlepogoCustomDomainChange(e){
-
-        let value = e.target.value;
-
-        if(value!==''){
-
-            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/custom-domain/"+value;
-            let data='';
-            const request = net.request(url);
-            request.on('response', (response) => {
-
-                response.on('end', () => {
-                    let obj = JSON.parse(data);
-
-                    if(obj.status !== "free"){
-                        this.setState({
-                            pogoCustomDomain_err: "pogoCustomDomain is "+obj.status
-                        });
-                    }
-                    else{
-                        this.setState({
-                            pogoCustomDomain_err: ""
-                        });
-                    }
-
-                });
-                response.on("data", chunk => {
-                    data += chunk;
-                });
-            })
-            request.end()
-        }
-
-        this.setState({
-            pogoCustomDomain: value,
-        });
-
-    }
-
     handleTryAgain(){
         this.setState({
             pogoCustomDomain: "",
@@ -139,7 +104,6 @@ export default class DisconnectDomainDialog extends React.Component{
         });
 
     }
-
 
     renderForm(){
         let previewUrl = this.props.pogoCustomDomain;

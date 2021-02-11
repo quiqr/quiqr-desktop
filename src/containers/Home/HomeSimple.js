@@ -104,7 +104,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             username: "",
             pogoAccountStatus: "",
             pogoCustomDomain: "not set",
-            pogoCustomDomainVerified: "unknown",
+            pogoCustomDomainVerified: "",
             pogoSiteStatus: "",
             pogoPublishStatus: "",
             oneTimeOnlySiteActive: false,
@@ -172,7 +172,6 @@ class Home extends React.Component<HomeProps, HomeState>{
                 var stateUpdate  = {};
                 stateUpdate.configurations = bundle.configurations;
                 stateUpdate.selectedSite = bundle.site;
-
 
                 stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
                 stateUpdate.selectedWorkspace = bundle.workspace;
@@ -271,7 +270,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-
     startPendingUpgradePolling(celebrate){
         service.api.logToConsole("site upgrade status poll");
 
@@ -313,7 +311,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     this.handleClaimDomainNow(false);
                 }
                 else{
-                    this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+                    //this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
                 }
             });
     }
@@ -348,6 +346,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                 stateUpdate.claimDomainDialog = {...this.state.claimDomainDialog, open:false};
 
                 this.setState(stateUpdate,()=>{
+                    snackMessageService.addSnackMessage('You just got yourself a shiny new site in the PoppyGo Cloud.');
                     service.api.logToConsole("start checking once")
                     this.getRemoteSiteStatus(false);
 
@@ -355,57 +354,26 @@ class Home extends React.Component<HomeProps, HomeState>{
                         this.handlePublishNow(false);
                     }
                 });
-
             })
-
         });
     }
 
-    handleConnectDomainClick(obj){
-
-        service.getConfigurations(true).then((c)=>{
-
-            service.getSiteAndWorkspaceData(this.state.currentSiteKey, this.state.currentWorkspaceKey).then((bundle)=>{
-                var stateUpdate  = {};
-                stateUpdate.configurations = bundle.configurations;
-                stateUpdate.selectedSite = bundle.site;
-                stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
-                stateUpdate.selectedWorkspace = bundle.workspace;
-                stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
-
-                //stateUpdate.pogoCustomDomain = obj.domain;
-
-                stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
-
-                this.setState(stateUpdate,()=>{
-                    service.api.logToConsole("finished connecting domain")
-                });
-            })
+    handleConnectDomainClick(){
+        var stateUpdate  = {};
+        stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
+        this.setState(stateUpdate,()=>{
+            service.api.logToConsole("finished connecting domain")
+            this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
         });
     }
 
     handleDisconnectDomainClick(){
-
-        service.getConfigurations(true).then((c)=>{
-
-            service.getSiteAndWorkspaceData(this.state.currentSiteKey, this.state.currentWorkspaceKey).then((bundle)=>{
-                var stateUpdate  = {};
-                stateUpdate.configurations = bundle.configurations;
-                stateUpdate.selectedSite = bundle.site;
-                stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
-                stateUpdate.selectedWorkspace = bundle.workspace;
-                stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
-
-                stateUpdate.pogoCustomDomain = "not set";
-
-                stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
-
-                this.setState(stateUpdate,()=>{
-                    service.api.logToConsole("finished disconnecting domain")
-                });
-
-            })
-
+        var stateUpdate  = {};
+        stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
+        stateUpdate.pogoCustomDomain = "not set";
+        this.setState(stateUpdate,()=>{
+            service.api.logToConsole("finished disconnecting domain")
+            this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
         });
     }
 
@@ -454,7 +422,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     if( obj.hasOwnProperty('pogo_account_status') && obj.pogo_account_status !== ""){
                         this.setState({pogoAccountStatus: obj.pogo_account_status});
 
-                        if(obj.pogoAccountStatus === "confirmed_member" && celebrate){
+                        if(obj.pogo_account_status === "confirmed_member" && celebrate){
                             snackMessageService.addSnackMessage('Well done.. you confirmed you\'re email address succesfully.');
                         }
                     }
@@ -581,6 +549,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         let requestVars =btoa(JSON.stringify(userVars));
 
         let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+ this.state.pogostripeConn.port+"/project-status/"+requestVars;
+                    service.api.logToConsole(url)
 
         let data='';
 
@@ -592,7 +561,10 @@ class Home extends React.Component<HomeProps, HomeState>{
             request.on('response', (response) => {
                 response.on('end', () => {
 
+                    service.api.logToConsole("hallo")
+
                     if(response.statusCode === 403){
+                        service.api.logToConsole("ownerIncorrect")
                         this.setState({pogoSiteStatus: "ownerIncorrect"});
                     }
                     else{
@@ -602,6 +574,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                         if (obj.hasOwnProperty('pogo_custom_domain')){
                             custom_domain = obj.pogo_custom_domain;
                         }
+
 
                         this.setState({
                             pogoSiteStatus: obj.pogo_plan_status,
@@ -660,7 +633,11 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         let site = this.state.selectedSite;
         service.api.logToConsole(site);
-        if(site.hasOwnProperty('publishStatus') && site.publishStatus === 1){
+
+        if(this.state.pogoAccountStatus === "unconfirmed_member"){
+            snackMessageService.addSnackMessage('You need to confirm your email. Please check your mail.');
+        }
+        else{
             this.setState({pogoSiteStatus: "pending_subscription"},function(){
                 this.startPendingUpgradePolling(true);
             })
@@ -675,14 +652,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             let requestVars =btoa(JSON.stringify(upgradeVars));
             let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/upgrade/"+requestVars;
             window.require('electron').shell.openExternal(url);
-
-        }
-        else{
-            if(pressed){
-                this.setState({buttonPressed:"upgrade"},function(){
-                    this.handlePublishNow(false);
-                });
-            }
         }
     }
 
@@ -704,6 +673,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         request.on('response', (response) => {
             response.on('end', () => {
+                snackMessageService.addSnackMessage('Confirmation mail has been sent.');
             });
             response.on("data", chunk => {
             });
@@ -734,6 +704,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
+
         service.api.parentTempUnHideMobilePreview();
 
         this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
@@ -762,7 +733,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         }
         else if(this.state.pogoAccountStatus === "unconfirmed_member"){
-            return <NotificationPanel>Unconfimed member</NotificationPanel>
+            return <NotificationPanel>
+                Please confirm your email by clicking the link in the confirmation mail or&nbsp;
+                <button className="reglink" onClick={()=>{this.handleResendConfirmationMail()}}>resend confirmation mail</button>
+                </NotificationPanel>
 
         }
         else if(this.state.pogoSiteStatus === "pending_subscription"){
@@ -919,7 +893,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             if(this.state.pogoAccountStatus === "unconfirmed_member"){
                 accountStatusMsg = (
                     <span><br/>
-                        You have not confirmed you're email address.<br/>
                         Check your email for a confirmation mail or <button className="reglink" onClick={()=>{this.handleResendConfirmationMail()}}>resend confirmation mail</button>
                     </span>
                 )
@@ -1105,7 +1078,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                                 this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
                                 service.api.parentTempUnHideMobilePreview();
                             }}
-                            onConnectDomainClick={(obj)=>{ this.handleConnectDomainClick(obj) }}
+                            onConnectDomainClick={(obj)=>{ this.handleConnectDomainClick() }}
                             username={this.state.username}
                             sitePath={pogoCloudPath}
                             fingerprint={this.state.fingerprint}
