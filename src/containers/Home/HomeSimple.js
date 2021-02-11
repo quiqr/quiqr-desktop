@@ -312,7 +312,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                     this.handleClaimDomainNow(false);
                 }
                 else{
-                    //this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"?key="+Math.random());
+                    this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
                 }
             });
     }
@@ -364,8 +364,8 @@ class Home extends React.Component<HomeProps, HomeState>{
         stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
         this.setState(stateUpdate,()=>{
             service.api.logToConsole("finished connecting domain")
-            //this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
-            this.setState({oneTimeConnectClick:"Success"});
+            this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+            //this.setState({oneTimeConnectClick:"Success"});
         });
     }
 
