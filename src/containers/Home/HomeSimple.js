@@ -621,8 +621,9 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     }
 
-    /*
-    handleManageSubscriptions(){
+    handleUnsubscribeClick(){
+        this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
+        service.api.parentTempUnHideMobilePreview();
 
         let userVars = {
             username: this.state.username,
@@ -635,7 +636,6 @@ class Home extends React.Component<HomeProps, HomeState>{
             this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/myaccount/"+requestVars;
         window.require('electron').shell.openExternal(url);
     }
-    */
 
     handleUpgradeLinkedSite(pressed){
 
@@ -1106,6 +1106,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                                 service.api.parentTempUnHideMobilePreview();
                             }}
                             onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
+                            onUnsubscribeClick={()=>{ this.handleUnsubscribeClick() }}
                             username={this.state.username}
                             pogoCustomDomain={this.state.pogoCustomDomain}
                             sitePath={pogoCloudPath}

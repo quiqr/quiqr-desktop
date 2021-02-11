@@ -31,6 +31,11 @@ export default class EditPlanDialog extends React.Component{
         this.props.onCancelClick();
     }
 
+    handleUnsubscribeClick = async (context) => {
+
+        this.props.onUnsubscribeClick();
+    }
+
     handleDisconnectDomainClick = async (context) => {
 
         this.setState({
@@ -70,7 +75,11 @@ export default class EditPlanDialog extends React.Component{
                 let obj = JSON.parse(data);
                 service.api.logToConsole(obj);
                 if(obj === true){
-                    this.props.onDisconnectDomainClick();
+
+                    let promise = service.api.createPogoDomainConf(sitePath, sitePath+".pogosite.com");
+                    promise.then((path)=>{
+                        this.props.onDisconnectDomainClick();
+                    });
                 }
                 else{
                     this.setState({
@@ -91,62 +100,34 @@ export default class EditPlanDialog extends React.Component{
 
     }
 
-    handlepogoCustomDomainChange(e){
-
-        let value = e.target.value;
-
-        if(value!==''){
-
-            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/custom-domain/"+value;
-            let data='';
-            const request = net.request(url);
-            request.on('response', (response) => {
-
-                response.on('end', () => {
-                    let obj = JSON.parse(data);
-
-                    if(obj.status !== "free"){
-                        this.setState({
-                            pogoCustomDomain_err: "pogoCustomDomain is "+obj.status
-                        });
-                    }
-                    else{
-                        this.setState({
-                            pogoCustomDomain_err: ""
-                        });
-                    }
-
-                });
-                response.on("data", chunk => {
-                    data += chunk;
-                });
-            })
-            request.end()
-        }
-
-        this.setState({
-            pogoCustomDomain: value,
-        });
-
-    }
-
     handleTryAgain(){
         this.setState({
             pogoCustomDomain: "",
             busy: false,
             failure: false,
         });
-
     }
 
-
     renderForm(){
+
+        let disconnectButton = ""
+        if(this.props.pogoCustomDomain !== "not set"){
+            disconnectButton = (
+                <FlatButton
+                    label={"Disconnect Custom Domain " + this.props.pogoCustomDomain}
+                    primary={false}
+                    onClick={this.handleDisconnectDomainClick}
+                />
+            )
+        }
+
         return (
             <div>
+                {disconnectButton}
                 <FlatButton
-                    label="Unsubscribe"
+                    label="Unsubscribe Plan"
                     primary={false}
-                    onClick={()=>this.handleUnsubscribe()}
+                    onClick={()=>this.handleUnsubscribeClick()}
                 />
             </div>
         )
@@ -168,7 +149,7 @@ export default class EditPlanDialog extends React.Component{
 
         const actions = [
             <FlatButton
-                label="Cancel"
+                label="Close"
                 primary={false}
                 onClick={this.handleCancelClick.bind(this)}
             />,
