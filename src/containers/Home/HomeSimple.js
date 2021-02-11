@@ -203,8 +203,11 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     handlePublishNow(pressed){
 
+        if(this.state.pogoSiteStatus === "ownerIncorrect"){
+            snackMessageService.addSnackMessage("You're not allowed to publish to this PoppyPot");
+            return;
+        }
         //EXAMPLE Snack Message
-        //snackMessageService.addSnackMessage('Site successfully published.');
 
         let workspace = this.state.selectedWorkspaceDetails;
         let workspaceHeader = this.state.selectedSiteWorkspaces[0];
