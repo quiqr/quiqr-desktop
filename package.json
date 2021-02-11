@@ -6,7 +6,7 @@
     "email": "info@poppygo.io"
   },
   "description": "The PoppyGo Hugo Publishing App.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",
