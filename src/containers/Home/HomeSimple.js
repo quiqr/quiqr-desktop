@@ -364,7 +364,8 @@ class Home extends React.Component<HomeProps, HomeState>{
         stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
         this.setState(stateUpdate,()=>{
             service.api.logToConsole("finished connecting domain")
-            this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+            //this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+            this.setState({oneTimeConnectClick:"Success"});
         });
     }
 
@@ -758,6 +759,15 @@ class Home extends React.Component<HomeProps, HomeState>{
             return (
                 <NotificationPanel>
                     Congratulations, you just upgraded your website to &nbsp;<strong>{this.state.pogoSitePlan}</strong>
+                </NotificationPanel>
+            )
+        } else if (this.state.pogoCustomDomainDNSStatus === "reachable") {
+            return (
+                <NotificationPanel>
+                    Congratulations, you succesfully connected to &nbsp;
+                    <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+                        window.require('electron').shell.openExternal("http://"+this.state.selectedSite.publish[0].config.defaultDomain);
+                    }}>{this.state.selectedSite.publish[0].config.defaultDomain}</button>
                 </NotificationPanel>
             )
         }
