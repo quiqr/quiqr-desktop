@@ -867,7 +867,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                         <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{
                             this.setState({pogoCustomDomainDNSStatus:'unknown'});
                         }} /><br/>
-                        <button className="reglink" onClick={()=>{this.handleOpenPro()}}>More information</button>
+                        <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>More information</button>
                     </ListItem>
                 </div>
             </div>
