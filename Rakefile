@@ -34,7 +34,7 @@ end
 
 desc "buildmac (2)"
 task :buildmac do
-  sh "./scripts/embgit.sh -d -b ./resources/linux"
+  sh "./scripts/embgit.sh -d -b ./resources/mac"
   set_build_info
   sh "npm install"
   sh "npm run dist-mac && npm run dist-mac-notarize"
