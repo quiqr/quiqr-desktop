@@ -57,7 +57,8 @@ end
 
 desc "buildwin"
 task :buildwin do
-  sh "./scripts/embgit.sh -d -b ./resources/win"
+  p "RUN THIS FROM POWERSHELL"
+  p  "./scripts/embgit.sh -d -b ./resources/win"
   set_build_info
   sh "npm install"
   sh "npm run dist-win"
