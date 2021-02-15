@@ -107,10 +107,14 @@ class App extends React.Component<AppProps,AppState>{
         let getProfile = service.api.getPoppyGoProfile();
 
         getProfile.then((profileAndFingerprint)=>{
-            //service.api.logToConsole(profileAndFingerprint)
             if(this.state.poppygoUsername !== profileAndFingerprint.profile.username){
                 this.setState({poppygoUsername: profileAndFingerprint.profile.username, poppygoFingerprint:profileAndFingerprint.fingerprint});
             }
+            /*
+            else{
+                this.setState({poppygoUsername: null, poppygoFingerprint: null});
+            }
+            */
 
         }, (e)=>{
         })
@@ -238,7 +242,6 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
           this.getProfile();
           return <Home 
-              xkey={ 'home' }
               key={ match.url }
               poppygoUsername={this.state.poppygoUsername}
               poppygoFingerprint={this.state.poppygoFingerprint}
@@ -249,7 +252,6 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
           this.getProfile();
           return <Home 
-              xkey={ 'home' }
               key={ match.url }
               poppygoUsername={this.state.poppygoUsername}
               poppygoFingerprint={this.state.poppygoFingerprint}

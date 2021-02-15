@@ -141,20 +141,6 @@ class PogoPublisher {
         return profile;
     }
 
-    //FIXME why this is the same?
-    readProfile2(){
-        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
-        var profile;
-        try {
-            const filecont = fs.readFileSync(profilepath, {encoding:'utf8', flag:'r'});
-            profile = JSON.parse(filecont);
-        } catch (e) {
-            profile = false;
-        }
-
-        return profile;
-    }
-
     async conf07pogoprofile(){
         let err=false;
         let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';

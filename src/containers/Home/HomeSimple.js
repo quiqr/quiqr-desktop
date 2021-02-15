@@ -417,6 +417,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             request.on('response', (response) => {
                 response.on('end', () => {
+                    console.log(data);
                     let obj = JSON.parse(data);
 
                     this.setState({stripe_customer_id: obj.stripe_customer_id});
@@ -567,8 +568,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             request.on('response', (response) => {
                 response.on('end', () => {
-
-                    service.api.logToConsole("hallo")
 
                     if(response.statusCode === 403){
                         service.api.logToConsole("ownerIncorrect")

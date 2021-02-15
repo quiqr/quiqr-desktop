@@ -76,7 +76,6 @@ class MenuManager {
     async createSiteFromThemeGitUrl(){
         let pogopubl = new PogoPublisher({});
         await pogopubl.createSiteFromThemeGitUrl();
-        //this.generateModel();
     }
 
     async generateModel() {
@@ -476,21 +475,26 @@ resources: []\n\
 
         let currentProfile = ""
         let pogopubl = new PogoPublisher({});
-        let readCurrentProfile = pogopubl.readProfile2()
+        let readCurrentProfile = pogopubl.readProfile()
         if(readCurrentProfile){
             currentProfile = readCurrentProfile.username;
-
-            profilesMenu.push({
-                id: 'rm-pogo-profile',
-                label: "Unset profile",
-                click: async function (){
-                    fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
-                    this.createMainMenu();
-                    global.mainWM.closeSiteAndShowSelectSites();
-                }.bind(this)
-            });
-            profilesMenu.push( { type: 'separator' });
         }
+
+        profilesMenu.push({
+            id: 'rm-pogo-profile',
+            label: "Unset profile",
+            click: async function (){
+                try{
+                    fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
+                }
+                catch(e){
+
+                }
+                this.createMainMenu();
+                global.mainWM.closeSiteAndShowSelectSites();
+            }.bind(this)
+        });
+        profilesMenu.push( { type: 'separator' });
 
         if(fs.existsSync(profilesDir)){
             var files = fs.readdirSync(profilesDir);
@@ -675,15 +679,6 @@ resources: []\n\
                 label: 'Site versions',
                 enabled: this.siteSelected(),
                 submenu: this.createVersionsMenu()
-            },
-            {
-                id: 'auto-create-model',
-                label: 'Generate PoppyGo config',
-                enabled: this.siteSelected(),
-                click: async () => {
-                    await this.generateModel();
-                    this.generateModel()
-                }
             },
             {
                 id: 'rename-site',
@@ -947,6 +942,15 @@ resources: []\n\
                         enabled: this.siteSelected(),
                         click: async () => {
                             this.openWorkSpaceDir()
+                        }
+                    },
+                    {
+                        id: 'auto-create-model',
+                        label: 'Generate PoppyGo config',
+                        enabled: this.siteSelected(),
+                        click: async () => {
+                            await this.generateModel();
+                            this.generateModel()
                         }
                     },
                     {
