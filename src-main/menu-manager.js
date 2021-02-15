@@ -241,11 +241,6 @@ resources: []\n\
             });
 
         }
-
-
-
-        //writeNewName
-        //Reload Site
     }
 
     async unlinkSiteDomain(){
@@ -491,8 +486,7 @@ resources: []\n\
                 click: async function (){
                     fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
                     this.createMainMenu();
-                    mainWindow = global.mainWM.getCurrentInstanceOrNew();
-                    mainWindow.reload();
+                    global.mainWM.closeSiteAndShowSelectSites();
                 }.bind(this)
             });
             profilesMenu.push( { type: 'separator' });
@@ -522,8 +516,8 @@ resources: []\n\
                             fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
                             await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
                             this.createMainMenu();
-                            mainWindow = global.mainWM.getCurrentInstanceOrNew();
-                            mainWindow.reload();
+                            global.mainWM.closeSiteAndShowSelectSites();
+
                         }.bind(this)
                     });
                 }
@@ -735,6 +729,7 @@ resources: []\n\
                     this.deleteSukohFolder()
                 }
             },
+            { role: 'toggledevtools' },
             {
                 label: 'Preferences',
                 click: async () => {
