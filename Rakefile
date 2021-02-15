@@ -40,6 +40,14 @@ task :buildmac do
   sh "npm run dist-mac && npm run dist-mac-notarize"
 end
 
+desc "buildmacunsigned"
+task :buildmacunsigned do
+  sh "./scripts/embgit.sh -d -b ./resources/mac"
+  set_build_info
+  sh "npm install"
+  sh "npm run dist-mac-unsigned"
+end
+
 desc "macoscodesigninfo"
 task :macoscodesigninfo do
   sh "security find-identity -v -p codesigning"

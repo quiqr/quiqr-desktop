@@ -26,3 +26,6 @@ yarn-error.log*
 package-lock.json
 /resources/all/build-git-id.txt
 /resources/all/build-date.txt
+resources/linux/embgit
+resources/mac/embgit
+resources/win/embgit.exe
