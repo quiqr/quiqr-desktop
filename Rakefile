@@ -11,7 +11,7 @@ end
 
 def set_build_info
   sh "git rev-parse --short HEAD > resources/all/build-git-id.txt"
-  sh "./dist/embgit version >> resources/all/build-git-id.txt"
+  #sh "./dist/embgit version >> resources/all/build-git-id.txt"
   d=DateTime.now()
   sh "echo \""+d.strftime("%m-%d-%Y at %I:%M%p in Amsterdam") + "\" > resources/all/build-date.txt"
 end
