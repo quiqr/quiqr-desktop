@@ -11,7 +11,7 @@ end
 
 def set_build_info
   sh "git rev-parse --short HEAD > resources/all/build-git-id.txt"
-
+  sh "./dist/embgit version >> resources/all/build-git-id.txt"
   d=DateTime.now()
   sh "echo \""+d.strftime("%m-%d-%Y at %I:%M%p in Amsterdam") + "\" > resources/all/build-date.txt"
 end
@@ -34,7 +34,8 @@ end
 
 desc "buildmac (2)"
 task :buildmac do
-  sh "./scripts/embgit.sh -d -b ./resources/mac"
+  sh "./scripts/embgit.sh -d -b ./dist"
+  sh "cp ./dist/embgit ./resources/mac"
   set_build_info
   sh "npm install"
   sh "npm run dist-mac && npm run dist-mac-notarize"
@@ -42,7 +43,8 @@ end
 
 desc "buildmacunsigned"
 task :buildmacunsigned do
-  sh "./scripts/embgit.sh -d -b ./resources/mac"
+  sh "./scripts/embgit.sh -d -b ./dist"
+  sh "cp ./dist/embgit ./resources/mac"
   set_build_info
   sh "npm install"
   sh "npm run dist-mac-unsigned"
@@ -74,7 +76,8 @@ end
 
 desc "buildlinux"
 task :buildlinux do
-  sh "./scripts/embgit.sh -d -b ./resources/linux"
+  sh "./scripts/embgit.sh -d -b ./dist"
+  sh "cp ./dist/embgit ./resources/linux"
   set_build_info
   sh "npm run dist-linux"
 end
