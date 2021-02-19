@@ -15,7 +15,9 @@ end
 
 def set_build_info
   sh "git rev-parse --short HEAD > resources/all/build-git-id.txt"
-  unless windows?
+  if windows?
+    sh ".\\dist\\embgit.exe version >> resources\\all\\build-git-id.txt"
+  else
     sh "echo "" >> resources/all/build-git-id.txt"
     sh "./dist/embgit version >> resources/all/build-git-id.txt"
   end
@@ -75,7 +77,9 @@ end
 desc "buildwin"
 task :buildwin do
   p "RUN THIS FROM POWERSHELL"
-  p  "./scripts/embgit.sh -d -b ./resources/win"
+  #system("c:\\Program Files\\Git\\bin\\bash.exe", ".\\scripts\\embgit.sh","-d", "-b", ".\\dist")
+  #sh 'c:\Program\\ Files\Git\bin\bash.exe .\scripts\embgit.sh -d -b .\dist'
+  sh "copy .\\dist\\embgit.exe .\\resources\\win"
   set_build_info
   sh "npm install"
   sh "npm run dist-win"
