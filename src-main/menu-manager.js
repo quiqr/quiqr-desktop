@@ -171,7 +171,7 @@ resources: []\n\
         console.log(datePath);
 
         if(fs.existsSync(idPath)){
-            buildGitId = "\nBuild ID " + fssimple.readFileSync(idPath, {encoding:'utf8', flag:'r'}).replace("\n",'');
+            buildGitId = "\nBuild ID " + fssimple.readFileSync(idPath, {encoding:'utf8', flag:'r'})
         }
         if(fs.existsSync(datePath)){
             buildDate = "\nBuild Date " + fssimple.readFileSync(datePath, {encoding:'utf8', flag:'r'}).replace("\n",'');

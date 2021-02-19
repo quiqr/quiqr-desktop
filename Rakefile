@@ -9,9 +9,16 @@ def getmeta
   JSON.load file
 end
 
+def windows?
+  (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+end
+
 def set_build_info
   sh "git rev-parse --short HEAD > resources/all/build-git-id.txt"
-  #sh "./dist/embgit version >> resources/all/build-git-id.txt"
+  unless windows?
+    sh "echo "" >> resources/all/build-git-id.txt"
+    sh "./dist/embgit version >> resources/all/build-git-id.txt"
+  end
   d=DateTime.now()
   sh "echo \""+d.strftime("%m-%d-%Y at %I:%M%p in Amsterdam") + "\" > resources/all/build-date.txt"
 end
