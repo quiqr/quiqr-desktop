@@ -1,0 +1,45 @@
+{{- $collection := "" -}}
+{{- $params := dict -}}
+{{- with .params }} {{$params = . }}{{- end -}}
+{{- $contentDir := (partial "getContentDir" .page ) -}}
+{{- $baseKey := partial "createKey" .page  -}}
+{{- $itemTitle :=  ( $baseKey | humanize) | singularize -}}
+{{- $language := partial "getLanguage" .page -}}
+{{- $sectionKey := printf "c_%s_%s" $language $baseKey -}}
+{{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
+
+{{- $sectionTitle := printf "%s%s" $language ($baseKey | humanize) -}}
+{{- range first 1 (.page.Resources.ByType "page") -}}
+    {{- if .File -}}
+        {{- $subDir := $baseKey -}}
+        {{- if in .File.Dir "data"}}
+            {{- $subDir = path.Base .File.Dir -}}
+        {{- end -}}
+        {{ if or (in $baseKey $subDir) (in $contentDir $baseKey) }}
+            {{- $dir := printf "%s%s/" $contentDir $subDir -}}
+            {{- $extension := .File.Ext -}}
+            {{- $dataFormat := "yaml" -}}
+            {{- $fields := slice -}}
+            {{- $resourceDir := "" -}}
+            {{- $page := . -}}
+            {{- $filePath := "" -}}
+            {{- with $page.File -}}{{- $filePath = .Path -}}{{- end -}}
+            {{- if (index (readDir $dir) 0).IsDir -}}
+                {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 0).Name -}}
+            {{- else -}}
+                {{- $resourceDir = printf "%s%s" $dir (index (readDir $dir) 1).Name -}}
+            {{- end -}}
+            {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $page "dir" $resourceDir )) -}}
+            {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
+            {{- range $key, $value := .Page.Params -}}
+            {{- if ne $key "maincontent" -}}
+                    {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath "params" $params) -}}
+                    {{- $fields = $fields | append $field -}}
+                {{- end -}}
+            {{- end -}}
+            {{- $fields = partial "sortFields" $fields -}}
+            {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" $dataFormat "fields" $fields "itemtitle" $itemTitle  -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- return $collection -}}

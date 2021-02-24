@@ -172,7 +172,6 @@
 
 {{/*------------------------Collections------------------------ */}}
 
-
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
     {{- $collectionPages = $collectionPages | append . -}}
 {{- end -}}
@@ -187,6 +186,8 @@
     {{ end }}
 {{- end -}}
 
+
+
 {{- range $collectionPages -}}
       {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
       {{- if gt (len $collection) 0 }}
@@ -194,6 +195,18 @@
           {{- $collections = $collections | append $collection -}}
       {{- end -}}
 {{- end -}}
+
+{{/*---------------------------Snippets----------------------------- */}}
+
+{{- $snippets := .Site.GetPage "/snippets" -}}
+
+{{ with $snippets }}
+  {{- $collection := (partial "createSnippetCollection" (dict "page" . "params" $.Site.Params )) -}}
+  {{- if gt (len $collection) 0 }}
+      {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
+      {{- $collections = $collections | append $collection -}}
+  {{- end -}}
+{{ end }}
 
 
 {{/*---------------------------Singles----------------------------- */}}
