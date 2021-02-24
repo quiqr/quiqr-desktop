@@ -37,7 +37,7 @@ class PogoPublisher {
                 break;
             }
             case PLATFORMS.windows: {
-                platform = 'windows';
+                platform = 'win';
                 executable = 'embgit.exe';
                 break;
             }
