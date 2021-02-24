@@ -141,16 +141,17 @@ function getFirstScreenAfterStartup(){
         const configurationDataProvider = require('./configuration-data-provider')
         configurationDataProvider.get(function(err, configurations){
             if(configurations.empty===true || configurations.sites.length ===0){
+                console.log("switch to welcomeScreen ");
                 mainWindow.webContents.once('dom-ready', () => {
-                    console.log("switch to welcomeScreen ");
                     mainWindow.webContents.send("redirectToGivenLocation", '/welcome');
                 });
             }
             else if(global.currentSiteKey && global.currentWorkspaceKey){
                 //TODO catch error when site does not exist
                 let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+                console.log("switch to "+ global.currentSiteKey);
+                mainWindow.webContents.send("redirectMountSite",newScreenURL);
                 mainWindow.webContents.once('dom-ready', () => {
-                    console.log("switch to "+ global.currentSiteKey);
                     mainWindow.webContents.send("redirectMountSite",newScreenURL);
                 });
             }

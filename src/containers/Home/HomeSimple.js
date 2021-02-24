@@ -564,7 +564,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
 
         service.api.logToConsole("getRemoteSiteStatus")
-        if(this.state.fingerprint !=="" && !this.checkLinkedPogoCloudPath()){
+        if(this.state.fingerprint ==="" || !this.checkLinkedPogoCloudPath()){
             return
         }
 
@@ -575,7 +575,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         };
 
         let requestVars =btoa(JSON.stringify(userVars));
-        service.api.logToConsole(userVars)
+        //service.api.logToConsole(userVars)
 
         let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+ this.state.pogostripeConn.port+"/project-status/"+requestVars;
         service.api.logToConsole(url)
