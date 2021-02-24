@@ -101,6 +101,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             registerDialog: {open: false},
             editPlanDialog: {open: false},
             claimDomainDialog: {open: false},
+            pogostripeConn: {protocol: ''},
             username: "",
             pogoAccountStatus: "",
             pogoCustomDomain: "not set",
@@ -142,7 +143,10 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     setUser(username,fingerprint){
-        this.setState({username: username, fingerprint: fingerprint});
+        this.setState({username: username, fingerprint: fingerprint},function(){
+            this.getRemoteSiteStatus(false);
+
+        });
     }
 
     checkSiteInProps(){
@@ -381,8 +385,16 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     checkLinkedPogoCloudPath(){
         let site = this.state.selectedSite;
-        if(site.publish.length === 1 && site.publish[0].config.type === 'poppygo' && site.publish[0].config.hasOwnProperty('path')){
-            return true;
+        if(site){
+            if( site.publish.length === 1
+                && site.publish[0].config.type === 'poppygo' 
+                && site.publish[0].config.hasOwnProperty('path')){
+
+                return true;
+            }
+            else{
+                service.api.logToConsole("site has no PoppyPot")
+            }
         }
         return false;
     }
@@ -396,6 +408,10 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     getRemoteUserStatus(celebrate){
+
+        if(this.state.pogostripeConn.protocol === "" && this.state.fingerprint === ""){
+            return;
+        }
 
         let userVars = {
             username: this.state.username,
@@ -497,11 +513,13 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     getRemotePublishStatus(celebrate){
+        if(!this.state.selectedSite){
+            return;
+        }
 
         service.api.logToConsole("getRemotePublishStatus")
         if(!this.checkLinkedPogoCloudPath()){
-            service.api.logToConsole("notLinked :(")
-            return
+            return;
         }
 
         let projectPath = this.state.selectedSite.publish[0].config.path;
@@ -541,10 +559,12 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     getRemoteSiteStatus(celebrate){
+        if(!this.state.selectedSite){
+            return;
+        }
 
         service.api.logToConsole("getRemoteSiteStatus")
-        if(!this.checkLinkedPogoCloudPath()){
-            service.api.logToConsole("notLinked :(")
+        if(this.state.fingerprint !=="" && !this.checkLinkedPogoCloudPath()){
             return
         }
 
@@ -555,9 +575,10 @@ class Home extends React.Component<HomeProps, HomeState>{
         };
 
         let requestVars =btoa(JSON.stringify(userVars));
+        service.api.logToConsole(userVars)
 
         let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+ this.state.pogostripeConn.port+"/project-status/"+requestVars;
-                    service.api.logToConsole(url)
+        service.api.logToConsole(url)
 
         let data='';
 
