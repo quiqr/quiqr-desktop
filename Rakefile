@@ -77,11 +77,11 @@ end
 desc "buildwin"
 task :buildwin do
   p "RUN THIS FROM POWERSHELL"
-  #system("c:\\Program Files\\Git\\bin\\bash.exe", ".\\scripts\\embgit.sh","-d", "-b", ".\\dist")
+  system("c:\\Program Files\\Git\\bin\\bash.exe", ".\\scripts\\embgit.sh","-d", "-b", ".\\dist")
   #sh 'c:\Program\\ Files\Git\bin\bash.exe .\scripts\embgit.sh -d -b .\dist'
   sh "copy .\\dist\\embgit.exe .\\resources\\win"
   set_build_info
-  sh "npm install"
+  #sh "npm install"
   sh "npm run dist-win"
 end
 
