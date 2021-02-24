@@ -1,5 +1,11 @@
 # PoppyGo App CHANGELOG
 
+## v0.8.3
+- fix upgrade race conditions on windows
+
+## v0.8.2
+- new embgit to fix openssh keys on mac
+
 ## v0.8.1
 - all subscription stuff
 
