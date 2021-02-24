@@ -109,6 +109,6 @@ task :release_linux do
   sh "cp ./dist/poppygo_linux_x86_64.AppImage #{BIN_PATH}/poppygo_linux_x86_64-#{data['version']}.AppImage"
   sh "cd #{BIN_PATH} && git pull"
   sh "cd #{BIN_PATH} && git add poppygo_linux_x86_64-#{data['version']}.AppImage"
-  sh "cd #{BIN_PATH} && git commit -m \"linux release #{ data['version']}\""
+  sh "cd #{BIN_PATH} && git commit -m \"linux release #{ data['version']}\" || echo oke"
   sh "cd #{BIN_PATH} && git push"
 end
