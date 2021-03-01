@@ -74,6 +74,7 @@
     "_electron-dist-linux-all": "npm run _electron-dist-linux && electron-builder --linux deb",
     "_electron-dist-mac": "npm run _copy-electron-code && electron-builder",
     "dist-win": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win",
+    "release-win": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win && electron-builder --publish=always",
     "dist-linux": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux",
     "dist-linux-all": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-linux-all",
     "dist-mac": "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-mac",
