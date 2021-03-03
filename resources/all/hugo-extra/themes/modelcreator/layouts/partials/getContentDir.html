@@ -3,9 +3,15 @@
     {{- $contentDir = printf "%s/" . -}}
 {{ else }}
     {{- $subDir := "" -}}
+    {{ warnf (printf "")}}
     {{- with .File.Dir }}
+      {{- $path := split . "/" -}}
+      {{ warnf (printf "fileDir: %s" . ) }}
       {{- if in . "data"}}
           {{- $subDir = path.Dir (path.Dir .) -}}
+      {{- end -}}
+      {{- if in . "contentblocks"}}
+          {{- $subDir =  index $path 0 -}}
       {{- end -}}
     {{- end -}}
     {{- if or (eq $subDir ".") (eq $subDir "") -}}
