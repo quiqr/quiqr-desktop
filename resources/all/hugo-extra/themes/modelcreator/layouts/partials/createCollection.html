@@ -7,7 +7,6 @@
 {{- $language := partial "getLanguage" .page -}}
 {{- $sectionKey := printf "c_%s_%s" $language $baseKey -}}
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
-
 {{- $sectionTitle := printf "%s%s" $language ($baseKey | humanize) -}}
 {{- range first 1 .page.Pages -}}
     {{- if .File -}}
@@ -40,6 +39,7 @@
             {{- $fields = partial "sortFields" $fields -}}
             {{- $collection =  dict "key" $sectionKey "title" $sectionTitle "folder" $dir "extension" $extension "dataformat" $dataFormat "fields" $fields "itemtitle" $itemTitle  -}}
         {{- end -}}
+    {{- else -}}
     {{- end -}}
 {{- end -}}
 {{- return $collection -}}

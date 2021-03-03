@@ -35,13 +35,21 @@
     {{- $accordionItems := ( index $value 0 ) -}}
     {{- range $key, $value := $accordionItems -}}
         {{- $accordionKeys = $accordionKeys | append $key -}}
-        {{- if or (eq $key "name") (eq $key "title") (eq $key "line") (eq $key "to") (eq $key "To") -}}
+        {{ if or (eq $key "line") (eq $key "to") (eq $key "To") -}}
             {{- $arrayTitle = $key -}}
         {{- end -}}
     {{- end -}}
+
+    {{- if in $accordionKeys "name" -}}
+        {{- $arrayTitle = "name" -}}
+    {{- else if (in $accordionKeys "title") -}}
+        {{- $arrayTitle = "title" -}}
+    {{- end -}}
+
     {{- if eq $arrayTitle "" -}}
         {{ $arrayTitle = index $accordionKeys 0 -}}
     {{- end -}}
+
     {{- range $key, $value := $accordionItems -}}
             {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
             {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $params) -}}
