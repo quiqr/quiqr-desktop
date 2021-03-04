@@ -172,22 +172,28 @@
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
 {{- end -}}
 
+{{/*---------------------------Contentbocks----------------------------- */}}
+
+{{- $contentblocks := .Site.GetPage "/contentblocks" -}}
+
+{{- with $contentblocks -}}
+  {{- $collection := (partial "createContentblockCollection" (dict "page" . "params" $.Site.Params )) -}}
+  {{- if gt (len $collection) 0 -}}
+      {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
+      {{- $collections = $collections | append $collection -}}
+  {{- end -}}
+{{- end -}}
+
 {{/*------------------------Collections------------------------ */}}
 
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
-  {{- if not (eq .Type "contentblocks") -}}
     {{- $collectionPages = $collectionPages | append . -}}
-  {{- else -}}
-    {{- if not (eq .Name "Contentblocks") -}}
-        {{- $contentBlocks = $contentBlocks | append . -}}
-    {{- end -}}
-  {{- end -}}
 {{- end -}}
 
 {{- $additionalCollections := slice -}}
 {{- range .Site.AllPages -}}
     {{- with .Parent -}}
-        {{- if and (not (eq .Type "contentblocks")) (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) -}}
+        {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) -}}
             {{- $additionalCollections = $additionalCollections | append .Path -}}
             {{- $collectionPages = $collectionPages | append . -}}
         {{- end -}}
@@ -198,14 +204,6 @@
       {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
       {{- if gt (len $collection) 0 }}
           {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
-          {{- $collections = $collections | append $collection -}}
-      {{- end -}}
-{{- end -}}
-
-{{- range $contentBlocks -}}
-      {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
-      {{- if gt (len $collection) 0 }}
-          {{- $contentBlockMenu = $contentBlockMenu | append (dict "key" (index $collection "key")) -}}
           {{- $collections = $collections | append $collection -}}
       {{- end -}}
 {{- end -}}
@@ -305,11 +303,6 @@
 {{- if gt (len $collectionMenu) 0 }}
     {{- $sortedCollectionMenu := sort $collectionMenu "key" "asc" -}}
     {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Collections of pages" "menuItems" $sortedCollectionMenu) -}}
-{{- end -}}
-
-{{- if gt (len $contentBlockMenu) 0 }}
-    {{- $sortedContentBlockMenu := sort $contentBlockMenu "key" "asc" -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "contentblocks" "title" "Contentblocks" "menuItems" $sortedContentBlockMenu) -}}
 {{- end -}}
 
 {{- if gt (len $dataMenu) 0 }}

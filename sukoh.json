@@ -1,0 +1,18 @@
+{
+   "build": [
+     {
+       "config": ".flowconfig",
+       "key": "default"
+     }
+   ],
+   "collections": [],
+   "hugover": "extended_0.76.5",
+   "menu": [],
+   "serve": [
+     {
+       "config": ".flowconfig",
+       "key": "default"
+     }
+   ],
+   "singles": []
+ }
