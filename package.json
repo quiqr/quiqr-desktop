@@ -154,11 +154,13 @@
       ],
       "category": "office"
     },
-    "publish": [{
-      "provider": "s3",
-      "bucket": "poppygo-app-releases",
-      "region": "eu-west-1"
-    }],
+    "publish": [
+      {
+        "provider": "s3",
+        "bucket": "poppygo-app-releases",
+        "region": "eu-west-1"
+      }
+    ],
     "fileAssociations": [
       {
         "ext": "pogosite",
