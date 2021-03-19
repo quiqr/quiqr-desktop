@@ -3,7 +3,7 @@
 {{- $pogoMenu := dict -}}
 {{- $sukoh := dict -}}
 {{- $pogoKeys := slice -}}
-{{- $sukohKeys := slice "home" "singles" "collections" "data" "general" "poppygo" }}
+{{- $sukohKeys := slice "home" "singles" "collections" "data" "general" "poppygo" "contentblocks" }}
 
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "zpogomenu.json" -}}

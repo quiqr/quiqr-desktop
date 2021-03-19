@@ -3,11 +3,13 @@
 {{- $singles := slice -}}
 {{- $singlesMenu := slice -}}
 {{- $collections := slice -}}
+{{- $contentBlocks := slice -}}
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
 {{- $pogoMenu := slice -}}
 {{- $generalMenu := slice -}}
+{{- $contentBlockMenu := slice -}}
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
 
@@ -90,13 +92,13 @@
 
     {{- if $imagesInRoot -}}
         {{- $key := "img_static" -}}
-        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static" "title" "General images" "key" $key "file" "static/.pogo-images.md" )) -}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" "static" "title" "Images in static" "key" $key "file" "static/.pogo-images.md" )) -}}
         {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
     {{- end -}}
 
     {{- if $imagesInSubFolder -}}
         {{ $key := "img_static_image"}}
-        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" $imageDir "title" "Grouped images" "key" $key "file" (printf "%s/.pogo-images.md" $imageDir))) -}}
+        {{- $singles = $singles | append (partial "staticBundleManager" ( dict "dir" $imageDir "title" "Images in subfolders" "key" $key "file" (printf "%s/.pogo-images.md" $imageDir))) -}}
         {{- $generalMenu = $generalMenu | append (dict "key" $key ) -}}
     {{- end -}}
   {{- end -}}
@@ -170,6 +172,18 @@
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
 {{- end -}}
 
+{{/*---------------------------Contentbocks----------------------------- */}}
+
+{{- $contentblocks := .Site.GetPage "/contentblocks" -}}
+
+{{- with $contentblocks -}}
+  {{- $collection := (partial "createContentblockCollection" (dict "page" . "params" $.Site.Params )) -}}
+  {{- if gt (len $collection) 0 -}}
+      {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
+      {{- $collections = $collections | append $collection -}}
+  {{- end -}}
+{{- end -}}
+
 {{/*------------------------Collections------------------------ */}}
 
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
@@ -178,15 +192,13 @@
 
 {{- $additionalCollections := slice -}}
 {{- range .Site.AllPages -}}
-    {{ with .Parent }}
+    {{- with .Parent -}}
         {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) -}}
             {{- $additionalCollections = $additionalCollections | append .Path -}}
             {{- $collectionPages = $collectionPages | append . -}}
         {{- end -}}
-    {{ end }}
+    {{- end -}}
 {{- end -}}
-
-
 
 {{- range $collectionPages -}}
       {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
@@ -195,19 +207,6 @@
           {{- $collections = $collections | append $collection -}}
       {{- end -}}
 {{- end -}}
-
-{{/*---------------------------Snippets----------------------------- */}}
-
-{{- $snippets := .Site.GetPage "/snippets" -}}
-
-{{ with $snippets }}
-  {{- $collection := (partial "createSnippetCollection" (dict "page" . "params" $.Site.Params )) -}}
-  {{- if gt (len $collection) 0 }}
-      {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
-      {{- $collections = $collections | append $collection -}}
-  {{- end -}}
-{{ end }}
-
 
 {{/*---------------------------Singles----------------------------- */}}
 
@@ -298,21 +297,21 @@
 
 {{- if gt (len $singlesMenu) 0 }}
     {{- $sortedSinglesMenu := sort $singlesMenu "key" "asc" -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "singles" "title" "Pages" "menuItems" $sortedSinglesMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "singles" "title" "Single pages" "menuItems" $sortedSinglesMenu) -}}
 {{- end -}}
 
 {{- if gt (len $collectionMenu) 0 }}
     {{- $sortedCollectionMenu := sort $collectionMenu "key" "asc" -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Groups" "menuItems" $sortedCollectionMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Collections of pages" "menuItems" $sortedCollectionMenu) -}}
 {{- end -}}
 
 {{- if gt (len $dataMenu) 0 }}
     {{- $sortedDataMenu := sort $dataMenu "key" "asc" -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "data" "title" "Other content" "menuItems" $sortedDataMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "data" "title" "Data files" "menuItems" $sortedDataMenu) -}}
 {{- end -}}
 
 {{- if gt (len $generalMenu) 0 }}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "general" "title" "General" "menuItems" $generalMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "general" "title" "Site settings" "menuItems" $generalMenu) -}}
 {{- end -}}
 
 {{- if gt (len $pogoMenu) 0 }}
