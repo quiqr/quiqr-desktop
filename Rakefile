@@ -1,6 +1,7 @@
 require "json"
 require "date"
 
+
 BIN_PATH = "../poppygo.app-site/public"
 BIN_PATHWIN = "..\\poppygo.app-site\\public"
 
@@ -111,4 +112,33 @@ task :release_linux do
   sh "cd #{BIN_PATH} && git add poppygo_linux_x86_64-#{data['version']}.AppImage"
   sh "cd #{BIN_PATH} && git commit -m \"linux release #{ data['version']}\" || echo oke"
   sh "cd #{BIN_PATH} && git push"
+end
+
+desc "thirdpartynotice"
+task "thirdpartynotice" do
+
+ fileout = <<HDOC
+POPPYGO
+
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+Do Not Translate or Localize
+
+This project incorporates components from the projects listed below. The
+original copyright notices and the licenses under which PoppyGo received such
+components are set forth below. PoppyGo reserves all rights not expressly
+granted herein, whether by implication, estoppel or otherwise.
+
+HDOC
+ jsontree = `license-checker --production --json`
+ licenceobj = JSON.parse(jsontree)
+ counter = 0
+ licenceobj.each do | lib, info |
+   counter+=1
+   lib = lib[1..-1] if lib[0,1] == '@'
+   libname, version = lib.split('@')
+
+   fileout += "#{counter.to_s.rjust(4)} #{libname} version #{version}, Licence: #{info['licenses']}, Repository: #{info['repository']}\n"
+ end
+
+ File.open('./ThirdPartyNotices.txt', 'w') { |file| file.write(fileout) }
 end
