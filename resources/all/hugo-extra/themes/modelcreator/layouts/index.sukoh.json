@@ -3,13 +3,13 @@
 {{- $singles := slice -}}
 {{- $singlesMenu := slice -}}
 {{- $collections := slice -}}
-{{- $contentBlocks := slice -}}
+{{- $page_components := slice -}}
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
 {{- $pogoMenu := slice -}}
 {{- $generalMenu := slice -}}
-{{- $contentBlockMenu := slice -}}
+{{- $page_componentMenu := slice -}}
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
 
@@ -172,28 +172,19 @@
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
 {{- end -}}
 
-{{/*---------------------------Contentbocks----------------------------- */}}
-
-{{- $contentblocks := .Site.GetPage "/contentblocks" -}}
-
-{{- with $contentblocks -}}
-  {{- $collection := (partial "createContentblockCollection" (dict "page" . "params" $.Site.Params )) -}}
-  {{- if gt (len $collection) 0 -}}
-      {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
-      {{- $collections = $collections | append $collection -}}
-  {{- end -}}
-{{- end -}}
 
 {{/*------------------------Collections------------------------ */}}
 
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
-    {{- $collectionPages = $collectionPages | append . -}}
+    {{ if not (eq .Type "poppy-components" )}}
+      {{- $collectionPages = $collectionPages | append . -}}
+    {{ end }}
 {{- end -}}
 
 {{- $additionalCollections := slice -}}
 {{- range .Site.AllPages -}}
     {{- with .Parent -}}
-        {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) -}}
+        {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) (not (eq .Type "poppy-components" )) -}}
             {{- $additionalCollections = $additionalCollections | append .Path -}}
             {{- $collectionPages = $collectionPages | append . -}}
         {{- end -}}
@@ -201,11 +192,11 @@
 {{- end -}}
 
 {{- range $collectionPages -}}
-      {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
-      {{- if gt (len $collection) 0 }}
-          {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
-          {{- $collections = $collections | append $collection -}}
-      {{- end -}}
+    {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
+    {{- if gt (len $collection) 0 }}
+        {{- $collections = $collections | append $collection -}}
+        {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
+    {{- end -}}
 {{- end -}}
 
 {{/*---------------------------Singles----------------------------- */}}
@@ -233,7 +224,7 @@
 {{- range $singlePages -}}
     {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_" "params" $.Site.Params) ) -}}
     {{ if gt (len $single) 0 }}
-        {{- if ne $single.file "" -}}
+        {{- if and (ne $single.file "") (ne $single.key "s__poppy-components") -}}
           {{- $singles = $singles | append $single -}}
           {{- $singlesMenu = $singlesMenu | append (dict "key" $single.key ) -}}
         {{- end -}}
