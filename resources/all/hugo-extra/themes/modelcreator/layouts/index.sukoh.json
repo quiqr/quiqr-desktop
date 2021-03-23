@@ -52,7 +52,7 @@
 
 {{- $configFilePath := partial "configFile" . -}}
 {{- $configParams := dict -}}
-{{ range $key, $value := $poppy_select }}
+{{ range $key, $value := $.Site.Params }}
     {{- if not (or (eq $key "mainsections") (eq $key "mainSections") ) -}}
         {{ $configParams = $configParams | merge (dict $key $value) -}}
     {{- end -}}
