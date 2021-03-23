@@ -1,10 +1,13 @@
 {{- $file := .file -}}
 {{- $key := .key -}}
-{{- $params := dict -}}
-{{- with .params }} {{$params = . }}{{- end -}}
+{{- $poppy_components := .poppy_components }}
+
+{{- $poppy_select := dict -}}
+{{- with .params }} {{$poppy_select = . }}{{- end -}}
 {{- if .file -}}
     {{- $key = partial "getRealKey" (dict "key" .key "file" .file ) -}}
 {{- end -}}
+
 {{- $value := .value -}}
 {{- $pogoType := "" -}}
 {{- if .type -}}
@@ -19,13 +22,13 @@
 {{- end -}}
 
 {{- if (eq $pogoType "section") -}}
-    {{- $subfields := slice -}}
-    {{- range $key, $value := $value -}}
-            {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $params) -}}
-            {{- $subfields = $subfields | append $field}}
-    {{- end -}}
-    {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
+  {{- $subfields := slice -}}
+      {{- range $key, $value := $value -}}
+          {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $poppy_select) -}}
+          {{- $subfields = $subfields | append $field -}}
+      {{- end -}}
+      {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
 {{- end -}}
 
 {{- if (eq $pogoType "accordion") -}}
@@ -51,12 +54,12 @@
     {{- end -}}
 
     {{- range $key, $value := $accordionItems -}}
-            {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
-            {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $params) -}}
-            {{- if eq $key $arrayTitle -}}
-                {{- $field = $field | merge (dict "arrayTitle" true ) -}}
-            {{- end -}}
-            {{- $subfields = $subfields | append $field -}}
+        {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $poppy_select) -}}
+        {{- if eq $key $arrayTitle -}}
+            {{- $field = $field | merge (dict "arrayTitle" true ) -}}
+        {{- end -}}
+        {{- $subfields = $subfields | append $field -}}
     {{- end -}}
     {{- $field = merge $field (dict "fields" $subfields ) -}}
 {{- end -}}
@@ -72,22 +75,23 @@
 {{- end -}}
 
 {{- if eq $pogoType "string" -}}
-    {{- $selectKeys := slice -}}
-    {{- with .params -}}
-      {{- with .pogoselect -}}
-          {{- range $selectKey, $value := . -}}
-            {{- if eq $selectKey $key -}}
-                {{- $field = dict "key" $key "title" $title "type" "select" -}}
-                {{- $subfields := slice -}}
-                {{- range $value -}}
-                        {{- $field := dict "text" . "value" ( . | anchorize )  -}}
-                        {{- $subfields = $subfields | append $field}}
-                {{- end -}}
-                {{- $field = merge $field (dict "multiple" false "options" $subfields) -}}
+
+  {{- $selectKeys := slice -}}
+  {{- with $poppy_select -}}
+      {{- range $selectKey, $value := . -}}
+        {{- if eq $selectKey $key -}}
+            {{- $field = dict "key" $key "title" $title "type" "select" -}}
+            {{- $subfields := slice -}}
+            {{- range $value -}}
+                    {{- $field := dict "text" . "value" ( . | anchorize )  -}}
+                    {{- $subfields = $subfields | append $field}}
             {{- end -}}
-          {{- end -}}
+            {{- $field = merge $field (dict "multiple" false "options" $subfields) -}}
+        {{- end -}}
       {{- end -}}
-    {{- end -}}
+  {{- end -}}
+
 {{- end -}}
+
 
 {{- return $field -}}
