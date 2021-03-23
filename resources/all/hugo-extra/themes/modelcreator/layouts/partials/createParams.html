@@ -8,14 +8,14 @@
 
 {{- if eq .dir "/" -}}
     {{- range $key, $value := .configItems -}}
-          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" $params ) -}}
+          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path ) -}}
           {{- $fields = $fields | append $field -}}
     {{- end -}}
-    {{- $fields = $fields | append (partial "createField" (dict "key" .paramsKey "value" .params "file" $path "params" $params )) -}}
+    {{- $fields = $fields | append (partial "createField" (dict "key" .paramsKey "value" .params "file" $path )) -}}
     {{- $path = .file -}}
 {{- else -}}
     {{- range $key, $value := .params -}}
-          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path "params" $params ) -}}
+          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $path  ) -}}
           {{- $fields = $fields | append $field -}}
     {{- end -}}
 {{- end -}}
