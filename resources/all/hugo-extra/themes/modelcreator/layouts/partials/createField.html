@@ -83,7 +83,12 @@
             {{- $field = dict "key" $key "title" $title "type" "select" -}}
             {{- $subfields := slice -}}
             {{- range $value -}}
-                    {{- $field := dict "text" . "value" ( . | anchorize )  -}}
+                    {{- $field := "" -}}
+                    {{- if eq . "my-component" -}}
+                      {{- $field = dict "text" . "value" ""  -}}
+                    {{- else -}}
+                      {{- $field = dict "text" . "value" ( . | anchorize )  -}}
+                    {{- end -}}
                     {{- $subfields = $subfields | append $field}}
             {{- end -}}
             {{- $field = merge $field (dict "multiple" false "options" $subfields) -}}
