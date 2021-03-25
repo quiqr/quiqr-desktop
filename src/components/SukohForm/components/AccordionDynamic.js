@@ -1,5 +1,6 @@
 //@flow
 
+import service from '../../../services/service';
 import React from 'react';
 import { Accordion, AccordionItem } from '../../Accordion'
 import { List, ListItem } from 'material-ui/List';
@@ -40,6 +41,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
     constructor(props: ComponentProps<AccordionDynamicField>){
         super(props);
+
         this.state = {index: null, dragFromIndex: null, dragToIndex: null};
     }
 
@@ -154,6 +156,32 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
                 let label = 'Untitled';
 
+                if("dynFormSearchRoot" in field){
+                    let dynFormSearchObjectFile = "sukoh";
+
+                    if("dynFormSearchKeyLevel")
+                        if("dynFormSearchObjectFile" in field){
+                            dynFormSearchObjectFile = field.dynFormSearchObjectFile;
+                        }
+
+                    let dynSearchKeyVals = [];
+                    let level = 0;
+                    while("dynFormSearchKeyLevel"+level.toString() in field){
+                        let searchKey = field["dynFormSearchKeyLevel"+level.toString()];
+                        let searchVal = item[searchKey];
+                        dynSearchKeyVals.push({ key: searchKey, val: searchVal });
+                        level++;
+                    }
+
+                    service.api.getDynFormFields( dynFormSearchObjectFile, field.dynFormSearchRoot, dynSearchKeyVals).then(function(extraFields){
+                        field.fields = field.fields.concat( extraFields);
+                        service.api.logToConsole(extraFields);
+                    });
+                }
+
+                //vraag via api extra field hash op basis van searchkeys
+                //voeg deze keys toe aan field.fields
+
                 let newNode = {
                     field,
                     state: context.value[childIndex],
@@ -205,6 +233,9 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                     this.setState({index:this.state.index===index?-1:index});
                 }}>
                     {context.value.map((item: any, childIndex: number)=>{
+
+
+
                         let componentKey = `item-${childIndex}`;
                         if(childIndex===dragFromIndex){
                             return renderItem(componentKey, item, childIndex, true);

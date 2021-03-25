@@ -5,6 +5,9 @@ const siteSourceBuilderFactory = require('./site-sources/builders/site-source-bu
 const hugoDownloader = require('./hugo/hugo-downloader')
 const fs = require('fs-extra');
 const {dirname} = require('path');
+const path = require('path');
+const glob = require('glob');
+const formatProviderResolver = require('./format-provider-resolver');
 const {shell} = require('electron');
 const menuManager = require('./menu-manager');
 const PoppyGoAppConfig = require('./poppygo-app-config');
@@ -288,6 +291,24 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}/*: any*/, context/*:
             context.reject(error);
         });
     });
+}
+
+api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, searchLevelKeyVals }, context){
+
+    let fileExp = path.join(global.currentSitePath,searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    let filePath = glob.sync(fileExp)[0] ;
+    let strData = fs.readFileSync(filePath,'utf8');
+
+    let formatProvider = await formatProviderResolver.resolveForFilePath(filePath);
+    if(formatProvider==null){
+        formatProvider = await formatProviderResolver.getDefaultFormat();
+    }
+    let returnData = await formatProvider.parse(strData);
+    if(searchRootNode in returnData){
+        let dynConf = returnData[searchRootNode].find(x => x[searchLevelKeyVals[0]['key']] === searchLevelKeyVals[0]['val']);
+        context.resolve(dynConf);
+    }
+
 }
 
 api.openSingleInEditor = function({siteKey, workspaceKey, singleKey}, context) {

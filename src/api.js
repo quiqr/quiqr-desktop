@@ -24,10 +24,10 @@ export class API {
         return mainProcessBridge.request('logToConsole', {message});
     }
 
-        /*importSite(){
-        return mainProcessBridge.request('selectSiteAction');
+    getDynFormFields(searchFormObjectFile: string, searchRootNode: string, searchLevelKeyVals: any){
+        return mainProcessBridge.request('getDynFormFields', {searchFormObjectFile, searchRootNode, searchLevelKeyVals});
     }
-    */
+
     importSite(){
         return mainProcessBridge.request('importSiteAction');
     }
