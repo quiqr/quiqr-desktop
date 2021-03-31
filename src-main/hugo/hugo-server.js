@@ -118,8 +118,6 @@ class HugoServer{
                 }
                 global.outputConsole.appendLine(line);
             });
-
-
         }
         catch(e){
             global.outputConsole.appendLine('Hugo Server failed to start.');
