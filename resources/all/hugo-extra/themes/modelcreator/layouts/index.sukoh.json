@@ -3,15 +3,54 @@
 {{- $singles := slice -}}
 {{- $singlesMenu := slice -}}
 {{- $collections := slice -}}
-{{- $contentBlocks := slice -}}
+{{- $page_components := slice -}}
 {{- $collectionMenu := slice -}}
 {{- $homeMenu := slice -}}
 {{- $dataMenu := slice -}}
 {{- $pogoMenu := slice -}}
 {{- $generalMenu := slice -}}
-{{- $contentBlockMenu := slice -}}
+{{- $page_componentMenu := slice -}}
 {{- $configItems := dict "title" "string" "description" "string" -}}
 {{- $translations := slice -}}
+{{- $poppy_select := site.Data.poppyselect -}}
+
+{{/*------------------------------ Poppyselect -----------------------------*/}}
+
+{{- $component_types := slice -}}
+{{- $component_variants := slice -}}
+
+{{- $component_types = $component_types | append "my-component" -}}
+
+{{- range (site.GetPage "/my-components" ).Pages }}
+  {{- $component_variant := (index (split .Dir "/" ) 1) -}}
+  {{- if not (in $component_variants $component_variant) -}}
+      {{- $component_variants = $component_variants | append $component_variant -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range (site.GetPage "/poppy-components" ).Pages }}
+  {{- $component_type := (index (split .Dir "/" ) 1) -}}
+  {{- $component_variant := (index (split .Dir "/" ) 2) -}}
+  {{- if not (in $component_types $component_type) -}}
+      {{- $component_types = $component_types | append $component_type -}}
+  {{- end -}}
+  {{- if not (in $component_variants $component_variant) -}}
+      {{- $component_variants = $component_variants | append $component_variant -}}
+  {{- end -}}
+{{- end }}
+
+{{- $poppy_select = merge $poppy_select (dict "component_type" $component_types "component_variant" $component_variants ) -}}
+
+{{- $listSelect := slice -}}
+{{- range site.Sections -}}
+  {{- if and (ne .Type "my-components") (ne .Type "poppy-components") -}}
+    {{- $listSelect = $listSelect | append .Type -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $poppy_select = merge $poppy_select (dict "list" $listSelect ) -}}
+
+{{/*------------------------------ Languages -----------------------------*/}}
 
 {{- range .Site.Languages -}}
       {{- if not ( in $translations .Lang ) -}}
@@ -23,10 +62,15 @@
 
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "data" -}}
-      {{- $data := (partial "createDataItems" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations "params" $.Site.Params)) -}}
+      {{- $data := (partial "createDataItems" (dict "dir" "/data/" "data" $.Site.Data "translations" $translations "params" $poppy_select)) -}}
       {{- $singles = $singles | append (index $data "singles") -}}
       {{- $collections = $collections | append (index $data "collections") -}}
-      {{- $dataMenu = $dataMenu | append (index $data "menu") -}}
+      {{- $dataKey := index (index (index $data "menu") 0) "key" -}}
+      {{- if eq $dataKey "ds_data_design" -}}
+        {{- $generalMenu = $generalMenu | append (index $data "menu") -}}
+      {{- else -}}
+        {{- $dataMenu = $dataMenu | append (index $data "menu") -}}
+      {{- end -}}
   {{- end -}}
 {{- end -}}
 
@@ -43,7 +87,7 @@
 {{- if in $configFilePath "config/_default/" }}
       {{- range $index, $file := partial "rangeFiles"  (dict "dir" "config/_default/" ) -}}
             {{- if or (in .file "params") (in .file "Params") -}}
-                {{- $single := partial "createParams" (dict "file" .file  "dir" "config/_default/" "params" $.Site.Params) -}}
+                {{- $single := partial "createParams" (dict "file" .file  "dir" "config/_default/" "params" $poppy_select) -}}
                 {{- $singles = $singles | append $single -}}
                 {{- $generalMenu = $generalMenu | append (dict "key" ( index $single "key" ) ) -}}
             {{- else if or (in .file "menu") (in .file "Menu") -}}
@@ -149,7 +193,7 @@
             {{- $fields = $fields | append (partial "createResourceBundleManagers" (dict "page" $st.Parent "dir" $resourceDir)) -}}
             {{- $fields := $fields | append (partial "createField" (dict "value" .Content "key" "mainContent" )) -}}
             {{- range $key, $value := .Params -}}
-                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $.Site.Params ) -}}
+                {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $poppy_select ) -}}
                 {{- $fields = $fields | append $field -}}
             {{- end -}}
             {{- $fields = partial "sortFields" $fields -}}
@@ -161,39 +205,28 @@
     {{- end -}}
 {{- end -}}
 
-
 {{- range $homeSinglePages -}}
       {{- $language := "" -}}
       {{- if and .Language.Lang  $homepage.IsTranslated -}}
           {{- $language = .Language.Lang -}}
       {{- end -}}
-      {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language "params" $.Site.Params )) -}}
+      {{- $single := (partial "createSingle" (dict "page" . "prefix" "h_" "language" $language "params" $poppy_select )) -}}
       {{- $singles = $singles | append $single -}}
       {{- $homeMenu = $homeMenu | append (dict "key" $single.key ) -}}
-{{- end -}}
-
-{{/*---------------------------Contentbocks----------------------------- */}}
-
-{{- $contentblocks := .Site.GetPage "/contentblocks" -}}
-
-{{- with $contentblocks -}}
-  {{- $collection := (partial "createContentblockCollection" (dict "page" . "params" $.Site.Params )) -}}
-  {{- if gt (len $collection) 0 -}}
-      {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
-      {{- $collections = $collections | append $collection -}}
-  {{- end -}}
 {{- end -}}
 
 {{/*------------------------Collections------------------------ */}}
 
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
-    {{- $collectionPages = $collectionPages | append . -}}
+    {{ if not (eq .Type "poppy-components" )}}
+      {{- $collectionPages = $collectionPages | append . -}}
+    {{ end }}
 {{- end -}}
 
 {{- $additionalCollections := slice -}}
 {{- range .Site.AllPages -}}
     {{- with .Parent -}}
-        {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) -}}
+        {{- if and (eq .Kind "section") (not (in $collectionPages . )) (not (in $additionalCollections .Path )) (not (eq .Type "poppy-components" )) -}}
             {{- $additionalCollections = $additionalCollections | append .Path -}}
             {{- $collectionPages = $collectionPages | append . -}}
         {{- end -}}
@@ -201,11 +234,15 @@
 {{- end -}}
 
 {{- range $collectionPages -}}
-      {{- $collection := (partial "createCollection" (dict "page" . "params" $.Site.Params )) -}}
-      {{- if gt (len $collection) 0 }}
-          {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
-          {{- $collections = $collections | append $collection -}}
-      {{- end -}}
+    {{- $collection := (partial "createCollection" (dict "page" . "params" $poppy_select )) -}}
+    {{- if gt (len $collection) 0 }}
+        {{- $collections = $collections | append $collection -}}
+        {{- if eq (index $collection "key") "c__my-components" -}}
+            {{- $generalMenu = $generalMenu | append (dict "key" (index $collection "key")) -}}
+        {{- else -}}
+            {{- $collectionMenu = $collectionMenu | append (dict "key" (index $collection "key")) -}}
+        {{- end -}}
+    {{- end -}}
 {{- end -}}
 
 {{/*---------------------------Singles----------------------------- */}}
@@ -231,9 +268,9 @@
 {{- end -}}
 
 {{- range $singlePages -}}
-    {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_" "params" $.Site.Params) ) -}}
+    {{- $single := (partial "createSingle" (dict "page" . "prefix" "s_" "params" $poppy_select ) ) -}}
     {{ if gt (len $single) 0 }}
-        {{- if ne $single.file "" -}}
+        {{- if and (ne $single.file "") (ne $single.key "s__poppy-components") (ne $single.key "s__my-components") -}}
           {{- $singles = $singles | append $single -}}
           {{- $singlesMenu = $singlesMenu | append (dict "key" $single.key ) -}}
         {{- end -}}
@@ -243,7 +280,6 @@
 {{/*--------------------pogoMenu items --------------------*/}}
 
 {{- $pogoCMS := dict -}}
-
 {{- range $index, $file := readDir "/" -}}
   {{- if eq $file.Name "zpogomenu.json" -}}
       {{- $pogoCMS = getJSON "/zpogomenu.json" -}}
@@ -285,8 +321,6 @@
   {{- end -}}
 {{- end -}}
 
-
-
 {{/*---------------------------Menu based----------------------------- */}}
 {{- $sukohMenu := slice -}}
 
@@ -297,12 +331,12 @@
 
 {{- if gt (len $singlesMenu) 0 }}
     {{- $sortedSinglesMenu := sort $singlesMenu "key" "asc" -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "singles" "title" "Single pages" "menuItems" $sortedSinglesMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "singles" "title" "Main pages" "menuItems" $sortedSinglesMenu) -}}
 {{- end -}}
 
 {{- if gt (len $collectionMenu) 0 }}
     {{- $sortedCollectionMenu := sort $collectionMenu "key" "asc" -}}
-    {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Collections of pages" "menuItems" $sortedCollectionMenu) -}}
+    {{- $sukohMenu = $sukohMenu | append (dict "key" "collections" "title" "Detail pages" "menuItems" $sortedCollectionMenu) -}}
 {{- end -}}
 
 {{- if gt (len $dataMenu) 0 }}

@@ -1,5 +1,6 @@
 {{- $collection := "" -}}
 {{- $params := dict -}}
+{{- $poppy_components := .poppy_components }}
 {{- with .params }} {{$params = . }}{{- end -}}
 {{- $contentDir := (partial "getContentDir" .page ) -}}
 {{- $baseKey := partial "createKey" .page  -}}
@@ -32,7 +33,7 @@
             {{- $fields = $fields | append (partial "createField" (dict "value" .Content "key" "mainContent")) -}}
             {{- range $key, $value := .Page.Params -}}
             {{- if ne $key "maincontent" -}}
-                    {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath "params" $params) -}}
+                    {{- $field := partial "createField" (dict "key" $key "value" $value "file" $filePath "params" $params "poppy_components" $poppy_components) -}}
                     {{- $fields = $fields | append $field -}}
                 {{- end -}}
             {{- end -}}

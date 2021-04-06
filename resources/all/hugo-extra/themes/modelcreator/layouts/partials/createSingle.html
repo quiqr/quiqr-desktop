@@ -1,4 +1,5 @@
 {{- $contentDir := (partial "getContentDir" .page ) -}}
+{{- $poppy_components := .poppy_components -}}
 {{- $params := dict -}}
 {{- with .params }} {{$params = . }}{{- end -}}
 {{- $language := "" -}}
@@ -11,7 +12,7 @@
 {{- $pageKey := printf "%s%s_%s" .prefix $language $baseKey  -}}
 {{- if $language -}} {{ $language = (printf "%s | " $language) }} {{- end -}}
 {{- $pageTitle := printf "%s%s"  $language ($baseKey | humanize) -}}
-{{- if .File -}}
+{{- if .page.File -}}
     {{- if and (.page.IsSection) (gt (len .page.RegularPages) 0 ) -}}
       {{- $pageTitle = printf "%s listpage" $pageTitle  -}}
     {{- end -}}
@@ -35,7 +36,7 @@
 {{- with $page.File -}} {{ $filePath = .Path -}} {{- end -}}
 {{- range $key, $value := .page.Params -}}
     {{- if ne $key "maincontent" -}}
-        {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $params ) -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key "file" $filePath "params" $params "poppy_components" $poppy_components) -}}
         {{- $fields = $fields | append $field -}}
     {{- end -}}
 {{- end -}}
