@@ -38,7 +38,8 @@ class AccordionItem extends React.Component{
         let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bodyStyle, style, wrapperProps } = this.props;
 
         let _headStyle = Object.assign({
-            border: 'solid 1px #e8e8e8',
+            border: 'solid 1px #d8d8d8',
+            //backgroundColor: '#e2e2e2',
             padding: '16px',
             display:'block',
             cursor:'pointer',
@@ -49,7 +50,7 @@ class AccordionItem extends React.Component{
         let _bodyStyle = Object.assign({
             display:active?'block':'none',
             padding:'16px 0',
-            border: 'solid 1px #e8e8e8',
+            border: 'solid 1px #d8d8d8',
             borderTopWidth: 0
         },bodyStyle);
 
