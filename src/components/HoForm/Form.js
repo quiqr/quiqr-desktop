@@ -155,6 +155,10 @@ class Form extends React.Component<FormProps,FormState> {
     }
 
     renderField(node : DynamicFormNode<FieldBase>, onValueChanged : ?(value: any) => void){
+
+        //service.api.logToConsole('+++++++++++++++++++++');
+        //service.api.logToConsole(node.field.key);
+
         var {field} = node;
         let component = this.props.componentRegistry.get(field.type);
         try{
