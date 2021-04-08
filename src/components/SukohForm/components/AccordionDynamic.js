@@ -148,9 +148,13 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         context.value.map( async (item: any, childIndex: number)=>{
             let componentKey = `item-${childIndex}`;
 
-            if("dynFormObjectRoot" in field && "dynFormSearchKey" in field){
+            if("dynFormSearchKey" in field){
                 let dynFormObjectFile = "sukoh"; //search in sukoh by default
+                let dynFormObjectRoot = "partials"; //search in sukoh by default
 
+                if("dynFormObjectRoot" in field){
+                    dynFormObjectRoot = field.dynFormObjectRoot;
+                }
                 if("dynFormObjectFile" in field){
                     dynFormObjectFile = field.dynFormObjectFile;
                 }
@@ -159,7 +163,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                 let searchVal = item[searchKey];
                 let dynSearchKeyVal = { key: searchKey, val: searchVal }
 
-                await service.api.getDynFormFields( dynFormObjectFile, field.dynFormObjectRoot, dynSearchKeyVal).then(function(extraFields){
+                await service.api.getDynFormFields( dynFormObjectFile, dynFormObjectRoot, dynSearchKeyVal).then(function(extraFields){
                     if (typeof extraFields !== 'undefined') {
 
                         let cleanedFieldFields = field.fields.filter(function( obj ) {
