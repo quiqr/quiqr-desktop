@@ -1,8 +1,10 @@
 {{- $fields := slice -}}
+{{/* {{ warnf (printf "page in bundlem is %s %s " .page (.dir)) }} */}}
 {{- if not (path.Ext .dir) -}}
-    {{- if or .page.IsSection  .page.IsHome -}}
+    {{- if or .page.IsSection .page.IsHome -}}
       {{- $fields = $fields | append (partial "createField" (dict "key" "page_related_images" "value" "" "type" "bundle-manager")) -}}
-    {{- else if .page.Resources -}}
+    {{- else if (gt (len .page.Resources) 0) -}}
+
         {{- $hasResourceDir := false -}}
         {{- range (readDir .dir) -}}
             {{- if .IsDir -}}
@@ -15,6 +17,7 @@
         {{- end -}}
     {{- else if .page.IsPage -}}
       {{- $fields = $fields | append (partial "createField" (dict "key" "page_related_images" "value" "images/" "type" "bundle-manager")) -}}
+    {{- else -}}
     {{- end -}}
 {{- end -}}
 {{- return $fields -}}

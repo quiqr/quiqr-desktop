@@ -82,7 +82,7 @@ class MenuManager {
 
         const dialog = electron.dialog;
         let config = await workspaceConfigProvider.getConfig(global.currentSitePath, global.currentWorkspaceKey);
-        let hugover = 'extended_0.82';
+        let hugover = 'extended_0.76.5';
         let modelPath = path.join(pathHelper.getTempDir(),"model");
         let modelFile = path.join(modelPath, "sukoh.json");
         let menuFile = path.join(modelPath, "zpogomenu.json");
