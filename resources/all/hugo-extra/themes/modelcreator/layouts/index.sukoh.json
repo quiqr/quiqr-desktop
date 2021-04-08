@@ -50,6 +50,14 @@
 
 {{- $poppy_select = merge $poppy_select (dict "list" $listSelect ) -}}
 
+{{- $colors := slice -}}
+{{- range $key, $value := site.Data.design.colorscheme -}}
+    {{- $colors = $colors | append $value.name -}}
+{{- end -}}
+{{ $colors = $colors | append "white" -}}
+{{ $colors = $colors | append "transparent" -}}
+{{- $poppy_select = merge $poppy_select (dict "color" $colors "bg_color" $colors "text_color" $colors "item_bg_color" $colors "border_color" $colors) -}}
+
 {{/*------------------------------ Languages -----------------------------*/}}
 
 {{- range .Site.Languages -}}
@@ -392,7 +400,6 @@
 {{- end -}}
 
 {{/*-----------------The core getting it all together------------- */}}
-
 
 {{- $hugover := printf "extended_%s" hugo.Version -}}
 {{- $serve := slice (dict "key" "default" "config" (partial "configFile" .)) -}}

@@ -1,5 +1,6 @@
 {{- $file := .file -}}
 {{- $key := .key -}}
+{{- $field := dict -}}
 {{- $poppy_components := .poppy_components }}
 
 {{- $poppy_select := dict -}}
@@ -16,12 +17,26 @@
     {{- $pogoType = partial "pogoType" (dict "value" $value "key" $key) -}}
 {{- end -}}
 {{- $title := humanize $key -}}
-{{- $field := dict "key" $key "title" $title "type" $pogoType -}}
+
+{{- if not (eq $pogoType "skip") -}}
+  {{- $field = dict "key" $key "title" $title "type" $pogoType -}}
+{{- end -}}
+
 {{- if (eq $pogoType "date") -}}
     {{- $field = merge $field (dict "default" "now") -}}
 {{- end -}}
 
 {{- if (eq $pogoType "section") -}}
+  {{- $subfields := slice -}}
+      {{- range $key, $value := $value -}}
+          {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
+          {{- $field := partial "createField" (dict "value" $value "key" $key "file" $file "params" $poppy_select) -}}
+          {{- $subfields = $subfields | append $field -}}
+      {{- end -}}
+      {{- $field = merge $field (dict "groupdata" true "fields" $subfields) -}}
+{{- end -}}
+
+{{- if (eq $pogoType "nest") -}}
   {{- $subfields := slice -}}
       {{- range $key, $value := $value -}}
           {{- $pogoType := partial "pogoType" (dict "value" $value "key" $key) -}}
