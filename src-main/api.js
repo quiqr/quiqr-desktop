@@ -293,7 +293,7 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}/*: any*/, context/*:
     });
 }
 
-api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, searchLevelKeyVals }, context){
+api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, searchLevelKeyVal }, context){
 
     let fileExp = path.join(global.currentSitePath,searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     let filePath = glob.sync(fileExp)[0] ;
@@ -305,10 +305,9 @@ api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, sea
     }
     let returnData = await formatProvider.parse(strData);
     if(searchRootNode in returnData){
-        let dynConf = returnData[searchRootNode].find(x => x[searchLevelKeyVals[0]['key']] === searchLevelKeyVals[0]['val']);
+        let dynConf = returnData[searchRootNode].find(x => x[searchLevelKeyVal['key']] === searchLevelKeyVal['val']);
         context.resolve(dynConf);
     }
-
 }
 
 api.openSingleInEditor = function({siteKey, workspaceKey, singleKey}, context) {

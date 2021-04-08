@@ -143,37 +143,38 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         let {field} = node;
 
         let dynFields = {}
+        let dynFieldsEmpty = field.fields;
 
         context.value.map( async (item: any, childIndex: number)=>{
             let componentKey = `item-${childIndex}`;
 
-            let efields = []
-            if("dynFormSearchRoot" in field){
-                let dynFormSearchObjectFile = "sukoh";
+            if("dynFormObjectRoot" in field && "dynFormSearchKey" in field){
+                let dynFormObjectFile = "sukoh"; //search in sukoh by default
 
-                if("dynFormSearchKeyLevel")
-                    if("dynFormSearchObjectFile" in field){
-                        dynFormSearchObjectFile = field.dynFormSearchObjectFile;
-                    }
-
-                let dynSearchKeyVals = [];
-                let level = 0;
-                while("dynFormSearchKeyLevel"+level.toString() in field){
-                    let searchKey = field["dynFormSearchKeyLevel"+level.toString()];
-                    let searchVal = item[searchKey];
-                    dynSearchKeyVals.push({ key: searchKey, val: searchVal });
-                    level++;
+                if("dynFormObjectFile" in field){
+                    dynFormObjectFile = field.dynFormObjectFile;
                 }
 
-                await service.api.getDynFormFields( dynFormSearchObjectFile, field.dynFormSearchRoot, dynSearchKeyVals).then(function(extraFields){
+                let searchKey = field["dynFormSearchKey"];
+                let searchVal = item[searchKey];
+                let dynSearchKeyVal = { key: searchKey, val: searchVal }
+
+                await service.api.getDynFormFields( dynFormObjectFile, field.dynFormObjectRoot, dynSearchKeyVal).then(function(extraFields){
                     if (typeof extraFields !== 'undefined') {
-                        dynFields[componentKey] = field.fields.concat(extraFields.fields);
+
+                        let cleanedFieldFields = field.fields.filter(function( obj ) {
+                            let found = extraFields.fields.find((x)=>x.key===obj.key);
+                            if (typeof found === 'undefined') {
+                                return true;
+                            }
+                        });
+
+                        dynFields[componentKey] = cleanedFieldFields.concat(extraFields.fields);
                     }
                 });
             }
 
         });
-        let dynFieldsEmpty = field.fields;
         this.setState({dynFields: dynFields, dynFieldsEmpty: dynFieldsEmpty});
     }
 
@@ -223,7 +224,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                 if(arrayTitle && newNode.state[arrayTitle.key]){
                     label = newNode.state[arrayTitle.key];
                 }
-
 
                 let headStyle = {
                     backgroundColor: '#eee',

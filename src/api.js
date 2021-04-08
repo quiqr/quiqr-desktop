@@ -24,8 +24,8 @@ export class API {
         return mainProcessBridge.request('logToConsole', {message});
     }
 
-    getDynFormFields(searchFormObjectFile: string, searchRootNode: string, searchLevelKeyVals: any){
-        return mainProcessBridge.request('getDynFormFields', {searchFormObjectFile, searchRootNode, searchLevelKeyVals});
+    getDynFormFields(searchFormObjectFile: string, searchRootNode: string, searchLevelKeyVal: any){
+        return mainProcessBridge.request('getDynFormFields', {searchFormObjectFile, searchRootNode, searchLevelKeyVal});
     }
 
     importSite(){
