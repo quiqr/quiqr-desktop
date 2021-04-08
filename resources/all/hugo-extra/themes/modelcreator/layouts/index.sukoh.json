@@ -16,30 +16,47 @@
 
 {{/*------------------------------ Poppyselect -----------------------------*/}}
 
-{{- $poppy_types := slice -}}
-{{- $poppy_variants := slice -}}
+{{- $component_types := slice -}}
+{{- $component_variants := slice -}}
 
-{{- $poppy_types = $poppy_types | append "my-component" -}}
+{{- $component_types = $component_types | append "my-component" -}}
 
 {{- range (site.GetPage "/my-components" ).Pages }}
-  {{- $poppy_variant := (index (split .Dir "/" ) 1) -}}
-  {{- if not (in $poppy_variants $poppy_variant) -}}
-      {{- $poppy_variants = $poppy_variants | append $poppy_variant -}}
+  {{- $component_variant := (index (split .Dir "/" ) 1) -}}
+  {{- if not (in $component_variants $component_variant) -}}
+      {{- $component_variants = $component_variants | append $component_variant -}}
   {{- end -}}
 {{- end -}}
 
 {{- range (site.GetPage "/poppy-components" ).Pages }}
-  {{- $poppy_type := (index (split .Dir "/" ) 1) -}}
-  {{- $poppy_variant := (index (split .Dir "/" ) 2) -}}
-  {{- if not (in $poppy_types $poppy_type) -}}
-      {{- $poppy_types = $poppy_types | append $poppy_type -}}
+  {{- $component_type := (index (split .Dir "/" ) 1) -}}
+  {{- $component_variant := (index (split .Dir "/" ) 2) -}}
+  {{- if not (in $component_types $component_type) -}}
+      {{- $component_types = $component_types | append $component_type -}}
   {{- end -}}
-  {{- if not (in $poppy_variants $poppy_variant) -}}
-      {{- $poppy_variants = $poppy_variants | append $poppy_variant -}}
+  {{- if not (in $component_variants $component_variant) -}}
+      {{- $component_variants = $component_variants | append $component_variant -}}
   {{- end -}}
 {{- end }}
 
-{{- $poppy_select = merge $poppy_select (dict "poppy_type" $poppy_types "poppy_variant" $poppy_variants ) -}}
+{{- $poppy_select = merge $poppy_select (dict "component_type" $component_types "component_variant" $component_variants ) -}}
+
+{{- $listSelect := slice -}}
+{{- range site.Sections -}}
+  {{- if and (ne .Type "my-components") (ne .Type "poppy-components") -}}
+    {{- $listSelect = $listSelect | append .Type -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $poppy_select = merge $poppy_select (dict "list" $listSelect ) -}}
+
+{{- $colors := slice -}}
+{{- range $key, $value := site.Data.design.colorscheme -}}
+    {{- $colors = $colors | append $value.name -}}
+{{- end -}}
+{{ $colors = $colors | append "white" -}}
+{{ $colors = $colors | append "transparent" -}}
+{{- $poppy_select = merge $poppy_select (dict "color" $colors "bg_color" $colors "text_color" $colors "item_bg_color" $colors "border_color" $colors) -}}
 
 {{/*------------------------------ Languages -----------------------------*/}}
 
@@ -383,7 +400,6 @@
 {{- end -}}
 
 {{/*-----------------The core getting it all together------------- */}}
-
 
 {{- $hugover := printf "extended_%s" hugo.Version -}}
 {{- $serve := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
