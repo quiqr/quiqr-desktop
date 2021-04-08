@@ -42,7 +42,13 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     constructor(props: ComponentProps<AccordionDynamicField>){
         super(props);
 
-        this.state = {index: null, dragFromIndex: null, dragToIndex: null};
+        this.state = {
+            index: null,
+            dragFromIndex: null,
+            dragToIndex: null,
+            dynFields: {},
+            dynFieldsEmpty: []
+        };
     }
 
     extendField(field: AccordionDynamicField, fieldExtender: FieldsExtender){
@@ -195,11 +201,13 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
             let renderItem = (componentKey: string, item: any, childIndex: number, isDragging: bool = false)=>{
 
-                if(componentKey in this.state.dynFields){
-                    field.fields = this.state.dynFields[componentKey];
-                }
-                else{
-                    field.fields = this.state.dynFieldsEmpty;
+                if(this.state.dynFieldsEmpty.length > 0){
+                    if(componentKey in this.state.dynFields){
+                        field.fields = this.state.dynFields[componentKey];
+                    }
+                    else{
+                        field.fields = this.state.dynFieldsEmpty;
+                    }
                 }
 
                 let label = 'Untitled';
