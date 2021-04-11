@@ -15,11 +15,11 @@ export const websiteConfiguration: FormCookbookSample = {
         ]}
     ],
     values: {
-        title: 'Sukoh, a sleek CMS for Hugo',
-        baseURL: 'https://sukoh.gitlab.io',
+        title: 'PoppyGo',
+        baseURL: 'https://poppygo.io',
         params: {
             author: 'Multiple Authors',
-            description: 'Sukoh, a open source CMS for Hugo. Try it now!'
+            description: 'PoppyGo, the app for Hugo. Try it now!'
         }
     }
 }
