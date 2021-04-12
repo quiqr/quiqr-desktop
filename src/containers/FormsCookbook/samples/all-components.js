@@ -1,16 +1,14 @@
-//@flow
-
 import type {FormCookbookSample} from '../samples';
 
 let fields: Array<any> = [
-    // { key: 'array-section', title:'Array', type:'section', groupdata:false, fields:[
-    //     { key:'array', title:'Array', type:'array', fields:[
-    //         { key:'title', title:'Title', type:'string', "arrayTitle": true },
-    //         { key:'boolean1', title:'Boolean 1', type:'boolean' },
-    //         { key:'boolean2', title:'Boolean 2', type:'boolean' },
-    //         { key:'boolean3', title:'Boolean 3', type:'boolean' }
-    //     ]}
-    // ]},
+    { key: 'array-section', title:'Array', type:'section', groupdata:false, fields:[
+        { key:'array', title:'Array', type:'array', fields:[
+            { key:'title', title:'Title', type:'string', "arrayTitle": true },
+            { key:'boolean1', title:'Boolean 1', type:'boolean' },
+            { key:'boolean2', title:'Boolean 2', type:'boolean' },
+            { key:'boolean3', title:'Boolean 3', type:'boolean' }
+        ]}
+    ]},
     { key: 'accordion-section', title:'Accordion', type:'section', groupdata:false, fields:[
         { key:'accordion', title:'accordion', type:'accordion', fields:[
             { key:'title', title:'Title', type:'string', "arrayTitle": true },
