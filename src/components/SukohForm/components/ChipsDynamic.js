@@ -2,13 +2,18 @@
 
 import React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
+
+import FormItemWrapper from './shared/FormItemWrapper';
+
 import Chips from '../../Chips';
+import Tip from '../../Tip';
 //import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 type ChipsDynamicField = {
     type: string,
+    tip: string,
     key: string,
     compositeKey: string,
     default: ?Array<string>
@@ -76,9 +81,12 @@ class ChipsDynamic extends BaseDynamic<ChipsDynamicField, ChipsDynamicState> {
             return (null);
         }
 
+        let iconButtons = [];
+        if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
+
         return (
-        <DefaultWrapper>
-            <Chips
+            <FormItemWrapper
+                control={<Chips
                 items={context.value}
                 sortable={true}
                 underlineShow={true}
@@ -87,8 +95,11 @@ class ChipsDynamic extends BaseDynamic<ChipsDynamicField, ChipsDynamicState> {
                 onRequestDelete={this.handleRequestDelete.bind(this)}
                 onPushItem={this.handlePushItem.bind(this)}
                 onSwap={this.handleSwap.bind(this)}
-            />
-        </DefaultWrapper>);
+            />}
+            iconButtons={iconButtons}
+            >
+
+        </FormItemWrapper>);
     }
 }
 
