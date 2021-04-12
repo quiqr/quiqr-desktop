@@ -9,7 +9,7 @@ type EmptyLineDynamicField = {
 }
 
 type EmptyLineDynamicState = {
-    
+
 }
 
 class EmptyLineDynamic extends BaseDynamic<EmptyLineDynamicField, EmptyLineDynamicState> {
@@ -19,15 +19,22 @@ class EmptyLineDynamic extends BaseDynamic<EmptyLineDynamicField, EmptyLineDynam
     }
 
     renderComponent(){
-        
+
         let {context} = this.props;
         let {node, currentPath, parentPath} = context;
         let {field} = node;
 
         if(currentPath!==parentPath){ return (null); }
+        let amount = field.amount||1;
+        let lines = [];
+        let idx;
+        for (idx = 0; idx < amount; idx++) {
+            lines.push(<br key={idx}/>)
+        }
 
         return (<div>
-            { new Array(field.amount||1).map((d,i)=><br key={i} />) }
+        {lines}
+
         </div>);
     }
 }
