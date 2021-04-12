@@ -24,8 +24,7 @@ const Fragment = React.Fragment;
 
 type AccordionDynamicField = {
     title:string,
-    fields:Array<any>,
-    groupdata: ?bool
+    fields:Array<any>
 } & FieldBase;
 
 type AccordionDynamicState = {

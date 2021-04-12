@@ -4,7 +4,6 @@ import { FloatingActionButton } from 'material-ui/';
 import { FormBreadcumb } from '../Breadcumb';
 import IconCheck from 'material-ui/svg-icons/navigation/check';
 import dynamicFormComponents from './components/all'
-//import service from '../../services/service';
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 

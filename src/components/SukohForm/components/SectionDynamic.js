@@ -1,8 +1,4 @@
-//@flow
-
 import React from 'react';
-//import dynamicComponentUtils from './shared/dynamic-component-utils';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
 import type { DynamicFormNode, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
 
 import { BaseDynamic } from '../../HoForm';

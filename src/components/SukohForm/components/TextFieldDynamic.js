@@ -1,10 +1,7 @@
-//@flow
-
 import * as React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import TextField from 'material-ui/TextField';
 import Tip from '../../Tip';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 
 type TextFieldDynamicField = {
@@ -22,10 +19,6 @@ type TextFieldDynamicState = {
 }
 
 class TextFieldDynamic extends BaseDynamic<TextFieldDynamicField,TextFieldDynamicState> {
-
-    // constructor(props: ComponentProps<TextFieldDynamicField>){
-    //     super(props);
-    // }
 
     normalizeState({state, field}: {state: any, field: TextFieldDynamicField}){
         let key = field.key;

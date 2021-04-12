@@ -1,9 +1,5 @@
-// @flow
-
 import { BaseDynamic } from '../../HoForm';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FieldsExtender, FormStateBuilder } from '../../HoForm';
 import type { DynamicFormNode, FieldsExtender, FormStateBuilder } from '../../HoForm';
-//import dynamicComponentUtils from './shared/dynamic-component-utils';
 
 type PullDynamicField = {
     type: string,

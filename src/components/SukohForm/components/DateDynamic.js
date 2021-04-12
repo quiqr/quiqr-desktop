@@ -1,5 +1,3 @@
-//@flow
-
 import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import DatePicker from 'material-ui/DatePicker';
