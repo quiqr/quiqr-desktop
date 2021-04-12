@@ -1,5 +1,6 @@
 //@flow
 
+import service from '../../../services/service';
 import React from 'react';
 import { Accordion, AccordionItem } from '../../Accordion'
 import { List, ListItem } from 'material-ui/List';
@@ -39,7 +40,14 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
     constructor(props: ComponentProps<AccordionDynamicField>){
         super(props);
-        this.state = {index: null, dragFromIndex: null, dragToIndex: null};
+
+        this.state = {
+            index: null,
+            dragFromIndex: null,
+            dragToIndex: null,
+            dynFields: {},
+            dynFieldsEmpty: []
+        };
     }
 
     extendField(field: AccordionDynamicField, fieldExtender: FieldsExtender){
@@ -127,6 +135,52 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         }.bind(this)
     }
 
+    componentDidMount(){
+
+        let {context} = this.props;
+        let {node, currentPath} = context;
+        let {field} = node;
+
+        let dynFields = {}
+        let dynFieldsEmpty = field.fields;
+
+        context.value.map( async (item: any, childIndex: number)=>{
+            let componentKey = `item-${childIndex}`;
+
+            if("dynFormSearchKey" in field){
+                let dynFormObjectFile = "sukoh"; //search in sukoh by default
+                let dynFormObjectRoot = "partials"; //search in sukoh by default
+
+                if("dynFormObjectRoot" in field){
+                    dynFormObjectRoot = field.dynFormObjectRoot;
+                }
+                if("dynFormObjectFile" in field){
+                    dynFormObjectFile = field.dynFormObjectFile;
+                }
+
+                let searchKey = field["dynFormSearchKey"];
+                let searchVal = item[searchKey];
+                let dynSearchKeyVal = { key: searchKey, val: searchVal }
+
+                await service.api.getDynFormFields( dynFormObjectFile, dynFormObjectRoot, dynSearchKeyVal).then(function(extraFields){
+                    if (typeof extraFields !== 'undefined') {
+
+                        let cleanedFieldFields = field.fields.filter(function( obj ) {
+                            let found = extraFields.fields.find((x)=>x.key===obj.key);
+                            if (typeof found === 'undefined') {
+                                return true;
+                            }
+                        });
+
+                        dynFields[componentKey] = cleanedFieldFields.concat(extraFields.fields);
+                    }
+                });
+            }
+
+        });
+        this.setState({dynFields: dynFields, dynFieldsEmpty: dynFieldsEmpty});
+    }
+
     renderComponent(){
 
         let {context} = this.props;
@@ -136,7 +190,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         if(currentPath===context.parentPath){
 
             return (<List style={{marginBottom:16, padding: 0}}><ListItem
-                style={{ border: 'solid 1px #e8e8e8', borderRadius:'7px'}}
+                style={{ border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
                 onClick={ function(){ context.setPath(node) } }
                 leftIcon={<IconFileFolder />}
                 rightIcon={<IconChevronRight />}
@@ -150,6 +204,15 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
             let { dragToIndex, dragFromIndex } = this.state;
 
             let renderItem = (componentKey: string, item: any, childIndex: number, isDragging: bool = false)=>{
+
+                if(this.state.dynFieldsEmpty.length > 0){
+                    if(componentKey in this.state.dynFields){
+                        field.fields = this.state.dynFields[componentKey];
+                    }
+                    else{
+                        field.fields = this.state.dynFieldsEmpty;
+                    }
+                }
 
                 let label = 'Untitled';
 
@@ -165,15 +228,19 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                     label = newNode.state[arrayTitle.key];
                 }
 
-                let background;
+                let headStyle = {
+                    backgroundColor: '#eee',
+                }
                 if(isDragging){
-                    background = '#eee';
+                    headStyle = {
+                        backgroundColor: "#e2e2e2",
+                    };
                 }
 
                 return (
                     <AccordionItem key={componentKey}
                         label={label}
-                        style={{background}}
+                        headStyle={headStyle}
                         bodyStyle={{padding:'16px 16px 0px 16px'}}
                         body={ context.renderLevel(newNode) }
                         wrapperProps={{
@@ -204,6 +271,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
                     this.setState({index:this.state.index===index?-1:index});
                 }}>
                     {context.value.map((item: any, childIndex: number)=>{
+
                         let componentKey = `item-${childIndex}`;
                         if(childIndex===dragFromIndex){
                             return renderItem(componentKey, item, childIndex, true);

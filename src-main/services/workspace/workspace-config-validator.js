@@ -30,6 +30,7 @@ class WorkspaceConfigValidator {
                 menu: joi.array(),
                 collections: joi.array().required(),
                 singles: joi.array().required(),
+                partials: joi.array(),
                 build: joi.array().items(joi.object().keys({
                     key:joi.string(),
                     config:joi.string().required()
