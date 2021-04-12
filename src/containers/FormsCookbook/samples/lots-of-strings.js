@@ -10,6 +10,6 @@ export const lotsOfString: FormCookbookSample = {
         return { key:`title-${i}`, title:`Title-${i}`, type:'string' }
     }),
     values: {
-        
+
     }
 }

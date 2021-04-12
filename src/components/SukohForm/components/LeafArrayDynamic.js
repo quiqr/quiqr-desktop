@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react';
 import IconButton from 'material-ui/IconButton';
 import IconButtonGroup from '../../IconButtonGroup';
@@ -8,7 +6,6 @@ import DefaultWrapper from './shared/DefaultWrapper';
 import IconAdd from 'material-ui/svg-icons/content/add';
 import IconRemove from 'material-ui/svg-icons/content/remove';
 import { BaseDynamic } from '../../HoForm';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 
 class TextFieldLabelMock extends React.Component<{children: any},void>{
     render(){

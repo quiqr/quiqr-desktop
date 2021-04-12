@@ -1,5 +1,3 @@
-//@flow
-
 import type {FormCookbookSample} from '../samples';
 
 export const blogPost: FormCookbookSample = {
@@ -14,6 +12,6 @@ export const blogPost: FormCookbookSample = {
         { key:'draft', title:'Draft', type:'boolean'}
     ],
     values: {
-        
+
     }
 }

@@ -1,12 +1,9 @@
-//@flow
-
 import React from 'react';
 import ArrayListManager from '../../ArrayListManager';
 import { List, ListItem } from 'material-ui/List';
 import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import IconFileFolder from 'material-ui/svg-icons/file/folder';
 import { BaseDynamic } from '../../HoForm';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FieldsExtender, FormStateBuilder } from '../../HoForm';
 import type {DynamicFormNode, FieldsExtender, FormStateBuilder } from '../../HoForm';
 import dynamicComponentUtils from './shared/dynamic-component-utils';
 
