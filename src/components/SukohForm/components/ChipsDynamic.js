@@ -1,7 +1,9 @@
+//@flow
+
 import React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
 
-import FormItemWrapper from './shared/FormItemWrapper';
+//import FormItemWrapper from './shared/FormItemWrapper';
 
 import Chips from '../../Chips';
 import Tip from '../../Tip';
@@ -83,8 +85,8 @@ class ChipsDynamic extends BaseDynamic<ChipsDynamicField, ChipsDynamicState> {
         if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
         return (
-            <FormItemWrapper
-                control={<Chips
+        <DefaultWrapper>
+            <Chips
                 items={context.value}
                 sortable={true}
                 underlineShow={true}
@@ -93,11 +95,8 @@ class ChipsDynamic extends BaseDynamic<ChipsDynamicField, ChipsDynamicState> {
                 onRequestDelete={this.handleRequestDelete.bind(this)}
                 onPushItem={this.handlePushItem.bind(this)}
                 onSwap={this.handleSwap.bind(this)}
-            />}
-            iconButtons={iconButtons}
-            >
-
-        </FormItemWrapper>);
+            />
+        </DefaultWrapper>);
     }
 }
 
