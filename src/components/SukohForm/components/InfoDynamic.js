@@ -3,7 +3,6 @@
 import * as React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
 import { BaseDynamic } from '../../HoForm';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
 import MarkdownIt from 'markdown-it';
 const md = new MarkdownIt({html:true});
 
@@ -29,7 +28,7 @@ type InfoDynamicField = {
     key: string,
     compositeKey: string,
     content: string,
-    size: number,
+    size: string,
     lineHeight: string,
     theme: 'default' | 'bare' | 'warn' | 'warn-bare' | 'black' | 'black-bare' | 'gray' | 'gray-bare'
 }
