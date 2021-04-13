@@ -1,21 +1,16 @@
 //@flow
 
 import React from 'react';
-import {List, ListItem } from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-//import IconActionList from 'material-ui/svg-icons/action/list';
-//import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
-//import IconMenu from 'material-ui/svg-icons/navigation/menu';
+import {List, ListItem } from 'material-ui-02/List';
+import Subheader from 'material-ui-02/Subheader';
 import Border from './../components/Border';
 
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-//import { FlatButton, IconButton } from 'material-ui';
+import darkBaseTheme from 'material-ui-02/styles/baseThemes/darkBaseTheme';
+import MuiThemeProvider from 'material-ui-02/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui-02/styles/getMuiTheme';
 
 const Fragment = React.Fragment;
 const translucentColor = 'RGBA(255,255,255,1)';
-//const translucentColorSubtle = 'RGBA(255,0,255,1)';
 
 let MenuBorder = ({ children }) => {
   return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>

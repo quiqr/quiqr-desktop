@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Spinner from './../../components/Spinner'
-import { Dialog, FlatButton } from 'material-ui';
+import { Dialog, FlatButton } from 'material-ui-02';
 
 type DeleteItemKeyDialogProps = {
   busy: bool,

@@ -1,7 +1,5 @@
-//@flow
 import * as React from 'react';
-//import { RaisedButton, TextField } from 'material-ui';
-import {TextField } from 'material-ui';
+import {TextField } from 'material-ui-02';
 import FolderPicker from './../../../../../components/FolderPicker';
 
 type FolderSourceFormModel = {

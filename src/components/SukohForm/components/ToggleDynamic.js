@@ -1,7 +1,7 @@
 import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import Tip from '../../Tip';
-import Toggle from 'material-ui/Toggle';
+import Toggle from 'material-ui-02/Toggle';
 import type { FormStateBuilder } from '../../HoForm';
 
 import { BaseDynamic } from '../../HoForm';

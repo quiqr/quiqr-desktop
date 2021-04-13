@@ -1,12 +1,11 @@
 import React from 'react';
 import { Breadcumb, BreadcumbItem } from './Breadcumb';
-import Divider from 'material-ui/Divider'
-import {List, ListItem} from 'material-ui/List'
-import FileFolderIcon from 'material-ui/svg-icons/file/folder';
-import FileIcon from 'material-ui/svg-icons/editor/insert-drive-file';
+import Divider from 'material-ui-02/Divider'
+import {List, ListItem} from 'material-ui-02/List'
+import FileFolderIcon from 'material-ui-02/svg-icons/file/folder';
+import FileIcon from 'material-ui-02/svg-icons/editor/insert-drive-file';
 
 const Fragment = React.Fragment;
-
 
 // return <ResourceManager
         //     fileTree={[

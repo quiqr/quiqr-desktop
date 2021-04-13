@@ -2,8 +2,8 @@ import React from 'react';
 import type {FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import FormItemWrapper from './shared/FormItemWrapper';
-import MenuItem from 'material-ui/MenuItem';
-import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui-02/MenuItem';
+import SelectField from 'material-ui-02/SelectField';
 import Tip from '../../Tip';
 
 type SelectDynamicField = {

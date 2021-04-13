@@ -1,9 +1,5 @@
-//@flow
-
 import React from 'react';
-//import Border from '../../Border';
-import IconBroken from 'material-ui/svg-icons/image/broken-image';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
+import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import Spinner from '../../Spinner';

@@ -1,8 +1,6 @@
-//@flow
-
 import * as React from 'react';
 
-import { Popover, Menu, MenuItem } from 'material-ui/';
+import { Popover, Menu, MenuItem } from 'material-ui-02/';
 
 type TriggerWithOptionsProps = {
     options: Array<string>,
@@ -48,7 +46,6 @@ export class TriggerWithOptions extends React.Component<TriggerWithOptionsProps,
       let result = this.props.onOptionClick(index);
       if(result!==false)
         this.setState({open:false});
-      
   }
 
   render() {

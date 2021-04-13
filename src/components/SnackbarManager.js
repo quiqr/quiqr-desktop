@@ -1,5 +1,5 @@
 import React from 'react';
-import Snackbar from 'material-ui/Snackbar';
+import Snackbar from 'material-ui-02/Snackbar';
 import { snackMessageService } from './../services/ui-service';
 const styles = {
   snackbarStyleViaContentProps: {

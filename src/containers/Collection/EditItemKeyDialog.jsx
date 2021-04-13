@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Spinner from './../../components/Spinner'
-import { Dialog, FlatButton, TextField } from 'material-ui';
+import { Dialog, FlatButton, TextField } from 'material-ui-02';
 
 type EditItemKeyDialogProps = {
   busy: bool,
