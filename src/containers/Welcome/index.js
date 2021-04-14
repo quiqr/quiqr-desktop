@@ -1,15 +1,22 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import service from './../../services/service';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 
-import { RaisedButton } from 'material-ui-02/';
-
-const styles = {
+const useStyles = makeStyles({
+    primaryButton: {
+        background: 'rgba(0,188,212,0.9)',
+        '&:hover': {
+            background: 'rgb(0,188,212)',
+            opacity: "1.0",
+        },
+    },
     container:{
         padding: '20px',
         height: '100%'
     },
-}
+});
 
 class Welcome extends React.Component {
 
@@ -48,14 +55,18 @@ class Welcome extends React.Component {
     }
 
     render(){
+        const classes = this.props.classes;
         return(
             <Route render={({history})=>{
 
                 this.history = history;
+
                 return (
-                    <div style={ styles.container }>
+                    <div className={ classes.container }>
                         <div style={{ border: 'solid 0px green', marginLeft: 'auto', marginTop: 13 }}>
-                            <RaisedButton primary={true} label="Close and continue" disabled={false} onClick={this.handleCloseClick} />
+                            <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleCloseClick}>
+                               Close and continue
+                            </Button>
                         </div>
                         <h1>Congratulations: You installed PoppyGo, The app for Hugo</h1>
                         <h3>You now have a publishing platform and CMS for your websites</h3>
@@ -75,7 +86,9 @@ class Welcome extends React.Component {
                             Your developer didn’t send you a site yet? Check the example template to start playing around.
                         </p>
                         <p>
-                            <RaisedButton primary={true} label="Import file" disabled={false} onClick={this.handleImportClick} />
+                            <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleImportClick}>
+                               Import file
+                            </Button>
                         </p>
                         <br/>
                         <strong><p>Are you developing a Hugo site on your local machine?</p></strong>
@@ -83,7 +96,9 @@ class Welcome extends React.Component {
                             Then open your existing site folder in PoppyGo to start content management and publishing right away.
                         </p>
                         <p>
-                            <RaisedButton primary={true} label="Open site" disabled={false} onClick={this.handleNewSiteClick} />
+                            <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleNewSiteClick}>
+                               Open site
+                            </Button>
                         </p>
                         <br/>
                         <strong><p>Are you new to Hugo sites, and do you want to start with an existing template?</p></strong>
@@ -100,4 +115,9 @@ class Welcome extends React.Component {
     }
 }
 
-export default Welcome;
+export default () => {
+    const classes = useStyles();
+    return (
+        <Welcome classes={classes} />
+    )
+}
