@@ -1,7 +1,7 @@
 import React from 'react';
-import FlatButton from 'material-ui/FlatButton';
-import IconNavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
-import IconNavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
+import FlatButton from 'material-ui-02/FlatButton';
+import IconNavigationExpandLess from 'material-ui-02/svg-icons/navigation/expand-less';
+import IconNavigationExpandMore from 'material-ui-02/svg-icons/navigation/expand-more';
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 

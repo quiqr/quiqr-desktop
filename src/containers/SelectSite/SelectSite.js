@@ -2,28 +2,16 @@ import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
-//import FlatButton from 'material-ui/FlatButton';
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-//import IconNavigationCheck from 'material-ui/svg-icons/navigation/check';
-import IconAdd from 'material-ui/svg-icons/content/add';
-//import IconFileFolder from 'material-ui/svg-icons/file/folder';
-//import TextField from 'material-ui/TextField';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import {List, ListItem} from 'material-ui-02/List';
+import Subheader from 'material-ui-02/Subheader';
+import IconAdd from 'material-ui-02/svg-icons/content/add';
+import muiThemeable from 'material-ui-02/styles/muiThemeable';
 import { Wrapper, MessageBlock } from './components/shared';
-//import { WorkspacesSimple } from './components/WorkspacesSimple';
 import CreateSiteDialog from './components/CreateSiteDialog';
-//import PublishSiteDialog from './components/PublishSiteDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
-//import MarkdownIt from 'markdown-it'
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
-
-//const md = new MarkdownIt({html:true});
-
-//$FlowFixMe
-//const Fragment = React.Fragment;
 
 const styles = {
     container:{

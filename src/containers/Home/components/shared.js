@@ -1,7 +1,5 @@
-//@flow
-
 import * as React from 'react';
-import { Subheader } from 'material-ui';
+import { Subheader } from 'material-ui-02';
 
 export const Wrapper = ({ title, style, children } : { title? : string, style? : any, children? : any } = {}) => {
     return <React.Fragment>

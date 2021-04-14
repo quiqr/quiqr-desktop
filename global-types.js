@@ -28,7 +28,6 @@ export type RawSiteConfig = {
     key: string,
     name: string,
     source: SiteSource<*>,
-    // transform: Array<SiteTransformConfig<*>>,
     publish: Array<SitePublishConfig<*>>
 }
 

@@ -2,13 +2,13 @@ import { Route } from 'react-router-dom';
 import React from 'react';
 import service from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
-import { RaisedButton } from 'material-ui/';
-import {List, ListItem} from 'material-ui/List';
-import IconAccountCircle from 'material-ui/svg-icons/action/account-circle';
-import IconDomain from 'material-ui/svg-icons/social/domain';
-import IconPublish from 'material-ui/svg-icons/editor/publish';
-import ActionThumbUp from 'material-ui/svg-icons/action/thumb-up'
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import { RaisedButton } from 'material-ui-02/';
+import {List, ListItem} from 'material-ui-02/List';
+import IconAccountCircle from 'material-ui-02/svg-icons/action/account-circle';
+import IconDomain from 'material-ui-02/svg-icons/social/domain';
+import IconPublish from 'material-ui-02/svg-icons/editor/publish';
+import ActionThumbUp from 'material-ui-02/svg-icons/action/thumb-up'
+import muiThemeable from 'material-ui-02/styles/muiThemeable';
 import { Wrapper, InfoLine } from './components/shared';
 import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';

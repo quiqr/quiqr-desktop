@@ -1,7 +1,5 @@
-//@flow
-
 import * as React from 'react';
-import { TextField, RaisedButton } from 'material-ui';
+import { TextField, RaisedButton } from 'material-ui-02';
 
 type FolderPickerProps = {
     onFolderSelected: (folder: ?string)=> void,
@@ -10,7 +8,7 @@ type FolderPickerProps = {
 }
 
 type FolderPickerState = {
-    
+
 }
 
 export default class FolderPicker extends React.Component<FolderPickerProps, FolderPickerState>{

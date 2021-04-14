@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import service from './../../../services/service';
-import { Dialog, FlatButton, TextField } from 'material-ui';
+import { Dialog, FlatButton, TextField } from 'material-ui-02';
 let net = window.require('electron').remote.net;
 
 export default class RegisterDialog extends React.Component{

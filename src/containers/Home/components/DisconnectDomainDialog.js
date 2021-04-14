@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import service from './../../../services/service';
-import { Dialog, FlatButton } from 'material-ui';
-import IconHttps from 'material-ui/svg-icons/action/https';
-import Paper from 'material-ui/Paper';
+import { Dialog, FlatButton } from 'material-ui-02';
+import IconHttps from 'material-ui-02/svg-icons/action/https';
+import Paper from 'material-ui-02/Paper';
 let net = window.require('electron').remote.net;
 
 export default class DisconnectDomainDialog extends React.Component{

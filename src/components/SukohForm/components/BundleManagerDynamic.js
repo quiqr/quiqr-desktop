@@ -1,10 +1,10 @@
 import React from 'react';
-import IconUpload from 'material-ui/svg-icons/file/folder-open';
-import RaisedButton from 'material-ui/RaisedButton';
+import IconUpload from 'material-ui-02/svg-icons/file/folder-open';
+import RaisedButton from 'material-ui-02/RaisedButton';
 import { BundleManager, BundleManagerItem } from '../../BundleManager';
 import DangerButton from '../../DangerButton';
-import FlatButton from 'material-ui/FlatButton';
-import IconRemove from 'material-ui/svg-icons/action/delete';
+import FlatButton from 'material-ui-02/FlatButton';
+import IconRemove from 'material-ui-02/svg-icons/action/delete';
 import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 

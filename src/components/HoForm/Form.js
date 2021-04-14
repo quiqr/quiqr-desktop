@@ -7,17 +7,13 @@ import { ComponentRegistry } from './component-registry';
 import { FormStateBuilder } from './form-state-builder';
 import service from '../../services/service';
 import { FieldsExtender } from './fields-extender';
-//import IconView from 'material-ui/svg-icons/action/visibility';
-import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
-import IconOpenEditor from 'material-ui/svg-icons/action/description';
-import IconBack from 'material-ui/svg-icons/navigation/arrow-back';
-import { IconButton } from 'material-ui';
-//import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
-
+import IconOpenBrowser from 'material-ui-02/svg-icons/action/open-in-browser';
+import IconOpenEditor from 'material-ui-02/svg-icons/action/description';
+import IconBack from 'material-ui-02/svg-icons/navigation/arrow-back';
+import { IconButton } from 'material-ui-02';
 
 const Fragment = React.Fragment;
 const componentMarginTop = '16px';
-
 
 type FormProps = {
     values: any,

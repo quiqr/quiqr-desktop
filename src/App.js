@@ -16,12 +16,10 @@ import Welcome from './containers/Welcome';
 import WorkspaceSidebar from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 
-//MATERIAL UI
-//import { MenuItem } from 'material-ui/';
-import lightBaseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import lightBaseTheme from 'material-ui-02/styles/baseThemes/lightBaseTheme';
+import darkBaseTheme from 'material-ui-02/styles/baseThemes/darkBaseTheme';
+import MuiThemeProvider from 'material-ui-02/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui-02/styles/getMuiTheme';
 
 import Redirect from 'react-router-dom/Redirect';
 import service from './services/service';

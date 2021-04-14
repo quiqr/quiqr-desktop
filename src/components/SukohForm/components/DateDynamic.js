@@ -1,11 +1,10 @@
 import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
-import DatePicker from 'material-ui/DatePicker';
+import DatePicker from 'material-ui-02/DatePicker';
 import Tip from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
-import IconClear from 'material-ui/svg-icons/content/clear';
-import IconButton from 'material-ui/IconButton';
+import IconClear from 'material-ui-02/svg-icons/content/clear';
+import IconButton from 'material-ui-02/IconButton';
 
 type DateDynamicField = {
     type: string,

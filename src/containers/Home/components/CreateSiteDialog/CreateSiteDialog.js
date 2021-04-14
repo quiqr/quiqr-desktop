@@ -1,6 +1,5 @@
-//@flow
 import * as React from 'react';
-import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui';
+import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui-02';
 import FolderSourceForm from './components/FolderSourceForm';
 
 type CreateSiteDialogProps = {
@@ -26,8 +25,6 @@ const SITE_SOURCES = [
     { key:'ftp', title:'FTP', enabled: false, form: NotImplementedSourceForm, description:'' },
     { key:'aws-s3', title:'AWS S3', enabled: false, form: NotImplementedSourceForm, description:'' }
 ];
-
-//const OUTPUT_FORMATS = ['JSON','YAML','TOML'];
 
 const INITIAL_STATE = {
     formIsValid: false,

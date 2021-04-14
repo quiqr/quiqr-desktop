@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Form, ComponentRegistry } from '../HoForm';
-import { FloatingActionButton } from 'material-ui/';
+import { FloatingActionButton } from 'material-ui-02/';
 import { FormBreadcumb } from '../Breadcumb';
-import IconCheck from 'material-ui/svg-icons/navigation/check';
+import IconCheck from 'material-ui-02/svg-icons/navigation/check';
 import dynamicFormComponents from './components/all'
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);

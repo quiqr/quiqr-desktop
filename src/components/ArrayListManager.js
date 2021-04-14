@@ -3,19 +3,19 @@ import React from 'react';
 import Border from './Border';
 
 //Material UI Components
-import FlatButton from 'material-ui/FlatButton';
-import {List, ListItem} from 'material-ui/List';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import Toggle from 'material-ui/Toggle';
+import FlatButton from 'material-ui-02/FlatButton';
+import {List, ListItem} from 'material-ui-02/List';
+import RaisedButton from 'material-ui-02/RaisedButton';
+import TextField from 'material-ui-02/TextField';
+import Toggle from 'material-ui-02/Toggle';
 
 //Material UI Icons
-import IconAdd from 'material-ui/svg-icons/content/add';
-import IconFileFolder from 'material-ui/svg-icons/file/folder';
-import IconArrowUp from 'material-ui/svg-icons/navigation/expand-less';
-import IconArrowDown from 'material-ui/svg-icons/navigation/expand-more';
-import IconChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
-import IconDelete from 'material-ui/svg-icons/action/delete';
+import IconAdd from 'material-ui-02/svg-icons/content/add';
+import IconFileFolder from 'material-ui-02/svg-icons/file/folder';
+import IconArrowUp from 'material-ui-02/svg-icons/navigation/expand-less';
+import IconArrowDown from 'material-ui-02/svg-icons/navigation/expand-more';
+import IconChevronRight from 'material-ui-02/svg-icons/navigation/chevron-right';
+import IconDelete from 'material-ui-02/svg-icons/action/delete';
 
 const Fragment = React.Fragment;
 const componentMarginTop = '20px';

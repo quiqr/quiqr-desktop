@@ -1,33 +1,16 @@
-//@flow
-
 import React from 'react';
 import { Route } from 'react-router-dom'
-import {List, ListItem } from 'material-ui/List';
-import { Divider, Toggle } from 'material-ui';
-import IconActionSetting from 'material-ui/svg-icons/action/settings';
-import IconOpenBrowser from 'material-ui/svg-icons/action/open-in-browser';
-import IconHome from 'material-ui/svg-icons/action/home';
-import IconPhone from 'material-ui/svg-icons/hardware/smartphone';
-//import IconActionList from 'material-ui/svg-icons/action/list';
-//import IconLockMenu from 'material-ui/svg-icons/action/lock-outline';
-//import IconMenu from 'material-ui/svg-icons/navigation/menu';
-//import IconMore from 'material-ui/svg-icons/navigation/more-vert';
-//import IconFileFolder from 'material-ui/svg-icons/file/folder';
-//import Border from './../components/Border';
-//import { TriggerWithOptions } from './../components/TriggerWithOptions';
+import { List, ListItem } from 'material-ui-02/List';
+import { Divider, Toggle } from 'material-ui-02';
+import IconActionSetting from 'material-ui-02/svg-icons/action/settings';
+import IconOpenBrowser from 'material-ui-02/svg-icons/action/open-in-browser';
+import IconHome from 'material-ui-02/svg-icons/action/home';
+import IconPhone from 'material-ui-02/svg-icons/hardware/smartphone';
 import service from './../services/service'
 import type { SiteConfig, WorkspaceConfig } from './../types'
 import * as Sidebar from './Sidebar';
 
 const translucentColor = 'RGBA(255,255,255,.8)';
-//const translucentColorSubtle = 'RGBA(255,255,255,.05)';
-
-/*let MenuBorder = ({ children }) => {
-    return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
-        {children}
-        </Border>;
-}
-*/
 
 type WorkspaceWidgetProps = {
     onClick : ()=> void,

@@ -1,8 +1,8 @@
 //@flow
 
 import React, { Component } from 'react';
-import IconButton from 'material-ui/IconButton';
-import IconHelp from 'material-ui/svg-icons/action/info-outline';
+import IconButton from 'material-ui-02/IconButton';
+import IconHelp from 'material-ui-02/svg-icons/action/info-outline';
 import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt({html:true});

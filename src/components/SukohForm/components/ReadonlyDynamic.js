@@ -1,13 +1,9 @@
-//@flow
-
 import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
-import TextField from 'material-ui/TextField';
+import TextField from 'material-ui-02/TextField';
 import Tip from '../../Tip';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder, FieldsExtender } from '../../HoForm';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
-
 
 type ReadonlyDynamicField = {
     key: string,

@@ -1,18 +1,14 @@
-//@flow
-
 import React from 'react';
 import Tip from '../../../Tip';
 import DefaultWrapper from '../shared/DefaultWrapper';
-import IconButton from 'material-ui/IconButton';
-import IconFullscreen from 'material-ui/svg-icons/navigation/fullscreen';
-import IconFullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
-import Paper from 'material-ui/Paper';
+import IconButton from 'material-ui-02/IconButton';
+import IconFullscreen from 'material-ui-02/svg-icons/navigation/fullscreen';
+import IconFullscreenExit from 'material-ui-02/svg-icons/navigation/fullscreen-exit';
+import Paper from 'material-ui-02/Paper';
 import MarkdownIt from 'markdown-it';
 import { AceEditor } from './AceEditor'
 
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase } from '../../../HoForm';
 import { BaseDynamic } from '../../../HoForm';
-
 
 const md = new MarkdownIt({html:true});
 
