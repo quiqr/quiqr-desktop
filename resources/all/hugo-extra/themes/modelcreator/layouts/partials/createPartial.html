@@ -1,0 +1,16 @@
+{{- $params := .params -}}
+{{- $partialtype := .partial -}}
+{{- $key := .key -}}
+{{- $page := .page -}}
+{{- $fields := slice -}}
+
+{{- range $key, $value := .page.Params -}}
+    {{- if and (ne $key "maincontent") (ne $key "poppy_type") (ne $key "poppy_variant") (ne $key "design") (ne $key "name") (ne $key "draft") -}}
+        {{- $field := partial "createField" (dict "value" $value "key" $key "params" $params) -}}
+        {{- $fields = $fields | append $field -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $fields = partial "sortFields" $fields -}}
+{{- $partial := (dict $partialtype $key "key" $key "fields" $fields)  -}}
+{{- return $partial -}}

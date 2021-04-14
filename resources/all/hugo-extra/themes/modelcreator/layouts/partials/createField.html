@@ -1,6 +1,8 @@
 {{- $file := .file -}}
 {{- $key := .key -}}
 {{- $field := dict -}}
+{{- $value := .value -}}
+
 {{- $poppy_components := .poppy_components }}
 
 {{- $poppy_select := dict -}}
@@ -9,7 +11,6 @@
     {{- $key = partial "getRealKey" (dict "key" .key "file" .file ) -}}
 {{- end -}}
 
-{{- $value := .value -}}
 {{- $pogoType := "" -}}
 {{- if .type -}}
     {{- $pogoType = .type -}}
@@ -47,6 +48,14 @@
 {{- end -}}
 
 {{- if (eq $pogoType "accordion") -}}
+  {{- if or (eq $key "page_sections") (eq $key "subpage_sections") -}}
+    {{- $subFields := slice -}}
+    {{- $field = merge $field (dict "dynFormSearchKey" "component") -}}
+    {{- $subField := partial "createField" (dict "value" "string" "key" "component" "file" $file "params" $poppy_select) -}}
+    {{- $subFields = $subFields | append $subField -}}
+    {{- $subFields = $subFields | append (dict "key" "name" "title" "Name" "type" "string" "arrayTitle" true) -}}
+    {{- $field = merge $field (dict "fields" $subFields) -}}
+  {{- else -}}
     {{- $subfields := slice -}}
     {{- $arrayTitle := "" -}}
     {{- $accordionKeys := slice -}}
@@ -58,7 +67,9 @@
         {{- end -}}
     {{- end -}}
 
-    {{- if in $accordionKeys "name" -}}
+    {{- if in $accordionKeys "component_type" -}}
+        {{- $arrayTitle = "component_type" -}}
+    {{- else if in $accordionKeys "name" -}}
         {{- $arrayTitle = "name" -}}
     {{- else if (in $accordionKeys "title") -}}
         {{- $arrayTitle = "title" -}}
@@ -77,6 +88,7 @@
         {{- $subfields = $subfields | append $field -}}
     {{- end -}}
     {{- $field = merge $field (dict "fields" $subfields ) -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if (eq $pogoType "bundle-manager") -}}
@@ -95,23 +107,17 @@
   {{- with $poppy_select -}}
       {{- range $selectKey, $value := . -}}
         {{- if eq $selectKey $key -}}
-            {{- $field = dict "key" $key "title" $title "type" "select" -}}
-            {{- $subfields := slice -}}
-            {{- range $value -}}
-                    {{- $field := "" -}}
-                    {{- if eq . "my-component" -}}
-                      {{- $field = dict "text" . "value" ""  -}}
-                    {{- else -}}
-                      {{- $field = dict "text" . "value" ( . | anchorize )  -}}
-                    {{- end -}}
-                    {{- $subfields = $subfields | append $field}}
-            {{- end -}}
-            {{- $field = merge $field (dict "multiple" false "options" $subfields) -}}
+              {{- $field = dict "key" $key "title" $title "type" "select" -}}
+              {{- $subfields := slice -}}
+              {{- range $value -}}
+                      {{- $field := dict "text" . "value" ( . | anchorize )  -}}
+                      {{- $subfields = $subfields | append $field}}
+              {{- end -}}
+              {{- $field = merge $field (dict "multiple" false "options" $subfields) -}}
         {{- end -}}
       {{- end -}}
   {{- end -}}
 
 {{- end -}}
-
 
 {{- return $field -}}
