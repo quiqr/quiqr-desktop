@@ -32,29 +32,47 @@
 {{- end -}}
 {{ $colors = $colors | append "white" -}}
 {{ $colors = $colors | append "transparent" -}}
-{{- $poppy_select = merge $poppy_select (dict "color" $colors "bg_color" $colors "text_color" $colors "item_bg_color" $colors "border_color" $colors) -}}
+{{- $poppy_select = merge $poppy_select (dict "color" $colors "background_color" $colors "text_color" $colors "item_background_color" $colors "border_color" $colors "outline_color" $colors) -}}
+
+{{- $fonts := slice -}}
+{{- range $key, $value := site.Data.design.fontscheme -}}
+    {{- $fonts = $fonts | append $value.name -}}
+{{- end -}}
+
+{{- $poppy_select = merge $poppy_select (dict "font" $fonts ) -}}
 
 {{/*------------------------------ Components -----------------------------*/}}
 
 {{- $components := slice -}}
+{{- $poppy_dir := "themes/theme-poppygo-one/content/poppy-components" -}}
+{{- $my_dir := "content/my-components" -}}
 
-{{- range (site.GetPage "/poppy-components" ).Pages }}
-  {{- $component := (index (split .Dir "/" ) 2) -}}
-  {{- $components = $components | append $component -}}
-  {{- $partial := partial "createPartial" (dict "partial" "component" "key" $component "page" . "params" $poppy_select ) -}}
-  {{ if gt (len $partial) 0 }}
-        {{- $partials = $partials | append $partial -}}
+{{ range readDir $poppy_dir }}
+  {{- if .IsDir -}}
+    {{- $dir := .Name -}}
+    {{ range readDir (printf "%s/%s" $poppy_dir $dir) }}
+    {{ $name := .Name}}
+      {{- with site.GetPage (printf "/poppy-components/%s/%s/index.md" $dir $name) -}}
+        {{- $components = $components | append $name -}}
+        {{- $partial := partial "createPartial" (dict "partial" "component" "key" $name "page" . "params" $poppy_select ) -}}
+        {{ if gt (len $partial) 0 }}
+              {{- $partials = $partials | append $partial -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
   {{- end -}}
-{{- end }}
+{{ end }}
 
-{{- range (site.GetPage "/my-components" ).Pages }}
-  {{- $component := (index (split .Dir "/" ) 1) -}}
-  {{- $components = $components | append $component -}}
-  {{- $partial := partial "createPartial" (dict "partial" "component" "key" $component "page" . "params" $poppy_select ) -}}
-  {{ if gt (len $partial) 0 }}
-        {{- $partials = $partials | append $partial -}}
+{{ range readDir $my_dir }}
+  {{ $name := .Name}}
+  {{- with site.GetPage (printf "/my-components/%s" $name) -}}
+    {{- $components = $components | append $name -}}
+    {{- $partial := partial "createPartial" (dict "partial" "component" "key" $name "page" . "params" $poppy_select ) -}}
+    {{ if gt (len $partial) 0 }}
+          {{- $partials = $partials | append $partial -}}
+    {{- end -}}
   {{- end -}}
-{{- end -}}
+{{ end }}
 
 {{- $poppy_select = merge $poppy_select (dict "component" $components ) -}}
 
