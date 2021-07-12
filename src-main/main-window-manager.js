@@ -337,14 +337,12 @@ module.exports = {
         if(global.currentServerProccess){
             const net = require('net');
             const client = new net.Socket();
-            const tryConnection = () => client.connect({port: 1313}, () => {
+            const tryConnection = () => client.connect({port: 13131}, () => {
 
                 client.end();
                 mobilePreviewView.webContents.loadURL(url);
                 mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
                 mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
-                //mobilePreviewView.webContents.loadURL('http://localhost:1313');
-                //mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
             }
             );
             client.on('error', (error) => {
@@ -374,12 +372,12 @@ module.exports = {
         if(global.currentServerProccess){
             const net = require('net');
             const client = new net.Socket();
-            const tryConnection = () => client.connect({port: 1313}, () => {
+            const tryConnection = () => client.connect({port: 13131}, () => {
 
                 client.end();
 
                 console.log('preview');
-                mobilePreviewViewUrl = 'http://localhost:1313';
+                mobilePreviewViewUrl = 'http://localhost:13131';
                 mobilePreviewView.webContents.loadURL(mobilePreviewViewUrl);
                 mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
             }

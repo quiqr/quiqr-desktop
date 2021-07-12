@@ -11,7 +11,7 @@ class PreviewButtons extends React.Component{
     }
 
     setUrl(event,url){
-        let path = url.split('1313')[1];
+        let path = url.split('13131')[1];
         if(path === ''){
             path = "/";
         }

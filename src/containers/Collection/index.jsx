@@ -370,7 +370,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     CollectionPath.shift();
 
     let path = CollectionPath.join("/");
-    let url = 'http://localhost:1313/'+path.toLowerCase();
+    let url = 'http://localhost:13131/'+path.toLowerCase();
 
     return url;
   }

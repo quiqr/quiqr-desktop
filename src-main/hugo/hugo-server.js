@@ -71,7 +71,8 @@ class HugoServer{
             return;
         }
 
-        let hugoArgs = [ 'server' ];
+        let hugoArgs = [ 'server', '--port', '13131' ];
+
         if(config){
             hugoArgs.push('--config');
             hugoArgs.push(config);
