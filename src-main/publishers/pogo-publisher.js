@@ -484,9 +484,9 @@ class PogoPublisher {
 
         var progressBar = new ProgressBar({
             indeterminate: false,
-            text: 'Publishing your site..',
+            text: 'Importing your site..',
             abortOnError: true,
-            detail: 'Uploading to PoppyGo servers',
+            detail: 'importing from PoppyGo servers',
             browserWindow: {
                 frame: false,
                 parent: mainWindow,

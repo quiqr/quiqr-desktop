@@ -57,7 +57,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         if(!this.state.hugoRunning){
             service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace");
         }
-        window.require('electron').shell.openExternal('http://localhost:1313');
+        window.require('electron').shell.openExternal('http://localhost:13131');
     }
 
     toggleMobilePreview(){
