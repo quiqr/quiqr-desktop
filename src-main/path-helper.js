@@ -18,7 +18,7 @@ class PathHelper{
         return this.getRoot()+ 'temp/';
     }
 
-    getSiteRoot(siteKey/*: string*/){
+    getSiteRoot(siteKey){
         return this.getRoot()+ `sites/${siteKey}/`;
     }
 
@@ -26,15 +26,15 @@ class PathHelper{
         return this.getRoot()+'config.'+siteKey+'.json';
     }
 
-    getSiteWorkspacesRoot(siteKey/*: string*/){
+    getSiteWorkspacesRoot(siteKey){
         return this.getSiteRoot(siteKey) + 'workspaces/';
     }
 
-    getSiteWorkspaceRoot(siteKey/*: string*/, workspaceKey/*: string*/){
+    getSiteWorkspaceRoot(siteKey, workspaceKey){
         return this.getSiteWorkspacesRoot(siteKey) + workspaceKey + '/';
     }
 
-    getSiteDefaultPublishDir(siteKey/*: string*/, publishKey/*: string*/){
+    getSiteDefaultPublishDir(siteKey, publishKey){
         return this.getSiteRoot(siteKey) + `publish/${publishKey}/`;
     }
 
@@ -45,11 +45,11 @@ class PathHelper{
         return this.getRoot() + 'sitesRepos/';
     }
 
-    getHugoBinDirForVer(version/*: string*/){
+    getHugoBinDirForVer(version){
         return this.getHugoBinRoot() + version + '/';
     }
 
-    getHugoBinForVer(version/*: string*/){
+    getHugoBinForVer(version){
         let platform = process.platform.toLowerCase();
         if(platform.startsWith('win')){
             return this.getHugoBinDirForVer(version) + 'hugo.exe';
@@ -60,12 +60,11 @@ class PathHelper{
 
     }
 
-    getLastBuildDir() /*: ?string*/{
+    getLastBuildDir() {
         return this._lastBuildDir;
     }
 
-    getBuildDir(path/*: string*/){
-        //this._lastBuildDir = this.getSiteRoot(siteKey) + `build/${workspaceKey}/${buildKey}/`;
+    getBuildDir(path){
         this._lastBuildDir = path + "/";
         return this._lastBuildDir;
     }

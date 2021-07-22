@@ -1,14 +1,12 @@
-//@flow
-
 const electron = require('electron');
 const BrowserWindow = electron.BrowserWindow;
 const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
 
-let prefsWindow/*: any*/;
+let prefsWindow;
 
-function showNotFound(prefsWindow/*: any*/, lookups/*: Array<string>*/){
+function showNotFound(prefsWindow, lookups){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
     prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
@@ -20,7 +18,7 @@ function showNotFound(prefsWindow/*: any*/, lookups/*: Array<string>*/){
 </html>`));
 }
 
-function showLookingForServer(prefsWindow/*: any*/, port/*: string*/){
+function showLookingForServer(prefsWindow, port){
     prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Waiting for Development Server</h1>
@@ -30,7 +28,7 @@ function showLookingForServer(prefsWindow/*: any*/, port/*: string*/){
 </html>`));
 }
 
-function showInvalidDevelopmentUrl(prefsWindow/*: any*/, url/*: ?string*/){
+function showInvalidDevelopmentUrl(prefsWindow, url){
     prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Invalid Development Server URL</h1>

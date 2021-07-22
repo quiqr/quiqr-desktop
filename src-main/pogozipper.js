@@ -1,6 +1,6 @@
 /* Copyright PoppyGo 2020
  *
- * pim@lingewoud.nl
+ * pim@poppygo.io
  *
  */
 const electron = require('electron')

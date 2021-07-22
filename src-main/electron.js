@@ -36,7 +36,6 @@ global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
 global.currentWorkspaceKey = pogoconf.lastOpenedSite.workspaceKey;
 global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
-
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;

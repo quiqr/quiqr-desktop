@@ -18,7 +18,7 @@ const PogoPublisher = require('./publishers/pogo-publisher');
 let api = {};
 let pogoconf = PoppyGoAppConfig();
 
-function bindResponseToContext(promise/*: Promise<any>*/, context/*: any*/){
+function bindResponseToContext(promise, context){
     promise.then((result)=>{
         context.resolve(result);
     }, (error)=>{
@@ -26,16 +26,16 @@ function bindResponseToContext(promise/*: Promise<any>*/, context/*: any*/){
     })
 }
 
-function getSiteService(siteKey/*: string*/, callback/*: CallbackTyped<SiteService>*/){
+function getSiteService(siteKey, callback){
     return getSiteServicePromise(siteKey).then((data)=>{
         callback(null, data);
     },(e)=>{
-        callback(e, (null/*: any*/));
+        callback(e, (null));
     })
 }
 
 
-function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
+function getSiteServicePromise(siteKey){
     return new Promise((resolve, reject)=>{
         configurationDataProvider.get(function(err, configurations){
 
@@ -53,18 +53,18 @@ function getSiteServicePromise(siteKey/*: string*/)/*: Promise<SiteService>*/{
     });
 }
 
-function getWorkspaceService(siteKey/*: string*/,
-    workspaceKey/*: string*/,
-    callback/*: CallbackTyped<{siteService: SiteService, workspaceService: WorkspaceService}>*/){
+function getWorkspaceService(siteKey,
+    workspaceKey,
+    callback){
     return getWorkspaceServicePromise(siteKey, workspaceKey).then((data)=>{
         callback(null, data);
     },(e)=>{
-        callback(e, (null/*: any*/));
+        callback(e, (null));
     })
 }
 
 async function getWorkspaceServicePromise(siteKey, workspaceKey){
-    let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
+    let siteService = await getSiteServicePromise(siteKey);
     let workspaceHead = await siteService.getWorkspaceHead(workspaceKey);
     if(workspaceHead==null){
         return Promise.reject(new Error('Could not find workspace.'));
@@ -75,7 +75,7 @@ async function getWorkspaceServicePromise(siteKey, workspaceKey){
     }
 }
 
-api.getConfigurations = function(options/*: any*/, context/*: any*/){
+api.getConfigurations = function(options, context){
     configurationDataProvider.get(function(err, data){
         if(err)
             context.reject(err);
@@ -84,7 +84,7 @@ api.getConfigurations = function(options/*: any*/, context/*: any*/){
     }, options);
 }
 
-api.openFileExplorer = function({path}/*: any*/, context/*: any*/){
+api.openFileExplorer = function({path}, context){
     try{
         let lstat = fs.lstatSync(path);
         if(lstat.isDirectory()){
@@ -98,7 +98,7 @@ api.openFileExplorer = function({path}/*: any*/, context/*: any*/){
     }
 }
 
-api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
+api.listWorkspaces = async function({siteKey}, context){
     let service = await getSiteServicePromise(siteKey);
     let workspaces = await service.listWorkspaces();
     context.resolve(workspaces);
@@ -106,7 +106,7 @@ api.listWorkspaces = async function({siteKey}/*: any*/, context/*: any*/){
 }
 
 api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
-    let siteService/*: SiteService*/ = await getSiteServicePromise(siteKey);
+    let siteService = await getSiteServicePromise(siteKey);
     siteService.getCreatorMessage().then(function(message){
         context.resolve(message);
     });
@@ -114,7 +114,7 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
 
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
-    let configuration /*: any */;
+    let configuration ;
     try{
         configuration = await workspaceService.getConfigurationsData();
         global.currentSiteKey = siteKey;
@@ -173,17 +173,14 @@ api.getCurrentSiteKey = async function(){
     return await global.currentSiteKey;
 }
 
-//TODO USE KEY
 api.getPogoConf = async function(key){
-    //if(key==='skipWelcomeScreen'){
-        return pogoconf.skipWelcomeScreen;
-    //}
+    return pogoconf.skipWelcomeScreen;
 }
 
 
 
 
-api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
+api.mountWorkspace = async function({siteKey, workspaceKey}, context){
     let siteService = await getSiteServicePromise(siteKey);
     bindResponseToContext(
         siteService.mountWorkspace(workspaceKey),
@@ -198,7 +195,7 @@ api.mountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*:
     menuManager.createMainMenu();
 }
 
-api.parentMountWorkspace = async function({siteKey, workspaceKey}/*: any*/, context/*: any*/){
+api.parentMountWorkspace = async function({siteKey, workspaceKey}, context){
     mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
@@ -243,7 +240,7 @@ api.importSiteAction = function(context){
         pogozipper.importSite()
     });
 }
-api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, context/*: any*/){
+api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
 
@@ -267,7 +264,7 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}/*: any*/, contex
     });
 }
 
-api.buildWorkspace = function({siteKey, workspaceKey, buildKey}/*: any*/, context/*: any*/){
+api.buildWorkspace = function({siteKey, workspaceKey, buildKey}, context){
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.build(buildKey).then(()=>{
@@ -281,7 +278,7 @@ api.buildWorkspace = function({siteKey, workspaceKey, buildKey}/*: any*/, contex
     });
 }
 
-api.getSingle = function({siteKey, workspaceKey, singleKey}/*: any*/, context/*: any*/) {
+api.getSingle = function({siteKey, workspaceKey, singleKey}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.getSingle(singleKey).then(r=>{
@@ -321,7 +318,7 @@ api.openSingleInEditor = function({siteKey, workspaceKey, singleKey}, context) {
         });
     });
 }
-api.updateSingle = function({siteKey, workspaceKey, singleKey, document}/*: any*/, context/*: any*/) {
+api.updateSingle = function({siteKey, workspaceKey, singleKey, document}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.updateSingle(singleKey, document).then(r=>{
@@ -333,7 +330,7 @@ api.updateSingle = function({siteKey, workspaceKey, singleKey, document}/*: any*
     });
 }
 
-api.listCollectionItems = function({siteKey, workspaceKey, collectionKey}/*: any*/, context/*: any*/){
+api.listCollectionItems = function({siteKey, workspaceKey, collectionKey}, context){
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.listCollectionItems(collectionKey)
@@ -346,7 +343,7 @@ api.listCollectionItems = function({siteKey, workspaceKey, collectionKey}/*: any
     });
 }
 
-api.getCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}/*: any*/, context/*: any*/){
+api.getCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}, context){
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.getCollectionItem(collectionKey, collectionItemKey)
@@ -385,7 +382,7 @@ api.openFileDialogForCollectionItem = function({siteKey, workspaceKey, collectio
     });
 }
 
-api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, document}/*: any*/, context/*: any*/) {
+api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, document}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.updateCollectionItem(collectionKey, collectionItemKey, document)
@@ -397,7 +394,7 @@ api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
         });
     });
 }
-api.copyFilesIntoCollectionItem = function ({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files }/*: any*/, context/*: any*/){
+api.copyFilesIntoCollectionItem = function ({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files }, context){
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.copyFilesIntoCollectionItem(collectionKey, collectionItemKey, targetPath, files)
@@ -410,7 +407,7 @@ api.copyFilesIntoCollectionItem = function ({siteKey, workspaceKey, collectionKe
     });
 }
 
-api.deleteCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}/*: any*/, context/*: any*/) {
+api.deleteCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.deleteCollectionItem(collectionKey, collectionItemKey)
@@ -423,7 +420,7 @@ api.deleteCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
     });
 }
 
-api.makePageBundleCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}/*: any*/, context/*: any*/) {
+api.makePageBundleCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.makePageBundleCollectionItem(collectionKey, collectionItemKey)
@@ -435,7 +432,7 @@ api.makePageBundleCollectionItem = function({siteKey, workspaceKey, collectionKe
         });
     });
 }
-api.renameCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey}/*: any*/, context/*: any*/) {
+api.renameCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey}, context) {
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ context.reject(err); return; }
         workspaceService.renameCollectionItem(collectionKey, collectionItemKey, collectionItemNewKey)
@@ -448,7 +445,7 @@ api.renameCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
     });
 }
 
-api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}/*: any*/, promise/*: any*/){
+api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, promise){
     getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
         if(err){ promise.reject(err); return; }
         workspaceService.getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath)
@@ -461,7 +458,7 @@ api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collec
     });
 }
 
-api.createSite = function(config/*: any*/, context/*: any*/){
+api.createSite = function(config, context){
     siteSourceBuilderFactory.get(config.sourceType).build(config).then(() =>{
         configurationDataProvider.invalidateCache();
         context.resolve();
@@ -470,13 +467,13 @@ api.createSite = function(config/*: any*/, context/*: any*/){
     });
 }
 
-api.setPublishStatus = async function({status}/*: any*/, context/*: any*/){
+api.setPublishStatus = async function({status}, context){
     let pogopubl = new PogoPublisher({});
     await pogopubl.writePublishStatus(status)
     context.resolve(true);
 }
 
-api.publishSite = function({siteKey, publishKey}/*: any*/, context/*: any*/){
+api.publishSite = function({siteKey, publishKey}, context){
     getSiteService(siteKey, function(err, siteService){
         if(err){ context.reject(err); return; }
         siteService.publish(publishKey).then(()=>{

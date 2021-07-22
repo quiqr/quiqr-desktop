@@ -5,7 +5,6 @@ const url = require('url')
 const path = require('path')
 const fs = require('fs-extra')
 
-//const WorkspaceService = require('./services/workspace/workspace-service')
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const menuManager = require('./menu-manager');
@@ -18,7 +17,7 @@ let mobilePreviewViewUrl;
 let mobilePreviewViewActive = false;
 let pogoconf = PoppyGoAppConfig();
 
-function showNotFound(mainWindow/*: any*/, lookups/*: Array<string>*/){
+function showNotFound(mainWindow, lookups){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
     mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
@@ -42,7 +41,7 @@ function showPreviewWaitForServer(previewWindow){
 }
 
 
-function showTesting(mainWindow/*: any*/){
+function showTesting(mainWindow){
     mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Testing</h1>
@@ -51,7 +50,7 @@ function showTesting(mainWindow/*: any*/){
 </html>`));
 }
 
-function showLookingForServer(mainWindow/*: any*/, port/*: string*/){
+function showLookingForServer(mainWindow, port){
     mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Waiting for Development Server</h1>
@@ -61,7 +60,7 @@ function showLookingForServer(mainWindow/*: any*/, port/*: string*/){
 </html>`));
 }
 
-function showInvalidDevelopmentUrl(mainWindow/*: any*/, url/*: ?string*/){
+function showInvalidDevelopmentUrl(mainWindow, url){
     mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 
 <body style="font-family: sans-serif; padding: 2em">
@@ -353,13 +352,8 @@ module.exports = {
 
     openMobilePreview: function(){
 
-        //mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
-        //console.log(global.hugoServer);
-        //console.log(global.currentServerProccess);
-
         mobilePreviewView.webContents.session.clearCache(function(){return true});
 
-        //mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
         showPreviewWaitForServer(mobilePreviewView);
 
         if(global.currentServerProccess){

@@ -1,5 +1,3 @@
-//@flow
-
 const PLATFORMS = {
     linux:'linux',
     windows:'windows',

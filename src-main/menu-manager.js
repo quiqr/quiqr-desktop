@@ -1,27 +1,22 @@
-const electron = require('electron')
-const Menu = electron.Menu
-const path = require("path");
-const { lstatSync, readdirSync } = require('fs')
-const prefsWindowManager = require('./prefs-window-manager');
-const logWindowManager = require('./log-window-manager');
-const pogozipper = require('./pogozipper');
-const pogoversions = require('./pogo-site-version-helper');
-const PoppyGoAppConfig = require('./poppygo-app-config');
-
-const SiteService = require('./services/site/site-service')
-//let configurationDataProvider = require('./configuration-data-provider')
-
-const rimraf = require("rimraf");
-const pathHelper = require('./path-helper');
-const fssimple = require('fs');
-const fs = require('fs-extra');
-const { shell } = require('electron')
-
-const hugoDownloader = require('./hugo/hugo-downloader')
-const HugoBuilder = require('./hugo/hugo-builder');
+const electron                    = require('electron')
+const Menu                        = electron.Menu
+const path                        = require("path");
+const { lstatSync, readdirSync }  = require('fs')
+const prefsWindowManager          = require('./prefs-window-manager');
+const logWindowManager            = require('./log-window-manager');
+const pogozipper                  = require('./pogozipper');
+const pogoversions                = require('./pogo-site-version-helper');
+const PoppyGoAppConfig            = require('./poppygo-app-config');
+const SiteService                 = require('./services/site/site-service')
+const rimraf                      = require("rimraf");
+const pathHelper                  = require('./path-helper');
+const fssimple                    = require('fs');
+const fs                          = require('fs-extra');
+const { shell }                   = require('electron')
+const hugoDownloader              = require('./hugo/hugo-downloader')
+const HugoBuilder                 = require('./hugo/hugo-builder');
 const { WorkspaceConfigProvider } = require('./services/workspace/workspace-config-provider');
-const PogoPublisher = require('./publishers/pogo-publisher');
-
+const PogoPublisher               = require('./publishers/pogo-publisher');
 
 const app = electron.app
 let mainWindow = null;
@@ -43,8 +38,6 @@ class MenuManager {
     stopServer() {
         mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
-        //service.api.updateMobilePreviewUrl(previewUrl)
-        //mainWindow.webContents.send("disableMobilePreview");
         if(global.hugoServer){
             global.hugoServer.stopIfRunning(function(err, stdout, stderr){
                 if(err){
