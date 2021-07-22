@@ -169,9 +169,6 @@ function createWindow () {
 
     configurationDataProvider.get(function(err, configurations){
 
-        let showFrame=false;
-        configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
-
         // Load the previous state with fallback to defaults
         mainWindowState = windowStateKeeper({
             defaultWidth: 800,
@@ -181,7 +178,7 @@ function createWindow () {
         // Create the browser window.
         mainWindow = new BrowserWindow({
             show: false,
-            frame: showFrame,
+            frame: true,
             backgroundColor:"#ffffff",
             webPreferences: {
                 nodeIntegration: true,

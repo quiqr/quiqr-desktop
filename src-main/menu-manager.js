@@ -463,15 +463,7 @@ resources: []\n\
     createProfilesMenu(){
 
         const profilesDir = path.join(pathHelper.getRoot(),"profiles")
-
         let profilesMenu = [];
-
-        let currentProfile = ""
-        let pogopubl = new PogoPublisher({});
-        let readCurrentProfile = pogopubl.readProfile()
-        if(readCurrentProfile){
-            currentProfile = readCurrentProfile.username;
-        }
 
         profilesMenu.push({
             id: 'rm-pogo-profile',
@@ -496,7 +488,7 @@ resources: []\n\
                 let checked = false;
                 if(lstatSync(path.join(profilesDir,f)).isDirectory()){
                     label = f;
-                    if(f == currentProfile){
+                    if(f == this.profileUserName){
                         checked = true;
                     }
                     profilesMenu.push({
@@ -543,6 +535,7 @@ resources: []\n\
                 }
 
             });
+
             if(siteService == null){
                 return;
             }
@@ -738,23 +731,25 @@ resources: []\n\
                 click: async () => {
 
                     let configurationDataProvider = require('./configuration-data-provider')
-                    let currentProfile = ""
-                    let pogopubl = new PogoPublisher({});
-                    let readCurrentProfile = pogopubl.readProfile()
-                    if(readCurrentProfile){
+                    configurationDataProvider.get(async function(err, configurations){
 
-                        let fingerprint = await pogopubl.getKeyFingerprint();
-                        let userVars = {
-                            username: readCurrentProfile.username,
-                            fingerprint: fingerprint,
-                        };
+                        if(this.profileUserName!=""){
 
-                        let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
-                        let url = GLOBAL_DEFAULTS.pogostripeConn.protocol+"//"+
-                            GLOBAL_DEFAULTS.pogostripeConn.host+":"+
-                            GLOBAL_DEFAULTS.pogostripeConn.port+"/myaccount/"+requestVars;
-                        await shell.openExternal(url);
-                    }
+                            let pogopubl = new PogoPublisher({});
+                            let fingerprint = await pogopubl.getKeyFingerprint();
+
+                            let userVars = {
+                                username: this.profileUserName,
+                                fingerprint: fingerprint,
+                            };
+
+                            let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+                            let url = configurations.global.pogostripeConn.protocol+"//"+
+                                configurations.global.pogostripeConn.host+":"+
+                                configurations.global.pogostripeConn.port+"/myaccount/"+requestVars;
+                            await shell.openExternal(url);
+                        }
+                    }.bind(this));
                 }
             },
             {
@@ -780,7 +775,8 @@ resources: []\n\
         return devMenu;
     }
 
-    createMainMenu(){
+
+    mainMenuArray(){
 
         const isMac = process.platform === 'darwin'
 
@@ -1049,8 +1045,30 @@ resources: []\n\
             }
         ]
 
-        menu = Menu.buildFromTemplate(template)
-        Menu.setApplicationMenu(menu)
+        return template;
+
+    }
+
+    createMainMenu(){
+
+        /* THIS IS A GREAT EXÅMPLE HOW TO USE PROMISES
+         *
+         * Before executing the main action get all needed promise data and run from within Promise.all
+         *
+         * */
+        this.profileUserName = "";
+        let pogopubl = new PogoPublisher({});
+        let readProfileAction = pogopubl.readProfile();
+        readProfileAction.then((profile)=>{
+            if(profile){
+                this.profileUserName = profile.username
+            }
+        });
+
+        Promise.all([readProfileAction]).then( () => {
+            menu = Menu.buildFromTemplate(this.mainMenuArray());
+            Menu.setApplicationMenu(menu)
+        });
     }
 }
 

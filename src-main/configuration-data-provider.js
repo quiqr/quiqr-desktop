@@ -13,10 +13,6 @@ const defaultPathSearchPattern = (pathHelper.getRoot() + 'config.{'+supportedFor
 const namespacedPathSearchPattern = (pathHelper.getRoot() + 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
 const globalConfigPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
 
-function normalizeSite(site){
-
-}
-
 function validateSite(site) {
     if(site==null){
         throw new Error(`Site config can't be null.`);
@@ -51,16 +47,10 @@ function validateSite(site) {
         throw result.error;
 }
 
-
 const GLOBAL_DEFAULTS = {
-    hideWindowFrame: false,
-    hideMenuBar: false,
-    hideInlineMenus: true,
     appTheme: "simple",
-
     //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
     pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
-
     pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
     //pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
 }
@@ -94,7 +84,6 @@ function get(callback, {invalidateCache} = {}){
                 if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)
                 let site = formatProvider.parse(strData);
                 validateSite(site);
-                normalizeSite(site);
                 site.configPath = file;
                 configurations.sites.push(site);
 
@@ -113,18 +102,8 @@ function get(callback, {invalidateCache} = {}){
             if(formatProvider==null) throw new Error(`Could not resolve a format provider for "${globalConfigFile}".`)
             let global = formatProvider.parse(strData);
             global = {
-                debugEnabled: global.debugEnabled == null ? GLOBAL_DEFAULTS.debugEnabled : global.debugEnabled===true, //default false
-                cookbookEnabled: global.cookbookEnabled == null ? GLOBAL_DEFAULTS.cookbookEnabled : global.cookbookEnabled===true, //default true
-                siteManagementEnabled: global.siteManagementEnabled == null ? GLOBAL_DEFAULTS.siteManagementEnabled : global.siteManagementEnabled===true,
-                hideWindowFrame: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideWindowFrame : global.hideWindowFrame===true,
-                hideInlineMenus: global.hideInlineMenus == null ? GLOBAL_DEFAULTS.hideInlineMenus : global.hideInlineMenus===true,
                 appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme,
-
-
             }
-
-            //settings overruled
-
 
             configurations.global = global;
         }

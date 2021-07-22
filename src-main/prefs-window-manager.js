@@ -45,31 +45,19 @@ function createWindow () {
     if(process.env.REACT_DEV_URL)
         icon = path.normalize(__dirname + "/../public/icon.png");
 
-
-    configurationDataProvider.get(function(err, configurations){
-      if(configurations.empty===true) throw new Error('Configurations is empty.');
-
-      let showFrame=false;
-      configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
-
-      // Create the browser window.
-      prefsWindow = new BrowserWindow({
-          show: false,
-          webPreferences: {
-              nodeIntegration: true,
-          },
-          frame: showFrame,
-          backgroundColor:"#ffffff",
-        //minWidth:1024,
-        //webPreferences:{webSecurity:false },
+    // Create the browser window.
+    prefsWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+        frame: true,
+        backgroundColor:"#ffffff",
         icon
-      });
-
-      prefsWindow.setMenuBarVisibility(false);
-
-
-      prefsWindow.show();
     });
+
+    prefsWindow.setMenuBarVisibility(false);
+    prefsWindow.show();
 
     if(process.env.REACT_DEV_URL){
 
