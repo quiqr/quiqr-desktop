@@ -1,33 +1,15 @@
-//@flow
-
 const formatProviderResolver = require('./../../format-provider-resolver');
 const path = require('path');
 const glob = require('glob');
 const fs = require('fs-extra');
 
-/*::
-import type { WorkspaceConfigRaw } from './../../../global-types.js';
-
-type GetConfigOpts = {
-    hugover: string,
-    configFile: string,
-    ext: string,
-    hugoConfigData: {[key: string]: any}
-};
-
-*/
-
 class InitialWorkspaceConfigBuilder{
 
-    /*::
-    workspacePath: string
-    */
-
-    constructor(workspacePath/*: string*/){
+    constructor(workspacePath){
         this.workspacePath = workspacePath;
     }
 
-    getConfig(opts/*: GetConfigOpts*/)/*: WorkspaceConfigRaw*/{
+    getConfig(opts){
 
         let rootKeysLower = {};
         Object.keys(opts.hugoConfigData).forEach(key => rootKeysLower[key.toLowerCase()] = key);

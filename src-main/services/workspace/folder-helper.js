@@ -10,7 +10,7 @@ let folderHelper = {
                     reject(e);
                 }
                 resolve(files);
-            });    
+            });
         });
     },
 
@@ -21,7 +21,7 @@ let folderHelper = {
                     reject(e);
                 }
                 resolve(result);
-            });    
+            });
         });
     },
 
@@ -29,17 +29,17 @@ let folderHelper = {
         let files = await folderHelper._readdirPromise(filePath);
         let promises = [];
         for(let i = 0; i < files.length; i++){
-            
+
             let file = files[i];
 
             let fullFilePath = path.join(filePath, file);
-            promises.push(   
+            promises.push(
                 folderHelper._lstatPromise(fullFilePath)
                 .then((stat)=>{
 
                     if(options.includeFunc!==undefined){
                         if(!options.includeFunc(fullFilePath, stat)){
-                            return Promise.resolve();    
+                            return Promise.resolve();
                         }
                     }
 

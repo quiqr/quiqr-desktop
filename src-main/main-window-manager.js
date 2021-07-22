@@ -199,13 +199,6 @@ function createWindow () {
         // and restore the maximized or full screen state
         mainWindowState.manage(mainWindow);
 
-        if(configurations.global.maximizeAtStart){
-            mainWindow.maximize();
-        }
-        if(configurations.global.hideMenuBar){
-            //mainWindow.setMenuBarVisibility(false);
-        }
-
         mobilePreviewView = new BrowserView();
         mobilePreviewTopBarView = new BrowserView({
             webPreferences: {

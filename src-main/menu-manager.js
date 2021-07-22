@@ -9,7 +9,7 @@ const pogoversions = require('./pogo-site-version-helper');
 const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const SiteService = require('./services/site/site-service')
-let configurationDataProvider = require('./configuration-data-provider')
+//let configurationDataProvider = require('./configuration-data-provider')
 
 const rimraf = require("rimraf");
 const pathHelper = require('./path-helper');
@@ -740,6 +740,30 @@ resources: []\n\
         let devMenu = [
             { role: 'forcereload' },
             { role: 'toggledevtools' },
+            {
+                label: 'Stripe Customer Portal',
+                click: async () => {
+
+                    let configurationDataProvider = require('./configuration-data-provider')
+                    let currentProfile = ""
+                    let pogopubl = new PogoPublisher({});
+                    let readCurrentProfile = pogopubl.readProfile()
+                    if(readCurrentProfile){
+
+                        let fingerprint = await pogopubl.getKeyFingerprint();
+                        let userVars = {
+                            username: readCurrentProfile.username,
+                            fingerprint: fingerprint,
+                        };
+
+                        let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+                        let url = GLOBAL_DEFAULTS.pogostripeConn.protocol+"//"+
+                            GLOBAL_DEFAULTS.pogostripeConn.host+":"+
+                            GLOBAL_DEFAULTS.pogostripeConn.port+"/myaccount/"+requestVars;
+                        await shell.openExternal(url);
+                    }
+                }
+            },
             {
                 label: 'Depreciated',
                 submenu: [

@@ -1,12 +1,7 @@
-// @flow
 const FolderSiteSourceBuilder = require('./folder-site-source-builder');
 
-/*::
-import type { SiteSourceBuilder } from './types';
-*/
-
 class SiteSourceBuilderFactory{
-    get(type/*: string*/) /*: SiteSourceBuilder */{
+    get(type){
         type = type.toLowerCase();
         if(type==='folder'){
             return new FolderSiteSourceBuilder();

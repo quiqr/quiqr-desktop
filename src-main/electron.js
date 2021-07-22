@@ -1,21 +1,19 @@
-const electron = require('electron')
-const ipcMainBinder = require('./ipc-main-binder');
+const electron          = require('electron')
+const ipcMainBinder     = require('./ipc-main-binder');
 const mainWindowManager = require('./main-window-manager');
-const unhandled = require('electron-unhandled');
-const contextMenu = require('electron-context-menu');
-const BrowserWindow = electron.BrowserWindow;
-const pogozipper = require('./pogozipper');
-const menuManager = require('./menu-manager');
-const request = require('request');
-const fs = require('fs-extra');
-const fssimple = require('fs');
-const pathHelper = require('./path-helper');
-const fileDirUtils = require('./file-dir-utils');
-const PoppyGoAppConfig = require('./poppygo-app-config');
-const ProgressBar = require('electron-progressbar');
-
-
-const outputConsole = require('./output-console');
+const unhandled         = require('electron-unhandled');
+const contextMenu       = require('electron-context-menu');
+const BrowserWindow     = electron.BrowserWindow;
+const pogozipper        = require('./pogozipper');
+const menuManager       = require('./menu-manager');
+const request           = require('request');
+const fs                = require('fs-extra');
+const fssimple          = require('fs');
+const pathHelper        = require('./path-helper');
+const fileDirUtils      = require('./file-dir-utils');
+const PoppyGoAppConfig  = require('./poppygo-app-config');
+const ProgressBar       = require('electron-progressbar');
+const outputConsole     = require('./output-console');
 
 unhandled();
 

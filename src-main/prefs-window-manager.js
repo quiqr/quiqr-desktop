@@ -67,10 +67,6 @@ function createWindow () {
         icon
       });
 
-      if(configurations.global.maximizeAtStart){
-        prefsWindow.maximize();
-      }
-
       prefsWindow.setMenuBarVisibility(false);
 
 

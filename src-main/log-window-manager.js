@@ -69,10 +69,6 @@ function createWindow () {
             icon
         });
 
-
-        if(configurations.global.maximizeAtStart){
-            logWindow.maximize();
-        }
         logWindow.setMenuBarVisibility(false);
 
         logWindow.show();

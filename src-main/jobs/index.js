@@ -1,8 +1,6 @@
-/* @flow */
-
 let jobsManager = require('./job-manager');
 
-module.exports.createThumbnailJob = (src /* : string */, dest /* : string */)=> {
+module.exports.createThumbnailJob = (src , dest )=> {
     return jobsManager.runSharedBackgroundJob(
         `create-thumbnail-job:${src}->${dest}`,
         require.resolve('./create-thumbnail-job'),
@@ -10,7 +8,7 @@ module.exports.createThumbnailJob = (src /* : string */, dest /* : string */)=> 
     );
 }
 
-module.exports.globJob = (expression /* : string */, options /* : any */) => {
+module.exports.globJob = (expression , options ) => {
     return jobsManager.runSharedBackgroundJob(
         `glob-job:${expression}(${JSON.stringify(options)})`,
         require.resolve('./glob-job'),

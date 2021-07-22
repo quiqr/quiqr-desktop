@@ -1,12 +1,11 @@
 const pathHelper = require('./../../path-helper');
 const fs = require('fs-extra');
 const path = require('path');
-//const WorkspaceService = require('./../workspace/workspace-service');
 const publisherFactory = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 
 class SiteService{
-    constructor(config/*: SiteConfig*/){
+    constructor(config){
         this._config = config;
     }
 
@@ -15,16 +14,16 @@ class SiteService{
     }
 
     //List all workspaces
-    async listWorkspaces()/*: Promise<Array<WorkspaceHeader>>*/{
+    async listWorkspaces(){
         return this._getSiteSource().listWorkspaces();
     }
 
-    async getWorkspaceHead(workspaceKey/*: string*/)/*: Promise<?WorkspaceHeader>*/{
+    async getWorkspaceHead(workspaceKey){
         return (await this.listWorkspaces())
             .find(x => x.key===workspaceKey);
     }
 
-    async mountWorkspace(workspaceKey/*: string*/)/*: Promise<void>*/{
+    async mountWorkspace(workspaceKey){
         console.log("mount workspace:"+workspaceKey);
         await this._getSiteSource().mountWorkspace(workspaceKey);
     }
@@ -44,7 +43,7 @@ class SiteService{
 
     }
 
-    _findFirstMatchOrDefault/*::<T: any>*/(arr/*: Array<T>*/, key/*: string*/)/*: T*/{
+    _findFirstMatchOrDefault(arr, key){
         let result;
 
         if(key){

@@ -1,6 +1,6 @@
 import mainProcessBridge from './utils/main-process-bridge';
 import type { AbortablePromise } from './utils/main-process-bridge';
-import type { Configurations, WorkspaceConfig } from './../global-types';
+//import type { Configurations, WorkspaceConfig } from './../global-types';
 
 export class API {
 

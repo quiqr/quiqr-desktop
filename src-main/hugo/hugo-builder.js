@@ -21,9 +21,6 @@ class HugoBuilder{
             return;
         }
 
-        //await fs.ensureDir(this.config.destination);
-        //await rimraf.sync(this.config.destination);
-
         return new Promise((resolve, reject)=>{
             execFile(
                 exec,
@@ -57,9 +54,6 @@ class HugoBuilder{
             Promise.reject(new Error(`Could not find hugo.exe for version ${this.config.hugover}.`));
             return;
         }
-
-        //await fs.ensureDir(this.config.destination);
-        //await rimraf.sync(this.config.destination);
 
         return new Promise((resolve, reject)=>{
             execFile(

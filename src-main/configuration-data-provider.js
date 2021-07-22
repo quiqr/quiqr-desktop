@@ -1,5 +1,3 @@
-//@flow
-
 const glob = require('glob');
 const fs = require('fs-extra');
 const path = require('path');
@@ -55,10 +53,6 @@ function validateSite(site) {
 
 
 const GLOBAL_DEFAULTS = {
-    debugEnabled: false,
-    cookbookEnabled: true,
-    siteManagementEnabled: true,
-    maximizeAtStart: false,
     hideWindowFrame: false,
     hideMenuBar: false,
     hideInlineMenus: true,
@@ -67,8 +61,8 @@ const GLOBAL_DEFAULTS = {
     //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
     pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
 
-    //pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
-    pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
+    pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
+    //pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
 }
 
 function invalidateCache(){
@@ -122,10 +116,7 @@ function get(callback, {invalidateCache} = {}){
                 debugEnabled: global.debugEnabled == null ? GLOBAL_DEFAULTS.debugEnabled : global.debugEnabled===true, //default false
                 cookbookEnabled: global.cookbookEnabled == null ? GLOBAL_DEFAULTS.cookbookEnabled : global.cookbookEnabled===true, //default true
                 siteManagementEnabled: global.siteManagementEnabled == null ? GLOBAL_DEFAULTS.siteManagementEnabled : global.siteManagementEnabled===true,
-                maximizeAtStart: global.maximizeAtStart == null ? GLOBAL_DEFAULTS.maximizeAtStart : global.maximizeAtStart===true,
                 hideWindowFrame: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideWindowFrame : global.hideWindowFrame===true,
-                hideMenuBar: false,
-                //hideMenuBar: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideMenuBar : global.hideMenuBar===true,
                 hideInlineMenus: global.hideInlineMenus == null ? GLOBAL_DEFAULTS.hideInlineMenus : global.hideInlineMenus===true,
                 appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme,
 

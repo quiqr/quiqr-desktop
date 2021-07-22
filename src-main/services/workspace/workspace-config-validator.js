@@ -1,4 +1,3 @@
-//@flow
 const formatProviderResolver = require('./../../format-provider-resolver');
 const joi = require('joi');
 const path = require('path');
@@ -13,14 +12,14 @@ let validationUtils= {
 
 class WorkspaceConfigValidator {
 
-    normalizeConfig(config/*: any*/){
+    normalizeConfig(config){
         if(config){
             if(!config.collections) config.collections = [];
             if(!config.singles) config.singles = [];
         }
     }
 
-    validate(config/*: any*/){
+    validate(config){
 
         this.normalizeConfig(config);
 
@@ -55,9 +54,9 @@ class WorkspaceConfigValidator {
         return null;
     }
 
-    checkFieldsKeys(fields/*: Array<any> | null*/, hintPath /*: string*/){
+    checkFieldsKeys(fields, hintPath){
         if(fields==null){ return; }
-        let keys /*Array<string>*/ = [];
+        let keys = [];
         const error =  `${hintPath}: Each field must have an unique key and the key must be a string.`;
         for(let i = 0; i < fields.length; i ++){
             const field = fields[i];
@@ -78,7 +77,7 @@ class WorkspaceConfigValidator {
         }
     }
 
-    validateCollection(collection/*: any*/){
+    validateCollection(collection){
 
         let validationError = null;
 
@@ -122,7 +121,7 @@ class WorkspaceConfigValidator {
         return null;
     }
 
-    validateSingle(single/*: any*/){
+    validateSingle(single){
 
         let validationError = null;
 

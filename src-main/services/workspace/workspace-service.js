@@ -10,7 +10,6 @@ const path = require('path');
 const glob = require('glob');
 const { nativeImage } = require('electron');
 const formatProviderResolver = require('./../../format-provider-resolver');
-//const WorkspaceConfigValidator = require('./workspace-config-validator');
 const { WorkspaceConfigProvider } = require('./workspace-config-provider');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 
@@ -24,24 +23,18 @@ const pathHelper = require('./../../path-helper');
 const workspaceConfigProvider = new WorkspaceConfigProvider();
 
 class WorkspaceService{
-    constructor(workspacePath/* : string */, workspaceKey/*: string*/, siteKey/*: string*/){
+    constructor(workspacePath, workspaceKey, siteKey){
         this.workspacePath = workspacePath;
         this.workspaceKey = workspaceKey;
         this.siteKey = siteKey;
     }
 
-    /*::
-        workspacePath : string;
-        workspaceKey : string;
-        siteKey : string;
-    */
-
     //Get the workspace configurations data to be used by the client
-    getConfigurationsData()/*: Promise<WorkspaceConfig>*/{
+    getConfigurationsData(){
         return workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
     }
 
-    async _smartResolveFormatProvider(filePath /* : string */, fallbacks /*: Array<string> */){
+    async _smartResolveFormatProvider(filePath , fallbacks ){
         let formatProvider;
         if(contentFormats.isContentFile(filePath)){
             if(fs.existsSync(filePath))
@@ -66,7 +59,7 @@ class WorkspaceService{
         return undefined;
     }
 
-    async _smartDump(filePath /* : string */, formatFallbacks  /*: Array<string> */, obj /* : any */){
+    async _smartDump(filePath , formatFallbacks  , obj ){
         let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
         if(formatProvider===undefined)
             formatProvider = formatProviderResolver.getDefaultFormat();
@@ -78,7 +71,7 @@ class WorkspaceService{
         }
     }
 
-    async _smartParse(filePath /* : string */, formatFallbacks  /*: Array<string> */, str /* : string */){
+    async _smartParse(filePath , formatFallbacks  , str ){
         if(str===undefined||str===null||str.length===0||!/\S$/gi){
             return {};
         }
@@ -93,7 +86,7 @@ class WorkspaceService{
         }
     }
 
-    async getSingle(singleKey /* : string */){
+    async getSingle(singleKey ){
         let config = await this.getConfigurationsData();
         let single = config.singles.find(x => x.key === singleKey);
         if(single==null)throw new Error('Could not find single.');
@@ -113,7 +106,7 @@ class WorkspaceService{
         }
     }
 
-    async getSingleFolder(singleKey /* : string */){
+    async getSingleFolder(singleKey ){
         let config = await this.getConfigurationsData();
         let single = config.singles.find(x => x.key === singleKey);
         if(single==null)throw new Error('Could not find single.');
@@ -185,7 +178,7 @@ class WorkspaceService{
         return merged;
     }
 
-    async getCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */){
+    async getCollectionItem(collectionKey , collectionItemKey ){
 
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
@@ -231,7 +224,7 @@ class WorkspaceService{
         return { key: returnedKey.replace(/\\/g,'/') };
     }
 
-    async listCollectionItems(collectionKey /* : string */){
+    async listCollectionItems(collectionKey ){
         let collection = (await this.getConfigurationsData())
             .collections.find(x => x.key === collectionKey);
 
@@ -284,7 +277,7 @@ class WorkspaceService{
         }
     }
 
-    _stripNonDocumentData(document /* : any */){
+    _stripNonDocumentData(document){
         for(var key in document){
             if(key.startsWith('__')){
                 delete document[key];
@@ -296,7 +289,7 @@ class WorkspaceService{
         }
     }
 
-    async renameCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */, collectionItemNewKey /* : string */){
+    async renameCollectionItem(collectionKey, collectionItemKey , collectionItemNewKey ){
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
         if(collection==null)
@@ -348,7 +341,7 @@ class WorkspaceService{
         return false;
     }
 
-    async makePageBundleCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */){
+    async makePageBundleCollectionItem(collectionKey , collectionItemKey ){
         //TODO: only work with "label" of a collection item
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
@@ -356,16 +349,7 @@ class WorkspaceService{
             throw new Error('Could not find collection.');
         let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
 
-        /*
-         if( fs.lstatSync(filePath).isDirectory()){
-            return false;
-        }
-        */
-
         if (fs.existsSync(filePath)){
-            //TODO: use async await with a promise to test if deletion succeded
-
-            //fs.renameSync(filePath, filePath+".bak");
             let newdir = path.join(this.workspacePath, collection.folder, collectionItemKey.split('.').slice(0, -1).join('.'));
             fs.mkdirSync(newdir);
             fs.renameSync(filePath, path.join(newdir, "index.md"));
@@ -385,7 +369,7 @@ class WorkspaceService{
         shell.openItem(filePath);
     }
 
-    async updateCollectionItem(collectionKey /* : string */ , collectionItemKey /* : string */, document /* : any */){
+    async updateCollectionItem(collectionKey , collectionItemKey , document ){
         //TODO: only work with "label" of a collection item
         let config = await this.getConfigurationsData();
         let collection = config.collections.find(x => x.key === collectionKey);
@@ -416,7 +400,7 @@ class WorkspaceService{
         return document;
     }
 
-    async copyFilesIntoCollectionItem(collectionKey /* : string */, collectionItemKey /* : string */, targetPath /* : string */, files /* : Array<string> */){
+    async copyFilesIntoCollectionItem(collectionKey , collectionItemKey , targetPath , files ){
         let config = await this.getConfigurationsData();
 
         let filesBasePath = ""
@@ -454,7 +438,7 @@ class WorkspaceService{
         });
     }
 
-    existsPromise(src /* : string */){
+    existsPromise(src ){
         return new Promise((resolve)=>{
             fs.exists(src, (exists)=>{
                 resolve(exists);
@@ -481,7 +465,6 @@ class WorkspaceService{
             if(collection==null)
                 throw new Error('Could not find collection.');
 
-            //    itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
             src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
         }
 
@@ -513,7 +496,7 @@ class WorkspaceService{
 
     }
 
-    _findFirstMatchOrDefault/*::<T: any>*/(arr/*: Array<T>*/, key/*: string*/)/*: T*/{
+    _findFirstMatchOrDefault(arr, key){
         let result;
 
         if(key){
@@ -535,7 +518,7 @@ class WorkspaceService{
         }
     }
 
-    async serve(serveKey/*:string*/)/*: Promise<void>*/{
+    async serve(serveKey){
         let workspaceDetails = await this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
 
@@ -560,7 +543,7 @@ class WorkspaceService{
         });
     }
 
-    async build(buildKey/*: string*/) /*:Promise<void>*/{
+    async build(buildKey) {
         let workspaceDetails = await this.getConfigurationsData();
         return new Promise((resolve,reject)=>{
 

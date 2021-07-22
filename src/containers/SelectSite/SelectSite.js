@@ -201,15 +201,13 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
                             />);
                         })}
-                        { configurations.empty || _configurations.global.siteManagementEnabled ? (
-                            <ListItem
-                                key="add-site"
-                                style={ styles.siteInactiveStyle }
-                                rightIcon={<IconAdd />}
-                                onClick={ this.handleAddSiteClick.bind(this) }
-                                primaryText="New"
-                            />
-                        ) : ( null ) }
+                        <ListItem
+                            key="add-site"
+                            style={ styles.siteInactiveStyle }
+                            rightIcon={<IconAdd />}
+                            onClick={ this.handleAddSiteClick.bind(this) }
+                            primaryText="New"
+                        />
                     </List>
                 </div>
         );

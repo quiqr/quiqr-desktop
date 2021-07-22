@@ -1,21 +1,14 @@
-// @flow
-
 const fs = require('fs');
 
 class FileCacheToken {
-    /*::
-        files: Array<string>|null;
-        token: string|null;
-        isBuilt: bool;
-    */
 
-    constructor(files/*: Array<string>*/){
+    constructor(files){
         this.files = files;
         this.token = null;
         this.isBuilt = false;
     }
 
-    async build()/*: Promise<FileCacheToken>*/{
+    async build(){
         if(this.isBuilt){
             return Promise.resolve(this);
         }
@@ -34,7 +27,7 @@ class FileCacheToken {
         return this;
     }
 
-    async match(other/*: FileCacheToken*/)/*: Promise<bool>*/{
+    async match(other){
         await Promise.all([this.build(), other.build()]);
         return this.token === other.token;
     }

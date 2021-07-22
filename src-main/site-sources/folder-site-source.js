@@ -1,35 +1,22 @@
-// @flow
-/*::
-import { SiteSource } from './types';
-import type { WorkspaceHeader } from './../../global-types';
+class FolderSiteSource {
 
-type FolderSiteSourceConfig = {
-    key: string,
-    path: string
-}
-*/
-
-class FolderSiteSource/*:: implements SiteSource*/ {
-
-    /*:: config: FolderSiteSourceConfig;*/
-
-    constructor(config/*: FolderSiteSourceConfig*/){
+    constructor(config){
         this.config = config;
     }
 
-    listWorkspaces()/*: Promise<Array<WorkspaceHeader>>*/{
+    listWorkspaces(){
         return Promise.resolve([{ 'key': 'source', 'path': this.config.path, 'state':'mounted' }]);
     }
 
-    mountWorkspace(key/*: string*/)/*: Promise<void>*/{
+    mountWorkspace(key){
         return Promise.resolve(undefined);
     }
 
-    unmountWorkspace(key/*: string*/)/*: Promise<void>*/{
+    unmountWorkspace(key){
         return Promise.resolve(undefined);
     }
 
-    update()/*: Promise<void> */{
+    update(){
         return Promise.resolve();
     }
 }
