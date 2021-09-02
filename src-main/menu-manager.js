@@ -1,18 +1,21 @@
+
 const electron                    = require('electron')
 const Menu                        = electron.Menu
 const path                        = require("path");
 const { lstatSync, readdirSync }  = require('fs')
-const prefsWindowManager          = require('./prefs-window-manager');
-const logWindowManager            = require('./log-window-manager');
-const pogozipper                  = require('./pogozipper');
-const pogoversions                = require('./pogo-site-version-helper');
-const PoppyGoAppConfig            = require('./poppygo-app-config');
-const SiteService                 = require('./services/site/site-service')
 const rimraf                      = require("rimraf");
-const pathHelper                  = require('./path-helper');
 const fssimple                    = require('fs');
 const fs                          = require('fs-extra');
 const { shell }                   = require('electron')
+
+const prefsWindowManager          = require('./prefs-window-manager');
+const logWindowManager            = require('./log-window-manager');
+const pogozipper                  = require('./pogozipper');
+const cloudCacheManager           = require('./pogocloud/cloud-cache-manager');
+const pogoversions                = require('./pogo-site-version-helper');
+const PoppyGoAppConfig            = require('./poppygo-app-config');
+const SiteService                 = require('./services/site/site-service')
+const pathHelper                  = require('./path-helper');
 const hugoDownloader              = require('./hugo/hugo-downloader')
 const HugoBuilder                 = require('./hugo/hugo-builder');
 const { WorkspaceConfigProvider } = require('./services/workspace/workspace-config-provider');
@@ -504,6 +507,9 @@ resources: []\n\
                             //fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
                             fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
                             await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
+
+                            await cloudCacheManager.updateUserRemoteCaches()
+
                             this.createMainMenu();
                             global.mainWM.closeSiteAndShowSelectSites();
 
@@ -661,12 +667,6 @@ resources: []\n\
                 submenu: this.createProfilesMenu()
             },
             {
-                id: 'switch-version',
-                label: 'Site versions',
-                enabled: this.siteSelected(),
-                submenu: this.createVersionsMenu()
-            },
-            {
                 id: 'rename-site',
                 label: 'Rename site',
                 enabled: this.siteSelected(),
@@ -686,6 +686,20 @@ resources: []\n\
                 label: 'Create new from Hugo theme git URL',
                 click: async () => {
                     this.createSiteFromThemeGitUrl();
+                }
+            },
+            {
+                id: 'cacheremotesiteinfo',
+                label: 'Sync remote site info',
+                click: async () => {
+                    cloudCacheManager.updateAllRemoteCaches()
+                }
+            },
+            {
+                id: 'cacheremoteuserinfo',
+                label: 'Sync remote user info',
+                click: async () => {
+                    cloudCacheManager.updateUserRemoteCaches()
                 }
             },
             {
@@ -760,6 +774,12 @@ resources: []\n\
                         click: async () => {
                             this.openHome()
                         }
+                    },
+                    {
+                        id: 'switch-version',
+                        label: 'Site versions',
+                        enabled: this.siteSelected(),
+                        submenu: this.createVersionsMenu()
                     },
                     {
                         label: 'Extra profile from siteconf',

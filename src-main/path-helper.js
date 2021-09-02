@@ -1,29 +1,29 @@
 const electron = require('electron')
 const path = require('path');
 const userHome = require('user-home');
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
+const fs       = require('fs-extra');
 const rootPath = require('electron-root-path').rootPath;
+
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
 
 class PathHelper{
 
-    getKnownHosts(){
-        return userHome +'/.ssh/known_hosts';
-    }
 
+    /* DIRS */
     getRoot(){
-        return userHome +'/Sukoh/';
+        const thedir = userHome +'/Sukoh/';
+        fs.ensureDirSync(thedir);
+        return thedir;
     }
 
     getTempDir(){
-        return this.getRoot()+ 'temp/';
+        const dir = this.getRoot()+ 'temp/';
+        fs.ensureDirSync(dir);
+        return dir;
     }
 
     getSiteRoot(siteKey){
         return this.getRoot()+ `sites/${siteKey}/`;
-    }
-
-    getKeyPath(siteKey){
-        return this.getRoot()+'config.'+siteKey+'.json';
     }
 
     getSiteWorkspacesRoot(siteKey){
@@ -49,17 +49,6 @@ class PathHelper{
         return this.getHugoBinRoot() + version + '/';
     }
 
-    getHugoBinForVer(version){
-        let platform = process.platform.toLowerCase();
-        if(platform.startsWith('win')){
-            return this.getHugoBinDirForVer(version) + 'hugo.exe';
-        }
-        else{
-            return this.getHugoBinDirForVer(version) + 'hugo';
-        }
-
-    }
-
     getLastBuildDir() {
         return this._lastBuildDir;
     }
@@ -71,10 +60,6 @@ class PathHelper{
 
     getThemesDir(){
         return this.getRoot() + 'tools/hugothemes/';
-    }
-
-    isLinuxAppImage(){
-        return electron.app.getAppPath().indexOf("/tmp/.mount_") === 0
     }
 
     getApplicationResourcesDir(){
@@ -97,6 +82,44 @@ class PathHelper{
             return path.join(rootPath, 'resources');
         }
     }
+
+    /* FILES */
+    ownersLookupCacheFilePath(){
+        return this.getTempDir() + 'cache-ownerslookup.json';
+    }
+
+    userCacheFilePath(profileUserName){
+        return this.getTempDir() + 'cache-user.'+profileUserName + '.json';
+    }
+
+    sitesCacheFilePath(){
+        return this.getTempDir() + 'cache-sites.json';
+    }
+
+    getKnownHosts(){
+        return userHome +'/.ssh/known_hosts';
+    }
+
+    getKeyPath(siteKey){
+        return this.getRoot()+'config.'+siteKey+'.json';
+    }
+
+    getHugoBinForVer(version){
+        let platform = process.platform.toLowerCase();
+        if(platform.startsWith('win')){
+            return this.getHugoBinDirForVer(version) + 'hugo.exe';
+        }
+        else{
+            return this.getHugoBinDirForVer(version) + 'hugo';
+        }
+
+    }
+
+    /* HELPERS */
+    isLinuxAppImage(){
+        return electron.app.getAppPath().indexOf("/tmp/.mount_") === 0
+    }
+
 }
 
 module.exports = new PathHelper();

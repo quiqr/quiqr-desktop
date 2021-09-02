@@ -68,7 +68,6 @@ type SelectSiteState = {
 
 class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
-
     constructor(props){
         super(props);
         this.state = {
@@ -189,7 +188,10 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                         <Subheader>All Sites</Subheader>
                         { (sites).map((site, index)=>{
                             let selected = site===selectedSite;
-
+                            let owner = 'user: unknown';
+                            if(site.owner !== '' ){
+                                owner = "user: " + site.owner;
+                            }
 
                             return (<ListItem
                                 id={"siteselectable-"+site.name}
@@ -197,7 +199,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                                 style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
                                 onClick={ ()=>{ this.mountSite(site) } }
                                 primaryText={ site.name }
-                                secondaryText=""
+                                secondaryText={ owner }
 
                             />);
                         })}
