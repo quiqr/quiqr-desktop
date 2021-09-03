@@ -10,13 +10,11 @@ const glob = require('glob');
 const formatProviderResolver = require('./format-provider-resolver');
 const {shell} = require('electron');
 const menuManager = require('./menu-manager');
-const PoppyGoAppConfig = require('./poppygo-app-config');
 
 const pogozipper = require('./pogozipper');
 const PogoPublisher = require('./publishers/pogo-publisher');
 
 let api = {};
-let pogoconf = PoppyGoAppConfig();
 
 function bindResponseToContext(promise, context){
     promise.then((result)=>{
@@ -121,8 +119,8 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
         global.currentWorkspaceKey = workspaceKey;
         global.currentSitePath = configuration.path;
 
-        pogoconf.setLastOpenedSite(siteKey, workspaceKey, currentSitePath);
-        pogoconf.saveState();
+        global.pogoconf.setLastOpenedSite(siteKey, workspaceKey, currentSitePath);
+        global.pogoconf.saveState();
 
     }
     catch(e){
@@ -173,8 +171,15 @@ api.getCurrentSiteKey = async function(){
     return await global.currentSiteKey;
 }
 
-api.getPogoConf = async function(key){
-    return pogoconf.skipWelcomeScreen;
+api.getPogoConfKey = async function({confkey},context){
+    console.log('ddd');
+    console.log(pogoconf[confkey]);
+    try{
+        context.resolve(pogoconf.sitesListingView);
+    }
+    catch(err){
+        context.reject(err);
+    }
 }
 
 

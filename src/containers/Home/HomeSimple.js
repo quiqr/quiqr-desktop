@@ -126,16 +126,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
     }
 
-    /*
-    componentWillMount(){
-        service.registerListener(this);
-    }
-
-    componentWillUnmount(){
-        service.unregisterListener(this);
-    }
-    */
-
     componentDidMount(){
         this.checkSiteInProps();
         this._ismounted = true;
@@ -145,7 +135,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     setUser(username,fingerprint){
         this.setState({username: username, fingerprint: fingerprint},function(){
             this.getRemoteSiteStatus(false);
-
         });
     }
 

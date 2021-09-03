@@ -130,8 +130,8 @@ export class API {
         return mainProcessBridge.request('getThumbnailForCollectionItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
     }
 
-    getPogoConf(confkey: string){
-        return mainProcessBridge.request('getPogoConf', confkey);
+    getPogoConfKey(confkey: string){
+        return mainProcessBridge.request('getPogoConfKey', {confkey});
     }
     createSite(siteConfig: any){
         return mainProcessBridge.request('createSite', siteConfig);

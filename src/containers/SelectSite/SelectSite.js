@@ -75,15 +75,21 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
             currentSiteKey: null,
             createSiteDialog: false,
             publishSiteDialog: undefined,
-            siteCreatorMessage: null
+            siteCreatorMessage: null,
+            sitesListingView: 'all'
         };
     }
 
     componentWillMount(){
+
         service.getConfigurations(true).then((c)=>{
             var stateUpdate  = {};
             stateUpdate.configurations = c;
             this.setState(stateUpdate);
+        });
+
+        service.api.getPogoConfKey('sitesListingView').then((view)=>{
+            this.setState({sitesListingView: view });
         });
     }
 
@@ -173,6 +179,29 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
             return <Spinner />
         }
 
+        let listTitle = 'All Sites';
+        service.api.logToConsole(this.props.poppygoUsername);
+
+        if(this.state.sitesListingView === 'mylocal'){
+            listTitle = 'My sites';
+            sites = sites.filter((site) => {
+                return site.owner === this.props.poppygoUsername
+            });
+        }
+
+        else if(this.state.sitesListingView === 'myremote'){
+            listTitle = 'Available remote sites';
+            sites = sites.filter((site) => {
+                return site.remoteonly === true
+            });
+        }
+        else if(this.state.sitesListingView === 'unpublished'){
+            listTitle = 'Unpublished sites';
+            sites = sites.filter((site) => {
+                return site.published === 'no'
+            });
+        }
+
         sites.sort(function(a, b){
             var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
             if (nameA < nameB) //sort string ascending
@@ -185,12 +214,18 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
         return (
                 <div style={ styles.sitesCol }>
                     <List>
-                        <Subheader>All Sites</Subheader>
+                        <Subheader>{listTitle}</Subheader>
                         { (sites).map((site, index)=>{
                             let selected = site===selectedSite;
                             let owner = 'user: unknown';
-                            if(site.owner !== '' ){
-                                owner = "user: " + site.owner;
+                            if(site.published === 'no' ){
+                                owner = "unpublished";
+                            }
+                            else{
+                                owner = 'user: unknown';
+                                if(site.owner !== '' ){
+                                    owner = "user: " + site.owner;
+                                }
                             }
 
                             return (<ListItem

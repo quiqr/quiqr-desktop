@@ -96,13 +96,19 @@ function get(callback, {invalidateCache} = {}){
                 if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)
                 let site = formatProvider.parse(strData);
                 validateSite(site);
+                site.published = 'unknown';
                 if(lookuploaded){
+                    site.published = 'yes';
                     site.owner = ''
                     if(site.key in ownerslookupHash.sitesToUsers){
                         site.owner = ownerslookupHash.sitesToUsers[site.key];
                     }
                     if(site.key in ownerslookupHash.sitesToUsers){
                         site.publishKey = ownerslookupHash.sitesToPaths[site.key];
+                    }
+                    //console.log(ownerslookupHash.sitesUnpublished);
+                    if(Array.isArray(ownerslookupHash.sitesUnpublished) && ownerslookupHash.sitesUnpublished.includes(site.key)){
+                        site.published = 'no';
                     }
                 }
                 site.configPath = file;

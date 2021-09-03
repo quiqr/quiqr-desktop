@@ -78,6 +78,7 @@ class CloudCacheManager{
             usersToSites: {},
             sitesToPaths: {},
             sitesToUsers: {},
+            sitesUnpublished: [],
             pathsToSites: {},
             pathsToUsers: {},
         }
@@ -90,9 +91,12 @@ class CloudCacheManager{
                 configurations.sites.forEach(function(site){
                     try{
                         if(site.publish[0].key=="poppygo-cloud"){
-                            let path = site.publish[0].config.path
-                            ownerslookupdata.sitesToPaths[site.key] = "sites/"+path
-                            ownerslookupdata.pathsToSites["sites/"+path] = site.key
+                            let path = site.publish[0].config.path;
+                            ownerslookupdata.sitesToPaths[site.key] = "sites/"+path;
+                            ownerslookupdata.pathsToSites["sites/"+path] = site.key;
+                        }
+                        else{
+                            ownerslookupdata.sitesUnpublished.push(site.key);
                         }
                     }
                     catch{

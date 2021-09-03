@@ -47,11 +47,15 @@ module.exports = function (options) {
         state.skipWelcomeScreen = skip;
     }
 
-    /* skip: bool */
+    /* toggle: bool */
     function setExperimentalFeatures(toggle){
         state.experimentalFeatures = toggle;
     }
 
+    /* view: string (all, mylocal, myremote)  */
+    function setSitesListingView(view){
+        state.sitesListingView = view;
+    }
     /*
      * END SETTINGS METHODS
      */
@@ -71,15 +75,20 @@ module.exports = function (options) {
         lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
         skipWelcomeScreen: false,
         experimentalFeatures: false,
+        sitesListingView: 'all',
     }, state);
 
     return {
         get lastOpenedSite() { return state.lastOpenedSite; },
         get skipWelcomeScreen() { return state.skipWelcomeScreen; },
         get experimentalFeatures() { return state.experimentalFeatures; },
+        get sitesListingView() {
+            return state.sitesListingView;
+        },
         setLastOpenedSite,
         setSkipWelcomeScreen,
         setExperimentalFeatures,
+        setSitesListingView,
         saveState,
         resetStateToDefault
     };

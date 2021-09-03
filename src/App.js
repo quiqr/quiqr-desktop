@@ -108,11 +108,6 @@ class App extends React.Component<AppProps,AppState>{
             if(this.state.poppygoUsername !== profileAndFingerprint.profile.username){
                 this.setState({poppygoUsername: profileAndFingerprint.profile.username, poppygoFingerprint:profileAndFingerprint.fingerprint});
             }
-            /*
-            else{
-                this.setState({poppygoUsername: null, poppygoFingerprint: null});
-            }
-            */
 
         }, (e)=>{
         })
@@ -223,38 +218,43 @@ class App extends React.Component<AppProps,AppState>{
     </Switch>);
   }
 
+  renderSelectSites(){
+    this.getProfile();
+    return <SelectSite
+      key={ 'selectSite' }
+      poppygoUsername={this.state.poppygoUsername}
+    />
+  }
+  renderHome(match){
+    this.getProfile();
+    return <Home
+      key={ match.url }
+      poppygoUsername={this.state.poppygoUsername}
+      poppygoFingerprint={this.state.poppygoFingerprint}
+      siteKey={ decodeURIComponent(match.params.site) }
+      workspaceKey={ decodeURIComponent(match.params.workspace) } />
+  }
+
   renderContentSwitch(){
     return (<Switch>
       <Route path='/' exact render={ () => {
-        return <SelectSite key={ 'selectSite' } />
+        return this.renderSelectSites();
       }} />
 
       <Route path='/selectsite' exact render={ () => {
-        return <SelectSite key={ 'selectSite' } />
+        return this.renderSelectSites();
       }} />
 
       <Route path='/welcome' exact render={ () => {
-            return <Welcome key={ 'selectSite' } />
+        return <Welcome key={ 'selectSite' } />
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-          this.getProfile();
-          return <Home 
-              key={ match.url }
-              poppygoUsername={this.state.poppygoUsername}
-              poppygoFingerprint={this.state.poppygoFingerprint}
-              siteKey={ decodeURIComponent(match.params.site) }
-              workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          return this.renderHome(match);
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
-          this.getProfile();
-          return <Home 
-              key={ match.url }
-              poppygoUsername={this.state.poppygoUsername}
-              poppygoFingerprint={this.state.poppygoFingerprint}
-              siteKey={ decodeURIComponent(match.params.site) }
-              workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          return this.renderHome(match);
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {

@@ -13,7 +13,6 @@ const logWindowManager            = require('./log-window-manager');
 const pogozipper                  = require('./pogozipper');
 const cloudCacheManager           = require('./pogocloud/cloud-cache-manager');
 const pogoversions                = require('./pogo-site-version-helper');
-const PoppyGoAppConfig            = require('./poppygo-app-config');
 const SiteService                 = require('./services/site/site-service')
 const pathHelper                  = require('./path-helper');
 const hugoDownloader              = require('./hugo/hugo-downloader')
@@ -25,7 +24,6 @@ const app = electron.app
 let mainWindow = null;
 let logWindow = null;
 let menu = null;
-let pogoconf = PoppyGoAppConfig();
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
 
@@ -463,6 +461,52 @@ resources: []\n\
         console.log(subdir);
     }
 
+    async setSitesListingView(view){
+        await global.pogoconf.setSitesListingView(view)
+        await global.pogoconf.saveState();
+        global.mainWM.closeSiteAndShowSelectSites();
+
+        this.createMainMenu();
+    }
+
+    createViewSitesMenu(){
+
+        let _menuContent = [
+            {
+                key: "all",
+                label: "View all sites",
+            },
+            {
+                key: "mylocal",
+                label: "My sites",
+            },
+            {
+                key: "myremote",
+                label: "My available",
+            },
+            {
+                key: "unpublished",
+                label: "Unpublished sites",
+            },
+        ];
+
+        let viewSitesMenu = [];
+        _menuContent.forEach((itemContent)=>{
+            viewSitesMenu.push({
+                id: `view-sites-${itemContent.key}`,
+                label: itemContent.label,
+                type: "checkbox",
+                checked: (itemContent.key===pogoconf.sitesListingView),
+                click: async () => {
+                    this.setSitesListingView(itemContent.key);
+                }
+            });
+        });
+
+        return viewSitesMenu;
+    }
+
+
     createProfilesMenu(){
 
         const profilesDir = path.join(pathHelper.getRoot(),"profiles")
@@ -649,13 +693,13 @@ resources: []\n\
 
     toggleExperimental(){
 
-        if(pogoconf.experimentalFeatures){
-            pogoconf.setExperimentalFeatures(false);
+        if(global.pogoconf.experimentalFeatures){
+            global.pogoconf.setExperimentalFeatures(false);
         }
         else{
-            pogoconf.setExperimentalFeatures(true);
+            global.pogoconf.setExperimentalFeatures(true);
         }
-        pogoconf.saveState();
+        global.pogoconf.saveState();
         this.createMainMenu();
 
     }
@@ -665,6 +709,11 @@ resources: []\n\
                 id: 'switch-profile',
                 label: 'Switch user',
                 submenu: this.createProfilesMenu()
+            },
+            {
+                id: 'switch-select-sites-view',
+                label: 'View sites',
+                submenu: this.createViewSitesMenu()
             },
             {
                 id: 'rename-site',
@@ -1012,7 +1061,7 @@ resources: []\n\
                     {
                         label: 'Enable experimental',
                         type: "checkbox",
-                        checked: pogoconf.experimentalFeatures,
+                        checked: global.pogoconf.experimentalFeatures,
                         click: async () => {
                             this.toggleExperimental()
                         }
@@ -1020,7 +1069,7 @@ resources: []\n\
                 ]
             },
 
-            ...(pogoconf.experimentalFeatures ? [{
+            ...(global.pogoconf.experimentalFeatures ? [{
                 label: 'Experimental',
                 submenu: this.createExperimentalMenu()
             }] : []),

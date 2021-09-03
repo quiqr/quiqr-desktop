@@ -31,7 +31,7 @@ app.setAsDefaultProtocolClient('poppygo');
 require('events').EventEmitter.prototype._maxListeners = 15;
 
 //console.log(process.argv);
-let pogoconf = PoppyGoAppConfig();
+global.pogoconf = PoppyGoAppConfig();
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
