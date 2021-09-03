@@ -172,8 +172,6 @@ api.getCurrentSiteKey = async function(){
 }
 
 api.getPogoConfKey = async function({confkey},context){
-    console.log('ddd');
-    console.log(pogoconf[confkey]);
     try{
         context.resolve(pogoconf.sitesListingView);
     }
@@ -181,9 +179,6 @@ api.getPogoConfKey = async function({confkey},context){
         context.reject(err);
     }
 }
-
-
-
 
 api.mountWorkspace = async function({siteKey, workspaceKey}, context){
     let siteService = await getSiteServicePromise(siteKey);
