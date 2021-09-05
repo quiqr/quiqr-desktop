@@ -1,14 +1,17 @@
 import { Route } from 'react-router-dom';
 import React from 'react';
-import service from './../../services/service';
-import { snackMessageService } from './../../services/ui-service';
+
 import {List, ListItem} from 'material-ui-02/List';
 import Subheader from 'material-ui-02/Subheader';
 import IconAdd from 'material-ui-02/svg-icons/content/add';
 import muiThemeable from 'material-ui-02/styles/muiThemeable';
+
+import service from './../../services/service';
+import { snackMessageService } from './../../services/ui-service';
 import { Wrapper, MessageBlock } from './components/shared';
 import CreateSiteDialog from './components/CreateSiteDialog';
 import BlockDialog from './components/BlockDialog';
+import RemoteSiteDialog from './components/RemoteSiteDialog';
 import Spinner from './../../components/Spinner';
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
@@ -73,9 +76,13 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     this.state = {
       blockingOperation: null,
       currentSiteKey: null,
+      remoteSiteDialog: false,
       createSiteDialog: false,
+      currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
+      remoteSitesAsOwner: [],
+      remoteSitesAsMember: [],
       sitesListingView: 'all'
     };
   }
@@ -87,6 +94,15 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
       stateUpdate.configurations = c;
       this.setState(stateUpdate);
     });
+    service.api.getUserRemoteSites(this.props.poppygoUsername).then((remote_sites)=>{
+      if(remote_sites.sites && remote_sites.sites_with_member_access){
+        this.setState({
+          remoteSitesAsOwner: remote_sites.sites,
+          remoteSitesAsMember: remote_sites.sites_with_member_access
+        });
+      }
+    });
+
 
     service.api.getPogoConfKey('sitesListingView').then((view)=>{
       this.setState({sitesListingView: view });
@@ -130,6 +146,10 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
   handleAddSiteClick(){
     this.setState({createSiteDialog: true});
+  }
+
+  handleRemoteSiteClick(){
+    this.setState({remoteSiteDialog: true});
   }
 
   handleCreateSiteSubmit = (data)=>{
@@ -188,10 +208,22 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     else if(this.state.sitesListingView === 'myremote'){
       listTitle = 'Available remote sites';
 
-
-      sites = sites.filter((site) => {
-        return site.remoteonly === true
+      sites = [];
+      this.state.remoteSitesAsOwner.forEach((remotesite)=>{
+        sites.push({
+          name: remotesite,
+          owner: this.props.poppygoUsername,
+          remote: true
+        })
       });
+      this.state.remoteSitesAsMember.forEach((remotesite)=>{
+        sites.push({
+          name: remotesite,
+          owner: "?",
+          remote: true
+        })
+      });
+
     }
     else if(this.state.sitesListingView === 'unpublished'){
       listTitle = 'Unpublished sites';
@@ -230,7 +262,19 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
             id={"siteselectable-"+site.name}
             key={index}
             style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
-            onClick={ ()=>{ this.mountSite(site) } }
+            onClick={ ()=>{
+              if(site.remote){
+                this.setState({remoteSiteDialog:true});
+                this.setState({currentRemoteSite:site.name})
+                /*
+                service.api.logToConsole(site.name);
+                })
+                 */
+              }
+              else{
+                this.mountSite(site)
+              }
+            }}
             primaryText={ site.name }
             secondaryText={ owner } />);
           })}
@@ -249,10 +293,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
   render(){
 
-    //let { siteKey } = this.props;
-    let { configurations, createSiteDialog } = this.state;
-
-    //let _configurations = ((configurations: any): Configurations);
+    let { configurations, createSiteDialog, remoteSiteDialog } = this.state;
 
     if(configurations==null){
       return <Spinner />
@@ -273,6 +314,14 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                 <MessageBlock></MessageBlock>
               </Wrapper>
             </div>
+
+            <RemoteSiteDialog
+            open={remoteSiteDialog}
+            configurations={configurations}
+            remoteSiteName={this.state.currentRemoteSite}
+            onCancelClick={()=>this.setState({remoteSiteDialog:false})}
+          />
+
             <CreateSiteDialog
             open={createSiteDialog}
             onCancelClick={()=>this.setState({createSiteDialog:false})}

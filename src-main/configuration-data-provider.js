@@ -106,7 +106,6 @@ function get(callback, {invalidateCache} = {}){
                     if(site.key in ownerslookupHash.sitesToUsers){
                         site.publishKey = ownerslookupHash.sitesToPaths[site.key];
                     }
-                    //console.log(ownerslookupHash.sitesUnpublished);
                     if(Array.isArray(ownerslookupHash.sitesUnpublished) && ownerslookupHash.sitesUnpublished.includes(site.key)){
                         site.published = 'no';
                     }

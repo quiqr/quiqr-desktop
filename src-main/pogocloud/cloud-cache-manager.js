@@ -4,8 +4,6 @@
  *
  */
 
-//const electron = require('electron')
-//const app      = electron.app
 const { app, shell }                   = require('electron')
 const fs       = require('fs-extra');
 const fssimple = require('fs');
@@ -69,8 +67,19 @@ class CloudCacheManager{
     }.bind(this));
   }
 
-  async getUsersAvailableSites(){
+  getUserRemoteSites(username){
 
+    let sites = {sites:[], sites_with_member_access:[]};
+    let file = pathHelper.userCacheFilePath(username);
+    try{
+    let strData = fs.readFileSync(file, {encoding: 'utf-8'});
+      sites = JSON.parse(strData);
+    }
+    catch(e){
+      console.log(e);
+    }
+    console.log(sites);
+    return sites;
   }
 
   async updateOwnersLookupCache(){
