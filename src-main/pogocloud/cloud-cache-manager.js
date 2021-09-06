@@ -125,7 +125,6 @@ class CloudCacheManager{
           try{
             let strData = fs.readFileSync(file, {encoding: 'utf-8'});
             let usercache = JSON.parse(strData);
-            console.log(usercache)
 
             let username = file.split('.')[1];
             ownerslookupdata.usersToPaths[username] = usercache.sites;
@@ -179,7 +178,7 @@ class CloudCacheManager{
           sites[site.key].name = site.name
         });
       }
-      console.log(sites);
+      //console.log(sites);
       cache["sites"] = sites;
 
       fs.writeFileSync( pathHelper.sitesCacheFilePath(), JSON.stringify(cache), 'utf-8');

@@ -9,8 +9,8 @@
   "version": "0.8.3",
   "private": true,
   "dependencies": {
-    "7zip-bin": "3.1.0",
     "@material-ui/core": "^4.11.3",
+    "7zip-bin": "3.1.0",
     "adm-zip": "0.4.13",
     "await-spawn": "4.0.1",
     "electron-context-menu": "^0.10.1",

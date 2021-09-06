@@ -101,7 +101,6 @@ class PogoPublisher {
         }
 
         return fingerprint;
-
     }
 
     async writeProfile(profile){

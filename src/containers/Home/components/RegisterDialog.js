@@ -49,7 +49,6 @@ export default class RegisterDialog extends React.Component{
                 busy: false
             });
         })
-
     }
 
     registerUserPost(username, email, pubkey){
@@ -82,8 +81,6 @@ export default class RegisterDialog extends React.Component{
                             email: this.state.email
                         });
                     });
-
-
                 }
                 else{
                     this.setState({
@@ -103,7 +100,6 @@ export default class RegisterDialog extends React.Component{
         })
         request.write(postData)
         request.end()
-
     }
 
     handleUserNameChange(e){

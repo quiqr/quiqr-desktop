@@ -231,6 +231,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
         return site.published === 'no'
       });
     }
+    //service.api.logToConsole(sites);
 
     sites.sort(function(a, b){
       var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
