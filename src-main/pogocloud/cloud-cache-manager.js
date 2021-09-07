@@ -20,7 +20,6 @@ class CloudCacheManager{
 
   async updateUserRemoteCaches(){
 
-
     return new Promise(resolve => {
       let sites = [];
       let profileUserName;
@@ -55,22 +54,15 @@ class CloudCacheManager{
               });
             }
           });
-
-          /*
-          req.on('finish', async () => {
+          req.on('error', (e) => {
+            console.log(e);
+            resolve(false);
           });
-          */
+
+
           req.end();
 
         }
-        //let //profileUserName = "";
-        //let pogopubl = new PogoPublisher({});
-        //let readProfileAction = pogopubl.readProfile();
-        //readProfileAction.then( async (profile)=>{
-        //if(profile){
-        //}
-        //});
-
       });
 
 

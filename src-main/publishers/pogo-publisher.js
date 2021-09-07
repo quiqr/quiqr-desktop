@@ -103,25 +103,10 @@ class PogoPublisher {
 
     global.pogoconf.setCurrectUsername(profile.username)
     global.pogoconf.saveState().then( async ()=>{
-
       var sukohdir = pathHelper.getRoot();
-
-      //var profilepath = path.join(pathHelper.getRoot(), "poppygo-profile.json");
       var profilepathDir = path.join(pathHelper.getRoot(),"profiles", profile.username);
-      //var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
-
       await fs.ensureDir(path.join(pathHelper.getRoot(),"profiles"))
       await fs.ensureDir(profilepathDir)
-
-//      let newProfile={
-        //"username":profile.username
-//      }
-
-      //        await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
-      //        await fs.chmodSync(profilepath, '0600');
-      //        await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
-      //        await fs.chmodSync(profilepath2, '0600');
-
       await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
       await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
 

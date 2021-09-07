@@ -33,43 +33,55 @@ class CloudApiManager{
     }.bind(this));
   }
 
-  connectWithCodeSuccessFul(connect_code){
+  async connectWithCodeSuccessFul(connect_code){
 
-    configurationDataProvider.get( async function(err, configurations){
+    return new Promise(resolve => {
 
-      let pogopubl = new PogoPublisher({});
-      let pubkey = await pogopubl.keygen();
+      configurationDataProvider.get( async (err, configurations)=>{
 
-      var postData = JSON.stringify({
-        connect_code : connect_code,
-        pubkey: ""+pubkey
+        let pogopubl = new PogoPublisher({});
+        let pubkey = await pogopubl.keygen();
+
+        var postData = JSON.stringify({
+          connect_code : connect_code,
+          pubkey: ""+pubkey
+        });
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+"/connect";
+
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          console.log(e);
+          resolve(false);
+        });
+        req.on('response', (response) => {
+          console.log(response.statusCode);
+          if(response.statusCode === 200){
+            response.on('data',async (chunk) => {
+              let obj = JSON.parse(chunk);
+              await pogopubl.writeProfile(obj)
+              resolve(true);
+            });
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
       });
 
-      let url = configurations.global.pogoboardConn.protocol+"//"+
-        configurations.global.pogoboardConn.host+":"+
-        configurations.global.pogoboardConn.port+"/connect";
-
-      const req = request({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': postData.length
-        },
-        url: url
-      });
-      req.on('response', (response) => {
-        if(response.statusCode === 200){
-          response.on('data',async (chunk) => {
-            let obj = JSON.parse(chunk);
-            await pogopubl.writeProfile(obj)
-          });
-        }
-      });
-      req.write(postData)
-      req.end()
-
-    }.bind(this));
-
+    });
   }
 }
 

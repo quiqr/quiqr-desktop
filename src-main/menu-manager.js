@@ -67,65 +67,46 @@ class MenuManager {
 
   async requestUserConnectCode(){
 
-    global.pogoconf.setCurrectUsername(null);
-    global.pogoconf.saveState().then( async ()=>{
+    let mainWindow = global.mainWM.getCurrentInstance();
 
-      let mainWindow = global.mainWM.getCurrentInstance();
+    const prompt = require('electron-prompt');
+    let email = await prompt({
+      title: 'Enter email address of the user you want to connect',
+      label: 'email:',
+      value: "",
+      inputAttrs: {
+        type: 'text',
+        required: true
+      },
+      type: 'input'
+    }, mainWindow);
 
-      const prompt = require('electron-prompt');
-      let email = await prompt({
-        title: 'Enter email address of the user you want to connect',
-        label: 'email:',
-        value: "",
-        inputAttrs: {
-          type: 'text',
-          required: true
-        },
-        type: 'input'
-      }, mainWindow);
+    if(!email || email===""){
+      return;
+    }
+    else{
+      const dialog = electron.dialog;
 
-      if(!email || email===""){
-        return;
-      }
-      else{
-        const dialog = electron.dialog;
+      const options = {
+        type: 'info',
+        buttons: ['Cancel', 'OK'],
+        defaultId: 1,
+        title: 'Email has been sent',
+        message: 'Email has been sent',
+        detail: 'If the email address exist a mail with a connect link will be sent. Check the instructions in the mail before continuing.',
+      };
 
-        const options = {
-          type: 'info',
-          buttons: ['Cancel', 'OK'],
-          defaultId: 1,
-          title: 'Email has been sent',
-          message: 'Email has been sent',
-          detail: 'If the email address exist a mail with a connect link will be sent. Check the instructions in the mail before continuing.',
-        };
-
-        dialog.showMessageBox(null, options, async (response) => {
-          if(response === 1){
-            await cloudApiManager.requestConnectMail(email)
-            console.log("mailsent")
-          }
-          else{
-            console.log(response)
-            return;
-          }
-        });
-      }
-
-      this.createMainMenu();
-      global.mainWM.closeSiteAndShowSelectSites();
-
-
-
-
-    });
-
-    //try{
-    //fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
-    //}
-    //catch(e){
-
-    //}
-
+      dialog.showMessageBox(null, options, async (response) => {
+        if(response === 1){
+          await cloudApiManager.requestConnectMail(email)
+          console.log("mailsent")
+        }
+        else{
+          console.log(response)
+          return;
+        }
+      });
+    }
   }
 
   async enterUserConnectCode(){
@@ -144,8 +125,10 @@ class MenuManager {
     }, mainWindow);
 
     if(!connect_code || connect_code===""){
+      //TODO MESSAGE nocode
     }
     else{
+
       if(await cloudApiManager.connectWithCodeSuccessFul(connect_code)){
         const dialog = electron.dialog;
 
@@ -160,6 +143,7 @@ class MenuManager {
 
         dialog.showMessageBox(null, options, async (response) => {
           //select user
+          this.setSitesListingView('myremote');
         });
 
       }
