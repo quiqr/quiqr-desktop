@@ -158,7 +158,6 @@ class CloudCacheManager{
       for (let username in ownerslookupdata.usersToPaths) {
         try{
           ownerslookupdata.usersToSites[username] = [];
-
           ownerslookupdata.usersToPaths[username].forEach(function(path){
             if(path in ownerslookupdata.pathsToSites){
               ownerslookupdata.usersToSites[username].push(ownerslookupdata.pathsToSites[path]);
@@ -166,7 +165,7 @@ class CloudCacheManager{
           });
         }
         catch(err){
-          console.log(err);
+          console.log("username invalid cache:"+username);
         }
       }
 

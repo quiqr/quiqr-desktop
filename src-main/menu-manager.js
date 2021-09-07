@@ -31,9 +31,7 @@ class MenuManager {
   openCookbooks() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
-    if (mainWindow) {
-      mainWindow.webContents.send("redirectCookbook")
-    }
+    mainWindow.webContents.send("redirectCookbook")
   }
   stopServer() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -197,6 +195,7 @@ class MenuManager {
 
   async generateModel() {
 
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     const dialog = electron.dialog;
     let config = await workspaceConfigProvider.getConfig(global.currentSitePath, global.currentWorkspaceKey);
     let hugover = 'extended_0.80.0';
@@ -305,6 +304,7 @@ resources: []\n\
   }
 
   async renameSite(){
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
@@ -347,7 +347,6 @@ resources: []\n\
           outputConsole.appendLine('rename site to: '+newName);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-          let mainWindow = global.mainWM.getCurrentInstanceOrNew();
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
           mainWindow.webContents.send("redirectMountSite",newScreenURL);
@@ -541,6 +540,10 @@ resources: []\n\
   }
 
   async setSitesListingView(view){
+
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    mainWindow.webContents.send("selectSiteSetBusy");
+
     global.pogoconf.setSitesListingView(view)
     global.pogoconf.saveState().then( ()=>{
       this.createMainMenu();
@@ -737,6 +740,7 @@ resources: []\n\
       }
 
       async editProjectPath(){
+        let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(global.currentSiteKey && global.currentWorkspaceKey){
           let siteKey = global.currentSiteKey;
@@ -788,7 +792,6 @@ resources: []\n\
               outputConsole.appendLine('rename projectpath to: '+newPath);
 
               let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
               mainWindow.webContents.send("redirectToGivenLocation","/");
               mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
               mainWindow.webContents.send("redirectMountSite",newScreenURL);
