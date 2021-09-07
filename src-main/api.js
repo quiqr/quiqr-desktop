@@ -168,9 +168,10 @@ api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
 }
 
+//TODO test again and use confkey
 api.getPogoConfKey = async function({confkey},context){
   try{
-    context.resolve(pogoconf.sitesListingView);
+    context.resolve(global.pogoconf.sitesListingView);
   }
   catch(err){
     context.reject(err);

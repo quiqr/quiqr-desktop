@@ -57,6 +57,12 @@ module.exports = function (options) {
     function setSitesListingView(view){
         state.sitesListingView = view;
     }
+
+    /* currentUsername: string  */
+    function setCurrectUsername(username){
+        state.currentUsername = username;
+    }
+
     /*
      * END SETTINGS METHODS
      */
@@ -77,16 +83,19 @@ module.exports = function (options) {
         skipWelcomeScreen: false,
         experimentalFeatures: false,
         sitesListingView: 'all',
+        currentUsername: null,
     }, state);
 
     return {
         get lastOpenedSite() { return state.lastOpenedSite; },
+        get currentUsername() { return state.currentUsername; },
         get skipWelcomeScreen() { return state.skipWelcomeScreen; },
         get experimentalFeatures() { return state.experimentalFeatures; },
         get sitesListingView() {
             return state.sitesListingView;
         },
         setLastOpenedSite,
+        setCurrectUsername,
         setSkipWelcomeScreen,
         setExperimentalFeatures,
         setSitesListingView,

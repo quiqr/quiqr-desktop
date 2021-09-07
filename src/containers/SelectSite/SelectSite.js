@@ -90,11 +90,8 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
   updateRemoteSites(username){
     if(username){
-      service.api.logToConsole(`selectsite will update: ${username}`)
       service.api.getUserRemoteSites(username).then((remote_sites)=>{
 
-        service.api.logToConsole(`username: ${username}`)
-        service.api.logToConsole(`got remote sites: ${remote_sites.sites}`)
         if(remote_sites.sites && remote_sites.sites_with_member_access){
           this.setState({
             remoteSitesAsOwner: remote_sites.sites,
@@ -119,9 +116,8 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   }
 
   componentWillMount(){
-    this.updateRemoteSites();
+    this.updateRemoteSites(this.props.poppygoUsername);
     window.require('electron').ipcRenderer.on('selectSiteSetBusy', ()=>{
-      service.api.logToConsole("sitebusy");
       this.setState({showSpinner: true});
     });
 
@@ -130,7 +126,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
       stateUpdate.configurations = c;
       this.setState(stateUpdate);
     });
-
 
     service.api.getPogoConfKey('sitesListingView').then((view)=>{
       this.setState({sitesListingView: view });
@@ -262,7 +257,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
         return site.published === 'no'
       });
     }
-    //service.api.logToConsole(sites);
 
     sites.sort(function(a, b){
       var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
@@ -298,10 +292,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
               if(site.remote){
                 this.setState({remoteSiteDialog:true});
                 this.setState({currentRemoteSite:site.name})
-                /*
-                service.api.logToConsole(site.name);
-                })
-                 */
               }
               else{
                 this.mountSite(site)

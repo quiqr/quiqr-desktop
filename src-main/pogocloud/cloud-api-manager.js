@@ -24,11 +24,9 @@ class CloudApiManager{
         url: url
       });
       req.on('response', (response) => {
-        console.log(`STATUS: ${response.statusCode}`);
         if(response.statusCode === 200){
           response.on('data',(chunk) => {
 
-            console.log(`SUCCES:}`);
           });
         }
       });
@@ -60,18 +58,16 @@ class CloudApiManager{
         url: url
       });
       req.on('response', (response) => {
-        console.log(`STATUS: ${response.statusCode}`);
         if(response.statusCode === 200){
           response.on('data',async (chunk) => {
             let obj = JSON.parse(chunk);
             await pogopubl.writeProfile(obj)
-            console.log(obj);
-            console.log(`SUCCES:}`);
           });
         }
       });
       req.write(postData)
       req.end()
+
     }.bind(this));
 
   }

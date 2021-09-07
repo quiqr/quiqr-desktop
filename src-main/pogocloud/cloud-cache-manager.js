@@ -20,54 +20,58 @@ class CloudCacheManager{
 
   async updateUserRemoteCaches(){
 
-    console.log('refresh remote cache')
 
     return new Promise(resolve => {
       let sites = [];
+      let profileUserName;
 
-      configurationDataProvider.get(async function(err, configurations){
+      configurationDataProvider.get(async (err, configurations)=>{
 
-        let profileUserName = "";
-        let pogopubl = new PogoPublisher({});
-        let readProfileAction = pogopubl.readProfile();
-        readProfileAction.then( async (profile)=>{
-          if(profile){
-            profileUserName = profile.username
+        if(profileUserName = global.pogoconf.currentUsername){
 
-            let pogopubl = new PogoPublisher({});
-            let fingerprint = await pogopubl.getKeyFingerprint();
+          let pogopubl = new PogoPublisher({});
+          let fingerprint = await pogopubl.getKeyFingerprint();
 
-            let userVars = {
-              username: profileUserName,
-              fingerprint: fingerprint,
-            };
+          let userVars = {
+            username: profileUserName,
+            fingerprint: fingerprint,
+          };
 
-            let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
-            let url = configurations.global.pogoboardConn.protocol+"//"+
-              configurations.global.pogoboardConn.host+":"+
-              configurations.global.pogoboardConn.port+"/profile/sites/"+requestVars;
+          let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+          let url = configurations.global.pogoboardConn.protocol+"//"+
+            configurations.global.pogoboardConn.host+":"+
+            configurations.global.pogoboardConn.port+"/profile/sites/"+requestVars;
 
-            const req = request({
-              method: 'GET',
-              url: url
-            });
-            req.on('response', (response) => {
-              console.log(`STATUS: ${response.statusCode}`);
-              if(response.statusCode === 200){
-                response.on('data',async (chunk) => {
-                  fs.writeFileSync(
-                    pathHelper.userCacheFilePath(profileUserName),
-                    chunk.toString(), 'utf-8');
-                  console.log(`WRITTEN: ${chunk.toString()}`)
-                  let ownersCache = await this.updateOwnersLookupCache();
-                  resolve(ownersCache);
-                });
-              }
-            });
-          }
-        });
+          const req = request({
+            method: 'GET',
+            url: url
+          });
+          req.on('response', (response) => {
+            if(response.statusCode === 200){
+              response.on('data',async (chunk) => {
+                await fs.writeFileSync( pathHelper.userCacheFilePath(profileUserName), chunk.toString(), 'utf-8');
+                await this.updateOwnersLookupCache();
+                resolve(true);
+              });
+            }
+          });
 
-      }.bind(this));
+          /*
+          req.on('finish', async () => {
+          });
+          */
+          req.end();
+
+        }
+        //let //profileUserName = "";
+        //let pogopubl = new PogoPublisher({});
+        //let readProfileAction = pogopubl.readProfile();
+        //readProfileAction.then( async (profile)=>{
+        //if(profile){
+        //}
+        //});
+
+      });
 
 
     });
@@ -75,7 +79,6 @@ class CloudCacheManager{
   }
 
   getUserRemoteSites(username){
-    console.log(`cloudapi: ${username}`)
     let sites = {sites:[], sites_with_member_access:[]};
     let file = pathHelper.userCacheFilePath(username);
     if(file!==''){
@@ -87,7 +90,6 @@ class CloudCacheManager{
         console.log(e);
       }
     }
-    console.log(sites);
     return sites;
   }
 
@@ -104,8 +106,7 @@ class CloudCacheManager{
       pathsToUsers: {},
     }
 
-
-    configurationDataProvider.get( function(err, configurations){
+    configurationDataProvider.get( async (err, configurations)=>{
       if(configurations.empty===true || configurations.sites.length ===0){
         console.log("No sites to get remote info for ");
       }
@@ -125,7 +126,6 @@ class CloudCacheManager{
             console.log("no path");
           }
         });
-
       }
 
       let files = glob.sync(namespacedPathSearchPattern).map(x=>path.normalize(x));
@@ -137,12 +137,10 @@ class CloudCacheManager{
             let usercache = JSON.parse(strData);
 
             let username = file.split('.')[1];
-            if(ownerslookupdata.usersToPaths[username]){
-              ownerslookupdata.usersToPaths[username] = usercache.sites;
-              usercache.sites.forEach(function(sitePaths){
-                ownerslookupdata.pathsToUsers[sitePaths] = username;
-              });
-            }
+            ownerslookupdata.usersToPaths[username] = usercache.sites;
+            usercache.sites.forEach(function(sitePaths){
+              ownerslookupdata.pathsToUsers[sitePaths] = username;
+            });
           }
           catch(e){
             outputConsole.appendLine(`Cache file is invalid '${file}': ${e.toString()}`);
@@ -171,13 +169,14 @@ class CloudCacheManager{
           console.log(err);
         }
       }
-      fs.writeFileSync( pathHelper.ownersLookupCacheFilePath(), JSON.stringify(ownerslookupdata), 'utf-8');
+
+      await fs.writeFileSync( pathHelper.ownersLookupCacheFilePath(), JSON.stringify(ownerslookupdata), 'utf-8');
     });
     console.log("fin");
+    return true;
   }
 
   async updateAllRemoteCaches() {
-    console.log('refresh remote cache')
 
     let cache = {};
     let sites = {};
@@ -192,7 +191,6 @@ class CloudCacheManager{
           sites[site.key].name = site.name
         });
       }
-      //console.log(sites);
       cache["sites"] = sites;
 
       fs.writeFileSync( pathHelper.sitesCacheFilePath(), JSON.stringify(cache), 'utf-8');

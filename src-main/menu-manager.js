@@ -22,8 +22,6 @@ const { WorkspaceConfigProvider } = require('./services/workspace/workspace-conf
 const PogoPublisher               = require('./publishers/pogo-publisher');
 
 const app = electron.app
-let mainWindow = null;
-let logWindow = null;
 let menu = null;
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
@@ -31,14 +29,14 @@ const workspaceConfigProvider = new WorkspaceConfigProvider();
 class MenuManager {
 
   openCookbooks() {
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
     if (mainWindow) {
       mainWindow.webContents.send("redirectCookbook")
     }
   }
   stopServer() {
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
     if(global.hugoServer){
       global.hugoServer.stopIfRunning(function(err, stdout, stderr){
@@ -70,56 +68,65 @@ class MenuManager {
   }
 
   async requestUserConnectCode(){
-    try{
-      fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
-    }
-    catch(e){
 
-    }
+    global.pogoconf.setCurrectUsername(null);
+    global.pogoconf.saveState().then( async ()=>{
 
-    let mainWindow = global.mainWM.getCurrentInstance();
+      let mainWindow = global.mainWM.getCurrentInstance();
 
-    const prompt = require('electron-prompt');
-    let email = await prompt({
-      title: 'Enter email address of the user you want to connect',
-      label: 'email:',
-      value: "",
-      inputAttrs: {
-        type: 'text',
-        required: true
-      },
-      type: 'input'
-    }, mainWindow);
+      const prompt = require('electron-prompt');
+      let email = await prompt({
+        title: 'Enter email address of the user you want to connect',
+        label: 'email:',
+        value: "",
+        inputAttrs: {
+          type: 'text',
+          required: true
+        },
+        type: 'input'
+      }, mainWindow);
 
-    if(!email || email===""){
-      return;
-    }
-    else{
-      const dialog = electron.dialog;
+      if(!email || email===""){
+        return;
+      }
+      else{
+        const dialog = electron.dialog;
 
-      const options = {
-        type: 'info',
-        buttons: ['Cancel', 'OK'],
-        defaultId: 1,
-        title: 'Email has been sent',
-        message: 'Email has been sent',
-        detail: 'If the email address exist a mail with a connect link will be sent. Check the instructions in the mail before continuing.',
-      };
+        const options = {
+          type: 'info',
+          buttons: ['Cancel', 'OK'],
+          defaultId: 1,
+          title: 'Email has been sent',
+          message: 'Email has been sent',
+          detail: 'If the email address exist a mail with a connect link will be sent. Check the instructions in the mail before continuing.',
+        };
 
-      dialog.showMessageBox(null, options, async (response) => {
-        if(response === 1){
-          await cloudApiManager.requestConnectMail(email)
-          console.log("mailsent")
-        }
-        else{
-          console.log(response)
-          return;
-        }
-      });
-    }
+        dialog.showMessageBox(null, options, async (response) => {
+          if(response === 1){
+            await cloudApiManager.requestConnectMail(email)
+            console.log("mailsent")
+          }
+          else{
+            console.log(response)
+            return;
+          }
+        });
+      }
 
-    this.createMainMenu();
-    global.mainWM.closeSiteAndShowSelectSites();
+      this.createMainMenu();
+      global.mainWM.closeSiteAndShowSelectSites();
+
+
+
+
+    });
+
+    //try{
+    //fs.remove(pathHelper.getRoot() + 'poppygo-profile.json');
+    //}
+    //catch(e){
+
+    //}
 
   }
 
@@ -340,7 +347,7 @@ resources: []\n\
           outputConsole.appendLine('rename site to: '+newName);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-          mainWindow = global.mainWM.getCurrentInstanceOrNew();
+          let mainWindow = global.mainWM.getCurrentInstanceOrNew();
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
           mainWindow.webContents.send("redirectMountSite",newScreenURL);
@@ -359,7 +366,7 @@ resources: []\n\
   }
 
   deleteSukohFolder() {
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
     let dir;
 
@@ -380,7 +387,7 @@ resources: []\n\
   }
 
   deleteSite() {
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
     let dir;
 
@@ -433,7 +440,7 @@ resources: []\n\
   }
 
   createLogWindow () {
-    logWindow = logWindowManager.getCurrentInstanceOrNew();
+    let logWindow = logWindowManager.getCurrentInstanceOrNew();
 
     if (logWindow) {
       logWindow.webContents.send("redirectConsole")
@@ -523,69 +530,22 @@ resources: []\n\
   }
 
   openHome() {
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     if (mainWindow) {
       mainWindow.webContents.send("redirectHome")
     }
   }
 
-  async extractProfileFromOldSiteConf(){
-
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let siteKey = global.currentSiteKey;
-      let siteService = null;
-      let configurationDataProvider = require('./configuration-data-provider')
-      configurationDataProvider.get(function(err, configurations){
-        if(configurations.empty===true) throw new Error('Configurations is empty.');
-        if(err) { reject(err); return; }
-        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-
-        if(siteData==null) {
-          //throw new Error('Could not find site is empty.');
-        }
-        else{
-          siteService = new SiteService(siteData);
-        }
-
-      });
-      if(siteService == null){
-        return;
-      }
-
-      let key = siteService._config.publish[0].config.privatekey;
-      let pubkey = siteService._config.publish[0].config.privatekey;
-      let username = siteService._config.publish[0].config.path;
-      const profilesDir = path.join(pathHelper.getRoot(),"profiles");
-      const profilepathDir = path.join(pathHelper.getRoot(),"profiles",username);
-      await fs.ensureDir(profilepathDir);
-
-      var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
-      var profilepathKey= path.join(profilepathDir, "id_rsa_pogo");
-      var profilepathKeyPub= path.join(profilepathDir, "id_rsa_pogo.pub");
-
-      let newProfile={
-        "username": username
-      }
-
-      await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
-      await fs.chmodSync(profilepath2, '0600');
-      await fs.writeFileSync(profilepathKey, key, 'utf-8');
-      await fs.writeFileSync(profilepathKeyPub, pubkey, 'utf-8');
-      await fs.chmodSync(profilepathKey, '0600');
-    }
-  }
   async selectSiteVersion(subdir){
     console.log(subdir);
   }
 
   async setSitesListingView(view){
-    console.log();
     global.pogoconf.setSitesListingView(view)
     global.pogoconf.saveState().then( ()=>{
       this.createMainMenu();
       global.mainWM.closeSiteAndShowSelectSites();
     });
-
   }
 
   createViewSitesMenu(){
@@ -618,7 +578,7 @@ resources: []\n\
         label: itemContent.label,
         type: "checkbox",
         enabled: itemContent.enabled,
-        checked: (itemContent.key===pogoconf.sitesListingView),
+        checked: (itemContent.key===global.pogoconf.sitesListingView),
         click: async () => {
           this.setSitesListingView(itemContent.key);
         }
@@ -630,7 +590,7 @@ resources: []\n\
 
   createProfilesMenu(){
 
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     const profilesDir = path.join(pathHelper.getRoot(),"profiles")
     let profilesMenu = [];
 
@@ -640,14 +600,8 @@ resources: []\n\
       enabled: ( this.profileUserName === '' ? false:true ),
       click: async ()=>{
         mainWindow.webContents.send("selectSiteSetBusy");
-        try{
-          fs.removeSync(pathHelper.getRoot() + 'poppygo-profile.json');
-        }
-        catch(e){
-          console.log(`could not unset user: ${e.to_json}`);
-        }
-
-        global.pogoconf.setSitesListingView('all')
+        global.pogoconf.setCurrectUsername(null);
+        global.pogoconf.setSitesListingView('all');
         global.pogoconf.saveState().then( ()=>{
           global.mainWM.closeSiteAndShowSelectSites();
           this.createMainMenu();
@@ -675,7 +629,8 @@ resources: []\n\
 
       if(fs.existsSync(profilesDir)){
         var files = fs.readdirSync(profilesDir);
-        files.forEach(function(f){
+
+        files.forEach((f)=>{
           let label = "";
           let checked = false;
           if(lstatSync(path.join(profilesDir,f)).isDirectory()){
@@ -688,28 +643,25 @@ resources: []\n\
               type: "checkbox",
               label: label,
               checked: checked,
-              click: async function (){
+              click: async ()=>{
+
                 mainWindow.webContents.send("selectSiteSetBusy");
+
                 let key = path.join(profilesDir,f,"id_rsa_pogo");
-                //let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
-                let profileJson= path.join(profilesDir,f,"poppygo-profile.json");
-                fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
-                //fs.copySync(pub, path.join(pathHelper.getRoot(),"id_rsa_pogo.pub"));
-                fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
+                await fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
                 await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
 
-                cloudCacheManager.updateUserRemoteCaches().then(async ()=>{
-                  await this.createMainMenu();
-                  console.log(this.profileUserName)
-                  global.mainWM.closeSiteAndShowSelectSites();
+                global.pogoconf.setCurrectUsername(f);
+                global.pogoconf.saveState().then(()=>{
+                  cloudCacheManager.updateUserRemoteCaches().then(async ()=>{
+                    await this.createMainMenu();
+                    global.mainWM.closeSiteAndShowSelectSites();
+                  });
                 });
-
-
-
-              }.bind(this)
+              }
             });
           }
-        }.bind(this));
+        });
         return profilesMenu;
       }
 
@@ -836,7 +788,7 @@ resources: []\n\
               outputConsole.appendLine('rename projectpath to: '+newPath);
 
               let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-              mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
               mainWindow.webContents.send("redirectToGivenLocation","/");
               mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
               mainWindow.webContents.send("redirectMountSite",newScreenURL);
@@ -990,12 +942,6 @@ resources: []\n\
                 label: 'Site versions',
                 enabled: this.siteSelected(),
                 submenu: this.createVersionsMenu()
-              },
-              {
-                label: 'Extra profile from siteconf',
-                click: async () => {
-                  this.extractProfileFromOldSiteConf()
-                }
               },
             ]
           }
@@ -1247,7 +1193,7 @@ resources: []\n\
                 id: 'welcome',
                 label: 'Show welcome screen',
                 click: async () => {
-                  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
                   mainWindow.webContents.send("disableMobilePreview");
                   mainWindow.webContents.send("redirectToGivenLocation","/welcome");
                 }

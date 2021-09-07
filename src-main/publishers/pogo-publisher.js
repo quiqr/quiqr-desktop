@@ -1,23 +1,21 @@
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
-const path = require('path');
-const rootPath = require('electron-root-path').rootPath;
-const electron = require('electron')
-
-const fileDirUtils = require('./../file-dir-utils');
-
-const fs = require('fs-extra');
-const fssimple = require('fs');
-const pathHelper = require('./../path-helper');
-const outputConsole = require('./../output-console');
-
+const electron    = require('electron')
+const rootPath    = require('electron-root-path').rootPath;
+const path        = require('path');
+const fs          = require('fs-extra');
+const fssimple    = require('fs');
 const ProgressBar = require('electron-progressbar');
-const rimraf = require("rimraf");
-const spawn = require("child_process").spawn;
-const spawnAw = require('await-spawn')
-const hugoDownloader = require('../hugo/hugo-downloader')
-const HugoBuilder = require('../hugo/hugo-builder');
-const formatProviderResolver = require('../format-provider-resolver');
-const toml = require('toml');
+const rimraf      = require("rimraf");
+const spawn       = require("child_process").spawn;
+const spawnAw     = require('await-spawn')
+const toml        = require('toml');
+
+const fileDirUtils                              = require('../file-dir-utils');
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../environment-resolver');
+const pathHelper                                = require('../path-helper');
+const outputConsole                             = require('../output-console');
+const hugoDownloader                            = require('../hugo/hugo-downloader')
+const HugoBuilder                               = require('../hugo/hugo-builder');
+const formatProviderResolver                    = require('../format-provider-resolver');
 
 class PogoPublisher {
     constructor(config){
@@ -84,7 +82,6 @@ class PogoPublisher {
     }
 
     async getKeyFingerprint(){
-        //let pubkey = '';
         var git_bin = this.getGitBin();
         var sukohdir = pathHelper.getRoot();
         let fingerprint = null;
@@ -95,7 +92,6 @@ class PogoPublisher {
             fingerprint = gencmd.toString().replace(/\n/g,"");
             //pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
 
-
         } catch (e) {
             outputConsole.appendLine('fingerprint error ...:' + e);
         }
@@ -103,41 +99,56 @@ class PogoPublisher {
         return fingerprint;
     }
 
-    async writeProfile(profile){
-        var sukohdir = pathHelper.getRoot();
-        var profilepath = path.join(pathHelper.getRoot(), "poppygo-profile.json");
-        var profilepathDir = path.join(pathHelper.getRoot(),"profiles", profile.username);
-        var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
+  async writeProfile(profile){
 
-        await fs.ensureDir(path.join(pathHelper.getRoot(),"profiles"))
-        await fs.ensureDir(profilepathDir)
+    global.pogoconf.setCurrectUsername(profile.username)
+    global.pogoconf.saveState().then( async ()=>{
 
-        let newProfile={
-            "username":profile.username
-        }
+      var sukohdir = pathHelper.getRoot();
 
-        await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
-        await fs.chmodSync(profilepath, '0600');
-        await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
-        await fs.chmodSync(profilepath2, '0600');
+      //var profilepath = path.join(pathHelper.getRoot(), "poppygo-profile.json");
+      var profilepathDir = path.join(pathHelper.getRoot(),"profiles", profile.username);
+      //var profilepath2 = path.join(profilepathDir, "poppygo-profile.json");
 
-        await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
-        await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
+      await fs.ensureDir(path.join(pathHelper.getRoot(),"profiles"))
+      await fs.ensureDir(profilepathDir)
 
-        return true;
+//      let newProfile={
+        //"username":profile.username
+//      }
+
+      //        await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
+      //        await fs.chmodSync(profilepath, '0600');
+      //        await fs.writeFileSync(profilepath2, JSON.stringify(newProfile), 'utf-8');
+      //        await fs.chmodSync(profilepath2, '0600');
+
+      await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
+      await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
+
+      return true;
+    });
+  }
+
+  async readProfile(){
+
+    let profile = {}
+    profile.username = global.pogoconf.currentUsername;
+    if(!profile.username){
+      profile = false;
     }
-    async readProfile(){
-        var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
-        var profile;
-        try {
-            const filecont = fs.readFileSync(profilepath, {encoding:'utf8', flag:'r'});
-            profile = JSON.parse(filecont);
-        } catch (e) {
-            profile = false;
-        }
+    return profile;
 
-        return profile;
-    }
+    //var profilepath = pathHelper.getRoot()+"/poppygo-profile.json";
+    //var profile;
+    //try {
+      //const filecont = fs.readFileSync(profilepath, {encoding:'utf8', flag:'r'});
+      //profile = JSON.parse(filecont);
+    //} catch (e) {
+      //profile = false;
+    //}
+
+    //return profile;
+  }
 
     async writePublishDate(publDate){
         let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
