@@ -180,9 +180,6 @@ export class API {
   getPoppyGoProfile(){
     return mainProcessBridge.request('getPoppyGoProfile',{});
   }
-  convert07(){
-    return mainProcessBridge.request('convert07',{});
-  }
   getUserRemoteSites(username){
     return mainProcessBridge.request('getUserRemoteSites',{username});
   }

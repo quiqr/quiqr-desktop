@@ -579,11 +579,13 @@ resources: []\n\
   }
 
   async setSitesListingView(view){
-    await global.pogoconf.setSitesListingView(view)
-    await global.pogoconf.saveState();
-    global.mainWM.closeSiteAndShowSelectSites();
+    console.log();
+    global.pogoconf.setSitesListingView(view)
+    global.pogoconf.saveState().then( ()=>{
+      this.createMainMenu();
+      global.mainWM.closeSiteAndShowSelectSites();
+    });
 
-    this.createMainMenu();
   }
 
   createViewSitesMenu(){
@@ -594,16 +596,18 @@ resources: []\n\
         label: "View all sites",
       },
       {
+        key: "unpublished",
+        label: "Unpublished sites",
+      },
+      {
         key: "mylocal",
         label: "My sites",
+        enabled: ( this.profileUserName === '' ? false:true ),
       },
       {
         key: "myremote",
         label: "My available",
-      },
-      {
-        key: "unpublished",
-        label: "Unpublished sites",
+        enabled: ( this.profileUserName === '' ? false:true ),
       },
     ];
 
@@ -613,6 +617,7 @@ resources: []\n\
         id: `view-sites-${itemContent.key}`,
         label: itemContent.label,
         type: "checkbox",
+        enabled: itemContent.enabled,
         checked: (itemContent.key===pogoconf.sitesListingView),
         click: async () => {
           this.setSitesListingView(itemContent.key);
@@ -625,22 +630,29 @@ resources: []\n\
 
   createProfilesMenu(){
 
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
     const profilesDir = path.join(pathHelper.getRoot(),"profiles")
     let profilesMenu = [];
 
     profilesMenu.push({
       id: 'rm-pogo-profile',
       label: "Unset profile",
-      click: async function (){
+      enabled: ( this.profileUserName === '' ? false:true ),
+      click: async ()=>{
+        mainWindow.webContents.send("selectSiteSetBusy");
         try{
           fs.removeSync(pathHelper.getRoot() + 'poppygo-profile.json');
         }
         catch(e){
-
+          console.log(`could not unset user: ${e.to_json}`);
         }
-        this.createMainMenu();
-        global.mainWM.closeSiteAndShowSelectSites();
-      }.bind(this)});
+
+        global.pogoconf.setSitesListingView('all')
+        global.pogoconf.saveState().then( ()=>{
+          global.mainWM.closeSiteAndShowSelectSites();
+          this.createMainMenu();
+        });
+      }});
 
 
       profilesMenu.push({
@@ -677,6 +689,7 @@ resources: []\n\
               label: label,
               checked: checked,
               click: async function (){
+                mainWindow.webContents.send("selectSiteSetBusy");
                 let key = path.join(profilesDir,f,"id_rsa_pogo");
                 //let pub = path.join(profilesDir,f,"id_rsa_pogo.pub");
                 let profileJson= path.join(profilesDir,f,"poppygo-profile.json");
@@ -685,10 +698,13 @@ resources: []\n\
                 fs.copySync(profileJson, path.join(pathHelper.getRoot(),"poppygo-profile.json"));
                 await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
 
-                await cloudCacheManager.updateUserRemoteCaches()
+                cloudCacheManager.updateUserRemoteCaches().then(async ()=>{
+                  await this.createMainMenu();
+                  console.log(this.profileUserName)
+                  global.mainWM.closeSiteAndShowSelectSites();
+                });
 
-                global.mainWM.closeSiteAndShowSelectSites();
-                this.createMainMenu();
+
 
               }.bind(this)
             });
@@ -842,8 +858,10 @@ resources: []\n\
         else{
           global.pogoconf.setExperimentalFeatures(true);
         }
-        global.pogoconf.saveState();
-        this.createMainMenu();
+
+        global.pogoconf.saveState().then(()=>{
+          this.createMainMenu();
+        });
 
       }
       createExperimentalMenu(){
@@ -1280,6 +1298,7 @@ resources: []\n\
         Promise.all([readProfileAction]).then( () => {
           menu = Menu.buildFromTemplate(this.mainMenuArray());
           Menu.setApplicationMenu(menu)
+          return true;
         });
       }
   }

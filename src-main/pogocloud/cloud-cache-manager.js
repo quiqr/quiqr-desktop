@@ -19,64 +19,73 @@ const PogoPublisher             = require('../publishers/pogo-publisher');
 class CloudCacheManager{
 
   async updateUserRemoteCaches(){
+
     console.log('refresh remote cache')
 
-    let sites = [];
+    return new Promise(resolve => {
+      let sites = [];
 
-    configurationDataProvider.get( function(err, configurations){
+      configurationDataProvider.get(async function(err, configurations){
 
-      let profileUserName = "";
-      let pogopubl = new PogoPublisher({});
-      let readProfileAction = pogopubl.readProfile();
-      readProfileAction.then( async (profile)=>{
-        if(profile){
-          profileUserName = profile.username
+        let profileUserName = "";
+        let pogopubl = new PogoPublisher({});
+        let readProfileAction = pogopubl.readProfile();
+        readProfileAction.then( async (profile)=>{
+          if(profile){
+            profileUserName = profile.username
 
-          let pogopubl = new PogoPublisher({});
-          let fingerprint = await pogopubl.getKeyFingerprint();
+            let pogopubl = new PogoPublisher({});
+            let fingerprint = await pogopubl.getKeyFingerprint();
 
-          let userVars = {
-            username: profileUserName,
-            fingerprint: fingerprint,
-          };
+            let userVars = {
+              username: profileUserName,
+              fingerprint: fingerprint,
+            };
 
-          let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
-          let url = configurations.global.pogoboardConn.protocol+"//"+
-            configurations.global.pogoboardConn.host+":"+
-            configurations.global.pogoboardConn.port+"/profile/sites/"+requestVars;
+            let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+            let url = configurations.global.pogoboardConn.protocol+"//"+
+              configurations.global.pogoboardConn.host+":"+
+              configurations.global.pogoboardConn.port+"/profile/sites/"+requestVars;
 
-          const req = request({
-            method: 'GET',
-            url: url
-          });
-          req.on('response', (response) => {
-            console.log(`STATUS: ${response.statusCode}`);
-            if(response.statusCode === 200){
-              response.on('data',(chunk) => {
-                fs.writeFileSync(
-                  pathHelper.userCacheFilePath(profileUserName),
-                  chunk.toString(), 'utf-8');
-                console.log(`WRITTEN: ${chunk.toString()}`)
-              });
-            }
-          });
-        }
-      });
-      this.updateOwnersLookupCache();
+            const req = request({
+              method: 'GET',
+              url: url
+            });
+            req.on('response', (response) => {
+              console.log(`STATUS: ${response.statusCode}`);
+              if(response.statusCode === 200){
+                response.on('data',async (chunk) => {
+                  fs.writeFileSync(
+                    pathHelper.userCacheFilePath(profileUserName),
+                    chunk.toString(), 'utf-8');
+                  console.log(`WRITTEN: ${chunk.toString()}`)
+                  let ownersCache = await this.updateOwnersLookupCache();
+                  resolve(ownersCache);
+                });
+              }
+            });
+          }
+        });
 
-    }.bind(this));
+      }.bind(this));
+
+
+    });
+
   }
 
   getUserRemoteSites(username){
-
+    console.log(`cloudapi: ${username}`)
     let sites = {sites:[], sites_with_member_access:[]};
     let file = pathHelper.userCacheFilePath(username);
-    try{
-    let strData = fs.readFileSync(file, {encoding: 'utf-8'});
-      sites = JSON.parse(strData);
-    }
-    catch(e){
-      console.log(e);
+    if(file!==''){
+      try{
+        let strData = fs.readFileSync(file, {encoding: 'utf-8'});
+        sites = JSON.parse(strData);
+      }
+      catch(e){
+        console.log(e);
+      }
     }
     console.log(sites);
     return sites;
@@ -94,6 +103,7 @@ class CloudCacheManager{
       pathsToSites: {},
       pathsToUsers: {},
     }
+
 
     configurationDataProvider.get( function(err, configurations){
       if(configurations.empty===true || configurations.sites.length ===0){
@@ -127,10 +137,12 @@ class CloudCacheManager{
             let usercache = JSON.parse(strData);
 
             let username = file.split('.')[1];
-            ownerslookupdata.usersToPaths[username] = usercache.sites;
-            usercache.sites.forEach(function(sitePaths){
-              ownerslookupdata.pathsToUsers[sitePaths] = username;
-            });
+            if(ownerslookupdata.usersToPaths[username]){
+              ownerslookupdata.usersToPaths[username] = usercache.sites;
+              usercache.sites.forEach(function(sitePaths){
+                ownerslookupdata.pathsToUsers[sitePaths] = username;
+              });
+            }
           }
           catch(e){
             outputConsole.appendLine(`Cache file is invalid '${file}': ${e.toString()}`);
@@ -148,6 +160,7 @@ class CloudCacheManager{
       for (let username in ownerslookupdata.usersToPaths) {
         try{
           ownerslookupdata.usersToSites[username] = [];
+
           ownerslookupdata.usersToPaths[username].forEach(function(path){
             if(path in ownerslookupdata.pathsToSites){
               ownerslookupdata.usersToSites[username].push(ownerslookupdata.pathsToSites[path]);
@@ -160,6 +173,7 @@ class CloudCacheManager{
       }
       fs.writeFileSync( pathHelper.ownersLookupCacheFilePath(), JSON.stringify(ownerslookupdata), 'utf-8');
     });
+    console.log("fin");
   }
 
   async updateAllRemoteCaches() {

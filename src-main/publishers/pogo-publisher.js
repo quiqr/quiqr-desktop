@@ -122,7 +122,6 @@ class PogoPublisher {
         await fs.chmodSync(profilepath2, '0600');
 
         await fs.copySync(path.join(sukohdir,"/id_rsa_pogo"), path.join(profilepathDir,"/id_rsa_pogo"));
-        //await fs.copySync(path.join(sukohdir,"/id_rsa_pogo.pub"), path.join(profilepathDir,"/id_rsa_pogo.pub"));
         await fs.chmodSync(path.join(profilepathDir,"/id_rsa_pogo"), '0600');
 
         return true;
@@ -138,70 +137,6 @@ class PogoPublisher {
         }
 
         return profile;
-    }
-
-    async conf07pogoprofile(){
-        let err=false;
-        let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
-        let privatekeyPath = pathHelper.getRoot() + 'id_rsa_pogo';
-        let publickeyPath = pathHelper.getRoot() + 'id_rsa_pogo.pub';
-        let profilepath = pathHelper.getRoot() + "/poppygo-profile.json";
-
-        let conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
-        let newConf = JSON.parse(conftxt);
-        let path = newConf.publish[0].config.repo
-        if(!path) return;
-        let publickey = newConf.publish[0].config.publickey
-        let privatekey = newConf.publish[0].config.privatekey
-
-        let userTable = {
-            "psycholoog-ijsselstein.nl": "jsmole",
-            "rusland1.nl": "adekock",
-            "hanskoning.com":"hanskoning",
-            "stijlcoach.com":"naomi",
-            "instappendichterbij.nl":"angie",
-            "joliejola.nl": "jolandadekker",
-            "pimsnel.com": "mipmip"
-        }
-        let domainTable = {
-            "psycholoog-ijsselstein.nl": "www.psycholoog-ijsselstein.nl",
-            "rusland1.nl": "rusland1.nl",
-            "hanskoning.com":"hanskoning.com",
-            "stijlcoach.com":"stijlcoach.com",
-            "instappendichterbij.nl":"instappendichterbij.nl",
-            "joliejola.nl": "joliejola.nl",
-            "pimsnel.com": "pimsnel.com"
-        }
-
-        //----------
-        if(userTable.hasOwnProperty(path)){
-            let newProfile = {"username":userTable[path]}
-            await fs.writeFileSync(profilepath, JSON.stringify(newProfile), 'utf-8');
-            await fs.chmodSync(profilepath, '0600');
-        }
-
-        if(domainTable.hasOwnProperty(path)){
-            newConf.publish[0].config.defaultDomain = domainTable[path];
-        }
-        else{
-            newConf.publish[0].config.defaultDomain = path.replace(/\./g,"-")+".pogosite.com";
-        }
-
-        newConf.publish[0].config.path = path
-        newConf.lastPublish = 1
-
-        //----------
-        if(err){
-            console.log("somerror");
-            return;
-        }
-        else{
-            await fs.writeFileSync(publickeyPath, publickey, 'utf-8');
-            await fs.writeFileSync(privatekeyPath, privatekey, 'utf-8');
-            await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-        }
-
-        global.mainWM.remountSite();
     }
 
     async writePublishDate(publDate){

@@ -303,8 +303,8 @@ module.exports = {
 
         mainWindow.setTitle("PoppyGo");
 
-        menuManager.updateMenu(null);
-        menuManager.createMainMenu();
+      // menuManager.updateMenu(null);
+      //menuManager.createMainMenu();
     },
 
     remountSite: function(){

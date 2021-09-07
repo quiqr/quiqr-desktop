@@ -89,7 +89,12 @@ class PathHelper{
     }
 
     userCacheFilePath(profileUserName){
+      if(profileUserName){
         return this.getTempDir() + 'cache-user.'+profileUserName + '.json';
+      }
+      else{
+        return '';
+      }
     }
 
     sitesCacheFilePath(){

@@ -42,7 +42,10 @@ class CloudApiManager{
       let pogopubl = new PogoPublisher({});
       let pubkey = await pogopubl.keygen();
 
-      var postData = JSON.stringify({connect_code : connect_code, pubkey: ""+pubkey });
+      var postData = JSON.stringify({
+        connect_code : connect_code,
+        pubkey: ""+pubkey
+      });
 
       let url = configurations.global.pogoboardConn.protocol+"//"+
         configurations.global.pogoboardConn.host+":"+

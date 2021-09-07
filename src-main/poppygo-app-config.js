@@ -26,14 +26,15 @@ module.exports = function (options) {
         }
     }
 
-    function saveState() {
-        try {
-            mkdirp.sync(path.dirname(fullStoreFileName));
-            jsonfile.writeFileSync(fullStoreFileName, state);
-        } catch (err) {
-            // Don't care
-        }
+  async function saveState() {
+    try {
+      mkdirp.sync(path.dirname(fullStoreFileName));
+      jsonfile.writeFileSync(fullStoreFileName, state);
+    } catch (err) {
+      console.log(`could not save state ${err.to_json()}`)
     }
+    return;
+  }
 
     /*
      * START SETTINGS METHODS

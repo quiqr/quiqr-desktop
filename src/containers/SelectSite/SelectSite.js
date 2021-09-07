@@ -76,6 +76,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     this.state = {
       blockingOperation: null,
       currentSiteKey: null,
+      showSpinner: false,
       remoteSiteDialog: false,
       createSiteDialog: false,
       currentRemoteSite: '',
@@ -87,20 +88,47 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     };
   }
 
+  updateRemoteSites(username){
+    if(username){
+      service.api.logToConsole(`selectsite will update: ${username}`)
+      service.api.getUserRemoteSites(username).then((remote_sites)=>{
+
+        service.api.logToConsole(`username: ${username}`)
+        service.api.logToConsole(`got remote sites: ${remote_sites.sites}`)
+        if(remote_sites.sites && remote_sites.sites_with_member_access){
+          this.setState({
+            remoteSitesAsOwner: remote_sites.sites,
+            remoteSitesAsMember: remote_sites.sites_with_member_access
+          });
+        }
+      });
+    }
+    else{
+      this.setState({
+        remoteSitesAsOwner: [],
+        remoteSitesAsMember: []
+      });
+
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if(this.props.poppygoUsername !== nextProps.poppygoUsername){
+      this.updateRemoteSites(nextProps.poppygoUsername);
+    }
+  }
+
   componentWillMount(){
+    this.updateRemoteSites();
+    window.require('electron').ipcRenderer.on('selectSiteSetBusy', ()=>{
+      service.api.logToConsole("sitebusy");
+      this.setState({showSpinner: true});
+    });
 
     service.getConfigurations(true).then((c)=>{
       var stateUpdate  = {};
       stateUpdate.configurations = c;
       this.setState(stateUpdate);
-    });
-    service.api.getUserRemoteSites(this.props.poppygoUsername).then((remote_sites)=>{
-      if(remote_sites.sites && remote_sites.sites_with_member_access){
-        this.setState({
-          remoteSitesAsOwner: remote_sites.sites,
-          remoteSitesAsMember: remote_sites.sites_with_member_access
-        });
-      }
     });
 
 
@@ -195,18 +223,21 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     if(configurations==null){
       return <Spinner />
     }
+    if(this.state.showSpinner){
+      return <Spinner />
+    }
 
     let listTitle = 'All Sites';
 
     if(this.state.sitesListingView === 'mylocal'){
-      listTitle = 'My sites';
+      listTitle = `My sites (${this.props.poppygoUsername})`;
       sites = sites.filter((site) => {
         return site.owner === this.props.poppygoUsername
       });
     }
 
     else if(this.state.sitesListingView === 'myremote'){
-      listTitle = 'Available remote sites';
+      listTitle = `Available remote sites (${this.props.poppygoUsername})`;
 
       sites = [];
       this.state.remoteSitesAsOwner.forEach((remotesite)=>{
