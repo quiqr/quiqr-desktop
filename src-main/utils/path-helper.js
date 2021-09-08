@@ -1,13 +1,11 @@
-const electron = require('electron')
-const path = require('path');
-const userHome = require('user-home');
-const fs       = require('fs-extra');
-const rootPath = require('electron-root-path').rootPath;
-
+const electron                                  = require('electron')
+const path                                      = require('path');
+const userHome                                  = require('user-home');
+const fs                                        = require('fs-extra');
+const rootPath                                  = require('electron-root-path').rootPath;
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
 
 class PathHelper{
-
 
     /* DIRS */
     getRoot(){

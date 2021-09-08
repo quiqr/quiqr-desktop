@@ -1,7 +1,7 @@
-const formatProviderResolver = require('./../../format-provider-resolver');
-const path = require('path');
-const glob = require('glob');
-const fs = require('fs-extra');
+const path                   = require('path');
+const glob                   = require('glob');
+const fs                     = require('fs-extra');
+const formatProviderResolver = require('./../../utils/format-provider-resolver');
 
 class InitialWorkspaceConfigBuilder{
 

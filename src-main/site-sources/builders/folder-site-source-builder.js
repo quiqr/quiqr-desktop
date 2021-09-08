@@ -1,5 +1,5 @@
-const fs = require('fs-extra');
-const pathHelper = require('./../../path-helper');
+const fs         = require('fs-extra');
+const pathHelper = require('./../../utils/path-helper');
 
 class FolderSiteSourceBuilder {
 

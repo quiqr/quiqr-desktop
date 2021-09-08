@@ -1,4 +1,4 @@
-const outputConsole = require('./../output-console');
+const outputConsole = require('./../logger/output-console');
 
 //Not a real factory, yet!
 class PublisherFactory{

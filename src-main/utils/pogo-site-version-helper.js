@@ -3,14 +3,14 @@
  * pim@poppygo.io
  *
  */
-const electron = require('electron')
-const pathHelper = require('./path-helper');
-const fs = require('fs-extra');
-const dialog = electron.dialog;
-const fssimple = require('fs');
-const outputConsole = require('./output-console');
-const path = require("path");
+const electron      = require('electron')
+const fs            = require('fs-extra');
+const dialog        = electron.dialog;
+const fssimple      = require('fs');
+const path          = require("path");
 const { lstatSync } = require('fs')
+const outputConsole = require('../logger/output-console');
+const pathHelper    = require('../utils/path-helper');
 
 class PogoSiteVersionHelper{
 

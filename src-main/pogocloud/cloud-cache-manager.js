@@ -3,17 +3,14 @@
  * pim@poppygo.io
  *
  */
-
-const { app, shell }                   = require('electron')
-const fs       = require('fs-extra');
-const fssimple = require('fs');
-const request = require('request');
-const glob = require('glob');
-const path = require('path');
-
-const configurationDataProvider = require('../configuration-data-provider')
-const pathHelper                = require('../path-helper');
-const fileDirUtils              = require('../file-dir-utils');
+const { app, shell }            = require('electron')
+const fs                        = require('fs-extra');
+const fssimple                  = require('fs');
+const request                   = require('request');
+const glob                      = require('glob');
+const path                      = require('path');
+const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
+const pathHelper                = require('../utils/path-helper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 
 class CloudCacheManager{

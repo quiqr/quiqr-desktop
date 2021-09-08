@@ -4,10 +4,9 @@
  *
  */
 
-const { app, shell } = require('electron')
-const request        = require('request');
-
-const configurationDataProvider = require('../configuration-data-provider')
+const { app, shell }            = require('electron')
+const request                   = require('request');
+const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const PogoPublisher             = require('../publishers/pogo-publisher');
 
 class CloudApiManager{

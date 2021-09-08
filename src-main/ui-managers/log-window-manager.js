@@ -1,14 +1,15 @@
-const electron = require('electron');
-const BrowserWindow = electron.BrowserWindow;
-const url = require('url')
-const path = require('path')
-const fs = require('fs-extra')
+const electron                  = require('electron');
+const BrowserWindow             = electron.BrowserWindow;
+const url                       = require('url')
+const path                      = require('path')
+const fs                        = require('fs-extra')
+const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 
-let prefsWindow;
+let logWindow;
 
-function showNotFound(prefsWindow, lookups){
+function showNotFound(logWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
-    prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
     <h1>Oops...</h1>
     <p>The file <b>index.html</b> was not found!</p>
@@ -18,8 +19,9 @@ function showNotFound(prefsWindow, lookups){
 </html>`));
 }
 
-function showLookingForServer(prefsWindow, port){
-    prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+
+function showLookingForServer(logWindow/*: any*/, port/*: string*/){
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Waiting for Development Server</h1>
 <p>Waiting for React development server in port ${port}...</p>
@@ -28,8 +30,8 @@ function showLookingForServer(prefsWindow, port){
 </html>`));
 }
 
-function showInvalidDevelopmentUrl(prefsWindow, url){
-    prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
+function showInvalidDevelopmentUrl(logWindow/*: any*/, url/*: ?string*/){
+    logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Invalid Development Server URL</h1>
 <p>The provided URL (${url||'EMPTY'}) does not match the required pattern.</p>
@@ -39,47 +41,49 @@ function showInvalidDevelopmentUrl(prefsWindow, url){
 }
 
 function createWindow () {
-    const configurationDataProvider = require('./configuration-data-provider')
+    //  console.log(process.env)
 
     let icon;
     if(process.env.REACT_DEV_URL)
         icon = path.normalize(__dirname + "/../public/icon.png");
-
+    //
     // Create the browser window.
-    prefsWindow = new BrowserWindow({
+    logWindow = new BrowserWindow({
         show: false,
         webPreferences: {
             nodeIntegration: true,
         },
         frame: true,
         backgroundColor:"#ffffff",
+        minWidth:1024,
+        //webPreferences:{webSecurity:false },
         icon
     });
 
-    prefsWindow.setMenuBarVisibility(false);
-    prefsWindow.show();
+    logWindow.setMenuBarVisibility(false);
+
+    logWindow.show();
 
     if(process.env.REACT_DEV_URL){
 
-      //DEVELOPMENT SERVER
+        //DEVELOPMENT SERVER
 
-      //let url = process.env.REACT_DEV_URL+'/console';
-      let url = process.env.REACT_DEV_URL;
-      const urlWithPortMatch = url.match(/:([0-9]{4})/);
+        //let url = process.env.REACT_DEV_URL+'/console';
+        let url = process.env.REACT_DEV_URL;
+        const urlWithPortMatch = url.match(/:([0-9]{4})/);
         if(urlWithPortMatch==null){
             showInvalidDevelopmentUrl(url);
         }
         else{
             let port = urlWithPortMatch[1];
-            showLookingForServer(prefsWindow, port);
+            showLookingForServer(logWindow, port);
 
             const net = require('net');
             const client = new net.Socket();
             const tryConnection = () => client.connect({port: port}, () => {
-                    client.end();
-                    if(prefsWindow)
-                        prefsWindow.loadURL(url);
-                }
+                client.end();
+                if(logWindow) logWindow.loadURL(url);
+            }
             );
             client.on('error', (error) => {
                 setTimeout(tryConnection, 1000);
@@ -105,17 +109,17 @@ function createWindow () {
             }
         }
         if(indexFile){
-            prefsWindow.loadURL(
-              url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
+            logWindow.loadURL(
+                url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
             );
         }
         else{
-            showNotFound(prefsWindow, lookups);
+            showNotFound(logWindow, lookups);
         }
     }
 
-    prefsWindow.on('closed', function () {
-        prefsWindow = undefined; //clear reference
+    logWindow.on('closed', function () {
+        logWindow = undefined; //clear reference
     })
 
     var handleRedirect = (e, url) => {
@@ -125,15 +129,15 @@ function createWindow () {
         }
     }
 
-    prefsWindow.webContents.on('will-navigate', handleRedirect);
-    prefsWindow.webContents.on('new-window', handleRedirect);
+    logWindow.webContents.on('will-navigate', handleRedirect);
+    logWindow.webContents.on('new-window', handleRedirect);
 
-    //prefsWindow.webContents.openDevTools();
+    //logWindow.webContents.openDevTools();
 }
 
 module.exports = {
     getCurrentInstance: function(){
-        return prefsWindow;
+        return logWindow;
     },
     getCurrentInstanceOrNew: function(){
         let instance = this.getCurrentInstance();
@@ -143,6 +147,6 @@ module.exports = {
         }
 
         createWindow();
-        return prefsWindow;
+        return logWindow;
     }
 }

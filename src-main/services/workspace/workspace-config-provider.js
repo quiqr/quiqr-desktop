@@ -1,11 +1,11 @@
-const fs = require('fs-extra');
-const path = require('path');
-const glob = require('glob');
-const formatProviderResolver = require('./../../format-provider-resolver');
-const WorkspaceConfigValidator = require('./workspace-config-validator');
+const fs                            = require('fs-extra');
+const path                          = require('path');
+const glob                          = require('glob');
+const { FileCacheToken }            = require('./file-cache-token');
+const WorkspaceConfigValidator      = require('./workspace-config-validator');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
-const pathHelper = require('./../../path-helper');
-const { FileCacheToken } = require('./file-cache-token');
+const pathHelper                    = require('./../../utils/path-helper');
+const formatProviderResolver        = require('./../../utils/format-provider-resolver');
 
 class WorkspaceConfigProvider{
 

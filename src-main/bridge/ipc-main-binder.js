@@ -1,5 +1,5 @@
 let { ipcMain } = require('electron');
-let api = require('./api');
+let apiMain     = require('./api-main');
 
 let enableLogging = process.env.ENV==='DEVELOPMENT';
 
@@ -8,7 +8,7 @@ exports.bind = function(){
     let handlers = {};
 
     function addListener(key/*: string*/){
-        if(api.hasOwnProperty(key)){
+        if(apiMain.hasOwnProperty(key)){
 
             if(enableLogging)
                 console.log('IPC_MAIN_BIND_LISTENER: '+key);
@@ -41,7 +41,7 @@ exports.bind = function(){
                     //    console.log('IPC_MAIN_REQUESTED: '+ key, args);
                 }
 
-                api[key](args.data, context);
+                apiMain[key](args.data, context);
             };
         }
         else{
@@ -49,7 +49,7 @@ exports.bind = function(){
         }
     };
 
-    for(var key in api){
+    for(var key in apiMain){
         if(!key.startsWith('_'))
             addListener(key);
     }

@@ -7,19 +7,19 @@ const rimraf                      = require("rimraf");
 const fssimple                    = require('fs');
 const fs                          = require('fs-extra');
 const { shell }                   = require('electron')
-
 const prefsWindowManager          = require('./prefs-window-manager');
 const logWindowManager            = require('./log-window-manager');
-const pogozipper                  = require('./import-export/pogozipper');
-const cloudCacheManager           = require('./pogocloud/cloud-cache-manager');
-const cloudApiManager             = require('./pogocloud/cloud-api-manager');
-const pogoversions                = require('./pogo-site-version-helper');
-const SiteService                 = require('./services/site/site-service')
-const pathHelper                  = require('./path-helper');
-const hugoDownloader              = require('./hugo/hugo-downloader')
-const HugoBuilder                 = require('./hugo/hugo-builder');
-const { WorkspaceConfigProvider } = require('./services/workspace/workspace-config-provider');
-const PogoPublisher               = require('./publishers/pogo-publisher');
+const pogozipper                  = require('../import-export/pogozipper');
+const cloudCacheManager           = require('../pogocloud/cloud-cache-manager');
+const cloudApiManager             = require('../pogocloud/cloud-api-manager');
+const pogoversions                = require('../utils/pogo-site-version-helper');
+const pathHelper                  = require('../utils/path-helper');
+const hugoDownloader              = require('../hugo/hugo-downloader')
+const HugoBuilder                 = require('../hugo/hugo-builder');
+const SiteService                 = require('../services/site/site-service')
+const { WorkspaceConfigProvider } = require('../services/workspace/workspace-config-provider');
+const PogoPublisher               = require('../publishers/pogo-publisher');
+const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 
 const app = electron.app
 let menu = null;
@@ -293,7 +293,6 @@ resources: []\n\
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
       let siteService = null;
-      let configurationDataProvider = require('./configuration-data-provider')
       configurationDataProvider.get(async (err, configurations)=>{
         if(configurations.empty===true) throw new Error('Configurations is empty.');
         if(err) { reject(err); return; }
@@ -656,7 +655,6 @@ resources: []\n\
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
       let siteService = null;
-      let configurationDataProvider = require('./configuration-data-provider')
       configurationDataProvider.get((err, configurations)=>{
         if(configurations.empty===true) throw new Error('Configurations is empty.');
         if(err) { reject(err); return; }
@@ -726,7 +724,6 @@ resources: []\n\
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
       let siteService = null;
-      let configurationDataProvider = require('./configuration-data-provider')
       configurationDataProvider.get(async (err, configurations) => {
         if(configurations.empty===true) throw new Error('Configurations is empty.');
         if(err) { reject(err); return; }
@@ -889,7 +886,6 @@ resources: []\n\
         label: 'Stripe Customer Portal',
         click: async () => {
 
-          let configurationDataProvider = require('./configuration-data-provider')
           configurationDataProvider.get(async (err, configurations) => {
 
             if(this.profileUserName!=""){

@@ -9,10 +9,9 @@ const app                  = electron.app
 const fs                   = require('fs-extra');
 const fssimple             = require('fs');
 const AdmZip               = require('adm-zip');
-
-const pathHelper           = require('../path-helper');
-const fileDirUtils         = require('../file-dir-utils');
-const outputConsole        = require('../output-console');
+const pathHelper           = require('../utils/path-helper');
+const fileDirUtils         = require('../utils/file-dir-utils');
+const outputConsole        = require('../logger/output-console');
 
 const PogoSiteExtension    = "pogosite";
 const PogoThemeExtension   = "pogotheme";

@@ -1,8 +1,8 @@
-const pathHelper = require('./../../path-helper');
-const fs = require('fs-extra');
-const path = require('path');
-const publisherFactory = require('./../../publishers/publisher-factory');
+const fs                = require('fs-extra');
+const path              = require('path');
+const publisherFactory  = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
+const pathHelper        = require('./../../utils/path-helper');
 
 class SiteService{
     constructor(config){

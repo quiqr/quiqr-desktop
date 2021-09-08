@@ -1,16 +1,17 @@
-const { execFile } = require('child_process');
-const electron = require('electron')
-const fs = require('fs-extra');
-const mkdirp = require("mkdirp");
-const path = require("path");
-const glob = require("glob");
-const pathHelper = require('./../path-helper');
-const {path7za} = require("7zip-bin");
-const request = require('request');
-const outputConsole = require('./../output-console');
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
+const electron                                  = require('electron')
+const { execFile }                              = require('child_process');
+const ProgressBar                               = require('electron-progressbar');
+const fs                                        = require('fs-extra');
+const mkdirp                                    = require("mkdirp");
+const path                                      = require("path");
+const glob                                      = require("glob");
+const {path7za}                                 = require("7zip-bin");
+const request                                   = require('request');
 
-const ProgressBar = require('electron-progressbar');
+const pathHelper                                = require('./../utils/path-helper');
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../utils/environment-resolver');
+const outputConsole                             = require('./../logger/output-console');
+
 
 class OfficialHugoSourceUrlBuilder{
     build(enviromnent, version){

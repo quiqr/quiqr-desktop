@@ -1,10 +1,10 @@
-const glob = require('glob');
-const fs = require('fs-extra');
-const path = require('path');
-const pathHelper = require('./path-helper');
-const formatProviderResolver = require('./format-provider-resolver');
-const outputConsole = require('./output-console');
-const Joi = require('joi');
+const glob                   = require('glob');
+const fs                     = require('fs-extra');
+const path                   = require('path');
+const Joi                    = require('joi');
+const pathHelper             = require('../utils/path-helper');
+const formatProviderResolver = require('../utils/format-provider-resolver');
+const outputConsole          = require('../logger/output-console');
 
 let configurationCache = undefined;
 

@@ -1,25 +1,21 @@
-const {shell} = require('electron');
-
-const fs = require('fs-extra');
-const fssimple = require('fs');
-const rimraf = require("rimraf");
-
-const fm = require('front-matter')
-
-const path = require('path');
-const glob = require('glob');
-const { nativeImage } = require('electron');
-const formatProviderResolver = require('./../../format-provider-resolver');
-const { WorkspaceConfigProvider } = require('./workspace-config-provider');
-const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
-
-const contentFormats = require('./../../content-formats');
-const { promisify } = require('util');
-const Jimp = require("jimp");
+const path                            = require('path');
+const glob                            = require('glob');
+const { shell, nativeImage }          = require('electron');
+const fs                              = require('fs-extra');
+const fssimple                        = require('fs');
+const rimraf                          = require("rimraf");
+const fm                              = require('front-matter')
+const { promisify }                   = require('util');
+const Jimp                            = require("jimp");
+const formatProviderResolver          = require('./../../utils/format-provider-resolver');
+const { WorkspaceConfigProvider }     = require('./workspace-config-provider');
+const InitialWorkspaceConfigBuilder   = require('./initial-workspace-config-builder');
+const contentFormats                  = require('./../../utils/content-formats');
+const pathHelper                      = require('./../../utils/path-helper');
 const { createThumbnailJob, globJob } = require('./../../jobs');
-const HugoBuilder = require('./../../hugo/hugo-builder');
-const HugoServer = require('./../../hugo/hugo-server');
-const pathHelper = require('./../../path-helper');
+const HugoBuilder                     = require('./../../hugo/hugo-builder');
+const HugoServer                      = require('./../../hugo/hugo-server');
+
 const workspaceConfigProvider = new WorkspaceConfigProvider();
 
 class WorkspaceService{

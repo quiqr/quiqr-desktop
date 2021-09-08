@@ -6,19 +6,16 @@ const request           = require('request');
 const fs                = require('fs-extra');
 const fssimple          = require('fs');
 const ProgressBar       = require('electron-progressbar');
-
-const ipcMainBinder     = require('./ipc-main-binder');
-const mainWindowManager = require('./main-window-manager');
+const ipcMainBinder     = require('./bridge/ipc-main-binder');
+const mainWindowManager = require('./ui-managers/main-window-manager');
+const menuManager       = require('./ui-managers/menu-manager');
 const pogozipper        = require('./import-export/pogozipper');
-const menuManager       = require('./menu-manager');
-const pathHelper        = require('./path-helper');
-const fileDirUtils      = require('./file-dir-utils');
-const PoppyGoAppConfig  = require('./poppygo-app-config');
-const outputConsole     = require('./output-console');
+const pathHelper        = require('./utils/path-helper');
+const PoppyGoAppConfig  = require('./app-prefs-state/poppygo-app-config');
+const outputConsole     = require('./logger/output-console');
 
 unhandled();
 
-// Module to control application life.
 const app = electron.app
 
 if(app.isPackaged) {

@@ -3,16 +3,16 @@ const {dirname}                 = require('path');
 const path                      = require('path');
 const glob                      = require('glob');
 const {shell}                   = require('electron');
-const configurationDataProvider = require('./configuration-data-provider')
-const SiteService               = require('./services/site/site-service')
-const WorkspaceService          = require('./services/workspace/workspace-service')
-const siteSourceBuilderFactory  = require('./site-sources/builders/site-source-builder-factory');
-const hugoDownloader            = require('./hugo/hugo-downloader')
-const formatProviderResolver    = require('./format-provider-resolver');
-const menuManager               = require('./menu-manager');
-const pogozipper                = require('./import-export/pogozipper');
-const PogoPublisher             = require('./publishers/pogo-publisher');
-const cloudCacheManager         = require('./pogocloud/cloud-cache-manager');
+const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
+const SiteService               = require('../services/site/site-service')
+const WorkspaceService          = require('../services/workspace/workspace-service')
+const siteSourceBuilderFactory  = require('../site-sources/builders/site-source-builder-factory');
+const hugoDownloader            = require('../hugo/hugo-downloader')
+const formatProviderResolver    = require('../utils/format-provider-resolver');
+const menuManager               = require('../ui-managers/menu-manager');
+const pogozipper                = require('../import-export/pogozipper');
+const PogoPublisher             = require('../publishers/pogo-publisher');
+const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
 
 let api = {};
 

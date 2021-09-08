@@ -1,21 +1,20 @@
-const electron    = require('electron')
-const rootPath    = require('electron-root-path').rootPath;
-const path        = require('path');
-const fs          = require('fs-extra');
-const fssimple    = require('fs');
-const ProgressBar = require('electron-progressbar');
-const rimraf      = require("rimraf");
-const spawn       = require("child_process").spawn;
-const spawnAw     = require('await-spawn')
-const toml        = require('toml');
-
-const fileDirUtils                              = require('../file-dir-utils');
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../environment-resolver');
-const pathHelper                                = require('../path-helper');
-const outputConsole                             = require('../output-console');
+const electron                                  = require('electron')
+const rootPath                                  = require('electron-root-path').rootPath;
+const path                                      = require('path');
+const fs                                        = require('fs-extra');
+const fssimple                                  = require('fs');
+const ProgressBar                               = require('electron-progressbar');
+const rimraf                                    = require("rimraf");
+const spawn                                     = require("child_process").spawn;
+const spawnAw                                   = require('await-spawn')
+const toml                                      = require('toml');
+const fileDirUtils                              = require('../utils/file-dir-utils');
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../utils/environment-resolver');
+const formatProviderResolver                    = require('../utils/format-provider-resolver');
+const pathHelper                                = require('../utils/path-helper');
+const outputConsole                             = require('../logger/output-console');
 const hugoDownloader                            = require('../hugo/hugo-downloader')
 const HugoBuilder                               = require('../hugo/hugo-builder');
-const formatProviderResolver                    = require('../format-provider-resolver');
 
 class PogoPublisher {
     constructor(config){

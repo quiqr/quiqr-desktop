@@ -1,9 +1,9 @@
-const { execFile } = require('child_process');
-const pathHelper = require('./../path-helper');
-const path = require('path');
-const fs = require('fs-extra');
-const rimraf = require("rimraf");
+const path           = require('path');
+const fs             = require('fs-extra');
+const rimraf         = require("rimraf");
+const { execFile }   = require('child_process');
 const hugoDownloader = require('./hugo-downloader')
+const pathHelper     = require('./../utils/path-helper');
 
 class HugoBuilder{
 

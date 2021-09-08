@@ -1,6 +1,6 @@
-const formatProviderResolver = require('./../../format-provider-resolver');
-const joi = require('joi');
-const path = require('path');
+const joi                    = require('joi');
+const path                   = require('path');
+const formatProviderResolver = require('./../../utils/format-provider-resolver');
 
 const dataFormatsPiped = formatProviderResolver.allFormatsExt().join('|');
 

@@ -1,14 +1,12 @@
+const electron                                  = require('electron')
+const path                                      = require('path');
+const rootPath                                  = require('electron-root-path').rootPath;
+const ProgressBar                               = require('electron-progressbar');
+const fs                                        = require('fs-extra');
+const outputConsole                             = require('./../logger/output-console');
+const pathHelper                                = require('./../utils/path-helper');
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../utils/environment-resolver');
 
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../environment-resolver');
-const path = require('path');
-const rootPath = require('electron-root-path').rootPath;
-const electron = require('electron')
-
-const fs = require('fs-extra');
-const pathHelper = require('./../path-helper');
-const outputConsole = require('./../output-console');
-
-const ProgressBar = require('electron-progressbar');
 
 class GithubPublisher {
     constructor(config){

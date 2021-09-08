@@ -1,7 +1,6 @@
-const fs = require('fs-extra');
-const pathHelper = require('./../path-helper');
-
-var FtpDeploy = require("ftp-deploy");
+const fs         = require('fs-extra');
+const FtpDeploy  = require("ftp-deploy");
+const pathHelper = require('./../utils/path-helper');
 
 class FtpPublisher{
   constructor(config){

@@ -1,5 +1,5 @@
-const rimraf = require("rimraf");
-const fs = require('fs-extra');
+const rimraf   = require("rimraf");
+const fs       = require('fs-extra');
 const fssimple = require('fs');
 
 class FileDirUtils{

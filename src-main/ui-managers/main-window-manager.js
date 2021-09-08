@@ -4,17 +4,14 @@ const windowStateKeeper              = require('electron-window-state');
 const url                            = require('url')
 const path                           = require('path')
 const fs                             = require('fs-extra')
-
-//const PoppyGoAppConfig = require('./poppygo-app-config');
-const menuManager = require('./menu-manager');
+const menuManager                    = require('./menu-manager');
+const configurationDataProvider      = require('../app-prefs-state/configuration-data-provider')
 
 let mainWindow;
 let mainWindowState;
 let mobilePreviewView;
 let mobilePreviewViewUrl;
-
 let mobilePreviewViewActive = false;
-//let pogoconf = PoppyGoAppConfig();
 
 function showNotFound(mainWindow, lookups){
   let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -136,7 +133,6 @@ function getLocation(locPath = ''){
 
 function getFirstScreenAfterStartup(){
   mainWindow.webContents.once('dom-ready', async () => {
-    const configurationDataProvider = require('./configuration-data-provider')
     configurationDataProvider.get(function(err, configurations){
       if(configurations.empty===true || configurations.sites.length ===0){
         console.log("switch to welcomeScreen ");
@@ -160,7 +156,6 @@ function getFirstScreenAfterStartup(){
 
 function createWindow () {
 
-  const configurationDataProvider = require('./configuration-data-provider')
 
   let icon;
   if(process.env.REACT_DEV_URL)
