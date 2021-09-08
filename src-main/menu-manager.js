@@ -37,7 +37,7 @@ class MenuManager {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
     if(global.hugoServer){
-      global.hugoServer.stopIfRunning(function(err, stdout, stderr){
+      global.hugoServer.stopIfRunning((err, stdout, stderr) => {
         if(err){
           console.log(err)
         }
@@ -52,7 +52,7 @@ class MenuManager {
   startServer() {
     console.log(global.hugoServer);
     if(global.hugoServer){
-      global.hugoServer.serve(function(err, stdout, stderr){
+      global.hugoServer.serve((err, stdout, stderr) => {
         if(err){
           console.log(err)
         }
@@ -294,7 +294,7 @@ resources: []\n\
       let siteKey = global.currentSiteKey;
       let siteService = null;
       let configurationDataProvider = require('./configuration-data-provider')
-      configurationDataProvider.get(async function(err, configurations){
+      configurationDataProvider.get(async (err, configurations)=>{
         if(configurations.empty===true) throw new Error('Configurations is empty.');
         if(err) { reject(err); return; }
         let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
@@ -304,7 +304,7 @@ resources: []\n\
           let currentName = siteService._config.name;
 
           // REMOVE INVALID KEYS
-          deleteInvalidConfKeys(newConf);
+          this.deleteInvalidConfKeys(newConf);
 
           const prompt = require('electron-prompt');
           var newName = await prompt({
@@ -334,10 +334,7 @@ resources: []\n\
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
           mainWindow.webContents.send("redirectMountSite",newScreenURL);
-
-
         }
-
       });
 
     }
@@ -388,7 +385,7 @@ resources: []\n\
       fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
 
       var rimraf = require("rimraf");
-      rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, function(){
+      rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, ()=>{
         //console.log("rm done");
       });
 
@@ -417,7 +414,7 @@ resources: []\n\
       prefsWindow.webContents.send("redirectPrefs")
     })
 
-    prefsWindow.on('closed', function() {
+    prefsWindow.on('closed', ()=>{
       prefsWindow = null
     })
   }
@@ -437,7 +434,7 @@ resources: []\n\
       logWindow.webContents.send("redirectConsole")
     })
 
-    logWindow.on('closed', function() {
+    logWindow.on('closed', () => {
       logWindow = null
     })
   }
@@ -468,7 +465,7 @@ resources: []\n\
 
   async selectSitesWindow () {
     if(global.hugoServer){
-      global.hugoServer.stopIfRunning(function(err, stdout, stderr){
+      global.hugoServer.stopIfRunning((err, stdout, stderr)=>{
         if(err){
           console.log(err)
         }
@@ -505,7 +502,7 @@ resources: []\n\
       'open-site-conf',
       'auto-create-model',
     ];
-    siteRelatedMenuIds.forEach(function(id){
+    siteRelatedMenuIds.forEach((id)=>{
       let myItem = menu.getMenuItemById(id);
       myItem.enabled = (currentSiteKey?true:false);
     });
@@ -596,448 +593,447 @@ resources: []\n\
       }});
 
 
-      profilesMenu.push({
-        id: 'connect-poppygo-user',
-        label: "Request PoppyGo User Connect Code",
-        click: async ()=>{
-          this.requestUserConnectCode();
+    profilesMenu.push({
+      id: 'connect-poppygo-user',
+      label: "Request PoppyGo User Connect Code",
+      click: async ()=>{
+        this.requestUserConnectCode();
+      }
+    });
+
+    profilesMenu.push({
+      id: 'enter-connect-code',
+      label: "Enter PoppyGo User Connect code",
+      click: async ()=>{
+        this.enterUserConnectCode();
+      }
+    });
+
+    profilesMenu.push( { type: 'separator' });
+
+    if(fs.existsSync(profilesDir)){
+      var files = fs.readdirSync(profilesDir);
+
+      files.forEach((f)=>{
+        let label = "";
+        let checked = false;
+        if(lstatSync(path.join(profilesDir,f)).isDirectory()){
+          label = f;
+          if(f == this.profileUserName){
+            checked = true;
+          }
+          profilesMenu.push({
+            id: f,
+            type: "checkbox",
+            label: label,
+            checked: checked,
+            click: async ()=>{
+
+              mainWindow.webContents.send("selectSiteSetBusy");
+
+              let key = path.join(profilesDir,f,"id_rsa_pogo");
+              await fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
+              await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
+
+              global.pogoconf.setCurrectUsername(f);
+              global.pogoconf.saveState().then(()=>{
+                cloudCacheManager.updateUserRemoteCaches().then(async ()=>{
+                  await this.createMainMenu();
+                  global.mainWM.closeSiteAndShowSelectSites();
+                });
+              });
+            }
+          });
         }
       });
+      return profilesMenu;
+    }
 
-      profilesMenu.push({
-        id: 'enter-connect-code',
-        label: "Enter PoppyGo User Connect code",
-        click: async ()=>{
-          this.enterUserConnectCode();
+    return [];
+  }
+
+  createVersionsMenu(){
+    if(global.currentSiteKey && global.currentWorkspaceKey){
+      let siteKey = global.currentSiteKey;
+      let siteService = null;
+      let configurationDataProvider = require('./configuration-data-provider')
+      configurationDataProvider.get((err, configurations)=>{
+        if(configurations.empty===true) throw new Error('Configurations is empty.');
+        if(err) { reject(err); return; }
+        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+
+        if(siteData==null) {
+          //throw new Error('Could not find site is empty.');
         }
+        else{
+          siteService = new SiteService(siteData);
+        }
+
       });
 
-      profilesMenu.push( { type: 'separator' });
+      if(siteService == null){
+        return;
+      }
 
-      if(fs.existsSync(profilesDir)){
-        var files = fs.readdirSync(profilesDir);
+      let currentPath = siteService._config.source.path;
+      let currentVersion = siteService._config.source.path.split("/").pop();
 
-        files.forEach((f)=>{
+
+      let versionsMenu = [];
+
+      if(path.resolve(currentPath, '..').split("/").pop()==='sources'){
+        let sources = path.resolve(currentPath, '..');
+        var files = fs.readdirSync(sources);
+        files.forEach( (f) => {
           let label = "";
           let checked = false;
-          if(lstatSync(path.join(profilesDir,f)).isDirectory()){
+          if(lstatSync(path.join(sources,f)).isDirectory()){
             label = f;
-            if(f == this.profileUserName){
+            if(f == currentVersion){
               checked = true;
             }
-            profilesMenu.push({
+            versionsMenu.push({
               id: f,
               type: "checkbox",
               label: label,
               checked: checked,
-              click: async ()=>{
-
-                mainWindow.webContents.send("selectSiteSetBusy");
-
-                let key = path.join(profilesDir,f,"id_rsa_pogo");
-                await fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));
-                await fs.chmodSync(path.join(pathHelper.getRoot(),"/id_rsa_pogo"), '0600');
-
-                global.pogoconf.setCurrectUsername(f);
-                global.pogoconf.saveState().then(()=>{
-                  cloudCacheManager.updateUserRemoteCaches().then(async ()=>{
-                    await this.createMainMenu();
-                    global.mainWM.closeSiteAndShowSelectSites();
-                  });
-                });
+              click: async () => {
+                pogoversions.setSiteVersion(f);
               }
             });
           }
         });
-        return profilesMenu;
       }
-
+      return versionsMenu;
+    }
+    else {
       return [];
     }
+  }
 
-      createVersionsMenu(){
-        if(global.currentSiteKey && global.currentWorkspaceKey){
-          let siteKey = global.currentSiteKey;
-          let siteService = null;
-          let configurationDataProvider = require('./configuration-data-provider')
-          configurationDataProvider.get(function(err, configurations){
-            if(configurations.empty===true) throw new Error('Configurations is empty.');
-            if(err) { reject(err); return; }
-            let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+  //TODO move to more general place
+  deleteInvalidConfKeys(newConf){
+    // REMOVE INVALID KEYS
+    delete newConf['configPath']
+    delete newConf['owner']
+    delete newConf['published']
+    delete newConf['publishKey']
+  }
 
-            if(siteData==null) {
-              //throw new Error('Could not find site is empty.');
-            }
-            else{
-              siteService = new SiteService(siteData);
-            }
+  async editProjectPath(){
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
-          });
+    if(global.currentSiteKey && global.currentWorkspaceKey){
+      let siteKey = global.currentSiteKey;
+      let siteService = null;
+      let configurationDataProvider = require('./configuration-data-provider')
+      configurationDataProvider.get(async (err, configurations) => {
+        if(configurations.empty===true) throw new Error('Configurations is empty.');
+        if(err) { reject(err); return; }
+        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
 
-          if(siteService == null){
+        if(siteData=siteService = new SiteService(siteData)){
+          let newConf = siteService._config;
+          console.log(newConf);
+
+          let currentPath = "";
+          if(newConf.hasOwnProperty("publish") && newConf.publish[0].hasOwnProperty("config") &&  newConf.publish[0].config.hasOwnProperty("path")){
+            currentPath = newConf.publish[0].config.path
+          }
+
+          this.deleteInvalidConfKeys(newConf);
+
+          const prompt = require('electron-prompt');
+          var newPath = await prompt({
+            title: 'project path',
+            label: 'key:',
+            value: currentPath,
+            inputAttrs: {
+              type: 'text',
+              required: true
+            },
+            type: 'input'
+          }, mainWindow);
+
+          console.log(newPath);
+          if(!newPath || newPath===""){
             return;
           }
 
-          let currentPath = siteService._config.source.path;
-          let currentVersion = siteService._config.source.path.split("/").pop();
+          let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
 
+          newConf.publish[0].key = "poppygo-cloud"
+          newConf.publish[0].config = {}
+          newConf.publish[0].config.path = newPath
+          newConf.publish[0].config.type = "poppygo"
+          newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
 
-          let versionsMenu = [];
+          await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
-          if(path.resolve(currentPath, '..').split("/").pop()==='sources'){
-            let sources = path.resolve(currentPath, '..');
-            var files = fs.readdirSync(sources);
-            files.forEach(function(f){
-              let label = "";
-              let checked = false;
-              if(lstatSync(path.join(sources,f)).isDirectory()){
-                label = f;
-                if(f == currentVersion){
-                  checked = true;
-                }
-                versionsMenu.push({
-                  id: f,
-                  type: "checkbox",
-                  label: label,
-                  checked: checked,
-                  click: async () => {
-                    pogoversions.setSiteVersion(f);
-                  }
-                });
-              }
-            });
-          }
-          return versionsMenu;
+          outputConsole.appendLine('rename projectpath to: '+newPath);
+
+          let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+          mainWindow.webContents.send("redirectToGivenLocation","/");
+          mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
+          mainWindow.webContents.send("redirectMountSite",newScreenURL);
+
         }
-        else {
-          return [];
+
+      });
+
+    }
+
+  }
+
+  toggleExperimental(){
+
+    if(global.pogoconf.experimentalFeatures){
+      global.pogoconf.setExperimentalFeatures(false);
+    }
+    else{
+      global.pogoconf.setExperimentalFeatures(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      this.createMainMenu();
+    });
+
+  }
+  createExperimentalMenu(){
+    let expMenu = [
+      {
+        id: 'switch-profile',
+        label: 'Switch user',
+        submenu: this.createProfilesMenu()
+      },
+      {
+        id: 'switch-select-sites-view',
+        label: 'View sites',
+        submenu: this.createViewSitesMenu()
+      },
+      {
+        id: 'rename-site',
+        label: 'Rename site',
+        enabled: this.siteSelected(),
+        click: async () => {
+          this.renameSite()
         }
-      }
+      },
+      {
+        id: 'import-site-from-url',
+        label: 'Import site from PogoURL',
+        click: async () => {
+          this.importSiteFromUrl()
+        }
+      },
+      {
+        id: 'create-new-from-hugo-theme-url',
+        label: 'Create new from Hugo theme git URL',
+        click: async () => {
+          this.createSiteFromThemeGitUrl();
+        }
+      },
+      {
+        id: 'cacheremotesiteinfo',
+        label: 'Sync remote site info',
+        click: async () => {
+          cloudCacheManager.updateAllRemoteCaches()
+        }
+      },
+      {
+        id: 'cacheremoteuserinfo',
+        label: 'Sync remote user info',
+        click: async () => {
+          cloudCacheManager.updateUserRemoteCaches()
+        }
+      },
+      {
+        id: 'unlink-site-domain',
+        label: 'Unlink site domain',
+        enabled: this.siteSelected(),
+        click: async () => {
+          this.unlinkSiteDomain()
+        }
+      },
+      {
+        id: 'add-project-path',
+        label: 'Edit project path',
+        enabled: this.siteSelected(),
+        click: async () => {
+          this.editProjectPath()
+        }
+      },
+      {
+        label: 'Reset all (dangerous)',
+        click: async () => {
+          this.deleteSukohFolder()
+        }
+      },
+      { role: 'toggledevtools' },
+      {
+        label: 'Preferences',
+        click: async () => {
+          this.createPrefsWindow()
+        }
+      },
+    ];
 
-      //TODO move to more general place
-      deleteInvalidConfKeys(newConf){
-        // REMOVE INVALID KEYS
-        delete newConf['configPath']
-        delete newConf['owner']
-        delete newConf['published']
-        delete newConf['publishKey']
-      }
+    return expMenu;
+  }
 
-      async editProjectPath(){
-        let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  createDevMenu(){
+    let devMenu = [
+      { role: 'forcereload' },
+      { role: 'toggledevtools' },
+      {
+        label: 'Stripe Customer Portal',
+        click: async () => {
 
-        if(global.currentSiteKey && global.currentWorkspaceKey){
-          let siteKey = global.currentSiteKey;
-          let siteService = null;
           let configurationDataProvider = require('./configuration-data-provider')
-          configurationDataProvider.get(async function(err, configurations){
-            if(configurations.empty===true) throw new Error('Configurations is empty.');
-            if(err) { reject(err); return; }
-            let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+          configurationDataProvider.get(async (err, configurations) => {
 
-            if(siteData=siteService = new SiteService(siteData)){
-              let newConf = siteService._config;
-              console.log(newConf);
+            if(this.profileUserName!=""){
 
-              let currentPath = "";
-              if(newConf.hasOwnProperty("publish") && newConf.publish[0].hasOwnProperty("config") &&  newConf.publish[0].config.hasOwnProperty("path")){
-                currentPath = newConf.publish[0].config.path
-              }
+              let pogopubl = new PogoPublisher({});
+              let fingerprint = await pogopubl.getKeyFingerprint();
 
-              deleteInvalidConfKeys(newConf);
+              let userVars = {
+                username: this.profileUserName,
+                fingerprint: fingerprint,
+              };
 
-              const prompt = require('electron-prompt');
-              var newPath = await prompt({
-                title: 'project path',
-                label: 'key:',
-                value: currentPath,
-                inputAttrs: {
-                  type: 'text',
-                  required: true
-                },
-                type: 'input'
-              }, mainWindow);
-
-              console.log(newPath);
-              if(!newPath || newPath===""){
-                return;
-              }
-
-              let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
-
-              newConf.publish[0].key = "poppygo-cloud"
-              newConf.publish[0].config = {}
-              newConf.publish[0].config.path = newPath
-              newConf.publish[0].config.type = "poppygo"
-              newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
-
-              await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
-
-              outputConsole.appendLine('rename projectpath to: '+newPath);
-
-              let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-              mainWindow.webContents.send("redirectToGivenLocation","/");
-              mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
-              mainWindow.webContents.send("redirectMountSite",newScreenURL);
-
-
+              let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+              let url = configurations.global.pogostripeConn.protocol+"//"+
+                configurations.global.pogostripeConn.host+":"+
+                configurations.global.pogostripeConn.port+"/myaccount/"+requestVars;
+              await shell.openExternal(url);
             }
-
           });
-
         }
-
-      }
-
-      toggleExperimental(){
-
-        if(global.pogoconf.experimentalFeatures){
-          global.pogoconf.setExperimentalFeatures(false);
-        }
-        else{
-          global.pogoconf.setExperimentalFeatures(true);
-        }
-
-        global.pogoconf.saveState().then(()=>{
-          this.createMainMenu();
-        });
-
-      }
-      createExperimentalMenu(){
-        let expMenu = [
+      },
+      {
+        label: 'Depreciated',
+        submenu: [
           {
-            id: 'switch-profile',
-            label: 'Switch user',
-            submenu: this.createProfilesMenu()
+            label: 'Front page',
+            click: async () => {
+              this.openHome()
+            }
           },
           {
-            id: 'switch-select-sites-view',
-            label: 'View sites',
-            submenu: this.createViewSitesMenu()
+            id: 'switch-version',
+            label: 'Site versions',
+            enabled: this.siteSelected(),
+            submenu: this.createVersionsMenu()
+          },
+        ]
+      }
+
+    ];
+
+    return devMenu;
+  }
+
+
+  mainMenuArray(){
+
+    const isMac = process.platform === 'darwin'
+
+    const template = [
+      ...(isMac ? [{
+        label: app.name,
+        submenu: [
+          { role: 'about' },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideothers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' }
+        ]
+      }] : []),
+      {
+        label: 'File',
+        submenu: [
+          {
+            label: 'Select site',
+            click: async () => {
+              this.selectSitesWindow();
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Import site',
+            click: async () => {
+              pogozipper.importSite()
+            }
           },
           {
-            id: 'rename-site',
-            label: 'Rename site',
+            id: 'export-site',
+            label: 'Export site',
             enabled: this.siteSelected(),
             click: async () => {
-              this.renameSite()
+              pogozipper.exportSite()
             }
           },
           {
-            id: 'import-site-from-url',
-            label: 'Import site from PogoURL',
-            click: async () => {
-              this.importSiteFromUrl()
-            }
-          },
-          {
-            id: 'create-new-from-hugo-theme-url',
-            label: 'Create new from Hugo theme git URL',
-            click: async () => {
-              this.createSiteFromThemeGitUrl();
-            }
-          },
-          {
-            id: 'cacheremotesiteinfo',
-            label: 'Sync remote site info',
-            click: async () => {
-              cloudCacheManager.updateAllRemoteCaches()
-            }
-          },
-          {
-            id: 'cacheremoteuserinfo',
-            label: 'Sync remote user info',
-            click: async () => {
-              cloudCacheManager.updateUserRemoteCaches()
-            }
-          },
-          {
-            id: 'unlink-site-domain',
-            label: 'Unlink site domain',
+            id: 'delete-site',
             enabled: this.siteSelected(),
+            label: 'Delete site',
             click: async () => {
-              this.unlinkSiteDomain()
+              this.deleteSite()
             }
           },
+          { type: 'separator' },
           {
-            id: 'add-project-path',
-            label: 'Edit project path',
+            id: 'import-theme',
             enabled: this.siteSelected(),
+            label: 'Import theme',
             click: async () => {
-              this.editProjectPath()
+              pogozipper.importTheme()
             }
           },
           {
-            label: 'Reset all (dangerous)',
+            id: 'export-theme',
+            enabled: this.siteSelected(),
+            label: 'Export theme',
             click: async () => {
-              this.deleteSukohFolder()
+              pogozipper.exportTheme()
             }
           },
-          { role: 'toggledevtools' },
+          { type: 'separator' },
           {
-            label: 'Preferences',
+            id: 'import-content',
+            enabled: this.siteSelected(),
+            label: 'Import content',
             click: async () => {
-              this.createPrefsWindow()
-            }
-          },
-        ];
-
-        return expMenu;
-      }
-
-      createDevMenu(){
-        let devMenu = [
-          { role: 'forcereload' },
-          { role: 'toggledevtools' },
-          {
-            label: 'Stripe Customer Portal',
-            click: async () => {
-
-              let configurationDataProvider = require('./configuration-data-provider')
-              configurationDataProvider.get(async function(err, configurations){
-
-                if(this.profileUserName!=""){
-
-                  let pogopubl = new PogoPublisher({});
-                  let fingerprint = await pogopubl.getKeyFingerprint();
-
-                  let userVars = {
-                    username: this.profileUserName,
-                    fingerprint: fingerprint,
-                  };
-
-                  let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
-                  let url = configurations.global.pogostripeConn.protocol+"//"+
-                    configurations.global.pogostripeConn.host+":"+
-                    configurations.global.pogostripeConn.port+"/myaccount/"+requestVars;
-                  await shell.openExternal(url);
-                }
-              }.bind(this));
+              pogozipper.importContent()
             }
           },
           {
-            label: 'Depreciated',
-            submenu: [
-              {
-                label: 'Front page',
-                click: async () => {
-                  this.openHome()
-                }
-              },
-              {
-                id: 'switch-version',
-                label: 'Site versions',
-                enabled: this.siteSelected(),
-                submenu: this.createVersionsMenu()
-              },
-            ]
-          }
-
-        ];
-
-        return devMenu;
-      }
-
-
-      mainMenuArray(){
-
-        const isMac = process.platform === 'darwin'
-
-        const template = [
-          ...(isMac ? [{
-            label: app.name,
-            submenu: [
-              { role: 'about' },
-              { type: 'separator' },
-              { role: 'services' },
-              { type: 'separator' },
-              { role: 'hide' },
-              { role: 'hideothers' },
-              { role: 'unhide' },
-              { type: 'separator' },
-              { role: 'quit' }
-            ]
-          }] : []),
-          {
-            label: 'File',
-            submenu: [
-              {
-                label: 'Select site',
-                click: async () => {
-                  this.selectSitesWindow();
-                }
-              },
-              { type: 'separator' },
-              {
-                label: 'Import site',
-                click: async () => {
-                  pogozipper.importSite()
-                }
-              },
-              {
-                id: 'export-site',
-                label: 'Export site',
-                enabled: this.siteSelected(),
-                click: async () => {
-                  pogozipper.exportSite()
-                }
-              },
-              {
-                id: 'delete-site',
-                enabled: this.siteSelected(),
-                label: 'Delete site',
-                click: async () => {
-                  this.deleteSite()
-                }
-              },
-              { type: 'separator' },
-              {
-                id: 'import-theme',
-                enabled: this.siteSelected(),
-                label: 'Import theme',
-                click: async () => {
-                  pogozipper.importTheme()
-                }
-              },
-              {
-                id: 'export-theme',
-                enabled: this.siteSelected(),
-                label: 'Export theme',
-                click: async () => {
-                  pogozipper.exportTheme()
-                }
-              },
-              { type: 'separator' },
-              {
-                id: 'import-content',
-                enabled: this.siteSelected(),
-                label: 'Import content',
-                click: async () => {
-                  pogozipper.importContent()
-                }
-              },
-              {
-                id: 'export-content',
-                enabled: this.siteSelected(),
-                label: 'Export content',
-                click: async () => {
-                  pogozipper.exportContent()
-                }
-              },
-              { type: 'separator' },
-              isMac ? { role: 'close' } : { role: 'quit' }
-            ]
+            id: 'export-content',
+            enabled: this.siteSelected(),
+            label: 'Export content',
+            click: async () => {
+              pogozipper.exportContent()
+            }
           },
-          {
-            label: 'Edit',
-            submenu: [
-              { role: 'undo' },
-              { role: 'redo' },
-              { type: 'separator' },
-              { role: 'cut' },
-              { role: 'copy' },
-              { role: 'paste' },
-              /*
+          { type: 'separator' },
+          isMac ? { role: 'close' } : { role: 'quit' }
+        ]
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          /*
                     ...(isMac ? [
                         { role: 'pasteAndMatchStyle' },
                         { role: 'delete' },
@@ -1063,177 +1059,177 @@ resources: []\n\
                     }
 
                   ])*/
-            ]
+        ]
+      },
+      {
+        label: 'View',
+        submenu: [
+
+          { role: 'reload' },
+
+          { type: 'separator' },
+
+          { role: 'resetzoom' },
+          { role: 'zoomin' },
+          { role: 'zoomout' },
+          { type: 'separator' },
+          { role: 'togglefullscreen' }
+        ]
+      },
+      {
+        label: 'Window',
+        submenu: [
+          { role: 'minimize' },
+          { role: 'zoom' },
+          ...(isMac ? [
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' }
+          ] : [
+          ])
+        ]
+      },
+      {
+        label: 'Expert',
+        submenu: [
+          {
+            id: 'start-server',
+            label: 'Restart preview',
+            enabled: this.siteSelected(),
+            click: async () => {
+              this.startServer()
+            }
           },
           {
-            label: 'View',
-            submenu: [
-
-              { role: 'reload' },
-
-              { type: 'separator' },
-
-              { role: 'resetzoom' },
-              { role: 'zoomin' },
-              { role: 'zoomout' },
-              { type: 'separator' },
-              { role: 'togglefullscreen' }
-            ]
+            label: 'Stop preview',
+            click: async () => {
+              this.stopServer()
+            }
+          },
+          { type: 'separator' },
+          {
+            id: 'open-site-dir',
+            label: 'Open site directory',
+            enabled: this.siteSelected(),
+            click: async () => {
+              this.openWorkSpaceDir()
+            }
           },
           {
-            label: 'Window',
-            submenu: [
-              { role: 'minimize' },
-              { role: 'zoom' },
-              ...(isMac ? [
-                { type: 'separator' },
-                { role: 'front' },
-                { type: 'separator' },
-                { role: 'window' }
-              ] : [
-              ])
-            ]
+            id: 'auto-create-model',
+            label: 'Generate PoppyGo config',
+            enabled: this.siteSelected(),
+            click: async () => {
+              await this.generateModel();
+              this.generateModel()
+            }
           },
           {
-            label: 'Expert',
-            submenu: [
-              {
-                id: 'start-server',
-                label: 'Restart preview',
-                enabled: this.siteSelected(),
-                click: async () => {
-                  this.startServer()
-                }
-              },
-              {
-                label: 'Stop preview',
-                click: async () => {
-                  this.stopServer()
-                }
-              },
-              { type: 'separator' },
-              {
-                id: 'open-site-dir',
-                label: 'Open site directory',
-                enabled: this.siteSelected(),
-                click: async () => {
-                  this.openWorkSpaceDir()
-                }
-              },
-              {
-                id: 'auto-create-model',
-                label: 'Generate PoppyGo config',
-                enabled: this.siteSelected(),
-                click: async () => {
-                  await this.generateModel();
-                  this.generateModel()
-                }
-              },
-              {
-                id: 'open-site-conf',
-                label: 'Open workspace config',
-                enabled: this.siteSelected(),
-                click: async () => {
-                  this.openWorkSpaceConfig()
-                }
-              },
-              { type: 'separator' },
-              {
-                label: 'Config docs',
-                click: async () => {
-                  this.openCookbooks()
-                }
-              },
-              { type: 'separator' },
-              {
-                label: 'Show Logs',
-                click: async () => {
-                  this.createLogWindow()
-                }
-              },
-              { type: 'separator' },
-              {
-                label: 'Enable experimental',
-                type: "checkbox",
-                checked: global.pogoconf.experimentalFeatures,
-                click: async () => {
-                  this.toggleExperimental()
-                }
-              },
-            ]
+            id: 'open-site-conf',
+            label: 'Open workspace config',
+            enabled: this.siteSelected(),
+            click: async () => {
+              this.openWorkSpaceConfig()
+            }
           },
-
-          ...(global.pogoconf.experimentalFeatures ? [{
-            label: 'Experimental',
-            submenu: this.createExperimentalMenu()
-          }] : []),
-
-          ...(process.env.REACT_DEV_URL ? [{
-            label: 'DevMenu',
-            submenu: this.createDevMenu()
-          }] : []),
-
+          { type: 'separator' },
           {
-            role: 'help',
-            submenu: [
-              {
-                id: 'welcome',
-                label: 'Show welcome screen',
-                click: async () => {
-                  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-                  mainWindow.webContents.send("disableMobilePreview");
-                  mainWindow.webContents.send("redirectToGivenLocation","/welcome");
-                }
-              },
-              {
-                label: 'Getting started',
-                click: async () => {
-                  await shell.openExternal("https://router.poppygo.app/getting-started");
-                }
-              },
-              { type: 'separator' },
-              {
-                label: 'Show PoppyGo version',
-                click: async () => {
-                  this.showVersion();
-                }
-              },
-              {
-                label: 'Release notes',
-                click: async () => {
-                  await shell.openExternal("https://router.poppygo.app/release-notes");
-                }
-              }
-            ]
+            label: 'Config docs',
+            click: async () => {
+              this.openCookbooks()
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Show Logs',
+            click: async () => {
+              this.createLogWindow()
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Enable experimental',
+            type: "checkbox",
+            checked: global.pogoconf.experimentalFeatures,
+            click: async () => {
+              this.toggleExperimental()
+            }
+          },
+        ]
+      },
+
+      ...(global.pogoconf.experimentalFeatures ? [{
+        label: 'Experimental',
+        submenu: this.createExperimentalMenu()
+      }] : []),
+
+      ...(process.env.REACT_DEV_URL ? [{
+        label: 'DevMenu',
+        submenu: this.createDevMenu()
+      }] : []),
+
+      {
+        role: 'help',
+        submenu: [
+          {
+            id: 'welcome',
+            label: 'Show welcome screen',
+            click: async () => {
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              mainWindow.webContents.send("disableMobilePreview");
+              mainWindow.webContents.send("redirectToGivenLocation","/welcome");
+            }
+          },
+          {
+            label: 'Getting started',
+            click: async () => {
+              await shell.openExternal("https://router.poppygo.app/getting-started");
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Show PoppyGo version',
+            click: async () => {
+              this.showVersion();
+            }
+          },
+          {
+            label: 'Release notes',
+            click: async () => {
+              await shell.openExternal("https://router.poppygo.app/release-notes");
+            }
           }
         ]
-
-        return template;
-
       }
+    ]
 
-      createMainMenu(){
+    return template;
 
-        /* THIS IS A GREAT EXÅMPLE HOW TO USE PROMISES
-         *
-         * Before executing the main action get all needed promise data and run from within Promise.all
-         *
-         * */
-        this.profileUserName = "";
-        let pogopubl = new PogoPublisher({});
-        let readProfileAction = pogopubl.readProfile();
-        readProfileAction.then((profile)=>{
-          if(profile){
-            this.profileUserName = profile.username
-          }
-        });
-
-        Promise.all([readProfileAction]).then( () => {
-          menu = Menu.buildFromTemplate(this.mainMenuArray());
-          Menu.setApplicationMenu(menu)
-          return true;
-        });
-      }
   }
 
-  module.exports = new MenuManager();
+  createMainMenu(){
+
+    /* THIS IS A GREAT EXÅMPLE HOW TO USE PROMISES
+     *
+     * Before executing the main action get all needed promise data and run from within Promise.all
+     *
+     * */
+    this.profileUserName = "";
+    let pogopubl = new PogoPublisher({});
+    let readProfileAction = pogopubl.readProfile();
+    readProfileAction.then((profile)=>{
+      if(profile){
+        this.profileUserName = profile.username
+      }
+    });
+
+    Promise.all([readProfileAction]).then( () => {
+      menu = Menu.buildFromTemplate(this.mainMenuArray());
+      Menu.setApplicationMenu(menu)
+      return true;
+    });
+  }
+}
+
+module.exports = new MenuManager();

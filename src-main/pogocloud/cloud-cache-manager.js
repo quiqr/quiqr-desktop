@@ -103,7 +103,7 @@ class CloudCacheManager{
         console.log("No sites to get remote info for ");
       }
       else{
-        configurations.sites.forEach(function(site){
+        configurations.sites.forEach((site)=>{
           try{
             if(site.publish[0].key=="poppygo-cloud"){
               let path = site.publish[0].config.path;
@@ -130,7 +130,7 @@ class CloudCacheManager{
 
             let username = file.split('.')[1];
             ownerslookupdata.usersToPaths[username] = usercache.sites;
-            usercache.sites.forEach(function(sitePaths){
+            usercache.sites.forEach((sitePaths) => {
               ownerslookupdata.pathsToUsers[sitePaths] = username;
             });
           }
@@ -150,7 +150,7 @@ class CloudCacheManager{
       for (let username in ownerslookupdata.usersToPaths) {
         try{
           ownerslookupdata.usersToSites[username] = [];
-          ownerslookupdata.usersToPaths[username].forEach(function(path){
+          ownerslookupdata.usersToPaths[username].forEach( (path) => {
             if(path in ownerslookupdata.pathsToSites){
               ownerslookupdata.usersToSites[username].push(ownerslookupdata.pathsToSites[path]);
             }
@@ -172,12 +172,12 @@ class CloudCacheManager{
     let cache = {};
     let sites = {};
 
-    configurationDataProvider.get( function(err, configurations){
+    configurationDataProvider.get( (err, configurations) => {
       if(configurations.empty===true || configurations.sites.length ===0){
         console.log("No sites to get remote info for ");
       }
       else{
-        configurations.sites.forEach(function(site){
+        configurations.sites.forEach((site) => {
           sites[site.key] = {}
           sites[site.key].name = site.name
         });

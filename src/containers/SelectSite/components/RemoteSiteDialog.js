@@ -8,17 +8,74 @@ export default class RemoteSiteDialog extends React.Component{
   constructor(props){
     super(props);
     this.state = {
+      remoteSiteName: "",
+      execButtonsDisabled: true,
+      errorTextSiteName: "",
       newSiteName: ""
     }
   }
 
-  componentDidUpdate(props){
-    if(this.props.remoteSiteName){
+  componentWillMount(){
+    let localsites = [];
+    service.getConfigurations(true).then((c)=>{
+
+      c.sites.forEach((site) =>{
+        localsites.push(site.name);
+      });
+
+      this.setState({
+        localsites :localsites
+      });
+    });
+  }
+
+  componentDidUpdate(){
+    if(this.props.remoteSiteName !== this.state.remoteSiteName && this.props.remoteSiteName){
       let siteName = this.props.remoteSiteName.split("/").pop();
-      if(siteName !== this.state.newSiteName){
-        //this.setState({ newSiteName: siteName });
-      }
+      this.validateSiteName(siteName);
+      this.setState({
+        remoteSiteName: this.props.remoteSiteName,
+        newSiteName: siteName
+      });
     }
+  }
+
+  validateSiteName(newName){
+    let errorTextSiteName = "";
+    let execButtonsDisabled = false;
+
+    if(this.state.localsites.includes(newName)){
+      errorTextSiteName = "Name is already used locally."
+      execButtonsDisabled = true;
+    }
+    this.setState({
+      execButtonsDisabled: execButtonsDisabled,
+      errorTextSiteName: errorTextSiteName
+    });
+  }
+
+  handleNameChange(e){
+    this.validateSiteName(e.target.value);
+    this.setState({
+      newSiteName: e.target.value
+    });
+  }
+
+  handleDownloadClone(){
+    //service.api.logToConsole(this.props.configurations);
+    //check if localname is not taken
+    //clone with publishing info setup
+  }
+
+  handleDownloadCopy(){
+    let nameExists = this.props.configurations.sites.filter((site)=>{
+      return (site.name === this.state.newSiteName);
+    });
+    service.api.logToConsole(this.state.newSiteName);
+    service.api.logToConsole(nameExists);
+
+    //check if localname is not taken
+    //clone without publishing info
   }
 
   renderForm(){
@@ -28,8 +85,8 @@ export default class RemoteSiteDialog extends React.Component{
       <div>
         Download <strong>{this.props.remoteSiteName}</strong> to your local computer for editing and previewing
         <TextField
-        xdisabled={busy}
-        floatingLabelText={this.props.remoteSiteName}
+        floatingLabelText="Name of local site copy"
+        errorText={this.state.errorTextSiteName}
         onChange={(e)=>{this.handleNameChange(e)}}
         value={this.state.newSiteName}
         fullWidth />
@@ -45,35 +102,6 @@ export default class RemoteSiteDialog extends React.Component{
     )
   }
 
-  handleNameChange(e){
-
-    service.api.logToConsole(e.target.value);
-    let value = e.target.value;
-    this.setState({
-      newSiteName: value
-    });
-  }
-
-
-  handleDownloadClone(){
-    //service.api.logToConsole(this.props.configurations);
-    //check if localname is not taken
-    //clone with publishing info setup
-  }
-
-  handleDownloadCopy(){
-    //service.api.logToConsole(this.props.configurations);
-    let nameExists = this.props.configurations.sites.filter((site)=>{
-        return (site.name === this.state.newSiteName);
-    });
-    service.api.logToConsole(this.state.newSiteName);
-    service.api.logToConsole(nameExists);
-
-
-    //check if localname is not taken
-    //clone without publishing info
-  }
-
   render(){
     let { open } = this.props;
     let busy = this.state.busy;
@@ -86,12 +114,14 @@ export default class RemoteSiteDialog extends React.Component{
       onClick={this.props.onCancelClick}
     />,
       <FlatButton
-      label="Download for participating"
+      label="CHECKOUT AS WORKING COPY"
+      disabled={this.state.execButtonsDisabled}
       primary={true}
       onClick={()=>this.handleDownloadClone()}
     />,
       <FlatButton
-      label="Download and copy as new site "
+      label="COPY AS NEW SITE"
+      disabled={this.state.execButtonsDisabled}
       primary={true}
       onClick={()=>this.handleDownloadCopy()}
     />,
