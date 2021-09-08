@@ -322,9 +322,10 @@ resources: []\n\
             return;
           }
 
-
           let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
           newConf.name = newName;
+
+          //TODO USE GENERAL
           await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
           outputConsole.appendLine('rename site to: '+newName);
@@ -709,7 +710,6 @@ resources: []\n\
     }
   }
 
-  //TODO move to more general place
   deleteInvalidConfKeys(newConf){
     // REMOVE INVALID KEYS
     delete newConf['configPath']
@@ -765,6 +765,7 @@ resources: []\n\
           newConf.publish[0].config.type = "poppygo"
           newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
 
+          //TODO USE GENERAL
           await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
           outputConsole.appendLine('rename projectpath to: '+newPath);

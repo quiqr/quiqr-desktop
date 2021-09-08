@@ -13,6 +13,7 @@ const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
+const cloudGitManager           = require('../pogocloud/cloud-git-manager');
 
 let api = {};
 
@@ -489,6 +490,16 @@ api.publishSite = function({siteKey, publishKey}, context){
       context.reject(err);
     });
   });
+}
+
+api.cloneRemoteAsSite = function({cloudPath, siteName}, context){
+  console.log("name:???"+siteName)
+  try{
+    context.resolve(cloudGitManager.clonePogoCloudSite(cloudPath, siteName));
+  }
+  catch(err){
+    context.reject(err);
+  }
 }
 
 module.exports = api;

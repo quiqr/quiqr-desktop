@@ -1,6 +1,5 @@
 import mainProcessBridge from './utils/main-process-bridge';
 import type { AbortablePromise } from './utils/main-process-bridge';
-//import type { Configurations, WorkspaceConfig } from './../global-types';
 
 export class API {
 
@@ -164,6 +163,7 @@ export class API {
   mountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('mountWorkspace', {siteKey, workspaceKey});
   }
+
   parentMountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
   }
@@ -171,18 +171,28 @@ export class API {
   createKeyPair(){
     return mainProcessBridge.request('createKeyPair',{}, {timeout:90000});
   }
+
   createPogoProfile(obj: any){
     return mainProcessBridge.request('createPogoProfile',{obj});
   }
+
   createPogoDomainConf(path: string, domain: string){
     return mainProcessBridge.request('createPogoDomainConf',{path, domain});
   }
+
   getPoppyGoProfile(){
     return mainProcessBridge.request('getPoppyGoProfile',{});
   }
+
+  cloneRemoteAsSite(cloudPath: string, siteName: string){
+    this.logToConsole("sitename??"+siteName);
+    return mainProcessBridge.request('cloneRemoteAsSite',{cloudPath, siteName});
+  }
+
   getUserRemoteSites(username){
     return mainProcessBridge.request('getUserRemoteSites',{username});
   }
+
 
 }
 

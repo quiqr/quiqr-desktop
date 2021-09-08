@@ -63,6 +63,13 @@ export default class RemoteSiteDialog extends React.Component{
 
   handleDownloadClone(){
     //clone with publishing info setup
+    try{
+      service.api.logToConsole("sitename?"+this.state.newSiteName);
+      service.api.cloneRemoteAsSite(this.props.remoteSiteName, this.state.newSiteName);
+    }
+    catch(e){
+      service.api.logToConsole("error cloning");
+    }
   }
 
   handleDownloadCopy(){

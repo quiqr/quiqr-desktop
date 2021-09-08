@@ -3,13 +3,13 @@
  * pim@poppygo.io
  *
  */
-
 const { app, shell }            = require('electron')
 const request                   = require('request');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const PogoPublisher             = require('../publishers/pogo-publisher');
 
 class CloudApiManager{
+
   requestConnectMail(email){
 
     configurationDataProvider.get( function(err, configurations){
