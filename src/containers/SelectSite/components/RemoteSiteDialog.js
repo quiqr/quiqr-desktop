@@ -62,8 +62,6 @@ export default class RemoteSiteDialog extends React.Component{
   }
 
   handleDownloadClone(){
-    //service.api.logToConsole(this.props.configurations);
-    //check if localname is not taken
     //clone with publishing info setup
   }
 
@@ -74,7 +72,6 @@ export default class RemoteSiteDialog extends React.Component{
     service.api.logToConsole(this.state.newSiteName);
     service.api.logToConsole(nameExists);
 
-    //check if localname is not taken
     //clone without publishing info
   }
 

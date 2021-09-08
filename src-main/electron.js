@@ -1,20 +1,20 @@
 const electron          = require('electron')
-const ipcMainBinder     = require('./ipc-main-binder');
-const mainWindowManager = require('./main-window-manager');
+const BrowserWindow     = electron.BrowserWindow;
 const unhandled         = require('electron-unhandled');
 const contextMenu       = require('electron-context-menu');
-const BrowserWindow     = electron.BrowserWindow;
-const pogozipper        = require('./pogozipper');
-const menuManager       = require('./menu-manager');
 const request           = require('request');
 const fs                = require('fs-extra');
 const fssimple          = require('fs');
+const ProgressBar       = require('electron-progressbar');
+
+const ipcMainBinder     = require('./ipc-main-binder');
+const mainWindowManager = require('./main-window-manager');
+const pogozipper        = require('./import-export/pogozipper');
+const menuManager       = require('./menu-manager');
 const pathHelper        = require('./path-helper');
 const fileDirUtils      = require('./file-dir-utils');
 const PoppyGoAppConfig  = require('./poppygo-app-config');
-const ProgressBar       = require('electron-progressbar');
 const outputConsole     = require('./output-console');
-
 
 unhandled();
 

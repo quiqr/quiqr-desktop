@@ -10,7 +10,7 @@ const { shell }                   = require('electron')
 
 const prefsWindowManager          = require('./prefs-window-manager');
 const logWindowManager            = require('./log-window-manager');
-const pogozipper                  = require('./pogozipper');
+const pogozipper                  = require('./import-export/pogozipper');
 const cloudCacheManager           = require('./pogocloud/cloud-cache-manager');
 const cloudApiManager             = require('./pogocloud/cloud-api-manager');
 const pogoversions                = require('./pogo-site-version-helper');

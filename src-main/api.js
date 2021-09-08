@@ -10,7 +10,7 @@ const siteSourceBuilderFactory  = require('./site-sources/builders/site-source-b
 const hugoDownloader            = require('./hugo/hugo-downloader')
 const formatProviderResolver    = require('./format-provider-resolver');
 const menuManager               = require('./menu-manager');
-const pogozipper                = require('./pogozipper');
+const pogozipper                = require('./import-export/pogozipper');
 const PogoPublisher             = require('./publishers/pogo-publisher');
 const cloudCacheManager         = require('./pogocloud/cloud-cache-manager');
 
