@@ -33,7 +33,6 @@ function getSiteService(siteKey, callback){
   })
 }
 
-
 function getSiteServicePromise(siteKey){
   return new Promise((resolve, reject)=>{
     configurationDataProvider.get(function(err, configurations){
@@ -195,11 +194,13 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
     context
   );
 
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  mainWindow.setTitle(siteKey.toUpperCase() + " - PoppyGo");
-  menuManager.updateMenu(siteKey);
+  let siteConfig = siteService.getSiteConfig();
   global.currentSiteKey = siteKey;
   global.currentWorkspaceKey = workspaceKey;
+
+  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  mainWindow.setTitle(`PoppyGo - Site: ${siteConfig.name}`);
+  menuManager.updateMenu(siteKey);
   menuManager.createMainMenu();
 }
 
@@ -466,6 +467,11 @@ api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collec
   });
 }
 
+api.invalidateCache = function(context){
+  configurationDataProvider.invalidateCache();
+}
+
+
 api.createSite = function(config, context){
   siteSourceBuilderFactory.get(config.sourceType).build(config).then(() =>{
     configurationDataProvider.invalidateCache();
@@ -492,10 +498,10 @@ api.publishSite = function({siteKey, publishKey}, context){
   });
 }
 
-api.cloneRemoteAsSite = function({cloudPath, siteName}, context){
-  console.log("name:???"+siteName)
+api.cloneRemoteAsSite = async function({cloudPath, siteName}, context){
   try{
-    context.resolve(cloudGitManager.clonePogoCloudSite(cloudPath, siteName));
+    let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName);
+    context.resolve(newConf);
   }
   catch(err){
     context.reject(err);

@@ -1,29 +1,30 @@
-import React from 'react';
-import { Switch, Route } from 'react-router-dom'
+import React                                         from 'react';
+import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
-import SelectSite from './containers/SelectSite'
-import Console from './containers/Console';
-import PreviewButtons from './containers/PreviewButtons';
-import Prefs from './containers/Prefs'
+import SelectSite                                    from './containers/SelectSite'
+import Console                                       from './containers/Console';
+import PreviewButtons                                from './containers/PreviewButtons';
+import Prefs                                         from './containers/Prefs'
 
-import Home from './containers/Home'
-import Collection from './containers/Collection';
-import CollectionItem from './containers/CollectionItem';
-import Single from './containers/Single';
-import Welcome from './containers/Welcome';
+import Home                                          from './containers/Home'
+import Collection                                    from './containers/Collection';
+import CollectionItem                                from './containers/CollectionItem';
+import Single                                        from './containers/Single';
+import Welcome                                       from './containers/Welcome';
 
-import WorkspaceSidebar from './containers/WorkspaceSidebar';
+import WorkspaceSidebar                              from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 
-import lightBaseTheme from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import darkBaseTheme from 'material-ui-02/styles/baseThemes/darkBaseTheme';
-import MuiThemeProvider from 'material-ui-02/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui-02/styles/getMuiTheme';
+import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
+import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
+import MuiThemeProvider                              from 'material-ui-02/styles/MuiThemeProvider';
+import getMuiTheme                                   from 'material-ui-02/styles/getMuiTheme';
 
-import Redirect from 'react-router-dom/Redirect';
-import service from './services/service';
-import type { EmptyConfigurations, Configurations } from './types';
+import Redirect                                      from 'react-router-dom/Redirect';
+import service                                       from './services/service';
+
+import type { EmptyConfigurations, Configurations }  from './types';
 
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
@@ -46,8 +47,6 @@ const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
   overrides: {
   },
 });
-
-
 
 type AppProps = {
 }

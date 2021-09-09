@@ -1,20 +1,4 @@
-// @flow
-
-/*flow-include
-class ExtendedPromise extends Promise<any>{
-    forceAbort : ()=>void;
-}
-
-type component = { +forceUpdate : ()=>void }
-
-*/
-
-
 class BaseService{
-
-    /*:: _listeners : Array<component> */
-    /*:: _notifyChangesTimeout : any */
-
 
     constructor(){
         this._listeners = [];

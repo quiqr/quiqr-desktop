@@ -5,7 +5,7 @@ const fssimple      = require('fs');
 
 class CloudSiteconfigManager {
 
-  createConf(siteKey, siteName, pathSource){
+  createConfUnmanaged(siteKey, siteName, pathSource){
     let newConf = {};
     newConf.key = siteKey;
     newConf.name = siteName;
@@ -21,6 +21,31 @@ class CloudSiteconfigManager {
 
     return newConf;
   }
+
+  createConfManaged(siteKey, siteName, pathSource, remotePath){
+
+    //TODO REMOVE we use full path
+    if(remotePath.includes("/")){
+      remotePath = remotePath.split("/").pop();
+    }
+
+    let newConf = {};
+    newConf.key = siteKey;
+    newConf.name = siteName;
+    newConf.source = {};
+    newConf.source.type = 'folder';
+    newConf.source.path = pathSource;
+    newConf.publish = [];
+    newConf.publish.push({});
+    newConf.publish[0].key = 'poppygo-cloud';
+    newConf.publish[0].config = {};
+    newConf.publish[0].config.type = "poppygo";
+    newConf.publish[0].config.path = remotePath;
+    newConf.lastPublish = 0;
+
+    return newConf;
+  }
+
 
   // REMOVE INVALID KEYS
   deleteInvalidConfKeys(newConf){

@@ -1,18 +1,16 @@
-import { Route } from 'react-router-dom';
-import React from 'react';
-
-import {List, ListItem} from 'material-ui-02/List';
-import Subheader from 'material-ui-02/Subheader';
-import IconAdd from 'material-ui-02/svg-icons/content/add';
-import muiThemeable from 'material-ui-02/styles/muiThemeable';
-
-import service from './../../services/service';
-import { snackMessageService } from './../../services/ui-service';
+import { Route }                 from 'react-router-dom';
+import React                     from 'react';
+import {List, ListItem}          from 'material-ui-02/List';
+import Subheader                 from 'material-ui-02/Subheader';
+import IconAdd                   from 'material-ui-02/svg-icons/content/add';
+import muiThemeable              from 'material-ui-02/styles/muiThemeable';
+import service                   from './../../services/service';
+import { snackMessageService }   from './../../services/ui-service';
 import { Wrapper, MessageBlock } from './components/shared';
-import CreateSiteDialog from './components/CreateSiteDialog';
-import BlockDialog from './components/BlockDialog';
-import RemoteSiteDialog from './components/RemoteSiteDialog';
-import Spinner from './../../components/Spinner';
+import CreateSiteDialog          from './components/CreateSiteDialog';
+import BlockDialog               from './components/BlockDialog';
+import RemoteSiteDialog          from './components/RemoteSiteDialog';
+import Spinner                   from './../../components/Spinner';
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 
@@ -134,6 +132,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
   mountSite(site : SiteConfig ){
 
+
     this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
     this.setState({currentSiteKey: site.key});
 
@@ -210,7 +209,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   }
 
   renderSelectSites(){
-    //let { siteKey } = this.props;
     let { selectedSite, configurations } = this.state;
 
     let _configurations = ((configurations: any): Configurations);
@@ -342,7 +340,15 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
             configurations={configurations}
             remoteSiteName={this.state.currentRemoteSite}
             onCancelClick={()=>this.setState({remoteSiteDialog:false})}
-          />
+            mountSite={async (siteKey)=>{
+
+              service.api.logToConsole(siteKey);
+              await service.api.mountWorkspace(siteKey, 'source');
+              this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent('source')}/home/init`);
+
+
+            }}
+            />
 
             <CreateSiteDialog
             open={createSiteDialog}

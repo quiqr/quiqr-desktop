@@ -133,7 +133,7 @@ function getLocation(locPath = ''){
 
 function getFirstScreenAfterStartup(){
   mainWindow.webContents.once('dom-ready', async () => {
-    configurationDataProvider.get(function(err, configurations){
+    configurationDataProvider.get((err, configurations) => {
       if(configurations.empty===true || configurations.sites.length ===0){
         console.log("switch to welcomeScreen ");
         mainWindow.webContents.once('dom-ready', () => {
@@ -141,6 +141,7 @@ function getFirstScreenAfterStartup(){
         });
       }
       else if(global.currentSiteKey && global.currentWorkspaceKey){
+
         //TODO catch error when site does not exist
         let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
         console.log("switch to "+ global.currentSiteKey);
@@ -148,6 +149,13 @@ function getFirstScreenAfterStartup(){
         mainWindow.webContents.once('dom-ready', () => {
           mainWindow.webContents.send("redirectMountSite",newScreenURL);
         });
+
+        let siteConfig = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+        mainWindow.setTitle(`PoppyGo - Site: ${siteConfig.name}`);
+      }
+      else{
+        mainWindow.setTitle("PoppyGo: Select site");
+
       }
     });
   });
@@ -155,7 +163,6 @@ function getFirstScreenAfterStartup(){
 
 
 function createWindow () {
-
 
   let icon;
   if(process.env.REACT_DEV_URL)
@@ -294,7 +301,7 @@ module.exports = {
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
       mainWindow.webContents.send("redirectToGivenLocation", '/');
 
-      mainWindow.setTitle("PoppyGo");
+      mainWindow.setTitle("PoppyGo: Select site");
     });
 
     // menuManager.updateMenu(null);

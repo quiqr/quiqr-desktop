@@ -331,12 +331,12 @@ resources: []\n\
           outputConsole.appendLine('rename site to: '+newName);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+          mainWindow.setTitle(`PoppyGo - Site: ${newName}`);
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
           mainWindow.webContents.send("redirectMountSite",newScreenURL);
         }
       });
-
     }
   }
 

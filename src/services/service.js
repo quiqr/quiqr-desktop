@@ -1,18 +1,6 @@
 import { BaseService } from './base-service';
 import * as api from './../api';
 
-/*
-import type { Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../types.js';
-
-export type SiteAndWorkspaceData = {
-    configurations : Configurations,
-    site : SiteConfig,
-    siteWorkspaces: Array<WorkspaceHeader>,
-    workspace: WorkspaceHeader,
-    workspaceDetails: WorkspaceConfig
-}
-*/
-
 class Service extends BaseService {
 
     api : api.API;

@@ -1,9 +1,16 @@
-import * as React from 'react';
-import Spinner from './../../../components/Spinner'
-import service from './../../../services/service';
-import { Dialog, FlatButton, TextField } from 'material-ui-02';
+import * as React            from 'react';
+import Spinner               from '../../../components/Spinner'
+import service               from '../../../services/service';
+import { Dialog, TextField } from 'material-ui-02';
+import SharedMaterialStyles  from '../../../shared-material-styles';
+import { withStyles }        from '@material-ui/core/styles';
+import Button            from '@material-ui/core/Button';
 
-export default class RemoteSiteDialog extends React.Component{
+const localStyles = {
+}
+const styles = {...SharedMaterialStyles, ...localStyles}
+
+class RemoteSiteDialog extends React.Component{
 
   constructor(props){
     super(props);
@@ -61,13 +68,30 @@ export default class RemoteSiteDialog extends React.Component{
     });
   }
 
-  handleDownloadClone(){
-    //clone with publishing info setup
+  async handleDownloadClone(){
     try{
-      service.api.logToConsole("sitename?"+this.state.newSiteName);
-      service.api.cloneRemoteAsSite(this.props.remoteSiteName, this.state.newSiteName);
+      this.setState({
+        busy: true,
+        execButtonsDisabled: true,
+        downloading: true,
+      });
+
+      await service.api.cloneRemoteAsSite(this.props.remoteSiteName, this.state.newSiteName).then((clonedSiteInfo)=>{
+        service.api.invalidateCache();
+        this.setState({
+          busy: false,
+          downloading: false,
+          finished: true,
+          newSiteKey: clonedSiteInfo.key,
+        });
+      });
     }
     catch(e){
+      this.setState({
+        busy: false,
+        downloading: false,
+        failure: true,
+      });
       service.api.logToConsole("error cloning");
     }
   }
@@ -78,13 +102,13 @@ export default class RemoteSiteDialog extends React.Component{
     });
     service.api.logToConsole(this.state.newSiteName);
     service.api.logToConsole(nameExists);
+  }
 
-    //clone without publishing info
+  async handleOpenNewSite(){
+    this.props.mountSite(this.state.newSiteKey)
   }
 
   renderForm(){
-    let busy = this.state.busy;
-
     return (
       <div>
         Download <strong>{this.props.remoteSiteName}</strong> to your local computer for editing and previewing
@@ -98,6 +122,23 @@ export default class RemoteSiteDialog extends React.Component{
     )
   }
 
+  renderDownloading(){
+    return (
+      <div>
+        Downloading <strong>{this.props.remoteSiteName}</strong> as {this.state.newName}
+      </div>
+    )
+  }
+
+  renderFinished(){
+    let { classes } = this.props;
+    return (
+      <div>
+        Finished downloading. <Button className={classes.primaryFlatButton} onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.newSiteName} now</Button>.
+      </div>
+    )
+  }
+
   renderFailure(){
     return (
       <div>
@@ -106,29 +147,36 @@ export default class RemoteSiteDialog extends React.Component{
     )
   }
 
+  renderBody(){
+    if(this.state.finished){
+      return this.renderFinished();
+    }
+    else if(this.state.downloading){
+      return this.renderDownloading();
+    }
+    else{
+      return this.renderForm();
+    }
+  }
+
   render(){
-    let { open } = this.props;
+
+    let { open, classes } = this.props;
     let busy = this.state.busy;
     let failure = this.state.failure;
 
     const actions = [
-      <FlatButton
-      label="Cancel"
-      primary={false}
-      onClick={this.props.onCancelClick}
-    />,
-      <FlatButton
-      label="CHECKOUT AS WORKING COPY"
-      disabled={this.state.execButtonsDisabled}
-      primary={true}
-      onClick={()=>this.handleDownloadClone()}
-    />,
-      <FlatButton
-      label="COPY AS NEW SITE"
-      disabled={this.state.execButtonsDisabled}
-      primary={true}
-      onClick={()=>this.handleDownloadCopy()}
-    />,
+      <Button className={classes.primaryFlatButton} onClick={this.props.onCancelClick}>
+        Cancel
+      </Button>,
+
+      <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >
+        CHECKOUT AS WORKING COPY
+      </Button>,
+
+      <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadCopy()} >
+        COPY AS NEW SITE
+      </Button>,
     ];
 
     return (
@@ -137,10 +185,10 @@ export default class RemoteSiteDialog extends React.Component{
       open={open}
       actions={actions}>
 
-      { failure? this.renderFailure() : this.renderForm() }
+      { failure? this.renderFailure() : this.renderBody() }
       { busy? <Spinner /> : undefined }
     </Dialog>
     );
   }
-
 }
+export default withStyles(styles)(RemoteSiteDialog)

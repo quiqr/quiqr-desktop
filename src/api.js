@@ -185,12 +185,14 @@ export class API {
   }
 
   cloneRemoteAsSite(cloudPath: string, siteName: string){
-    this.logToConsole("sitename??"+siteName);
     return mainProcessBridge.request('cloneRemoteAsSite',{cloudPath, siteName});
   }
 
   getUserRemoteSites(username){
     return mainProcessBridge.request('getUserRemoteSites',{username});
+  }
+  invalidateCache(){
+    return mainProcessBridge.request('invalidateCache');
   }
 
 

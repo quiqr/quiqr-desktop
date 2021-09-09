@@ -18,7 +18,7 @@ class CloudGitManager {
     return cloudPath.split('/').pop() + '-' + pathHelper.randomPathSafeString(4);
   }
 
-  async createGitManagedSiteFromTempPath(tempSourcePath, siteKey){
+  async createGitManagedSiteWithSiteKeyFromTempPath(tempSourcePath, siteKey){
 
     const pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
     await fs.ensureDir(pathSite);
@@ -27,6 +27,7 @@ class CloudGitManager {
     await fs.ensureDir(pathSiteSource);
 
     await fs.moveSync(tempSourcePath, pathSiteSource);
+    return pathSiteSource;
   }
 
   clonePogoCloudSite(cloudPath, siteName){
@@ -41,15 +42,10 @@ class CloudGitManager {
       try {
 
         await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
-
-        let pathSiteSource = await this.createGitManagedSiteFromTempPath(temp_clone_path, siteKey);
-
-        let newConf = cloudSiteconfigManager.createConf(siteKey, siteName, pathSiteSource);
+        let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
+        let newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
         await cloudSiteconfigManager.writeConf(newConf,siteKey);
-        console.log('createdSite'+siteName);
-
-
-        resolve(true);
+        resolve(newConf);
       } catch (e) {
         console.log("Clone Error:"+siteKey);
         reject(e);
