@@ -14,6 +14,7 @@ const pogozipper                = require('../import-export/pogozipper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
 const cloudGitManager           = require('../pogocloud/cloud-git-manager');
+const { EnvironmentResolver }   = require('../utils/environment-resolver');
 
 let api = {};
 
@@ -137,9 +138,10 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 }
 
 api.createKeyPair = async function({},context){
-  let pogopubl = new PogoPublisher({});
-  pubkey = await pogopubl.keygen();
-  context.resolve(pubkey);
+  let pubkey = await cloudGitManager.keygen();
+  let environmentResolver = new EnvironmentResolver();
+  let pubkey_title = environmentResolver.getUPIS()
+  context.resolve({pubkey, pubkey_title});
 }
 
 api.createPogoProfile = async function(profile,context){
@@ -150,8 +152,10 @@ api.createPogoProfile = async function(profile,context){
 
 api.getPoppyGoProfile = async function({},context){
   let pogopubl = new PogoPublisher({});
-  profile = await pogopubl.readProfile();
-  fingerprint = await pogopubl.getKeyFingerprint();
+  let profile = await pogopubl.readProfile();
+
+  let fingerprint = await cloudGitManager.getKeyFingerprint();
+
   if(profile && fingerprint){
     context.resolve({profile,fingerprint});
   }

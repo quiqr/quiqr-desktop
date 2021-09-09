@@ -304,8 +304,8 @@ module.exports = {
       mainWindow.setTitle("PoppyGo: Select site");
     });
 
-    // menuManager.updateMenu(null);
-    //menuManager.createMainMenu();
+    menuManager.updateMenu(null);
+    menuManager.createMainMenu();
   },
 
   remountSite: function(){

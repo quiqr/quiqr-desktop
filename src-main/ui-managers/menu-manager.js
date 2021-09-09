@@ -1,4 +1,3 @@
-
 const electron                    = require('electron')
 const Menu                        = electron.Menu
 const path                        = require("path");
@@ -12,6 +11,7 @@ const logWindowManager            = require('./log-window-manager');
 const pogozipper                  = require('../import-export/pogozipper');
 const cloudCacheManager           = require('../pogocloud/cloud-cache-manager');
 const cloudApiManager             = require('../pogocloud/cloud-api-manager');
+const cloudGitManager             = require('../pogocloud/cloud-git-manager');
 const pogoversions                = require('../utils/pogo-site-version-helper');
 const pathHelper                  = require('../utils/path-helper');
 const hugoDownloader              = require('../hugo/hugo-downloader')
@@ -20,6 +20,7 @@ const SiteService                 = require('../services/site/site-service')
 const { WorkspaceConfigProvider } = require('../services/workspace/workspace-config-provider');
 const PogoPublisher               = require('../publishers/pogo-publisher');
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
+const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
 const app = electron.app
 let menu = null;
@@ -267,8 +268,9 @@ resources: []\n\
     const datePath = path.join(pathHelper.getApplicationResourcesDir(),"all", "build-date.txt");
     let buildGitId = "";
     let buildDate = "";
-    console.log(app.getAppPath());
-    console.log(datePath);
+
+    let environmentResolver = new EnvironmentResolver();
+    const upis = `\n\nUPIS: ${environmentResolver.getUPIS()}\n`;
 
     if(fs.existsSync(idPath)){
       buildGitId = "\nBuild ID " + fssimple.readFileSync(idPath, {encoding:'utf8', flag:'r'})
@@ -282,7 +284,7 @@ resources: []\n\
     let options  = {
       buttons: ["Close"],
       title: "About",
-      message: "PoppyGo Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate
+      message: "PoppyGo Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate + upis
     }
     dialog.showMessageBox(options)
   }
@@ -479,7 +481,8 @@ resources: []\n\
   }
 
   siteSelected(){
-    if(global.currentSiteKey){
+    if(global.currentSiteKey && global.currentSiteKey !== ""){
+      console.log(global.currentSiteKey);
       return true;
     }
     else{
@@ -810,21 +813,6 @@ resources: []\n\
         submenu: this.createViewSitesMenu()
       },
       {
-        id: 'rename-site',
-        label: 'Rename site',
-        enabled: this.siteSelected(),
-        click: async () => {
-          this.renameSite()
-        }
-      },
-      {
-        id: 'import-site-from-url',
-        label: 'Import site from PogoURL',
-        click: async () => {
-          this.importSiteFromUrl()
-        }
-      },
-      {
         id: 'create-new-from-hugo-theme-url',
         label: 'Create new from Hugo theme git URL',
         click: async () => {
@@ -891,8 +879,7 @@ resources: []\n\
 
             if(this.profileUserName!=""){
 
-              let pogopubl = new PogoPublisher({});
-              let fingerprint = await pogopubl.getKeyFingerprint();
+              let fingerprint = await cloudGitManager.getKeyFingerprint();
 
               let userVars = {
                 username: this.profileUserName,
@@ -915,6 +902,13 @@ resources: []\n\
             label: 'Front page',
             click: async () => {
               this.openHome()
+            }
+          },
+          {
+            id: 'import-site-from-url',
+            label: 'Import site from PogoURL',
+            click: async () => {
+              this.importSiteFromUrl()
             }
           },
           {
@@ -962,17 +956,19 @@ resources: []\n\
           },
           { type: 'separator' },
           {
-            label: 'Import site',
+            id: 'close-site',
+            label: 'Close site',
+            enabled: this.siteSelected(),
             click: async () => {
-              pogozipper.importSite()
+              this.selectSitesWindow();
             }
           },
           {
-            id: 'export-site',
-            label: 'Export site',
+            id: 'rename-site',
+            label: 'Rename site',
             enabled: this.siteSelected(),
             click: async () => {
-              pogozipper.exportSite()
+              this.renameSite()
             }
           },
           {
@@ -985,37 +981,60 @@ resources: []\n\
           },
           { type: 'separator' },
           {
-            id: 'import-theme',
-            enabled: this.siteSelected(),
-            label: 'Import theme',
-            click: async () => {
-              pogozipper.importTheme()
-            }
+            label: 'Import',
+            submenu: [
+              {
+                label: 'Import site',
+                click: async () => {
+                  pogozipper.importSite()
+                }
+              },
+              {
+                id: 'import-theme',
+                enabled: this.siteSelected(),
+                label: 'Import theme',
+                click: async () => {
+                  pogozipper.importTheme()
+                }
+              },
+              {
+                id: 'import-content',
+                enabled: this.siteSelected(),
+                label: 'Import content',
+                click: async () => {
+                  pogozipper.importContent()
+                }
+              },
+            ]
           },
           {
-            id: 'export-theme',
-            enabled: this.siteSelected(),
-            label: 'Export theme',
-            click: async () => {
-              pogozipper.exportTheme()
-            }
-          },
-          { type: 'separator' },
-          {
-            id: 'import-content',
-            enabled: this.siteSelected(),
-            label: 'Import content',
-            click: async () => {
-              pogozipper.importContent()
-            }
-          },
-          {
-            id: 'export-content',
-            enabled: this.siteSelected(),
-            label: 'Export content',
-            click: async () => {
-              pogozipper.exportContent()
-            }
+            label: 'Export',
+            submenu: [
+              {
+                id: 'export-site',
+                label: 'Export site',
+                enabled: this.siteSelected(),
+                click: async () => {
+                  pogozipper.exportSite()
+                }
+              },
+              {
+                id: 'export-theme',
+                enabled: this.siteSelected(),
+                label: 'Export theme',
+                click: async () => {
+                  pogozipper.exportTheme()
+                }
+              },
+              {
+                id: 'export-content',
+                enabled: this.siteSelected(),
+                label: 'Export content',
+                click: async () => {
+                  pogozipper.exportContent()
+                }
+              },
+            ]
           },
           { type: 'separator' },
           isMac ? { role: 'close' } : { role: 'quit' }

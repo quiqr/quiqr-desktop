@@ -1,3 +1,7 @@
+const electron = require('electron')
+const os       = require('os');
+const app      = electron.app
+
 const PLATFORMS = {
     linux:'linux',
     windows:'windows',
@@ -30,6 +34,16 @@ class EnvironmentResolver{
             throw new Error('Could not resolve environment. Arch not supported.');
 
         return {platform, arch};
+    }
+
+    getUPIS(){
+      let computerName = os.hostname()
+      if(computerName.includes('.')) computerName = computerName.split('.')[0];
+      const computerPlatform = os.platform()
+      const computerRelease = os.release()
+      const username = os.userInfo().username;
+      const appVersion = app.getVersion();
+      return `${username}@${computerName}+${username}+${computerPlatform}+${computerRelease}+poppyapp-${appVersion}`;
     }
 }
 

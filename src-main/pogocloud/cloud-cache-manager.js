@@ -12,6 +12,7 @@ const path                      = require('path');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const pathHelper                = require('../utils/path-helper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
+const cloudGitManager           = require('./cloud-git-manager');
 
 class CloudCacheManager{
 
@@ -25,8 +26,7 @@ class CloudCacheManager{
 
         if(profileUserName = global.pogoconf.currentUsername){
 
-          let pogopubl = new PogoPublisher({});
-          let fingerprint = await pogopubl.getKeyFingerprint();
+          let fingerprint = await cloudGitManager.getKeyFingerprint();
 
           let userVars = {
             username: profileUserName,

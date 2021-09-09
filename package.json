@@ -6,7 +6,7 @@
     "email": "info@poppygo.io"
   },
   "description": "The PoppyGo Hugo Publishing App.",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.3",

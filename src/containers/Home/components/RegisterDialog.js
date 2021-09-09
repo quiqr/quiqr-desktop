@@ -6,246 +6,247 @@ let net = window.require('electron').remote.net;
 
 export default class RegisterDialog extends React.Component{
 
-    constructor(props){
-        super(props);
-        this.state = {
-            username: "",
-            email: "",
-            username_err: "",
-            email_err: "",
-            failure: false,
-            busy: false,
-         }
+  constructor(props){
+    super(props);
+    this.state = {
+      username: "",
+      email: "",
+      username_err: "",
+      email_err: "",
+      failure: false,
+      busy: false,
     }
+  }
 
-    componentDidMount(){
-        service.getConfigurations().then((c)=>{
-            var stateUpdate  = {};
-            stateUpdate.pogoboardConn = c.global.pogoboardConn;
-            this.setState(stateUpdate);
-        })
-    }
+  componentDidMount(){
+    service.getConfigurations().then((c)=>{
+      var stateUpdate  = {};
+      stateUpdate.pogoboardConn = c.global.pogoboardConn;
+      this.setState(stateUpdate);
+    })
+  }
 
-    handleCancelClick = () => {
-        this.props.onCancelClick();
-    }
+  handleCancelClick = () => {
+    this.props.onCancelClick();
+  }
 
-    handleRegisterClick = async (context) => {
+  handleRegisterClick = async (context) => {
+
+    this.setState({
+      busy: true
+    });
+
+    let promise = service.api.createKeyPair();
+
+    promise.then((pubkey)=>{
+      service.api.logToConsole("frontend:pubkeyok");
+      this.registerUserPost(this.state.username, this.state.email, pubkey.pubkey, pubkey.pubkey_title);
+
+    }, (e)=>{
+      service.api.logToConsole("frontend:" + e);
+      this.setState({
+        busy: false
+      });
+    })
+  }
+
+  registerUserPost(username, email, pubkey, pubkey_title){
+    var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey, pubkey_title: ""+pubkey_title });
+
+    service.api.logToConsole(postData);
+
+    let data='';
+
+    let request = net.request({
+      method: 'POST',
+      protocol: this.state.pogoboardConn.protocol,
+      hostname: this.state.pogoboardConn.host,
+      port: this.state.pogoboardConn.port,
+      path: '/user/new',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': postData.length
+      }
+    })
+
+    request.on('response', (response) => {
+
+      response.on('end', () => {
+        let obj = JSON.parse(data);
+        if(obj.hasOwnProperty('username')){
+
+          let promise = service.api.createPogoProfile(obj);
+          promise.then(()=>{
+            this.props.onRegisterClick({
+              username: this.state.username,
+              email: this.state.email
+            });
+          });
+        }
+        else{
+          this.setState({
+            failure: true
+          });
+        }
 
         this.setState({
-            busy: true
+          busy: false
         });
+      });
 
-        let promise = service.api.createKeyPair();
+      response.on("data", chunk => {
+        data += chunk;
+      });
 
-        promise.then((pubkey)=>{
-            service.api.logToConsole("frontend:pubkeyok");
+    })
+    request.write(postData)
+    request.end()
+  }
 
-            this.registerUserPost(this.state.username, this.state.email, pubkey);
+  handleUserNameChange(e){
 
-        }, (e)=>{
-            service.api.logToConsole("frontend:" + e);
+    let value = e.target.value;
+
+    if(value!==''){
+
+      let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/uname/"+value;
+      let data='';
+
+      const request = net.request(url);
+      request.on('response', (response) => {
+
+        response.on('end', () => {
+          let obj = JSON.parse(data);
+
+          if(obj.status !== "free"){
             this.setState({
-                busy: false
+              username_err: "username is "+obj.status
             });
-        })
-    }
-
-    registerUserPost(username, email, pubkey){
-        var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey });
-
-        let data='';
-
-        let request = net.request({
-            method: 'POST',
-            protocol: this.state.pogoboardConn.protocol,
-            hostname: this.state.pogoboardConn.host,
-            port: this.state.pogoboardConn.port,
-            path: '/user/new',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length
-            }
-        })
-
-        request.on('response', (response) => {
-
-            response.on('end', () => {
-                let obj = JSON.parse(data);
-                if(obj.hasOwnProperty('username')){
-
-                    let promise = service.api.createPogoProfile(obj);
-                    promise.then(()=>{
-                        this.props.onRegisterClick({
-                            username: this.state.username,
-                            email: this.state.email
-                        });
-                    });
-                }
-                else{
-                    this.setState({
-                        failure: true
-                    });
-                }
-
-                this.setState({
-                    busy: false
-                });
+          }
+          else{
+            this.setState({
+              username_err: ""
             });
+          }
 
-            response.on("data", chunk => {
-                data += chunk;
+        });
+        response.on("data", chunk => {
+          data += chunk;
+        });
+      })
+      request.end()
+    }
+
+    this.setState({
+      username: value,
+    });
+
+  }
+
+  handleTryAgain(){
+    this.setState({
+      username: "",
+      email: "",
+      busy: false,
+      failure: false,
+    });
+
+  }
+  handleEmailChange(e){
+    let value = e.target.value;
+    this.setState({
+      email: value,
+    });
+
+    if(value!==''){
+      let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/email/"+value;
+      let data='';
+
+      const request = net.request(url);
+      request.on('response', (response) => {
+
+        response.on('end', () => {
+          let obj = JSON.parse(data);
+
+          if(obj.status !== "free"){
+            this.setState({
+              email_err: "email is "+obj.status
             });
+          }
+          else{
+            this.setState({
+              email_err: ""
+            });
+          }
 
-        })
-        request.write(postData)
-        request.end()
-    }
-
-    handleUserNameChange(e){
-
-        let value = e.target.value;
-
-        if(value!==''){
-
-            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/uname/"+value;
-            let data='';
-
-            const request = net.request(url);
-            request.on('response', (response) => {
-
-                response.on('end', () => {
-                    let obj = JSON.parse(data);
-
-                    if(obj.status !== "free"){
-                        this.setState({
-                            username_err: "username is "+obj.status
-                        });
-                    }
-                    else{
-                        this.setState({
-                            username_err: ""
-                        });
-                    }
-
-                });
-                response.on("data", chunk => {
-                    data += chunk;
-                });
-            })
-            request.end()
-        }
-
-        this.setState({
-            username: value,
         });
-
-    }
-
-    handleTryAgain(){
-        this.setState({
-            username: "",
-            email: "",
-            busy: false,
-            failure: false,
+        response.on("data", chunk => {
+          data += chunk;
         });
-
-    }
-    handleEmailChange(e){
-        let value = e.target.value;
-        this.setState({
-            email: value,
-        });
-
-        if(value!==''){
-            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/email/"+value;
-            let data='';
-
-            const request = net.request(url);
-            request.on('response', (response) => {
-
-                response.on('end', () => {
-                    let obj = JSON.parse(data);
-
-                    if(obj.status !== "free"){
-                        this.setState({
-                            email_err: "email is "+obj.status
-                        });
-                    }
-                    else{
-                        this.setState({
-                            email_err: ""
-                        });
-                    }
-
-                });
-                response.on("data", chunk => {
-                    data += chunk;
-                });
-            })
-            request.end()
-        }
-
+      })
+      request.end()
     }
 
-    validate(){
-        return !this.state.busy &&
-            !this.state.failure &&
-            this.state.username_err === '' &&
-            this.state.email_err === '' &&
-            this.state.username !== '' &&
-            this.state.email !== '';
-    }
-    renderForm(){
-        //let valid = this.validate();
-        let busy = this.state.busy;
-        return (
-            <div>
-                <TextField disabled={busy} errorText={this.state.username_err} floatingLabelText={'username'} value={this.state.username} onChange={(e)=>{this.handleUserNameChange(e)}} fullWidth />
-                <TextField disabled={busy} errorText={this.state.email_err} floatingLabelText={'email address'} value={this.state.email} onChange={(e)=>{this.handleEmailChange(e)}} fullWidth />
-            </div>
-        )
+  }
 
-    }
+  validate(){
+    return !this.state.busy &&
+      !this.state.failure &&
+      this.state.username_err === '' &&
+      this.state.email_err === '' &&
+      this.state.username !== '' &&
+      this.state.email !== '';
+  }
+  renderForm(){
+    //let valid = this.validate();
+    let busy = this.state.busy;
+    return (
+      <div>
+        <TextField disabled={busy} errorText={this.state.username_err} floatingLabelText={'username'} value={this.state.username} onChange={(e)=>{this.handleUserNameChange(e)}} fullWidth />
+        <TextField disabled={busy} errorText={this.state.email_err} floatingLabelText={'email address'} value={this.state.email} onChange={(e)=>{this.handleEmailChange(e)}} fullWidth />
+      </div>
+    )
 
-    renderFailure(){
-        return (
-                <div>
-                    Something went wrong. Please <button className="reglink" onClick={()=>this.handleTryAgain()}>try again.</button>
-                </div>
-        )
-    }
+  }
 
-    render(){
-        let { open } = this.props;
-        let valid = this.validate();
-        let busy = this.state.busy;
-        let failure = this.state.failure;
+  renderFailure(){
+    return (
+      <div>
+        Something went wrong. Please <button className="reglink" onClick={()=>this.handleTryAgain()}>try again.</button>
+      </div>
+    )
+  }
 
-        const actions = [
-            <FlatButton
-                label="Cancel"
-                primary={false}
-                onClick={this.handleCancelClick.bind(this)}
-            />,
-            <FlatButton
-                disabled={!valid}
-                label="Sign up"
-                primary={true}
-                onClick={this.handleRegisterClick}
-            />,
-        ];
+  render(){
+    let { open } = this.props;
+    let valid = this.validate();
+    let busy = this.state.busy;
+    let failure = this.state.failure;
 
-        return (
-            <Dialog
-                title="Sign up for free publishing with PoppyGo Live"
-                open={open}
-                actions={actions}>
+    const actions = [
+      <FlatButton
+      label="Cancel"
+      primary={false}
+      onClick={this.handleCancelClick.bind(this)}
+    />,
+      <FlatButton
+      disabled={!valid}
+      label="Sign up"
+      primary={true}
+      onClick={this.handleRegisterClick}
+    />,
+    ];
 
-                { failure? this.renderFailure() : this.renderForm() }
-                { busy? <Spinner /> : undefined }
-            </Dialog>
-        );
-    }
+    return (
+      <Dialog
+      title="Sign up for free publishing with PoppyGo Live"
+      open={open}
+      actions={actions}>
+
+      { failure? this.renderFailure() : this.renderForm() }
+      { busy? <Spinner /> : undefined }
+    </Dialog>
+    );
+  }
 
 }

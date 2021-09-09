@@ -23,48 +23,6 @@ class PogoPublisher {
     this._config = config;
   }
 
-  async keygen(){
-
-    let pubkey = '';
-    var git_bin = Embgit.getGitBin();
-    var sukohdir = pathHelper.getRoot();
-
-    try {
-      console.log(git_bin);
-      let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
-      outputConsole.appendLine('Keygen success ...');
-      pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
-    } catch (e) {
-      outputConsole.appendLine('keygen error ...:' + e);
-    }
-
-    try {
-      await fs.unlinkSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
-    } catch (e) {
-      outputConsole.appendLine('no key were there ...:' + e);
-    }
-
-    return pubkey;
-  }
-
-  async getKeyFingerprint(){
-    var git_bin = Embgit.getGitBin();
-    var sukohdir = pathHelper.getRoot();
-    let fingerprint = null;
-
-    try {
-      //console.log(git_bin);
-      let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
-      fingerprint = gencmd.toString().replace(/\n/g,"");
-      //pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
-
-    } catch (e) {
-      outputConsole.appendLine('fingerprint error ...:' + e);
-    }
-
-    return fingerprint;
-  }
-
   async writeProfile(profile){
 
     global.pogoconf.setCurrectUsername(profile.username)

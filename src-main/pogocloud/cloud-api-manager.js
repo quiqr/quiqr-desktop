@@ -7,6 +7,8 @@ const { app, shell }            = require('electron')
 const request                   = require('request');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const PogoPublisher             = require('../publishers/pogo-publisher');
+const cloudGitManager           = require('./cloud-git-manager');
+const { EnvironmentResolver }   = require('../utils/environment-resolver');
 
 class CloudApiManager{
 
@@ -39,11 +41,13 @@ class CloudApiManager{
       configurationDataProvider.get( async (err, configurations)=>{
 
         let pogopubl = new PogoPublisher({});
-        let pubkey = await pogopubl.keygen();
+        let pubkey = await cloudGitManager.keygen();
 
+        let environmentResolver = new EnvironmentResolver();
         var postData = JSON.stringify({
           connect_code : connect_code,
-          pubkey: ""+pubkey
+          pubkey: ""+pubkey,
+          pubkey_title: environmentResolver.getUPIS()
         });
 
         let url = configurations.global.pogoboardConn.protocol+"//"+

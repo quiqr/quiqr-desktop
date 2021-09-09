@@ -1,10 +1,11 @@
+const fs                     = require('fs-extra');
+const spawnAw                = require('await-spawn')
 const Embgit                 = require('../embgit/embgit');
+const path                   = require('path');
 const pathHelper             = require('../utils/path-helper');
 const outputConsole          = require('../logger/output-console');
 const fileDirUtils           = require('../utils/file-dir-utils');
 const cloudSiteconfigManager = require('./cloud-siteconfig-manager');
-//const fssimple               = require('fs');
-const fs                     = require('fs-extra');
 
 //const git_bin = Embgit.getGitBin();
 
@@ -51,6 +52,44 @@ class CloudGitManager {
         reject(e);
       }
     });
+  }
+
+  async keygen(){
+
+    let pubkey = '';
+    var git_bin = Embgit.getGitBin();
+    var sukohdir = pathHelper.getRoot();
+
+    try {
+      let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
+      outputConsole.appendLine('Keygen success ...');
+      pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+    } catch (e) {
+      outputConsole.appendLine('keygen error ...:' + e);
+    }
+
+    try {
+      await fs.unlinkSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+    } catch (e) {
+      outputConsole.appendLine('no key were there ...:' + e);
+    }
+
+    return pubkey;
+  }
+
+  async getKeyFingerprint(){
+    var git_bin = Embgit.getGitBin();
+    var sukohdir = pathHelper.getRoot();
+    let fingerprint = null;
+
+    try {
+      let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
+      fingerprint = gencmd.toString().replace(/\n/g,"");
+    } catch (e) {
+      outputConsole.appendLine('fingerprint error ...:' + e);
+    }
+
+    return fingerprint;
   }
 }
 
