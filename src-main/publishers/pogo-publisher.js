@@ -558,7 +558,12 @@ class PogoPublisher {
             progressBar.detail = 'Apply changes';
 
             var spawn = require("child_process").spawn;
-            let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n','sukoh','-e','sukoh@brepi.eu', '-m', 'publish from sukoh',full_gh_dest]);
+
+            const environmentResolver = new EnvironmentResolver();
+            const UPIS = environmentResolver.getUPIS();
+
+            let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
+
             clonecmd3.stdout.on("data", (data) => {
             });
             clonecmd3.stderr.on("data", (err) => {

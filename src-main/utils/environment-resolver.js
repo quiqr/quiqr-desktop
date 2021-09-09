@@ -43,7 +43,7 @@ class EnvironmentResolver{
       const computerRelease = os.release()
       const username = os.userInfo().username;
       const appVersion = app.getVersion();
-      return `${username}@${computerName}+${username}+${computerPlatform}+${computerRelease}+poppyapp-${appVersion}`;
+      return `${username}@${computerName}+${computerPlatform}+${computerRelease}+poppyapp-${appVersion}`;
     }
 }
 
