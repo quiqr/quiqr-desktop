@@ -526,7 +526,7 @@ resources: []\n\
   async setSitesListingView(view){
 
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    mainWindow.webContents.send("selectSiteSetBusy");
+    mainWindow.webContents.send("frontEndBusy");
 
     global.pogoconf.setSitesListingView(view)
     global.pogoconf.saveState().then( ()=>{
@@ -586,7 +586,7 @@ resources: []\n\
       label: "Unset profile",
       enabled: ( this.profileUserName === '' ? false:true ),
       click: async ()=>{
-        mainWindow.webContents.send("selectSiteSetBusy");
+        mainWindow.webContents.send("frontEndBusy");
         global.pogoconf.setCurrectUsername(null);
         global.pogoconf.setSitesListingView('all');
         global.pogoconf.saveState().then( ()=>{
@@ -632,7 +632,7 @@ resources: []\n\
             checked: checked,
             click: async ()=>{
 
-              mainWindow.webContents.send("selectSiteSetBusy");
+              mainWindow.webContents.send("frontEndBusy");
 
               let key = path.join(profilesDir,f,"id_rsa_pogo");
               await fs.copySync(key, path.join(pathHelper.getRoot(),"id_rsa_pogo"));

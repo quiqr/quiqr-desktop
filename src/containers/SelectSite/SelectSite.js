@@ -115,7 +115,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
   componentWillMount(){
     this.updateRemoteSites(this.props.poppygoUsername);
-    window.require('electron').ipcRenderer.on('selectSiteSetBusy', ()=>{
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });
 
@@ -128,6 +128,9 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     service.api.getPogoConfKey('sitesListingView').then((view)=>{
       this.setState({sitesListingView: view });
     });
+  }
+
+  componentWillUnmount(){
   }
 
   mountSite(site : SiteConfig ){

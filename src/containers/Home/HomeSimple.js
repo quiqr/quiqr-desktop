@@ -126,6 +126,13 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
   }
 
+  componentWillMount(){
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showSpinner: true});
+    });
+  }
+  componentWillUnmount(){
+  }
   componentDidMount(){
     this.checkSiteInProps();
     this._ismounted = true;
@@ -1046,7 +1053,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     let { configurations } = this.state;
 
-    if( configurations == null || this.state.selectedSite == null ){
+    if( this.state.showSpinner || configurations == null || this.state.selectedSite == null ){
       return <Spinner />
     }
 
