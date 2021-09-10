@@ -32,7 +32,7 @@ class CloudGitManager {
     return pathSiteSource;
   }
 
-  clonePogoCloudSite(cloudPath, siteName){
+  clonePogoCloudSite(cloudPath, siteName, managed = true){
 
     const siteKey = this.newSiteKeyFromPath(cloudPath);
     Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
@@ -40,11 +40,18 @@ class CloudGitManager {
     const temp_clone_path = pathHelper.getTempDir()+'siteFromUrl/';
     fileDirUtils.ensureEmptyDir(temp_clone_path);
 
+    let newConf;
+
     return new Promise( async (resolve, reject)=>{
       try {
         await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
         let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
-        let newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
+        if(managed){
+          newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
+        }
+        else{
+          newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey, siteName, pathSiteSource);
+        }
         await cloudSiteconfigManager.writeConf(newConf,siteKey);
         resolve(newConf);
       } catch (e) {

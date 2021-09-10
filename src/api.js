@@ -184,8 +184,12 @@ export class API {
     return mainProcessBridge.request('getPoppyGoProfile',{});
   }
 
-  cloneRemoteAsSite(cloudPath: string, siteName: string){
-    return mainProcessBridge.request('cloneRemoteAsSite',{cloudPath, siteName});
+  cloneRemoteAsManagedSite(cloudPath: string, siteName: string){
+    return mainProcessBridge.request('cloneRemoteAsManagedSite',{cloudPath, siteName});
+  }
+
+  cloneRemoteAsUnmanagedSite(cloudPath: string, siteName: string){
+    return mainProcessBridge.request('cloneRemoteAsUnmanagedSite',{cloudPath, siteName});
   }
 
   getUserRemoteSites(username){

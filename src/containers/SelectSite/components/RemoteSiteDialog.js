@@ -18,6 +18,10 @@ class RemoteSiteDialog extends React.Component{
       remoteSiteName: "",
       execButtonsDisabled: true,
       errorTextSiteName: "",
+      busy: false,
+      downloading: false,
+      finished: false,
+      cancelText: "cancel",
       newSiteName: ""
     }
   }
@@ -42,7 +46,11 @@ class RemoteSiteDialog extends React.Component{
       this.validateSiteName(siteName);
       this.setState({
         remoteSiteName: this.props.remoteSiteName,
-        newSiteName: siteName
+        newSiteName: siteName,
+        busy: false,
+        cancelText: "cancel",
+        downloading: false,
+        finished: false,
       });
     }
   }
@@ -76,12 +84,43 @@ class RemoteSiteDialog extends React.Component{
         downloading: true,
       });
 
-      await service.api.cloneRemoteAsSite(this.props.remoteSiteName, this.state.newSiteName).then((clonedSiteInfo)=>{
+      await service.api.cloneRemoteAsManagedSite(this.props.remoteSiteName, this.state.newSiteName).then((clonedSiteInfo)=>{
         service.api.invalidateCache();
         this.setState({
           busy: false,
           downloading: false,
           finished: true,
+          cancelText: "Close",
+          newSiteKey: clonedSiteInfo.key,
+        });
+      });
+    }
+    catch(e){
+      this.setState({
+        busy: false,
+        cancelText: "Close",
+        downloading: false,
+        failure: true,
+      });
+      service.api.logToConsole("error cloning");
+    }
+  }
+
+  async handleDownloadCopy(){
+    try{
+      this.setState({
+        busy: true,
+        execButtonsDisabled: true,
+        downloading: true,
+      });
+
+      await service.api.cloneRemoteAsUnmanagedSite(this.props.remoteSiteName, this.state.newSiteName).then((clonedSiteInfo)=>{
+        service.api.invalidateCache();
+        this.setState({
+          busy: false,
+          downloading: false,
+          finished: true,
+          cancelText: "Close",
           newSiteKey: clonedSiteInfo.key,
         });
       });
@@ -90,18 +129,11 @@ class RemoteSiteDialog extends React.Component{
       this.setState({
         busy: false,
         downloading: false,
+        cancelText: "Close",
         failure: true,
       });
       service.api.logToConsole("error cloning");
     }
-  }
-
-  handleDownloadCopy(){
-    let nameExists = this.props.configurations.sites.filter((site)=>{
-      return (site.name === this.state.newSiteName);
-    });
-    service.api.logToConsole(this.state.newSiteName);
-    service.api.logToConsole(nameExists);
   }
 
   async handleOpenNewSite(){
@@ -167,7 +199,7 @@ class RemoteSiteDialog extends React.Component{
 
     const actions = [
       <Button className={classes.primaryFlatButton} onClick={this.props.onCancelClick}>
-        Cancel
+        {this.state.cancelText}
       </Button>,
 
       <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >

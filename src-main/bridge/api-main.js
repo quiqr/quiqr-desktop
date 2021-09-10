@@ -502,10 +502,21 @@ api.publishSite = function({siteKey, publishKey}, context){
   });
 }
 
-api.cloneRemoteAsSite = async function({cloudPath, siteName}, context){
+
+api.cloneRemoteAsManagedSite = async function({cloudPath, siteName}, context){
   try{
-    let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName);
+    let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName, true);
     cloudCacheManager.updateRemoteSiteCache(newConf, global.pogoconf.currentUsername);
+    context.resolve(newConf);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
+api.cloneRemoteAsUnmanagedSite = async function({cloudPath, siteName}, context){
+  try{
+    let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName, false);
     context.resolve(newConf);
   }
   catch(err){
