@@ -561,7 +561,6 @@ class PogoPublisher {
 
             const environmentResolver = new EnvironmentResolver();
             const UPIS = environmentResolver.getUPIS();
-
             let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
 
             clonecmd3.stdout.on("data", (data) => {

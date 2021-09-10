@@ -490,6 +490,32 @@ resources: []\n\
     }
   }
 
+  userIsOwner(siteKey, user){
+    return true;
+  }
+
+  siteIsPogoCloudManaged(){
+
+    if(global.currentSiteKey && global.currentSiteKey !== ""){
+
+      return true;
+
+      configurationDataProvider.get((err, configurations)=>{
+        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+        if(siteData.hasOwnProperty("publish") && siteData.publish[0].hasOwnProperty("config") && siteData.publish[0].config.hasOwnProperty("path")){
+          if(this.userIsOwner(global.currentSiteKey, this.profileUserName)){
+            console.log('jajhh')
+            return true;
+          }
+        }
+        else{
+          return false;
+        }
+      });
+    }
+    return false;
+  }
+
   updateMenu(currentSiteKey){
     return;
 
@@ -817,6 +843,21 @@ resources: []\n\
         label: 'Create new from Hugo theme git URL',
         click: async () => {
           this.createSiteFromThemeGitUrl();
+        }
+      },
+      {
+        id: 'pulllastgitchanges',
+        label: 'Merge last changes from the cloud',
+        enabled: this.siteIsPogoCloudManaged(),
+        click: async () => {
+
+          configurationDataProvider.get(async (err, configurations)=>{
+            let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+            cloudGitManager.pullFastForwardMerge(siteData).then((status)=>{
+              console.log(status);
+            });
+          });
+
         }
       },
       {

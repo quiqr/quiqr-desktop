@@ -61,6 +61,22 @@ class CloudGitManager {
     });
   }
 
+  pullFastForwardMerge(site){
+
+    Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
+
+    return new Promise( async (resolve, reject)=>{
+      try {
+        await Embgit.pull(site.source.path);
+        resolve(true);
+      } catch (e) {
+        console.log("Clone Error:"+site.key);
+        //console.log(e);
+        //reject(e);
+      }
+    });
+  }
+
   async keygen(){
 
     let pubkey = '';

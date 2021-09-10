@@ -59,6 +59,27 @@ class Embgit{
     return cmd;
   }
 
+  async pull(destination_path){
+    const git_bin = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let clonecmd = await spawnAw( git_bin, [ "pull", "-s" ,"-i", userconf.privateKey, destination_path ]);
+        await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
+        outputConsole.appendLine('Pull success ...');
+        console.log(clonecmd.toString());
+        resolve(true)
+      } catch (e) {
+        await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
+        //await outputConsole.appendLine('Pull error ...:' + e);
+        console.log(e.stdout.toString())
+        if(e.stdout.toString().includes("already up-to-date")) {
+          console.log("no changed");
+        }
+        //reject(e);
+      }
+    });
+
+  }
   async cloneWithKey(url, destination_path){
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
