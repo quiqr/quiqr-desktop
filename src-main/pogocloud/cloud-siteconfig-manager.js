@@ -66,4 +66,3 @@ class CloudSiteconfigManager {
 }
 
 module.exports = new CloudSiteconfigManager;
-

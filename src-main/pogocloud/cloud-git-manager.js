@@ -1,11 +1,12 @@
 const fs                     = require('fs-extra');
 const spawnAw                = require('await-spawn')
-const Embgit                 = require('../embgit/embgit');
 const path                   = require('path');
+const Embgit                 = require('../embgit/embgit');
 const pathHelper             = require('../utils/path-helper');
 const outputConsole          = require('../logger/output-console');
 const fileDirUtils           = require('../utils/file-dir-utils');
 const cloudSiteconfigManager = require('./cloud-siteconfig-manager');
+const cloudCacheManager      = require('../pogocloud/cloud-cache-manager');
 
 //const git_bin = Embgit.getGitBin();
 
@@ -41,7 +42,6 @@ class CloudGitManager {
 
     return new Promise( async (resolve, reject)=>{
       try {
-
         await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
         let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
         let newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);

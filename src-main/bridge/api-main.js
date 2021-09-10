@@ -505,6 +505,7 @@ api.publishSite = function({siteKey, publishKey}, context){
 api.cloneRemoteAsSite = async function({cloudPath, siteName}, context){
   try{
     let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName);
+    cloudCacheManager.updateRemoteSiteCache(newConf, global.pogoconf.currentUsername);
     context.resolve(newConf);
   }
   catch(err){

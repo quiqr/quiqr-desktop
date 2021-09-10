@@ -11,6 +11,7 @@ const glob                      = require('glob');
 const path                      = require('path');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const pathHelper                = require('../utils/path-helper');
+const RequestHelper             = require('../utils/request-helper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudGitManager           = require('./cloud-git-manager');
 
@@ -27,7 +28,7 @@ class CloudCacheManager{
         if(profileUserName = global.pogoconf.currentUsername){
 
           let fingerprint = await cloudGitManager.getKeyFingerprint();
-
+          console.log(fingerprint);
           let userVars = {
             username: profileUserName,
             fingerprint: fingerprint,
@@ -55,8 +56,6 @@ class CloudCacheManager{
             console.log(e);
             resolve(false);
           });
-
-
           req.end();
 
         }
@@ -162,6 +161,45 @@ class CloudCacheManager{
     });
     console.log("fin");
     return true;
+  }
+
+  async updateRemoteSiteCache(site, username){
+
+    return new Promise( resolve => {
+
+      configurationDataProvider.get(async (err, configurations) => {
+
+        if(site.publish[0] && site.publish[0].config.type == "poppygo" && site.publish[0].config.path){
+
+          let fingerprint = await cloudGitManager.getKeyFingerprint();
+          let userVars = {
+            username:    username,
+            fingerprint: fingerprint,
+            projectPath: site.publish[0].config.path,
+          }
+
+          let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+
+          let url = configurations.global.pogoboardConn.protocol+"//"+
+            configurations.global.pogoboardConn.host+":"+
+            configurations.global.pogoboardConn.port+"/site/"+requestVars;
+
+          try{
+            RequestHelper.dumpJSONBodyFromGetRequestToFileAndReturn(url, pathHelper.siteCacheFilePath(site.key)).then((content)=>{
+              console.log(content)
+              resolve(true);
+            });
+          }
+          catch(e){
+            console.log(e)
+          }
+        }
+        else{
+          resolve(false);
+        }
+      });
+
+    });
   }
 
   async updateAllRemoteCaches() {

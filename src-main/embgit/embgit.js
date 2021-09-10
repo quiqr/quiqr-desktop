@@ -29,6 +29,7 @@ class Embgit{
     let executable;
     let cmd;
 
+    //TODO USE ENVIRONMENT UTIL
     switch(enviromnent.platform){
       case PLATFORMS.linux: {
         platform = 'linux';

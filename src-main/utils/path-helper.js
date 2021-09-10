@@ -95,6 +95,10 @@ class PathHelper{
     }
   }
 
+  siteCacheFilePath(siteKey){
+    return this.getTempDir() + 'cache-site.'+siteKey+'.json';
+  }
+
   sitesCacheFilePath(){
     return this.getTempDir() + 'cache-sites.json';
   }
