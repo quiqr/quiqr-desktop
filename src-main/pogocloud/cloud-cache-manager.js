@@ -136,10 +136,11 @@ class CloudCacheManager{
         }
       }
 
-      for (let path in ownerslookupdata.pathsToSites) {
+      for (let site in ownerslookupdata.sitesToPaths) {
+        let path = ownerslookupdata.sitesToPaths[site];
         let username = ownerslookupdata.pathsToUsers[path];
         if (typeof(username) != "undefined"){
-          ownerslookupdata.sitesToUsers[ownerslookupdata.pathsToSites[path]] = username;
+          ownerslookupdata.sitesToUsers[site] = username;
         }
       }
 

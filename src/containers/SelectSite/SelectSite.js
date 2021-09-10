@@ -131,14 +131,14 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   }
 
   mountSite(site : SiteConfig ){
-
-
     this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
     this.setState({currentSiteKey: site.key});
 
     //load all site configuration to enforce validation
 
     service.api.listWorkspaces(site.key).then((workspaces)=>{
+
+      service.api.logToConsole(workspaces[0]);
 
       this.setState({selectedSiteWorkspaces: workspaces});
       if(workspaces.length === 1){
@@ -153,17 +153,9 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   };
 
   async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-
     this.setState({currentWorkspaceKey: workspace.key});
-
-    let select = true;
-    if(select){
-      await service.api.mountWorkspace(siteKey, workspace.key);
-      this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
-    }
-    else{
-      this.history.push(`/`);
-    }
+    await service.api.mountWorkspace(siteKey, workspace.key);
+    this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
   }
 
   handleAddSiteClick(){
@@ -340,13 +332,11 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
             configurations={configurations}
             remoteSiteName={this.state.currentRemoteSite}
             onCancelClick={()=>this.setState({remoteSiteDialog:false})}
-            mountSite={async (siteKey)=>{
-
-              service.api.logToConsole(siteKey);
-              await service.api.mountWorkspace(siteKey, 'source');
-              this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent('source')}/home/init`);
-
-
+            mountSite={(siteKey)=>{
+              service.getConfigurations(true).then((c)=>{
+                let site = c.sites.find((x)=>x.key===siteKey);
+                this.mountSite(site);
+              });
             }}
             />
 
