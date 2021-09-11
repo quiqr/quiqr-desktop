@@ -566,7 +566,7 @@ resources: []\n\
     let _menuContent = [
       {
         key: "all",
-        label: "View all sites",
+        label: "All sites",
       },
       {
         key: "unpublished",
@@ -834,18 +834,6 @@ resources: []\n\
         submenu: this.createProfilesMenu()
       },
       {
-        id: 'switch-select-sites-view',
-        label: 'View sites',
-        submenu: this.createViewSitesMenu()
-      },
-      {
-        id: 'create-new-from-hugo-theme-url',
-        label: 'Create new from Hugo theme git URL',
-        click: async () => {
-          this.createSiteFromThemeGitUrl();
-        }
-      },
-      {
         id: 'pulllastgitchanges',
         label: 'Merge last changes from the cloud',
         enabled: this.siteIsPogoCloudManaged(),
@@ -875,46 +863,11 @@ resources: []\n\
         }
       },
       {
-        id: 'cacheremotesiteinfo',
-        label: 'Sync remote site info',
-        click: async () => {
-          cloudCacheManager.updateAllRemoteCaches()
-        }
-      },
-      {
         id: 'cacheremoteuserinfo',
-        label: 'Sync remote user info',
+        enabled: ( this.profileUserName === '' ? false:true ),
+        label: 'Sync remote user data',
         click: async () => {
           cloudCacheManager.updateUserRemoteCaches()
-        }
-      },
-      {
-        id: 'unlink-site-domain',
-        label: 'Unlink site domain',
-        enabled: this.siteSelected(),
-        click: async () => {
-          this.unlinkSiteDomain()
-        }
-      },
-      {
-        id: 'add-project-path',
-        label: 'Edit project path',
-        enabled: this.siteSelected(),
-        click: async () => {
-          this.editProjectPath()
-        }
-      },
-      {
-        label: 'Reset all (dangerous)',
-        click: async () => {
-          this.deleteSukohFolder()
-        }
-      },
-      { role: 'toggledevtools' },
-      {
-        label: 'Preferences',
-        click: async () => {
-          this.createPrefsWindow()
         }
       },
     ];
@@ -925,6 +878,12 @@ resources: []\n\
   createDevMenu(){
     let devMenu = [
       { role: 'forcereload' },
+      {
+        label: 'Preferences',
+        click: async () => {
+          this.createPrefsWindow()
+        }
+      },
       { role: 'toggledevtools' },
       {
         label: 'Stripe Customer Portal',
@@ -953,6 +912,28 @@ resources: []\n\
       {
         label: 'Depreciated',
         submenu: [
+          {
+            label: 'Delete Sukoh folder (dangerous)',
+            click: async () => {
+              this.deleteSukohFolder()
+            }
+          },
+          {
+            id: 'unlink-site-domain',
+            label: 'Unlink site domain',
+            enabled: this.siteSelected(),
+            click: async () => {
+              this.unlinkSiteDomain()
+            }
+          },
+          {
+            id: 'add-project-path',
+            label: 'Edit project path',
+            enabled: this.siteSelected(),
+            click: async () => {
+              this.editProjectPath()
+            }
+          },
           {
             label: 'Front page',
             click: async () => {
@@ -1004,10 +985,27 @@ resources: []\n\
         label: 'File',
         submenu: [
           {
-            label: 'Select site',
-            click: async () => {
-              this.selectSitesWindow();
-            }
+            id: 'switch-select-sites-view',
+            label: 'Open site',
+            submenu: this.createViewSitesMenu()
+          },
+//          {
+            //label: 'Open site',
+            //click: async () => {
+              //this.selectSitesWindow();
+            //}
+//          },
+          {
+            label: 'New',
+            submenu: [
+              {
+                id: 'create-new-from-hugo-theme-url',
+                label: 'Create site from Hugo theme git-URL',
+                click: async () => {
+                  this.createSiteFromThemeGitUrl();
+                }
+              },
+            ]
           },
           { type: 'separator' },
           {

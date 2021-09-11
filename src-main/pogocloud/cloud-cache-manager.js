@@ -203,25 +203,5 @@ class CloudCacheManager{
     });
   }
 
-  async updateAllRemoteCaches() {
-
-    let cache = {};
-    let sites = {};
-
-    configurationDataProvider.get( (err, configurations) => {
-      if(configurations.empty===true || configurations.sites.length ===0){
-        console.log("No sites to get remote info for ");
-      }
-      else{
-        configurations.sites.forEach((site) => {
-          sites[site.key] = {}
-          sites[site.key].name = site.name
-        });
-      }
-      cache["sites"] = sites;
-
-      fs.writeFileSync( pathHelper.sitesCacheFilePath(), JSON.stringify(cache), 'utf-8');
-    });
-  }
 }
 module.exports = new CloudCacheManager;
