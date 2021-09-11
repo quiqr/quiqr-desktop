@@ -12,6 +12,49 @@ const { EnvironmentResolver }   = require('../utils/environment-resolver');
 
 class CloudApiManager{
 
+  sendInvitationMail(email,siteKey){
+
+    let profileUserName;
+    configurationDataProvider.get( async (err, configurations)=>{
+
+      let siteData = configurations.sites.find((x)=>x.key===siteKey);
+      if(siteData.hasOwnProperty("publish") &&
+        siteData.publish[0].hasOwnProperty("config") &&
+        siteData.publish[0].config.hasOwnProperty("path")){
+        let sitePath = siteData.publish[0].config.path;
+
+        if(profileUserName = global.pogoconf.currentUsername){
+
+          let fingerprint = await cloudGitManager.getKeyFingerprint();
+          let userVars = {
+            username: profileUserName,
+            fingerprint: fingerprint,
+          };
+
+          let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+          let url = configurations.global.pogoboardConn.protocol+"//"+
+            configurations.global.pogoboardConn.host+":"+
+            configurations.global.pogoboardConn.port+"/site/invite-member/"+sitePath+"/"+email+"/"+requestVars;
+
+          console.log(url);
+          const req = request({
+            method: 'GET',
+            url: url
+          });
+          req.on('response', (response) => {
+            if(response.statusCode === 200){
+              response.on('data',(chunk) => {
+
+              });
+            }
+          });
+
+        }
+      }
+
+    });
+  }
+
   requestConnectMail(email){
 
     configurationDataProvider.get( function(err, configurations){

@@ -66,6 +66,51 @@ class MenuManager {
     await pogopubl.siteFromPogoUrl();
   }
 
+  async inviteUserForSite(){
+
+    let mainWindow = global.mainWM.getCurrentInstance();
+
+    const prompt = require('electron-prompt');
+    let email = await prompt({
+      title: 'Enter email address of the user you want to invite',
+      label: 'email:',
+      value: "",
+      inputAttrs: {
+        type: 'text',
+        required: true
+      },
+      type: 'input'
+    }, mainWindow);
+
+    if(!email || email===""){
+      return;
+    }
+    else{
+      const dialog = electron.dialog;
+
+      const options = {
+        type: 'info',
+        buttons: ['Cancel', 'OK'],
+        defaultId: 1,
+        title: 'Email has been sent',
+        message: 'Email has been sent',
+        detail: 'If the email address exist a mail with a invitation link will be sent.',
+      };
+
+      dialog.showMessageBox(null, options, async (response) => {
+        if(response === 1){
+          await cloudApiManager.sendInvitationMail(email,global.currentSiteKey)
+          console.log("mailsent")
+        }
+        else{
+          console.log(response)
+          return;
+        }
+      });
+    }
+  }
+
+
   async requestUserConnectCode(){
 
     let mainWindow = global.mainWM.getCurrentInstance();
@@ -621,6 +666,18 @@ resources: []\n\
         });
       }});
 
+    profilesMenu.push( { type: 'separator' });
+
+    profilesMenu.push({
+      id: 'invite-poppygo-user',
+      label: "Invite PoppyGo User as site member",
+      enabled: this.siteIsPogoCloudManaged(),
+      click: async ()=>{
+        this.inviteUserForSite();
+      }
+    });
+
+    profilesMenu.push( { type: 'separator' });
 
     profilesMenu.push({
       id: 'connect-poppygo-user',
@@ -989,12 +1046,12 @@ resources: []\n\
             label: 'Open site',
             submenu: this.createViewSitesMenu()
           },
-//          {
-            //label: 'Open site',
-            //click: async () => {
-              //this.selectSitesWindow();
-            //}
-//          },
+          //          {
+          //label: 'Open site',
+          //click: async () => {
+          //this.selectSitesWindow();
+          //}
+          //          },
           {
             label: 'New',
             submenu: [
