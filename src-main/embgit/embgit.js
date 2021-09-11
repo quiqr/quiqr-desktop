@@ -59,6 +59,28 @@ class Embgit{
     return cmd;
   }
 
+  async commit(destination_path, message){
+    let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
+  }
+
+  async commit(destination_path, message){
+    const git_bin = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let cmd = await spawnAw( git_bin, [ "commit", "-a" ,"-n", global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', message, destination_path ]);
+        outputConsole.appendLine('Commit success ...');
+        console.log(cmd.toString());
+        resolve(true)
+      } catch (e) {
+        await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
+        console.log(e.stdout.toString())
+        if(e.stdout.toString().includes("already up-to-date")) {
+          console.log("no changed");
+        }
+      }
+    });
+
+  }
   async pull(destination_path){
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
@@ -71,11 +93,7 @@ class Embgit{
       } catch (e) {
         await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
         //await outputConsole.appendLine('Pull error ...:' + e);
-        console.log(e.stdout.toString())
-        if(e.stdout.toString().includes("already up-to-date")) {
-          console.log("no changed");
-        }
-        //reject(e);
+        reject(e);
       }
     });
 

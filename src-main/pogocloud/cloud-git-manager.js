@@ -1,12 +1,13 @@
-const fs                     = require('fs-extra');
-const spawnAw                = require('await-spawn')
-const path                   = require('path');
-const Embgit                 = require('../embgit/embgit');
-const pathHelper             = require('../utils/path-helper');
-const outputConsole          = require('../logger/output-console');
-const fileDirUtils           = require('../utils/file-dir-utils');
-const cloudSiteconfigManager = require('./cloud-siteconfig-manager');
-const cloudCacheManager      = require('../pogocloud/cloud-cache-manager');
+const fs                      = require('fs-extra');
+const spawnAw                 = require('await-spawn')
+const path                    = require('path');
+const Embgit                  = require('../embgit/embgit');
+const pathHelper              = require('../utils/path-helper');
+const outputConsole           = require('../logger/output-console');
+const fileDirUtils            = require('../utils/file-dir-utils');
+const cloudSiteconfigManager  = require('./cloud-siteconfig-manager');
+const cloudCacheManager       = require('../pogocloud/cloud-cache-manager');
+const { EnvironmentResolver } = require('../utils/environment-resolver');
 
 //const git_bin = Embgit.getGitBin();
 
@@ -65,14 +66,26 @@ class CloudGitManager {
 
     Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
 
+    const environmentResolver = new EnvironmentResolver();
+    const UPIS = environmentResolver.getUPIS();
+    const message = "merge from " + UPIS;
+
     return new Promise( async (resolve, reject)=>{
       try {
-        await Embgit.pull(site.source.path);
-        resolve(true);
+        await Embgit.commit(site.source.path, message).then(async (e)=>{
+          await Embgit.pull(site.source.path);
+          resolve("merged_with_remote");
+        });
       } catch (e) {
-        console.log("Clone Error:"+site.key);
-        //console.log(e);
-        //reject(e);
+        console.log("Pull Error:"+site.key);
+
+        console.log(e.stdout.toString())
+        if(e.stdout.toString().includes("already up-to-date")) {
+          resolve("no_changes")
+        }
+        else if(e.stdout.toString().includes("non-fast-forward update")){
+          resolve("non_fast_forward");
+        }
       }
     });
   }

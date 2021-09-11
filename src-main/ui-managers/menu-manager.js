@@ -854,7 +854,21 @@ resources: []\n\
           configurationDataProvider.get(async (err, configurations)=>{
             let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
             cloudGitManager.pullFastForwardMerge(siteData).then((status)=>{
-              console.log(status);
+              if(status === "non_fast_forward"){
+                const dialog = electron.dialog;
+
+                const options = {
+                  type: 'warning',
+                  buttons: [ 'CLOSE'],
+                  defaultId: 1,
+                  title: 'Merge failed',
+                  message: 'Could not merge remote code.',
+                  detail: 'Nothing changed locally. When you publish, remote changes will be overwritten.',
+                };
+
+                dialog.showMessageBox(null, options)
+              }
+
             });
           });
 
