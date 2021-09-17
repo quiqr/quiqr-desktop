@@ -1,6 +1,7 @@
 const fs                      = require('fs-extra');
 const spawnAw                 = require('await-spawn')
 const path                    = require('path');
+const del                     = require('del');
 const Embgit                  = require('../embgit/embgit');
 const pathHelper              = require('../utils/path-helper');
 const outputConsole           = require('../logger/output-console');
@@ -8,6 +9,7 @@ const fileDirUtils            = require('../utils/file-dir-utils');
 const cloudSiteconfigManager  = require('./cloud-siteconfig-manager');
 const cloudCacheManager       = require('../pogocloud/cloud-cache-manager');
 const { EnvironmentResolver } = require('../utils/environment-resolver');
+
 
 //const git_bin = Embgit.getGitBin();
 
@@ -27,7 +29,6 @@ class CloudGitManager {
     await fs.ensureDir(pathSite);
 
     const pathSiteSource = pathHelper.getRoot()+"sites/"+siteKey+"/pogocloudrepo";
-    await fs.ensureDir(pathSiteSource);
 
     await fs.moveSync(tempSourcePath, pathSiteSource);
     return pathSiteSource;
@@ -39,14 +40,16 @@ class CloudGitManager {
     Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
 
     const temp_clone_path = pathHelper.getTempDir()+'siteFromUrl/';
-    fileDirUtils.ensureEmptyDir(temp_clone_path);
 
     let newConf;
 
     return new Promise( async (resolve, reject)=>{
       try {
+        await del.sync([temp_clone_path],{force:true});
         await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
+
         let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
+
         if(managed){
           newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
         }
