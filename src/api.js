@@ -185,11 +185,11 @@ export class API {
   }
 
   cloneRemoteAsManagedSite(cloudPath: string, siteName: string){
-    return mainProcessBridge.request('cloneRemoteAsManagedSite',{cloudPath, siteName});
+    return mainProcessBridge.request('cloneRemoteAsManagedSite',{cloudPath, siteName}, {timeout: 1000000});
   }
 
   cloneRemoteAsUnmanagedSite(cloudPath: string, siteName: string){
-    return mainProcessBridge.request('cloneRemoteAsUnmanagedSite',{cloudPath, siteName});
+    return mainProcessBridge.request('cloneRemoteAsUnmanagedSite',{cloudPath, siteName}, {timeout: 1000000});
   }
 
   getUserRemoteSites(username){

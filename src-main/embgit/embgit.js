@@ -102,13 +102,14 @@ class Embgit{
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
-        let clonecmd = await spawnAw( git_bin, [ "clone", "-s" ,"-i", userconf.privateKey, url , destination_path ]);
+        let cmd = await spawnAw( git_bin, [ "clone", "-s" ,"-i", userconf.privateKey, url , destination_path ]);
         await outputConsole.appendLine(git_bin + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
         outputConsole.appendLine('Clone success ...');
         resolve(true)
       } catch (e) {
         await outputConsole.appendLine(git_bin + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
         await outputConsole.appendLine('Clone error ...:' + e);
+        console.log(e.stderr.toString())
         reject(e);
       }
     });

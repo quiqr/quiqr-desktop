@@ -202,7 +202,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   handlePublishNow(pressed){
 
-    if(this.state.pogoSiteStatus === "ownerIncorrect"){
+    if(this.state.pogoSiteStatus === "noAccess"){
       snackMessageService.addSnackMessage("You're not allowed to publish to this pogocloud-path");
       return;
     }
@@ -389,7 +389,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         return true;
       }
       else{
-        service.api.logToConsole("site is not in the pogocloud")
+        //service.api.logToConsole("site is not in the pogocloud")
       }
     }
     return false;
@@ -551,8 +551,12 @@ class Home extends React.Component<HomeProps, HomeState>{
     } catch (e) {
       service.api.logToConsole('catch');
     }
+  }
+
+  getSitePermissions(){
 
   }
+
 
   getRemoteSiteStatus(celebrate){
     if(!this.state.selectedSite){
@@ -570,6 +574,8 @@ class Home extends React.Component<HomeProps, HomeState>{
       projectPath:  this.state.selectedSite.publish[0].config.path,
     };
 
+    service.api.logToConsole(userVars);
+
     let requestVars = btoa(JSON.stringify(userVars));
 
     let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+ this.state.pogostripeConn.port+"/project-status/"+requestVars;
@@ -586,12 +592,12 @@ class Home extends React.Component<HomeProps, HomeState>{
         response.on('end', () => {
 
           if(response.statusCode === 403){
-            service.api.logToConsole("ownerIncorrect")
-            this.setState({pogoSiteStatus: "ownerIncorrect"});
+            this.setState({pogoSiteStatus: "noAccess"});
           }
           else{
             let obj = JSON.parse(data);
 
+            service.api.logToConsole(obj);
             let custom_domain = "not set"
             let defaultDomain = `${this.getPogoCloudPath()}.pogosite.com`;
             if (obj.hasOwnProperty('pogo_custom_domain')){
@@ -601,6 +607,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             this.setState({
               pogoSiteStatus:   obj.pogo_plan_status,
+              pogoUserRole:     obj.role,
               pogoSitePlan:     obj.pogo_plan_name,
               pogoCustomDomain: custom_domain,
               defaultDomain:    defaultDomain,
@@ -929,10 +936,15 @@ class Home extends React.Component<HomeProps, HomeState>{
           </span>
         )
       }
+      let roleStatus = "";
+      if(this.state.pogoUserRole){
+        roleStatus = <span><br/>you are {this.state.pogoUserRole} of this site.</span>
+      }
 
       return (
         <ListItem leftIcon={<IconAccountCircle color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "bold", fontSize:"110%"}}>Hi {this.state.username}</span>
+          {roleStatus}
           {accountStatusMsg}
         </ListItem>
       );
@@ -948,7 +960,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   renderPublishButton(){
-    if(this.state.pogoSiteStatus !== "ownerIncorrect"){
+    if(this.state.pogoSiteStatus !== "noAccess"){
       return (
         <div style={Object.assign({position : 'relative',padding: "0px 16px 16px 30px", width:'100%', display:'flex'})}>
           <RaisedButton primary={true} label="Publish" onClick={()=>{ this.handlePublishNow(true) }} />
@@ -962,7 +974,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   renderPogoCloudPathInfo(){
 
-    if(this.state.pogoSiteStatus === "ownerIncorrect"){
+    if(this.state.pogoSiteStatus === "noAccess"){
     return(
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"110%"}}>
@@ -985,7 +997,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       }
 
       let ownerInfo = ""
-      if(this.state.pogoSiteStatus === "ownerIncorrect"){
+      if(this.state.pogoSiteStatus === "noAccess"){
         ownerInfo = <div>This domain is owned by somebody else</div>
       }
 
@@ -998,7 +1010,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
       return (
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-          <span style={{fontWeight: "normal", fontSize:"110%"}}>Your site is live at &nbsp;
+          <span style={{fontWeight: "normal", fontSize:"110%"}}>The site is live at &nbsp;
 
           <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
             window.require('electron').shell.openExternal("http://"+this.state.defaultDomain);

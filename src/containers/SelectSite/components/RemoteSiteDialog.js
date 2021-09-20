@@ -76,7 +76,7 @@ class RemoteSiteDialog extends React.Component{
     });
   }
 
-  async handleDownloadClone(){
+  handleDownloadClone(){
     try{
       this.setState({
         busy: true,
@@ -84,7 +84,7 @@ class RemoteSiteDialog extends React.Component{
         downloading: true,
       });
 
-      await service.api.cloneRemoteAsManagedSite(this.props.remoteSiteName, this.state.newSiteName).then((clonedSiteInfo)=>{
+      service.api.cloneRemoteAsManagedSite(this.props.remoteSiteName, this.state.newSiteName).then((clonedSiteInfo)=>{
         service.api.invalidateCache();
         this.setState({
           busy: false,

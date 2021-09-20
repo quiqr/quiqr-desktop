@@ -46,6 +46,7 @@ class CloudGitManager {
     return new Promise( async (resolve, reject)=>{
       try {
         await del.sync([temp_clone_path],{force:true});
+        //await fs.ensureDir(temp_clone_path);
         await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
 
         let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
