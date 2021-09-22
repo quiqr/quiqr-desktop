@@ -15,10 +15,10 @@ const globalConfigPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+
 
 const GLOBAL_DEFAULTS = {
     appTheme: "simple",
-    pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
-    //pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
-    pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
-    //pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
+    //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
+    pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
+    //pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
+    pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
 }
 
 function validateSite(site) {
