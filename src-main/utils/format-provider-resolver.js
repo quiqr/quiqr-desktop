@@ -1,28 +1,8 @@
-//@flow
-
-const fs = require('fs-extra');
-const jsYaml = require('js-yaml');
-const path = require('path');
+const fs      = require('fs-extra');
+const jsYaml  = require('js-yaml');
+const path    = require('path');
 const tomlify = require('tomlify-j0.4');
-const toml = require('toml');
-
-/*::
-
-interface FormatProvider{
-
-    defaultExt(): string;
-
-    matchContentFirstLine(line: string): bool;
-
-    parse(str: string): any;
-
-    dump(obj: any): string;
-
-    dumpContent(obj: any): string;
-
-    parseFromMdFileString(str: string): any;
-}
-*/
+const toml    = require('toml');
 
 class JsonFormatProvider /*:: implements FormatProvider */{
 

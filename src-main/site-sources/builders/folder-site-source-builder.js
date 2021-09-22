@@ -1,13 +1,13 @@
-const fs = require('fs-extra');
-const pathHelper = require('./../../path-helper');
+const fs         = require('fs-extra');
+const pathHelper = require('./../../utils/path-helper');
 
-class FolderSiteSourceBuilder/*:: implements SiteSourceBuilder*/ {
+class FolderSiteSourceBuilder {
 
     constructor(){
     }
 
-    async build(config/*: BuildConfig*/)/*:Promise<void>*/{
-        let siteConfig/*: RawSiteConfig*/ = {
+    async build(config){
+        let siteConfig = {
             key: config.key,
             name: config.key,
             source: { type: 'folder', path: config.folderPath },

@@ -1,27 +1,13 @@
-//@flow
+const fs         = require('fs-extra');
+const pathHelper = require('./../utils/path-helper');
 
-const fs = require('fs-extra');
-const pathHelper = require('./../path-helper');
 
-/*::
-import type { IPublisher, PublishContext } from './types';
-
-type FolderPublisherConfig = {
-    path: ?string,
-    clean: ?boolean
-};
-
- */
-
-class FolderPublisher/*:: implements IPublisher*/{
-    /*::
-    _config: FolderPublisherConfig;
-    */
-    constructor(config/*: FolderPublisherConfig */){
+class FolderPublisher{
+    constructor(config){
         this._config = config;
     }
 
-    async publish(context/*: PublishContext*/)/*: Promise<void>*/{
+    async publish(context){
         let { path, clean } = this._config;
 
         let resolvedDest = path || pathHelper.getSiteDefaultPublishDir(context.siteKey, context.publishKey);

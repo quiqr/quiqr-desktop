@@ -4,7 +4,6 @@ exports.container = {
   position: 'relative',
   display: 'flex',
   height: 'calc(100vh - 0px)',
-  xmarginTop: '42px',
   overflowX: 'hidden'
 };
 

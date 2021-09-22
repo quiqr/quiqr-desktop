@@ -1,20 +1,21 @@
-/* Copyright PoppyGo 2020
+/* Copyright PoppyGo 2021
  *
- * pim@lingewoud.nl
+ * pim@poppygo.io
  *
  */
-const electron = require('electron')
-const pathHelper = require('./path-helper');
-const fileDirUtils = require('./file-dir-utils');
-const fs = require('fs-extra');
-const fssimple = require('fs');
-const AdmZip = require('adm-zip');
-const PogoSiteExtension = "pogosite";
-const PogoThemeExtension = "pogotheme";
+const electron             = require('electron')
+const dialog               = electron.dialog;
+const app                  = electron.app
+const fs                   = require('fs-extra');
+const fssimple             = require('fs');
+const AdmZip               = require('adm-zip');
+const pathHelper           = require('../utils/path-helper');
+const fileDirUtils         = require('../utils/file-dir-utils');
+const outputConsole        = require('../logger/output-console');
+
+const PogoSiteExtension    = "pogosite";
+const PogoThemeExtension   = "pogotheme";
 const PogoContentExtension = "pogocontent";
-const dialog = electron.dialog;
-let outputConsole = require('./output-console');
-const app = electron.app
 
 class Pogozipper{
 
@@ -91,7 +92,6 @@ class Pogozipper{
 
     async importSite(path=null) {
 
-        let outputConsole = require('./output-console');
         const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){

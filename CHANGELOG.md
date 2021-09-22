@@ -198,7 +198,7 @@
   - when theme found copy to css
   - else copy default
   - voorkeuren voor kleuren (ik word gek van paars en blauw)
-- config.json
+- onfig.json
   - niet gemaximaliseerd starten
   - hide extra menu
 - meer stylen als een native programma

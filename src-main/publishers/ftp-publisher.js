@@ -1,16 +1,13 @@
-//@flow
+const fs         = require('fs-extra');
+const FtpDeploy  = require("ftp-deploy");
+const pathHelper = require('./../utils/path-helper');
 
-const fs = require('fs-extra');
-const pathHelper = require('./../path-helper');
-
-var FtpDeploy = require("ftp-deploy");
-
-class FtpPublisher/*:: implements IPublisher*/{
-  constructor(config/*: FolderPublisherConfig */){
+class FtpPublisher{
+  constructor(config){
     this._config = config;
   }
 
-  async publish(context/*: PublishContext*/)/*: Promise<void>*/{
+  async publish(context){
 
     var ftpDeployConfig = {
       user: this._config.user,
@@ -20,7 +17,6 @@ class FtpPublisher/*:: implements IPublisher*/{
       port: 21,
       localRoot: context.from,
       remoteRoot: this._config.path,
-      //include: ["*.php", "dist/*", ".*"],
       include: ["*", "**/*"],      // this would upload everything except dot files
       exclude: [],
       // delete ALL existing files at destination before uploading, if true

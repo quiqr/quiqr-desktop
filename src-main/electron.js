@@ -1,25 +1,21 @@
-const electron = require('electron')
-const ipcMainBinder = require('./ipc-main-binder');
-const mainWindowManager = require('./main-window-manager');
-const unhandled = require('electron-unhandled');
-const contextMenu = require('electron-context-menu');
-const BrowserWindow = electron.BrowserWindow;
-const pogozipper = require('./pogozipper');
-const menuManager = require('./menu-manager');
-const request = require('request');
-const fs = require('fs-extra');
-const fssimple = require('fs');
-const pathHelper = require('./path-helper');
-const fileDirUtils = require('./file-dir-utils');
-const PoppyGoAppConfig = require('./poppygo-app-config');
-const ProgressBar = require('electron-progressbar');
-
-
-const outputConsole = require('./output-console');
+const electron          = require('electron')
+const BrowserWindow     = electron.BrowserWindow;
+const unhandled         = require('electron-unhandled');
+const contextMenu       = require('electron-context-menu');
+const request           = require('request');
+const fs                = require('fs-extra');
+const fssimple          = require('fs');
+const ProgressBar       = require('electron-progressbar');
+const ipcMainBinder     = require('./bridge/ipc-main-binder');
+const mainWindowManager = require('./ui-managers/main-window-manager');
+const menuManager       = require('./ui-managers/menu-manager');
+const pogozipper        = require('./import-export/pogozipper');
+const pathHelper        = require('./utils/path-helper');
+const PoppyGoAppConfig  = require('./app-prefs-state/poppygo-app-config');
+const outputConsole     = require('./logger/output-console');
 
 unhandled();
 
-// Module to control application life.
 const app = electron.app
 
 if(app.isPackaged) {
@@ -32,17 +28,15 @@ app.setAsDefaultProtocolClient('poppygo');
 require('events').EventEmitter.prototype._maxListeners = 15;
 
 //console.log(process.argv);
-let pogoconf = PoppyGoAppConfig();
+global.pogoconf = PoppyGoAppConfig();
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
 global.currentWorkspaceKey = pogoconf.lastOpenedSite.workspaceKey;
 global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
-
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

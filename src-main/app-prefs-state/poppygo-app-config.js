@@ -26,14 +26,15 @@ module.exports = function (options) {
         }
     }
 
-    function saveState() {
-        try {
-            mkdirp.sync(path.dirname(fullStoreFileName));
-            jsonfile.writeFileSync(fullStoreFileName, state);
-        } catch (err) {
-            // Don't care
-        }
+  async function saveState() {
+    try {
+      mkdirp.sync(path.dirname(fullStoreFileName));
+      jsonfile.writeFileSync(fullStoreFileName, state);
+    } catch (err) {
+      console.log(`could not save state ${err.to_json()}`)
     }
+    return;
+  }
 
     /*
      * START SETTINGS METHODS
@@ -47,9 +48,19 @@ module.exports = function (options) {
         state.skipWelcomeScreen = skip;
     }
 
-    /* skip: bool */
+    /* toggle: bool */
     function setExperimentalFeatures(toggle){
         state.experimentalFeatures = toggle;
+    }
+
+    /* view: string (all, mylocal, myremote)  */
+    function setSitesListingView(view){
+        state.sitesListingView = view;
+    }
+
+    /* currentUsername: string  */
+    function setCurrectUsername(username){
+        state.currentUsername = username;
     }
 
     /*
@@ -71,15 +82,23 @@ module.exports = function (options) {
         lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
         skipWelcomeScreen: false,
         experimentalFeatures: false,
+        sitesListingView: 'all',
+        currentUsername: null,
     }, state);
 
     return {
         get lastOpenedSite() { return state.lastOpenedSite; },
+        get currentUsername() { return state.currentUsername; },
         get skipWelcomeScreen() { return state.skipWelcomeScreen; },
         get experimentalFeatures() { return state.experimentalFeatures; },
+        get sitesListingView() {
+            return state.sitesListingView;
+        },
         setLastOpenedSite,
+        setCurrectUsername,
         setSkipWelcomeScreen,
         setExperimentalFeatures,
+        setSitesListingView,
         saveState,
         resetStateToDefault
     };

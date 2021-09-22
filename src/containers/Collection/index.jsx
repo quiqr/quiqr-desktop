@@ -195,6 +195,9 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
   }
 
   componentWillMount(){
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showSpinner: true});
+    });
     service.registerListener(this);
   }
 
@@ -382,7 +385,7 @@ class Collection extends React.Component<CollectionProps,CollectionState>{
     let { filteredItems, trunked } = this.state;
     let dialog = undefined;
 
-    if(this.state.selectedWorkspaceDetails==null){
+    if(this.state.showSpinner ||this.state.selectedWorkspaceDetails==null){
       return (<Spinner />);
     }
     let collection = this.state.selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);

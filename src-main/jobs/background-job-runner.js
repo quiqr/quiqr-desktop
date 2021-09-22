@@ -1,11 +1,9 @@
-/* @flow */
-
 const { BrowserWindow, ipcMain } = require('electron');
 const crypto = require("crypto");
 
 class BackgroundJobRunner{
 
-    run(action /*: string */, params /*: any */) /*: Promise<any> */{
+    run(action , params ) {
         return new Promise((resolve, reject)=>{
             let actionWindow = new BrowserWindow({
                 webPreferences: {

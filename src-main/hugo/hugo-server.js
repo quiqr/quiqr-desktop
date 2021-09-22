@@ -1,6 +1,6 @@
-const { spawn } = require('child_process');
-const pathHelper = require('./../path-helper');
-const fs = require('fs-extra');
+const { spawn }  = require('child_process');
+const fs         = require('fs-extra');
+const pathHelper = require('./../utils/path-helper');
 
 global.currentServerProccess = undefined;
 let mainWindow;

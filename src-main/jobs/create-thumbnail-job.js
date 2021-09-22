@@ -1,18 +1,14 @@
-// @flow
-
 const fs = require('fs-extra');
 const jimp = require('jimp');
 const path = require('path');
 
-const action /* : ( params: { src: string, dest: string }) => Promise<void> */ = async ({src , dest}) => {
+const action  = async ({src , dest}) => {
     await fs.ensureDir(path.dirname(dest));
     console.log ("thumbnailJob");
     let resizePromise = new Promise((resolve, reject)=>{
         jimp.read(src, function (err, lenna) {
             if (err) reject(err);
             else{
-                //lenna.resize(56, 56).write(dest, (err) =>{
-
                 lenna.scaleToFit(400,400).write(dest, (err) =>{
                     if(err) reject();
                     else resolve();

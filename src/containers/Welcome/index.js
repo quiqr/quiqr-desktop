@@ -1,26 +1,22 @@
-import React from 'react';
-import { Route } from 'react-router-dom';
-import service from './../../services/service';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import React                from 'react';
+import { Route }            from 'react-router-dom';
+import { makeStyles }       from '@material-ui/core/styles';
+import Button               from '@material-ui/core/Button';
+import service              from '../../services/service';
+import SharedMaterialStyles from '../../shared-material-styles';
 
-const useStyles = makeStyles({
-    primaryButton: {
-        background: 'rgba(0,188,212,0.9)',
-        '&:hover': {
-            background: 'rgb(0,188,212)',
-            opacity: "1.0",
-        },
-    },
-    container:{
-        padding: '20px',
-        height: '100%'
-    },
-});
+const localStyles = {
+  container:{
+    padding: '20px',
+    height: '100%'
+  },
+}
+const useStyles = makeStyles({...SharedMaterialStyles, ...localStyles})
 
 class Welcome extends React.Component {
 
     constructor(props){
+      service.api.logToConsole(SharedMaterialStyles);
         super(props);
         this.state = {};
     }

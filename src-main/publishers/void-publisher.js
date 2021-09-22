@@ -1,11 +1,5 @@
-//@flow
-
-/*::
-import type { IPublisher, PublishContext } from './types';
-*/
-
-class VoidPublisher/*:: implements IPublisher*/{
-    publish(context/*: PublishContext*/)/*: Promise<void>*/{
+class VoidPublisher{
+    publish(context){
         return Promise.resolve();
     }
 }

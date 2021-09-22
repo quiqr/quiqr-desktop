@@ -32,25 +32,6 @@ PoppyGo App and the PoppyGo Platform.
 
 The website configuration files are stored in your *home/username/Sukoh* folder.
 
-### PoppyGo App Configuration File
-
-An optional configuration file can be stored in your *home/username/Sukoh*
-folder. When *config.json* is found sukoh will read the settings at startup.
-
-It looks like this:
-
-```json
-{
-  "debugEnabled": true,
-  "cookbookEnabled": true,
-  "siteManagementEnabled": true,
-  "maximizeAtStart": false,
-  "hideWindowFrame": false,
-  "hideMenuBar": false,
-  "appTheme": "simple"
-}
-```
-
 ### Workspace Configuration File
 
 All the UI configurations and bindings are set in the workspace configuration file.

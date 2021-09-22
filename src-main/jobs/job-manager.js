@@ -1,23 +1,17 @@
-/* @flow */
-
 const { BrowserWindow, ipcMain } = require('electron');
 const crypto = require("crypto");
 const BackgroundJobRunner = require('./background-job-runner');
 
 class JobsManager{
-    /*::
-        backgroundJobRunner: BackgroundJobRunner;
-        runningActions: { [key: string]: Promise<any> };
-    */
-    
+
     constructor(){
         this.backgroundJobRunner = new BackgroundJobRunner();
         this.runningActions = {};
     }
 
-    runSharedJob/*::<T>*/(key/*: string*/, job/*: ()=>Promise<T> */ )/*: Promise<any>*/{
-        let promise /*: Promise<any> */ = this.runningActions[key];
-        
+    runSharedJob(key, job ){
+        let promise  = this.runningActions[key];
+
         if(promise==null){
             promise = job();
             promise.finally(() => delete this.runningActions[key]);
@@ -27,15 +21,15 @@ class JobsManager{
     }
 
     // A single background job. Will run on its own window.
-    runBackgroundJob(key/*: string*/, resolvedPath/*: string*/, payload/*: any*/)/*: Promise<any>*/{
-        let promise /*: Promise<any> */ = this.backgroundJobRunner.run(resolvedPath, payload);
+    runBackgroundJob(key, resolvedPath, payload){
+        let promise  = this.backgroundJobRunner.run(resolvedPath, payload);
         return promise;
     }
 
-    // A job whose result can be used by many methods. 
-    runSharedBackgroundJob(key/*: string*/, resolvedPath/*: string*/, payload/*: any*/)/*: Promise<any>*/{
-        let promise /*: Promise<any> */ = this.runningActions[key];
-        
+    // A job whose result can be used by many methods.
+    runSharedBackgroundJob(key, resolvedPath, payload){
+        let promise  = this.runningActions[key];
+
         if(promise==null){
             promise = this.backgroundJobRunner.run(resolvedPath, payload);
             promise.finally(() => delete this.runningActions[key]);

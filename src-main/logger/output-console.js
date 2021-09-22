@@ -1,4 +1,4 @@
-const logWindowManager = require('./log-window-manager');
+const logWindowManager = require('../ui-managers/log-window-manager');
 
 class OutputConsole{
 

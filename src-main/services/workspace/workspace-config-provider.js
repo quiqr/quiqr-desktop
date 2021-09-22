@@ -1,35 +1,22 @@
-// @flow
-
-const fs = require('fs-extra');
-const path = require('path');
-const glob = require('glob');
-const formatProviderResolver = require('./../../format-provider-resolver');
-const WorkspaceConfigValidator = require('./workspace-config-validator');
+const fs                            = require('fs-extra');
+const path                          = require('path');
+const glob                          = require('glob');
+const { FileCacheToken }            = require('./file-cache-token');
+const WorkspaceConfigValidator      = require('./workspace-config-validator');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
-const pathHelper = require('./../../path-helper');
-const { FileCacheToken } = require('./file-cache-token');
-
-/*::
-import type { WorkspaceConfig } from './../../../global-types.js';
-*/
+const pathHelper                    = require('./../../utils/path-helper');
+const formatProviderResolver        = require('./../../utils/format-provider-resolver');
 
 class WorkspaceConfigProvider{
-
-    /*::
-    cache: { [ file: string ]: { token: FileCacheToken, config: any  } };
-    */
 
     constructor(){
         this.cache = {};
     }
 
-    async getConfig(workspacePath/*: string*/, workspaceKey/*: string*/)/*: Promise<WorkspaceConfig & { path: string, key: string }>*/{
-
-        //console.log("workspacePath:"+workspacePath);
-        //console.log("workspaceKey:"+workspaceKey);
+    async getConfig(workspacePath, workspaceKey){
 
         let filePath = this._getFilePath(workspacePath);
-        let config/*: WorkspaceConfig*/;
+        let config;
 
         if(filePath!=null){
             const cached = this.cache[filePath];
@@ -61,13 +48,13 @@ class WorkspaceConfigProvider{
         }
     }
 
-    _getFilePath(workspacePath/*: string*/){
+    _getFilePath(workspacePath){
         let fileExp = path.join(workspacePath,'sukoh.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
         return glob.sync(fileExp)[0];
     }
 
-    _buildDefaultConfig(workspacePath/*: string*/)/*: {config: WorkspaceConfig, path: string}*/{
-        let configBuilder/*: any*/ = new InitialWorkspaceConfigBuilder(workspacePath);
+    _buildDefaultConfig(workspacePath){
+        let configBuilder = new InitialWorkspaceConfigBuilder(workspacePath);
         let {data, formatProvider} = configBuilder.build();
         let filePath = path.join(workspacePath,'sukoh.'+formatProvider.defaultExt());
         fs.writeFileSync(
@@ -77,7 +64,7 @@ class WorkspaceConfigProvider{
         return { config: data, path: filePath };
     }
 
-    _loadConfigurationsData(filePath/*: string*/, workspaceKey/*: string*/)/*: WorkspaceConfig*/{
+    _loadConfigurationsData(filePath, workspaceKey){
 
         let strData = fs.readFileSync(filePath,'utf8');
         let formatProvider = formatProviderResolver.resolveForFilePath(filePath);
@@ -90,7 +77,6 @@ class WorkspaceConfigProvider{
         let result = validator.validate(returnData);
         if(result)
             throw new Error(result);
-
         return returnData;
     }
 }

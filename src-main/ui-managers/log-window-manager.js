@@ -1,12 +1,11 @@
-//@flow
+const electron                  = require('electron');
+const BrowserWindow             = electron.BrowserWindow;
+const url                       = require('url')
+const path                      = require('path')
+const fs                        = require('fs-extra')
+const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 
-const electron = require('electron');
-const BrowserWindow = electron.BrowserWindow;
-const url = require('url')
-const path = require('path')
-const fs = require('fs-extra')
-
-let logWindow/*: any*/;
+let logWindow;
 
 function showNotFound(logWindow/*: any*/, lookups/*: Array<string>*/){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -43,40 +42,27 @@ function showInvalidDevelopmentUrl(logWindow/*: any*/, url/*: ?string*/){
 
 function createWindow () {
     //  console.log(process.env)
-    const configurationDataProvider = require('./configuration-data-provider')
 
     let icon;
     if(process.env.REACT_DEV_URL)
         icon = path.normalize(__dirname + "/../public/icon.png");
-
-
-    configurationDataProvider.get(function(err, configurations){
-        if(configurations.empty===true) throw new Error('Configurations is empty.');
-
-        let showFrame=false;
-        configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
-
-        // Create the browser window.
-        logWindow = new BrowserWindow({
-            show: false,
-            webPreferences: {
-                nodeIntegration: true,
-            },
-            frame: showFrame,
-            backgroundColor:"#ffffff",
-            minWidth:1024,
-            //webPreferences:{webSecurity:false },
-            icon
-        });
-
-
-        if(configurations.global.maximizeAtStart){
-            logWindow.maximize();
-        }
-        logWindow.setMenuBarVisibility(false);
-
-        logWindow.show();
+    //
+    // Create the browser window.
+    logWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+        frame: true,
+        backgroundColor:"#ffffff",
+        minWidth:1024,
+        //webPreferences:{webSecurity:false },
+        icon
     });
+
+    logWindow.setMenuBarVisibility(false);
+
+    logWindow.show();
 
     if(process.env.REACT_DEV_URL){
 

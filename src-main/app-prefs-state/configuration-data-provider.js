@@ -1,12 +1,10 @@
-//@flow
-
-const glob = require('glob');
-const fs = require('fs-extra');
-const path = require('path');
-const pathHelper = require('./path-helper');
-const formatProviderResolver = require('./format-provider-resolver');
-const outputConsole = require('./output-console');
-const Joi = require('joi');
+const glob                   = require('glob');
+const fs                     = require('fs-extra');
+const path                   = require('path');
+const Joi                    = require('joi');
+const pathHelper             = require('../utils/path-helper');
+const formatProviderResolver = require('../utils/format-provider-resolver');
+const outputConsole          = require('../logger/output-console');
 
 let configurationCache = undefined;
 
@@ -15,8 +13,12 @@ const defaultPathSearchPattern = (pathHelper.getRoot() + 'config.{'+supportedFor
 const namespacedPathSearchPattern = (pathHelper.getRoot() + 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
 const globalConfigPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
 
-function normalizeSite(site){
-
+const GLOBAL_DEFAULTS = {
+    appTheme: "simple",
+    pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
+    //pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
+    pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
+    //pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
 }
 
 function validateSite(site) {
@@ -54,23 +56,6 @@ function validateSite(site) {
 }
 
 
-const GLOBAL_DEFAULTS = {
-    debugEnabled: false,
-    cookbookEnabled: true,
-    siteManagementEnabled: true,
-    maximizeAtStart: false,
-    hideWindowFrame: false,
-    hideMenuBar: false,
-    hideInlineMenus: true,
-    appTheme: "simple",
-
-    //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
-    pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
-
-    //pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
-    pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
-}
-
 function invalidateCache(){
     configurationCache = undefined;
 }
@@ -91,6 +76,17 @@ function get(callback, {invalidateCache} = {}){
 
     let configurations = {sites:[], global: GLOBAL_DEFAULTS};
 
+    let ownerslookupHash = {};
+    let lookuploaded = false;
+    try{
+        ownerslookUpData = fs.readFileSync(pathHelper.ownersLookupCacheFilePath(), {encoding: 'utf-8'});
+        ownerslookupHash = JSON.parse(ownerslookUpData);
+        lookuploaded = true;
+    }
+    catch(e){
+        outputConsole.appendLine(`Could not read ownerslookup}': ${e.toString()}`);
+    }
+
     for(let i = 0; i < files.length; i++){
         let file = files[i];
         if(fs.existsSync(file)){
@@ -100,10 +96,22 @@ function get(callback, {invalidateCache} = {}){
                 if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)
                 let site = formatProvider.parse(strData);
                 validateSite(site);
-                normalizeSite(site);
+                site.published = 'unknown';
+                if(lookuploaded){
+                    site.published = 'yes';
+                    site.owner = ''
+                    if(site.key in ownerslookupHash.sitesToUsers){
+                        site.owner = ownerslookupHash.sitesToUsers[site.key];
+                    }
+                    if(site.key in ownerslookupHash.sitesToUsers){
+                        site.publishKey = ownerslookupHash.sitesToPaths[site.key];
+                    }
+                    if(Array.isArray(ownerslookupHash.sitesUnpublished) && ownerslookupHash.sitesUnpublished.includes(site.key)){
+                        site.published = 'no';
+                    }
+                }
                 site.configPath = file;
                 configurations.sites.push(site);
-
             }
             catch(e){
                 outputConsole.appendLine(`Configuration file is invalid '${file}': ${e.toString()}`);
@@ -119,21 +127,8 @@ function get(callback, {invalidateCache} = {}){
             if(formatProvider==null) throw new Error(`Could not resolve a format provider for "${globalConfigFile}".`)
             let global = formatProvider.parse(strData);
             global = {
-                debugEnabled: global.debugEnabled == null ? GLOBAL_DEFAULTS.debugEnabled : global.debugEnabled===true, //default false
-                cookbookEnabled: global.cookbookEnabled == null ? GLOBAL_DEFAULTS.cookbookEnabled : global.cookbookEnabled===true, //default true
-                siteManagementEnabled: global.siteManagementEnabled == null ? GLOBAL_DEFAULTS.siteManagementEnabled : global.siteManagementEnabled===true,
-                maximizeAtStart: global.maximizeAtStart == null ? GLOBAL_DEFAULTS.maximizeAtStart : global.maximizeAtStart===true,
-                hideWindowFrame: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideWindowFrame : global.hideWindowFrame===true,
-                hideMenuBar: false,
-                //hideMenuBar: global.hideMenuBar == null ? GLOBAL_DEFAULTS.hideMenuBar : global.hideMenuBar===true,
-                hideInlineMenus: global.hideInlineMenus == null ? GLOBAL_DEFAULTS.hideInlineMenus : global.hideInlineMenus===true,
                 appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme,
-
-
             }
-
-            //settings overruled
-
 
             configurations.global = global;
         }

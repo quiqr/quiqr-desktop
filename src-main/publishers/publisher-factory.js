@@ -1,23 +1,11 @@
-//@flow
-
-/*::
-
-    import type { IPublisher } from './types';
-    import type { PublisherConfig } from './../types';
-
-    interface IPublisherConfig {
-        +provider: string;
-    };
-*/
-
-const outputConsole = require('./../output-console');
+const outputConsole = require('./../logger/output-console');
 
 //Not a real factory, yet!
 class PublisherFactory{
-    getPublisher(publisherConfig/*: PublisherConfig<*>*/) /*: IPublisher*/{
+    getPublisher(publisherConfig) {
         let type = publisherConfig.type;
         console.log(publisherConfig);
-        let genericPublisherConfig = (publisherConfig/*: any*/);
+        let genericPublisherConfig = (publisherConfig);
 
         outputConsole.appendLine(' about to start publisher with type: ' + type )
 

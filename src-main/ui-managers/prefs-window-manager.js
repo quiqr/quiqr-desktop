@@ -1,14 +1,12 @@
-//@flow
-
-const electron = require('electron');
+const electron      = require('electron');
 const BrowserWindow = electron.BrowserWindow;
-const url = require('url')
-const path = require('path')
-const fs = require('fs-extra')
+const url           = require('url')
+const path          = require('path')
+const fs            = require('fs-extra')
 
-let prefsWindow/*: any*/;
+let prefsWindow;
 
-function showNotFound(prefsWindow/*: any*/, lookups/*: Array<string>*/){
+function showNotFound(prefsWindow, lookups){
     let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
     prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
@@ -20,7 +18,7 @@ function showNotFound(prefsWindow/*: any*/, lookups/*: Array<string>*/){
 </html>`));
 }
 
-function showLookingForServer(prefsWindow/*: any*/, port/*: string*/){
+function showLookingForServer(prefsWindow, port){
     prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Waiting for Development Server</h1>
@@ -30,7 +28,7 @@ function showLookingForServer(prefsWindow/*: any*/, port/*: string*/){
 </html>`));
 }
 
-function showInvalidDevelopmentUrl(prefsWindow/*: any*/, url/*: ?string*/){
+function showInvalidDevelopmentUrl(prefsWindow, url){
     prefsWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
 <body style="font-family: sans-serif; padding: 2em">
 <h1>Invalid Development Server URL</h1>
@@ -41,41 +39,24 @@ function showInvalidDevelopmentUrl(prefsWindow/*: any*/, url/*: ?string*/){
 }
 
 function createWindow () {
-    const configurationDataProvider = require('./configuration-data-provider')
 
     let icon;
     if(process.env.REACT_DEV_URL)
         icon = path.normalize(__dirname + "/../public/icon.png");
 
-
-    configurationDataProvider.get(function(err, configurations){
-      if(configurations.empty===true) throw new Error('Configurations is empty.');
-
-      let showFrame=false;
-      configurations.global.hideWindowFrame ? showFrame = false : showFrame = true;
-
-      // Create the browser window.
-      prefsWindow = new BrowserWindow({
-          show: false,
-          webPreferences: {
-              nodeIntegration: true,
-          },
-          frame: showFrame,
-          backgroundColor:"#ffffff",
-        //minWidth:1024,
-        //webPreferences:{webSecurity:false },
+    // Create the browser window.
+    prefsWindow = new BrowserWindow({
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+        frame: true,
+        backgroundColor:"#ffffff",
         icon
-      });
-
-      if(configurations.global.maximizeAtStart){
-        prefsWindow.maximize();
-      }
-
-      prefsWindow.setMenuBarVisibility(false);
-
-
-      prefsWindow.show();
     });
+
+    prefsWindow.setMenuBarVisibility(false);
+    prefsWindow.show();
 
     if(process.env.REACT_DEV_URL){
 
