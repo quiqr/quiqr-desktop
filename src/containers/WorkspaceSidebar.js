@@ -58,6 +58,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     service.api.getPogoConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
       this.setState({devDisableAutoHugoServe: devDisableAutoHugoServe });
     });
+    service.api.getPogoConfKey('devShowCurrentUser').then((value)=>{
+      this.setState({devShowCurrentUser: value });
+    });
 
   }
 
@@ -217,6 +220,13 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     let devSets = [];
 
+    if(this.state.devShowCurrentUser){
+      let username=this.props.poppygoUsername;
+      devSets.push(
+        <Chip label={username} color="secondary" size="small" />
+      )
+    }
+
     if(this.state.devLocalApi){
       devSets.push(
         <Chip label="Local API" color="secondary" size="small" />
@@ -369,6 +379,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
         <WorkspaceWidget
         siteConfig={this.state.site}
         workspaceConfig={this.state.workspace}
+        poppygoUsername={this.props.poppygoUsername}
         onClick={()=>{
           if(this.state.error!=null){
             history.push('/');

@@ -909,6 +909,23 @@ resources: []\n\
     });
   }
 
+  toggleDevShowCurrentUser(){
+
+    if(global.pogoconf.devShowCurrentUser){
+      global.pogoconf.setDevShowCurrentUser(false);
+    }
+    else{
+      global.pogoconf.setDevShowCurrentUser(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      mainWindow.webContents.send("updateBadges");
+      this.createMainMenu();
+    });
+  }
+
+
   toggleDevDisableAutoHugoServe(){
 
     if(global.pogoconf.devDisableAutoHugoServe){
@@ -986,6 +1003,14 @@ resources: []\n\
         }
       },
       { role: 'toggledevtools' },
+      {
+        label: 'Show current User',
+        type: "checkbox",
+        checked: global.pogoconf.devShowCurrentUser,
+        click: async () => {
+          this.toggleDevShowCurrentUser()
+        }
+      },
       {
         label: 'Use local api servers',
         type: "checkbox",

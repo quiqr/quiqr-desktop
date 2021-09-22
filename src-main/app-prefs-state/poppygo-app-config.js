@@ -60,6 +60,10 @@ module.exports = function (options) {
   function setDevDisableAutoHugoServe(toggle){
     state.devDisableAutoHugoServe = toggle;
   }
+  /* toggle: bool */
+  function setDevShowCurrentUser(toggle){
+    state.devShowCurrentUser = toggle;
+  }
 
   /* view: string (all, mylocal, myremote)  */
   function setSitesListingView(view){
@@ -92,6 +96,7 @@ module.exports = function (options) {
     experimentalFeatures: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
+    devShowCurrentUser: false,
     sitesListingView: 'all',
     currentUsername: null,
   }, state);
@@ -103,6 +108,7 @@ module.exports = function (options) {
     get experimentalFeatures() { return state.experimentalFeatures; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
+    get devShowCurrentUser() { return state.devShowCurrentUser; },
     get sitesListingView() {
       return state.sitesListingView;
     },
@@ -112,6 +118,7 @@ module.exports = function (options) {
     setExperimentalFeatures,
     setDevLocalApi,
     setDevDisableAutoHugoServe,
+    setDevShowCurrentUser,
     setSitesListingView,
     saveState,
     resetStateToDefault
