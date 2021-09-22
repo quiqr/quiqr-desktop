@@ -176,7 +176,7 @@ api.getCurrentSiteKey = async function(){
 //TODO test again and use confkey
 api.getPogoConfKey = async function({confkey},context){
   try{
-    context.resolve(global.pogoconf.sitesListingView);
+    context.resolve(global.pogoconf[confkey]);
   }
   catch(err){
     context.reject(err);
@@ -270,7 +270,6 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
     if(!workspaceService){ return; }
 
-    console.log("serve:"+serveKey);
     workspaceService.serve(serveKey).then(()=>{
       context.resolve();
     }, ()=>{

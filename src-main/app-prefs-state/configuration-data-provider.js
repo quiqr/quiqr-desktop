@@ -5,6 +5,9 @@ const Joi                    = require('joi');
 const pathHelper             = require('../utils/path-helper');
 const formatProviderResolver = require('../utils/format-provider-resolver');
 const outputConsole          = require('../logger/output-console');
+const PoppyGoAppConfig       = require('./poppygo-app-config');
+
+const pogoconf = PoppyGoAppConfig();
 
 let configurationCache = undefined;
 
@@ -13,13 +16,20 @@ const defaultPathSearchPattern = (pathHelper.getRoot() + 'config.{'+supportedFor
 const namespacedPathSearchPattern = (pathHelper.getRoot() + 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
 const globalConfigPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
 
+let pogoboardConn, pogostripeConn;
+
+if(pogoconf.devLocalApi){
+  pogoboardConn = {host:"localhost",port:9999, protocol: "http:"};
+  pogostripeConn = {host:"localhost",port:4242, protocol: "http:"};
+}else{
+  pogoboardConn = {host:"board.poppygo.io",port:443, protocol: "https:"};
+  pogostripeConn = {host:"payments.poppygo.io",port:443, protocol: "https:"};
+}
+
 const GLOBAL_DEFAULTS = {
   appTheme: "simple",
-
-  //pogoboardConn: {host:"localhost",port:9999, protocol: "http:"},
-  pogoboardConn: {host:"board.poppygo.io",port:443, protocol: "https:"},
-  //pogostripeConn: {host:"localhost",port:4242, protocol: "http:"},
-  pogostripeConn: {host:"payments.poppygo.io",port:443, protocol: "https:"},
+  pogostripeConn: pogostripeConn,
+  pogoboardConn: pogoboardConn
 }
 
 function validateSite(site) {

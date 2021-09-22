@@ -141,8 +141,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
     service.api.listWorkspaces(site.key).then((workspaces)=>{
 
-      service.api.logToConsole(workspaces[0]);
-
       this.setState({selectedSiteWorkspaces: workspaces});
       if(workspaces.length === 1){
         this.selectWorkspace(site.key, workspaces[0]);

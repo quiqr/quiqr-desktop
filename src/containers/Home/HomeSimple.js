@@ -161,9 +161,11 @@ class Home extends React.Component<HomeProps, HomeState>{
     if(siteKey && workspaceKey){
 
       if(this.state.currentSiteKey !== siteKey){
-
-        //TODO Make dev TOGGLE
-        service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace");
+        service.api.getPogoConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
+          if(!devDisableAutoHugoServe){
+            service.api.serveWorkspace(siteKey, workspaceKey, "Start Hugo from Home");
+          }
+        });
       }
 
       this.setState({currentSiteKey: siteKey});
@@ -422,6 +424,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       this.state.pogostripeConn.host+":"+
       this.state.pogostripeConn.port+"/myaccount-status/"+requestVars;
 
+    service.api.logToConsole(url);
     let data='';
 
     try {

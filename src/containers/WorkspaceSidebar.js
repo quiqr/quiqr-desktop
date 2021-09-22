@@ -1,14 +1,15 @@
-import React from 'react';
-import { Route } from 'react-router-dom'
-import { List, ListItem } from 'material-ui-02/List';
-import { Divider, Toggle } from 'material-ui-02';
-import IconActionSetting from 'material-ui-02/svg-icons/action/settings';
-import IconOpenBrowser from 'material-ui-02/svg-icons/action/open-in-browser';
-import IconHome from 'material-ui-02/svg-icons/action/home';
-import IconPhone from 'material-ui-02/svg-icons/hardware/smartphone';
-import service from './../services/service'
+import React                                from 'react';
+import { Route }                            from 'react-router-dom'
+import { List, ListItem }                   from 'material-ui-02/List';
+import { Divider, Toggle }                  from 'material-ui-02';
+import IconActionSetting                    from 'material-ui-02/svg-icons/action/settings';
+import IconOpenBrowser                      from 'material-ui-02/svg-icons/action/open-in-browser';
+import IconHome                             from 'material-ui-02/svg-icons/action/home';
+import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
+import Chip                                 from '@material-ui/core/Chip';
+import service                              from './../services/service'
 import type { SiteConfig, WorkspaceConfig } from './../types'
-import * as Sidebar from './Sidebar';
+import * as Sidebar                         from './Sidebar';
 
 const translucentColor = 'RGBA(255,255,255,.8)';
 
@@ -23,6 +24,8 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
   constructor(props : WorkspaceWidgetProps){
     super(props);
     this.state = {
+      devDisableAutoHugoServe: false,
+      devLocalApi: false,
       hugoRunning: false
     };
   }
@@ -31,9 +34,16 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     this._ismounted = true;
   }
   componentWillMount(){
+
+    this.updateBadges();
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showEmpty: true});
     });
+
+    window.require('electron').ipcRenderer.on('updateBadges', ()=>{
+      this.updateBadges();
+    });
+
     window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
     window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
     window.require('electron').ipcRenderer.on('disableMobilePreview', this.disableMobilePreview.bind(this));
@@ -41,11 +51,22 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     window.require('electron').ipcRenderer.on('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
   }
 
+  updateBadges(){
+    service.api.getPogoConfKey('devLocalApi').then((devLocalApi)=>{
+      this.setState({devLocalApi: devLocalApi });
+    });
+    service.api.getPogoConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
+      this.setState({devDisableAutoHugoServe: devDisableAutoHugoServe });
+    });
+
+  }
+
   componentWillUnmount(){
     window.require('electron').ipcRenderer.removeListener('serverLive', this.activatePreview.bind(this));
     window.require('electron').ipcRenderer.removeListener('serverDown', this.disablePreview.bind(this));
     window.require('electron').ipcRenderer.removeListener('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
     window.require('electron').ipcRenderer.removeListener('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
+    window.require('electron').ipcRenderer.removeAllListeners('updateBadges');
     this._ismounted = false;
   }
 
@@ -55,11 +76,14 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       workspaceConfig,
     } = this.props;
 
-    if(!this.state.hugoRunning){
-      service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "instantly serve at selectWorkspace");
+    if(!this.state.hugoRunning && !this.state.devDisableAutoHugoServe){
+      service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "Start HUGO from Sidebar");
     }
     window.require('electron').shell.openExternal('http://localhost:13131');
   }
+
+
+
 
   toggleMobilePreview(){
     if(this.state.mobilePreviewActive){
@@ -176,9 +200,8 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
         <ListItem
         secondaryText={'Select site'}
         onClick={onClick}
-        rightIcon={<IconActionSetting color={translucentColor} />}
-      />
-        </List>
+        rightIcon={<IconActionSetting color={translucentColor} />} />
+    </List>
     )
   }
 
@@ -190,6 +213,32 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     )
   }
 
+  renderPartialDevInfo(){
+
+    let devSets = [];
+
+    if(this.state.devLocalApi){
+      devSets.push(
+        <Chip label="Local API" color="secondary" size="small" />
+      )
+    }
+    if(this.state.devDisableAutoHugoServe){
+      devSets.push(
+        <Chip label="Disable Hugo Serve" color="secondary" size="small" />
+      )
+    }
+
+    if(devSets.length > 0){
+      return (
+        <div>
+          {devSets}
+        </div>
+      )
+    }
+
+    return (null)
+  }
+
   render(){
     let {
       siteConfig,
@@ -197,13 +246,28 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     } = this.props;
 
     if(this.state.showEmpty){
-      return this.renderEmpty();
+      return (
+        <React.Fragment>
+          {this.renderPartialDevInfo()}
+          {this.renderEmpty()}
+        </React.Fragment>
+      )
     }
     else if(siteConfig!=null && workspaceConfig!=null){
-      return this.renderSiteMounted();
+      return (
+        <React.Fragment>
+          {this.renderPartialDevInfo()}
+          { this.renderSiteMounted()}
+        </React.Fragment>
+      )
     }
     else{
-      return this.renderSelectSite();
+      return (
+        <React.Fragment>
+          {this.renderPartialDevInfo()}
+          {this.renderSelectSite()}
+        </React.Fragment>
+      )
     }
   }
 }

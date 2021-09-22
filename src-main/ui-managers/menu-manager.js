@@ -51,7 +51,6 @@ class MenuManager {
 
   }
   startServer() {
-    console.log(global.hugoServer);
     if(global.hugoServer){
       global.hugoServer.serve((err, stdout, stderr) => {
         if(err){
@@ -364,7 +363,6 @@ resources: []\n\
             type: 'input'
           }, mainWindow);
 
-          console.log(newName);
           if(!newName || newName===""){
             return;
           }
@@ -433,7 +431,6 @@ resources: []\n\
 
       var rimraf = require("rimraf");
       rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, ()=>{
-        //console.log("rm done");
       });
 
       this.selectSitesWindow();
@@ -527,7 +524,6 @@ resources: []\n\
 
   siteSelected(){
     if(global.currentSiteKey && global.currentSiteKey !== ""){
-      console.log(global.currentSiteKey);
       return true;
     }
     else{
@@ -549,7 +545,6 @@ resources: []\n\
         let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
         if(siteData.hasOwnProperty("publish") && siteData.publish[0].hasOwnProperty("config") && siteData.publish[0].config.hasOwnProperty("path")){
           if(this.userIsOwner(global.currentSiteKey, this.profileUserName)){
-            console.log('jajhh')
             return true;
           }
         }
@@ -817,7 +812,6 @@ resources: []\n\
 
         if(siteData=siteService = new SiteService(siteData)){
           let newConf = siteService._config;
-          console.log(newConf);
 
           let currentPath = "";
           if(newConf.hasOwnProperty("publish") && newConf.publish[0].hasOwnProperty("config") &&  newConf.publish[0].config.hasOwnProperty("path")){
@@ -881,8 +875,59 @@ resources: []\n\
     global.pogoconf.saveState().then(()=>{
       this.createMainMenu();
     });
-
   }
+
+  toggleLocalApiServers(){
+
+    if(global.pogoconf.devLocalApi){
+      global.pogoconf.setDevLocalApi(false);
+    }
+    else{
+      global.pogoconf.setDevLocalApi(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      mainWindow.webContents.send("updateBadges");
+
+      const dialog = electron.dialog;
+
+      const options = {
+        type: 'info',
+        buttons: ['OK'],
+        defaultId: 1,
+        title: 'Restart to use new settings',
+        message: 'Restart to use new settings',
+        detail: 'You should restart PoppyGo to make changes effective.',
+      };
+
+      dialog.showMessageBox(null, options, async (response) => {
+      });
+
+
+      this.createMainMenu();
+    });
+  }
+
+  toggleDevDisableAutoHugoServe(){
+
+    if(global.pogoconf.devDisableAutoHugoServe){
+      global.pogoconf.setDevDisableAutoHugoServe(false);
+    }
+    else{
+      global.pogoconf.setDevDisableAutoHugoServe(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      mainWindow.webContents.send("updateBadges");
+      this.createMainMenu();
+    });
+  }
+
+
+
+
   createExperimentalMenu(){
     let expMenu = [
       {
@@ -901,7 +946,6 @@ resources: []\n\
             cloudGitManager.pullFastForwardMerge(siteData).then((status)=>{
               if(status === "non_fast_forward"){
                 const dialog = electron.dialog;
-
                 const options = {
                   type: 'warning',
                   buttons: [ 'CLOSE'],
@@ -942,6 +986,23 @@ resources: []\n\
         }
       },
       { role: 'toggledevtools' },
+      {
+        label: 'Use local api servers',
+        type: "checkbox",
+        checked: global.pogoconf.devLocalApi,
+        click: async () => {
+          this.toggleLocalApiServers()
+        }
+      },
+      {
+        label: 'Disable Auto Hugo Serve',
+        type: "checkbox",
+        checked: global.pogoconf.devDisableAutoHugoServe,
+        click: async () => {
+          this.toggleDevDisableAutoHugoServe()
+        }
+      },
+
       {
         label: 'Stripe Customer Portal',
         click: async () => {
