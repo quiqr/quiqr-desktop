@@ -19,8 +19,8 @@ export class API {
     return mainProcessBridge.request('serveWorkspace', {siteKey, workspaceKey, serveKey});
   }
 
-  logToConsole( message: string){
-    return mainProcessBridge.request('logToConsole', {message});
+  logToConsole( message, label){
+    return mainProcessBridge.request('logToConsole', {message, label});
   }
 
   getDynFormFields(searchFormObjectFile: string, searchRootNode: string, searchLevelKeyVal: any){

@@ -3,6 +3,7 @@ const {dirname}                 = require('path');
 const path                      = require('path');
 const glob                      = require('glob');
 const {shell}                   = require('electron');
+const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
 const WorkspaceService          = require('../services/workspace/workspace-service')
@@ -244,9 +245,17 @@ api.updateMobilePreviewUrl = function({url}, context){
     global.mainWM.setMobilePreviewUrl(url);
   });
 }
-api.logToConsole = function({message}, context){
-  console.log(message);
+
+api.logToConsole = function({message, label}, context){
+
+  if(label){
+    console.log("\b--- " + label.toUpperCase() + " --> ");
+  }
+  else{
+  }
+  console.log(util.inspect(message, false, null, true));
 }
+
 
 api.importSiteAction = function(context){
   return new Promise((resolve, reject)=>{

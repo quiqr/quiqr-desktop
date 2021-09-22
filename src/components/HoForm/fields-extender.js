@@ -1,5 +1,3 @@
-//@flow
-
 import { ComponentRegistry } from './component-registry';
 
 export class FieldsExtender{
@@ -21,6 +19,5 @@ export class FieldsExtender{
             let component = this.componentRegistry.getProplessInstance(field.type);
             component.extendField(field, this);
         }
-        //console.log(fields);
     }
 }
