@@ -14,6 +14,7 @@ class RemoteSiteDialog extends React.Component{
 
   constructor(props){
     super(props);
+
     this.state = {
       remoteSiteName: "",
       execButtonsDisabled: true,
@@ -41,16 +42,21 @@ class RemoteSiteDialog extends React.Component{
   }
 
   componentDidUpdate(){
-    if(this.props.remoteSiteName !== this.state.remoteSiteName && this.props.remoteSiteName){
+
+    if(this.props.open !== this.state.open && this.props.remoteSiteName){
+
       let siteName = this.props.remoteSiteName.split("/").pop();
       this.validateSiteName(siteName);
       this.setState({
         remoteSiteName: this.props.remoteSiteName,
         newSiteName: siteName,
         busy: false,
+        open: this.props.open,
         cancelText: "cancel",
         downloading: false,
         finished: false,
+        failure: false,
+
       });
     }
   }
@@ -102,7 +108,7 @@ class RemoteSiteDialog extends React.Component{
         downloading: false,
         failure: true,
       });
-      service.api.logToConsole("error cloning");
+      service.api.logToConsole("FE: error cloning");
     }
   }
 
@@ -132,12 +138,16 @@ class RemoteSiteDialog extends React.Component{
         cancelText: "Close",
         failure: true,
       });
-      service.api.logToConsole("error cloning");
+      service.api.logToConsole("FE: error cloning unmanaged");
     }
   }
 
   async handleOpenNewSite(){
-    this.props.mountSite(this.state.newSiteKey)
+    this.setState({
+      open: false
+    },()=>{
+      this.props.mountSite(this.state.newSiteKey)
+    });
   }
 
   renderForm(){
@@ -198,17 +208,23 @@ class RemoteSiteDialog extends React.Component{
     let failure = this.state.failure;
 
     const actions = [
-      <Button className={classes.primaryFlatButton} onClick={this.props.onCancelClick}>
-        {this.state.cancelText}
+      <Button className={classes.primaryFlatButton} onClick={()=>{
+        this.setState({
+          open: false
+        },()=>{
+          this.props.onCancelClick();
+        });
+      }}>
+      {this.state.cancelText}
       </Button>,
 
       <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >
         CHECKOUT AS WORKING COPY
-      </Button>,
+        </Button>,
 
       <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadCopy()} >
         COPY AS NEW SITE
-      </Button>,
+        </Button>,
     ];
 
     return (

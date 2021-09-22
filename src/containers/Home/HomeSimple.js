@@ -202,7 +202,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   handlePublishNow(pressed){
 
-    if(this.state.pogoSiteStatus === "noAccess"){
+    if(this.state.pogoSiteStatus === "noAccess"|| this.state.username === ""){
       snackMessageService.addSnackMessage("You're not allowed to publish to this pogocloud-path");
       return;
     }
@@ -798,7 +798,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   renderActionPanel(){
-    if(this.checkLinkedPogoCloudPath() && this.state.pogoSiteStatus !== ""){
+    if(this.state.pogoUserRole === "owner" && this.checkLinkedPogoCloudPath() && this.state.pogoSiteStatus !== ""){
 
       if(this.state.pogoSiteStatus === "no_plan"){
         return this.renderActionUpgadePanel();
@@ -960,7 +960,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   renderPublishButton(){
-    if(this.state.pogoSiteStatus !== "noAccess"){
+    if(this.state.pogoSiteStatus !== "noAccess" && this.state.username !== ""){
       return (
         <div style={Object.assign({position : 'relative',padding: "0px 16px 16px 30px", width:'100%', display:'flex'})}>
           <RaisedButton primary={true} label="Publish" onClick={()=>{ this.handlePublishNow(true) }} />
@@ -974,7 +974,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   renderPogoCloudPathInfo(){
 
-    if(this.state.pogoSiteStatus === "noAccess"){
+    if( this.state.pogoSiteStatus === "noAccess" || this.state.username === "" ){
     return(
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"110%"}}>
@@ -992,7 +992,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       }
 
       let editPlanButton = ""
-      if(this.state.pogoSiteStatus === "active"){
+      if(this.state.pogoSiteStatus === "active" && this.state.pogoUserRole === "owner"){
         editPlanButton = <span style={{marginLeft:"50px"}}><button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button></span>
       }
 
@@ -1061,6 +1061,29 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
   }
 
+  renderPogoSiteActionsAndInfo(){
+
+    if(this.state.pogoSiteStatus !== ""){
+      return(
+        <div>
+          <div style={{padding: "0px 16px"}}>
+            <List>
+              {this.renderUserInfoActions()}
+              {this.renderPogoCloudPathInfo()}
+              {this.renderPublishInfo()}
+            </List>
+          </div>
+
+          {this.renderPublishButton()}
+
+          { this.renderNotificationPanel() }
+
+        </div>
+      )
+
+    }
+  }
+
   render(){
 
     let { configurations } = this.state;
@@ -1084,17 +1107,7 @@ class Home extends React.Component<HomeProps, HomeState>{
                   <h2 style={{padding:0, margin:0}}>{this.state.selectedSite.name}</h2>
                 </InfoLine>
 
-                <div style={{padding: "0px 16px"}}>
-                  <List>
-                    {this.renderUserInfoActions()}
-                    {this.renderPogoCloudPathInfo()}
-                    {this.renderPublishInfo()}
-                  </List>
-                </div>
-
-                {this.renderPublishButton()}
-
-                { this.renderNotificationPanel() }
+                { this.renderPogoSiteActionsAndInfo() }
                 { this.renderActionPanel() }
 
                 <div className="markdown" style={ styles.creatorMessage } dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}} />
