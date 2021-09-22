@@ -161,7 +161,9 @@ class Home extends React.Component<HomeProps, HomeState>{
     if(siteKey && workspaceKey){
 
       if(this.state.currentSiteKey !== siteKey){
-        service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"/*serveKey*/);
+
+        //TODO Make dev TOGGLE
+        //service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"[>serveKey<]);
       }
 
       this.setState({currentSiteKey: siteKey});
@@ -469,8 +471,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     let projectPath = this.state.selectedSite.publish[0].config.path;
     let url = "http://"+this.state.pogoCustomDomain+"/.pogo_with_me"
 
-    service.api.logToConsole(url);
-
     let data='';
     const request = net.request(url);
 
@@ -489,7 +489,6 @@ class Home extends React.Component<HomeProps, HomeState>{
         let obj = JSON.parse(data);
 
         if (obj.path === projectPath){
-          service.api.logToConsole( obj);
           this.setState({oneTimeOnlyPublishFinished: true});
           this.setState({pogoCustomDomainDNSStatus:"reachable"});
         }
@@ -521,7 +520,6 @@ class Home extends React.Component<HomeProps, HomeState>{
     let projectPath = this.state.selectedSite.publish[0].config.path;
     let url = "http://"+projectPath+".pogosite.com/.pogo_with_me"
 
-    service.api.logToConsole(url);
 
 
     try {
@@ -535,7 +533,6 @@ class Home extends React.Component<HomeProps, HomeState>{
           service.api.setPublishStatus(1)
 
           if (obj.path === projectPath){
-            service.api.logToConsole( obj);
             this.setState({oneTimeOnlyPublishFinished: true});
           }
           else{
@@ -564,7 +561,13 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     service.api.logToConsole("getRemoteSiteStatus")
-    if(this.state.fingerprint ==="" || !this.checkLinkedPogoCloudPath()){
+
+
+    if(!this.checkLinkedPogoCloudPath()){
+      this.setState({
+        pogoSiteStatus: "no_pogocloud"
+      })
+
       return
     }
 
@@ -574,12 +577,9 @@ class Home extends React.Component<HomeProps, HomeState>{
       projectPath:  this.state.selectedSite.publish[0].config.path,
     };
 
-    service.api.logToConsole(userVars);
-
     let requestVars = btoa(JSON.stringify(userVars));
 
     let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+ this.state.pogostripeConn.port+"/project-status/"+requestVars;
-    service.api.logToConsole(url)
 
     let data='';
 
@@ -597,7 +597,6 @@ class Home extends React.Component<HomeProps, HomeState>{
           else{
             let obj = JSON.parse(data);
 
-            service.api.logToConsole(obj);
             let custom_domain = "not set"
             let defaultDomain = `${this.getPogoCloudPath()}.pogosite.com`;
             if (obj.hasOwnProperty('pogo_custom_domain')){
@@ -613,13 +612,13 @@ class Home extends React.Component<HomeProps, HomeState>{
               defaultDomain:    defaultDomain,
             },function(){
 
+
               if(this.state.pogoSiteStatus === "active"){
                 if(celebrate) this.setState({oneTimeOnlySiteActive: true});
                 this.getRemoteDomainVerification(false);
 
               }
               else if (this.state.pogoSiteStatus === 'pending_subscription'){
-
                 this.startPendingUpgradePolling(true);
               }
 
@@ -665,7 +664,6 @@ class Home extends React.Component<HomeProps, HomeState>{
   handleUpgradeLinkedSite(pressed){
 
     let site = this.state.selectedSite;
-    service.api.logToConsole(site);
 
     if(this.state.pogoAccountStatus === "unconfirmed_member"){
       snackMessageService.addSnackMessage('You need to confirm your email. Please check your mail.');
@@ -974,14 +972,22 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   renderPogoCloudPathInfo(){
 
-    if( this.state.pogoSiteStatus === "noAccess" || this.state.username === "" ){
-    return(
+   if(this.state.pogoSiteStatus === "no_pogocloud"){
+      return  (
+        <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
+          <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {this.state.selectedSite.name} </span>
+          &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
+        </ListItem>
+      )
+    }
+    else if( this.state.pogoSiteStatus === "noAccess" || this.state.username === "" ){
+      return(
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"110%"}}>
-          You are allowed to publish to this site in the pogocloud.
-        </span>
+            You are now allowed to publish to this site in the pogocloud.
+          </span>
 
-      </ListItem>
+        </ListItem>
       )
     }
     else if(this.checkLinkedPogoCloudPath()){
@@ -1021,13 +1027,17 @@ class Home extends React.Component<HomeProps, HomeState>{
       </ListItem>
       )
     }
+
     else{
+      return (null);
+      /*
       return  (
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {this.state.selectedSite.name} </span>
           &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
         </ListItem>
       )
+      */
     }
   }
 
