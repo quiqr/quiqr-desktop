@@ -163,7 +163,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       if(this.state.currentSiteKey !== siteKey){
 
         //TODO Make dev TOGGLE
-        //service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"[>serveKey<]);
+        service.api.serveWorkspace(siteKey, workspaceKey, "instantly serve at selectWorkspace"[>serveKey<]);
       }
 
       this.setState({currentSiteKey: siteKey});
