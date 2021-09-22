@@ -147,6 +147,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     if(!Array.isArray(context.value)){
       context.value = [];
     }
+
     context.value.map( async (item: any, childIndex: number)=>{
       let componentKey = `item-${childIndex}`;
 
@@ -165,7 +166,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         let searchVal = item[searchKey];
         let dynSearchKeyVal = { key: searchKey, val: searchVal }
 
-        await service.api.getDynFormFields( dynFormObjectFile, dynFormObjectRoot, dynSearchKeyVal).then(function(extraFields){
+        await service.api.getDynFormFields( dynFormObjectFile, dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
           if (typeof extraFields !== 'undefined') {
 
             extraFields.fields.forEach(function(extrField){
@@ -187,14 +188,18 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
               }
             });
 
-
-            dynFields[componentKey] = cleanedFieldFields.concat(extraFields.fields);
+            //service.api.logToConsole(componentKey, "working in MAP");
+            let newFields = cleanedFieldFields.concat(extraFields.fields);
+            //service.api.logToConsole(newFields, "working in MAP fields");
+            dynFields[componentKey] = newFields;
+            this.setState({["dyn-"+componentKey]: newFields});
           }
         });
       }
 
     });
-    this.setState({dynFields: dynFields, dynFieldsEmpty: dynFieldsEmpty});
+    this.setState({ dynFieldsEmpty: dynFieldsEmpty});
+    this.setState({ dynFields: dynFields });
   }
 
   renderComponent(){
@@ -221,11 +226,18 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     }
 
     if(currentPath===context.nodePath){
+
+      service.api.logToConsole(currentPath,"komen we hier wel");
+      service.api.logToConsole(context.nodePath,"startswith");
       let { dragToIndex, dragFromIndex } = this.state;
 
       let renderItem = (componentKey: string, item: any, childIndex: number, isDragging: bool = false)=>{
 
         if(this.state.dynFieldsEmpty.length > 0){
+//          if(Object.keys(this.state).includes("dyn-"+componentKey)){
+            //service.api.logToConsole( "assing synfields");
+            //field.fields = this.state["dyn-"+componentKey];
+//          }
           if(componentKey in this.state.dynFields){
             field.fields = this.state.dynFields[componentKey];
           }
@@ -324,9 +336,12 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     }
 
     if(currentPath.startsWith(context.nodePath)){
+      service.api.logToConsole(currentPath,"nope we komen hier");
+      service.api.logToConsole(context.nodePath,"startswith");
 
       let matchedNode = context.findPreviousNodeInCurrentNodeTree(node);
       if(matchedNode==null||matchedNode.uiState==null||matchedNode.uiState.childIndex==null){
+        service.api.logToConsole(context.nodePath,"error");
         throw new Error('Unexpected state.');
       }
       let childIndex = matchedNode.uiState.childIndex;
@@ -338,6 +353,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       }));
 
     }
+    service.api.logToConsole(context.nodePath,"could not find");
 
     return (null);
   }
