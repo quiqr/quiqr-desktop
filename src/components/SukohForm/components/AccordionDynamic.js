@@ -214,149 +214,197 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
     if(currentPath===context.parentPath){
 
-      return (<List style={{marginBottom:16, padding: 0}}><ListItem
-      style={{ border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
-      onClick={ function(){ context.setPath(node) } }
-      leftIcon={<IconFileFolder />}
-      rightIcon={<IconChevronRight />}
-      primaryText={field.title}
-      secondaryText={context.value.length +' items'}
-    /></List>
-      );
-    }
+      return this.renderUnOpened(field.title, context, node);
 
-    if(currentPath===context.nodePath){
+    } else if(currentPath===context.nodePath){
+      service.api.logToConsole(currentPath,"ACCORDION IT SELF");
 
-      service.api.logToConsole(currentPath,"komen we hier wel");
-      service.api.logToConsole(context.nodePath,"startswith");
-      let { dragToIndex, dragFromIndex } = this.state;
+      return this.renderAccordion(field, context, currentPath, node);
 
-      let renderItem = (componentKey: string, item: any, childIndex: number, isDragging: bool = false)=>{
+    } else if(currentPath.startsWith(context.nodePath)){
 
-        if(this.state.dynFieldsEmpty.length > 0){
-//          if(Object.keys(this.state).includes("dyn-"+componentKey)){
-            //service.api.logToConsole( "assing synfields");
-            //field.fields = this.state["dyn-"+componentKey];
-//          }
-          if(componentKey in this.state.dynFields){
-            field.fields = this.state.dynFields[componentKey];
-          }
-          else{
-            field.fields = this.state.dynFieldsEmpty;
-          }
-        }
-
-        let label = 'Untitled';
-
-        let newNode = {
-          field,
-          state: context.value[childIndex],
-          uiState:{childIndex},
-          parent: node
-        };
-
-        let arrayTitle = field.fields.find((x)=>x.arrayTitle===true);
-        if(arrayTitle && newNode.state[arrayTitle.key]){
-          label = newNode.state[arrayTitle.key];
-        }
-
-        let headStyle = {
-          backgroundColor: '#eee',
-        }
-        if(isDragging){
-          headStyle = {
-            backgroundColor: "#e2e2e2",
-          };
-        }
-
-        return (
-          <AccordionItem key={componentKey}
-          label={label}
-          headStyle={headStyle}
-          bodyStyle={{padding:'16px 16px 0px 16px'}}
-          body={ context.renderLevel(newNode) }
-          wrapperProps={{
-            onMouseEnter: this.getOnItemMouseEnter(childIndex)
-          }}
-          headerRightItems={[
-            <FlatButton
-            onClick={(e)=>{e.stopPropagation()}}
-            onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
-            style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
-            <DangerButton
-            onClick={(e, loaded)=>{
-              e.stopPropagation();
-              if(loaded){
-                this.removeItemAtIndex(childIndex)
-              }
-            }}
-            loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
-            button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
-          />
-          ]}
-          />
-        );
-      };
-
-      return (<Fragment>
-        <Accordion index={this.state.index} onChange={(index)=>{
-          this.setState({index:this.state.index===index?-1:index});
-        }}>
-        {context.value.map((item: any, childIndex: number)=>{
-
-          let componentKey = `item-${childIndex}`;
-          if(childIndex===dragFromIndex){
-            return renderItem(componentKey, item, childIndex, true);
-          }
-
-          if(childIndex===dragToIndex&&dragFromIndex!=null&&dragToIndex!=null){
-            let movedItem = <div style={{margin:'8px 0', height:'8px', background:'#00bcd4'/*cyan500*/, borderRadius:3}}></div>;
-            let beforeItem, afterItem;
-            if(dragFromIndex < dragToIndex)
-              afterItem = movedItem;
-            else
-              beforeItem = movedItem;
-            return <Fragment key={componentKey}>
-              {beforeItem}
-              {renderItem(componentKey, item,childIndex)}
-              {afterItem}
-            </Fragment>
-          }
-          else{
-            return renderItem(componentKey, item, childIndex);
-          }
-        })}
-          </Accordion>
-          <RaisedButton
-          style={{marginTop:'16px'}}
-          onClick={this.onAddClickHandler.bind(this)}
-          icon={<IconAdd />}
-        />
-            </Fragment>);
-    }
-
-    if(currentPath.startsWith(context.nodePath)){
       service.api.logToConsole(currentPath,"nope we komen hier");
       service.api.logToConsole(context.nodePath,"startswith");
+      //service.api.logToConsole(field,"startswith");
 
       let matchedNode = context.findPreviousNodeInCurrentNodeTree(node);
+
       if(matchedNode==null||matchedNode.uiState==null||matchedNode.uiState.childIndex==null){
         service.api.logToConsole(context.nodePath,"error");
         throw new Error('Unexpected state.');
       }
+
       let childIndex = matchedNode.uiState.childIndex;
+
+      let newState =  context.value[childIndex]
+      let newState2;
+      //let newField = field;
+
+      // FIXME this breaks stuff
+      if(matchedNode.field.lazy === true){
+        service.api.logToConsole("ISLAZY");
+        service.api.logToConsole(currentPath, "currentPath");
+        let getPath = currentPath
+        var objectPath = require("object-path");
+        let pathArr = getPath.split('/')
+        service.api.logToConsole(pathArr, "objectpathBefore");
+        pathArr.shift();
+        pathArr = pathArr.filter(item => item);
+
+        //newState = objectPath.get(matchedNode.parent.state , pathArr);
+        //field = matchedNode.field;
+        service.api.logToConsole(newState2, "newState");
+        service.api.logToConsole(pathArr, "objectpathAfter");
+//        service.api.logToConsole(matchedNode.parent.state, "parentState");
+        //service.api.logToConsole(node.state, "node.state");
+        //service.api.logToConsole(matchedNode.uiState, "uiState");
+//        service.api.logToConsole(matchedNode.field, "field");
+      }
+      service.api.logToConsole("assign noW");
+
+
       return (context.renderLevel({
         field,
-        state: context.value[childIndex],
+        state: newState,
         uiState: {childIndex},
         parent: node
       }));
 
+    } else {
+      return (null);
     }
-    service.api.logToConsole(context.nodePath,"could not find");
 
-    return (null);
   }
+
+  renderUnOpened(title, context, node){
+    return (
+      <List style={{marginBottom:16, padding: 0}}><ListItem
+      style={{ border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
+      onClick={ function(){ context.setPath(node) } }
+      leftIcon={<IconFileFolder />}
+      rightIcon={<IconChevronRight />}
+      primaryText={title}
+      secondaryText={context.value.length +' items'}
+    /></List>
+    );
+  }
+
+  renderAccordion(field, context, currentPath, node){
+
+    let { dragToIndex, dragFromIndex } = this.state;
+
+    return (
+      <Fragment>
+
+        <Accordion index={this.state.index} onChange={(index)=>{ this.setState({index:this.state.index===index?-1:index}); }}>
+
+          {context.value.map((item: any, childIndex: number)=>{
+
+            let componentKey = `item-${childIndex}`;
+
+            if(childIndex===dragFromIndex){
+              return this.renderAccordionItem(field, context, node, componentKey, item, childIndex, true);
+            }
+
+            if(childIndex === dragToIndex && dragFromIndex != null && dragToIndex != null){
+
+              let movedItem = (
+                <div style={{margin:'18px 0', height:'8px', background:'#00bcd4', borderRadius:3}}></div>
+              )
+
+              let beforeItem, afterItem;
+              if(dragFromIndex < dragToIndex){
+                afterItem = movedItem;
+              }
+              else {
+                beforeItem = movedItem;
+              }
+              return (
+                <Fragment key={componentKey}>
+                  {beforeItem}
+                  {this.renderAccordionItem(field, context, node, componentKey, item,childIndex)}
+                  {afterItem}
+                </Fragment>
+              )
+            }
+            else{
+              return this.renderAccordionItem(field, context, node, componentKey, item, childIndex);
+            }
+          })}
+              </Accordion>
+              <RaisedButton style={{marginTop:'16px'}} onClick={this.onAddClickHandler.bind(this)} icon={<IconAdd />} />
+            </Fragment>
+    );
+  }
+
+  renderAccordionItem(field, context, node, componentKey: string, item: any, childIndex: number, isDragging: bool = false){
+
+      if(this.state.dynFieldsEmpty.length > 0){
+        //          if(Object.keys(this.state).includes("dyn-"+componentKey)){
+        //service.api.logToConsole( "assing synfields");
+        //field.fields = this.state["dyn-"+componentKey];
+        //          }
+        if(componentKey in this.state.dynFields){
+          field.fields = this.state.dynFields[componentKey];
+        }
+        else{
+          field.fields = this.state.dynFieldsEmpty;
+        }
+      }
+
+      let label = 'Untitled';
+
+      let newNode = {
+        field,
+        state: context.value[childIndex],
+        uiState:{childIndex},
+        parent: node
+      };
+
+      let arrayTitle = field.fields.find((x)=>x.arrayTitle===true);
+      if(arrayTitle && newNode.state[arrayTitle.key]){
+        label = newNode.state[arrayTitle.key];
+      }
+
+      let headStyle = {
+        backgroundColor: '#eee',
+      }
+      if(isDragging){
+        headStyle = {
+          backgroundColor: "#e2e2e2",
+        };
+      }
+
+      return (
+        <AccordionItem key={componentKey}
+        label={label}
+        headStyle={headStyle}
+        bodyStyle={{padding:'16px 16px 0px 16px'}}
+        body={ context.renderLevel(newNode) }
+        wrapperProps={{
+          onMouseEnter: this.getOnItemMouseEnter(childIndex)
+        }}
+        headerRightItems={[
+          <FlatButton
+          onClick={(e)=>{e.stopPropagation()}}
+          onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
+          style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
+          <DangerButton
+          onClick={(e, loaded)=>{
+            e.stopPropagation();
+            if(loaded){
+              this.removeItemAtIndex(childIndex)
+            }
+          }}
+          loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
+          button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
+        />
+        ]}
+        />
+      );
+    };
+
+
 }
 
 export default AccordionDynamic;
