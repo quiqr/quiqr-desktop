@@ -104,8 +104,8 @@ function getLocation(locPath = ''){
 
     //LOOKING FOR INDEX.HTML
     let lookups = [
-      path.normalize(path.join(__dirname, '/../index.html')), //works in production
-      path.normalize(path.join(__dirname, '../build/index.html')) //works in development after react_build
+      path.normalize(path.join(__dirname, '/../../index.html')), //works in production
+      path.normalize(path.join(__dirname, '../../build/index.html')) //works in development after react_build
     ];
 
     let indexFile = null;
