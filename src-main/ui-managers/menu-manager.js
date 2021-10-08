@@ -614,12 +614,12 @@ resources: []\n\
       },
       {
         key: "mylocal",
-        label: "My sites",
+        label: "Your sites",
         enabled: ( this.profileUserName === '' ? false:true ),
       },
       {
         key: "myremote",
-        label: "My available",
+        label: "Available sites",
         enabled: ( this.profileUserName === '' ? false:true ),
       },
     ];

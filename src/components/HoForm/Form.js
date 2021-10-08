@@ -152,7 +152,8 @@ class Form extends React.Component<FormProps,FormState> {
 
   renderField(node : DynamicFormNode<FieldBase>, onValueChanged : ?(value: any) => void){
 
-    service.api.logToConsole(node.field.key, "renderField key");
+    //INDIANSUMMERRECURSIVE
+    //service.api.logToConsole(node.field.key, "renderField key");
 
     var {field} = node;
     let component = this.props.componentRegistry.get(field.type);
@@ -211,7 +212,8 @@ class Form extends React.Component<FormProps,FormState> {
    */
   renderLevel({ field, state, uiState, parent}: DynamicFormNode<FieldBaseGroup>): React.Node {
 
-    service.api.logToConsole(uiState, "uistate");
+    //INDIANSUMMERRECURSIVE
+    //service.api.logToConsole(uiState, "uistate");
     if(this.props.debug)
       service.api.logToConsole('RENDER LEVEL');
 
