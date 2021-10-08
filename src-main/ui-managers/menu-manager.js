@@ -863,6 +863,22 @@ resources: []\n\
 
   }
 
+  togglePreviewWindow(){
+
+    if(global.pogoconf.expPreviewWindow){
+      global.pogoconf.setExpPreviewWindow(false);
+    }
+    else{
+      global.pogoconf.setExpPreviewWindow(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      this.createMainMenu();
+    });
+  }
+
+
+
   toggleExperimental(){
 
     if(global.pogoconf.experimentalFeatures){
@@ -986,6 +1002,14 @@ resources: []\n\
         label: 'Sync remote user data',
         click: async () => {
           cloudCacheManager.updateUserRemoteCaches()
+        }
+      },
+      {
+        label: 'Enable Preview Window',
+        type: "checkbox",
+        checked: global.pogoconf.expPreviewWindow,
+        click: async () => {
+          this.togglePreviewWindow()
         }
       },
     ];

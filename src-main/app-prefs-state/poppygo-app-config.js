@@ -53,6 +53,10 @@ module.exports = function (options) {
     state.experimentalFeatures = toggle;
   }
   /* toggle: bool */
+  function setExpPreviewWindow(toggle){
+    state.expPreviewWindow = toggle;
+  }
+  /* toggle: bool */
   function setDevLocalApi (toggle){
     state.devLocalApi = toggle;
   }
@@ -94,6 +98,7 @@ module.exports = function (options) {
     lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
     skipWelcomeScreen: false,
     experimentalFeatures: false,
+    expPreviewWindow: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
     devShowCurrentUser: false,
@@ -106,6 +111,7 @@ module.exports = function (options) {
     get currentUsername() { return state.currentUsername; },
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
     get experimentalFeatures() { return state.experimentalFeatures; },
+    get expPreviewWindow() { return state.expPreviewWindow; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
     get devShowCurrentUser() { return state.devShowCurrentUser; },
@@ -116,6 +122,7 @@ module.exports = function (options) {
     setCurrectUsername,
     setSkipWelcomeScreen,
     setExperimentalFeatures,
+    setExpPreviewWindow,
     setDevLocalApi,
     setDevDisableAutoHugoServe,
     setDevShowCurrentUser,

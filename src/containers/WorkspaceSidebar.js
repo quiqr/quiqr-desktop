@@ -25,6 +25,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     super(props);
     this.state = {
       devDisableAutoHugoServe: false,
+      expPreviewWindow: false,
       devLocalApi: false,
       hugoRunning: false
     };
@@ -34,6 +35,12 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     this._ismounted = true;
   }
   componentWillMount(){
+    service.api.getPogoConfKey('expPreviewWindow').then((value)=>{
+      this.setState({expPreviewWindow: value });
+      if(!value){
+        this.disableMobilePreview();
+      }
+    });
 
     this.updateBadges();
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
@@ -138,12 +145,17 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       this.setState({hugoRunning: false});
     }
   }
+
+
+
   renderSiteMounted(){
 
     let {
       onClick,
       siteConfig,
     } = this.props;
+
+
 
     //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
@@ -152,6 +164,20 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     onToggle={(e,value)=>{ this.toggleMobilePreview() }}
     style={{marginRight: 24}}
     labelPosition='right' />
+
+
+
+    let previewWindowItem = "";
+    if(this.state.expPreviewWindow){
+      previewWindowItem = <ListItem
+      primaryText="Preview on the side"
+      onClick={(e,value)=>{ this.toggleMobilePreview() }}
+      secondaryText=""
+      rightIcon={mobilePreviewToggle}
+      leftIcon={<IconPhone color="white"  />} />
+    }
+
+
 
       return (
         <div style={{paddingLeft:'0px'}}>
@@ -162,12 +188,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
             onClick={onClick}
             leftIcon={<IconHome color="white" style={{}} />}
           />
-              <ListItem
-              primaryText="Preview on the side"
-              onClick={(e,value)=>{ this.toggleMobilePreview() }}
-              secondaryText=""
-              rightIcon={mobilePreviewToggle}
-              leftIcon={<IconPhone color="white"  />} />
+              { previewWindowItem}
             <ListItem
             primaryText="Preview in browser"
             secondaryText=""
