@@ -75,6 +75,14 @@ task :release_mac do
   sh "cd #{BIN_PATH} && git push"
 end
 
+
+desc "updateembgitwin"
+task :updateembgitwin do
+  p "RUN THIS FROM POWERSHELL"
+  system("c:\\Program Files\\Git\\bin\\bash.exe", ".\\scripts\\embgit.sh","-d", "-b", ".\\dist")
+  sh "copy .\\dist\\embgit.exe .\\resources\\win"
+end
+
 desc "buildwin"
 task :buildwin do
   p "RUN THIS FROM POWERSHELL"
