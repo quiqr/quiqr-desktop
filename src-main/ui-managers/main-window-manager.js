@@ -350,6 +350,10 @@ module.exports = {
 
   openMobilePreview: function(){
 
+    if(global.pogoconf.expPreviewWindow === false){
+      return;
+    }
+
     mobilePreviewView.webContents.session.clearCache(function(){return true});
 
     showPreviewWaitForServer(mobilePreviewView);
@@ -379,7 +383,6 @@ module.exports = {
       console.log(global.currentSitePath);
 
     }
-
 
     mobilePreviewViewActive = true;
     mainWindow.webContents.send("setMobileBrowserOpen");
