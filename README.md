@@ -7,84 +7,45 @@ PoppyGo App is a CMS and Publishing tool for Hugo to run on your computer.
 Take a look at our features and understand why PoppyGo is a great tool for your
 Hugo websites:
 
+* **Made for Hugo.** PoppyGo is a desktop CMS for Hugo websites.
+* **Embedded git.** PoppyGo comes with embedded git functionality for
+  publishing and version management.
 * **Runs on your computer.** Supported Platforms: Windows, Linux and macOS.
-* **Free for commercial use.** Download our binaries today and use it for your own commercial purposes.
+* **Free for commercial use.** Download our binaries today and use it for your
+  own commercial purposes.
 * **One click installer.** It's a breeze to install on your PC.
-* **Dozen of ready to use UI components.** Crafted to handle many use cases and complex data hierarchy.
-* **Clean UI.** Clearly see what you are doing without any clutter or confusion.
+* **Dozen of ready to use UI components.** Crafted to handle many use cases and
+  complex data hierarchy.
+* **Clean UI.** Clearly see what you are doing without any clutter or
+  confusion.
 * **Open Source.** MIT license. Copy, edit, share, redistribute.
-* **Build User Interfaces Easily.** Just create a small configuration file (JSON, TOML and YAML are supported).
+* **Build User Interfaces Easily.** Just create a small configuration file
+  (JSON, TOML and YAML are supported).
 
 ## Getting Started
 
 * Download
 * Open the application.
-* In the home screen, add a new website and choose a Site Source _(at the moment, the only option is the Folder Source)_ and complete the form.
+* Follow the instuctions on the welcome screen.
 
-## Basics
+PoppyGo targets Hugo Website Developers and Hugo Website Content Managers.
+
+### Hugo Website Content Managers
+
+When you are a content manager you can download existing theme's and site
+templates. A Hugo Site Developer can give you access to a custom made site.
+
+TODO READ/WATCH the quick start for content managers.
+
+### Hugo Website Developers
 
 You'll have to learn some concepts before diving deep into PoppyGo site
-development. Read the quickstart or the [PoppyGo
-Book](https://poppygo.github.io/poppygo-book/) for full reference of the
-PoppyGo App and the PoppyGo Platform.
+development.
 
-### Website Configuration File
+TODO READ/WATCH the quick start for site developers.
 
-The website configuration files are stored in your *home/username/Sukoh* folder.
-
-### Workspace Configuration File
-
-All the UI configurations and bindings are set in the workspace configuration file.
-
-Keep in mind:
-
-* The workspace configuration file must be placed at the root of your Hugo website.
-
-For a minimal configuration file, see the default workspace configuration.
-
-Note that your workspace configuration can be a JSON, YAML or TOML file.
-
-### Fields
-
-Collections and singles configurations have a property named "fields" where you
-must provide an array of field configurations.
-
-Each field must use one of the available PoppyGo components by setting a "type"
-property. The current types list is below:
-
-* accordion
-* boolean
-* bundle-manager
-* chips
-* code-editor
-* date
-* leaf-array
-* hidden
-* markdown
-* nest
-* number
-* readonly
-* section
-* select
-* string
-
-Some components have a "field" or "fields" property, allowing for nesting and
-composition.
-
-To see the components in action, you can access our [Forms
-Cookbook](http://formscookbook.hokus.io.s3-website-us-east-1.amazonaws.com/).
-For quick reference. _\(the Forms Cookbook is also included in the desktop
-app.\)_
-
-You can also refer to the source code to see all available properties for each
-component type.
-
-## Global configuration
-
-### More Concepts
-
-More concepts are yet to come, but with those already given, and by looking
-into the Forms Cookbook, you should now be ready to use PoppyGo CMS.
+Read the [PoppyGo Book](https://poppygo.github.io/poppygo-book/)
+for full reference of the PoppyGo App and the PoppyGo Platform.
 
 ## Building
 
@@ -127,28 +88,58 @@ brew install npm
 
 Clone the repository and set the current directory to the root:
 
-```git clone https://github.com/poppygo/poppygo-app.git && cd sukoh```
+```git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app```
 
 Install NPM dependencies and build:
 
 ```npm install && npm run _rebuild-native && npm run dist-mac```
 
-## Vision
+## Development
 
-The desired workflow for PoppyGo is:
+### Development Environment on Nix / NixOS
 
-* Someone installs PoppyGo and opens it.
-* A list of existing Hugo website templates ("PoppyGo-ready") are listed for
-  selection.
-* The user select the desired template and the website is downloaded.
-* Right from the start, the user can create posts without hassle.
-* The user selects a way to version the content and a place to publish it, just
-  providing minimal configurations.
+Clone the repository.
 
-## Development Stack
+```git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app```
+
+Enter the nix-shell
+
+```
+nix-shell
+[nix-shell:~/poppygo-app]$
+```
+
+Install npm dependancies.
+
+```npm install```
+
+Start electron with a single command.
+
+```npm run start```
+
+Alternatively you can start two seperate nix-shell terminal (e.g. with tmux),
+one for the backend...
+
+```
+nix-shell
+npm run _electron-dev
+```
+
+... and one for the frontend.
+
+```
+nix-shell
+npm run _react-dev
+```
+
+
+### Stack
 
 * Node JS
 * Electron
 * React
 * Material UI for React JS
 * Go
+
+
+

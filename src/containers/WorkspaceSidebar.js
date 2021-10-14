@@ -92,9 +92,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     window.require('electron').shell.openExternal('http://localhost:13131');
   }
 
-
-
-
   toggleMobilePreview(){
     if(this.state.mobilePreviewActive){
       this.disableMobilePreview();
