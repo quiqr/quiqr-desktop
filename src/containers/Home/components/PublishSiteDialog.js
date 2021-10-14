@@ -79,7 +79,7 @@ export default class PublishSiteDialog extends React.Component<PublishSiteDialog
             />,
         ];
 
-        let title = "Publish "+this.props.site.key + " to PoppyGo Cloud"
+        let title = "Publish "+this.props.site.name + " to PoppyGo Cloud"
         let text = "Publish changes to the PoppyGo Webservers.";
 
         return (

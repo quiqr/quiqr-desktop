@@ -216,7 +216,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     let listTitle = 'All Sites';
 
     if(this.state.sitesListingView === 'mylocal'){
-      listTitle = `My sites (${this.props.poppygoUsername})`;
+      listTitle = `Your sites (${this.props.poppygoUsername})`;
       sites = sites.filter((site) => {
         return site.owner === this.props.poppygoUsername
       });

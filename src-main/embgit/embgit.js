@@ -59,8 +59,25 @@ class Embgit{
     return cmd;
   }
 
-  async commit(destination_path, message){
-    let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
+  //async commit(destination_path, message){
+    //let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
+  //}
+
+  async reset_hard(destination_path){
+    const git_bin = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let cmd = await spawnAw( git_bin, [ "reset_hard", destination_path ]);
+        outputConsole.appendLine('Reset success ...');
+        console.log(cmd.toString());
+        resolve(true)
+      } catch (e) {
+        await outputConsole.appendLine(git_bin + " reset_hard  " + destination_path );
+        console.log("ERROR")
+        console.log(e.stdout.toString())
+      }
+    });
+
   }
 
   async commit(destination_path, message){
@@ -72,7 +89,7 @@ class Embgit{
         console.log(cmd.toString());
         resolve(true)
       } catch (e) {
-        await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
+        await outputConsole.appendLine(git_bin + " commit -s -i " + userconf.privateKey + " " + destination_path );
         console.log(e.stdout.toString())
         if(e.stdout.toString().includes("already up-to-date")) {
           console.log("no changed");
@@ -81,6 +98,7 @@ class Embgit{
     });
 
   }
+
   async pull(destination_path){
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{

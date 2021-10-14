@@ -219,11 +219,11 @@ class RemoteSiteDialog extends React.Component{
       </Button>,
 
       <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >
-        CHECKOUT AS WORKING COPY
+        DOWNLOAD
         </Button>,
 
       <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadCopy()} >
-        COPY AS NEW SITE
+        DOWNLOAD AND COPY AS NEW SITE
         </Button>,
     ];
 

@@ -76,9 +76,13 @@ class CloudGitManager {
 
     return new Promise( async (resolve, reject)=>{
       try {
-        await Embgit.commit(site.source.path, message).then(async (e)=>{
+        //await Embgit.pull(site.source.path).then(async(e)=>{
+          //resolve("merged_with_remote");
+        //});
+        await Embgit.reset_hard(site.source.path).then(async (e)=>{
           await Embgit.pull(site.source.path);
-          resolve("merged_with_remote");
+          console.log("pulled succesfully")
+          resolve("reset-and-pulled-from-remote");
         });
       } catch (e) {
         console.log("Pull Error:"+site.key);
