@@ -29,39 +29,40 @@ class Embgit{
     let executable;
     let cmd;
 
-    //TODO USE ENVIRONMENT UTIL
-    switch(enviromnent.platform){
-      case PLATFORMS.linux: {
-        platform = 'linux';
-        executable = 'embgit';
-        break;
-      }
-      case PLATFORMS.windows: {
-        platform = 'win';
-        executable = 'embgit.exe';
-        break;
-      }
-      case PLATFORMS.macOS: {
-        platform = 'mac';
-        executable = 'embgit';
-        break;
-      }
-      default:{ throw new Error('Not implemented.') }
-    }
-
-    if(process.env.NODE_ENV === 'production'){
-      cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
+    // CUSTOM PATH TO EMBGIT E.G. for nix developments
+    if(global.process.env.EMBGIT_PATH){
+      cmd = global.process.env.EMBGIT_PATH;
     }
     else{
-      cmd = path.join(rootPath, 'resources', platform, executable);
-    }
+      //TODO USE ENVIRONMENT UTIL
+      switch(enviromnent.platform){
+        case PLATFORMS.linux: {
+          platform = 'linux';
+          executable = 'embgit';
+          break;
+        }
+        case PLATFORMS.windows: {
+          platform = 'win';
+          executable = 'embgit.exe';
+          break;
+        }
+        case PLATFORMS.macOS: {
+          platform = 'mac';
+          executable = 'embgit';
+          break;
+        }
+        default:{ throw new Error('Not implemented.') }
+      }
 
+      if(process.env.NODE_ENV === 'production'){
+        cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
+      }
+      else{
+        cmd = path.join(rootPath, 'resources', platform, executable);
+      }
+    }
     return cmd;
   }
-
-  //async commit(destination_path, message){
-    //let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
-  //}
 
   async reset_hard(destination_path){
     const git_bin = this.getGitBin();

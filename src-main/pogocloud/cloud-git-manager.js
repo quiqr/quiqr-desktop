@@ -10,9 +10,6 @@ const cloudSiteconfigManager  = require('./cloud-siteconfig-manager');
 const cloudCacheManager       = require('../pogocloud/cloud-cache-manager');
 const { EnvironmentResolver } = require('../utils/environment-resolver');
 
-
-//const git_bin = Embgit.getGitBin();
-
 class CloudGitManager {
 
   cloudPathToUrl(cloudPath){
@@ -46,7 +43,6 @@ class CloudGitManager {
     return new Promise( async (resolve, reject)=>{
       try {
         await del.sync([temp_clone_path],{force:true});
-        //await fs.ensureDir(temp_clone_path);
         await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
 
         let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
@@ -130,7 +126,7 @@ class CloudGitManager {
       let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
       fingerprint = gencmd.toString().replace(/\n/g,"");
     } catch (e) {
-      outputConsole.appendLine('fingerprint error ...:' + e);
+      console.log(e.stderr.toString());
     }
 
     return fingerprint;
