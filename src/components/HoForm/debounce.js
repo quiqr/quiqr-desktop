@@ -1,7 +1,7 @@
 //@flow
 
 export class Debounce{
-    
+
     timeout: ?any = null;
 
     run(fn: ()=>void, time: number){

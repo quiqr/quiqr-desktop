@@ -141,8 +141,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
 
     service.api.listWorkspaces(site.key).then((workspaces)=>{
 
-      service.api.logToConsole(workspaces[0]);
-
       this.setState({selectedSiteWorkspaces: workspaces});
       if(workspaces.length === 1){
         this.selectWorkspace(site.key, workspaces[0]);
@@ -218,7 +216,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     let listTitle = 'All Sites';
 
     if(this.state.sitesListingView === 'mylocal'){
-      listTitle = `My sites (${this.props.poppygoUsername})`;
+      listTitle = `Your sites (${this.props.poppygoUsername})`;
       sites = sites.filter((site) => {
         return site.owner === this.props.poppygoUsername
       });

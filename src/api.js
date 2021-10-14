@@ -19,8 +19,8 @@ export class API {
     return mainProcessBridge.request('serveWorkspace', {siteKey, workspaceKey, serveKey});
   }
 
-  logToConsole( message: string){
-    return mainProcessBridge.request('logToConsole', {message});
+  logToConsole( message, label){
+    return mainProcessBridge.request('logToConsole', {message, label});
   }
 
   getDynFormFields(searchFormObjectFile: string, searchRootNode: string, searchLevelKeyVal: any){
@@ -185,7 +185,7 @@ export class API {
   }
 
   cloneRemoteAsManagedSite(cloudPath: string, siteName: string){
-    return mainProcessBridge.request('cloneRemoteAsManagedSite',{cloudPath, siteName}, {timeoutx: 1000000});
+    return mainProcessBridge.request('cloneRemoteAsManagedSite',{cloudPath, siteName}, {timeout: 1000000});
   }
 
   cloneRemoteAsUnmanagedSite(cloudPath: string, siteName: string){

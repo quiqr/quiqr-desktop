@@ -187,6 +187,7 @@ class App extends React.Component<AppProps,AppState>{
     key={ url }
     siteKey={ site ? decodeURIComponent(site) : null }
     workspaceKey={ workspace ? decodeURIComponent(workspace) : null }
+    poppygoUsername={this.state.poppygoUsername}
     history={history}
     hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
     menuIsLocked={this.state.menuIsLocked}

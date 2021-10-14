@@ -3,6 +3,7 @@ const {dirname}                 = require('path');
 const path                      = require('path');
 const glob                      = require('glob');
 const {shell}                   = require('electron');
+const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
 const WorkspaceService          = require('../services/workspace/workspace-service')
@@ -175,7 +176,7 @@ api.getCurrentSiteKey = async function(){
 //TODO test again and use confkey
 api.getPogoConfKey = async function({confkey},context){
   try{
-    context.resolve(global.pogoconf.sitesListingView);
+    context.resolve(global.pogoconf[confkey]);
   }
   catch(err){
     context.reject(err);
@@ -244,9 +245,17 @@ api.updateMobilePreviewUrl = function({url}, context){
     global.mainWM.setMobilePreviewUrl(url);
   });
 }
-api.logToConsole = function({message}, context){
-  console.log(message);
+
+api.logToConsole = function({message, label}, context){
+
+  if(label){
+    console.log("\b--- " + label.toUpperCase() + " --> ");
+  }
+  else{
+  }
+  console.log(util.inspect(message, false, null, true));
 }
+
 
 api.importSiteAction = function(context){
   return new Promise((resolve, reject)=>{
@@ -261,7 +270,6 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
     if(!workspaceService){ return; }
 
-    console.log("serve:"+serveKey);
     workspaceService.serve(serveKey).then(()=>{
       context.resolve();
     }, ()=>{

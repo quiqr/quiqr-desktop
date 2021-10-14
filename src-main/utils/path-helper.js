@@ -116,6 +116,12 @@ class PathHelper{
   }
 
   getHugoBinForVer(version){
+
+    // CUSTOM PATH TO HUGO E.G. for nix developments
+    if(global.process.env.HUGO_PATH){
+      return global.process.env.HUGO_PATH;
+    }
+
     let platform = process.platform.toLowerCase();
     if(platform.startsWith('win')){
       return this.getHugoBinDirForVer(version) + 'hugo.exe';
