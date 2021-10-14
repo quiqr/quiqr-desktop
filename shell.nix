@@ -35,9 +35,11 @@ in
   pkgs.mkShell {
     nativeBuildInputs = [
       pkgs.nodejs
+      pkgs.hugo
       pkgs.electron_5
       myPackages.embgit
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_5}/bin/";
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
+    HUGO_PATH="${pkgs.hugo}/bin/hugo";
   }
