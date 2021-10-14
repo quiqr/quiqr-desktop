@@ -172,7 +172,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
             extraFields.fields.forEach(function(extrField){
               extrField.compositeKey = field.compositeKey + "." + extrField.key;
               extrField.lazy = true;
-              //service.api.logToConsole(extrField,"lazefield");
+
               //TODO make recursive
               if("fields" in extrField){
                 extrField.fields.forEach(function(efld2nd){
@@ -188,9 +188,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
               }
             });
 
-            //service.api.logToConsole(componentKey, "working in MAP");
             let newFields = cleanedFieldFields.concat(extraFields.fields);
-            //service.api.logToConsole(newFields, "working in MAP fields");
             dynFields[componentKey] = newFields;
             this.setState({["dyn-"+componentKey]: newFields});
           }
@@ -212,56 +210,59 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       context.value = [];
     }
 
-    if(currentPath===context.parentPath){
-
+    if(currentPath === context.parentPath){
       return this.renderUnOpened(field.title, context, node);
 
     } else if(currentPath===context.nodePath){
-      service.api.logToConsole(currentPath,"ACCORDION IT SELF");
 
       return this.renderAccordion(field, context, currentPath, node);
 
     } else if(currentPath.startsWith(context.nodePath)){
 
-      service.api.logToConsole(currentPath,"nope we komen hier");
-      service.api.logToConsole(context.nodePath,"startswith");
-      //service.api.logToConsole(field,"startswith");
-
       let matchedNode = context.findPreviousNodeInCurrentNodeTree(node);
 
-      if(matchedNode==null||matchedNode.uiState==null||matchedNode.uiState.childIndex==null){
+      if(matchedNode == null || matchedNode.uiState == null || matchedNode.uiState.childIndex == null){
         service.api.logToConsole(context.nodePath,"error");
         throw new Error('Unexpected state.');
       }
 
       let childIndex = matchedNode.uiState.childIndex;
-
       let newState =  context.value[childIndex]
-      let newState2;
-      //let newField = field;
 
-      // FIXME this breaks stuff
       if(matchedNode.field.lazy === true){
-        service.api.logToConsole("ISLAZY");
-        service.api.logToConsole(currentPath, "currentPath");
+        //service.api.logToConsole("ISLAZY");
+        //service.api.logToConsole(currentPath, "currentPath");
+        //service.api.logToConsole(pathArr, "objectpathBefore");
+
+        /*
         let getPath = currentPath
         var objectPath = require("object-path");
         let pathArr = getPath.split('/')
-        service.api.logToConsole(pathArr, "objectpathBefore");
         pathArr.shift();
         pathArr = pathArr.filter(item => item);
+        */
 
         //newState = objectPath.get(matchedNode.parent.state , pathArr);
         //field = matchedNode.field;
-        service.api.logToConsole(newState2, "newState");
-        service.api.logToConsole(pathArr, "objectpathAfter");
-//        service.api.logToConsole(matchedNode.parent.state, "parentState");
-        //service.api.logToConsole(node.state, "node.state");
-        //service.api.logToConsole(matchedNode.uiState, "uiState");
-//        service.api.logToConsole(matchedNode.field, "field");
-      }
-      service.api.logToConsole("assign noW");
+        //service.api.logToConsole(newState, "newState"); // BEVAT DE DATA VAN HET DEELFRAGMENT VAN DE BUITENSTE ACCORDION
+        //service.api.logToConsole(childIndex, "childIndex"); // BEVAT DE DATA VAN HET DEELFRAGMENT VAN DE BUITENSTE ACCORDION
+        //service.api.logToConsole(pathArr, "objectpathAfter");
+        //service.api.logToConsole(matchedNode.parent.state, "parentState"); // NODE.STATE IS THE HUIDIGE DATA IN EEN BOOMSTRUCTUUR
+        //service.api.logToConsole(node.state, "node.state"); // NODE.STATE IS THE HUIDIGE DATA IN EEN BOOMSTRUCTUUR
+        //service.api.logToConsole(matchedNode.uiState, "uiState"); //GEEFT HET NUMMER VAN HET ELEMENT AAN IN DE BUITENSTE ACCORDION
+        //service.api.logToConsole(matchedNode.field, "field"); // DATASTRUCTUUR VAN HET HET SPECIFIEKE ELEMENT IN DE ACCORDION
+        //service.api.logToConsole(matchedNode.field.compositeKey, "field compositeKey");
 
+        let compositeKeyInFields = false;
+        node.field.fields.forEach(function(fld){
+          if(fld.compositeKey === matchedNode.field.compositeKey){
+            compositeKeyInFields = true;
+          }
+        });
+        if(!compositeKeyInFields){
+          node.field.fields.push(matchedNode.field);
+        }
+      }
 
       return (context.renderLevel({
         field,
@@ -340,10 +341,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
   renderAccordionItem(field, context, node, componentKey: string, item: any, childIndex: number, isDragging: bool = false){
 
       if(this.state.dynFieldsEmpty.length > 0){
-        //          if(Object.keys(this.state).includes("dyn-"+componentKey)){
-        //service.api.logToConsole( "assing synfields");
-        //field.fields = this.state["dyn-"+componentKey];
-        //          }
         if(componentKey in this.state.dynFields){
           field.fields = this.state.dynFields[componentKey];
         }
