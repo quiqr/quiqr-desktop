@@ -30,18 +30,6 @@
 {{- range $key, $value := site.Data.design.colorscheme -}}
     {{- $colors = $colors | append $value.name -}}
 {{- end -}}
-<<<<<<< HEAD
-{{ $colors = $colors | append "white" -}}
-{{ $colors = $colors | append "transparent" -}}
-{{- $poppy_select = merge $poppy_select (dict "color" $colors "background_color" $colors "text_color" $colors "item_background_color" $colors "border_color" $colors "outline_color" $colors) -}}
-
-{{- $fonts := slice -}}
-{{- range $key, $value := site.Data.design.fontscheme -}}
-    {{- $fonts = $fonts | append $value.name -}}
-{{- end -}}
-
-{{- $poppy_select = merge $poppy_select (dict "font" $fonts ) -}}
-=======
 {{- $colors = $colors | append "white" -}}
 {{- $colors = $colors | append "transparent" -}}
 {{- $poppy_select = merge $poppy_select (dict "color" $colors "background_color" $colors "text_color" $colors "item_background_color" $colors "border_color" $colors "outline_color" $colors "text_outline_color" $colors) -}}
@@ -57,7 +45,6 @@
     {{- $buttons = $buttons | append .name -}}
 {{- end -}}
 {{- $poppy_select = merge $poppy_select (dict "button_type" $buttons) -}}
->>>>>>> 82b2e8fdd09e02e14548a6dcc5871f1c755c79f8
 
 {{/*------------------------------ Components -----------------------------*/}}
 
