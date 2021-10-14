@@ -36,6 +36,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
   constructor(props: ComponentProps<AccordionDynamicField>){
     super(props);
 
+    this.orgNode = null;
     this.state = {
       index: null,
       dragFromIndex: null,
@@ -91,14 +92,26 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
   }
 
   swapItems({index, otherIndex}: {index: number, otherIndex: number}){
-    if(index===otherIndex)
+    if(index===otherIndex){
       return;
+    }
     let context = this.props.context;
+
+    //REMOVE ADDED LAZY ELEMENTS, WERE GOING TO ADD THEM AGAIN
+    context.node.field.fields.forEach(function(fld,idx){
+      if(fld.lazy === true){
+        //service.api.logToConsole(fld.compositeKey,"comp to remove");
+        delete context.node.field.fields[idx];
+      }
+    });
+
     let copy = context.value.slice(0);
     let temp = copy[index];
     copy[index] = copy[otherIndex];
     copy[otherIndex] = temp;
     context.setValue(copy);
+
+    this.procDynamicFields();
   }
 
   //DRAG EVENTS
@@ -115,7 +128,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
   getOnItemDragHandleMouseDown(index: number){
     return function(e: any){
-      if(true /*this.props.sortable*/){
+      if(true){
         this.setState({ dragFromIndex: index, dragToIndex: index, index:-1 });
         document.addEventListener('mouseup', this.getDocumentMouseUpListener());
       }
@@ -190,7 +203,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
             let newFields = cleanedFieldFields.concat(extraFields.fields);
             dynFields[componentKey] = newFields;
-            this.setState({["dyn-"+componentKey]: newFields});
+            //this.setState({["dyn-"+componentKey]: newFields});
           }
         });
       }
@@ -206,11 +219,19 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     let {node, currentPath} = context;
     let {field} = node;
 
+    node.field.fields.forEach(function(fld,idx){
+      if(fld.lazyTemp === true){
+        //service.api.logToConsole(fld.compositeKey,"comp to remove");
+        delete node.field.fields[idx];
+      }
+    });
+
     if(!Array.isArray(context.value)){
       context.value = [];
     }
 
     if(currentPath === context.parentPath){
+      //service.api.logToConsole(field.title,"renderUnOpened" );
       return this.renderUnOpened(field.title, context, node);
 
     } else if(currentPath===context.nodePath){
@@ -230,37 +251,18 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       let newState =  context.value[childIndex]
 
       if(matchedNode.field.lazy === true){
-        //service.api.logToConsole("ISLAZY");
-        //service.api.logToConsole(currentPath, "currentPath");
-        //service.api.logToConsole(pathArr, "objectpathBefore");
-
-        /*
-        let getPath = currentPath
-        var objectPath = require("object-path");
-        let pathArr = getPath.split('/')
-        pathArr.shift();
-        pathArr = pathArr.filter(item => item);
-        */
-
-        //newState = objectPath.get(matchedNode.parent.state , pathArr);
-        //field = matchedNode.field;
-        //service.api.logToConsole(newState, "newState"); // BEVAT DE DATA VAN HET DEELFRAGMENT VAN DE BUITENSTE ACCORDION
-        //service.api.logToConsole(childIndex, "childIndex"); // BEVAT DE DATA VAN HET DEELFRAGMENT VAN DE BUITENSTE ACCORDION
-        //service.api.logToConsole(pathArr, "objectpathAfter");
-        //service.api.logToConsole(matchedNode.parent.state, "parentState"); // NODE.STATE IS THE HUIDIGE DATA IN EEN BOOMSTRUCTUUR
-        //service.api.logToConsole(node.state, "node.state"); // NODE.STATE IS THE HUIDIGE DATA IN EEN BOOMSTRUCTUUR
-        //service.api.logToConsole(matchedNode.uiState, "uiState"); //GEEFT HET NUMMER VAN HET ELEMENT AAN IN DE BUITENSTE ACCORDION
-        //service.api.logToConsole(matchedNode.field, "field"); // DATASTRUCTUUR VAN HET HET SPECIFIEKE ELEMENT IN DE ACCORDION
-        //service.api.logToConsole(matchedNode.field.compositeKey, "field compositeKey");
-
+        //THIS ENSURES THAT THE DATASTRUCTURE IS KNOWN IN DE node.fields-array  for LAZY elements
         let compositeKeyInFields = false;
         node.field.fields.forEach(function(fld){
           if(fld.compositeKey === matchedNode.field.compositeKey){
             compositeKeyInFields = true;
           }
         });
+
         if(!compositeKeyInFields){
-          node.field.fields.push(matchedNode.field);
+          let newField = {...matchedNode.field};
+          newField.lazyTemp = true;
+          node.field.fields.push(newField);
         }
       }
 
@@ -347,7 +349,19 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         else{
           field.fields = this.state.dynFieldsEmpty;
         }
+        //service.api.logToConsole(componentKey, "componentKey");
+        //service.api.logToConsole(Object.keys(this.state.dynFieldsEmpty).length, "dynFieldsLength");
+        //service.api.logToConsole(this.state.dynFields, "dynFields");
       }
+
+      /*
+    service.api.logToConsole("=============")
+    service.api.logToConsole("START FOREACH")
+    field.fields.forEach(function(fld){
+      service.api.logToConsole(fld.key, "fieldtitle")
+
+    });
+       */
 
       let label = 'Untitled';
 
