@@ -429,7 +429,7 @@ class PogoPublisher {
     await fs.ensureDir(pathSite);
     await fs.ensureDir(pathSiteSources);
     await fs.moveSync(full_gh_dest, pathSource);
-    let newConf = cloudSiteconfigManager.createConf(siteKey, pathSource);
+    let newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey,siteKey, pathSource);
     await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 
