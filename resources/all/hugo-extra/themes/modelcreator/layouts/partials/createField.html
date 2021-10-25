@@ -60,9 +60,10 @@
     {{- $arrayTitle := "" -}}
     {{- $accordionKeys := slice -}}
     {{- $accordionItems := ( index $value 0 ) -}}
+    {{- $ifkey := $key -}}
     {{- range $key, $value := $accordionItems -}}
         {{- $accordionKeys = $accordionKeys | append $key -}}
-        {{ if or (eq $key "line") (eq $key "to") (eq $key "To") -}}
+        {{ if or (eq $key "line") (eq $key "to") (eq $key "To") (eq $key "Label") (eq $key "label") -}}
             {{- $arrayTitle = $key -}}
         {{- end -}}
     {{- end -}}

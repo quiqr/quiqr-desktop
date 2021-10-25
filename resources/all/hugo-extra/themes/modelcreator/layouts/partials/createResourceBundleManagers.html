@@ -1,5 +1,4 @@
 {{- $fields := slice -}}
-{{/* {{ warnf (printf "page in bundlem is %s %s " .page (.dir)) }} */}}
 {{- if not (path.Ext .dir) -}}
     {{- if or .page.IsSection .page.IsHome -}}
       {{- $fields = $fields | append (partial "createField" (dict "key" "page_related_images" "value" "" "type" "bundle-manager")) -}}
