@@ -11,7 +11,7 @@
 {{- $pogoMenu := slice -}}
 {{- $generalMenu := slice -}}
 {{- $page_componentMenu := slice -}}
-{{- $configItems := dict "title" "string" "description" "string" -}}
+{{- $configItems := dict "title" "string" "description" "string" "baseURL" "string" "author" "string" -}}
 {{- $translations := slice -}}
 {{- $poppy_select := site.Data.poppyselect -}}
 
@@ -250,9 +250,9 @@
 {{/*------------------------Collections------------------------ */}}
 
 {{- range where .Site.AllPages "Kind" "in" (slice "section" "taxonomy" ) -}}
-    {{ if not (eq .Type "poppy-components" )}}
+    {{- if not (eq .Type "poppy-components" ) -}}
       {{- $collectionPages = $collectionPages | append . -}}
-    {{ end }}
+    {{- end -}}
 {{- end -}}
 
 {{- $additionalCollections := slice -}}
