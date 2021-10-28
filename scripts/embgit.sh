@@ -25,7 +25,7 @@ parse_args() {
   # over-ridden by flag below
 
   BINDIR=${BINDIR:-./bin}
-  while getopts "b:dh?x" arg; do
+  while getopts "b:dhp?x" arg; do
     case "$arg" in
       b) BINDIR="$OPTARG" ;;
       d) log_set_priority 10 ;;
