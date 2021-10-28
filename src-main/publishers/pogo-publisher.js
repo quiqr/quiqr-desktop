@@ -227,15 +227,20 @@ class PogoPublisher {
 
       await fs.copySync(full_gh_themes_dest+"/exampleSite", full_gh_dest);
 
-      let strData = fs.readFileSync(full_gh_dest+"/config.toml", {encoding: 'utf-8'});
-      let formatProvider = formatProviderResolver.resolveForFilePath(full_gh_dest+"/config.toml");
-      let hconfig = formatProvider.parse(strData);
-      hconfig.theme = themeName;
-      hconfig.baseURL = "/"
-      fs.writeFileSync(
-        full_gh_dest+"/config.toml",
-        formatProvider.dump(hconfig)
-      );
+      try{
+        let strData = fs.readFileSync(full_gh_dest+"/config.toml", {encoding: 'utf-8'});
+        let formatProvider = formatProviderResolver.resolveForFilePath(full_gh_dest+"/config.toml");
+        let hconfig = formatProvider.parse(strData);
+        hconfig.theme = themeName;
+        hconfig.baseURL = "/"
+        fs.writeFileSync(
+          full_gh_dest+"/config.toml",
+          formatProvider.dump(hconfig)
+        );
+      }
+      catch(e){
+        console.log("no config.toml in exampleSite");
+      }
 
       progressBar.value = 100;
       progressBar.setCompleted();
@@ -429,7 +434,7 @@ class PogoPublisher {
     await fs.ensureDir(pathSite);
     await fs.ensureDir(pathSiteSources);
     await fs.moveSync(full_gh_dest, pathSource);
-    let newConf = cloudSiteconfigManager.createConf(siteKey, pathSource);
+    let newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey,siteKey, pathSource);
     await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 
