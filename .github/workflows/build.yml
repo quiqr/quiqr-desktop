@@ -5,7 +5,7 @@ on:
   # but only for the main branch
   push:
     branches:
-      - testactionx
+      - testaction
 
 jobs:
   release:
