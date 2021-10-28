@@ -48,7 +48,7 @@ task :buildmac do
   sh "cp ./dist/embgit ./resources/mac"
   set_build_info
   sh "npm install"
-  sh "npm run dist-mac && npm run dist-mac-notarize"
+  sh "npm run dist && npm run mac-notarize"
 end
 
 desc "buildmacunsigned"
@@ -57,7 +57,7 @@ task :buildmacunsigned do
   sh "cp ./dist/embgit ./resources/mac"
   set_build_info
   sh "npm install"
-  sh "npm run dist-mac-unsigned"
+  sh "CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist"
 end
 
 desc "macoscodesigninfo"
@@ -90,16 +90,7 @@ task :buildwin do
   #sh 'c:\Program\\ Files\Git\bin\bash.exe .\scripts\embgit.sh -d -b .\dist'
   sh "copy .\\dist\\embgit.exe .\\resources\\win"
   set_build_info
-  #sh "npm install"
-  sh "npm run dist-win"
-end
-
-desc "buildlinux"
-task :buildlinux do
-  sh "./scripts/embgit.sh -d -b ./dist"
-  sh "cp ./dist/embgit ./resources/linux"
-  set_build_info
-  sh "npm run dist-linux"
+  sh "npm run dist"
 end
 
 desc "release_win"
@@ -110,6 +101,14 @@ task :release_win do
   sh "cd #{BIN_PATHWIN} && git add poppygo_win-#{data['version']}.exe"
   sh "cd #{BIN_PATHWIN} && git commit -m \"win release #{ data['version']}\""
   sh "cd #{BIN_PATHWIN} && git push"
+end
+
+desc "buildlinux"
+task :buildlinux do
+  sh "./scripts/embgit.sh -d -b ./dist"
+  sh "cp ./dist/embgit ./resources/linux"
+  set_build_info
+  sh "npm run dist"
 end
 
 desc "release_linux"
