@@ -3,7 +3,7 @@ const prefixlog = "embgit.sh -> ";
 let command;
 
 if(process.platform === "win32"){
-  command = "c:\\Program Files\\Git\\bin\\bash.exe", ".\\scripts\\embgit.sh -d -p"
+  command = '"c:\\Program Files\\Git\\bin\\bash.exe" .\\scripts\\embgit.sh -d -p'
 }
 else{
   command = "./scripts/embgit.sh -d -p"
