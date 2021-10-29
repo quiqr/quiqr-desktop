@@ -48,6 +48,7 @@
     "electron": "5.0.13",
     "electron-builder": "^22.8.0",
     "electron-notarize": "^0.2.1",
+    "license-checker": "^25.0.1",
     "markdown-it": "8.4.1",
     "mocha": "^5.0.2",
     "node-abi": "^2.8.0",
@@ -61,32 +62,27 @@
   "peerDependencies": {},
   "main": "src-main/electron.js",
   "scripts": {
+    "REMOVE_copy_ace_extras": "copyfiles -u 2 -V \"./extras/ace-editor/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
+    "REMOVE_rebuild-native":  "cross-env VisualStudioVersion=15.0 npm install --build-from-source",
+    "REMOVE-release-win":     "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win && electron-builder --publish=always",
+    "REMOVEdist":             "electron-builder --publish=always",
 
-    "REMOVE_copy_ace_extras":   "copyfiles -u 2 -V \"./extras/ace-editor/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
-    "REMOVE_rebuild-native":    "cross-env VisualStudioVersion=15.0 npm install --build-from-source",
-    "REMOVE-release-win":       "npm run _copy-ace && rimraf dist && rimraf build && npm run _react-build && npm run _electron-dist-win && electron-builder --publish=always",
-    "REMOVEdist":               "electron-builder --publish=always",
+    "test":                   "./node_modules/.bin/mocha",
+    "clean":                  "rimraf dist && rimraf build",
 
-    "test":                     "./node_modules/.bin/mocha",
+    "_copy-ace":              "copyfiles -u 3 -V \"./node_modules/ace-editor-builds/src-min-noconflict/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
+    "_react-build":           "cross-env CI=false react-scripts build",
+    "_copy-electron-code":    "copyfiles -u 1 -V \"./src-main/**/*\" \"./build/electron/\"",
+    "_pack_embgit":           "node scripts/embgit-sh-runner.js",
+    "_build_info":            "node scripts/build_info.js",
 
-    "clean":                    "rimraf dist && rimraf build",
+    "build":                  "npm run clean && npm run _copy-ace && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
+    "dist":                   "npm run build && electron-builder",
+    "mac-notarize":           "node scripts/notarize.js",
 
-    "_copy-ace":                "copyfiles -u 3 -V \"./node_modules/ace-editor-builds/src-min-noconflict/**/*.*\" \"./public/ace-editor-min-noconflict/\"",
-    "_react-build":             "cross-env CI=false react-scripts build",
-    "_copy-electron-code":      "copyfiles -u 1 -V \"./src-main/**/*\" \"./build/electron/\"",
-    "_pack_embgit":             "./scripts/embgit.sh -d -p",
-    "_build_info":              "node scripts/build_info.js",
-
-    "build":                    "npm run clean && npm run _copy-ace && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
-
-    "dist":                     "npm run build && electron-builder",
-
-    "mac-notarize":             "node scripts/notarize.js",
-
-    "_react-dev":               "cross-env APP_ENV=development cross-env BROWSER=none cross-env PORT=4000 cross-env react-scripts start",
-    "_electron-dev":            "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4000 cross-env  electron .",
-    "start":                    "npm run _copy-ace && concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
-
+    "_react-dev":             "cross-env APP_ENV=development cross-env BROWSER=none cross-env PORT=4000 cross-env react-scripts start",
+    "_electron-dev":          "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4000 cross-env  electron .",
+    "start":                  "npm run _copy-ace && concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
   },
   "build": {
     "appId": "com.lingewoud.poppygo",
