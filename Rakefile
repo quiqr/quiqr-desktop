@@ -93,33 +93,33 @@ task :buildwin do
   sh "npm run dist"
 end
 
-desc "release_win"
-task :release_win do
-  data = getmeta
-  sh "copy dist\\poppygo_win.exe #{BIN_PATHWIN}\\poppygo_win-#{data['version']}.exe"
-  sh "cd #{BIN_PATHWIN} && git pull"
-  sh "cd #{BIN_PATHWIN} && git add poppygo_win-#{data['version']}.exe"
-  sh "cd #{BIN_PATHWIN} && git commit -m \"win release #{ data['version']}\""
-  sh "cd #{BIN_PATHWIN} && git push"
-end
+#desc "release_win"
+#task :release_win do
+  #data = getmeta
+  #sh "copy dist\\poppygo_win.exe #{BIN_PATHWIN}\\poppygo_win-#{data['version']}.exe"
+  #sh "cd #{BIN_PATHWIN} && git pull"
+  #sh "cd #{BIN_PATHWIN} && git add poppygo_win-#{data['version']}.exe"
+  #sh "cd #{BIN_PATHWIN} && git commit -m \"win release #{ data['version']}\""
+  #sh "cd #{BIN_PATHWIN} && git push"
+#end
 
-desc "buildlinux"
-task :buildlinux do
-  sh "./scripts/embgit.sh -d -b ./dist"
-  sh "cp ./dist/embgit ./resources/linux"
-  set_build_info
-  sh "npm run dist"
-end
+#desc "buildlinux"
+#task :buildlinux do
+#  sh "./scripts/embgit.sh -d -b ./dist"
+#  sh "cp ./dist/embgit ./resources/linux"
+#  set_build_info
+#  sh "npm run dist"
+#end
 
-desc "release_linux"
-task :release_linux do
-  data = getmeta
-  sh "cp ./dist/poppygo_linux_x86_64.AppImage #{BIN_PATH}/poppygo_linux_x86_64-#{data['version']}.AppImage"
-  sh "cd #{BIN_PATH} && git pull"
-  sh "cd #{BIN_PATH} && git add poppygo_linux_x86_64-#{data['version']}.AppImage"
-  sh "cd #{BIN_PATH} && git commit -m \"linux release #{ data['version']}\" || echo oke"
-  sh "cd #{BIN_PATH} && git push"
-end
+#desc "release_linux"
+#task :release_linux do
+#  data = getmeta
+#  sh "cp ./dist/poppygo_linux_x86_64.AppImage #{BIN_PATH}/poppygo_linux_x86_64-#{data['version']}.AppImage"
+#  sh "cd #{BIN_PATH} && git pull"
+#  sh "cd #{BIN_PATH} && git add poppygo_linux_x86_64-#{data['version']}.AppImage"
+#  sh "cd #{BIN_PATH} && git commit -m \"linux release #{ data['version']}\" || echo oke"
+#  sh "cd #{BIN_PATH} && git push"
+#end
 
 desc "thirdpartynotice"
 task "thirdpartynotice" do
