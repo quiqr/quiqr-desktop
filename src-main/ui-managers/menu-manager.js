@@ -663,35 +663,6 @@ resources: []\n\
 
     profilesMenu.push( { type: 'separator' });
 
-    profilesMenu.push({
-      id: 'invite-poppygo-user',
-      label: "Invite PoppyGo User as site member",
-      enabled: this.siteIsPogoCloudManaged(),
-      click: async ()=>{
-        this.inviteUserForSite();
-      }
-    });
-
-    profilesMenu.push( { type: 'separator' });
-
-    profilesMenu.push({
-      id: 'connect-poppygo-user',
-      label: "Request PoppyGo User Connect Code",
-      click: async ()=>{
-        this.requestUserConnectCode();
-      }
-    });
-
-    profilesMenu.push({
-      id: 'enter-connect-code',
-      label: "Enter PoppyGo User Connect code",
-      click: async ()=>{
-        this.enterUserConnectCode();
-      }
-    });
-
-    profilesMenu.push( { type: 'separator' });
-
     if(fs.existsSync(profilesDir)){
       var files = fs.readdirSync(profilesDir);
 
@@ -731,6 +702,47 @@ resources: []\n\
     }
 
     return [];
+  }
+
+  connectProfilesMenu(){
+
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let profilesMenu = [];
+
+    profilesMenu.push({
+      id: 'connect-poppygo-user',
+      label: "Request PoppyGo User Connect Code",
+      click: async ()=>{
+        this.requestUserConnectCode();
+      }
+    });
+
+    profilesMenu.push({
+      id: 'enter-connect-code',
+      label: "Enter PoppyGo User Connect code",
+      click: async ()=>{
+        this.enterUserConnectCode();
+      }
+    });
+
+    return profilesMenu;
+  }
+
+  inviteMenu(){
+
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let profilesMenu = [];
+
+    profilesMenu.push({
+      id: 'invite-poppygo-user',
+      label: "Invite PoppyGo User as site member",
+      enabled: this.siteIsPogoCloudManaged(),
+      click: async ()=>{
+        this.inviteUserForSite();
+      }
+    });
+
+    return profilesMenu;
   }
 
   createVersionsMenu(){
@@ -1257,6 +1269,19 @@ resources: []\n\
             ]
           },
           { type: 'separator' },
+          {
+            id: 'connect-user',
+            label: 'Connect user',
+            submenu: this.connectProfilesMenu()
+          },
+          {
+            id: 'invite',
+            label: 'Invite',
+            submenu: this.inviteMenu()
+          },
+
+          { type: 'separator' },
+
           isMac ? { role: 'close' } : { role: 'quit' }
         ]
       },
