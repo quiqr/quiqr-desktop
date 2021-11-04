@@ -175,20 +175,25 @@ class MenuManager {
     else{
 
       if(await cloudApiManager.connectWithCodeSuccessFul(connect_code)){
-        const dialog = electron.dialog;
 
-        const options = {
-          type: 'info',
-          buttons: [ 'OK'],
-          defaultId: 1,
-          title: 'Connection was successful',
-          message: 'Connection was successful',
-          detail: 'Connection was successful',
-        };
+        cloudCacheManager.updateUserRemoteCaches().then(async ()=>{
 
-        dialog.showMessageBox(null, options, async (response) => {
-          //select user
-          this.setSitesListingView('myremote');
+          const dialog = electron.dialog;
+
+          const options = {
+            type: 'info',
+            buttons: [ 'OK'],
+            defaultId: 1,
+            title: 'Connection was successful',
+            message: 'Connection was successful',
+            detail: 'Connection was successful',
+          };
+
+          dialog.showMessageBox(null, options, async (response) => {
+            //select user
+            this.setSitesListingView('myremote');
+          });
+
         });
 
       }
