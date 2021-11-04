@@ -49,17 +49,14 @@ for full reference of the PoppyGo App and the PoppyGo Platform.
 
 ## Building
 
-###  Building on Windows
+###  Preparing on Windows
 
 * Install the required tools:
   * [Git (optional)](https://nodejs.org/en/download/)
   * [Node + NPM](https://nodejs.org/en/download/)
   * [Visual Studio 2017 (c++ tools)](//docs.microsoft.com/pt-br/visualstudio/)
-* Clone or download the source code.
-* Open the terminal in the project's root directory.
-* Run ```npm install && npm run _rebuild-native && npm run dist-win```
 
-###  Building on Linux
+###  Preparing on Linux
 
 Install the required tools:
 
@@ -70,15 +67,7 @@ sudo apt-get install git-core
 sudo apt-get install libssl-dev
 ```
 
-Clone the repository and set the current directory to the root:
-
-```git clone https://github.com/poppygo/poppygo-app.git && cd sukoh```
-
-Install NPM dependencies and build:
-
-```npm install && npm run _rebuild-native && npm run dist-linux```
-
-### Building on macOS
+### Preparing macOS
 
 Install the required tools:
 
@@ -86,15 +75,60 @@ Install the required tools:
 brew install npm
 ```
 
-Clone the repository and set the current directory to the root:
+### Building
 
-```git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app```
+* Clone or download the source code.
 
-Install NPM dependencies and build:
+```
+git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app
+```
 
-```npm install && npm run _rebuild-native && npm run dist-mac```
+* Open the terminal in the project's root directory.
+* Run
+
+```
+npm install && npm run dist
+```
 
 ## Development
+
+Clone the repository.
+
+```
+git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app
+```
+
+Install npm dependancies.
+
+```
+npm install
+```
+
+Get latest embgit
+
+```
+npm run _pack_embgit
+```
+
+Start electron with a single command.
+
+```
+npm run start
+```
+
+Alternatively you can start two seperate nix-shell terminal (e.g. with tmux),
+one for the backend...
+
+```
+npm run _electron-dev
+```
+
+... and one for the frontend.
+
+```
+npm run _react-dev
+```
+
 
 ### Development Environment on Nix / NixOS
 
@@ -111,27 +145,19 @@ nix-shell
 
 Install npm dependancies.
 
-```npm install```
+```
+npm install
+```
+
+Get latest embgit
+
+``` npm run _pack_embgit```
 
 Start electron with a single command.
 
-```npm run start```
-
-Alternatively you can start two seperate nix-shell terminal (e.g. with tmux),
-one for the backend...
-
 ```
-nix-shell
-npm run _electron-dev
+npm run start
 ```
-
-... and one for the frontend.
-
-```
-nix-shell
-npm run _react-dev
-```
-
 
 ### Stack
 
@@ -140,6 +166,3 @@ npm run _react-dev
 * React
 * Material UI for React JS
 * Go
-
-
-
