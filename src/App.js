@@ -110,7 +110,8 @@ class App extends React.Component<AppProps,AppState>{
         }
       }
       else{
-        this.setState({poppygoUsername: '', poppygoFingerprint: ''});
+        //CAUSES LOOP
+        //this.setState({poppygoUsername: '', poppygoFingerprint: ''});
       }
     }, (e)=>{
     })
