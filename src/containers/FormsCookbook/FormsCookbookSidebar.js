@@ -1,7 +1,5 @@
-//@flow
-
 import * as React from 'react';
-import { Route } from 'react-router';
+import { Route } from 'react-router-dom';
 import { Sidebar } from './../Sidebar';
 import type { SidebarMenu } from './../Sidebar';
 import { samples } from './samples'
