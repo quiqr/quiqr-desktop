@@ -203,6 +203,10 @@ class App extends React.Component<AppProps,AppState>{
         return this.renderWorkspaceSidebar(history, match.url, null, null);
       }} />
 
+      <Route path="/create-new" exact={true} render={ ({match, history})=> {
+        return null;
+      }} />
+
       <Route path="/welcome" exact={true} render={ ({match, history})=> {
         return null;
       }} />
@@ -225,11 +229,25 @@ class App extends React.Component<AppProps,AppState>{
 
   renderSelectSites(){
     this.getProfile();
-    return <SelectSite
-    key={ 'selectSite' }
-    poppygoUsername={this.state.poppygoUsername}
-  />
+    return (
+      <SelectSite
+        key={ 'selectSite' }
+        poppygoUsername={this.state.poppygoUsername}
+      />
+    );
   }
+
+  renderCreateSite() {
+    this.getProfile();
+    return (
+      <SelectSite
+        key={ 'selectSite' }
+        poppygoUsername={this.state.poppygoUsername}
+        createSite={ true }
+      />
+    );
+  }
+
   renderHome(match){
     this.getProfile();
     return <Home
@@ -249,6 +267,11 @@ class App extends React.Component<AppProps,AppState>{
       <Route path='/selectsite' exact render={ () => {
         return this.renderSelectSites();
       }} />
+
+      <Route path='/create-new' exact render={ () => {
+        return this.renderCreateSite();
+      }} />
+
 
       <Route path='/welcome' exact render={ () => {
         return <Welcome key={ 'selectSite' } />

@@ -1173,18 +1173,28 @@ resources: []\n\
             label: 'Open site',
             submenu: this.createViewSitesMenu()
           },
-          //          {
-          //label: 'Open site',
-          //click: async () => {
-          //this.selectSitesWindow();
-          //}
-          //          },
           {
             label: 'New',
             submenu: [
               {
+                id: 'create-new-pick-folder',
+                label: 'New with local Hugo folder',
+
+                click: async () => {
+
+                  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                  mainWindow.webContents.send("frontEndBusy");
+
+                  global.pogoconf.setSitesListingView('unpublished')
+                  global.pogoconf.saveState().then( ()=>{
+                    this.createMainMenu();
+                    global.mainWM.closeSiteAndCreateNew();
+                  });
+                }
+              },
+              {
                 id: 'create-new-from-hugo-theme-url',
-                label: 'Create site from Hugo theme git-URL',
+                label: 'New with Hugo theme git-URL',
                 click: async () => {
                   this.createSiteFromThemeGitUrl();
                 }
