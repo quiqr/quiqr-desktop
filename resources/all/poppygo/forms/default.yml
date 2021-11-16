@@ -1,8 +1,8 @@
 ---
-subject: Contactformulier op hanskoning.com
+subject: some subject
 from: you-have-mail@pogoform.com
-to: info@hanskoning.com
-redirect_to: contact/contactformulier-verzonden
+to: info@example.com
+redirect_to: /form-sent
 validations:
   fields:
     email:
