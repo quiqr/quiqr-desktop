@@ -4,7 +4,7 @@ const path    = require('path');
 const tomlify = require('tomlify-j0.4');
 const toml    = require('toml');
 
-class JsonFormatProvider /*:: implements FormatProvider */{
+class JsonFormatProvider{
 
     defaultExt(){
         return 'json';

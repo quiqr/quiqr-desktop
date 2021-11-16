@@ -112,6 +112,8 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
   });
 }
 
+
+
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   let configuration ;

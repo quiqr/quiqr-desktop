@@ -23,7 +23,7 @@ const configurationDataProvider   = require('../app-prefs-state/configuration-da
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
 const app = electron.app
-let menu = null;
+let menuObject = null;
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
 
@@ -219,8 +219,6 @@ class MenuManager {
 
     }
   }
-
-
 
   async createSiteFromThemeGitUrl(){
     let pogopubl = new PogoPublisher({});
@@ -577,7 +575,7 @@ resources: []\n\
       'auto-create-model',
     ];
     siteRelatedMenuIds.forEach((id)=>{
-      let myItem = menu.getMenuItemById(id);
+      let myItem = menuObject.getMenuItemById(id);
       myItem.enabled = (currentSiteKey?true:false);
     });
 
@@ -1402,6 +1400,14 @@ resources: []\n\
             }
           },
           {
+            id: 'clear-config-cache',
+            label: 'Clear Cache',
+            //enabled: this.siteSelected(),
+            click: async () => {
+              //workspaceConfigProvider.clearCache();
+            }
+          },
+          {
             id: 'open-site-conf',
             label: 'Open workspace config',
             enabled: this.siteSelected(),
@@ -1501,8 +1507,8 @@ resources: []\n\
     });
 
     Promise.all([readProfileAction]).then( () => {
-      menu = Menu.buildFromTemplate(this.mainMenuArray());
-      Menu.setApplicationMenu(menu)
+      menuObject = Menu.buildFromTemplate(this.mainMenuArray());
+      Menu.setApplicationMenu(menuObject)
       return true;
     });
   }

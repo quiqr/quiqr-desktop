@@ -6,6 +6,7 @@ let enableLogging = process.env.ENV==='DEVELOPMENT';
 exports.bind = function(){
 
     let handlers = {};
+  //const apiMain = global.apiMain;
 
     function addListener(key/*: string*/){
         if(apiMain.hasOwnProperty(key)){
