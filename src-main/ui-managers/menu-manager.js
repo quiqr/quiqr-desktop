@@ -24,8 +24,18 @@ const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
 const app = electron.app
 let menuObject = null;
+const apiMain = global.apiMain;
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
+
+let context = {};
+context.reject = function(error){
+  console.log(error);
+}
+
+context.resolve = function(response){
+  console.log(response);
+}
 
 class MenuManager {
 
@@ -1404,7 +1414,7 @@ resources: []\n\
             label: 'Clear Cache',
             //enabled: this.siteSelected(),
             click: async () => {
-              //workspaceConfigProvider.clearCache();
+              global.apiMain.clearWorkSpaceConfigCache({},context);
             }
           },
           {

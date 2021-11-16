@@ -13,7 +13,7 @@ const pogozipper        = require('./import-export/pogozipper');
 const pathHelper        = require('./utils/path-helper');
 const PoppyGoAppConfig  = require('./app-prefs-state/poppygo-app-config');
 const outputConsole     = require('./logger/output-console');
-//const apiMain           = require('./bridge/api-main');
+const apiMain           = require('./bridge/api-main');
 
 unhandled();
 
@@ -43,7 +43,7 @@ global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;
-//global.apiMain = apiMain;
+global.apiMain = apiMain;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

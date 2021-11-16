@@ -1,3 +1,8 @@
+const fs                            = require('fs-extra');
+const path                          = require('path');
+const glob                          = require('glob');
+const { FileCacheToken }            = require('./file-cache-token');
+const WorkspaceConfigValidator      = require('./workspace-config-validator');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 const pathHelper                    = require('./../../utils/path-helper');
 const formatProviderResolver        = require('./../../utils/format-provider-resolver');
@@ -10,7 +15,7 @@ class WorkspaceConfigProvider{
   }
 
   clearCache(){
-    //this.cache = {};
+    this.cache = {};
   }
 
   async getConfig(workspacePath, workspaceKey){
@@ -18,7 +23,7 @@ class WorkspaceConfigProvider{
     let filePath = this._getFilePath(workspacePath);
     let config;
 
-    //console.log(Object.keys( this.cache ));
+    console.log(Object.keys( this.cache ));
 
     if(filePath!=null){
       const cached = this.cache[filePath];

@@ -30,11 +30,9 @@ class WorkspaceService{
         return workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
     }
 
-    /*
-    clearConfigurationsDataCache()
+    clearConfigurationsDataCache(){
       workspaceConfigProvider.clearCache();
     }
-    */
 
     async _smartResolveFormatProvider(filePath , fallbacks ){
         let formatProvider;

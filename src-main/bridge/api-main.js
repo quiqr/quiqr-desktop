@@ -112,7 +112,11 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
   });
 }
 
-
+api.clearWorkSpaceConfigCache = async function({}, context){
+  let workspaceService = new WorkspaceService();
+  workspaceService.clearConfigurationsDataCache();
+  context.resolve(true);
+}
 
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
