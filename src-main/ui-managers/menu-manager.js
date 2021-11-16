@@ -312,7 +312,7 @@ resources: []\n\
         let response = dialog.showMessageBox(options)
         if(response === 1) return;
 
-        fs.copySync(modelFile, path.join(global.currentSitePath, "sukoh.json"));
+        fs.copySync(modelFile, path.join(global.currentSitePath,"poppygo","model", "base.json"));
         if (fs.existsSync(menuFile)){
           fs.copySync(menuFile, path.join(global.currentSitePath, "zpogomenu.json"));
         }
