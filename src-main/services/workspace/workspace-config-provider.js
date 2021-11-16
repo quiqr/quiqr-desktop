@@ -104,16 +104,25 @@ class WorkspaceConfigProvider{
   }
 
   _postProcessConfigObject(configOrg, workspacePath){
+
     if(configOrg){
+      if(!configOrg.menu) configOrg.menu = [];
       if(!configOrg.collections) configOrg.collections = [];
       if(!configOrg.singles) configOrg.singles = [];
     }
 
+    // MERGE INCLUDES
     configOrg = this._loadIncludes(configOrg, workspacePath);
 
     // MERGE PARTIALS
     configOrg.collections = configOrg.collections.map(x => this._mergePartials(x, workspacePath));
     configOrg.singles = configOrg.singles.map(x => this._mergePartials(x, workspacePath));
+
+    // CLEANUP
+    if(!configOrg.menu) delete configOrg['menu'];
+    if(!configOrg.collections) delete configOrg['collections'];
+    if(!configOrg.singles) delete configOrg['singles'];
+
     return configOrg;
   }
 
