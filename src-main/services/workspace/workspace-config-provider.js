@@ -23,7 +23,7 @@ class WorkspaceConfigProvider{
     let filePath = this._getFilePath(workspacePath);
     let config;
 
-    console.log(Object.keys( this.cache ));
+    //console.log(Object.keys( this.cache ));
 
     if(filePath!=null){
       const cached = this.cache[filePath];
@@ -153,14 +153,18 @@ class WorkspaceConfigProvider{
         let mergeData = formatProvider.parse(strData);
         let newData = deepmerge(mergeData, mergeKey);
 
+        //REMOVE DUPLICATES PREFER FIELDS FROM BASE.JSON OVER PARTIALS FIELDS
         newData.fields = newData.fields.reverse().filter((field, index, self) =>
           index === self.findIndex((t) => (
             t.key === field.key
           ))
         )
+        //RESTORE ORDER AGAIN
+        newData.fields = newData.fields.reverse();
 
         mergeKey = newData;
-        //only when merge was succesfull delete the key to prevent error.
+
+        //ONLY WHEN MERGE WAS SUCCESFULL DELETE THE KEY TO PREVENT ERROR.
         delete mergeKey['_mergeFromPartial'];
       }
     }
