@@ -1,4 +1,4 @@
-# PoppyGo App
+# PoppyGo Electron Desktop App
 
 PoppyGo App is a CMS and Publishing tool for Hugo to run on your computer.
 

@@ -37,7 +37,7 @@
     {{- $pogoType = "hidden" -}}
 {{- end -}}
 
-{{- if or (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") -}}
+{{- if or (eq $key "iscjklanguage") (eq $key "resources") (eq $key "previewUrl") (eq $key "headless") (eq $key "draft") -}}
     {{- $pogoType = "skip" -}}
 {{- end -}}
 
