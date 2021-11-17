@@ -96,8 +96,8 @@ function createWindow () {
         //LOOKING FOR INDEX.HTML
 
         let lookups = [
-            path.normalize(path.join(__dirname, '/../index.html')), //works in production
-            path.normalize(path.join(__dirname, '../build/index.html')) //works in development after react_build
+          path.normalize(path.join(__dirname, '/../../index.html')), //works in production
+          path.normalize(path.join(__dirname, '../../build/index.html')) //works in development after react_build
         ];
 
         let indexFile = null;
@@ -131,8 +131,6 @@ function createWindow () {
 
     logWindow.webContents.on('will-navigate', handleRedirect);
     logWindow.webContents.on('new-window', handleRedirect);
-
-    //logWindow.webContents.openDevTools();
 }
 
 module.exports = {

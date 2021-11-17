@@ -108,6 +108,11 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   }
 
   componentWillUpdate(nextProps, nextState) {
+
+    if(this.props.createSite !== nextProps.createSite){
+      this.setState({createSiteDialog: nextProps.createSite});
+    }
+
     if(this.props.poppygoUsername !== nextProps.poppygoUsername){
       this.updateRemoteSites(nextProps.poppygoUsername);
     }
@@ -138,7 +143,6 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     this.setState({currentSiteKey: site.key});
 
     //load all site configuration to enforce validation
-
     service.api.listWorkspaces(site.key).then((workspaces)=>{
 
       this.setState({selectedSiteWorkspaces: workspaces});
@@ -168,10 +172,15 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   }
 
   handleCreateSiteSubmit = (data)=>{
+    let siteKey = data.key;
     this.setState({createSiteDialog:false, blockingOperation:'Creating site...'})
 
-    service.api.createSite(data).then(()=>{
-      return service.getConfigurations(true);
+    service.api.createSite(data).then( ()=> {
+      service.getConfigurations(true).then((c)=>{
+        let site = c.sites.find((x)=>x.key===siteKey);
+        this.mountSite(site);
+      });
+
     }).then(configurations=>{
       this.setState({configurations});
     }).catch((e)=>{
@@ -307,6 +316,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
   render(){
 
     let { configurations, createSiteDialog, remoteSiteDialog } = this.state;
+
 
     if(configurations==null){
       return <Spinner />

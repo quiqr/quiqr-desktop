@@ -456,35 +456,40 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
       }
       else{
-        //collections menu
-        menus.push({
-          title: 'Items',
-          items: this.state.workspace.collections.map((collection, index) => {
-            return {
-              label: collection.title,
-              onClick: () => {
-                history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
-                this.refresh();
-              },
-              active: false
-            }
-          })
-        });
 
-        //singles menu
-        menus.push({
-          title: 'Pages',
-          items: this.state.workspace.singles.map((collection, index) => {
-            return {
-              label: collection.title,
-              onClick: () => {
-                history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
-                this.refresh();
-              },
-              active: false
-            }
-          })
-        });
+        //COLLECTIONS MENU
+        if(this.state.workspace.collections.length > 0){
+          menus.push({
+            title: 'Collections',
+            items: this.state.workspace.collections.map((collection, index) => {
+              return {
+                label: collection.title,
+                onClick: () => {
+                  history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
+                  this.refresh();
+                },
+                active: false
+              }
+            })
+          });
+        }
+
+        //SINGLES MENU
+        if(this.state.workspace.singles.length > 0){
+          menus.push({
+            title: 'Singles',
+            items: this.state.workspace.singles.map((collection, index) => {
+              return {
+                label: collection.title,
+                onClick: () => {
+                  history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
+                  this.refresh();
+                },
+                active: false
+              }
+            })
+          });
+        }
 
       }
     }

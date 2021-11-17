@@ -10,6 +10,7 @@ $this: download go binaries for poppygo/embgit
 
 Usage: $this [-b] bindir [-d] [tag]
   -b sets bindir or installation directory, Defaults to ./bin
+  -p sets bindir to ./resources/mac|win|linux
   -d turns on debug logging
    [tag] is a tag from
    https://github.com/poppygo/embgit/releases
@@ -24,10 +25,11 @@ parse_args() {
   # over-ridden by flag below
 
   BINDIR=${BINDIR:-./bin}
-  while getopts "b:dh?x" arg; do
+  while getopts "b:dhp?x" arg; do
     case "$arg" in
       b) BINDIR="$OPTARG" ;;
       d) log_set_priority 10 ;;
+      p) set_bindir_for_by_arch ;;
       h | \?) usage "$0" ;;
       x) set -x ;;
     esac
@@ -142,6 +144,18 @@ log_prefix() {
 _logp=6
 log_set_priority() {
   _logp="$1"
+}
+set_bindir_for_by_arch() {
+  case "$OS" in
+    darwin)  BINDIR="./resources/mac";;
+    linux)   BINDIR="./resources/linux" ;;
+    windows) BINDIR="./resources/win" ;;
+    *)
+      log_crit "platform $OS is not supported.  Make sure this script is up-to-date and file request at https://github.com/${PREFIX}/issues/new"
+      exit 1
+      ;;
+  esac
+
 }
 log_priority() {
   if test -z "$1"; then

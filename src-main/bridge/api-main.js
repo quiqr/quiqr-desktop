@@ -112,6 +112,12 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
   });
 }
 
+api.clearWorkSpaceConfigCache = async function({}, context){
+  let workspaceService = new WorkspaceService();
+  workspaceService.clearConfigurationsDataCache();
+  context.resolve(true);
+}
+
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   let configuration ;
@@ -313,7 +319,15 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}, context) {
 
 api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, searchLevelKeyVal }, context){
 
-  let fileExp = path.join(global.currentSitePath,searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  let fileExp = path.join(global.currentSitePath, "poppygo", "model", searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  if(glob.sync(fileExp).length < 1){
+    fileExp = path.join(global.currentSitePath, searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  }
+
+  //BACKWARDS COMPATIBILITY
+  if(glob.sync(fileExp).length < 1){
+    fileExp = path.join(global.currentSitePath, 'sukoh'+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  }
   let filePath = glob.sync(fileExp)[0] ;
   let strData = fs.readFileSync(filePath,'utf8');
 

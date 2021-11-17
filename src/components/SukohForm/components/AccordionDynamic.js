@@ -165,8 +165,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       let componentKey = `item-${childIndex}`;
 
       if("dynFormSearchKey" in field){
-        let dynFormObjectFile = "sukoh"; //search in sukoh by default
-        let dynFormObjectRoot = "partials"; //search in sukoh by default
+        let dynFormObjectFile = "base"; //search in model/base by default
+        let dynFormObjectRoot = "dynamics"; //search in sukoh by default
 
         if("dynFormObjectRoot" in field){
           dynFormObjectRoot = field.dynFormObjectRoot;

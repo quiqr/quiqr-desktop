@@ -1,7 +1,7 @@
 {{- $collectionPages := slice -}}
 {{- $singlePages := slice -}}
 {{- $singles := slice -}}
-{{- $partials := slice -}}
+{{- $dynamics := slice -}}
 {{- $singlesMenu := slice -}}
 {{- $collections := slice -}}
 {{- $page_components := slice -}}
@@ -59,9 +59,9 @@
     {{ $name := .Name}}
       {{- with site.GetPage (printf "/poppy-components/%s/%s/index.md" $dir $name) -}}
         {{- $components = $components | append $name -}}
-        {{- $partial := partial "createPartial" (dict "partial" "component" "key" $name "page" . "params" $poppy_select ) -}}
-        {{ if gt (len $partial) 0 }}
-              {{- $partials = $partials | append $partial -}}
+        {{- $dynamic := partial "createPartial" (dict "partial" "component" "key" $name "page" . "params" $poppy_select ) -}}
+        {{ if gt (len $dynamic) 0 }}
+              {{- $dynamics = $dynamics | append $dynamic -}}
         {{- end -}}
       {{- end -}}
     {{- end -}}
@@ -72,9 +72,9 @@
   {{ $name := .Name}}
   {{- with site.GetPage (printf "/my-components/%s" $name) -}}
     {{- $components = $components | append $name -}}
-    {{- $partial := partial "createPartial" (dict "partial" "component" "key" $name "page" . "params" $poppy_select ) -}}
-    {{ if gt (len $partial) 0 }}
-          {{- $partials = $partials | append $partial -}}
+    {{- $dynamic := partial "createPartial" (dict "partial" "component" "key" $name "page" . "params" $poppy_select ) -}}
+    {{ if gt (len $dynamic) 0 }}
+          {{- $dynamics = $dynamics | append $dynamic -}}
     {{- end -}}
   {{- end -}}
 {{ end }}
@@ -428,4 +428,4 @@
 {{- $hugover := printf "extended_%s" hugo.Version -}}
 {{- $serve := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
 {{- $build := slice (dict "key" "default" "config" (partial "configFile" .)) -}}
-{{- dict "hugover" $hugover "serve" $serve "build" $build "menu" $menu "singles" $singles "collections" $collections "partials" $partials | jsonify (dict "prefix" " " "indent" "  ") -}}
+{{- dict "hugover" $hugover "serve" $serve "build" $build "menu" $menu "singles" $singles "collections" $collections "dynamics" $dynamics | jsonify (dict "prefix" " " "indent" "  ") -}}
