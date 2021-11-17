@@ -9,7 +9,6 @@ const { promisify }                   = require('util');
 const Jimp                            = require("jimp");
 const formatProviderResolver          = require('./../../utils/format-provider-resolver');
 const { WorkspaceConfigProvider }     = require('./workspace-config-provider');
-const InitialWorkspaceConfigBuilder   = require('./initial-workspace-config-builder');
 const contentFormats                  = require('./../../utils/content-formats');
 const pathHelper                      = require('./../../utils/path-helper');
 const { createThumbnailJob, globJob } = require('./../../jobs');

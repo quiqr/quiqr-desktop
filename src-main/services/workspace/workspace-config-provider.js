@@ -22,38 +22,58 @@ class WorkspaceConfigProvider{
 
     let filePath = this._getFilePath(workspacePath);
     let config;
-
-    //console.log(Object.keys( this.cache ));
+    let token;
 
     if(filePath!=null){
       const cached = this.cache[filePath];
-      const token = await new FileCacheToken([filePath]).build();
+      token = await new FileCacheToken([filePath]).build();
 
       if(cached!=null){
         if(await cached.token.match(token)){ //can be reused
           return cached.config;
         }
       }
-
-      let config = this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
-      config.path = workspacePath;
-      config.key = workspaceKey;
-
-      this.cache[filePath] = { token, config }
-      return config;
-
     }
     else{
       // need to build default config and update cache
-      const newConfig = this._buildDefaultConfig(workspacePath);
-      config = newConfig.config;
-      filePath = newConfig.path;
-      const token = await (new FileCacheToken([filePath])).build();
-      config.path = workspacePath;
-      config.key = workspaceKey;
-      this.cache[filePath] = { token, config }
-      return config;
+      filePath = this._buildDefaultConfig(workspacePath);
+      token = await (new FileCacheToken([filePath])).build();
+
+      //THIS SEEMS NEW CHECK IF README EXIST OR CREATE
+      let readmePath = path.join(workspacePath,'poppygo','home','index.md');
+      if( !fs.existsSync(readmePath) ){
+        fs.ensureDirSync(path.join(workspacePath,'poppygo','home'));
+        fs.writeFileSync(
+          readmePath,
+          `
+# README FOR NEW SITE
+
+If you're a developer you can read the [PoppyGo Site Developer
+Docs](https://poppygo.github.io/poppygo-book/)
+how to customize your Site Admin.
+
+PoppyGo is a Desktop App made for [Hugo](https://gohugo.io). Read all about
+[creating Hugo websites](https://gohugo.io/getting-started/quick-start/).
+
+To change this about text, edit this file: *${readmePath}*.
+
+Happy Creating.
+
+❤️ PoppyGo
+        `.trim()
+        );
+
+      }
+
     }
+
+    config = this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
+    config.path = workspacePath;
+    config.key = workspaceKey;
+
+    this.cache[filePath] = { token, config }
+    return config;
+
   }
 
   //CREATE poppygo/base.yaml
@@ -72,16 +92,31 @@ class WorkspaceConfigProvider{
   //CREATE poppygo/base.yaml
   _buildDefaultConfig(workspacePath){
     let configBuilder = new InitialWorkspaceConfigBuilder(workspacePath);
-    let {data, formatProvider} = configBuilder.build();
+    let {dataBase, formatProvider} = configBuilder.buildBase();
+    let dataInclude = configBuilder.buildInclude();
+    let dataPartial = configBuilder.buildPartials();
 
     fs.ensureDirSync(path.join(workspacePath,'poppygo','model'));
+    fs.ensureDirSync(path.join(workspacePath,'poppygo','model','includes'));
+    fs.ensureDirSync(path.join(workspacePath,'poppygo','model','partials'));
 
-    let filePath = path.join(workspacePath,'poppygo','model','base.'+formatProvider.defaultExt());
+    let filePathInclude = path.join(workspacePath,'poppygo','model','includes','collections.'+formatProvider.defaultExt());
+    let filePathPartial = path.join(workspacePath,'poppygo','model','partials', 'page.'+formatProvider.defaultExt());
+    let filePathBase    = path.join(workspacePath,'poppygo','model','base.'+formatProvider.defaultExt());
+
     fs.writeFileSync(
-      filePath,
-      formatProvider.dump(data)
+      filePathBase,
+      formatProvider.dump(dataBase)
     );
-    return { config: data, path: filePath };
+    fs.writeFileSync(
+      filePathInclude,
+      formatProvider.dump(dataInclude)
+    );
+    fs.writeFileSync(
+      filePathPartial,
+      formatProvider.dump(dataPartial)
+    );
+    return filePathBase;
   }
 
   _loadConfigurationsData(filePath, workspaceKey, workspacePath){
@@ -119,9 +154,9 @@ class WorkspaceConfigProvider{
     configOrg.singles = configOrg.singles.map(x => this._mergePartials(x, workspacePath));
 
     // CLEANUP
-    if(!configOrg.menu) delete configOrg['menu'];
-    if(!configOrg.collections) delete configOrg['collections'];
-    if(!configOrg.singles) delete configOrg['singles'];
+    if(configOrg.menu.length < 1) delete configOrg['menu'];
+    if(configOrg.collections.length < 1) delete configOrg['collections'];
+    if(configOrg.singles.length < 1) delete configOrg['singles'];
 
     return configOrg;
   }

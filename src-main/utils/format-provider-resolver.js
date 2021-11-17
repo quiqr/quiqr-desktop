@@ -4,7 +4,7 @@ const path    = require('path');
 const tomlify = require('tomlify-j0.4');
 const toml    = require('toml');
 
-class JsonFormatProvider{
+class JsonFormatProvider /*:: implements FormatProvider */{
 
     defaultExt(){
         return 'json';
@@ -212,11 +212,6 @@ ${content}`;
 
 class FormatProviderResolver{
 
-     /*::
-     _formats: {[key:string]: FormatProvider};
-     _exts: Array<string>;
-     */
-
     constructor(){
         let yaml = new YamlFormatProvider();
         this._formats = {
@@ -236,7 +231,7 @@ class FormatProviderResolver{
         return this._formats[this.getDefaultFormatExt()];
     }
 
-    getDefaultFormatExt()/*: string*/{
+    getDefaultFormatExt(){
         return 'yaml';
     }
 
