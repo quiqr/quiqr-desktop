@@ -7,8 +7,6 @@ const configurationDataProvider = require('../app-prefs-state/configuration-data
 
 let logWindow;
 
-console.log("loaded")
-
 function showNotFound(logWindow/*: any*/, lookups/*: Array<string>*/){
   let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
   logWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
