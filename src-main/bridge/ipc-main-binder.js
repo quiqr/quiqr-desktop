@@ -3,6 +3,10 @@ let apiMain     = require('./api-main');
 
 let enableLogging = process.env.ENV==='DEVELOPMENT';
 
+exports.api = function(){
+  return apiMain;
+}
+
 exports.bind = function(){
 
   let handlers = {};

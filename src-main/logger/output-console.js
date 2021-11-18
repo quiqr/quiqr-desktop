@@ -11,7 +11,6 @@ class OutputConsole{
     console.log(line);
 
     let logWindow = logWindowManager.getCurrentInstance();
-    console.log(logWindowManager);
     if(logWindow)
       logWindow.webContents.send('message',{ type:'console', data:{ line }});
 
