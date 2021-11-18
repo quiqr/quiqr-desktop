@@ -43,6 +43,7 @@ global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;
+global.apiMain = apiMain;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
