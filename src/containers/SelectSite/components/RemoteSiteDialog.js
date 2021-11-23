@@ -65,7 +65,7 @@ class RemoteSiteDialog extends React.Component{
     let errorTextSiteName = "";
     let execButtonsDisabled = false;
 
-    if(this.state.localsites.includes(newName)){
+    if(this.state.localsites && this.state.localsites.includes(newName)){
       errorTextSiteName = "Name is already used locally."
       execButtonsDisabled = true;
     }
