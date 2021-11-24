@@ -79,7 +79,7 @@
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
     "build": "npm run clean && npm run _copy-ace && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
-    "dist": "npm run build && electron-builder -p always",
+    "dist": "npm run build && electron-builder",
     "mac-notarize": "node scripts/notarize.js",
     "_react-dev": "cross-env APP_ENV=development cross-env BROWSER=none cross-env PORT=4000 cross-env react-scripts start",
     "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4000 cross-env  electron .",
@@ -158,7 +158,6 @@
     "publish": [
       {
         "provider": "github",
-        "token": "{{secrets.GITHUB_TOKEN}}"
       }
     ],
     "fileAssociations": [
