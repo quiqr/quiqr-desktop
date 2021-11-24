@@ -5,6 +5,10 @@
     "name": "Pim Snel, Brecht Swanenberg",
     "email": "info@poppygo.io"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/poppygo/poppygo-electron-app.git"
+  },
   "description": "The PoppyGo Hugo Publishing App",
   "version": "0.9.0",
   "private": true,
@@ -75,14 +79,14 @@
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
     "build": "npm run clean && npm run _copy-ace && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
-    "dist": "npm run build && electron-builder",
+    "dist": "npm run build && electron-builder -p always",
     "mac-notarize": "node scripts/notarize.js",
     "_react-dev": "cross-env APP_ENV=development cross-env BROWSER=none cross-env PORT=4000 cross-env react-scripts start",
     "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4000 cross-env  electron .",
     "start": "npm run _copy-ace && concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
   },
   "build": {
-    "appId": "com.lingewoud.poppygo",
+    "appId": "io.poppygo.poppygo-desktop",
     "artifactName": "poppygo_${os}_${arch}.${ext}",
     "productName": "PoppyGo",
     "directories": {
@@ -153,9 +157,8 @@
     },
     "publish": [
       {
-        "provider": "s3",
-        "bucket": "poppygo-app-releases",
-        "region": "eu-west-1"
+        "provider": "github",
+        "token": "{{secrets.GITHUB_TOKEN}}"
       }
     ],
     "fileAssociations": [
