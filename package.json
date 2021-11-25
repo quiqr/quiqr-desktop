@@ -86,6 +86,16 @@
     "directories": {
       "buildResources": "public"
     },
+    "publish": [
+      {
+        "provider": "github"
+      },
+      {
+        "provider": "s3",
+        "bucket": "poppygo-app-releases",
+        "region": "eu-west-1"
+      }
+    ],
     "protocols": [
       {
         "name": "poppygo",

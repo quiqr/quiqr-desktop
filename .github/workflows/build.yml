@@ -41,7 +41,10 @@ jobs:
           # release the app after building
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
-        #env:
-        # macOS notarization API key
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+          # macOS notarization API key
           #API_KEY_ID: ${{ secrets.api_key_id }}
           #API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
