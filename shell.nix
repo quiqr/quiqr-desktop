@@ -33,6 +33,13 @@ let
   });
 in
   pkgs.mkShell {
+    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+      pkgs.stdenv.cc.cc
+    #  pkgs.libGL
+      pkgs.zlib
+    #  pkgs.glib
+    ];
+
     nativeBuildInputs = [
       pkgs.nodejs
       pkgs.hugo
@@ -40,6 +47,7 @@ in
       myPackages.embgit
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_5}/bin/";
+    NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
     HUGO_PATH="${pkgs.hugo}/bin/hugo";
   }
