@@ -32,10 +32,6 @@ let fields: Array<any> = [
     { key:'chips-section', title:'Chips', type:'section', groupdata:false, fields:[
         { key:'chips', title:'Chips', type:'chips' }
     ]},
-    { key:'code-editor-section', title:'Code Editor', type:'section', groupdata:false, fields:[
-        { key:'code-editor-html', title:'Code Editor HTML', type:'code-editor', lightTheme:true, language: 'html' },
-        { key:'code-editor-markdown', title:'Code Editor Markdown', type:'code-editor', language: 'markdown' }
-    ]},
     { key:'date-section', title:'Date', type:'section', groupdata:false, fields:[
         { key:'date', title:'Date', type:'date'}
     ]},

@@ -1,5 +1,4 @@
 import AccordionDynamic from './AccordionDynamic';
-import AceDynamic from './AceDynamic';
 import ArrayDynamic from './ArrayDynamic';
 import ChipsDynamic from './ChipsDynamic';
 import DateDynamic from './DateDynamic';
@@ -21,7 +20,6 @@ import BundleImgThumbDynamic from './BundleImgThumbDynamic';
 
 export default [
     AccordionDynamic,
-    AceDynamic,
     ArrayDynamic,
     BundleImgThumbDynamic,
     ChipsDynamic,

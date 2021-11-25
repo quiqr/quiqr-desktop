@@ -126,7 +126,7 @@ class CloudGitManager {
       let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
       fingerprint = gencmd.toString().replace(/\n/g,"");
     } catch (e) {
-      console.log(e.stderr.toString());
+      console.log(e);
     }
 
     return fingerprint;
