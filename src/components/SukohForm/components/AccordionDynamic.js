@@ -150,7 +150,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
   procDynamicFields(){
 
     let {context} = this.props;
-    let {node, currentPath} = context;
+    let {node} = context;
     let {field} = node;
 
     let dynFields = {}
@@ -199,6 +199,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
               if (typeof found === 'undefined') {
                 return true;
               }
+              return false; // TODO TESTEN
             });
 
             let newFields = cleanedFieldFields.concat(extraFields.fields);

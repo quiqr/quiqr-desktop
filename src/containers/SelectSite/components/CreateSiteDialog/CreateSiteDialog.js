@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Dialog, FlatButton, MenuItem, SelectField, TextField } from 'material-ui-02';
+import { Dialog, FlatButton, TextField } from 'material-ui-02';
 import FolderSourceForm from './components/FolderSourceForm';
 
 type CreateSiteDialogProps = {
@@ -13,10 +13,6 @@ type CreateSiteDialogState = {
   model: any,
   sourceIndex: number,
   key: string
-}
-
-function NotImplementedSourceForm(){
-  return <p>This feature is not implemented yet.</p>;
 }
 
 const SITE_SOURCES = [

@@ -666,7 +666,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   handleUpgradeLinkedSite(pressed){
 
-    let site = this.state.selectedSite;
+    //let site = this.state.selectedSite;
 
     if(this.state.pogoAccountStatus === "unconfirmed_member"){
       snackMessageService.addSnackMessage('You need to confirm your email. Please check your mail.');
@@ -995,20 +995,24 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
     else if(this.checkLinkedPogoCloudPath()){
 
+      /*
       let disconnectButton = ""
       if( this.state.pogoCustomDomain !== "not set"){
         disconnectButton = <button className="reglink" onClick={()=>{this.handleDisconnectDomain()}}>disconnect custom domain</button>
       }
+      */
 
       let editPlanButton = ""
       if(this.state.pogoSiteStatus === "active" && this.state.pogoUserRole === "owner"){
         editPlanButton = <span style={{marginLeft:"50px"}}><button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button></span>
       }
 
+      /*
       let ownerInfo = ""
       if(this.state.pogoSiteStatus === "noAccess"){
         ownerInfo = <div>This domain is owned by somebody else</div>
       }
+      */
 
       let planInfo = ""
       if(this.state.pogoSiteStatus === "active"){
