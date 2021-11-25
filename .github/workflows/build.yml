@@ -25,9 +25,9 @@ jobs:
         with:
           node-version: 14
 
+      # Import Apple API key for app notarization on macOS
       - name: Prepare for app notarization (macOS)
         if: startsWith(matrix.os, 'macos')
-        # Import Apple API key for app notarization on macOS
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
@@ -40,8 +40,6 @@ jobs:
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
 
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
@@ -57,8 +55,7 @@ jobs:
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
 
       - name: Install Snapcraft
-          uses: samuelmeuli/action-snapcraft@v1
-          # Only install Snapcraft on Ubuntu
-          if: startsWith(matrix.os, 'ubuntu')
-          with:
-            snapcraft_token: ${{ secrets.snapcraft_token }}
+        uses: samuelmeuli/action-snapcraft@v1
+        if: startsWith(matrix.os, 'ubuntu')
+        with:
+          snapcraft_token: ${{ secrets.snapcraft_token }}
