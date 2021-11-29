@@ -17,6 +17,7 @@ import ReadonlyDynamic from './ReadonlyDynamic';
 import BundleManagerDynamic from './BundleManagerDynamic';
 import SectionDynamic from './SectionDynamic';
 import SelectDynamic from './SelectDynamic';
+import SliderDynamic from './SliderDynamic';
 import BundleImgThumbDynamic from './BundleImgThumbDynamic';
 
 export default [
@@ -37,6 +38,7 @@ export default [
     BundleManagerDynamic,
     SectionDynamic,
     SelectDynamic,
+    SliderDynamic,
     TextFieldDynamic,
     TextFieldNumberDynamic,
     ToggleDynamic
