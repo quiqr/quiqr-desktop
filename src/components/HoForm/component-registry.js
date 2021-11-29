@@ -1,4 +1,3 @@
-//@flow
 import * as React from 'react';
 import type {ComponentProps, FieldBase} from './types';
 import BaseDynamic from './BaseDynamic';

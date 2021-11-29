@@ -1,5 +1,3 @@
-//@flow
-
 export class Debounce{
 
     timeout: ?any = null;

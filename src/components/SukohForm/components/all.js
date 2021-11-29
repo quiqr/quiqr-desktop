@@ -1,6 +1,7 @@
 import AccordionDynamic from './AccordionDynamic';
 import ArrayDynamic from './ArrayDynamic';
 import ChipsDynamic from './ChipsDynamic';
+import ColorToolDynamic from './ColorToolDynamic';
 import DateDynamic from './DateDynamic';
 import EmptyLineDynamic from './EmptyLineDynamic';
 import HiddenDynamic from './HiddenDynamic';
@@ -16,6 +17,7 @@ import ReadonlyDynamic from './ReadonlyDynamic';
 import BundleManagerDynamic from './BundleManagerDynamic';
 import SectionDynamic from './SectionDynamic';
 import SelectDynamic from './SelectDynamic';
+import SliderDynamic from './SliderDynamic';
 import BundleImgThumbDynamic from './BundleImgThumbDynamic';
 
 export default [
@@ -23,6 +25,7 @@ export default [
     ArrayDynamic,
     BundleImgThumbDynamic,
     ChipsDynamic,
+    ColorToolDynamic,
     DateDynamic,
     EmptyLineDynamic,
     LeafArrayDynamic,
@@ -35,6 +38,7 @@ export default [
     BundleManagerDynamic,
     SectionDynamic,
     SelectDynamic,
+    SliderDynamic,
     TextFieldDynamic,
     TextFieldNumberDynamic,
     ToggleDynamic
