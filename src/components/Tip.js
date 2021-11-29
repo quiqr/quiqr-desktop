@@ -94,7 +94,7 @@ class Tip extends Component<TipProps, TipState> {
                 zIndex: 5,
                 fontSize: '80%',
                 padding: '0.3em 0.9em',
-                background: '#16062f',
+                background: '#EAE4AD',
                 color:'white',
                 borderRadius: '3px'
             };

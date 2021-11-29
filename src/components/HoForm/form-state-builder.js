@@ -1,5 +1,3 @@
-//@flow
-
 import { ComponentRegistry } from './component-registry';
 
 export class FormStateBuilder{

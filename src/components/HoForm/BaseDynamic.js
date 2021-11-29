@@ -1,5 +1,3 @@
-//@flow
-
 import * as React from 'react';
 import Border from './../Border';
 import type { ComponentContext, ComponentProps, DynamicFormNode, BreadcumbItem, FieldBase } from './types';

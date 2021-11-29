@@ -37,20 +37,3 @@ export type BreadcumbProps = {
 };
 
 export type BreadcumbComponentType = React.ComponentType<BreadcumbProps>;
-
-/*
-interface Base{
-    base:number;
-}
-type BaseExtended = Base & { extended:number }
-type Unbased = { extended:number }
-type ABase = { a:Base };
-type A<T1: Base> = { a:T1 } & ABase;
-
-interface IHaveName{
-    name: string
-}
-
-let varExtended: A<BaseExtended> = { a:{base:1, extended:1} };
-let varBase: ABase = varExtended;
-*/
