@@ -11,8 +11,8 @@ const action  = async ({src , dest}) => {
 
   const ext = path.extname(src).toLowerCase();
 
-  if(ext == ".mp4"){
-
+  if(ext == ".gif"){
+    await fs.copy(src, dest);
   }
   else{
     let resizePromise = new Promise((resolve, reject)=>{

@@ -484,6 +484,7 @@ class WorkspaceService{
 
       if(!thumbSrcExists){
         try{
+          console.log("we ghan");
           await createThumbnailJob(src, thumbSrc);
         }
         catch(e){
