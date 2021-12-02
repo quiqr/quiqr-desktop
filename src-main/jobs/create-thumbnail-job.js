@@ -5,22 +5,30 @@ const path = require('path');
 const action  = async ({src , dest}) => {
   await fs.ensureDir(path.dirname(dest));
 
+  console.log(src)
+  console.log(dest)
+  console.log("thumbnailJob");
 
+  const ext = path.extname(src).toLowerCase();
 
-  console.log ("thumbnailJob");
-  let resizePromise = new Promise((resolve, reject)=>{
-    jimp.read(src, function (err, lenna) {
-      if (err) reject(err);
-      else{
-        lenna.scaleToFit(400,400).write(dest, (err) =>{
-          if(err) reject();
-          else resolve();
-        });
-      }
+  if(ext == ".mp4"){
+
+  }
+  else{
+    let resizePromise = new Promise((resolve, reject)=>{
+      jimp.read(src, function (err, lenna) {
+        if (err) reject(err);
+        else{
+          lenna.scaleToFit(400,400).write(dest, (err) =>{
+            if(err) reject();
+            else resolve();
+          });
+        }
+      });
     });
-  });
 
-  await resizePromise;
+    await resizePromise;
+  }
 
   let thumbExistsPromise = new Promise((resolve, reject)=>{
     fs.exists(dest,(exists)=> resolve(exists));
@@ -30,6 +38,8 @@ const action  = async ({src , dest}) => {
   if(!thumbExists){
     throw new Error('Something went wrong');
   }
+
+
 }
 
 module.exports = action;

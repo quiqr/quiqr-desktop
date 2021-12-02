@@ -3,28 +3,32 @@ const crypto = require("crypto");
 
 class BackgroundJobRunner{
 
-    run(action , params ) {
-        return new Promise((resolve, reject)=>{
-            let actionWindow = new BrowserWindow({
-                webPreferences: {
-                    nodeIntegration: true,
-                },
-                show: false,
-                backgroundColor:"#ffffff"
-            });
-            let html = `<html><body><p>Running Action.</p></body></html>`;
-            actionWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+  run(action , params ) {
+    console.log("running bg job");
+    console.log(action);
+    console.log(params);
 
-            let channel = crypto.randomBytes(16).toString("hex");
-            ipcMain.once(channel, (event, {response, e})=>{
-                actionWindow.close();
-                if(e==null)
-                    resolve(response);
-                else
-                    reject(e);
-            });
+    return new Promise((resolve, reject)=>{
+      let actionWindow = new BrowserWindow({
+        webPreferences: {
+          nodeIntegration: true,
+        },
+        show: false,
+        backgroundColor:"#ffffff"
+      });
+      let html = `<html><body><p>Running Action.</p></body></html>`;
+      actionWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
 
-            actionWindow.webContents.executeJavaScript(`
+      let channel = crypto.randomBytes(16).toString("hex");
+      ipcMain.once(channel, (event, {response, e})=>{
+        actionWindow.close();
+        if(e==null)
+          resolve(response);
+        else
+          reject(e);
+      });
+
+      actionWindow.webContents.executeJavaScript(`
 const action = require('${action.replace(/\\/g,'/')}');
 const { ipcRenderer } = require('electron');
 
@@ -34,8 +38,8 @@ action(${JSON.stringify(params)}).then((response)=>{
     ipcRenderer.send('${channel}', {response:null,e});
 });
 `);
-        });
-    }
+    });
+  }
 }
 
 module.exports = BackgroundJobRunner;

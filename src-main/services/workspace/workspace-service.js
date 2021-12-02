@@ -445,7 +445,12 @@ class WorkspaceService{
     });
   }
 
+  //TODO RENAME ALSO USED FOR SINGLES
   async getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath){
+
+    console.log(collectionItemKey)
+    console.log(collectionKey)
+    console.log(targetPath)
 
     let config = await this.getConfigurationsData();
 
@@ -474,8 +479,13 @@ class WorkspaceService{
 
     let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
     let thumbSrcExists = await this.existsPromise(thumbSrc);
-    let targetExt = path.extname(targetPath)
-    if (targetExt != ".svg" && targetExt != ".md" && targetExt != ".pdf" ){
+    let targetExt = path.extname(targetPath).toLowerCase();
+
+    if (targetExt == ".png" ||
+      targetExt == ".jpg" ||
+      targetExt == ".jpeg" ||
+      targetExt == ".gif" ){
+
       if(!thumbSrcExists){
         try{
           await createThumbnailJob(src, thumbSrc);

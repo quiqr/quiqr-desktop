@@ -45,6 +45,9 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     for(let r = 0; r < state['resources'].length; r++){
       let resource = state['resources'][r];
 
+      if(!field.extensions){
+        field.extensions= [];
+      }
       if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
         stateBuilder.setLevelState(resource, field.fields);
       }
@@ -99,6 +102,10 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
 
     if(currentPath!==parentPath){
       return (null);
+    }
+
+    if(!field.extensions){
+      field.extensions= [];
     }
 
     let itemsStates = context.value.filter(x => {
