@@ -4,6 +4,7 @@ import ChipsDynamic from './ChipsDynamic';
 import ColorToolDynamic from './ColorToolDynamic';
 import DateDynamic from './DateDynamic';
 import EmptyLineDynamic from './EmptyLineDynamic';
+import EasyMarkDownDynamic from './EasyMarkDownDynamic';
 import HiddenDynamic from './HiddenDynamic';
 import InfoDynamic from './InfoDynamic';
 import LeafArrayDynamic from './LeafArrayDynamic'
@@ -28,6 +29,7 @@ export default [
     ColorToolDynamic,
     DateDynamic,
     EmptyLineDynamic,
+    EasyMarkDownDynamic,
     LeafArrayDynamic,
     HiddenDynamic,
     InfoDynamic,
