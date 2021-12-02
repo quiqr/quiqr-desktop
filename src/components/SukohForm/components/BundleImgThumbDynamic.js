@@ -3,6 +3,7 @@ import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import Spinner from '../../Spinner';
+import service from '../../../services/service';
 
 type BundleImgThumbDynamicField = {
   key: string,
@@ -28,6 +29,8 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
     //let {node, form} = this.props.context;
     //let {node} = this.props.context;
     //let {field, state} = node;
+    //service.api.logToConsole(this.state.src);
+
     return (
       <div className="checkered" style={{ width:'auto', height:'100%', marginBottom:'0px', overflow:'hidden', backgroundColor: '#ccc'}}>
         {

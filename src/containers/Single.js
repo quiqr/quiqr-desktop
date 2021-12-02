@@ -1,14 +1,8 @@
-//@flow
-
 import React from 'react';
 import service from './../services/service'
 import { snackMessageService } from './../services/ui-service'
-//import { Redirect } from 'react-router-dom'
 import { SukohForm } from './../components/SukohForm';
 import Spinner from './../components/Spinner';
-//import { FormBreadcumb } from './../components/Breadcumb'
-
-//import type { Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig, SingleConfig } from './../types';
 import type { WorkspaceConfig, SingleConfig } from './../types';
 
 type SingleProps = {
@@ -113,9 +107,11 @@ class Single extends React.Component<SingleProps,SingleState>{
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
     plugins={{
+
       openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
         return service.api.openFileDialogForCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions});
       },
+
       getBundleThumbnailSrc: function(targetPath){
         return service.api.getThumbnailForCollectionItemImage(siteKey,workspaceKey,"",singleKey, targetPath);
       }
