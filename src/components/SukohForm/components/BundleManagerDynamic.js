@@ -67,6 +67,10 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     let {context} = this.props;
     let {field} = context.node;
 
+    if(field.extensions.length === 0){
+      delete field.extensions;
+    }
+
     context.form.props.plugins.openBundleFileDialog({title:field.title, extensions: field.extensions, targetPath: field.path})
       .then((files)=>{
         if(files){
