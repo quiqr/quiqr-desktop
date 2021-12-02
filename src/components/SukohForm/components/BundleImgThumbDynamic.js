@@ -3,8 +3,7 @@ import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import Spinner from '../../Spinner';
-import service from '../../../services/service';
-
+//import service from '../../../services/service';
 import MovieIcon from '@material-ui/icons/Movie';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
@@ -30,7 +29,7 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
   }
 
   renderComponent(){
-    let {node, form} = this.props.context;
+    let {node} = this.props.context;
     let {field, state} = node;
     if(this.isImage(state[field.src||'src'])){
       return (
@@ -72,7 +71,7 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
 
   isPDF(file){
     const extname = this.getExt(file);
-    if(extname=='pdf'
+    if(extname==='pdf'
     ){
       return true;
     }
@@ -81,10 +80,11 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
   }
   isImage(file){
     const extname = this.getExt(file);
-    if(extname=='gif' ||
-      extname == 'png' ||
-      extname == 'jpg' ||
-      extname == 'jpeg'
+    if(extname ==='gif' ||
+      extname === 'png' ||
+      extname === 'svg' ||
+      extname === 'jpg' ||
+      extname === 'jpeg'
     ){
       return true;
     }
@@ -94,10 +94,10 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
 
   isVideo(file){
     const extname = this.getExt(file);
-    if(extname=='mov' ||
-      extname == 'mpg' ||
-      extname == 'mpeg' ||
-      extname == 'mp4'
+    if(extname ==='mov' ||
+      extname === 'mpg' ||
+      extname === 'mpeg' ||
+      extname === 'mp4'
     ){
       return true;
     }

@@ -11,7 +11,9 @@ const action  = async ({src , dest}) => {
 
   const ext = path.extname(src).toLowerCase();
 
-  if(ext == ".gif"){
+  if(ext === ".gif" ||
+    ext === ".svg"
+  ){
     await fs.copy(src, dest);
   }
   else{

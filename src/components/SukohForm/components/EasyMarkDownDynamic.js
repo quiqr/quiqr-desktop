@@ -4,7 +4,7 @@ import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import Tip from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
-import service                              from './../../../services/service'
+//import service                              from './../../../services/service'
 
 type EasyMarkdownDynamicField = {
   key: string,

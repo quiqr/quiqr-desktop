@@ -151,7 +151,9 @@ class WorkspaceService{
       for(let r = 0; r < document.resources.length; r++){
         let resource = document.resources[r];
         if(resource.__deleted){
+
           let fullSrc = path.join(directory, resource.src);
+          this.removeThumbnailForItemImage("", singleKey, resource.src);
           await fs.remove(fullSrc);
         }
       }
@@ -368,6 +370,7 @@ class WorkspaceService{
     shell.openItem(filePath);
   }
 
+  // TODO REMOVE CODE SMELL REDUNDANT CODE WITH SINGLE
   async updateCollectionItem(collectionKey , collectionItemKey , document ){
     //TODO: only work with "label" of a collection item
     let config = await this.getConfigurationsData();
@@ -390,7 +393,9 @@ class WorkspaceService{
       for(let r = 0; r < document.resources.length; r++){
         let resource = document.resources[r];
         if(resource.__deleted){
+
           let fullSrc = path.join(directory, resource.src);
+          this.removeThumbnailForItemImage("", singleKey, resource.src);
           await fs.remove(fullSrc);
         }
       }
@@ -445,6 +450,24 @@ class WorkspaceService{
     });
   }
 
+  async removeThumbnailForItemImage(collectionKey, collectionItemKey, targetPath){
+    let folder;
+    let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
+    if(collectionKey == ""){
+      folder = path.basename(await this.getSingleFolder(collectionItemKey));
+    }
+    else {
+      let collection = config.collections.find(x => x.key === collectionKey);
+      folder = collection.folder;
+    }
+
+    let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
+    let thumbSrcExists = await this.existsPromise(thumbSrc);
+    if(thumbSrcExists){
+      fs.remove(thumbSrc);
+    }
+  }
+
   //TODO RENAME ALSO USED FOR SINGLES
   async getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath){
 
@@ -454,7 +477,6 @@ class WorkspaceService{
     let folder;
     let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
     if(collectionKey == ""){
-
       src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
       folder = path.basename(await this.getSingleFolder(collectionItemKey));
     }
@@ -475,16 +497,16 @@ class WorkspaceService{
 
     let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
     let thumbSrcExists = await this.existsPromise(thumbSrc);
-    let targetExt = path.extname(targetPath).toLowerCase();
+    let ext = path.extname(thumbSrc).replace('.','').toLowerCase();
 
-    if (targetExt == ".png" ||
-      targetExt == ".jpg" ||
-      targetExt == ".jpeg" ||
-      targetExt == ".gif" ){
+    if (ext === "png" ||
+      ext === "jpg" ||
+      ext === "jpeg" ||
+      ext === "svg" ||
+      ext === "gif" ){
 
       if(!thumbSrcExists){
         try{
-          console.log("we ghan");
           await createThumbnailJob(src, thumbSrc);
         }
         catch(e){
@@ -493,7 +515,8 @@ class WorkspaceService{
       }
     }
 
-    let ext = path.extname(thumbSrc).replace('.','');
+    if (ext === "svg") ext = "svg+xml";
+
     let mime = `image/${ext}`;
     let buffer = await promisify(fs.readFile)(thumbSrc);
     let base64 = buffer.toString('base64');

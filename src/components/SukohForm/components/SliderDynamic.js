@@ -5,7 +5,7 @@ import Slider from '@material-ui/core/Slider';
 import Tip from '../../Tip';
 import Typography from '@material-ui/core/Typography';
 import { BaseDynamic } from '../../HoForm';
-import service                              from './../../../services/service'
+//import service                              from './../../../services/service'
 
 type SliderDynamicField = {
   key: string,

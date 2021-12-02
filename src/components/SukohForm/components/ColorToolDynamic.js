@@ -4,8 +4,9 @@ import FormItemWrapper from './shared/FormItemWrapper';
 import Tip from '../../Tip';
 import { ColorPicker } from 'material-ui-color';
 import { BaseDynamic } from '../../HoForm';
-import service                              from './../../../services/service'
+//import service                              from './../../../services/service'
 
+/*
 type ColorToolDynamicField = {
   key: string,
   compositeKey: string,
@@ -14,6 +15,7 @@ type ColorToolDynamicField = {
   tip: ?string,
   title: ?string
 }
+*/
 
 const palette = {
   red: '#ff0000',

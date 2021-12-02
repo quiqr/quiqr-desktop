@@ -4,9 +4,6 @@ const crypto = require("crypto");
 class BackgroundJobRunner{
 
   run(action , params ) {
-    console.log("running bg job");
-    console.log(action);
-    console.log(params);
 
     return new Promise((resolve, reject)=>{
       let actionWindow = new BrowserWindow({
