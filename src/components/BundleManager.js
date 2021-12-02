@@ -33,6 +33,10 @@ class BundleManagerItem extends React.Component{
     render(){
         let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
 
+        let _style = Object.assign({
+            minWidth: '250px'
+        }, style);
+
         let _headStyle = Object.assign({
             border: 'solid 0px #e8e8e8',
             padding: '12px 0px 12px 8px',
@@ -58,7 +62,7 @@ class BundleManagerItem extends React.Component{
             boxShadow: '1px 1px 4px RGBA(0,0,0,.2)'
         },bundleStyle);
 
-        return <div style={style} className="BundleManager-item col-xl-3 col-lg-4 col-6" {...wrapperProps} >
+        return <div style={_style} className="BundleManager-item col-xl-3 col-lg-4 col-6" {...wrapperProps} >
               <div style={_bundleStyle}>
                 <BundleManagerHeader
                     style={_headStyle}

@@ -120,7 +120,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       );
     });
 
-
     return (<React.Fragment>
       <div style={{padding:'16px 0'}}>
         <strong>{field.title?field.title:"Page files"}</strong>
@@ -134,10 +133,19 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
             uiState:{},
             parent: node
           };
+
+          let filename = state.name||state.src;
+          let _farr = filename.split('.');
+          let fName = _farr[0];
+          let fExtention = _farr[1];
+          if(fName.length > 25){
+            filename = fName.substr(0,10) + "..." + fName.substr(-5) + "." +fExtention;
+          }
+
           return (<BundleManagerItem
           style={{marginTop:childIndex?'0px':undefined}}
           bodyStyle={{padding:'0px 0px 0px 0px'}}
-          label={state.name||state.src}
+          label={filename}
           forceActive={true}
           path={state.src}
           key={field.key+'-resource-'+childIndex}
