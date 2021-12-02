@@ -448,10 +448,6 @@ class WorkspaceService{
   //TODO RENAME ALSO USED FOR SINGLES
   async getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath){
 
-    console.log(collectionItemKey)
-    console.log(collectionKey)
-    console.log(targetPath)
-
     let config = await this.getConfigurationsData();
 
     let src;

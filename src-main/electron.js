@@ -21,7 +21,6 @@ const app = electron.app
 
 if(app.isPackaged) {
     process.env.NODE_ENV = 'production';
-    console.log('production!');
 }
 
 // FIXME TODO this is to solve the 2021q3 Lets Encrypt problems
@@ -31,7 +30,6 @@ app.setAsDefaultProtocolClient('poppygo');
 
 require('events').EventEmitter.prototype._maxListeners = 15;
 
-//console.log(process.argv);
 global.pogoconf = PoppyGoAppConfig();
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
@@ -62,13 +60,11 @@ function downloadFile(file_url , targetPath){
     if(file_url.includes("picdrop.t3lab.com")){
         let urlarr = file_url.split('picdrop.t3lab.com')
         file_url = 'https://picdrop.t3lab.com'+urlarr[1];
-        console.log(file_url);
     }
 
     if(file_url.includes("download.pogotheme.com")){
         let urlarr = file_url.split('download.pogotheme.com')
         file_url = 'https://download.pogotheme.com'+urlarr[1];
-        console.log(file_url);
     }
 
     let progressBar = new ProgressBar({
@@ -193,18 +189,11 @@ openUrlFromArgv(process.argv)
 app.on('second-instance', function(event, argv){
     console.log('Someone tried to run a second instance')
     openUrlFromArgv(argv)
-        /*
-    if (window) {
-        if (window.isMinimized()) window.show()
-        window.focus()
-    }
-    */
 })
 
 async function handlePogoUrl(event, schemeData){
 
     const remoteFileURL = schemeData.substr(10);
-    console.log(remoteFileURL);
     if(remoteFileURL === "continue"){
         // do nothing just get focus back
     }
