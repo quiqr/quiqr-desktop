@@ -18,7 +18,7 @@ const Fragment = React.Fragment;
         //                 { name:"file1.png" },
         //                 { name:"file2.png" },
         //                 { name:"file3.png" },
-        //                 { name:"file4.png" } 
+        //                 { name:"file4.png" }
         //             ] }
         //         ]},
         //         { name:"css", files: [
@@ -56,7 +56,7 @@ class ResourceManager extends React.Component{
         ]
     */
 
-    
+
     getHandleItemClick(type, fileName){
         return () =>{
             let path = ['.', ...this.props.currentPath];
@@ -136,7 +136,7 @@ class ResourceManager extends React.Component{
                 }
             }
         }
-        return undefined;        
+        return undefined;
     }
 
     render(){

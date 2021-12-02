@@ -343,78 +343,78 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
   renderAccordionItem(field, context, node, componentKey: string, item: any, childIndex: number, isDragging: bool = false){
 
-      if(this.state.dynFieldsEmpty.length > 0){
-        if(componentKey in this.state.dynFields){
-          field.fields = this.state.dynFields[componentKey];
-        }
-        else{
-          field.fields = this.state.dynFieldsEmpty;
-        }
-        //service.api.logToConsole(componentKey, "componentKey");
-        //service.api.logToConsole(Object.keys(this.state.dynFieldsEmpty).length, "dynFieldsLength");
-        //service.api.logToConsole(this.state.dynFields, "dynFields");
+    if(this.state.dynFieldsEmpty.length > 0){
+      if(componentKey in this.state.dynFields){
+        field.fields = this.state.dynFields[componentKey];
       }
+      else{
+        field.fields = this.state.dynFieldsEmpty;
+      }
+      //service.api.logToConsole(componentKey, "componentKey");
+      //service.api.logToConsole(Object.keys(this.state.dynFieldsEmpty).length, "dynFieldsLength");
+      //service.api.logToConsole(this.state.dynFields, "dynFields");
+    }
 
-      /*
+    /*
     service.api.logToConsole("=============")
     service.api.logToConsole("START FOREACH")
     field.fields.forEach(function(fld){
       service.api.logToConsole(fld.key, "fieldtitle")
 
     });
-       */
+    */
 
-      let label = 'Untitled';
+    let label = 'Untitled';
 
-      let newNode = {
-        field,
-        state: context.value[childIndex],
-        uiState:{childIndex},
-        parent: node
-      };
-
-      let arrayTitle = field.fields.find((x)=>x.arrayTitle===true);
-      if(arrayTitle && newNode.state[arrayTitle.key]){
-        label = newNode.state[arrayTitle.key];
-      }
-
-      let headStyle = {
-        backgroundColor: '#eee',
-      }
-      if(isDragging){
-        headStyle = {
-          backgroundColor: "#e2e2e2",
-        };
-      }
-
-      return (
-        <AccordionItem key={componentKey}
-        label={label}
-        headStyle={headStyle}
-        bodyStyle={{padding:'16px 16px 0px 16px'}}
-        body={ context.renderLevel(newNode) }
-        wrapperProps={{
-          onMouseEnter: this.getOnItemMouseEnter(childIndex)
-        }}
-        headerRightItems={[
-          <FlatButton
-          onClick={(e)=>{e.stopPropagation()}}
-          onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
-          style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
-          <DangerButton
-          onClick={(e, loaded)=>{
-            e.stopPropagation();
-            if(loaded){
-              this.removeItemAtIndex(childIndex)
-            }
-          }}
-          loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
-          button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
-        />
-        ]}
-        />
-      );
+    let newNode = {
+      field,
+      state: context.value[childIndex],
+      uiState:{childIndex},
+      parent: node
     };
+
+    let arrayTitle = field.fields.find((x)=>x.arrayTitle===true);
+    if(arrayTitle && newNode.state[arrayTitle.key]){
+      label = newNode.state[arrayTitle.key];
+    }
+
+    let headStyle = {
+      backgroundColor: '#eee',
+    }
+    if(isDragging){
+      headStyle = {
+        backgroundColor: "#e2e2e2",
+      };
+    }
+
+    return (
+      <AccordionItem key={componentKey}
+      label={label}
+      headStyle={headStyle}
+      bodyStyle={{padding:'16px 16px 0px 16px'}}
+      body={ context.renderLevel(newNode) }
+      wrapperProps={{
+        onMouseEnter: this.getOnItemMouseEnter(childIndex)
+      }}
+      headerRightItems={[
+        <FlatButton
+        onClick={(e)=>{e.stopPropagation()}}
+        onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
+        style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
+        <DangerButton
+        onClick={(e, loaded)=>{
+          e.stopPropagation();
+          if(loaded){
+            this.removeItemAtIndex(childIndex)
+          }
+        }}
+        loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
+        button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
+      />
+      ]}
+      />
+    );
+  };
 
 
 }

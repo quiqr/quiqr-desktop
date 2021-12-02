@@ -38,7 +38,7 @@ class SliderDynamic extends BaseDynamic<SliderDynamicField,SliderDynamicState> {
 
   handleChange = (e: Event, value: any)=>{
     this.props.context.setValue(value, 250);
-      this.forceUpdate();
+    this.forceUpdate();
   }
 
 

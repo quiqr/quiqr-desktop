@@ -1,13 +1,7 @@
-//@flow
-
 import React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
-
-//import FormItemWrapper from './shared/FormItemWrapper';
-
 import Chips from '../../Chips';
 import Tip from '../../Tip';
-//import type { ComponentContext, DynamicFormNode, ComponentProps, FieldBase, FormStateBuilder } from '../../HoForm';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 

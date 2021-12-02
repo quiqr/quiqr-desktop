@@ -5,13 +5,13 @@ import Tip from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
 
 type TextFieldDynamicField = {
-    key: string,
-    compositeKey: string,
-    type: string,
-    default: ?string,
-    multiLine: ?bool,
-    tip: ?string,
-    title: ?string
+  key: string,
+  compositeKey: string,
+  type: string,
+  default: ?string,
+  multiLine: ?bool,
+  tip: ?string,
+  title: ?string
 }
 
 type TextFieldDynamicState = {
@@ -20,49 +20,49 @@ type TextFieldDynamicState = {
 
 class TextFieldDynamic extends BaseDynamic<TextFieldDynamicField,TextFieldDynamicState> {
 
-    normalizeState({state, field}: {state: any, field: TextFieldDynamicField}){
-        let key = field.key;
-        if(state[key]===undefined){
-            state[key] = field.default || '';
-        }
+  normalizeState({state, field}: {state: any, field: TextFieldDynamicField}){
+    let key = field.key;
+    if(state[key]===undefined){
+      state[key] = field.default || '';
+    }
+  }
+
+  getType(){
+    return 'string';
+  }
+
+  handleChange = (e: Event, value: any)=>{
+    this.forceUpdate();
+    this.props.context.setValue(value, 250);
+  }
+
+  renderComponent(){
+
+    let {context} = this.props;
+    let {node, currentPath, parentPath} = context;
+    let {field} = node;
+
+    if(currentPath!==parentPath){
+      return (null);
     }
 
-    getType(){
-        return 'string';
+    let iconButtons = [];
+    if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
+
+    return (<FormItemWrapper
+    control={<TextField
+    id={`text-field-${field.key}`}
+    onChange={ this.handleChange }
+    value={context.value}
+    floatingLabelFixed={true}
+    multiLine={field.multiLine===true}
+    underlineShow={true}
+    fullWidth={true}
+    floatingLabelText={field.title} />
     }
-
-    handleChange = (e: Event, value: any)=>{
-        this.forceUpdate();
-        this.props.context.setValue(value, 250);
-    }
-
-    renderComponent(){
-
-        let {context} = this.props;
-        let {node, currentPath, parentPath} = context;
-        let {field} = node;
-
-        if(currentPath!==parentPath){
-            return (null);
-        }
-
-        let iconButtons = [];
-        if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
-
-        return (<FormItemWrapper
-            control={<TextField
-                id={`text-field-${field.key}`}
-                onChange={ this.handleChange }
-                value={context.value}
-                floatingLabelFixed={true}
-                multiLine={field.multiLine===true}
-                underlineShow={true}
-                fullWidth={true}
-                floatingLabelText={field.title} />
-            }
-            iconButtons={iconButtons}
-        />);
-    }
+    iconButtons={iconButtons}
+  />);
+  }
 }
 
 export default TextFieldDynamic;
