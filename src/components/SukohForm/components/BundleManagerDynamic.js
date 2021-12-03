@@ -143,26 +143,26 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
           }
 
           return (<BundleManagerItem
-          style={{marginTop:childIndex?'0px':undefined}}
-          bodyStyle={{padding:'0px 0px 0px 0px'}}
-          label={filename}
-          forceActive={true}
-          path={state.src}
-          key={field.key+'-resource-'+childIndex}
-          body={context.renderLevel(newNode)}
-          headerRightItems={[
-            <DangerButton
-            onClick={(e, loaded)=>{
-              e.stopPropagation();
-              if(loaded){
-                this.removeItemWithValue(state)
-              }
-            }}
-            loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
-            button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.5} />} />}
-          />
-          ]}
-          />)
+            style={{marginTop:childIndex?'0px':undefined}}
+            bodyStyle={{padding:'0px 0px 0px 0px'}}
+            label={filename}
+            forceActive={true}
+            path={state.src}
+            key={field.key+'-resource-'+childIndex}
+            body={context.renderLevel(newNode)}
+            headerRightItems={[
+              <DangerButton
+              onClick={(e, loaded)=>{
+                e.stopPropagation();
+                if(loaded){
+                  this.removeItemWithValue(state)
+                }
+              }}
+              loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
+              button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.5} />} />}
+            />
+            ]}
+            />)
         }) }
           </BundleManager>
 
