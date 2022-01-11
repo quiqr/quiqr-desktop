@@ -10,7 +10,7 @@
     "url": "https://github.com/poppygo/poppygo-electron-app.git"
   },
   "description": "The PoppyGo Hugo Publishing App",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",
