@@ -14,6 +14,7 @@ import PullDynamic from './PullDynamic';
 import TextFieldDynamic from './TextFieldNumberDynamic';
 import TextFieldNumberDynamic from './TextFieldDynamic';
 import ToggleDynamic from './ToggleDynamic';
+import UniqDynamic from './UniqDynamic';
 import ReadonlyDynamic from './ReadonlyDynamic';
 import BundleManagerDynamic from './BundleManagerDynamic';
 import SectionDynamic from './SectionDynamic';
@@ -36,6 +37,7 @@ export default [
     MarkdownDynamic,
     NestDynamic,
     PullDynamic,
+    UniqDynamic,
     ReadonlyDynamic,
     BundleManagerDynamic,
     SectionDynamic,

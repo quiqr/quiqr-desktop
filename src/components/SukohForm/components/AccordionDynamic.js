@@ -373,7 +373,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       parent: node
     };
 
-    let arrayTitle = field.fields.find((x)=>x.arrayTitle===true);
+    let arrayTitle = field.fields.find((x)=> x.arrayTitle===true);
     if(arrayTitle && newNode.state[arrayTitle.key]){
       label = newNode.state[arrayTitle.key];
     }
