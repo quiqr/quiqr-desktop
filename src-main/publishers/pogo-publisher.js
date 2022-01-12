@@ -445,6 +445,17 @@ class PogoPublisher {
 
     this.writePublishStatus(2); // publication Pending
 
+    let progressDialogConfObj = {
+      title:"Publishing your site...",
+      message: 'Uploading to PoppyGo servers',
+      visible: true,
+      percent: 5,
+    };
+    mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
+
+    //mainWindow.webContents.send("progressBar");
+
+    /*
     var progressBar = new ProgressBar({
       indeterminate: false,
       text: 'Publishing your site..',
@@ -458,8 +469,9 @@ class PogoPublisher {
         }
       }
     });
+    */
 
-    progressBar.on('completed', function() {
+    /*progressBar.on('completed', function() {
       progressBar.detail = 'Your site has been uploaded.';
     })
       .on('aborted', function(value) {
@@ -467,9 +479,16 @@ class PogoPublisher {
       })
       .on('progress', function(value) {
       });
+      */
 
+    /*
     progressBar.value += 10;
     progressBar.detail = 'Preparing upload';
+    */
+
+    progressDialogConfObj.message = 'Preparing upload';
+    progressDialogConfObj.percent = 15;
+    mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
     var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
@@ -502,8 +521,13 @@ class PogoPublisher {
     await fs.emptyDir(resolvedDest);
     await fs.ensureDir(resolvedDest);
 
+    /*
     progressBar.value += 10;
     progressBar.detail = 'Getting live site files for synchronization';
+    */
+    progressDialogConfObj.message =  'Getting live site files for synchronization';
+    progressDialogConfObj.percent =  25;
+    mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
     outputConsole.appendLine('Cloning from: ' + full_gh_url);
 
@@ -518,11 +542,12 @@ class PogoPublisher {
       if(code==0){
         outputConsole.appendLine('Clone succes ...');
 
-        progressBar.value += 10;
-        progressBar.detail = 'Synchronizing your last changes';
+        //progressBar.value += 10;
+        //progressBar.detail = 'Synchronizing your last changes';
+        progressDialogConfObj.message =  'Synchronizing your last changes';
+        progressDialogConfObj.percent =  35;
+        mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
-        //console.log(full_gh_dest + '/.git');
-        //console.log(full_gh_dest + '/.gitmove');
         await fs.moveSync(full_gh_dest + '/.git', full_gh_dest + '/.gitmove');
         await fileDirUtils.recurForceRemove(full_gh_dest+'/content');
         await fileDirUtils.recurForceRemove(full_gh_dest+'/themes');
@@ -545,8 +570,12 @@ class PogoPublisher {
         outputConsole.appendLine('context.from is: ' + context.from);
         outputConsole.appendLine('copy finished, going to git-add ...');
 
-        progressBar.value += 10;
-        progressBar.detail = 'Copying your changes to PoppyGo servers';
+
+        //progressBar.value += 10;
+        //progressBar.detail = 'Copying your changes to PoppyGo servers';
+        progressDialogConfObj.message =  'Copying your changes to PoppyGo servers';
+        progressDialogConfObj.percent =  55;
+        mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
         var spawn = require("child_process").spawn;
         let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
@@ -559,8 +588,11 @@ class PogoPublisher {
           if(code==0){
 
             outputConsole.appendLine('git-add finished, going to git-commit ...');
-            progressBar.value += 10;
-            progressBar.detail = 'Apply changes';
+            //progressBar.value += 10;
+            //progressBar.detail = 'Apply changes';
+            progressDialogConfObj.message =  'Apply changes';
+            progressDialogConfObj.percent =  65;
+            mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
             var spawn = require("child_process").spawn;
 
@@ -590,26 +622,42 @@ class PogoPublisher {
 
                   if(code==0){
                     outputConsole.appendLine('git-push finished ... changes are published.');
-                    progressBar.value = 100;
-                    progressBar.detail = 'Successfully copied your changes';
-                    progressBar.setCompleted();
-                    progressBar._window.hide();
-                    progressBar.close();
+                    //progressBar.value = 100;
+                    //progressBar.detail = 'Successfully copied your changes';
+                    //progressBar.setCompleted();
+                    //progressBar._window.hide();
+                    //progressBar.close();
+
+                    progressDialogConfObj.message =  'Successfully copied your changes';
+                    progressDialogConfObj.percent =  90;
+                    mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
                     this.writePublishDate(publDate);
 
+                    progressDialogConfObj.message =  'Succesfully published your changes. <br/> They will be visible in a minute or two.';
+                    progressDialogConfObj.percent =  100;
+                    progressDialogConfObj.visible = false;
+                    mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
+
+                    //mainWindow.webContents.send("closeProgressDialog");
+                    /*
                     dialog.showMessageBox(mainWindow, {
                       title: 'PoppyGo',
                       type: 'info',
                       message: "Succesfully published your changes. \n They will be visible in a minute or two.",
                     });
+                    */
 
                   }
                   else{
                     this.writePublishStatus(7);
                     outputConsole.appendLine('ERROR: Could not git-push ...');
-                    progressBar._window.hide();
-                    progressBar.close();
+
+                    //progressBar._window.hide();
+                    //progressBar.close();
+                    progressDialogConfObj.visible = false;
+                    mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
+
                     dialog.showMessageBox(mainWindow, {
                       title: 'PoppyGo',
                       type: 'warning',
@@ -621,8 +669,10 @@ class PogoPublisher {
               else {
                 this.writePublishStatus(8);
                 outputConsole.appendLine('ERROR: Could not git-commit ...');
-                progressBar._window.hide();
-                progressBar.close();
+                //progressBar._window.hide();
+                //progressBar.close();
+                progressDialogConfObj.visible = false;
+                mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
                 dialog.showMessageBox(mainWindow, {
                   title: 'PoppyGo',
                   type: 'warning',
@@ -634,8 +684,10 @@ class PogoPublisher {
           }
           else {
             outputConsole.appendLine('ERROR: Could not git-add ...');
-            progressBar._window.hide();
-            progressBar.close();
+            //progressBar._window.hide();
+            //progressBar.close();
+            progressDialogConfObj.visible = false;
+            mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
             dialog.showMessageBox(mainWindow, {
               title: 'PoppyGo',
               type: 'warning',
@@ -647,8 +699,10 @@ class PogoPublisher {
       else {
         outputConsole.appendLine('Could not clone destination repository');
         outputConsole.appendLine(`${git_bin} clone -i ${pogokeypath} ${full_gh_url} ${full_gh_dest}`);
-        progressBar._window.hide();
-        progressBar.close();
+        //progressBar._window.hide();
+        //progressBar.close();
+        progressDialogConfObj.visible = false;
+        mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
         dialog.showMessageBox(mainWindow, {
           title: 'PoppyGo',
           type: 'warning',

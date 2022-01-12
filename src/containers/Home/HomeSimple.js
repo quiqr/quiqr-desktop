@@ -18,6 +18,7 @@ import DisconnectDomainDialog from './components/DisconnectDomainDialog';
 import EditPlanDialog from './components/EditPlanDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
+import ProgressDialog from './../../components/ProgressDialog';
 import SnackbarManager from './../../components/SnackbarManager';
 import MarkdownIt from 'markdown-it'
 
@@ -112,6 +113,14 @@ class Home extends React.Component<HomeProps, HomeState>{
       oneTimeOnlyPublishFinished: false,
       fingerprint: "",
       buttonPressed: "",
+
+      progressDialogConf: {
+        title: '',
+        message: '',
+        percent: 0,
+        visible: false,
+      },
+
       siteCreatorMessage: null
     };
   }
@@ -130,9 +139,22 @@ class Home extends React.Component<HomeProps, HomeState>{
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });
+
+    window.require('electron').ipcRenderer.on('setProgressDialogConfHome', (event, confObj)=>{
+      this.setState({progressDialogConf: confObj});
+    });
+
   }
+
   componentWillUnmount(){
+    [
+      'frontEndBusy',
+      'setProgressDialogConf',
+    ].forEach((channel)=>{
+      window.require('electron').ipcRenderer.removeAllListeners(channel);
+    });
   }
+
   componentDidMount(){
     this.checkSiteInProps();
     this._ismounted = true;
@@ -747,7 +769,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       this.setState({blockingOperation: 'Publishing site...'});
 
       service.api.publishSite(siteKey, publish).then(()=>{
-        this.startPublishPolling(true);
+        //this.startPublishPolling(true);
       });
 
     }).then(()=>{
@@ -1200,6 +1222,11 @@ class Home extends React.Component<HomeProps, HomeState>{
             fingerprint={this.state.fingerprint}
             open={this.state.editPlanDialog!=null&&this.state.editPlanDialog.open}
           />
+
+            <ProgressDialog
+            conf={this.state.progressDialogConf}
+            />
+
 
           </div>
         )
