@@ -5,6 +5,24 @@ let
     permittedInsecurePackages = [ "electron-5.0.13" ];
   };
   pkgs = import <nixpkgs> { inherit config; };
+  nixos05 = import <nixos05> { 
+    config = { 
+      allowUnfree = true; 
+      permittedInsecurePackages = [ "electron-5.0.13" ];
+    }; 
+  };
+
+  /*
+  nixpkgs.config.packageOverrides = pkgs: {
+
+    #unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
+    nixos05 = import <nixos05> {
+      config = {
+        permittedInsecurePackages = [ "electron-5.0.13" ];
+      };
+    };
+    };
+    */
 
   inherit (pkgs) lib;
 
@@ -34,19 +52,17 @@ let
 in
   pkgs.mkShell {
     LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-      pkgs.stdenv.cc.cc
-    #  pkgs.libGL
-      pkgs.zlib
-    #  pkgs.glib
+      nixos05.stdenv.cc.cc
+      nixos05.zlib
     ];
 
     nativeBuildInputs = [
-      pkgs.nodejs
-      pkgs.hugo
-      pkgs.electron_5
+      nixos05.nodejs
+      nixos05.hugo
+      nixos05.electron_5
       myPackages.embgit
     ];
-    ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_5}/bin/";
+    ELECTRON_OVERRIDE_DIST_PATH = "${nixos05.electron_5}/bin/";
     NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
     HUGO_PATH="${pkgs.hugo}/bin/hugo";
