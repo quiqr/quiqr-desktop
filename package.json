@@ -20,7 +20,7 @@
     "await-spawn": "4.0.1",
     "deepmerge": "^4.2.2",
     "del": "^6.0.0",
-    "easymde": "^2.15.0",
+    "easymde": "^2.16.1",
     "electron-builder-notarize": "^1.2.0",
     "electron-context-menu": "^0.10.1",
     "electron-is-dev": "^1.1.0",
