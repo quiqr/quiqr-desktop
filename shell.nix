@@ -5,11 +5,11 @@ let
     permittedInsecurePackages = [ "electron-5.0.13" ];
   };
   pkgs = import <nixpkgs> { inherit config; };
-  nixos05 = import <nixos05> { 
-    config = { 
-      allowUnfree = true; 
+  nixos05 = import <nixos05> {
+    config = {
+      allowUnfree = true;
       permittedInsecurePackages = [ "electron-5.0.13" ];
-    }; 
+    };
   };
 
   /*
@@ -30,7 +30,7 @@ let
   {
     embgit = pkgs.buildGoModule rec {
       name = "embgit";
-      version = "0.3.2";
+      version = "0.3.4";
 
       src = pkgs.fetchgit {
         url = "https://github.com/quiqr/embgit.git";
