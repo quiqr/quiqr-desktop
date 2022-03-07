@@ -1417,15 +1417,6 @@ resources: []\n\
               global.apiMain.clearWorkSpaceConfigCache({},context);
             }
           },
-          {
-            id: 'auto-create-model',
-            label: 'Generate Quiqr Config',
-            enabled: this.siteSelected(),
-            click: async () => {
-              await this.generateModel();
-              this.generateModel()
-            }
-          },
           { type: 'separator' },
           {
             label: 'Configuration Examples',
