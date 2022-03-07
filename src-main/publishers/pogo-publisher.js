@@ -74,10 +74,10 @@ class PogoPublisher {
     var newConf = JSON.parse(conftxt);
     newConf.publish = [];
     newConf.publish.push({
-      key: 'poppygo-cloud',
+      key: 'quiqr-cloud',
       config: {
         path: pogoDomain,
-        type: 'poppygo',
+        type: 'quiqr',
         defaultDomain: domain
       }
     });
@@ -91,9 +91,9 @@ class PogoPublisher {
     newConf.lastPublish = 0,
       newConf.publish = [];
     newConf.publish.push({
-      key: 'poppygo-nocloud',
+      key: 'quiqr-nocloud',
       config: {
-        type: 'poppygo',
+        type: 'quiqr',
       }
     });
     await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
@@ -117,7 +117,7 @@ class PogoPublisher {
       const dialog = electron.dialog;
       dialog.showMessageBox(mainWindow, {
         buttons: ["Close"],
-        title: "PoppyGo will now download hugo " + hugover,
+        title: "Quiqr will now download hugo " + hugover,
         message: "Try again when download has finished",
       });
 
@@ -167,7 +167,7 @@ class PogoPublisher {
         indeterminate: false,
         text: 'Creating your site..',
         abortOnError: true,
-        detail: 'Creating poppygo website',
+        detail: 'Creating quiqr website',
         browserWindow: {
           frame: false,
           parent: mainWindow,
@@ -321,7 +321,7 @@ class PogoPublisher {
       indeterminate: false,
       text: 'Importing your site..',
       abortOnError: true,
-      detail: 'importing from PoppyGo servers',
+      detail: 'importing from Quiqr servers',
       browserWindow: {
         frame: false,
         parent: mainWindow,
@@ -447,7 +447,7 @@ class PogoPublisher {
 
     let progressDialogConfObj = {
       title:"Publishing your site...",
-      message: 'Uploading to PoppyGo servers',
+      message: 'Uploading to Quiqr servers',
       visible: true,
       percent: 5,
     };
@@ -460,7 +460,7 @@ class PogoPublisher {
       indeterminate: false,
       text: 'Publishing your site..',
       abortOnError: true,
-      detail: 'Uploading to PoppyGo servers',
+      detail: 'Uploading to Quiqr servers',
       browserWindow: {
         frame: false,
         parent: mainWindow,
@@ -572,8 +572,8 @@ class PogoPublisher {
 
 
         //progressBar.value += 10;
-        //progressBar.detail = 'Copying your changes to PoppyGo servers';
-        progressDialogConfObj.message =  'Copying your changes to PoppyGo servers';
+        //progressBar.detail = 'Copying your changes to Quiqr servers';
+        progressDialogConfObj.message =  'Copying your changes to Quiqr servers';
         progressDialogConfObj.percent =  55;
         mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
@@ -642,7 +642,7 @@ class PogoPublisher {
                     //mainWindow.webContents.send("closeProgressDialog");
                     /*
                     dialog.showMessageBox(mainWindow, {
-                      title: 'PoppyGo',
+                      title: 'Quiqr',
                       type: 'info',
                       message: "Succesfully published your changes. \n They will be visible in a minute or two.",
                     });
@@ -659,7 +659,7 @@ class PogoPublisher {
                     mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
                     dialog.showMessageBox(mainWindow, {
-                      title: 'PoppyGo',
+                      title: 'Quiqr',
                       type: 'warning',
                       message: "Publishing failed. (git-push)",
                     });
@@ -674,7 +674,7 @@ class PogoPublisher {
                 progressDialogConfObj.visible = false;
                 mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
                 dialog.showMessageBox(mainWindow, {
-                  title: 'PoppyGo',
+                  title: 'Quiqr',
                   type: 'warning',
                   message: "Publishing failed. (git-commit)",
                 });
@@ -689,7 +689,7 @@ class PogoPublisher {
             progressDialogConfObj.visible = false;
             mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
             dialog.showMessageBox(mainWindow, {
-              title: 'PoppyGo',
+              title: 'Quiqr',
               type: 'warning',
               message: "Publishing failed. (git-add)",
             });
@@ -704,7 +704,7 @@ class PogoPublisher {
         progressDialogConfObj.visible = false;
         mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
         dialog.showMessageBox(mainWindow, {
-          title: 'PoppyGo',
+          title: 'Quiqr',
           type: 'warning',
           message: "Publishing failed. (git-clone)",
         });

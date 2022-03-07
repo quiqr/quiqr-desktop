@@ -76,9 +76,9 @@ class App extends React.Component<AppProps,AppState>{
       forceShowMenu: false,
       mobileBrowserActive: false,
       skipMenuTransition: false,
-      poppygoUsername: "",
-      poppygoFingerprint: "",
-      poppygoDomain: "",
+      quiqrUsername: "",
+      quiqrFingerprint: "",
+      quiqrDomain: "",
     };
 
     win.on('maximize', () => { this.setState({maximized: true}); });
@@ -101,17 +101,17 @@ class App extends React.Component<AppProps,AppState>{
   }
 
   getProfile(){
-    let getProfile = service.api.getPoppyGoProfile();
+    let getProfile = service.api.getQuiqrProfile();
 
     getProfile.then((profileAndFingerprint)=>{
       if(profileAndFingerprint){
-        if(this.state.poppygoUsername !== profileAndFingerprint.profile.username){
-          this.setState({poppygoUsername: profileAndFingerprint.profile.username, poppygoFingerprint:profileAndFingerprint.fingerprint});
+        if(this.state.quiqrUsername !== profileAndFingerprint.profile.username){
+          this.setState({quiqrUsername: profileAndFingerprint.profile.username, quiqrFingerprint:profileAndFingerprint.fingerprint});
         }
       }
       else{
         //CAUSES LOOP
-        //this.setState({poppygoUsername: '', poppygoFingerprint: ''});
+        //this.setState({quiqrUsername: '', quiqrFingerprint: ''});
       }
     }, (e)=>{
     })
@@ -188,7 +188,7 @@ class App extends React.Component<AppProps,AppState>{
     key={ url }
     siteKey={ site ? decodeURIComponent(site) : null }
     workspaceKey={ workspace ? decodeURIComponent(workspace) : null }
-    poppygoUsername={this.state.poppygoUsername}
+    quiqrUsername={this.state.quiqrUsername}
     history={history}
     hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
     menuIsLocked={this.state.menuIsLocked}
@@ -232,7 +232,7 @@ class App extends React.Component<AppProps,AppState>{
     return (
       <SelectSite
         key={ 'selectSite' }
-        poppygoUsername={this.state.poppygoUsername}
+        quiqrUsername={this.state.quiqrUsername}
       />
     );
   }
@@ -242,7 +242,7 @@ class App extends React.Component<AppProps,AppState>{
     return (
       <SelectSite
         key={ 'selectSite' }
-        poppygoUsername={this.state.poppygoUsername}
+        quiqrUsername={this.state.quiqrUsername}
         createSite={ true }
       />
     );
@@ -252,8 +252,8 @@ class App extends React.Component<AppProps,AppState>{
     this.getProfile();
     return <Home
     key={ match.url }
-    poppygoUsername={this.state.poppygoUsername}
-    poppygoFingerprint={this.state.poppygoFingerprint}
+    quiqrUsername={this.state.quiqrUsername}
+    quiqrFingerprint={this.state.quiqrFingerprint}
     siteKey={ decodeURIComponent(match.params.site) }
     workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }

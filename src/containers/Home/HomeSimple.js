@@ -130,8 +130,8 @@ class Home extends React.Component<HomeProps, HomeState>{
       this.checkSiteInProps();
     }
 
-    if(this._ismounted && preProps.poppygoUsername !== this.props.poppygoUsername){
-      this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
+    if(this._ismounted && preProps.quiqrUsername !== this.props.quiqrUsername){
+      this.setUser(this.props.quiqrUsername, this.props.quiqrFingerprint);
     }
   }
 
@@ -158,7 +158,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   componentDidMount(){
     this.checkSiteInProps();
     this._ismounted = true;
-    this.setUser(this.props.poppygoUsername, this.props.poppygoFingerprint);
+    this.setUser(this.props.quiqrUsername, this.props.quiqrFingerprint);
   }
 
   setUser(username,fingerprint){
@@ -372,7 +372,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         stateUpdate.claimDomainDialog = {...this.state.claimDomainDialog, open:false};
 
         this.setState(stateUpdate,()=>{
-          snackMessageService.addSnackMessage('You just got yourself a shiny new site in the PoppyGo Cloud.');
+          snackMessageService.addSnackMessage('You just got yourself a shiny new site in the Quiqr Cloud.');
           service.api.logToConsole("start checking once")
           this.getRemoteSiteStatus(false);
 
@@ -409,7 +409,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     let site = this.state.selectedSite;
     if(site){
       if( site.publish.length === 1
-        && site.publish[0].config.type === 'poppygo'
+        && site.publish[0].config.type === 'quiqr'
         && site.publish[0].config.hasOwnProperty('path')){
 
         return true;
@@ -702,7 +702,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         username: this.state.username,
         fingerprint: this.state.fingerprint,
         projectPath:  this.state.selectedSite.publish[0].config.path,
-        plan: "PoppyGo Pro"
+        plan: "Quiqr Pro"
       };
 
       let requestVars =btoa(JSON.stringify(upgradeVars));
@@ -740,15 +740,15 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   handleOpenCustomDomainDocs(){
-    window.require('electron').shell.openExternal('https://poppygo.io/documentation/custom-domain/');
+    window.require('electron').shell.openExternal('https://book.quiqr.org/docs/03-quiqr-cloud-services/01-quiqr-cloud-hosting/01-custom-domain/');
   }
 
   handleOpenTerms(){
-    window.require('electron').shell.openExternal('https://router.poppygo.app/beta-terms');
+    window.require('electron').shell.openExternal('https://quiqr.org/terms');
   }
 
   handleOpenPro(){
-    window.require('electron').shell.openExternal('https://poppygo.io/plans/poppygo-pro/');
+    window.require('electron').shell.openExternal('https://quiqr.org/plans/quiqr-pro/');
   }
 
   hasActivePlan(pogoSiteStatus){
@@ -854,7 +854,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         <div class="col-12 col-lg-8" style={{padding:"0px"}}>
           <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
             <span>
-              <h2>Upgrade to PoppyGo Pro</h2>
+              <h2>Upgrade to Quiqr Pro</h2>
               <ul>
                 <li>Use your own domain</li>
                 <li>Secure your site hosting</li>
@@ -880,7 +880,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         <div class="col-12 col-lg-8" style={{padding:"0px"}}>
           <ListItem leftIcon={<IconDomain color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
             <h3>Connect your custom domain</h3>
-            <p> With PoppyGo Pro now you can </p>
+            <p> With Quiqr Pro now you can </p>
           </ListItem>
         </div>
         <div class="col-8 offset-4 offset-lg-0 col-lg-4" style={{padding:"0px"}}>
@@ -927,7 +927,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         <div class="col-12 col-lg-8" style={{padding:"0px"}}>
           <ListItem leftIcon={<ActionThumbUp color="#2f343c" style={{marginTop:"28px"}} />} disabled={true}  >
             <span>
-              <h2>Upgrade to PoppyGo Pro</h2>
+              <h2>Upgrade to Quiqr Pro</h2>
               <ul>
                 <li>Use your own domain</li>
                 <li>Secure your site hosting</li>
@@ -1000,7 +1000,7 @@ class Home extends React.Component<HomeProps, HomeState>{
    if(this.state.pogoSiteStatus === "no_pogocloud"){
       return  (
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-          <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {this.state.selectedSite.name} </span>
+          <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a Quiqr Cloud live URL for {this.state.selectedSite.name} </span>
           &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
         </ListItem>
       )
@@ -1059,14 +1059,6 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     else{
       return (null);
-      /*
-      return  (
-        <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
-          <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a poppygo live URL for {this.state.selectedSite.name} </span>
-          &nbsp;&nbsp;<button className="reglink" onClick={()=>{this.handleClaimDomainNow(true)}}>claim now!</button>
-        </ListItem>
-      )
-      */
     }
   }
 

@@ -1,15 +1,15 @@
 {
   "homepage": "./",
-  "name": "poppygo",
+  "name": "quiqr",
   "author": {
-    "name": "Pim Snel, Brecht Swanenberg",
-    "email": "info@poppygo.io"
+    "name": "Pim Snel",
+    "email": "info@quiqr.org"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/poppygo/poppygo-electron-app.git"
+    "url": "https://github.com/quiqr/quiqr-desktop.git"
   },
-  "description": "The PoppyGo Hugo Publishing App",
+  "description": "CMS with a Hugo Engine",
   "version": "0.9.1",
   "private": true,
   "dependencies": {
@@ -85,9 +85,9 @@
     "start": "concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
   },
   "build": {
-    "appId": "io.poppygo.poppygo-desktop",
-    "artifactName": "poppygo_${os}_${arch}.${ext}",
-    "productName": "PoppyGo",
+    "appId": "org.quiqr.quiqr-desktop",
+    "artifactName": "quiqr${os}_${arch}.${ext}",
+    "productName": "Quiqr",
     "directories": {
       "buildResources": "public"
     },
@@ -97,16 +97,16 @@
       },
       {
         "provider": "s3",
-        "bucket": "poppygo-app-releases",
+        "bucket": "quiqr-app-releases",
         "region": "eu-west-1"
       }
     ],
     "protocols": [
       {
-        "name": "poppygo",
+        "name": "quiqr",
         "role": "Editor",
         "schemes": [
-          "poppygo"
+          "quiqr"
         ]
       }
     ],
@@ -168,25 +168,25 @@
     "fileAssociations": [
       {
         "ext": "pogosite",
-        "name": "PoppyGo Site File",
+        "name": "Quiqr Site File",
         "role": "Editor",
         "icon": "public/iconfile"
       },
       {
         "ext": "pogopass",
-        "name": "PoppyGo Passport File",
+        "name": "Quiqr Passport File",
         "role": "Editor",
         "icon": "public/iconfile"
       },
       {
         "ext": "pogocontent",
-        "name": "PoppyGo Content File",
+        "name": "Quiqr Content File",
         "role": "Editor",
         "icon": "public/iconfile"
       },
       {
         "ext": "pogotheme",
-        "name": "PoppyGo Theme File",
+        "name": "Quiqr Theme File",
         "role": "Editor",
         "icon": "public/iconfile"
       }

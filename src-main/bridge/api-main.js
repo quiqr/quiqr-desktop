@@ -157,7 +157,7 @@ api.createPogoProfile = async function(profile,context){
   context.resolve(true);
 }
 
-api.getPoppyGoProfile = async function({},context){
+api.getQuiqrProfile = async function({},context){
   let pogopubl = new PogoPublisher({});
   let profile = await pogopubl.readProfile();
 
@@ -210,7 +210,7 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   global.currentWorkspaceKey = workspaceKey;
 
   mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  mainWindow.setTitle(`PoppyGo - Site: ${siteConfig.name}`);
+  mainWindow.setTitle(`Quiqr - Site: ${siteConfig.name}`);
   menuManager.updateMenu(siteKey);
   menuManager.createMainMenu();
 }
@@ -319,7 +319,7 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}, context) {
 
 api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, searchLevelKeyVal }, context){
 
-  let fileExp = path.join(global.currentSitePath, "poppygo", "model", searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  let fileExp = path.join(global.currentSitePath, "quiqr", "model", searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
   if(glob.sync(fileExp).length < 1){
     fileExp = path.join(global.currentSitePath, searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
   }

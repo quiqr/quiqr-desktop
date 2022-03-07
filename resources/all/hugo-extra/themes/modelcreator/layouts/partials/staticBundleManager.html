@@ -1,9 +1,0 @@
-{{- $fields := slice -}}
-{{- range (readDir .dir) -}}
-    {{- if .IsDir -}}
-        {{ $path := printf "%s/" .Name }}
-          {{- $fields = $fields | append (partial "createField" (dict "key" .Name "value" $path "type" "bundle-manager")) -}}
-    {{- end -}}
-{{- end -}}
-{{- $single := (dict "key" .key "title" .title "file" .file "dataformat" "md" "fields" $fields) -}}
-{{- return $single -}}

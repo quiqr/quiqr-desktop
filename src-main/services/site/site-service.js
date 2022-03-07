@@ -33,7 +33,7 @@ class SiteService{
 
   async getCreatorMessage(){
 
-    let indexPath = this._config.source.path + "/poppygo/home/index.md"
+    let indexPath = this._config.source.path + "/quiqr/home/index.md"
     try {
       if (fs.existsSync(indexPath)) {
         var data = fs.readFileSync(indexPath);

@@ -1,14 +1,14 @@
-# PoppyGo Electron Desktop App
+# Quiqr Electron Desktop App
 
-PoppyGo App is a CMS and Publishing tool for Hugo to run on your computer.
+Quiqr App is a CMS and Publishing tool for Hugo to run on your computer.
 
 ## Features
 
-Take a look at our features and understand why PoppyGo is a great tool for your
+Take a look at our features and understand why Quiqr is a great tool for your
 Hugo websites:
 
-* **Made for Hugo.** PoppyGo is a desktop CMS for Hugo websites.
-* **Embedded git.** PoppyGo comes with embedded git functionality for
+* **Made for Hugo.** Quiqr is a desktop CMS for Hugo websites.
+* **Embedded git.** Quiqr comes with embedded git functionality for
   publishing and version management.
 * **Runs on your computer.** Supported Platforms: Windows, Linux and macOS.
 * **Free for commercial use.** Download our binaries today and use it for your
@@ -28,7 +28,7 @@ Hugo websites:
 * Open the application.
 * Follow the instuctions on the welcome screen.
 
-PoppyGo targets Hugo Website Developers and Hugo Website Content Managers.
+Quiqr targets Hugo Website Developers and Hugo Website Content Managers.
 
 ### Hugo Website Content Managers
 
@@ -39,13 +39,13 @@ TODO READ/WATCH the quick start for content managers.
 
 ### Hugo Website Developers
 
-You'll have to learn some concepts before diving deep into PoppyGo site
+You'll have to learn some concepts before diving deep into Quiqr site
 development.
 
 TODO READ/WATCH the quick start for site developers.
 
-Read the [PoppyGo Book](https://poppygo.github.io/poppygo-book/)
-for full reference of the PoppyGo App and the PoppyGo Platform.
+Read the [Quiqr Book](https://book.quiqr.org)
+for full reference of the Quiqr App and the Quiqr Platform.
 
 ## Building
 
@@ -80,7 +80,7 @@ brew install npm
 * Clone or download the source code.
 
 ```
-git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app
+git clone https://github.com/quiqr/quiqr-desktop.git && cd quiqr-app
 ```
 
 * Open the terminal in the project's root directory.
@@ -95,7 +95,7 @@ npm install && npm run dist
 Clone the repository.
 
 ```
-git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app
+git clone https://github.com/quiqr/quiqr-desktop.git && cd quiqr-app
 ```
 
 Install npm dependancies.
@@ -134,13 +134,15 @@ npm run _react-dev
 
 Clone the repository.
 
-```git clone https://github.com/poppygo/poppygo-app.git && cd poppygo-app```
+```
+git clone https://github.com/quiqr/quiqr-desktop.git && cd quiqr-app
+```
 
 Enter the nix-shell
 
 ```
 nix-shell
-[nix-shell:~/poppygo-app]$
+[nix-shell:~/quiqr-app]$
 ```
 
 Install npm dependancies.

@@ -6,7 +6,7 @@ const pathHelper                                = require('../utils/path-helper'
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../utils/environment-resolver');
 
 let userconf = {
-  email:   "anonymous@poppygo.xyz",
+  email:   "pim@quiqr.org",
   name:    'anonymous',
   machine: 'unknown-machine',
   privateKey: null,

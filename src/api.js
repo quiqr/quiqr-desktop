@@ -180,8 +180,8 @@ export class API {
     return mainProcessBridge.request('createPogoDomainConf',{path, domain});
   }
 
-  getPoppyGoProfile(){
-    return mainProcessBridge.request('getPoppyGoProfile',{});
+  getQuiqrProfile(){
+    return mainProcessBridge.request('getQuiqrProfile',{});
   }
 
   cloneRemoteAsManagedSite(cloudPath: string, siteName: string){

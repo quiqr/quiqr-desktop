@@ -14,9 +14,9 @@ class CloudSiteconfigManager {
     newConf.source.path = pathSource;
     newConf.publish = [];
     newConf.publish.push({});
-    newConf.publish[0].key = 'poppygo-nocloud';
+    newConf.publish[0].key = 'quiqr-nocloud';
     newConf.publish[0].config = {};
-    newConf.publish[0].config.type = "poppygo";
+    newConf.publish[0].config.type = "quiqr";
     newConf.lastPublish = 0;
 
     return newConf;
@@ -37,9 +37,9 @@ class CloudSiteconfigManager {
     newConf.source.path = pathSource;
     newConf.publish = [];
     newConf.publish.push({});
-    newConf.publish[0].key = 'poppygo-cloud';
+    newConf.publish[0].key = 'quiqr-cloud';
     newConf.publish[0].config = {};
-    newConf.publish[0].config.type = "poppygo";
+    newConf.publish[0].config.type = "quiqr";
     newConf.publish[0].config.path = remotePath;
     newConf.lastPublish = 0;
 

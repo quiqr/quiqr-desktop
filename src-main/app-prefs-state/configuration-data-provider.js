@@ -5,9 +5,9 @@ const Joi                    = require('joi');
 const pathHelper             = require('../utils/path-helper');
 const formatProviderResolver = require('../utils/format-provider-resolver');
 const outputConsole          = require('../logger/output-console');
-const PoppyGoAppConfig       = require('./poppygo-app-config');
+const QuiqrAppConfig       = require('./quiqr-app-config');
 
-const pogoconf = PoppyGoAppConfig();
+const pogoconf = QuiqrAppConfig();
 
 let configurationCache = undefined;
 
@@ -22,8 +22,8 @@ if(pogoconf.devLocalApi){
   pogoboardConn = {host:"localhost",port:9999, protocol: "http:"};
   pogostripeConn = {host:"localhost",port:4242, protocol: "http:"};
 }else{
-  pogoboardConn = {host:"board.poppygo.io",port:443, protocol: "https:"};
-  pogostripeConn = {host:"payments.poppygo.io",port:443, protocol: "https:"};
+  pogoboardConn = {host:"board.quiqr.org",port:443, protocol: "https:"};
+  pogostripeConn = {host:"payments.quiqr.org",port:443, protocol: "https:"};
 }
 
 const GLOBAL_DEFAULTS = {

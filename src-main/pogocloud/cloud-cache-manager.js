@@ -1,6 +1,6 @@
-/* Copyright PoppyGo 2021
+/* Copyright Quiqr 2021
  *
- * pim@poppygo.io
+ * pim@quiqr.org
  *
  */
 const { app, shell }            = require('electron')
@@ -101,7 +101,7 @@ class CloudCacheManager{
       else{
         configurations.sites.forEach((site)=>{
           try{
-            if(site.publish[0].key=="poppygo-cloud"){
+            if(site.publish[0].key=="quiqr-cloud"){
               let path = site.publish[0].config.path;
               ownerslookupdata.sitesToPaths[site.key] = "sites/"+path;
               ownerslookupdata.pathsToSites["sites/"+path] = site.key;
@@ -170,7 +170,7 @@ class CloudCacheManager{
 
       configurationDataProvider.get(async (err, configurations) => {
 
-        if(site.publish[0] && site.publish[0].config.type == "poppygo" && site.publish[0].config.path){
+        if(site.publish[0] && site.publish[0].config.type == "quiqr" && site.publish[0].config.path){
 
           let fingerprint = await cloudGitManager.getKeyFingerprint();
           let userVars = {

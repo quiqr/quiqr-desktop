@@ -21,7 +21,7 @@ class PublisherFactory{
             let GithubPublisher = require('./github-publisher');
             return new GithubPublisher(genericPublisherConfig);
         }
-        if(type==='poppygo'){
+        if(type==='quiqr'){
             let PogoPublisher = require('./pogo-publisher');
             //console.log(genericPublisherConfig);
             return new PogoPublisher(genericPublisherConfig);

@@ -1,6 +1,6 @@
-/* Copyright PoppyGo 2021
+/* Copyright Quiqr 2021
  *
- * pim@poppygo.io
+ * pim@quiqr.org
  *
  */
 const electron             = require('electron')
@@ -97,7 +97,7 @@ class Pogozipper{
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
                 filters: [
-                    { name: "PoppyGo Sites", extensions: [PogoSiteExtension] }
+                    { name: "Quiqr Sites", extensions: [PogoSiteExtension] }
                 ],
                 properties: ['openFile'] });
 
@@ -192,7 +192,7 @@ class Pogozipper{
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
                 filters: [
-                    { name: "PoppyGo Themes", extensions: [PogoThemeExtension] }
+                    { name: "Quiqr Themes", extensions: [PogoThemeExtension] }
                 ],
                 properties: ['openFile'] });
 
@@ -394,7 +394,7 @@ class Pogozipper{
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
                 filters: [
-                    { name: "PoppyGo Content", extensions: [PogoContentExtension] }
+                    { name: "Quiqr Content", extensions: [PogoContentExtension] }
                 ],
                 properties: ['openFile'] });
 

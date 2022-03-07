@@ -6,14 +6,14 @@ set -e
 usage() {
   this=$1
   cat <<EOF
-$this: download go binaries for poppygo/embgit
+$this: download go binaries for quiqr/embgit
 
 Usage: $this [-b] bindir [-d] [tag]
   -b sets bindir or installation directory, Defaults to ./bin
   -p sets bindir to ./resources/mac|win|linux
   -d turns on debug logging
    [tag] is a tag from
-   https://github.com/poppygo/embgit/releases
+   https://github.com/quiqr/embgit/releases
    If tag is missing, then the latest will be used.
 
 EOF
@@ -367,7 +367,7 @@ End of functions from https://github.com/client9/shlib
 EOF
 
 PROJECT_NAME="embgit"
-OWNER=poppygo
+OWNER=quiqr
 REPO="embgit"
 BINARY=embgit
 FORMAT=tar.gz

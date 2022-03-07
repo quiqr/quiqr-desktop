@@ -258,7 +258,7 @@ class MenuManager {
       const dialog = electron.dialog;
       dialog.showMessageBox(mainWindow, {
         buttons: ["Close"],
-        title: "PoppyGo will now download hugo " + hugover,
+        title: "Quiqr will now download hugo " + hugover,
         message: "Try again when download has finished",
       });
 
@@ -279,7 +279,7 @@ class MenuManager {
       const imgFile = path.join(global.currentSitePath, "static", "img", ".pogo-images.md");
       const imageFile2 = path.join(global.currentSitePath, "static", ".pogo-images.md");
       const imageFileContent = "---\n\
-description: this file is a helper file for the PoppyGo asset manager\n\
+description: this file is a helper file for the Quiqr asset manager\n\
 resources: []\n\
 ---\n\
 \n";
@@ -313,7 +313,7 @@ resources: []\n\
         let response = dialog.showMessageBox(options)
         if(response === 1) return;
 
-        fs.copySync(modelFile, path.join(global.currentSitePath,"poppygo","model", "base.json"));
+        fs.copySync(modelFile, path.join(global.currentSitePath,"quiqr","model", "base.json"));
         if (fs.existsSync(menuFile)){
           fs.copySync(menuFile, path.join(global.currentSitePath, "zpogomenu.json"));
         }
@@ -342,7 +342,7 @@ resources: []\n\
     let options  = {
       buttons: ["Close"],
       title: "About",
-      message: "PoppyGo Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate + upis
+      message: "Quiqr Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate + upis
     }
     dialog.showMessageBox(options)
   }
@@ -390,7 +390,7 @@ resources: []\n\
           outputConsole.appendLine('rename site to: '+newName);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-          mainWindow.setTitle(`PoppyGo - Site: ${newName}`);
+          mainWindow.setTitle(`Quiqr - Site: ${newName}`);
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
           mainWindow.webContents.send("redirectMountSite",newScreenURL);
@@ -724,8 +724,8 @@ resources: []\n\
     let profilesMenu = [];
 
     profilesMenu.push({
-      id: 'connect-poppygo-user',
-      label: "Request PoppyGo User Connect Code",
+      id: 'connect-quiqr-user',
+      label: "Request Quiqr User Connect Code",
       click: async ()=>{
         this.requestUserConnectCode();
       }
@@ -733,7 +733,7 @@ resources: []\n\
 
     profilesMenu.push({
       id: 'enter-connect-code',
-      label: "Enter PoppyGo User Connect code",
+      label: "Enter Quiqr User Connect code",
       click: async ()=>{
         this.enterUserConnectCode();
       }
@@ -748,8 +748,8 @@ resources: []\n\
     let profilesMenu = [];
 
     profilesMenu.push({
-      id: 'invite-poppygo-user',
-      label: "Invite PoppyGo User as Site Member",
+      id: 'invite-quiqr-user',
+      label: "Invite Quiqr User as Site Member",
       enabled: this.siteIsPogoCloudManaged(),
       click: async ()=>{
         this.inviteUserForSite();
@@ -865,10 +865,10 @@ resources: []\n\
 
           let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
 
-          newConf.publish[0].key = "poppygo-cloud"
+          newConf.publish[0].key = "quiqr-cloud"
           newConf.publish[0].config = {}
           newConf.publish[0].config.path = newPath
-          newConf.publish[0].config.type = "poppygo"
+          newConf.publish[0].config.type = "quiqr"
           newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
 
           //TODO USE GENERAL
@@ -940,7 +940,7 @@ resources: []\n\
         defaultId: 1,
         title: 'Restart to use new settings',
         message: 'Restart to use new settings',
-        detail: 'You should restart PoppyGo to make changes effective.',
+        detail: 'You should restart Quiqr to make changes effective.',
       };
 
       dialog.showMessageBox(null, options, async (response) => {
@@ -1419,7 +1419,7 @@ resources: []\n\
           },
           {
             id: 'auto-create-model',
-            label: 'Generate PoppyGo Config',
+            label: 'Generate Quiqr Config',
             enabled: this.siteSelected(),
             click: async () => {
               await this.generateModel();
@@ -1477,12 +1477,12 @@ resources: []\n\
           {
             label: 'Getting Started',
             click: async () => {
-              await shell.openExternal("https://router.poppygo.app/getting-started");
+              await shell.openExternal("https://book.quiqr.org/docs/01-getting-started/");
             }
           },
           { type: 'separator' },
           {
-            label: 'Show PoppyGo Version',
+            label: 'Show Quiqr Version',
             click: async () => {
               this.showVersion();
             }
@@ -1490,7 +1490,7 @@ resources: []\n\
           {
             label: 'Release Notes',
             click: async () => {
-              await shell.openExternal("https://router.poppygo.app/release-notes");
+              await shell.openExternal("https://router.quiqr.cloud/release-notes");
             }
           }
         ]

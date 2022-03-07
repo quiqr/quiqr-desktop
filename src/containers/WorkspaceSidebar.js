@@ -239,7 +239,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     let devSets = [];
 
     if(this.state.devShowCurrentUser){
-      let username=this.props.poppygoUsername;
+      let username=this.props.quiqrUsername;
       devSets.push(
         <Chip label={username} color="secondary" size="small" />
       )
@@ -397,7 +397,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
         <WorkspaceWidget
         siteConfig={this.state.site}
         workspaceConfig={this.state.workspace}
-        poppygoUsername={this.props.poppygoUsername}
+        quiqrUsername={this.props.quiqrUsername}
         onClick={()=>{
           if(this.state.error!=null){
             history.push('/');

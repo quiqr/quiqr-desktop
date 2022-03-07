@@ -30,7 +30,7 @@ function showPreviewWaitForServer(previewWindow){
     <html>
         <body style="background-color:#ccc;font-family: sans-serif; padding: 2em">
         <h3>Starting preview..</h3>
-        <p>PoppyGo is building your site. </p>
+        <p>Quiqr is building your site. </p>
         <p>It can take a minute or two the first time.</p>
         </body>
     </html>`));
@@ -151,10 +151,10 @@ function getFirstScreenAfterStartup(){
         });
 
         let siteConfig = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-        mainWindow.setTitle(`PoppyGo - Site: ${siteConfig.name}`);
+        mainWindow.setTitle(`Quiqr - Site: ${siteConfig.name}`);
       }
       else{
-        mainWindow.setTitle("PoppyGo: Select site");
+        mainWindow.setTitle("Quiqr: Select site");
 
       }
     });
@@ -302,7 +302,7 @@ module.exports = {
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
       mainWindow.webContents.send("redirectToGivenLocation", '/create-new');
 
-      mainWindow.setTitle("PoppyGo: Create new PoppyGo site");
+      mainWindow.setTitle("Quiqr: Create new Quiqr site");
     });
 
     menuManager.updateMenu(null);
@@ -319,7 +319,7 @@ module.exports = {
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
       mainWindow.webContents.send("redirectToGivenLocation", '/');
 
-      mainWindow.setTitle("PoppyGo: Select site");
+      mainWindow.setTitle("Quiqr: Select site");
     });
 
     menuManager.updateMenu(null);

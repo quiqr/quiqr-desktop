@@ -143,7 +143,7 @@ class HugoDownloader{
             let mainWindow = global.mainWM.getCurrentInstance();
             var progressBar = new ProgressBar({
                 indeterminate: false,
-                text: 'Downloading PoppyGo Components, ..',
+                text: 'Downloading Quiqr Components, ..',
                 abortOnError: true,
                 detail: 'Preparing download..',
                 browserWindow: {

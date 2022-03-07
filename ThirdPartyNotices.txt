@@ -1,11 +1,11 @@
-poppygo
+quiqr
 
 THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 Do Not Translate or Localize
 
 This project incorporates components from the projects listed below. The
-original copyright notices and the licenses under which PoppyGo received such
-components are set forth below. PoppyGo reserves all rights not expressly
+original copyright notices and the licenses under which Quiqr received such
+components are set forth below. Quiqr reserves all rights not expressly
  granted herein, whether by implication, estoppel or otherwise.
 
    1 7zip-bin-linux version 1.3.1, Licence: MIT, Repository: https://github.com/develar/7zip-bin
@@ -226,7 +226,7 @@ components are set forth below. PoppyGo reserves all rights not expressly
  216 pixelmatch version 4.0.2, Licence: ISC, Repository: https://github.com/mapbox/pixelmatch
  217 pluralize version 7.0.0, Licence: MIT, Repository: https://github.com/blakeembrey/pluralize
  218 pngjs version 3.4.0, Licence: MIT, Repository: https://github.com/lukeapage/pngjs2
- 219 poppygo version 0.8.3, Licence: UNLICENSED, Repository: 
+ 219 quiqr version 0.8.3, Licence: UNLICENSED, Repository: 
  220 prelude-ls version 1.1.2, Licence: MIT, Repository: https://github.com/gkz/prelude-ls
  221 process version 0.5.2, Licence: MIT*, Repository: https://github.com/shtylman/node-process
  222 progress version 2.0.3, Licence: MIT, Repository: https://github.com/visionmedia/node-progress

@@ -1,4 +1,4 @@
-# PoppyGo App CHANGELOG
+# Quiqr App CHANGELOG
 
 ## v0.9.1
 - todo ...
@@ -30,7 +30,7 @@
 - detect if hugo server is running or not
 - show not running server in preview window
 - improve restart of hugo server
-- autoimport by clicking link in browser for Windows & Linux (poppygo://)
+- autoimport by clicking link in browser for Windows & Linux (quiqr://)
 
 ## v0.7.1
 
@@ -39,8 +39,8 @@
 
 ## v0.7.0
 
-- become a PoppyGo member
-- claim a PoppyGo domain
+- become a Quiqr member
+- claim a Quiqr domain
 - new authentication flow for publishing sites
 
 ## v0.6.6
@@ -79,7 +79,7 @@
 ## v0.6.2
 
 - fix unstable select site task
-- fix hugo not starting after returning to poppygo
+- fix hugo not starting after returning to quiqr
 
 ## v0.6.1
 - fix embgit.exe location on Windows
@@ -107,12 +107,12 @@
 - close mobile preview window in multiple situations where needed
 
 ## v0.5.1
-- [site-source]/poppygo/home/index.md is displayed on the site dashboard
+- [site-source]/quiqr/home/index.md is displayed on the site dashboard
 
 ## v0.5.0
 
 - fix progress windows not closing bug
-- fix double click pogofile error when poppygo not running
+- fix double click pogofile error when quiqr not running
 - first working version of the poppy:// handler
 
 ## v0.4.5
@@ -144,7 +144,7 @@
 - no need to restart the app after site import, or site deletion,
 - open site directoty in expert-menu,
 - open site config in expert-menu
-- help-menu opens https://docs.poppygo.app/
+- help-menu opens https://docs.quiqr.app/
 
 ## versie 0.3.5 - Private Beta 3
 - cleanup export file (ignore .git and public)
@@ -153,7 +153,7 @@
 - embgit fixes
 
 ## versie 0.3.2 - Private Beta 1
-- poppygo publisher
+- quiqr publisher
 - custom menu slots
 - interface cleanups
 - progress windows

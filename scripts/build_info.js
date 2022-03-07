@@ -1,7 +1,7 @@
 const https = require('https');
 const { exec } = require("child_process");
 const fs = require('fs')
-const REPO = "poppygo/embgit"
+const REPO = "quiqr/embgit"
 
 const gitFileWriter = fs.createWriteStream('resources/all/build-git-id.txt', {})
 const dateFileWriter = fs.createWriteStream('resources/all/build-date.txt', {})
@@ -41,6 +41,6 @@ exec("git rev-parse --short HEAD", async (error, stdout, stderr) => {
   const json = JSON.parse(res);
   const newest = json[0];
   const newestVersion = newest.tag_name;
-  const embgitTxt = `\nembgit v${newestVersion}\nCopyright PoppyGo B.V. 2020-2021`
+  const embgitTxt = `\nembgit v${newestVersion}\nCopyright Quiqr. 2022`
   gitFileWriter.write(embgitTxt); // append string to your file
 });

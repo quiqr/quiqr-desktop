@@ -40,26 +40,26 @@ class WorkspaceConfigProvider{
       token = await (new FileCacheToken([filePath])).build();
 
       //THIS SEEMS NEW CHECK IF README EXIST OR CREATE
-      let readmePath = path.join(workspacePath,'poppygo','home','index.md');
+      let readmePath = path.join(workspacePath,'quiqr','home','index.md');
       if( !fs.existsSync(readmePath) ){
-        fs.ensureDirSync(path.join(workspacePath,'poppygo','home'));
+        fs.ensureDirSync(path.join(workspacePath,'quiqr','home'));
         fs.writeFileSync(
           readmePath,
           `
 # README FOR NEW SITE
 
-If you're a developer you can read the [PoppyGo Site Developer
-Docs](https://poppygo.github.io/poppygo-book/)
+If you're a developer you can read the [Quiqr Site Developer
+Docs](https://book.quiqr.org/)
 how to customize your Site Admin.
 
-PoppyGo is a Desktop App made for [Hugo](https://gohugo.io). Read all about
+Quiqr is a Desktop App made for [Hugo](https://gohugo.io). Read all about
 [creating Hugo websites](https://gohugo.io/getting-started/quick-start/).
 
 To change this about text, edit this file: *${readmePath}*.
 
 Happy Creating.
 
-❤️ PoppyGo
+❤️ Quiqr
         `.trim()
         );
 
@@ -76,10 +76,10 @@ Happy Creating.
 
   }
 
-  //CREATE poppygo/base.yaml
+  //CREATE quiqr/base.yaml
   _getFilePath(workspacePath){
 
-    let fileExpPrimary = path.join(workspacePath,'poppygo','model','base.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    let fileExpPrimary = path.join(workspacePath,'quiqr','model','base.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
 
     if( glob.sync(fileExpPrimary).length > 0 ){
       return glob.sync(fileExpPrimary)[0];
@@ -89,20 +89,20 @@ Happy Creating.
     return glob.sync(fileExpFallback)[0];
   }
 
-  //CREATE poppygo/base.yaml
+  //CREATE quiqr/base.yaml
   _buildDefaultConfig(workspacePath){
     let configBuilder = new InitialWorkspaceConfigBuilder(workspacePath);
     let {dataBase, formatProvider} = configBuilder.buildBase();
     let dataInclude = configBuilder.buildInclude();
     let dataPartial = configBuilder.buildPartials();
 
-    fs.ensureDirSync(path.join(workspacePath,'poppygo','model'));
-    fs.ensureDirSync(path.join(workspacePath,'poppygo','model','includes'));
-    fs.ensureDirSync(path.join(workspacePath,'poppygo','model','partials'));
+    fs.ensureDirSync(path.join(workspacePath,'quiqr','model'));
+    fs.ensureDirSync(path.join(workspacePath,'quiqr','model','includes'));
+    fs.ensureDirSync(path.join(workspacePath,'quiqr','model','partials'));
 
-    let filePathInclude = path.join(workspacePath,'poppygo','model','includes','collections.'+formatProvider.defaultExt());
-    let filePathPartial = path.join(workspacePath,'poppygo','model','partials', 'page.'+formatProvider.defaultExt());
-    let filePathBase    = path.join(workspacePath,'poppygo','model','base.'+formatProvider.defaultExt());
+    let filePathInclude = path.join(workspacePath,'quiqr','model','includes','collections.'+formatProvider.defaultExt());
+    let filePathPartial = path.join(workspacePath,'quiqr','model','partials', 'page.'+formatProvider.defaultExt());
+    let filePathBase    = path.join(workspacePath,'quiqr','model','base.'+formatProvider.defaultExt());
 
     fs.writeFileSync(
       filePathBase,
@@ -162,7 +162,7 @@ Happy Creating.
   }
 
   _loadIncludes(configObject, workspacePath){
-    let fileIncludes = path.join(workspacePath,'poppygo','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    let fileIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     let files = glob.sync(fileIncludes);
 
     let newObject = {}
@@ -184,7 +184,7 @@ Happy Creating.
 
   _mergePartials(mergeKey, workspacePath){
     if( "_mergeFromPartial" in mergeKey){
-      let filePartial = path.join(workspacePath,'poppygo','model','partials',mergeKey._mergeFromPartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+      let filePartial = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergeFromPartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
 
       let files = glob.sync(filePartial);
       if( files.length > 0 && fs.existsSync(files[0]) ){

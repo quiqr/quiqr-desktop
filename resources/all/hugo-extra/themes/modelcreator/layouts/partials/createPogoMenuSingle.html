@@ -1,7 +1,0 @@
-{{- $fields := slice -}}
-{{- range $key, $value := .item -}}
-    {{- $field := partial "createField" (dict "value" $value "key" $key ) -}}
-    {{- $fields = $fields | append $field -}}
-{{- end -}}
-{{- $single := dict "key" .key "title" .title "file" .file "dataformat" .dataformat "fields" $fields "previewUrl" "/" -}}
-{{- return $single  -}}

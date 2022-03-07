@@ -15,11 +15,11 @@ export const websiteConfiguration: FormCookbookSample = {
         ]}
     ],
     values: {
-        title: 'PoppyGo',
-        baseURL: 'https://poppygo.io',
+        title: 'Quiqr',
+        baseURL: 'https://quiqr.org',
         params: {
             author: 'Multiple Authors',
-            description: 'PoppyGo, the app for Hugo. Try it now!'
+            description: 'Quiqr, the app for Hugo. Try it now!'
         }
     }
 }

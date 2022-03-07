@@ -22,11 +22,11 @@ class Welcome extends React.Component {
     }
 
     handleLinkThemeGallery = ()=>{
-        window.require('electron').shell.openExternal("https://router.poppygo.app/theme-gallery");
+        window.require('electron').shell.openExternal("https://router.quiqr.cloud/theme-gallery");
     }
 
     handleLinkPoppyWebsite = ()=>{
-        window.require('electron').shell.openExternal("https://poppygo.io/documentation/");
+        window.require('electron').shell.openExternal("https://book.quiqr.org/");
     }
 
     handleImportClick = ()=>{
@@ -64,7 +64,7 @@ class Welcome extends React.Component {
                                Close and continue
                             </Button>
                         </div>
-                        <h1>Congratulations: You installed PoppyGo, The app for Hugo</h1>
+                        <h1>Congratulations: You installed Quiqr, The app for Hugo</h1>
                         <h3>You now have a publishing platform and CMS for your websites</h3>
                         <p>
                             <ul>
@@ -73,7 +73,7 @@ class Welcome extends React.Component {
                                 <li>Publish with a single click</li>
                                 <li>All without setup</li>
                             </ul>
-                            <button className="reglink" onClick={this.handleLinkPoppyWebsite} >PoppyGo Docs</button>
+                            <button className="reglink" onClick={this.handleLinkPoppyWebsite} >Quiqr Docs</button>
                         </p>
                         <br/>
                         <strong><p>Did you receive a pogosite file?</p></strong>
@@ -89,7 +89,7 @@ class Welcome extends React.Component {
                         <br/>
                         <strong><p>Are you developing a Hugo site on your local machine?</p></strong>
                         <p>
-                            Then open your existing site folder in PoppyGo to start content management and publishing right away.
+                            Then open your existing site folder in Quiqr to start content management and publishing right away.
                         </p>
                         <p>
                             <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleNewSiteClick}>
@@ -97,13 +97,6 @@ class Welcome extends React.Component {
                             </Button>
                         </p>
                         <br/>
-                        <strong><p>Are you new to Hugo sites, and do you want to start with an existing template?</p></strong>
-                        <p>
-                            Then select a template below to start and experience PoppyGo right away.
-                        </p>
-
-                        <object data="https://poppygo.io/themes/iframe.html" width="100%" height="2000px" scroll="no" type="text/html">...</object>
-
                     </div>
                 );
             }}/>

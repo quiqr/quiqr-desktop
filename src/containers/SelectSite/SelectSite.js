@@ -113,13 +113,13 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
       this.setState({createSiteDialog: nextProps.createSite});
     }
 
-    if(this.props.poppygoUsername !== nextProps.poppygoUsername){
-      this.updateRemoteSites(nextProps.poppygoUsername);
+    if(this.props.quiqrUsername !== nextProps.quiqrUsername){
+      this.updateRemoteSites(nextProps.quiqrUsername);
     }
   }
 
   componentWillMount(){
-    this.updateRemoteSites(this.props.poppygoUsername);
+    this.updateRemoteSites(this.props.quiqrUsername);
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });
@@ -225,20 +225,20 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
     let listTitle = 'All Sites';
 
     if(this.state.sitesListingView === 'mylocal'){
-      listTitle = `Your sites (${this.props.poppygoUsername})`;
+      listTitle = `Your sites (${this.props.quiqrUsername})`;
       sites = sites.filter((site) => {
-        return site.owner === this.props.poppygoUsername
+        return site.owner === this.props.quiqrUsername
       });
     }
 
     else if(this.state.sitesListingView === 'myremote'){
-      listTitle = `Available remote sites (${this.props.poppygoUsername})`;
+      listTitle = `Available remote sites (${this.props.quiqrUsername})`;
 
       sites = [];
       this.state.remoteSitesAsOwner.forEach((remotesite)=>{
         sites.push({
           name: remotesite,
-          owner: this.props.poppygoUsername,
+          owner: this.props.quiqrUsername,
           remote: true
         })
       });

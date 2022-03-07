@@ -9,7 +9,7 @@ module.exports = function (options) {
   const app = electron.app || electron.remote.app;
   let state;
   const config = Object.assign({
-    file: 'poppygo-app-config.json',
+    file: 'quiqr-app-config.json',
     path: app.getPath('userData')
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);

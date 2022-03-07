@@ -91,7 +91,7 @@ class WorkspaceConfigValidator {
       joi.object().keys({
         key: joi.string().trim().regex(/^[A-Za-z0-9\-_]+$/i).min(3).max(90).required().error(new Error('The collection key "'+collection.key+'" is invalid.')),
         title: joi.string().trim().min(3).max(90).required().error(new Error('The title value is invalid.')),
-        folder: joi.string().trim().regex(/^(content|data|poppygo).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The folder value is invalid.')),
+        folder: joi.string().trim().regex(/^(content|data|quiqr).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The folder value is invalid.')),
         itemtitle: joi.string().trim().min(3).max(90).error(new Error('The itemtitle value is invalid.')),
         extension: joi.string().regex(validationUtils.allFormatsReg).required().error(new Error('The extension value is invalid.')),
         dataformat: joi.string().trim().error(new Error('The dataformat value is invalid.')), //is not required here

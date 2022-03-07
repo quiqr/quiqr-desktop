@@ -11,7 +11,7 @@ const mainWindowManager = require('./ui-managers/main-window-manager');
 const menuManager       = require('./ui-managers/menu-manager');
 const pogozipper        = require('./import-export/pogozipper');
 const pathHelper        = require('./utils/path-helper');
-const PoppyGoAppConfig  = require('./app-prefs-state/poppygo-app-config');
+const QuiqrAppConfig  = require('./app-prefs-state/quiqr-app-config');
 const outputConsole     = require('./logger/output-console');
 const apiMain           = require('./bridge/api-main');
 
@@ -26,11 +26,11 @@ if(app.isPackaged) {
 // FIXME TODO this is to solve the 2021q3 Lets Encrypt problems
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-app.setAsDefaultProtocolClient('poppygo');
+app.setAsDefaultProtocolClient('quiqr');
 
 require('events').EventEmitter.prototype._maxListeners = 15;
 
-global.pogoconf = PoppyGoAppConfig();
+global.pogoconf = QuiqrAppConfig();
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
@@ -174,8 +174,8 @@ app.on('open-url', function(event, schemeData){
 function openUrlFromArgv(argv) {
     for (let i = 1; i < argv.length; i++) {
         let arg = argv[i]
-        if (!arg.startsWith('poppygo:') && !arg.startsWith('poppygo:')) {
-            console.log("open-url: URI doesn't start with poppygo:", arg)
+        if (!arg.startsWith('quiqr:') && !arg.startsWith('quiqr:')) {
+            console.log("open-url: URI doesn't start with quiqr:", arg)
             continue
         }
 

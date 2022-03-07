@@ -239,7 +239,7 @@ export default class RegisterDialog extends React.Component{
 
     return (
       <Dialog
-      title="Sign up for free publishing with PoppyGo Live"
+      title="Sign up for free publishing with Quiqr Live"
       open={open}
       actions={actions}>
 

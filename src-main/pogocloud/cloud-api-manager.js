@@ -1,6 +1,6 @@
-/* Copyright PoppyGo 2021
+/* Copyright Quiqr 2021
  *
- * pim@poppygo.io
+ * pim@quiqr.org
  *
  */
 const { app, shell }            = require('electron')

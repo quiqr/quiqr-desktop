@@ -1,6 +1,6 @@
-/* Copyright PoppyGo 2020
+/* Copyright Quiqr 2020
  *
- * pim@poppygo.io
+ * pim@quiqr.org
  *
  */
 const electron      = require('electron')

@@ -39,7 +39,7 @@ describe('Application launch', function () {
       var times = 5;
       for(var i=0; i < times; i++){
           this.app.webContents.send("redirectHome");
-          this.app.client.click('#siteselectable-poppygo-test-website');
+          this.app.client.click('#siteselectable-quiqr-test-website');
           await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
       }
 
@@ -53,7 +53,7 @@ describe('Application launch', function () {
       var times = 5;
       for(var i=0; i < times; i++){
           this.app.webContents.send("redirectHome");
-          this.app.client.click('#siteselectable-poppygo-test-website');
+          this.app.client.click('#siteselectable-quiqr-test-website');
           await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
       }
       this.app.webContents.send("redirectHome");
