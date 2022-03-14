@@ -71,7 +71,7 @@ export default class ClaimDomainDialog extends React.Component{
                 let obj = JSON.parse(data);
                 if(obj.hasOwnProperty('path')){
 
-                    let promise = service.api.createPogoDomainConf(obj.path, obj.path+".pogosite.com");
+                    let promise = service.api.createPogoDomainConf(obj.path, obj.path+".quiqr.cloud");
                     promise.then((path)=>{
                         this.props.onClaimDomainClick({ pogourl: path });
                     });
@@ -158,7 +158,7 @@ export default class ClaimDomainDialog extends React.Component{
             <div>
                 <TextField disabled={busy} errorText={this.state.pogourl_err} floatingLabelText={'Quiqr URL'} value={this.state.pogourl} onChange={(e)=>{this.handlepogourlChange(e)}} fullWidth />
                 <Paper style={{margin:10,padding:"0 7px 7px 7px"}}>
-                    <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span>.pogosite.com</span>
+                    <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span>.quiqr.cloud</span>
                 </Paper>
             </div>
         )

@@ -869,7 +869,7 @@ resources: []\n\
           newConf.publish[0].config = {}
           newConf.publish[0].config.path = newPath
           newConf.publish[0].config.type = "quiqr"
-          newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".pogosite.com"
+          newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".quiqr.cloud"
 
           //TODO USE GENERAL
           await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});

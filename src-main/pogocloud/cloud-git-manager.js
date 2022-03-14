@@ -13,7 +13,7 @@ const { EnvironmentResolver } = require('../utils/environment-resolver');
 class CloudGitManager {
 
   cloudPathToUrl(cloudPath){
-    return `git@gitlab.brepi.eu:${cloudPath}.git`;
+    return `git@gl.quiqr.org:${cloudPath}.git`;
   }
 
   newSiteKeyFromPath(cloudPath){

@@ -398,7 +398,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     var stateUpdate  = {};
     stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
     stateUpdate.pogoCustomDomain = "not set";
-    stateUpdate.defaultDomain = `${this.getPogoCloudPath()}.pogosite.com`;
+    stateUpdate.defaultDomain = `${this.getPogoCloudPath()}.quiqr.cloud`;
     this.setState(stateUpdate,()=>{
       service.api.logToConsole("finished disconnecting domain")
       this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
@@ -543,7 +543,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     }
 
     let projectPath = this.state.selectedSite.publish[0].config.path;
-    let url = "http://"+projectPath+".pogosite.com/.pogo_with_me"
+    let url = "http://"+projectPath+".quiqr.cloud/.pogo_with_me"
 
 
 
@@ -623,7 +623,7 @@ class Home extends React.Component<HomeProps, HomeState>{
             let obj = JSON.parse(data);
 
             let custom_domain = "not set"
-            let defaultDomain = `${this.getPogoCloudPath()}.pogosite.com`;
+            let defaultDomain = `${this.getPogoCloudPath()}.quiqr.cloud`;
             if (obj.hasOwnProperty('pogo_custom_domain')){
               custom_domain = obj.pogo_custom_domain;
               defaultDomain = obj.pogo_custom_domain;
@@ -1009,7 +1009,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       return(
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"110%"}}>
-            You are now allowed to publish to this site in the pogocloud.
+            You are not allowed to publish to this site in the pogocloud.
           </span>
 
         </ListItem>

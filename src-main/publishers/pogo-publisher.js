@@ -496,14 +496,14 @@ class PogoPublisher {
     var group = (this._config.group?this._config.group:"sites");
 
     var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
-    var full_gh_url = 'git@gitlab.brepi.eu:' + group + '/' + repository +'.git';
+    var full_gh_url = 'git@gl.quiqr.org:' + group + '/' + repository +'.git';
     var full_gh_dest = resolvedDest + '' + repository;
     var gitignore = "/public\n\
 .sukoh\n";
 
     var gitlabCi = "include:\n\
-  - project: 'platform/pogo-include'\n\
-    ref: master\n\
+  - project: 'system/quiqr-build-include'\n\
+    ref: main\n\
     file: '/main.yml'\n";
 
     var git_bin = Embgit.getGitBin();
@@ -598,7 +598,7 @@ class PogoPublisher {
 
             const environmentResolver = new EnvironmentResolver();
             const UPIS = environmentResolver.getUPIS();
-            let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', "publication from " + UPIS, full_gh_dest]);
+            let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', "publication from " + UPIS, full_gh_dest]);
 
             clonecmd3.stdout.on("data", (data) => {
             });

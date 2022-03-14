@@ -76,7 +76,7 @@ export default class EditPlanDialog extends React.Component{
                 service.api.logToConsole(obj);
                 if(obj === true){
 
-                    let promise = service.api.createPogoDomainConf(sitePath, sitePath+".pogosite.com");
+                    let promise = service.api.createPogoDomainConf(sitePath, sitePath+".quiqr.cloud");
                     promise.then((path)=>{
                         this.props.onDisconnectDomainClick();
                     });

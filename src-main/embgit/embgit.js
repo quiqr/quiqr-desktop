@@ -85,7 +85,7 @@ class Embgit{
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
-        let cmd = await spawnAw( git_bin, [ "commit", "-a" ,"-n", global.pogoconf.currentUsername, '-e','sukoh@brepi.eu', '-m', message, destination_path ]);
+        let cmd = await spawnAw( git_bin, [ "commit", "-a" ,"-n", global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', message, destination_path ]);
         outputConsole.appendLine('Commit success ...');
         console.log(cmd.toString());
         resolve(true)

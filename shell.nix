@@ -61,6 +61,7 @@ in
       nixos05.hugo
       nixos05.electron_5
       myPackages.embgit
+      nixos05.xdg-utils
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${nixos05.electron_5}/bin/";
     NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";

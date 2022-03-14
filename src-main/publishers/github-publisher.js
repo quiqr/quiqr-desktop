@@ -101,7 +101,7 @@ class GithubPublisher {
 
               var spawn = require("child_process").spawn;
               //let clonecmd3 = spawn( git_bin, [ "commit" , '-a', '-m', 'publish from sukoh'],{cwd: full_gh_dest});
-              let clonecmd3 = spawn( git_bin, [ "commit" , '-n','sukoh','-e','sukoh@brepi.eu', '-m', 'publish from sukoh',full_gh_dest]);
+              let clonecmd3 = spawn( git_bin, [ "commit" , '-n','sukoh','-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', 'publish from sukoh',full_gh_dest]);
               clonecmd3.stdout.on("data", (data) => {
               });
               clonecmd3.stderr.on("data", (err) => {
