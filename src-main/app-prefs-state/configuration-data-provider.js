@@ -21,9 +21,10 @@ let pogoboardConn, pogostripeConn;
 if(pogoconf.devLocalApi){
   pogoboardConn = {host:"localhost",port:9999, protocol: "http:"};
   pogostripeConn = {host:"localhost",port:4242, protocol: "http:"};
-}else{
-  pogoboardConn = {host:"board.quiqr.org",port:443, protocol: "https:"};
-  pogostripeConn = {host:"payments.quiqr.org",port:443, protocol: "https:"};
+}
+else{
+  pogoboardConn = {host:"board.quiqr.app",port:443, protocol: "https:"};
+  pogostripeConn = {host:"pay.quiqr.app",port:443, protocol: "https:"};
 }
 
 const GLOBAL_DEFAULTS = {
