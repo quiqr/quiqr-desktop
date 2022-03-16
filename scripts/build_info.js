@@ -40,6 +40,7 @@ exec("git rev-parse --short HEAD", async (error, stdout, stderr) => {
   const res = await getContent("api.github.com", `/repos/${REPO}/releases`);
   const json = JSON.parse(res);
   const newest = json[0];
+  console.log(newest);
   const newestVersion = newest.tag_name;
   const embgitTxt = `\nembgit v${newestVersion}\nCopyright Quiqr. 2022`
   gitFileWriter.write(embgitTxt); // append string to your file
