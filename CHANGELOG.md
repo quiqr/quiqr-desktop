@@ -1,9 +1,9 @@
 # Quiqr App CHANGELOG
 
-<!--
-Placeholder for the next version (at the beginning of the line):
+## **WORK IN PROGRESS**
+
 ## 0.9.2 (2022-03-16)
--->
+- fork from PoppyGo App
 
 ## v0.9.1
 - todo ...
