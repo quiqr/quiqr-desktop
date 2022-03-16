@@ -35,8 +35,8 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.API_KEY_ID }}.p8
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+#      - name: Setup tmate session
+#        uses: mxschmitt/action-tmate@v3
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
@@ -53,6 +53,7 @@ jobs:
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
 
         env:
+          GH_PRIV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USE_HARD_LINKS: false
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

@@ -9,11 +9,14 @@ const dateFileWriter = fs.createWriteStream('resources/all/build-date.txt', {})
 const buildDate = new Date().toString();
 dateFileWriter.write(buildDate+"\n");
 
+const ghToken = process.env.GH_PRIV_TOKEN;
+
 const getContent = function(host, path) {
   return new Promise((resolve, reject) => {
     const request = https.get({
       headers: {
-        "User-Agent": "Node"
+        "User-Agent": "Node",
+        "Authorization": "token " + ghToken,
       },
       host,
       path
