@@ -1,6 +1,7 @@
 # Quiqr App CHANGELOG
 
 ## **WORK IN PROGRESS**
+- todo
 
 ## 0.9.2 (2022-03-16)
 - fork from PoppyGo App
