@@ -6,8 +6,8 @@ on:
   push:
     branches:
       - 'build'
-    tags:
-      - '*'
+        #    tags:
+        #      - '*'
 
 jobs:
   release:
