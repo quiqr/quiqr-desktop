@@ -48,6 +48,7 @@
     "user-home": "2.0.0"
   },
   "devDependencies": {
+    "@alcalzone/release-script": "^3.5.6",
     "ajv": "6.5.4",
     "chai": "4.1.2",
     "concurrently": "3.5.1",
@@ -81,7 +82,8 @@
     "_build_info": "node scripts/build_info.js",
     "_mac-notarize": "node scripts/notarize.js",
     "build": "npm run clean && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
-    "dist": "npm run build && electron-builder",
+    "dist": "electron-builder",
+    "release": "release-script",
     "start": "concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
   },
   "build": {

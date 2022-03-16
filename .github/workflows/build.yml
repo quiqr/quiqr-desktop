@@ -5,9 +5,8 @@ on:
   # but only for the main branch
   push:
     branches:
-      - build
-        #    tags:
-        #      - '*'
+    tags:
+      - '*'
 
 jobs:
   release:
