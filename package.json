@@ -163,6 +163,7 @@
       "target": [
         "AppImage",
         "snap",
+        "flatpak",
         "deb",
         "rpm"
       ],
