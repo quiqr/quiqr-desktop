@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+
+## **WORK IN PROGRESS**
+- todo
+
 ## 0.9.4 (2022-03-16)
 - todo
 
