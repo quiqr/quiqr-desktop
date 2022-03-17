@@ -161,9 +161,11 @@
     "linux": {
       "icon": "public/icon",
       "target": [
-        {
-          "target": "AppImage"
-        }
+          "AppImage",
+          "snap",
+          "deb",
+          "flatpak",
+          "rpm"
       ],
       "category": "office"
     },
