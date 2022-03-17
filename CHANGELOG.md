@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.9.5-3 (2022-03-17)
 - enable flatpak
 
 ## 0.9.5-2 (2022-03-17)
