@@ -37,6 +37,12 @@ jobs:
 #      - name: Setup tmate session
 #        uses: mxschmitt/action-tmate@v3
 
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        if: startsWith(matrix.os, 'ubuntu')
+        with:
+          snapcraft_token: ${{ secrets.SNAPCRAFT_TOKEN }}
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
@@ -61,8 +67,4 @@ jobs:
           API_KEY_ID: ${{ secrets.API_KEY_ID }}
           API_KEY_ISSUER_ID: ${{ secrets.API_KEY_ISSUER_ID }}
 
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
-        if: startsWith(matrix.os, 'ubuntu')
-        with:
-          snapcraft_token: ${{ secrets.SNAPCRAFT_TOKEN }}
+

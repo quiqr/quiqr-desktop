@@ -164,7 +164,6 @@
         "AppImage",
         "snap",
         "deb",
-        "flatpak",
         "rpm"
       ],
       "category": "office"
