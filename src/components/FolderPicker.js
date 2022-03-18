@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { TextField, RaisedButton } from 'material-ui-02';
+import TextField2 from '@material-ui/core/TextField';
 
 type FolderPickerProps = {
     onFolderSelected: (folder: ?string)=> void,
@@ -36,13 +37,13 @@ export default class FolderPicker extends React.Component<FolderPickerProps, Fol
 
         return (
             <div style={{display:'flex' }}>
-                <TextField
+                <TextField2
                     readOnly fullWidth
                     value={selectedFolder||''}
                     floatingLabelText={label}
                     floatingLabelFixed
                     onClick={this.handleTextFieldClick.bind(this)}
-                    style={{flex:'1'}} />
+                    style={{flex:'1 0 500px',  flexDirection: 'row'}} />
                 <RaisedButton
                     onClick={this.handlePickFileClick.bind(this) }
                     style={{flex:'140px 0 0', alignSelf: 'flex-end', marginLeft: '8px', marginBottom:'8px'}}

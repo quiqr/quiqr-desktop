@@ -5,7 +5,7 @@ import { Switch, Route }                             from 'react-router-dom'
 import SelectSite                                    from './containers/SelectSite'
 import Console                                       from './containers/Console';
 import PreviewButtons                                from './containers/PreviewButtons';
-import Prefs                                         from './containers/Prefs'
+//import Prefs                                         from './containers/Prefs'
 
 import Home                                          from './containers/Home'
 import Collection                                    from './containers/Collection';
@@ -15,6 +15,7 @@ import Welcome                                       from './containers/Welcome'
 
 import WorkspaceSidebar                              from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
+import { PrefsSidebar, PrefsRouted }                 from './containers/Prefs';
 
 import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
@@ -224,7 +225,20 @@ class App extends React.Component<AppProps,AppState>{
         onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
       />);
       }} />
-        </Switch>);
+
+      <Route path="/prefs" exact={false} render={ ({match, history})=> {
+        return (<PrefsSidebar
+        menus={[]}
+        hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
+        menuIsLocked={this.state.menuIsLocked}
+        onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
+        onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
+      />);
+      }} />
+
+
+
+    </Switch>);
   }
 
   renderSelectSites(){
@@ -277,47 +291,50 @@ class App extends React.Component<AppProps,AppState>{
         return <Welcome key={ 'selectSite' } />
       }} />
 
-        <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-          return this.renderHome(match);
-        }} />
+      <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
+        return this.renderHome(match);
+      }} />
 
-        <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
-          return this.renderHome(match);
-        }} />
+      <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
+        return this.renderHome(match);
+      }} />
 
-        <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {
-          return <Collection
-          key={ match.url }
-          siteKey={ decodeURIComponent(match.params.site) }
-          workspaceKey={ decodeURIComponent(match.params.workspace) }
-          collectionKey={ decodeURIComponent(match.params.collection) } />
-        }} />
+      <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {
+        return <Collection
+        key={ match.url }
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
+        collectionKey={ decodeURIComponent(match.params.collection) } />
+      }} />
 
-          <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item' exact render={ ({match})=> {
-            return <CollectionItem
-            key={ match.url }
-            siteKey={ decodeURIComponent(match.params.site) }
-            workspaceKey={ decodeURIComponent(match.params.workspace) }
-            collectionKey={ decodeURIComponent(match.params.collection) }
-            collectionItemKey={ decodeURIComponent(match.params.item) } />
-          }} />
+      <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item' exact render={ ({match})=> {
+        return <CollectionItem
+        key={ match.url }
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
+        collectionKey={ decodeURIComponent(match.params.collection) }
+        collectionItemKey={ decodeURIComponent(match.params.item) } />
+      }} />
 
-            <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
-              return <Single
-              key={ match.url }
-              siteKey={ decodeURIComponent(match.params.site) }
-              workspaceKey={ decodeURIComponent(match.params.workspace) }
-              singleKey={ decodeURIComponent(match.params.single) } /> }} />
+      <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
+        return <Single
+        key={ match.url }
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
+        singleKey={ decodeURIComponent(match.params.single) } /> }} />
 
-              <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
-                return <FormsCookbookRouted />;
-              }} />
+      <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
+        return <FormsCookbookRouted />;
+      }} />
 
+      <Route path="/prefs" exact={false} render={ ({match, history})=> {
+        return <PrefsRouted />;
+      }} />
 
-                <Route path="*" component={(data)=>{
-                  return <Redirect to='/' />
-                }} />
-                  </Switch>);
+      <Route path="*" component={(data)=>{
+        return <Redirect to='/' />
+      }} />
+    </Switch>);
   }
 
   tryServer(){
@@ -391,91 +408,74 @@ class App extends React.Component<AppProps,AppState>{
 
       }} />
 
-          <Route path="/prefs" exact={false} render={ ({match, history})=> {
-            this.history = history;
 
-            return (
-              <MuiThemeProvider muiTheme={pogoTheme}>
-                <div className="App">
-                  <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+      <Route path='/preview-empty' exact render={ ({match, history}) => {
+        this.history = history;
 
-                    <Prefs />
+        return (
+          <MuiThemeProvider muiTheme={pogoDarkTheme}>
+            <div style={{backgroundColor:"#ccc", height:"83px"}}>
+            </div>
+          </MuiThemeProvider>
+        )
+      }} />
 
-                  </div>
+
+      <Route path='/preview-buttons' exact render={ ({match, history}) => {
+        this.history = history;
+        return (
+          <MuiThemeProvider muiTheme={pogoDarkTheme}>
+            <div style={{backgroundColor:"#606060"}}>
+              <PreviewButtons />
+            </div>
+          </MuiThemeProvider>
+        )
+      }} />
+
+      <Route path='/preview-no-server' exact render={ ({match, history}) => {
+        this.history = history;
+
+        this.tryServer();
+        return (
+          <MuiThemeProvider muiTheme={pogoDarkTheme}>
+            <div style={{backgroundColor:"#ccc", height:"83px"}}>
+            </div>
+          </MuiThemeProvider>
+        )
+      }} />
+
+      <Route
+      path="*"
+      render={ ({match, history})=>{
+        const isRedirect = history.action === 'REPLACE';
+        if(isRedirect){
+          service.api.logToConsole('ISREDIRECT');
+        }
+
+        this.history = history;
+        return (
+          <MuiThemeProvider muiTheme={pogoTheme}>
+
+            <div className="App" style={marginStyles}>
+
+              <div style={containerStyle}>
+
+                <div style={menuContainerStyle} className='hideScrollbar' >
+                  { this.renderMenuSwitch() }
                 </div>
-              </MuiThemeProvider>
-            )
 
-          }} />
+                <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+                  { this.renderContentSwitch() }
+                </div>
 
-              <Route path='/preview-empty' exact render={ ({match, history}) => {
-                this.history = history;
+              </div>
 
-                return (
-                  <MuiThemeProvider muiTheme={pogoDarkTheme}>
-                    <div style={{backgroundColor:"#ccc", height:"83px"}}>
-                    </div>
-                  </MuiThemeProvider>
-                )
-              }} />
+            </div>
+          </MuiThemeProvider>
+        );
 
-
-                  <Route path='/preview-buttons' exact render={ ({match, history}) => {
-                    this.history = history;
-                    return (
-                      <MuiThemeProvider muiTheme={pogoDarkTheme}>
-                        <div style={{backgroundColor:"#606060"}}>
-                          <PreviewButtons />
-                        </div>
-                      </MuiThemeProvider>
-                    )
-                  }} />
-
-                      <Route path='/preview-no-server' exact render={ ({match, history}) => {
-                        this.history = history;
-
-                        this.tryServer();
-                        return (
-                          <MuiThemeProvider muiTheme={pogoDarkTheme}>
-                            <div style={{backgroundColor:"#ccc", height:"83px"}}>
-                            </div>
-                          </MuiThemeProvider>
-                        )
-                      }} />
-
-                          <Route
-                          path="*"
-                          render={ ({match, history})=>{
-                            const isRedirect = history.action === 'REPLACE';
-                            if(isRedirect){
-                              service.api.logToConsole('ISREDIRECT');
-                            }
-
-                            this.history = history;
-                            return (
-                              <MuiThemeProvider muiTheme={pogoTheme}>
-
-                                <div className="App" style={marginStyles}>
-
-                                  <div style={containerStyle}>
-
-                                    <div style={menuContainerStyle} className='hideScrollbar' >
-                                      { this.renderMenuSwitch() }
-                                    </div>
-
-                                    <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
-                                      { this.renderContentSwitch() }
-                                    </div>
-
-                                  </div>
-
-                                </div>
-                              </MuiThemeProvider>
-                            );
-
-                          }}
-                            />
-                                </Switch>);
+      }} />
+  </Switch>);
   }
 }
 

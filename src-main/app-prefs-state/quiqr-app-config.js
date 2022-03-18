@@ -79,6 +79,12 @@ module.exports = function (options) {
     state.currentUsername = username;
   }
 
+
+  function setPrefkey(prefKey, prefValue){
+    state.prefs[prefKey] = prefValue;
+  }
+
+
   /*
    * END SETTINGS METHODS
    */
@@ -96,6 +102,9 @@ module.exports = function (options) {
   // Set state fallback values
   state = Object.assign({
     lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
+    prefs: {
+      dataFolder: "~/QuiqrData"
+    },
     skipWelcomeScreen: false,
     experimentalFeatures: false,
     expPreviewWindow: false,
@@ -108,6 +117,7 @@ module.exports = function (options) {
 
   return {
     get lastOpenedSite() { return state.lastOpenedSite; },
+    get prefs() { return state.prefs; },
     get currentUsername() { return state.currentUsername; },
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
     get experimentalFeatures() { return state.experimentalFeatures; },
@@ -119,6 +129,7 @@ module.exports = function (options) {
       return state.sitesListingView;
     },
     setLastOpenedSite,
+    setPrefkey,
     setCurrectUsername,
     setSkipWelcomeScreen,
     setExperimentalFeatures,

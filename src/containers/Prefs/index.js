@@ -1,3 +1,5 @@
 import Prefs from './Prefs';
-export default Prefs;
 
+export {Prefs};
+export {PrefsRouted} from './PrefsRouted';
+export {PrefsSidebar} from './PrefsSidebar';

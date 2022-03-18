@@ -118,6 +118,26 @@ api.clearWorkSpaceConfigCache = async function({}, context){
   context.resolve(true);
 }
 
+
+api.savePrefKey = async function({prefKey, prefValue}, context){
+  global.pogoconf.setPrefkey(prefKey, prefValue);
+  global.pogoconf.saveState();
+  context.resolve(true);
+}
+
+/*
+api.prefKey = async function({prefKey}, context){
+  return global.pogoconf.prefKeyValue(prefKey);
+}
+
+api.savePrefKey = async function({prefKey, prefValue}, context){
+  global.pogoconf.setPrefkey(prefKey, prefValue);
+  global.pogoconf.saveState();
+  context.resolve(true);
+}
+*/
+
+
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   let configuration ;
@@ -182,6 +202,7 @@ api.getCurrentSiteKey = async function(){
 //TODO test again and use confkey
 api.getPogoConfKey = async function({confkey},context){
   try{
+    console.log(global.pogoconf);
     context.resolve(global.pogoconf[confkey]);
   }
   catch(err){

@@ -1,9 +1,8 @@
-//@flow
 import * as React from 'react';
 import { Route } from 'react-router-dom';
 import { FormsCookbook } from './FormsCookbook';
 
-export class FormsCookbookRouted extends React.Component<any, any>{
+export class FormsCookbookRouted extends React.Component {
 
     render(){
         return (<Route

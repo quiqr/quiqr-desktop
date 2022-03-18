@@ -458,24 +458,24 @@ resources: []\n\
       });
     }
   }
-  createPrefsWindow () {
-    let prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();
-    if (prefsWindow) {
-      prefsWindow.webContents.send("redirectPrefs")
-    }
+/*  createPrefsWindow () {*/
+    /*let prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();*/
+    /*if (prefsWindow) {*/
+      /*prefsWindow.webContents.send("redirectPrefs")*/
+    /*}*/
 
-    prefsWindow.once('ready-to-show', () => {
-      prefsWindow.webContents.send("redirectPrefs")
-    })
+    /*prefsWindow.once('ready-to-show', () => {*/
+      /*prefsWindow.webContents.send("redirectPrefs")*/
+    /*})*/
 
-    prefsWindow.webContents.on('did-finish-load',() => {
-      prefsWindow.webContents.send("redirectPrefs")
-    })
+    /*prefsWindow.webContents.on('did-finish-load',() => {*/
+      /*prefsWindow.webContents.send("redirectPrefs")*/
+    /*})*/
 
-    prefsWindow.on('closed', ()=>{
-      prefsWindow = null
-    })
-  }
+    /*prefsWindow.on('closed', ()=>{*/
+      /*prefsWindow = null*/
+    /*})*/
+  /*}*/
 
   createLogWindow () {
     let logWindow = logWindowManager.getCurrentInstanceOrNew();
@@ -1049,7 +1049,11 @@ resources: []\n\
       {
         label: 'Preferences',
         click: async () => {
-          this.createPrefsWindow()
+
+          let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+          mainWindow.webContents.send("disableMobilePreview");
+          mainWindow.webContents.send("redirectToGivenLocation","/prefs");
+
         }
       },
       { role: 'toggledevtools' },

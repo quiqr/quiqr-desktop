@@ -97,6 +97,16 @@ export class API {
     return mainProcessBridge.request('makePageBundleCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey});
   }
 
+  savePrefKey(prefKey: string, prefValue: string){
+    return mainProcessBridge.request('savePrefKey', {prefKey, prefValue});
+  }
+
+  /*
+  prefKeyValue(prefKey: string){
+    return mainProcessBridge.request('prefKeyValue', {prefKey});
+  }
+  */
+
   renameCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, collectionItemNewKey: string){
     return mainProcessBridge.request('renameCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
   }
