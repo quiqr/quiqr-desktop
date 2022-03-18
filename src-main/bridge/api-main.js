@@ -44,6 +44,7 @@ function getSiteServicePromise(siteKey){
       if(err) { reject(err); return; }
 
       let siteData = configurations.sites.find((x)=>x.key===siteKey);
+      console.log(siteData);
 
       if(siteData==null) throw new Error('Could not find site is empty.');
 
@@ -343,6 +344,7 @@ api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, sea
   if(glob.sync(fileExp).length < 1){
     fileExp = path.join(global.currentSitePath, searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
   }
+  console.log(fileExp);
 
   //BACKWARDS COMPATIBILITY
   if(glob.sync(fileExp).length < 1){

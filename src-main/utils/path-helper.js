@@ -15,6 +15,7 @@ class PathHelper{
 
     let dataFolder = "";
     let thedir = "";
+
     let prefs = pogoconf.prefs;
 
     if(prefs.dataFolder && fs.existsSync(prefs.dataFolder)){

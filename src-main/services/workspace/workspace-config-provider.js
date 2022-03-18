@@ -71,6 +71,7 @@ Happy Creating.
     config.path = workspacePath;
     config.key = workspaceKey;
 
+
     this.cache[filePath] = { token, config }
     return config;
 
