@@ -5,7 +5,7 @@ const Joi                    = require('joi');
 const pathHelper             = require('../utils/path-helper');
 const formatProviderResolver = require('../utils/format-provider-resolver');
 const outputConsole          = require('../logger/output-console');
-const QuiqrAppConfig       = require('./quiqr-app-config');
+const QuiqrAppConfig         = require('./quiqr-app-config');
 
 const pogoconf = QuiqrAppConfig();
 

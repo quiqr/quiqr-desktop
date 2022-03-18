@@ -404,27 +404,6 @@ resources: []\n\
     await pogopubl.UnlinkDomain();
   }
 
-  deleteSukohFolder() {
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    mainWindow.webContents.send("disableMobilePreview");
-    let dir;
-
-    const dialog = electron.dialog;
-
-    let options  = {
-      title: "Please confirm",
-      buttons: ["Yes","Cancel"],
-      message: "Do you really want to purge all data?"
-    }
-    let response = dialog.showMessageBox(options)
-    if(response === 1) return;
-
-    var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
-
-    fs.renameSync(pathHelper.getRoot(),pathHelper.getRoot().replace(/\/$/, "")+"-bak-"+todayDate );
-    this.selectSitesWindow();
-  }
-
   deleteSite() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
@@ -458,24 +437,6 @@ resources: []\n\
       });
     }
   }
-/*  createPrefsWindow () {*/
-    /*let prefsWindow = prefsWindowManager.getCurrentInstanceOrNew();*/
-    /*if (prefsWindow) {*/
-      /*prefsWindow.webContents.send("redirectPrefs")*/
-    /*}*/
-
-    /*prefsWindow.once('ready-to-show', () => {*/
-      /*prefsWindow.webContents.send("redirectPrefs")*/
-    /*})*/
-
-    /*prefsWindow.webContents.on('did-finish-load',() => {*/
-      /*prefsWindow.webContents.send("redirectPrefs")*/
-    /*})*/
-
-    /*prefsWindow.on('closed', ()=>{*/
-      /*prefsWindow = null*/
-    /*})*/
-  /*}*/
 
   createLogWindow () {
     let logWindow = logWindowManager.getCurrentInstanceOrNew();
@@ -1046,16 +1007,6 @@ resources: []\n\
   createDevMenu(){
     let devMenu = [
       { role: 'forcereload' },
-      {
-        label: 'Preferences',
-        click: async () => {
-
-          let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-          mainWindow.webContents.send("disableMobilePreview");
-          mainWindow.webContents.send("redirectToGivenLocation","/prefs");
-
-        }
-      },
       { role: 'toggledevtools' },
       {
         label: 'Show Current User',
@@ -1109,12 +1060,6 @@ resources: []\n\
       {
         label: 'Depreciated',
         submenu: [
-          {
-            label: 'Delete Sukoh Directory (dangerous)',
-            click: async () => {
-              this.deleteSukohFolder()
-            }
-          },
           {
             id: 'unlink-site-domain',
             label: 'Unlink Site Domain',
@@ -1322,6 +1267,17 @@ resources: []\n\
           { role: 'cut' },
           { role: 'copy' },
           { role: 'paste' },
+          {
+            label: 'Preferences',
+            click: async () => {
+
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              mainWindow.webContents.send("disableMobilePreview");
+              mainWindow.webContents.send("redirectToGivenLocation","/prefs");
+
+            }
+          },
+
           /*
                     ...(isMac ? [
                         { role: 'pasteAndMatchStyle' },

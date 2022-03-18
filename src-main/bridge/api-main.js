@@ -202,7 +202,6 @@ api.getCurrentSiteKey = async function(){
 //TODO test again and use confkey
 api.getPogoConfKey = async function({confkey},context){
   try{
-    console.log(global.pogoconf);
     context.resolve(global.pogoconf[confkey]);
   }
   catch(err){

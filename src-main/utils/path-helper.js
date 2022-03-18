@@ -4,13 +4,29 @@ const userHome                                  = require('user-home');
 const fs                                        = require('fs-extra');
 const rootPath                                  = require('electron-root-path').rootPath;
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
+const QuiqrAppConfig                            = require('../app-prefs-state/quiqr-app-config');
+
+const pogoconf = QuiqrAppConfig();
 
 class PathHelper{
 
   /* DIRS */
   getRoot(){
-    const thedir = userHome +'/Sukoh/';
-    fs.ensureDirSync(thedir);
+
+    let dataFolder = "";
+    let thedir = "";
+    let prefs = pogoconf.prefs;
+
+    if(prefs.dataFolder && fs.existsSync(prefs.dataFolder)){
+      thedir = prefs.dataFolder+'/';
+    }
+    else {
+      thedir = "~/Quiqr Data/";
+      fs.ensureDirSync(thedir);
+      pogoconf.setPrefkey("dataFolder", thedir);
+      pogoconf.saveState();
+    }
+
     return thedir;
   }
 
