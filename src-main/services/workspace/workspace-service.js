@@ -429,7 +429,7 @@ class WorkspaceService{
     return document;
   }
 
-  async copyFilesIntoCollectionItem(collectionKey , collectionItemKey , targetPath , files ){
+  async copyFilesIntoCollectionItem(collectionKey , collectionItemKey , targetPath , files, forceFileName ){
     let config = await this.getConfigurationsData();
 
     let filesBasePath = ""
@@ -457,6 +457,11 @@ class WorkspaceService{
 
       let from = file;
       let to = path.join(filesBasePath, path.basename(file));
+
+      if(i==0 && forceFileName){
+        to = path.join(filesBasePath, forceFileName);
+        files[0]=forceFileName;
+      }
 
       let toExists = fs.existsSync(to);
       if(toExists){
@@ -496,9 +501,7 @@ class WorkspaceService{
     }
 
     let thumbSrcExists = await this.existsPromise(thumbSrc);
-    console.log(thumbSrc);
     if(thumbSrcExists){
-      console.log(thumbSrc, "Exist");
 
       fs.remove(thumbSrc);
     }

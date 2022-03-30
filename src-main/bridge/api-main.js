@@ -452,10 +452,10 @@ api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
       });
   });
 }
-api.copyFilesIntoCollectionItem = function ({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files }, context){
+api.copyFilesIntoCollectionItem = function ({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files, forceFileName }, context){
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ context.reject(err); return; }
-    workspaceService.copyFilesIntoCollectionItem(collectionKey, collectionItemKey, targetPath, files)
+    workspaceService.copyFilesIntoCollectionItem(collectionKey, collectionItemKey, targetPath, files, forceFileName)
       .then((result)=>{
         context.resolve(result);
       })
