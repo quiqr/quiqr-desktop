@@ -22,7 +22,7 @@ class PathHelper{
       thedir = prefs.dataFolder+'/';
     }
     else {
-      thedir = "~/Quiqr Data/";
+      thedir =  path.join(electron.app.getPath('home'), 'Quiqr Data');
       fs.ensureDirSync(thedir);
       pogoconf.setPrefkey("dataFolder", thedir);
       pogoconf.saveState();
