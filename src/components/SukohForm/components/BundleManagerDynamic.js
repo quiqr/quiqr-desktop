@@ -166,6 +166,15 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     });
 
 
+
+    service.api.logToConsole(field.maxItems,"maxiterms");
+    let showAddButton = true;
+    if(field.maxItems && typeof field.maxItems === 'number'){
+      if(field.maxItems <= itemsStates.length){
+        showAddButton = false;
+      }
+    }
+
     return (<React.Fragment>
       <div style={{padding:'16px 0'}}>
         <strong>{field.title?field.title:"Page files"}</strong>
@@ -215,13 +224,13 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         }) }
           </BundleManager>
 
-
+          { showAddButton?
           <RaisedButton
           primary={true}
           label="Add file"
           style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
           onClick={this.onButtonClick.bind(this)}
-          icon={<IconUpload />} />
+          icon={<IconUpload />} />:null}
 
         </React.Fragment>);
   }
