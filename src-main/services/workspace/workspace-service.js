@@ -148,12 +148,18 @@ class WorkspaceService{
     let stringData = await this._smartDump(filePath, [path.extname(single.file).replace('.','')], documentClone);
     fs.writeFileSync(filePath, stringData);
 
+
     if(document.resources){
       for(let r = 0; r < document.resources.length; r++){
         let resource = document.resources[r];
         if(resource.__deleted){
 
           let fullSrc = path.join(directory, resource.src);
+
+          if(resource.src.charAt(0)=="/" || resource.src.charAt(0)=="\\"){
+            fullSrc = path.join(this.workspacePath, resource.src);
+          }
+
           this.removeThumbnailForItemImage("", singleKey, resource.src);
           await fs.remove(fullSrc);
         }
@@ -485,8 +491,15 @@ class WorkspaceService{
     }
 
     let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
+    if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
+      thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', targetPath);
+    }
+
     let thumbSrcExists = await this.existsPromise(thumbSrc);
+    console.log(thumbSrc);
     if(thumbSrcExists){
+      console.log(thumbSrc, "Exist");
+
       fs.remove(thumbSrc);
     }
   }
@@ -503,6 +516,7 @@ class WorkspaceService{
     if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
       src = path.join(this.workspacePath, targetPath);
       folder = "";
+      itemPath =  "";
     }
     else if(collectionKey == ""){
       src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);

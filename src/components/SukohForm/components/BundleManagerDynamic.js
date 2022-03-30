@@ -39,12 +39,10 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   }
 
   extendField(field: BundleManagerDynamicField, fieldExtender : any){
-    if(field.fields===undefined)
+    if(field.fields===undefined){
       field.fields = [];
-    //field.fields.unshift({ key:'src', type:'readonly', title:'Source File' });
+    }
     fieldExtender.extendFields(field.fields);
-
-
   }
 
   buildPathFragment(node: DynamicFormNode<BundleManagerDynamicField>, nodeLevel: number, nodes: Array<DynamicFormNode<FieldBase>>): ?string {
@@ -62,19 +60,27 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   checkRootPathFiles(){
     let {context} = this.props;
     let {field} = context.node;
+    if(!Array.isArray(context.node.state['resources'])){
+      context.node.state['resources'] = [];
+    }
 
     if(field.path.charAt(0) == "/" || field.path.charAt(0) == "\\"){
-      service.api.getFilesFromAbsolutePath(field.path).then((files)=>{
+      service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
 
         if(this.state.absFiles.length == 0){
+          let files = _files.map(item => {
+            item.src = path.join(field.path, item.src);
+            return item;
+          })
           this.setState({absFiles: files});
+          context.setValue(files);
         }
       });
     }
   }
 
-
   normalizeState({state, field, stateBuilder} : {state:any, field:BundleManagerDynamicField, stateBuilder: any}){
+
     if(!Array.isArray(state['resources'])){
       state['resources'] = [];
     }
@@ -88,8 +94,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         stateBuilder.setLevelState(resource, field.fields);
       }
     }
-
-
   }
 
   getType(){
@@ -113,7 +117,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       .then((files)=>{
         if(files){
           let currentFiles = context.value.slice();
-          //let newItems = [];
           for(let f = 0; f < files.length; f++){
             let file = files[f];
             let match = currentFiles.find((x)=>x.src===file);
@@ -133,8 +136,10 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   removeItemWithValue(state: any){
     state.__deleted = true;
     let { context } = this.props;
+    service.api.logToConsole(state, "removeItemWithValue state")
 
     context.setValue(context.value);
+    service.api.logToConsole(context.value, "removeItemWithValue context/value")
   }
 
   renderComponent(){
@@ -151,22 +156,14 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       field.extensions= [];
     }
 
-
     let itemsStates = [];
 
-    if(this.state.absFiles.length > 0 ){
-      itemsStates = this.state.absFiles;
-    }
-    else{
-
-      itemsStates = context.value.filter(x => {
-
-        return (
-          x.src.startsWith(field.path) && x.__deleted!==true
-          && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
-        );
-      });
-    }
+    itemsStates = context.value.filter(x => {
+      return (
+        //x.src.startsWith(field.path) && x.__deleted !== true && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
+        x.__deleted !== true && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
+      );
+    });
 
 
     return (<React.Fragment>
@@ -185,9 +182,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
             parent: node
           };
 
-          if(this.state.absFiles.length > 0 ){
-            newNode.state.src = path.join(field.path, state.src);
-          }
 
           let filename = state.name||state.src;
           let _farr = filename.split('.');
@@ -237,6 +231,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   }
   setValue(context: ComponentContext<BundleManagerDynamicField>, value: any){
     context.node.state['resources'] = value;
+    //service.api.logToConsole(context.node.state);
   }
   clearValue(context: ComponentContext<BundleManagerDynamicField>){
     delete context.node.state['resources'];
