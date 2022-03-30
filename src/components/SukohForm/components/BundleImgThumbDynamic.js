@@ -24,16 +24,16 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
   constructor(props: ComponentProps<BundleImgThumbDynamicField>){
     super(props);
     if(props){
-      this.state = { src: undefined };
+      this.state = {
+        srcFile: undefined,
+        src: undefined };
     }
-
   }
 
   renderComponent(){
     let {node} = this.props.context;
 
     let {field, state} = node;
-    service.api.logToConsole(state);
     if(this.isImage(state[field.src||'src'])){
       return (
         <div className="checkered" style={{ width:'auto', height:'100%', marginBottom:'0px', overflow:'hidden', backgroundColor: '#ccc'}}>
@@ -108,20 +108,32 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
     return false;
   }
 
-  componentDidMount(){
+  componentDidUpdate(preProps: HomeProps){
+    this.checkThumbs();
+  }
+
+  checkThumbs(){
     let {node, form} = this.props.context;
     let {field, state} = node;
 
-    //service.api.logToConsole(field);
+    if(state[field.src||'src'] != this.state.srcFile){
 
-    if(this.isImage(state[field.src||'src'])){
-      form.props.plugins.getBundleThumbnailSrc(state[field.src||'src'])
-        .then((src)=>{
+      if(this.isImage(state[field.src||'src'])){
 
-          //service.api.logToConsole(src)
-          this.setState({src});
-        });
+        this.setState({srcFile: state[field.src||'src'] });
+        form.props.plugins.getBundleThumbnailSrc(state[field.src||'src'])
+          .then((src)=>{
+
+            this.setState({src});
+          });
+      }
     }
+
+  }
+
+
+  componentDidMount(){
+    this.checkThumbs();
   }
 
   getType(){

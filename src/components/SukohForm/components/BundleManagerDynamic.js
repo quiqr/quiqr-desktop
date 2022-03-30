@@ -51,13 +51,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     return undefined;
   }
 
-  /*
-  componentDidMount(){
-    let {context} = this.props;
-    let {field} = context.node;
-
-  }
-  */
   componentDidMount(){
     this.checkRootPathFiles();
   }
@@ -195,7 +188,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
           if(this.state.absFiles.length > 0 ){
             newNode.state.src = path.join(field.path, state.src);
           }
-
 
           let filename = state.name||state.src;
           let _farr = filename.split('.');
