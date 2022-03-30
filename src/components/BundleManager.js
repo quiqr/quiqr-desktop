@@ -2,6 +2,7 @@ import React from 'react';
 import FlatButton from 'material-ui-02/FlatButton';
 import IconNavigationExpandLess from 'material-ui-02/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui-02/svg-icons/navigation/expand-more';
+import service from '../services/service';
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
@@ -31,6 +32,7 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
 
 class BundleManagerItem extends React.Component{
   render(){
+
     let {active, body, label, onHeadClick, headerRightItems=[], headerLeftItems=[], headStyle, bundleStyle, bodyStyle, style, wrapperProps } = this.props;
 
     let _style = Object.assign({
@@ -117,7 +119,8 @@ class BundleManager extends React.Component{
       { this.props.children.map(function(item, index){
         let active = this.props.forceActive || index === openedIndex;
         let splitPath = (item.props.path).split("/");
-        if (splitPath.length < 3 ){
+        //ugly hack to prevent displaying files from subdirs TODO REMOVE
+        if (splitPath.length < 99 ){
           return React.cloneElement(item, {
             active,
             onHeadClick: this.getHandleChange(index),

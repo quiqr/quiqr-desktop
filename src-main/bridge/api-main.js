@@ -3,6 +3,7 @@ const {dirname}                 = require('path');
 const path                      = require('path');
 const glob                      = require('glob');
 const {shell}                   = require('electron');
+//const { promisify, inspect }             = require('util');
 const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
@@ -44,7 +45,7 @@ function getSiteServicePromise(siteKey){
       if(err) { reject(err); return; }
 
       let siteData = configurations.sites.find((x)=>x.key===siteKey);
-      console.log(siteData);
+      //console.log(siteData);
 
       if(siteData==null) throw new Error('Could not find site is empty.');
 
@@ -500,6 +501,21 @@ api.renameCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
         context.reject(error);
       });
   });
+}
+
+api.getFilesFromAbsolutePath = function({path},promise){
+
+  getWorkspaceService(global.currentSiteKey, global.currentWorkspaceKey, function(err, {workspaceService}){
+    if(err){ promise.reject(err); return; }
+    workspaceService.getFilesFromAbsolutePath(path)
+      .then((result)=>{
+        promise.resolve(result);
+      })
+      .catch((error)=>{
+        promise.reject(error);
+      });
+  });
+
 }
 
 api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, promise){

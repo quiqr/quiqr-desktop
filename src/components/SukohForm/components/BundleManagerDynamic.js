@@ -7,8 +7,9 @@ import FlatButton from 'material-ui-02/FlatButton';
 import IconRemove from 'material-ui-02/svg-icons/action/delete';
 import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
+import path from 'path';
 
-//import service from '../../../services/service';
+import service from '../../../services/service';
 
 const regExtractExt = /[.]([^.]+)$/
 const extractExt = (file) => {
@@ -26,17 +27,59 @@ type BundleManagerDynamicField= {
   title: string
 }
 
+
 class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
+
+  constructor(props: ComponentProps<BundleManagerDynamicField>){
+    super(props);
+
+    this.state = {
+      absFiles: []
+    };
+  }
 
   extendField(field: BundleManagerDynamicField, fieldExtender : any){
     if(field.fields===undefined)
       field.fields = [];
     //field.fields.unshift({ key:'src', type:'readonly', title:'Source File' });
     fieldExtender.extendFields(field.fields);
+
+
   }
+
   buildPathFragment(node: DynamicFormNode<BundleManagerDynamicField>, nodeLevel: number, nodes: Array<DynamicFormNode<FieldBase>>): ?string {
     return undefined;
   }
+
+  /*
+  componentDidMount(){
+    let {context} = this.props;
+    let {field} = context.node;
+
+  }
+  */
+  componentDidMount(){
+    this.checkRootPathFiles();
+  }
+
+  componentDidUpdate(preProps: HomeProps){
+    this.checkRootPathFiles();
+  }
+
+  checkRootPathFiles(){
+    let {context} = this.props;
+    let {field} = context.node;
+
+    if(field.path.charAt(0) == "/" || field.path.charAt(0) == "\\"){
+      service.api.getFilesFromAbsolutePath(field.path).then((files)=>{
+
+        if(this.state.absFiles.length == 0){
+          this.setState({absFiles: files});
+        }
+      });
+    }
+  }
+
 
   normalizeState({state, field, stateBuilder} : {state:any, field:BundleManagerDynamicField, stateBuilder: any}){
     if(!Array.isArray(state['resources'])){
@@ -52,6 +95,8 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         stateBuilder.setLevelState(resource, field.fields);
       }
     }
+
+
   }
 
   getType(){
@@ -60,7 +105,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
 
   allocateStateLevel(field: BundleManagerDynamicField, parentState: any, rootState: any){
     return rootState;
-  }
+ }
 
   onButtonClick(e: any){
 
@@ -95,6 +140,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   removeItemWithValue(state: any){
     state.__deleted = true;
     let { context } = this.props;
+
     context.setValue(context.value);
   }
 
@@ -112,13 +158,23 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       field.extensions= [];
     }
 
-    let itemsStates = context.value.filter(x => {
-      return (
-        x.src.startsWith(field.path)
-        && x.__deleted!==true
-        && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
-      );
-    });
+
+    let itemsStates = [];
+
+    if(this.state.absFiles.length > 0 ){
+      itemsStates = this.state.absFiles;
+    }
+    else{
+
+      itemsStates = context.value.filter(x => {
+
+        return (
+          x.src.startsWith(field.path) && x.__deleted!==true
+          && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
+        );
+      });
+    }
+
 
     return (<React.Fragment>
       <div style={{padding:'16px 0'}}>
@@ -126,13 +182,20 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       </div>
 
       <BundleManager forceActive={true}>
+
         { (itemsStates).map((state,childIndex)=>{
+
           let newNode = {
             field,
             state,
             uiState:{},
             parent: node
           };
+
+          if(this.state.absFiles.length > 0 ){
+            newNode.state.src = path.join(field.path, state.src);
+          }
+
 
           let filename = state.name||state.src;
           let _farr = filename.split('.');
@@ -166,14 +229,13 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         }) }
           </BundleManager>
 
+
           <RaisedButton
           primary={true}
           label="Add file"
           style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
           onClick={this.onButtonClick.bind(this)}
           icon={<IconUpload />} />
-
-
 
         </React.Fragment>);
   }

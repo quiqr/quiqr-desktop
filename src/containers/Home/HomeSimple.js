@@ -276,7 +276,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
 
   startDomVerificationPolling(celebrate){
-    service.api.logToConsole("domainVerification status poll");
+    //service.api.logToConsole("domainVerification status poll");
     if(this.state.pogoCustomDomainDNSStatus === "reachable"){
       let time=3000;
       this.timeout = setTimeout(() => {
@@ -286,7 +286,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   startPublishPolling(celebrate){
-    service.api.logToConsole("site publish status poll");
+    //service.api.logToConsole("site publish status poll");
     let site = this.state.selectedSite;
     if(site.hasOwnProperty('publishStatus') && site.publishStatus === 2){
       let time=3000;
@@ -297,7 +297,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   startPendingUpgradePolling(celebrate){
-    service.api.logToConsole("site upgrade status poll");
+    //service.api.logToConsole("site upgrade status poll");
 
     if(this.state.pogoSiteStatus === "pending_subscription"){
       let time=3000;
@@ -308,7 +308,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   startUnconfirmedUserPolling(celebrate){
-    service.api.logToConsole("user status poll");
+    //service.api.logToConsole("user status poll");
 
     if(this.state.pogoAccountStatus === "unconfirmed_member"){
 
@@ -373,7 +373,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
         this.setState(stateUpdate,()=>{
           snackMessageService.addSnackMessage('You just got yourself a shiny new site in the Quiqr Cloud.');
-          service.api.logToConsole("start checking once")
+          //service.api.logToConsole("start checking once")
           this.getRemoteSiteStatus(false);
 
           if(this.state.buttonPressed === 'publish'){
@@ -388,7 +388,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     var stateUpdate  = {};
     stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
     this.setState(stateUpdate,()=>{
-      service.api.logToConsole("finished connecting domain")
+      //service.api.logToConsole("finished connecting domain")
       this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
       //this.setState({oneTimeConnectClick:"Success"});
     });
@@ -400,7 +400,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     stateUpdate.pogoCustomDomain = "not set";
     stateUpdate.defaultDomain = `${this.getPogoCloudPath()}.quiqr.cloud`;
     this.setState(stateUpdate,()=>{
-      service.api.logToConsole("finished disconnecting domain")
+      //service.api.logToConsole("finished disconnecting domain")
       this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
     });
   }
@@ -446,7 +446,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       this.state.pogostripeConn.host+":"+
       this.state.pogostripeConn.port+"/myaccount-status/"+requestVars;
 
-    service.api.logToConsole(url);
+    //service.api.logToConsole(url);
     let data='';
 
     try {
@@ -486,10 +486,10 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   getRemoteDomainVerification(celebrate){
 
-    service.api.logToConsole("getRemoteVerificationStatus")
+    //service.api.logToConsole("getRemoteVerificationStatus")
 
     if(this.state.pogoCustomDomain === "not set"){
-      service.api.logToConsole("nocustomdomain")
+      //service.api.logToConsole("nocustomdomain")
       return
     }
 
@@ -500,14 +500,14 @@ class Home extends React.Component<HomeProps, HomeState>{
     const request = net.request(url);
 
     request.on('error', (err) => {
-      service.api.logToConsole("eerrrr");
+      //service.api.logToConsole("eerrrr");
       this.setState({pogoCustomDomainDNSStatus:"unreachable"});
       this.startDomVerificationPolling(true);
     });
 
     request.on('response', (response) => {
       response.on('error', (error) => {
-        service.api.logToConsole("eerrrr");
+        //service.api.logToConsole("eerrrr");
       })
 
       response.on('end', () => {
@@ -523,7 +523,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         }
       });
       response.on("close", () => {
-        service.api.logToConsole("close");
+        //service.api.logToConsole("close");
       });
       response.on("data", chunk => {
         data += chunk;
@@ -537,7 +537,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       return;
     }
 
-    service.api.logToConsole("getRemotePublishStatus")
+    //service.api.logToConsole("getRemotePublishStatus")
     if(!this.checkLinkedPogoCloudPath()){
       return;
     }
@@ -571,7 +571,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       request.end()
 
     } catch (e) {
-      service.api.logToConsole('catch');
+      //service.api.logToConsole('catch');
     }
   }
 
@@ -585,7 +585,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       return;
     }
 
-    service.api.logToConsole("getRemoteSiteStatus")
+    //service.api.logToConsole("getRemoteSiteStatus")
 
 
     if(!this.checkLinkedPogoCloudPath()){
@@ -665,7 +665,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       request.end()
 
     } catch (e) {
-      service.api.logToConsole.log('catch', e);
+      //service.api.logToConsole.log('catch', e);
     }
 
   }

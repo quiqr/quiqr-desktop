@@ -69,7 +69,7 @@ export default class ConnectDomainDialog extends React.Component{
 
             response.on('end', () => {
                 let obj = JSON.parse(data);
-                service.api.logToConsole(obj);
+              //service.api.logToConsole(obj);
                 if(obj.hasOwnProperty('domain')){
 
                     let promise = service.api.createPogoDomainConf(sitePath, obj.domain);

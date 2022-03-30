@@ -3,7 +3,7 @@ import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import Spinner from '../../Spinner';
-//import service from '../../../services/service';
+import service from '../../../services/service';
 import MovieIcon from '@material-ui/icons/Movie';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
@@ -26,11 +26,14 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
     if(props){
       this.state = { src: undefined };
     }
+
   }
 
   renderComponent(){
     let {node} = this.props.context;
+
     let {field, state} = node;
+    service.api.logToConsole(state);
     if(this.isImage(state[field.src||'src'])){
       return (
         <div className="checkered" style={{ width:'auto', height:'100%', marginBottom:'0px', overflow:'hidden', backgroundColor: '#ccc'}}>
@@ -108,9 +111,14 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
   componentDidMount(){
     let {node, form} = this.props.context;
     let {field, state} = node;
+
+    //service.api.logToConsole(field);
+
     if(this.isImage(state[field.src||'src'])){
       form.props.plugins.getBundleThumbnailSrc(state[field.src||'src'])
         .then((src)=>{
+
+          //service.api.logToConsole(src)
           this.setState({src});
         });
     }

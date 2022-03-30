@@ -1,5 +1,6 @@
 import mainProcessBridge from './utils/main-process-bridge';
 import type { AbortablePromise } from './utils/main-process-bridge';
+import service from './services/service'
 
 export class API {
 
@@ -117,6 +118,10 @@ export class API {
 
   openFileDialogForCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string,
     targetPath: string, { title, extensions }:{title: string, extensions: Array<string>}){
+
+    service.api.logToConsole(targetPath);
+    service.api.logToConsole("Hallo");
+
     let remote= window.require('electron').remote;
     let openDialogOptions = {
       title:title||'Select Files',
@@ -137,6 +142,10 @@ export class API {
 
   getThumbnailForCollectionItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForCollectionItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
+  }
+
+  getFilesFromAbsolutePath(path: string){
+    return mainProcessBridge.request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
   }
 
   getPogoConfKey(confkey: string){

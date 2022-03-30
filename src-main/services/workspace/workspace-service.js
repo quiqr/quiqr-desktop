@@ -87,6 +87,7 @@ class WorkspaceService{
 
   async getSingle(singleKey ){
     let config = await this.getConfigurationsData();
+
     let single = config.singles.find(x => x.key === singleKey);
     if(single==null)throw new Error('Could not find single.');
     let filePath = path.join(this.workspacePath, single.file);
@@ -163,10 +164,28 @@ class WorkspaceService{
     return document;
   }
 
+  async getFilesFromAbsolutePath(filePath){
+
+    let directory = path.join(this.workspacePath, filePath);
+
+    let globExp = '*';
+    let allFiles = await promisify(glob)(globExp, {nodir:true, absolute:false, root:directory, cwd:directory });
+
+    let expression = `_?index[.](${contentFormats.SUPPORTED_CONTENT_EXTENSIONS.join('|')})$`;
+    let pageOrSectionIndexReg = new RegExp(expression);
+    allFiles = allFiles.filter(x => !pageOrSectionIndexReg.test(x));
+
+    let merged = allFiles.map(src =>{
+      return Object.assign({ src }, [].find(r => r.src===src));
+    });
+    return merged;
+  }
+
   async getResourcesFromContent(filePath, currentResources = []){
     filePath = path.normalize(filePath);
     let directory = path.dirname(filePath);
-    let globExp = '**/*';
+    //let globExp = '**/*';
+    let globExp = '*';
     let allFiles = await promisify(glob)(globExp, {nodir:true, absolute:false, root:directory, cwd:directory });
 
     let expression = `_?index[.](${contentFormats.SUPPORTED_CONTENT_EXTENSIONS.join('|')})$`;
@@ -408,19 +427,23 @@ class WorkspaceService{
     let config = await this.getConfigurationsData();
 
     let filesBasePath = ""
-    if(collectionKey == ""){
-      filesBasePath =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
-
+    // When file starts with / uise the root of the site directory
+    if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
+        filesBasePath = path.join(this.workspacePath, targetPath);
     }
-    else {
+    else{
+      if(collectionKey == ""){
+        filesBasePath =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+      }
+      else {
 
-      let collection = config.collections.find(x => x.key === collectionKey);
-      if(collection==null)
-        throw new Error('Could not find collection.');
+        let collection = config.collections.find(x => x.key === collectionKey);
+        if(collection==null)
+          throw new Error('Could not find collection.');
 
-      let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^\/]+$/,'') , targetPath);
-      filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
-
+        let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^\/]+$/,'') , targetPath);
+        filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
+      }
     }
 
     for(let i =0; i < files.length; i++){
@@ -476,7 +499,12 @@ class WorkspaceService{
     let src;
     let folder;
     let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
-    if(collectionKey == ""){
+
+    if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
+      src = path.join(this.workspacePath, targetPath);
+      folder = "";
+    }
+    else if(collectionKey == ""){
       src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
       folder = path.basename(await this.getSingleFolder(collectionItemKey));
     }
@@ -489,6 +517,8 @@ class WorkspaceService{
 
       src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
     }
+
+    console.log(src);
 
     let srcExists = await this.existsPromise(src);
     if(!srcExists){

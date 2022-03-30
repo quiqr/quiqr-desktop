@@ -130,6 +130,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
     values={values}
     trim={false}
     plugins={{
+
       openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
         return service.api.openFileDialogForCollectionItem(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath, {title, extensions});
       },
