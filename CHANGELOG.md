@@ -1,12 +1,11 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.10.0 (2022-03-31)
 
 - implement preferences with choosable Data Folder
 - many fixes in bundle-manager
 - new bundle-manager attribute: forceFileName
 - new bundle-manager attribute: maxItems
 - new bundle-manager feature to write to path relative to site dir
-
 
 ## 0.9.5-4 (2022-03-17)
 - fix mac build
