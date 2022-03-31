@@ -83,6 +83,7 @@
     "_mac-notarize": "node scripts/notarize.js",
     "build": "npm run clean && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
     "dist": "electron-builder",
+    "packdev": "electron-builder -p never",
     "release": "release-script",
     "start": "concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
   },
