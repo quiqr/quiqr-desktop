@@ -3,10 +3,10 @@ import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
 import Spinner from '../../Spinner';
-import service from '../../../services/service';
 import MovieIcon from '@material-ui/icons/Movie';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+//import service from '../../../services/service';
 
 type BundleImgThumbDynamicField = {
   key: string,
@@ -116,7 +116,7 @@ class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, Bund
     let {node, form} = this.props.context;
     let {field, state} = node;
 
-    if(state[field.src||'src'] != this.state.srcFile){
+    if(state[field.src||'src'] !== this.state.srcFile){
 
       if(this.isImage(state[field.src||'src'])){
 

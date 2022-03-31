@@ -2,7 +2,7 @@ import React from 'react';
 import FlatButton from 'material-ui-02/FlatButton';
 import IconNavigationExpandLess from 'material-ui-02/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui-02/svg-icons/navigation/expand-more';
-import service from '../services/service';
+//import service from '../services/service';
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 

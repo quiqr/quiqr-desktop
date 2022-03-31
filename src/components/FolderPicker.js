@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextField, RaisedButton } from 'material-ui-02';
+import { RaisedButton } from 'material-ui-02';
 import TextField2 from '@material-ui/core/TextField';
 
 type FolderPickerProps = {

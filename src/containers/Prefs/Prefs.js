@@ -1,16 +1,14 @@
 import React from 'react';
 import service from './../../services/service';
-import SharedMaterialStyles from '../../shared-material-styles';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import Button               from '@material-ui/core/Button';
 
 import { withStyles } from '@material-ui/core/styles';
-import { createTheme } from '@material-ui/core/styles';
-import purple from '@material-ui/core/colors/purple';
-import green from '@material-ui/core/colors/green';
+//import { createTheme } from '@material-ui/core/styles';
+//import purple from '@material-ui/core/colors/purple';
+//import green from '@material-ui/core/colors/green';
 import FolderPicker from '../../components/FolderPicker';
 
+/*
 const theme = createTheme({
   spacing: 4,
   palette: {
@@ -22,6 +20,7 @@ const theme = createTheme({
     },
   },
 });
+*/
 
 const useStyles = theme => ({
 
@@ -88,10 +87,12 @@ class Prefs extends React.Component {
 
   render(){
     const { classes } = this.props;
+    /*
     const model = {
       folderPath: "~/QuiqrData",
       theme: ""
     };
+    */
     return (
       <div className={ this.props.classes.container }>
         <Typography variant="h4">General Preferences</Typography>

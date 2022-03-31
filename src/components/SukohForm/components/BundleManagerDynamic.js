@@ -64,10 +64,10 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       context.node.state['resources'] = [];
     }
 
-    if(field.path.charAt(0) == "/" || field.path.charAt(0) == "\\"){
+    if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
       service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
 
-        if(this.state.absFiles.length == 0){
+        if(this.state.absFiles.length === 0){
           let files = _files.map(item => {
             item.src = path.join(field.path, item.src);
             return item;

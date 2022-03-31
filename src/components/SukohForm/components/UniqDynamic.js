@@ -4,7 +4,7 @@ import TextField                 from 'material-ui-02/TextField';
 import Tip                       from '../../Tip';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic }           from '../../HoForm';
-import service                   from './../../../services/service'
+//import service                   from './../../../services/service'
 import IconRefresh from 'material-ui-02/svg-icons/navigation/refresh';
 import RaisedButton from 'material-ui-02/RaisedButton';
 
