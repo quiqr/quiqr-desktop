@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.10.1 (2022-03-31)
 - code cleanup
 
 ## 0.10.0 (2022-03-31)
