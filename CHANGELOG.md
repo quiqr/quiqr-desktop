@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+
+## **WORK IN PROGRESS**
+- code cleanup
+
 ## 0.10.0 (2022-03-31)
 
 - implement preferences with choosable Data Folder
