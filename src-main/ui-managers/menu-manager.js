@@ -1114,6 +1114,17 @@ resources: []\n\
         submenu: [
           { role: 'about' },
           { type: 'separator' },
+          {
+            label: 'Preferences',
+            click: async () => {
+
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              mainWindow.webContents.send("disableMobilePreview");
+              mainWindow.webContents.send("redirectToGivenLocation","/prefs");
+
+            }
+          },
+          { type: 'separator' },
           { role: 'services' },
           { type: 'separator' },
           { role: 'hide' },
