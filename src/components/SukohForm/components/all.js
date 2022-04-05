@@ -19,6 +19,7 @@ import ReadonlyDynamic from './ReadonlyDynamic';
 import BundleManagerDynamic from './BundleManagerDynamic';
 import SectionDynamic from './SectionDynamic';
 import SelectDynamic from './SelectDynamic';
+import FontPickerDynamic from './FontPickerDynamic';
 import SliderDynamic from './SliderDynamic';
 import BundleImgThumbDynamic from './BundleImgThumbDynamic';
 
@@ -32,6 +33,7 @@ export default [
     EmptyLineDynamic,
     EasyMarkDownDynamic,
     LeafArrayDynamic,
+    FontPickerDynamic,
     HiddenDynamic,
     InfoDynamic,
     MarkdownDynamic,
