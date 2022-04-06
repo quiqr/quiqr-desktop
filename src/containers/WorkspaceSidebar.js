@@ -89,7 +89,9 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     if(!this.state.hugoRunning && !this.state.devDisableAutoHugoServe){
       service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "Start HUGO from Sidebar");
     }
+
     window.require('electron').shell.openExternal('http://localhost:13131');
+
   }
 
   toggleMobilePreview(){

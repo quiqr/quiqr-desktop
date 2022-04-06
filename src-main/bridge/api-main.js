@@ -90,13 +90,14 @@ api.openFileExplorer = function({path}, context){
   try{
     let lstat = fs.lstatSync(path);
     if(lstat.isDirectory()){
-      shell.openItem(path);
+      shell.openPath(path);
     }
     else{
-      shell.openItem(dirname(path));
+      shell.openPath(dirname(path));
     }
   }
   catch(e){
+    console.log(e);
   }
 }
 
@@ -372,6 +373,7 @@ api.openSingleInEditor = function({siteKey, workspaceKey, singleKey}, context) {
       context.resolve(r);
     })
       .catch((error)=>{
+        console.log(error);
         context.reject(error);
       });
   });

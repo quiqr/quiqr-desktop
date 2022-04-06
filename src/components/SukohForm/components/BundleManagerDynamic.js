@@ -109,13 +109,15 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     let {context} = this.props;
     let {field} = context.node;
 
-    if(field.extensions.length === 0){
+    if(field.extensions && field.extensions.length === 0){
       delete field.extensions;
     }
 
+
+    service.api.logToConsole(field,"FROM BUNDLE MANAGER");
     context.form.props.plugins.openBundleFileDialog({title:field.title, extensions: field.extensions, targetPath: field.path, forceFileName: field.forceFileName})
       .then((files)=>{
-        service.api.logToConsole(files,"openBundleFileDialog");
+        service.api.logToConsole(files,"FILES BUNDLE MANAGER");
         if(files){
           let currentFiles = context.value.slice();
           for(let f = 0; f < files.length; f++){
@@ -170,8 +172,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       field.maxItems = 1;
     }
 
-    service.api.logToConsole(field.maxItems,"maxiterms");
-    service.api.logToConsole(field.forceFileName,"forceFileName");
     let showAddButton = true;
     if(field.maxItems && typeof field.maxItems === 'number'){
       if(field.maxItems <= itemsStates.length){

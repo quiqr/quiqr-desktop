@@ -64,7 +64,7 @@ class BundleManagerItem extends React.Component{
       boxShadow: '1px 1px 4px RGBA(0,0,0,.2)'
     },bundleStyle);
 
-    return <div style={_style} className="BundleManager-item col-xl-3 col-lg-4 col-6" {...wrapperProps} >
+    return <div style={_style} className="BundleManager-item col-xl-2 col-lg-4 col-6" {...wrapperProps} >
       <div style={_bundleStyle}>
         <BundleManagerHeader
         style={_headStyle}

@@ -128,7 +128,7 @@ class WorkspaceService{
     let single = config.singles.find(x => x.key === singleKey);
     if(single==null)throw new Error('Could not find single.');
     let filePath = path.join(this.workspacePath, single.file);
-    shell.openItem(filePath);
+    shell.openPath(filePath);
   }
   //Update the single
   async updateSingle(singleKey, document ){
@@ -392,7 +392,7 @@ class WorkspaceService{
       throw new Error('Could not find collection.');
     let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
 
-    shell.openItem(filePath);
+    shell.openPath(filePath);
   }
 
   // TODO REMOVE CODE SMELL REDUNDANT CODE WITH SINGLE

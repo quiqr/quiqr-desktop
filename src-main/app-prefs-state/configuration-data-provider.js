@@ -103,7 +103,6 @@ function get(callback, {invalidateCache} = {}){
     let file = files[i];
     if(fs.existsSync(file)){
       try{
-        console.log("file exists");
         let strData = fs.readFileSync(file, {encoding: 'utf-8'});
         let formatProvider = formatProviderResolver.resolveForFilePath(file);
         if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)

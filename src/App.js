@@ -157,6 +157,19 @@ class App extends React.Component<AppProps,AppState>{
       this.history.push(location);
     }.bind(this));
   }
+  componentWillUnmount(){
+    [
+      'redirectHome',
+      'redirectCookbook',
+      'redirectConsole',
+      'redirectPrefs',
+      'setMobileBrowserOpen',
+      'setMobileBrowserClose',
+      'redirectMountSite',
+    ].forEach((channel)=>{
+      window.require('electron').ipcRenderer.removeAllListeners(channel);
+    });
+  }
 
   closeWindow(){
     window.require('electron').remote.getCurrentWindow().close();

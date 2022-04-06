@@ -460,13 +460,15 @@ resources: []\n\
 
   openWorkSpaceDir(){
     let wspath = global.currentSitePath;
+    let lstat = fs.lstatSync(wspath);
+
     try{
       let lstat = fs.lstatSync(wspath);
       if(lstat.isDirectory()){
-        shell.openItem(wspath);
+        shell.openPath(wspath);
       }
       else{
-        shell.openItem(dirname(wspath));
+        shell.openPath(dirname(wspath));
       }
     }
     catch(e){
@@ -476,9 +478,10 @@ resources: []\n\
   openWorkSpaceConfig(){
     let wspath = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
     try{
-      shell.openItem(wspath);
+      shell.openPath(wspath);
     }
     catch(e){
+      console.log(e);
     }
   }
 

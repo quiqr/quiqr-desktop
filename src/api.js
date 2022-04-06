@@ -116,48 +116,50 @@ export class API {
     mainProcessBridge.requestVoid('openFileExplorer', {path});
   }
 
-  openFileDialogForCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string,
-    targetPath: string, { title, extensions }:{title: string, extensions: Array<string>}){
+  openFileDialogForSingleAndCollectionItem(
+    siteKey: string,
+    workspaceKey: string,
+    collectionKey: string,
+    collectionItemKey: string,
+    targetPath: string,
+    { title, extensions }:{title: string, extensions: Array<string>},
+    forceFileName: string
+  ){
+
+    let properties = ['openFile'];
+    if(!forceFileName){
+      properties = ['multiSelections', 'openFile'];
+    }
 
     let remote= window.require('electron').remote;
-    let openDialogOptions = {
-      title:title||'Select Files',
-      properties:['multiSelections','openFile'],
-      filters:[{name:'Allowed Extensions', extensions: extensions }]
-    };
-    return (new Promise((resolve)=>{
-      remote.dialog.showOpenDialog(
-        remote.getCurrentWindow(),
-        openDialogOptions,
-        (files)=> resolve(files)
-      );
-    })).then((files)=>{
-      if(files) return mainProcessBridge.request('copyFilesIntoCollectionItem',
-        {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files });
-    });
-  }
 
-  openBundleFileDialogForceFilename(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string,
-    targetPath: string, { title, extensions }:{title: string, extensions: Array<string>}, forceFileName: string){
-
-    let remote= window.require('electron').remote;
     let openDialogOptions = {
-      title:title||'Select File',
-      properties:['openFile'],
-      filters:[{name:'Allowed Extensions', extensions: extensions }]
+      title: title || 'Select Files',
+      properties: properties,
+      filters: [ {name:'Allowed Extensions', extensions: extensions }]
     };
-    return (new Promise((resolve)=>{
-      remote.dialog.showOpenDialog(
-        remote.getCurrentWindow(),
-        openDialogOptions,
-        (files)=> resolve(files)
-      );
-    })).then((files)=>{
-      if(files){
-        service.api.logToConsole(files, "openBundleFileDialogForceFilename");
-        return mainProcessBridge.request('copyFilesIntoCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files, forceFileName });
-      }
-    });
+
+    return (
+
+      new Promise((resolve)=>{
+
+        remote.dialog.showOpenDialog(
+          remote.getCurrentWindow(),
+          openDialogOptions,
+        ).then((result)=>{
+          if(result.filePaths){
+            let files = result.filePaths;
+            resolve(
+              mainProcessBridge.request('copyFilesIntoCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files, forceFileName })
+            );
+          }
+        }).catch(err => {
+          service.api.logToConsole(err);
+        });
+
+      })
+
+    );
   }
 
   getThumbnailForCollectionItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){

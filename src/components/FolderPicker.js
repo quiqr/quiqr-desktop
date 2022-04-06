@@ -1,6 +1,7 @@
-import * as React from 'react';
+import * as React       from 'react';
 import { RaisedButton } from 'material-ui-02';
-import TextField2 from '@material-ui/core/TextField';
+import TextField2       from '@material-ui/core/TextField';
+import service          from '../services/service';
 
 type FolderPickerProps = {
     onFolderSelected: (folder: ?string)=> void,
@@ -23,13 +24,19 @@ export default class FolderPicker extends React.Component<FolderPickerProps, Fol
     }
 
     openPicker(){
-        let { remote } = window.require('electron');
-        remote.dialog.showOpenDialog(remote.getCurrentWindow(), {
-            properties: ['openDirectory']
-        }, (result)=>{
-            let selectedFolder = (result||[])[0];
-            this.props.onFolderSelected(selectedFolder||null);
-        });
+      let { remote } = window.require('electron');
+
+      remote.dialog.showOpenDialog(
+        remote.getCurrentWindow(),
+        { properties: ['openDirectory']}
+      ).then( (result)=> {
+          let selectedFolder = (result.filePaths||[])[0];
+          this.props.onFolderSelected(selectedFolder||null);
+      }).catch( (err) => {
+
+      });
+
+
     }
 
     render(){

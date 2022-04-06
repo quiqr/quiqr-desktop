@@ -109,12 +109,15 @@ class Single extends React.Component<SingleProps,SingleState>{
     plugins={{
 
       openBundleFileDialog: function({title, extensions, targetPath, forceFileName}, onFilesReady){
-        if(forceFileName){
+
+        return service.api.openFileDialogForSingleAndCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions}, forceFileName);
+
+        /*if(forceFileName){
           return service.api.openBundleFileDialogForceFilename(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions}, forceFileName);
         }
         else{
-          return service.api.openFileDialogForCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions});
         }
+        */
       },
 
       getBundleThumbnailSrc: function(targetPath){
