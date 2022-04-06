@@ -70,7 +70,8 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
-    return (<FormItemWrapper
+    return (
+      <FormItemWrapper
     control={<SelectField
     underlineShow={true}
     floatingLabelText={field.title}

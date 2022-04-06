@@ -1,7 +1,7 @@
 import React from 'react';
-import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import type {ComponentProps} from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
+import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
 import Spinner from '../../Spinner';
 import MovieIcon from '@material-ui/icons/Movie';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';

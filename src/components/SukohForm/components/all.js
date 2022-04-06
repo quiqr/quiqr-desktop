@@ -6,6 +6,7 @@ import DateDynamic from './DateDynamic';
 import EmptyLineDynamic from './EmptyLineDynamic';
 import EasyMarkDownDynamic from './EasyMarkDownDynamic';
 import HiddenDynamic from './HiddenDynamic';
+import ImageSelectDynamic from './ImageSelectDynamic';
 import InfoDynamic from './InfoDynamic';
 import LeafArrayDynamic from './LeafArrayDynamic'
 import MarkdownDynamic from './MarkdownDynamic';
@@ -35,6 +36,7 @@ export default [
     LeafArrayDynamic,
     FontPickerDynamic,
     HiddenDynamic,
+    ImageSelectDynamic,
     InfoDynamic,
     MarkdownDynamic,
     NestDynamic,

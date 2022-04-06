@@ -535,6 +535,8 @@ class WorkspaceService{
       src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
     }
 
+    console.log(src);
+
     let srcExists = await this.existsPromise(src);
     if(!srcExists){
       return 'NOT_FOUND';
