@@ -91,6 +91,10 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
       state[key] = field.default || undefined;
     }
 
+    if (typeof field.buttonTitle !== 'string' || !field.buttonTitle instanceof String){
+      field.buttonTitle="Select Image";
+    }
+
     if(!Array.isArray(state['resources'])){
       state['resources'] = [];
     }
@@ -225,16 +229,16 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         iconButtons={iconButtons}
       />
 
-        <div style={{paddingBottom:"20px"}}>
+        <div style={{paddingBottom:"10px"}}>
           {this.renderImage()}
 
-          <Button variant="contained" color="primary" onClick={()=>{
+          <Button style={{marginTop:'5px'}} variant="contained" color="primary" onClick={()=>{
             let conf = this.state.selectImagesDialogConf;
             conf.visible = true;
 
             this.setState({selectImagesDialogConf:conf})
           }}>
-            Select File
+           {field.buttonTitle}
           </Button>
         </div>
 
