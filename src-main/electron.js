@@ -11,7 +11,7 @@ const mainWindowManager = require('./ui-managers/main-window-manager');
 const menuManager       = require('./ui-managers/menu-manager');
 const pogozipper        = require('./import-export/pogozipper');
 const pathHelper        = require('./utils/path-helper');
-const QuiqrAppConfig  = require('./app-prefs-state/quiqr-app-config');
+const QuiqrAppConfig    = require('./app-prefs-state/quiqr-app-config');
 const outputConsole     = require('./logger/output-console');
 const apiMain           = require('./bridge/api-main');
 
@@ -40,6 +40,9 @@ global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;
 global.apiMain = apiMain;
+global.modelDirWatcher = undefined;
+
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

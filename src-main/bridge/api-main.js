@@ -18,6 +18,8 @@ const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
 const cloudGitManager           = require('../pogocloud/cloud-git-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 
+const chokidar          = require('chokidar');
+
 let api = {};
 
 function bindResponseToContext(promise, context){
@@ -77,6 +79,24 @@ async function getWorkspaceServicePromise(siteKey, workspaceKey){
   }
 }
 
+function clearWorkSpaceConfigCache(workspaceService){
+  workspaceService.clearConfigurationsDataCache();
+}
+
+function setWatcher(workspaceService){
+  let watchDir = path.join(global.currentSitePath,"quiqr/model");
+  const watchOptions = {
+    ignored: /(^|[\/\\])\../, // ignore dotfiles
+    persistent: true
+  };
+
+  global.modelDirWatcher = chokidar.watch(watchDir, watchOptions );
+  global.modelDirWatcher
+    .on('add', path => clearWorkSpaceConfigCache(workspaceService))
+    .on('change', path => clearWorkSpaceConfigCache(workspaceService))
+    .on('unlink', path => clearWorkSpaceConfigCache(workspaceService));
+}
+
 api.getConfigurations = function(options, context){
   configurationDataProvider.get(function(err, data){
     if(err)
@@ -115,11 +135,13 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
   });
 }
 
+/*
 api.clearWorkSpaceConfigCache = async function({}, context){
   let workspaceService = new WorkspaceService();
   workspaceService.clearConfigurationsDataCache();
   context.resolve(true);
 }
+*/
 
 
 api.savePrefKey = async function({prefKey, prefValue}, context){
@@ -152,6 +174,18 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 
     global.pogoconf.setLastOpenedSite(siteKey, workspaceKey, currentSitePath);
     global.pogoconf.saveState();
+
+
+
+    if(global.modelDirWatcher){
+      global.modelDirWatcher.close().then(()=>{
+        setWatcher(workspaceService);
+      })
+    }
+    else{
+      setWatcher(workspaceService);
+    }
+
 
   }
   catch(e){
@@ -236,6 +270,9 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   mainWindow.setTitle(`Quiqr - Site: ${siteConfig.name}`);
   menuManager.updateMenu(siteKey);
   menuManager.createMainMenu();
+
+
+
 }
 
 api.parentMountWorkspace = async function({siteKey, workspaceKey}, context){

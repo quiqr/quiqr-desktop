@@ -1375,7 +1375,6 @@ resources: []\n\
               this.openWorkSpaceDir()
             }
           },
-          { type: 'separator' },
           {
             id: 'open-site-conf',
             label: 'Open Site Config',
@@ -1384,6 +1383,7 @@ resources: []\n\
               this.openWorkSpaceConfig()
             }
           },
+          /*
           {
             id: 'clear-config-cache',
             label: 'Clear Model Cache',
@@ -1391,6 +1391,7 @@ resources: []\n\
               global.apiMain.clearWorkSpaceConfigCache({},context);
             }
           },
+          */
           { type: 'separator' },
           {
             label: 'Configuration Examples',
