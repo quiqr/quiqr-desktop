@@ -1455,7 +1455,7 @@ resources: []\n\
           {
             label: 'Release Notes',
             click: async () => {
-              await shell.openExternal("https://router.quiqr.cloud/release-notes");
+              await shell.openExternal("https://book.quiqr.org/docs/10-release-notes/01-quiqr-desktop/");
             }
           }
         ]

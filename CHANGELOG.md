@@ -1,8 +1,8 @@
 # Quiqr App CHANGELOG
 
-
-## **WORK IN PROGRESS**
+# **WORK IN PROGRESS**
 - new type: font-picker
+- new type: image-select
 - improve image layout
 - upgraded electron from 5 to 9
 - remove redundant openFileDialog code
