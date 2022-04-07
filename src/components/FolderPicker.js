@@ -1,7 +1,7 @@
 import * as React       from 'react';
 import { RaisedButton } from 'material-ui-02';
 import TextField2       from '@material-ui/core/TextField';
-import service          from '../services/service';
+//import service          from '../services/service';
 
 type FolderPickerProps = {
     onFolderSelected: (folder: ?string)=> void,

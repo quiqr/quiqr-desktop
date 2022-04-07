@@ -243,18 +243,18 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     if(this.state.devShowCurrentUser){
       let username=this.props.quiqrUsername;
       devSets.push(
-        <Chip label={username} color="secondary" size="small" />
+        <Chip label={username} key="chipUsername" color="secondary" size="small" />
       )
     }
 
     if(this.state.devLocalApi){
       devSets.push(
-        <Chip label="Local API" color="secondary" size="small" />
+        <Chip label="Local API" key="localApi" color="secondary" size="small" />
       )
     }
     if(this.state.devDisableAutoHugoServe){
       devSets.push(
-        <Chip label="Disable Hugo Serve" color="secondary" size="small" />
+        <Chip label="Disable Hugo Serve" key="disableHugo" color="secondary" size="small" />
       )
     }
 

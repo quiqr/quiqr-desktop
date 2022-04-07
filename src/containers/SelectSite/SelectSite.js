@@ -273,14 +273,17 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
           <Subheader>{listTitle}</Subheader>
           { (sites).map((site, index)=>{
             let selected = site===selectedSite;
-            let owner = 'user: unknown';
 
+
+            /*
             let sourcePath = '';
-
             if(site.source && site.source.path){
               sourcePath = site.source.path
             }
+            */
 
+            /*
+            let owner = 'user: unknown';
             if(site.published === 'no' ){
               owner = "unpublished";
             }
@@ -290,6 +293,7 @@ class SelectSite extends React.Component<SelectSiteProps, SelectSiteState>{
                 owner = "user: " + site.owner;
               }
             }
+            */
 
             return (<ListItem
             id={"siteselectable-"+site.name}

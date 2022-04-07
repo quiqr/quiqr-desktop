@@ -118,8 +118,9 @@ class BundleManager extends React.Component{
     return <div className="BundleManager row" style={this.props.style}>
       { this.props.children.map(function(item, index){
         let active = this.props.forceActive || index === openedIndex;
+
+        //SPLITPATH ugly hack to prevent displaying files from subdirs TODO REMOVE
         let splitPath = (item.props.path).split("/");
-        //ugly hack to prevent displaying files from subdirs TODO REMOVE
         if (splitPath.length < 99 ){
           return React.cloneElement(item, {
             active,
