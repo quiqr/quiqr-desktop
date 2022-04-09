@@ -3,10 +3,12 @@
 # **WORK IN PROGRESS**
 - new type: font-picker
 - new type: image-select
+- show read only site configuration
 - improve image layout
 - upgraded electron from 5 to 9
 - remove redundant openFileDialog code
 - unsubscribe from listeners in App.js
+- auto compile (inotify) site-root/quiqr/model/base.yml
 
 ## 0.10.1 (2022-03-31)
 - code cleanup
