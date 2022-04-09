@@ -22,7 +22,7 @@ class Welcome extends React.Component {
     }
 
     handleLinkThemeGallery = ()=>{
-        window.require('electron').shell.openExternal("https://router.quiqr.cloud/theme-gallery");
+        window.require('electron').shell.openExternal("https://router.poppygo.app/theme-gallery");
     }
 
     handleLinkPoppyWebsite = ()=>{
@@ -76,16 +76,7 @@ class Welcome extends React.Component {
                             <button className="reglink" onClick={this.handleLinkPoppyWebsite} >Quiqr Docs</button>
                         </p>
                         <br/>
-                        <strong><p>Did you receive a pogosite file?</p></strong>
-                        <p>
-                            Then import the site that your developer has created for you.
-                            Your developer didn’t send you a site yet? Check the example template to start playing around.
-                        </p>
-                        <p>
-                            <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleImportClick}>
-                               Import file
-                            </Button>
-                        </p>
+
                         <br/>
                         <strong><p>Are you developing a Hugo site on your local machine?</p></strong>
                         <p>
@@ -97,7 +88,7 @@ class Welcome extends React.Component {
                             </Button>
                         </p>
                         <br/>
-                    </div>
+                      </div>
                 );
             }}/>
         );

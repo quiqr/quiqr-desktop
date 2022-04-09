@@ -270,9 +270,6 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   mainWindow.setTitle(`Quiqr - Site: ${siteConfig.name}`);
   menuManager.updateMenu(siteKey);
   menuManager.createMainMenu();
-
-
-
 }
 
 api.parentMountWorkspace = async function({siteKey, workspaceKey}, context){

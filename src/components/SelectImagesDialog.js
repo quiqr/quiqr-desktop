@@ -61,7 +61,7 @@ class ImageThumb extends React.Component{
             : this.state.src === 'NOT_FOUND'? (<IconBroken className="fadeIn animated" style={{width:32, height:32, margin:16, color:'#e84b92'}} />)
             :
             (
-              <img src={this.state.src} className="fadeIn animated" style={{cursor: "pointer", width:'100%', marginBottom:'-7px'}} />
+              <img src={this.state.src} alt="" className="fadeIn animated" style={{cursor: "pointer", width:'100%', marginBottom:'-7px'}} />
             )
           }
         </div>);

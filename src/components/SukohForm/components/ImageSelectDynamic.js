@@ -69,6 +69,8 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
       context.node.state['resources'] = [];
     }
 
+    service.api.logToConsole(field.path)
+
     if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
       service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
 
@@ -83,7 +85,6 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
       });
     }
   }
-
 
   normalizeState({state, field, stateBuilder} : {state:any, field:ImageSelectDynamicField, stateBuilder: any}){
     let key = field.key;
@@ -116,7 +117,9 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
   }
 
   getExt(file){
-    return file.split('.').pop().toLowerCase();
+    if (typeof file === 'string'){
+      return file.split('.').pop().toLowerCase();
+    }
   }
 
   isImage(file){
@@ -150,6 +153,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         if(field.path){
           thumbPath = path.join(field.path, this.props.context.value);
         }
+            service.api.logToConsole(thumbPath);
 
         form.props.plugins.getBundleThumbnailSrc(thumbPath)
           .then((src)=>{
@@ -200,12 +204,9 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         imageItems={this.state.absFiles}
         getBundleThumbnailSrc={form.props.plugins.getBundleThumbnailSrc}
         handleSelect={(selected)=>{
-          //service.api.logToConsole(selected);
           context.setValue(selected);
           this.checkThumbs();
-
           this.handleCloseDialog();
-
         }}
         handleClose={()=>{
           this.handleCloseDialog();

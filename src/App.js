@@ -5,7 +5,6 @@ import { Switch, Route }                             from 'react-router-dom'
 import SelectSite                                    from './containers/SelectSite'
 import Console                                       from './containers/Console';
 import PreviewButtons                                from './containers/PreviewButtons';
-//import Prefs                                         from './containers/Prefs'
 
 import Home                                          from './containers/Home'
 import Collection                                    from './containers/Collection';
@@ -16,6 +15,7 @@ import Welcome                                       from './containers/Welcome'
 import WorkspaceSidebar                              from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 import { PrefsSidebar, PrefsRouted }                 from './containers/Prefs';
+import { SiteConfSidebar, SiteConfRouted }           from './containers/SiteConf';
 
 import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
@@ -128,8 +128,13 @@ class App extends React.Component<AppProps,AppState>{
   redirectCookbook(){
     this.history.push('/forms-cookbook');
   }
+
   redirectPrefs(){
     this.history.push('/prefs');
+  }
+
+  redirectSiteConf(){
+    this.history.push('/siteconf');
   }
 
   redirectConsole(){
@@ -148,6 +153,7 @@ class App extends React.Component<AppProps,AppState>{
     window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
     window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
     window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
+    window.require('electron').ipcRenderer.on('redirectSiteConf', this.redirectSiteConf.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
     window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
@@ -163,6 +169,7 @@ class App extends React.Component<AppProps,AppState>{
       'redirectCookbook',
       'redirectConsole',
       'redirectPrefs',
+      'redirectSiteConf',
       'setMobileBrowserOpen',
       'setMobileBrowserClose',
       'redirectMountSite',
@@ -242,6 +249,18 @@ class App extends React.Component<AppProps,AppState>{
       <Route path="/prefs" exact={false} render={ ({match, history})=> {
         return (<PrefsSidebar
         menus={[]}
+        hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
+        menuIsLocked={this.state.menuIsLocked}
+        onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
+        onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
+      />);
+      }} />
+
+      <Route path='/siteconf/:site/workspaces/:workspace' render={ ({match, history})=> {
+        return (<SiteConfSidebar
+        menus={[]}
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
         hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
         menuIsLocked={this.state.menuIsLocked}
         onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
@@ -342,6 +361,13 @@ class App extends React.Component<AppProps,AppState>{
 
       <Route path="/prefs" exact={false} render={ ({match, history})=> {
         return <PrefsRouted />;
+      }} />
+
+        <Route path='/siteconf/:site/workspaces/:workspace'  render={ ({match})=> {
+          return <SiteConfRouted
+          siteKey={ decodeURIComponent(match.params.site) }
+          workspaceKey={ decodeURIComponent(match.params.workspace) } />
+
       }} />
 
       <Route path="*" component={(data)=>{

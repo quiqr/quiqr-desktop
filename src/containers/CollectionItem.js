@@ -132,7 +132,7 @@ class CollectionItem extends React.Component<CollectionItemProps,CollectionItemS
     plugins={{
 
       openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
-        return service.api.openFileDialogForCollectionItem(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath, {title, extensions});
+        return service.api.openFileDialogForSingleAndCollectionItem(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath, {title, extensions});
       },
       getBundleThumbnailSrc: function(targetPath){
         return service.api.getThumbnailForCollectionItemImage(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath);

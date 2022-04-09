@@ -41,12 +41,6 @@ function showInvalidDevelopmentUrl(logWindow/*: any*/, url/*: ?string*/){
 }
 
 function createWindow () {
-  //  console.log(process.env)
-
-  let icon;
-  if(process.env.REACT_DEV_URL)
-    icon = path.normalize(__dirname + "/../public/icon.png");
-  //
   // Create the browser window.
   logWindow = new BrowserWindow({
     show: false,
@@ -56,8 +50,6 @@ function createWindow () {
     frame: true,
     backgroundColor:"#ffffff",
     minWidth:1024,
-    //webPreferences:{webSecurity:false },
-    icon
   });
 
   logWindow.setMenuBarVisibility(false);

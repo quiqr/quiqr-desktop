@@ -6,7 +6,6 @@ const rimraf                      = require("rimraf");
 const fssimple                    = require('fs');
 const fs                          = require('fs-extra');
 const { shell }                   = require('electron')
-const prefsWindowManager          = require('./prefs-window-manager');
 const logWindowManager            = require('./log-window-manager');
 const pogozipper                  = require('../import-export/pogozipper');
 const cloudCacheManager           = require('../pogocloud/cloud-cache-manager');
@@ -404,6 +403,25 @@ resources: []\n\
     await pogopubl.UnlinkDomain();
   }
 
+  appPrefs(){
+    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    mainWindow.webContents.send("disableMobilePreview");
+    mainWindow.webContents.send("redirectToGivenLocation","/prefs");
+  }
+
+  siteConfig() {
+    if(global.currentSiteKey && global.currentWorkspaceKey){
+      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      mainWindow.webContents.send("disableMobilePreview");
+      //mainWindow.webContents.send("redirectToGivenLocation","/siteconf");
+
+      //var newURL='/siteconf/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
+      let newScreenURL = `/siteconf/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
+      mainWindow.webContents.send("redirectToGivenLocation", newScreenURL);
+    }
+
+  }
+
   deleteSite() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
@@ -554,13 +572,6 @@ resources: []\n\
       myItem.enabled = (currentSiteKey?true:false);
     });
 
-  }
-
-  openHome() {
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    if (mainWindow) {
-      mainWindow.webContents.send("redirectHome")
-    }
   }
 
   async selectSiteVersion(subdir){
@@ -1080,12 +1091,6 @@ resources: []\n\
             }
           },
           {
-            label: 'Front Page',
-            click: async () => {
-              this.openHome()
-            }
-          },
-          {
             id: 'import-site-from-url',
             label: 'Import Site From PogoURL',
             click: async () => {
@@ -1121,9 +1126,7 @@ resources: []\n\
             label: 'Preferences',
             click: async () => {
 
-              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-              mainWindow.webContents.send("disableMobilePreview");
-              mainWindow.webContents.send("redirectToGivenLocation","/prefs");
+              this.appPrefs();
 
             }
           },
@@ -1175,6 +1178,17 @@ resources: []\n\
           },
           { type: 'separator' },
           {
+            id: 'home-site',
+            label: 'Site Dashboard',
+            enabled: this.siteSelected(),
+            click: async () => {
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
+              var newURL='/sites/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
+              mainWindow.webContents.send("redirectToGivenLocation", newURL);
+            }
+          },
+          {
             id: 'close-site',
             label: 'Close Site',
             enabled: this.siteSelected(),
@@ -1188,6 +1202,14 @@ resources: []\n\
             enabled: this.siteSelected(),
             click: async () => {
               this.renameSite()
+            }
+          },
+          {
+            id: 'config-site',
+            enabled: this.siteSelected(),
+            label: 'Site Configuration',
+            click: async () => {
+              this.siteConfig()
             }
           },
           {
@@ -1284,40 +1306,9 @@ resources: []\n\
           {
             label: 'Preferences',
             click: async () => {
-
-              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-              mainWindow.webContents.send("disableMobilePreview");
-              mainWindow.webContents.send("redirectToGivenLocation","/prefs");
-
+              this.appPrefs();
             }
           },
-
-          /*
-                    ...(isMac ? [
-                        { role: 'pasteAndMatchStyle' },
-                        { role: 'delete' },
-                        { role: 'selectAll' },
-                        { type: 'separator' },
-                        {
-                            label: 'Speech',
-                            submenu: [
-                                { role: 'startspeaking' },
-                                { role: 'stopspeaking' }
-                            ]
-                        }
-                    ] : [
-                        { role: 'delete' },
-                        { type: 'separator' },
-                        { role: 'selectAll' },
-
-                    {
-                        label: 'Preferences',
-                        click: async () => {
-                            createPrefsWindow()
-                        }
-                    }
-
-                  ])*/
         ]
       },
       {

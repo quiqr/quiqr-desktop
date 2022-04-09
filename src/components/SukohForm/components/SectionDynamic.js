@@ -63,8 +63,8 @@ class SectionDynamic extends BaseDynamic<SectionDynamicField, SectionDynamicStat
       });
 
       return (<React.Fragment>
-        {field.title?<div style={{padding:'16px 0'}}>{field.title}</div>:undefined}
-        <div style={{padding:'16px 0px 0px 16px', marginBottom:'16px', overflow:'auto', borderLeft: 'solid 10px #eee'}}>{level}</div>
+        {field.title?<div style={{fontWeight:'bold',padding:'16px 0'}}>{field.title}</div>:undefined}
+        <div style={{padding:'16px 0px 0px 16px', marginBottom:'16px', borderLeft: 'solid 10px #eee'}}>{level}</div>
         </React.Fragment>);
     }
 
