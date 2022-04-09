@@ -1,6 +1,6 @@
 # Quiqr App CHANGELOG
 
-# **WORK IN PROGRESS**
+## **WORK IN PROGRESS**
 - new type: font-picker
 - new type: image-select
 - show read only site configuration
