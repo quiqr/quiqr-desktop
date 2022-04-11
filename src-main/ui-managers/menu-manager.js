@@ -139,11 +139,14 @@ class MenuManager {
       return;
     }
     else{
+
+      await cloudApiManager.requestConnectMail(email)
+
       const dialog = electron.dialog;
 
       const options = {
         type: 'info',
-        buttons: ['Cancel', 'OK'],
+        buttons: ['OK'],
         defaultId: 1,
         title: 'Email has been sent',
         message: 'Email has been sent',
@@ -152,7 +155,6 @@ class MenuManager {
 
       dialog.showMessageBox(null, options, async (response) => {
         if(response === 1){
-          await cloudApiManager.requestConnectMail(email)
           console.log("mailsent")
         }
         else{
