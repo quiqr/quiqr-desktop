@@ -83,12 +83,6 @@ class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDyn
               userSelect: 'none',
               color: 'rgba(0, 0, 0, 0.3)' }}>{field.title}</label>
 
-            <div>
-              <p className={"apply-font-"+field.pickerId}>
-                the quick brown fox jumps over the lazy dog.<br/>
-                THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.
-              </p>
-            </div>
 
             <FontPicker
               pickerId={field.pickerId}
@@ -103,7 +97,14 @@ class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDyn
               onChange={(nextFont) =>
                   this.props.context.setValue(nextFont.family)
               }
-          />
+            />
+            <div>
+              <p className={"apply-font-"+field.pickerId}>
+                the quick brown fox jumps over the lazy dog.<br/>
+                THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.
+              </p>
+            </div>
+
         </div>
 
         }
