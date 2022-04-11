@@ -177,7 +177,7 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 
 
 
-    if(global.modelDirWatcher){
+    if(global.modelDirWatcher && typeof global.modelDirWatcher.close === 'function'){
       global.modelDirWatcher.close().then(()=>{
         setWatcher(workspaceService);
       })
