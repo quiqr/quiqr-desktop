@@ -8,201 +8,201 @@ let net = window.require('electron').remote.net;
 
 export default class ClaimDomainDialog extends React.Component{
 
-    constructor(props){
-        super(props);
-        this.state = {
-            pogourl: "",
-            pogourl_err: "",
-            email_err: "",
-            failure: false,
-            busy: false,
-            username: this.props.username,
-            fingerprint: this.props.fingerprint
-         }
+  constructor(props){
+    super(props);
+    this.state = {
+      pogourl: "",
+      pogourl_err: "",
+      email_err: "",
+      failure: false,
+      busy: false,
+      username: this.props.username,
+      fingerprint: this.props.fingerprint
     }
-    componentDidMount(){
-        service.getConfigurations().then((c)=>{
-            var stateUpdate  = {};
-            stateUpdate.pogoboardConn = c.global.pogoboardConn;
-            this.setState(stateUpdate);
-        })
+  }
+  componentDidMount(){
+    service.getConfigurations().then((c)=>{
+      var stateUpdate  = {};
+      stateUpdate.pogoboardConn = c.global.pogoboardConn;
+      this.setState(stateUpdate);
+    })
+  }
+
+  handleCancelClick = () => {
+    this.props.onCancelClick();
+  }
+
+  handleDomainClaimClick = async (context) => {
+
+    this.setState({
+      busy: true
+    });
+
+    this.registerDomain(this.state.pogourl, this.props.username, this.props.fingerprint);
+  }
+
+  registerDomain(pogourl, username, fingerprint){
+    if(username===""){
+      this.setState({
+        failure: true
+      });
+
+      this.setState({ busy: false });
+      return
     }
+    var postData = JSON.stringify({sitename : pogourl, username: username, fingerprint: fingerprint});
 
-    handleCancelClick = () => {
-        this.props.onCancelClick();
-    }
+    let data='';
+    let request = net.request({
+      method: 'POST',
+      protocol: this.state.pogoboardConn.protocol,
+      hostname: this.state.pogoboardConn.host,
+      port: this.state.pogoboardConn.port,
+      path: '/site/new',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': postData.length
+      }
+    })
 
-    handleDomainClaimClick = async (context) => {
+    request.on('response', (response) => {
 
-        this.setState({
-            busy: true
-        });
+      response.on('end', () => {
+        let obj = JSON.parse(data);
+        if(obj.hasOwnProperty('path')){
 
-        this.registerDomain(this.state.pogourl, this.props.username, this.props.fingerprint);
-    }
+          let promise = service.api.createPogoDomainConf(obj.path, obj.path+".quiqr.cloud");
+          promise.then((path)=>{
+            this.props.onClaimDomainClick({ pogourl: path });
+          });
+        }
+        else{
+          this.setState({
+            failure: true
+          });
+        }
 
-    registerDomain(pogourl, username, fingerprint){
-        if(username===""){
+        this.setState({ busy: false });
+      });
+
+      response.on("data", chunk => {
+        data += chunk;
+      });
+
+    })
+    request.write(postData)
+    request.end()
+
+  }
+
+  handlepogourlChange(e){
+
+    let value = e.target.value;
+
+    if(value!==''){
+
+      let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/site/"+value;
+      let data='';
+      const request = net.request(url);
+      request.on('response', (response) => {
+
+        response.on('end', () => {
+          let obj = JSON.parse(data);
+
+          if(obj.status !== "free"){
             this.setState({
-                failure: true
+              pogourl_err: "pogourl is "+obj.status
             });
-
-            this.setState({ busy: false });
-            return
-        }
-        var postData = JSON.stringify({sitename : pogourl, username: username, fingerprint: fingerprint});
-
-        let data='';
-        let request = net.request({
-            method: 'POST',
-            protocol: this.state.pogoboardConn.protocol,
-            hostname: this.state.pogoboardConn.host,
-            port: this.state.pogoboardConn.port,
-            path: '/site/new',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length
-            }
-        })
-
-        request.on('response', (response) => {
-
-            response.on('end', () => {
-                let obj = JSON.parse(data);
-                if(obj.hasOwnProperty('path')){
-
-                    let promise = service.api.createPogoDomainConf(obj.path, obj.path+".quiqr.cloud");
-                    promise.then((path)=>{
-                        this.props.onClaimDomainClick({ pogourl: path });
-                    });
-                }
-                else{
-                    this.setState({
-                        failure: true
-                    });
-                }
-
-                this.setState({ busy: false });
+          }
+          else{
+            this.setState({
+              pogourl_err: ""
             });
+          }
 
-            response.on("data", chunk => {
-                data += chunk;
-            });
-
-        })
-        request.write(postData)
-        request.end()
-
-    }
-
-    handlepogourlChange(e){
-
-        let value = e.target.value;
-
-        if(value!==''){
-
-            let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/site/"+value;
-            let data='';
-            const request = net.request(url);
-            request.on('response', (response) => {
-
-                response.on('end', () => {
-                    let obj = JSON.parse(data);
-
-                    if(obj.status !== "free"){
-                        this.setState({
-                            pogourl_err: "pogourl is "+obj.status
-                        });
-                    }
-                    else{
-                        this.setState({
-                            pogourl_err: ""
-                        });
-                    }
-
-                });
-                response.on("data", chunk => {
-                    data += chunk;
-                });
-            })
-            request.end()
-        }
-
-        this.setState({
-            pogourl: value,
         });
-
-    }
-
-    handleTryAgain(){
-        this.setState({
-            pogourl: "",
-            busy: false,
-            failure: false,
+        response.on("data", chunk => {
+          data += chunk;
         });
-
+      })
+      request.end()
     }
 
-    validate(){
-        return !this.state.busy &&
-            !this.state.failure &&
-            this.state.pogourl_err === '' &&
-            this.state.pogourl !== ''
-    }
+    this.setState({
+      pogourl: value,
+    });
 
-    renderForm(){
-        //let valid = this.validate();
-        let busy = this.state.busy;
-        let previewUrl = this.state.pogourl.replace(/\./g,"-");
-        return (
-            <div>
-                <TextField disabled={busy} errorText={this.state.pogourl_err} floatingLabelText={'Quiqr URL'} value={this.state.pogourl} onChange={(e)=>{this.handlepogourlChange(e)}} fullWidth />
-                <Paper style={{margin:10,padding:"0 7px 7px 7px"}}>
-                    <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span>.quiqr.cloud</span>
-                </Paper>
-            </div>
-        )
+  }
 
-    }
+  handleTryAgain(){
+    this.setState({
+      pogourl: "",
+      busy: false,
+      failure: false,
+    });
 
-    renderFailure(){
-        return (
-                <div>
-                    Something went wrong. Please <button className="reglink" onClick={()=>this.handleTryAgain()}>try again.</button>
-                </div>
-        )
-    }
+  }
 
-    render(){
-        let { open } = this.props;
-        let valid = this.validate();
-        let busy = this.state.busy;
-        let failure = this.state.failure;
+  validate(){
+    return !this.state.busy &&
+      !this.state.failure &&
+      this.state.pogourl_err === '' &&
+      this.state.pogourl !== ''
+  }
 
-        const actions = [
-            <FlatButton
-                label="Cancel"
-                primary={false}
-                onClick={this.handleCancelClick.bind(this)}
-            />,
-            <FlatButton
-                disabled={!valid}
-                label="Claim domain"
-                primary={true}
-                onClick={this.handleDomainClaimClick}
-            />,
-        ];
+  renderForm(){
+    //let valid = this.validate();
+    let busy = this.state.busy;
+    let previewUrl = this.state.pogourl.replace(/\./g,"-");
+    return (
+      <div>
+        <TextField disabled={busy} errorText={this.state.pogourl_err} floatingLabelText={'Quiqr URL'} value={this.state.pogourl} onChange={(e)=>{this.handlepogourlChange(e)}} fullWidth />
+        <Paper style={{margin:10,padding:"0 7px 7px 7px"}}>
+          <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span>.quiqr.cloud</span>
+        </Paper>
+      </div>
+    )
 
-        return (
-            <Dialog
-                title="Claim your Quiqr URL for easy publishing to the web"
-                open={open}
-                actions={actions}>
+  }
 
-                { failure? this.renderFailure() : this.renderForm() }
-                { busy? <Spinner /> : undefined }
-            </Dialog>
-        );
-    }
+  renderFailure(){
+    return (
+      <div>
+        Something went wrong. Please <button className="reglink" onClick={()=>this.handleTryAgain()}>try again.</button>
+      </div>
+    )
+  }
+
+  render(){
+    let { open } = this.props;
+    let valid = this.validate();
+    let busy = this.state.busy;
+    let failure = this.state.failure;
+
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        primary={false}
+        onClick={this.handleCancelClick.bind(this)}
+      />,
+      <FlatButton
+        disabled={!valid}
+        label="Claim domain"
+        primary={true}
+        onClick={this.handleDomainClaimClick}
+      />,
+    ];
+
+    return (
+      <Dialog
+        title="Claim your Quiqr URL for easy publishing to the web"
+        open={open}
+        actions={actions}>
+
+        { failure? this.renderFailure() : this.renderForm() }
+        { busy? <Spinner /> : undefined }
+      </Dialog>
+    );
+  }
 
 }
