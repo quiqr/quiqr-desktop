@@ -182,6 +182,54 @@ class CloudApiManager{
     });
   }
 
+  async deleteSiteFromCloud(postData){
+
+    return new Promise(resolve => {
+
+      configurationDataProvider.get( async (err, configurations)=>{
+
+        let data='';
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+'/site/delete';
+
+        console.log(url);
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          console.log(e);
+          resolve(false);
+        });
+
+        req.on('response', (response) => {
+          if(response.statusCode === 200){
+            response.on('end', async () => {
+
+              let pogopubl = new PogoPublisher({});
+              await pogopubl.UnlinkCloudPath();
+
+              resolve(true);
+            });
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
+      });
+
+    });
+  }
+
   async disconnectPogoDomain(postData){
 
     return new Promise(resolve => {
@@ -211,7 +259,7 @@ class CloudApiManager{
         req.on('response', (response) => {
           if(response.statusCode === 200){
             response.on('end', () => {
-                resolve(true);
+              resolve(true);
             });
           }
           else{
@@ -256,7 +304,7 @@ class CloudApiManager{
         req.on('response', (response) => {
           if(response.statusCode === 200){
             response.on('end', () => {
-                resolve(true);
+              resolve(true);
             });
           }
           else{

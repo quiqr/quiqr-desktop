@@ -486,10 +486,12 @@ class App extends React.Component<AppProps,AppState>{
       <Route
       path="*"
       render={ ({match, history})=>{
+        /*
         const isRedirect = history.action === 'REPLACE';
         if(isRedirect){
           service.api.logToConsole('ISREDIRECT');
         }
+        */
 
         this.history = history;
         return (

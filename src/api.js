@@ -233,6 +233,10 @@ export class API {
     return mainProcessBridge.request('connectPogoDomain',{postData});
   }
 
+  deleteSiteFromCloud(postData){
+    return mainProcessBridge.request('deleteSiteFromCloud',{postData});
+  }
+
   disconnectPogoDomain(postData){
     return mainProcessBridge.request('disconnectPogoDomain',{postData});
   }

@@ -402,7 +402,7 @@ resources: []\n\
 
   async unlinkSiteDomain(){
     let pogopubl = new PogoPublisher({});
-    await pogopubl.UnlinkDomain();
+    await pogopubl.UnlinkCloudPath();
   }
 
   appPrefs(){

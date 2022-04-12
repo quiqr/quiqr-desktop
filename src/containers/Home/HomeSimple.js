@@ -393,6 +393,18 @@ class Home extends React.Component<HomeProps, HomeState>{
     });
   }
 
+  handleDeleteSiteFromCloudClick(){
+    /*
+    var stateUpdate  = {};
+    stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
+    stateUpdate.pogoCustomDomain = "not set";
+    stateUpdate.defaultDomain = `${this.getPogoCloudPath()}.quiqr.cloud`;
+    */
+    this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+    //this.setState(stateUpdate,()=>{
+    //});
+  }
+
   handleDisconnectDomainClick(){
     var stateUpdate  = {};
     stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
@@ -775,6 +787,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       </NotificationPanel>
 
     }
+    /*
     else if(this.state.pogoSiteStatus === "no_plan"){
       return (
         <NotificationPanel>
@@ -782,6 +795,7 @@ class Home extends React.Component<HomeProps, HomeState>{
         </NotificationPanel>
       )
     }
+    */
     else if (this.state.oneTimeOnlySiteActive === true) {
       return (
         <NotificationPanel>
@@ -1005,9 +1019,15 @@ class Home extends React.Component<HomeProps, HomeState>{
       */
 
       let editPlanButton = ""
+
+      if(this.state.pogoUserRole === "owner"){
+        editPlanButton = <span style={{marginLeft:"50px"}}><button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button></span>
+      }
+      /*
       if(this.state.pogoSiteStatus === "active" && this.state.pogoUserRole === "owner"){
         editPlanButton = <span style={{marginLeft:"50px"}}><button className="reglink" onClick={()=>{this.handleEditPlan()}}>edit plan</button></span>
       }
+      */
 
       /*
       let ownerInfo = ""
@@ -1171,10 +1191,12 @@ class Home extends React.Component<HomeProps, HomeState>{
                 this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
                 service.api.parentTempUnHideMobilePreview();
               }}
+              onDeleteSiteFromCloudClick={()=>{ this.handleDeleteSiteFromCloudClick() }}
               onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
               onUnsubscribeClick={()=>{ this.handleUnsubscribeClick() }}
               username={this.state.username}
               pogoCustomDomain={this.state.pogoCustomDomain}
+              pogoSiteStatus={this.state.pogoSiteStatus}
               sitePath={pogoCloudPath}
               fingerprint={this.state.fingerprint}
               open={this.state.editPlanDialog!=null&&this.state.editPlanDialog.open}

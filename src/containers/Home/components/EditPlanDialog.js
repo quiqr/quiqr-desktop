@@ -15,6 +15,7 @@ export default class EditPlanDialog extends React.Component{
       email_err: "",
       failure: false,
       firstdisconnect: false,
+      firstunsubscribe: false,
       busy: false,
       username: this.props.username,
       fingerprint: this.props.fingerprint
@@ -35,9 +36,59 @@ export default class EditPlanDialog extends React.Component{
   handleUnsubscribeClick = async (context) => {
     if(this.props.pogoCustomDomain !== "not set"){
       this.setState({firstdisconnect: true});
+      this.setState({firstunsubscribe: false});
     }
     else{
       this.props.onUnsubscribeClick();
+    }
+  }
+
+  handleDeleteSiteClick = async (context) => {
+    if(this.props.pogoSiteStatus === "active"){
+      this.setState({firstdisconnect: false});
+      this.setState({firstunsubscribe: true});
+    }
+    else{
+      this.setState({
+        busy: true
+      });
+
+      if(!this.props.username||!this.props.sitePath||!this.props.fingerprint){
+        this.setState({
+          failure: true
+        });
+
+        this.setState({ busy: false });
+        return
+      }
+
+      var postData = JSON.stringify({sitePath : this.props.sitePath, username: this.props.username, fingerprint: this.props.fingerprint});
+
+      let promise = service.api.deleteSiteFromCloud(postData);
+      promise.then((result)=>{
+        if(result){
+          service.api.logToConsole('deleted');
+          this.props.onDeleteSiteFromCloudClick();
+          /*
+        let promise2 = service.api.UnlinkCloudPath(sitePath);
+        promise2.then(()=>{
+          service.api.logToConsole('disconnect');
+          this.props.onDisconnectDomainClick();
+        });
+        */
+        }
+        else{
+          this.setState({
+            failure: true
+          });
+        }
+        this.setState({ busy: false });
+      });
+
+
+      this.setState({
+        busy: false
+      });
     }
   }
 
@@ -76,11 +127,8 @@ export default class EditPlanDialog extends React.Component{
           failure: true
         });
       }
-
       this.setState({ busy: false });
-
     });
-
   }
 
   handleTryAgain(){
@@ -92,6 +140,12 @@ export default class EditPlanDialog extends React.Component{
   }
 
   renderForm(){
+    let deleteSiteButton = ""
+    deleteSiteButton = (
+      <Button color="primary" style={{margin:'5px'}}  variant="contained"  onClick={this.handleDeleteSiteClick} >
+        {"Delete Site from Cloud"}
+      </Button>
+    )
 
     let disconnectButton = ""
     if(this.props.pogoCustomDomain !== "not set"){
@@ -99,17 +153,23 @@ export default class EditPlanDialog extends React.Component{
         <Button color="primary" style={{margin:'5px'}}  variant="contained"  onClick={this.handleDisconnectDomainClick} >
           {"Disconnect Custom Domain: " + this.props.pogoCustomDomain}
         </Button>
+      )
+    }
 
+    let unsubscribeButton = ""
+    if(this.props.pogoSiteStatus === "active"){
+      unsubscribeButton = (
+        <Button color="primary" style={{margin:'5px'}} variant="contained"  onClick={this.handleUnsubscribeClick} >
+          {"Unsubscribe Plan"}
+        </Button>
       )
     }
 
     return (
       <div>
         {disconnectButton}
-        <Button color="secondary" style={{margin:'5px'}} variant="contained"  onClick={this.handleUnsubscribeClick} >
-          {"Unsubscribe Plan"}
-        </Button>
-
+        {unsubscribeButton}
+        {deleteSiteButton}
       </div>
     )
   }
@@ -118,6 +178,15 @@ export default class EditPlanDialog extends React.Component{
     return (
       <div style={{marginTop: "5px;"}}>
         Before you can unsubscribe you need to disconnect the domain {this.props.pogoCustomDomain} first.
+      </div>
+    )
+  }
+
+
+  renderFirstUnsubscribe(){
+    return (
+      <div style={{marginTop: "5px;"}}>
+        Before you can delete your site from the Quiqr Cloud your need to unsubscribe the paid plan first.
       </div>
     )
   }
@@ -132,9 +201,6 @@ export default class EditPlanDialog extends React.Component{
 
   render(){
     let { open } = this.props;
-    let busy = this.state.busy;
-    let failure = this.state.failure;
-    let firstdisconnect = this.state.firstdisconnect;
 
     const actions = [
       <FlatButton
@@ -150,9 +216,10 @@ export default class EditPlanDialog extends React.Component{
         open={open}
         actions={actions}>
 
-        { failure? this.renderFailure() : this.renderForm() }
-        { firstdisconnect? this.renderFirstDisconnect() : undefined }
-        { busy? <Spinner /> : undefined }
+        { this.state.failure? this.renderFailure() : this.renderForm() }
+        { this.state.firstdisconnect? this.renderFirstDisconnect() : undefined }
+        { this.state.firstunsubscribe? this.renderFirstUnsubscribe() : undefined }
+        { this.state.busy? <Spinner /> : undefined }
       </Dialog>
     );
   }

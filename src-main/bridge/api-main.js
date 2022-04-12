@@ -237,6 +237,16 @@ api.registerPogoUser = async function({postData},context){
   }
 }
 
+api.deleteSiteFromCloud = async function({postData},context){
+  try{
+    let result = await cloudApiManager.deleteSiteFromCloud(postData);
+    context.resolve(result);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
 api.disconnectPogoDomain = async function({postData},context){
   try{
     let result = await cloudApiManager.disconnectPogoDomain(postData);

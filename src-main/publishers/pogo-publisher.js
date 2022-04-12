@@ -84,7 +84,7 @@ class PogoPublisher {
     await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
   }
 
-  async UnlinkDomain(){
+  async UnlinkCloudPath(){
     let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
