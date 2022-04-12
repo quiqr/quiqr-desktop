@@ -103,7 +103,8 @@ class CloudGitManager {
     try {
       let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
       outputConsole.appendLine('Keygen success ...');
-      pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"));
+      pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"), {encoding: 'utf8'});
+      console.log(pubkey);
     } catch (e) {
       outputConsole.appendLine('keygen error ...:' + e);
     }

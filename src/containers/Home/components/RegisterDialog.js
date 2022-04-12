@@ -53,54 +53,29 @@ export default class RegisterDialog extends React.Component{
   registerUserPost(username, email, pubkey, pubkey_title){
     var postData = JSON.stringify({username : username, email: email, pubkey: ""+pubkey, pubkey_title: ""+pubkey_title });
 
-    service.api.logToConsole(postData);
-
-    let data='';
-
-    let request = net.request({
-      method: 'POST',
-      protocol: this.state.pogoboardConn.protocol,
-      hostname: this.state.pogoboardConn.host,
-      port: this.state.pogoboardConn.port,
-      path: '/user/new',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': postData.length
-      }
-    })
-
-    request.on('response', (response) => {
-
-      response.on('end', () => {
-        let obj = JSON.parse(data);
-        if(obj.hasOwnProperty('username')){
-
-          let promise = service.api.createPogoProfile(obj);
-          promise.then(()=>{
-            this.props.onRegisterClick({
-              username: this.state.username,
-              email: this.state.email
-            });
+    let promise = service.api.registerPogoUser(postData);
+    promise.then((userObj)=>{
+      service.api.logToConsole(userObj);
+      if(userObj){
+        let promise = service.api.createPogoProfile(userObj);
+        promise.then(()=>{
+          this.props.onRegisterClick({
+            username: this.state.username,
+            email: this.state.email
           });
-        }
-        else{
-          this.setState({
-            failure: true
-          });
-        }
-
-        this.setState({
-          busy: false
         });
+      }
+      else{
+        this.setState({
+          failure: true
+        });
+      }
+      this.setState({
+        busy: false
       });
 
-      response.on("data", chunk => {
-        data += chunk;
-      });
+    });
 
-    })
-    request.write(postData)
-    request.end()
   }
 
   handleUserNameChange(e){

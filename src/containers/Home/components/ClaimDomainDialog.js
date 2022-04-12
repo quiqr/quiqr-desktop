@@ -54,7 +54,6 @@ export default class ClaimDomainDialog extends React.Component{
 
     let promise = service.api.registerPogoDomain(postData);
     promise.then((path)=>{
-      service.api.logToConsole(path);
 
       if(path){
 

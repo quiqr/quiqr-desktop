@@ -14,7 +14,6 @@ import PublishSiteDialog from './components/PublishSiteDialog';
 import RegisterDialog from './components/RegisterDialog';
 import ClaimDomainDialog from './components/ClaimDomainDialog';
 import ConnectDomainDialog from './components/ConnectDomainDialog';
-import DisconnectDomainDialog from './components/DisconnectDomainDialog';
 import EditPlanDialog from './components/EditPlanDialog';
 import BlockDialog from './components/BlockDialog';
 import Spinner from './../../components/Spinner';
@@ -299,7 +298,7 @@ class Home extends React.Component<HomeProps, HomeState>{
   startPendingUpgradePolling(celebrate){
     //service.api.logToConsole("site upgrade status poll");
 
-    if(this.state.pogoSiteStatus === "pending_subscription"){
+    if(this.state.pogoSiteStatus === "no_plan"){
       let time=3000;
       this.timeout = setTimeout(() => {
         this.getRemoteSiteStatus(celebrate);
@@ -585,7 +584,6 @@ class Home extends React.Component<HomeProps, HomeState>{
       return;
     }
 
-    //service.api.logToConsole("getRemoteSiteStatus")
 
 
     if(!this.checkLinkedPogoCloudPath()){
@@ -643,7 +641,9 @@ class Home extends React.Component<HomeProps, HomeState>{
                 this.getRemoteDomainVerification(false);
 
               }
-              else if (this.state.pogoSiteStatus === 'pending_subscription'){
+              else {
+                //else if (this.state.pogoSiteStatus === 'no_plan'){
+                //service.api.logToConsole(this.state.pogoSiteStatus)
                 this.startPendingUpgradePolling(true);
               }
 
@@ -688,13 +688,11 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   handleUpgradeLinkedSite(pressed){
 
-    //let site = this.state.selectedSite;
-
     if(this.state.pogoAccountStatus === "unconfirmed_member"){
       snackMessageService.addSnackMessage('You need to confirm your email. Please check your mail.');
     }
     else{
-      this.setState({pogoSiteStatus: "pending_subscription"},function(){
+      this.setState({pogoSiteStatus: "no_plan"},function(){
         this.startPendingUpgradePolling(true);
       })
 
@@ -712,31 +710,13 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   handleResendConfirmationMail(){
-
     var postData = JSON.stringify({ username: this.state.username, fingerprint: this.state.fingerprint});
-
-    let request = net.request({
-      method: 'POST',
-      protocol: this.state.pogoboardConn.protocol,
-      hostname: this.state.pogoboardConn.host,
-      port: this.state.pogoboardConn.port,
-      path: '/resend-confirmation-link',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': postData.length
-      }
-    })
-
-    request.on('response', (response) => {
-      response.on('end', () => {
+    let promise = service.api.resendConfirmationLinkPogoUser(postData);
+    promise.then((result)=>{
+      if(result){
         snackMessageService.addSnackMessage('Confirmation mail has been sent.');
-      });
-      response.on("data", chunk => {
-      });
-    })
-    request.write(postData)
-    request.end()
-
+      }
+    });
   }
 
   handleOpenCustomDomainDocs(){
@@ -795,7 +775,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       </NotificationPanel>
 
     }
-    else if(this.state.pogoSiteStatus === "pending_subscription"){
+    else if(this.state.pogoSiteStatus === "no_plan"){
       return (
         <NotificationPanel>
           <span style={{color:"white"}}>Upgrade pending. <button className="reglink" onClick={()=>{ this.handleUpgradeLinkedSite(true); }}>Finish upgrade in browser.</button></span>
@@ -815,7 +795,7 @@ class Home extends React.Component<HomeProps, HomeState>{
           <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
             window.require('electron').shell.openExternal("http://"+this.state.defaultDomain);
           }}>{this.state.defaultDomain}</button>
-      </NotificationPanel>
+        </NotificationPanel>
       )
     }
   }
@@ -826,7 +806,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       if(this.state.pogoSiteStatus === "no_plan"){
         return this.renderActionUpgadePanel();
       }
-      else if(this.state.pogoSiteStatus === "pending_subscription"){
+      else if(this.state.pogoSiteStatus === "no_plan"){
         return this.renderActionUpgadePanel();
       }
 
@@ -902,8 +882,8 @@ class Home extends React.Component<HomeProps, HomeState>{
             <span>
               <h2>You're almost there!</h2><h3>Change your DNS settings </h3>
               <pre>
-                A-record        54.155.245.139<br/>
-                AAAA-record:    54.155.245.139
+                A-record        99.81.100.114<br/>
+                AAAA-record:    99.81.100.114
               </pre>
             </span>
             <br/>
@@ -914,10 +894,10 @@ class Home extends React.Component<HomeProps, HomeState>{
             <RaisedButton primary={true} label="Close this panel" disabled={false} onClick={()=>{
               this.setState({pogoCustomDomainDNSStatus:'unknown'});
             }} /><br/>
-          <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>More information</button>
-        </ListItem>
+            <button className="reglink" onClick={()=>{this.handleOpenCustomDomainDocs()}}>More information</button>
+          </ListItem>
+        </div>
       </div>
-    </div>
     )
   }
 
@@ -997,7 +977,7 @@ class Home extends React.Component<HomeProps, HomeState>{
 
   renderPogoCloudPathInfo(){
 
-   if(this.state.pogoSiteStatus === "no_pogocloud"){
+    if(this.state.pogoSiteStatus === "no_pogocloud"){
       return  (
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"100%"}}>Claim a Quiqr Cloud live URL for {this.state.selectedSite.name} </span>
@@ -1047,13 +1027,13 @@ class Home extends React.Component<HomeProps, HomeState>{
         <ListItem leftIcon={<IconDomain color="" style={{}} />} disabled={true} >
           <span style={{fontWeight: "normal", fontSize:"110%"}}>The site is live at &nbsp;
 
-          <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
-            window.require('electron').shell.openExternal("http://"+this.state.defaultDomain);
-          }}>{this.state.defaultDomain}</button> &nbsp;
-          {planInfo}{editPlanButton}
-        </span>
+            <button className="reglink" style={{fontWeight:"bold"}} onClick={()=>{
+              window.require('electron').shell.openExternal("http://"+this.state.defaultDomain);
+            }}>{this.state.defaultDomain}</button> &nbsp;
+            {planInfo}{editPlanButton}
+          </span>
 
-      </ListItem>
+        </ListItem>
       )
     }
 
@@ -1155,68 +1135,53 @@ class Home extends React.Component<HomeProps, HomeState>{
             {this.renderPublishSiteDialog()}
 
             <RegisterDialog
-            onCancelClick={()=>{
-              this.setState({registerDialog: {...this.state.registerDialog, open:false}});
-              service.api.parentTempUnHideMobilePreview();
-            }}
-            onRegisterClick={({username, email})=>{ this.handleRegisterClick(username, email) }}
-            open={this.state.registerDialog != null && this.state.registerDialog.open}
-          />
+              onCancelClick={()=>{
+                this.setState({registerDialog: {...this.state.registerDialog, open:false}});
+                service.api.parentTempUnHideMobilePreview();
+              }}
+              onRegisterClick={({username, email})=>{ this.handleRegisterClick(username, email) }}
+              open={this.state.registerDialog != null && this.state.registerDialog.open}
+            />
 
             <ClaimDomainDialog
-            onCancelClick={()=>{
-              this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
-              service.api.parentTempUnHideMobilePreview();
-            }}
-            onClaimDomainClick={(obj)=>{ this.handleClaimDomainClick(obj) }}
-            username={this.state.username}
-            fingerprint={this.state.fingerprint}
-            open={this.state.claimDomainDialog != null && this.state.claimDomainDialog.open}
-          />
+              onCancelClick={()=>{
+                this.setState({claimDomainDialog: {...this.state.claimDomainDialog, open:false}});
+                service.api.parentTempUnHideMobilePreview();
+              }}
+              onClaimDomainClick={(obj)=>{ this.handleClaimDomainClick(obj) }}
+              username={this.state.username}
+              fingerprint={this.state.fingerprint}
+              open={this.state.claimDomainDialog != null && this.state.claimDomainDialog.open}
+            />
 
             <ConnectDomainDialog
-            onCancelClick={()=>{
-              this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
-              service.api.parentTempUnHideMobilePreview();
-            }}
-            onConnectDomainClick={(obj)=>{ this.handleConnectDomainClick() }}
-            username={this.state.username}
-            sitePath={pogoCloudPath}
-            fingerprint={this.state.fingerprint}
-            open={this.state.connectDomainDialog != null && this.state.connectDomainDialog.open}
-          />
-
-            <DisconnectDomainDialog
-            onCancelClick={
-              ()=>{
-                this.setState({disconnectDomainDialog: {...this.state.disconnectDomainDialog, open:false}});
+              onCancelClick={()=>{
+                this.setState({connectDomainDialog: {...this.state.connectDomainDialog, open:false}});
                 service.api.parentTempUnHideMobilePreview();
-              }
-            }
-            onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
-            username={this.state.username}
-            pogoCustomDomain={this.state.pogoCustomDomain}
-            sitePath={pogoCloudPath}
-            fingerprint={this.state.fingerprint}
-            open={this.state.disconnectDomainDialog != null && this.state.disconnectDomainDialog.open}
-          />
+              }}
+              onConnectDomainClick={(obj)=>{ this.handleConnectDomainClick() }}
+              username={this.state.username}
+              sitePath={pogoCloudPath}
+              fingerprint={this.state.fingerprint}
+              open={this.state.connectDomainDialog != null && this.state.connectDomainDialog.open}
+            />
 
             <EditPlanDialog
-            onCancelClick={()=>{
-              this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
-              service.api.parentTempUnHideMobilePreview();
-            }}
-            onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
-            onUnsubscribeClick={()=>{ this.handleUnsubscribeClick() }}
-            username={this.state.username}
-            pogoCustomDomain={this.state.pogoCustomDomain}
-            sitePath={pogoCloudPath}
-            fingerprint={this.state.fingerprint}
-            open={this.state.editPlanDialog!=null&&this.state.editPlanDialog.open}
-          />
+              onCancelClick={()=>{
+                this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
+                service.api.parentTempUnHideMobilePreview();
+              }}
+              onDisconnectDomainClick={()=>{ this.handleDisconnectDomainClick() }}
+              onUnsubscribeClick={()=>{ this.handleUnsubscribeClick() }}
+              username={this.state.username}
+              pogoCustomDomain={this.state.pogoCustomDomain}
+              sitePath={pogoCloudPath}
+              fingerprint={this.state.fingerprint}
+              open={this.state.editPlanDialog!=null&&this.state.editPlanDialog.open}
+            />
 
             <ProgressDialog
-            conf={this.state.progressDialogConf}
+              conf={this.state.progressDialogConf}
             />
 
 
@@ -1232,16 +1197,16 @@ class Home extends React.Component<HomeProps, HomeState>{
       return (
 
         <PublishSiteDialog
-        site={this.state.selectedSite}
-        workspace={this.state.publishSiteDialog.workspace}
-        workspaceHeader={this.state.publishSiteDialog.workspaceHeader}
-        onCancelClick={()=>{
-          this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
-          service.api.parentTempUnHideMobilePreview();
-        }}
-        onBuildAndPublishClick={this.handleBuildAndPublishClick}
-        open={this.state.publishSiteDialog!=null&&this.state.publishSiteDialog.open}
-      />
+          site={this.state.selectedSite}
+          workspace={this.state.publishSiteDialog.workspace}
+          workspaceHeader={this.state.publishSiteDialog.workspaceHeader}
+          onCancelClick={()=>{
+            this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
+            service.api.parentTempUnHideMobilePreview();
+          }}
+          onBuildAndPublishClick={this.handleBuildAndPublishClick}
+          open={this.state.publishSiteDialog!=null&&this.state.publishSiteDialog.open}
+        />
 
       )
     }

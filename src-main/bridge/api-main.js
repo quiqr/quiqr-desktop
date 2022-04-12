@@ -3,7 +3,6 @@ const {dirname}                 = require('path');
 const path                      = require('path');
 const glob                      = require('glob');
 const {shell}                   = require('electron');
-//const { promisify, inspect }             = require('util');
 const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
@@ -48,7 +47,6 @@ function getSiteServicePromise(siteKey){
       if(err) { reject(err); return; }
 
       let siteData = configurations.sites.find((x)=>x.key===siteKey);
-      //console.log(siteData);
 
       if(siteData==null) throw new Error('Could not find site is empty.');
 
@@ -229,6 +227,36 @@ api.getQuiqrProfile = async function({},context){
   }
 }
 
+api.registerPogoUser = async function({postData},context){
+  try{
+    let userObj = await cloudApiManager.registerPogoUser(postData);
+    context.resolve(userObj);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
+api.disconnectPogoDomain = async function({postData},context){
+  try{
+    let result = await cloudApiManager.disconnectPogoDomain(postData);
+    context.resolve(result);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
+api.resendConfirmationLinkPogoUser = async function({postData},context){
+  try{
+    let result = await cloudApiManager.resendConfirmationLinkPogoUser(postData);
+    context.resolve(result);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
 api.registerPogoDomain = async function({postData},context){
   try{
     let path = await cloudApiManager.registerPogoDomain(postData);
@@ -238,6 +266,17 @@ api.registerPogoDomain = async function({postData},context){
     context.reject(err);
   }
 }
+
+api.connectPogoDomain = async function({postData},context){
+  try{
+    let domain = await cloudApiManager.connectPogoDomain(postData);
+    context.resolve(domain);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
 
 api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;

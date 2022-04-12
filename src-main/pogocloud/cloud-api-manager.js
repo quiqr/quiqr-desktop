@@ -1,4 +1,4 @@
-/* Copyright Quiqr 2021
+/* Copyright Quiqr 2021-2022
  *
  * pim@quiqr.org
  *
@@ -36,7 +36,6 @@ class CloudApiManager{
             configurations.global.pogoboardConn.host+":"+
             configurations.global.pogoboardConn.port+"/site/invite-member/"+sitePath+"/"+email+"/"+requestVars;
 
-          console.log(url);
           const req = request({
             method: 'GET',
             url: url
@@ -110,7 +109,6 @@ class CloudApiManager{
           resolve(false);
         });
         req.on('response', (response) => {
-          console.log(response.statusCode);
           if(response.statusCode === 200){
             response.on('data',async (chunk) => {
               let obj = JSON.parse(chunk);
@@ -130,21 +128,156 @@ class CloudApiManager{
     });
   }
 
+  async registerPogoUser(postData){
+
+    return new Promise(resolve => {
+
+      configurationDataProvider.get( async (err, configurations)=>{
+
+        let data='';
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+"/user/new";
+
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          resolve(false);
+        });
+
+        req.on('response', (response) => {
+          if(response.statusCode === 200){
+
+            response.on('data',async (chunk) => {
+              data += chunk;
+            });
+
+            response.on('end', () => {
+              let obj = JSON.parse(data);
+              if(obj.hasOwnProperty('username')){
+                resolve(obj);
+              }
+              else{
+                resolve(false);
+              }
+            });
+
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
+      });
+
+    });
+  }
+
+  async disconnectPogoDomain(postData){
+
+    return new Promise(resolve => {
+
+      configurationDataProvider.get( async (err, configurations)=>{
+
+        let data='';
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+'/site/disconnect-domain';
+
+        console.log(url);
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          console.log(e);
+          resolve(false);
+        });
+
+        req.on('response', (response) => {
+          if(response.statusCode === 200){
+            response.on('end', () => {
+                resolve(true);
+            });
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
+      });
+
+    });
+  }
+
+
+
+  async resendConfirmationLinkPogoUser(postData){
+
+    return new Promise(resolve => {
+
+      configurationDataProvider.get( async (err, configurations)=>{
+
+        let data='';
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+'/resend-confirmation-link';
+
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          console.log(e);
+          resolve(false);
+        });
+
+        req.on('response', (response) => {
+          if(response.statusCode === 200){
+            response.on('end', () => {
+                resolve(true);
+            });
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
+      });
+
+    });
+  }
+
+
   async registerPogoDomain(postData){
 
     return new Promise(resolve => {
 
       configurationDataProvider.get( async (err, configurations)=>{
 
-        /*
-        let environmentResolver = new EnvironmentResolver();
-        var postData = JSON.stringify({
-          connect_code : connect_code,
-          pubkey: ""+pubkey,
-          pubkey_title: environmentResolver.getUPIS()
-        });
-        */
-          console.log(postData);
         let data='';
 
         let url = configurations.global.pogoboardConn.protocol+"//"+
@@ -165,7 +298,6 @@ class CloudApiManager{
         });
 
         req.on('response', (response) => {
-          console.log(response.statusCode);
           if(response.statusCode === 200){
 
             response.on('data',async (chunk) => {
@@ -182,6 +314,60 @@ class CloudApiManager{
               }
             });
 
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
+      });
+
+    });
+  }
+
+  async connectPogoDomain(postData){
+
+    return new Promise(resolve => {
+
+      configurationDataProvider.get( async (err, configurations)=>{
+
+        let data='';
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+'/site/connect-domain';
+
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          console.log(e);
+          resolve(false);
+        });
+
+        req.on('response', (response) => {
+          if(response.statusCode === 200){
+
+            response.on('data',async (chunk) => {
+              data += chunk;
+            });
+
+            response.on('end', () => {
+              let obj = JSON.parse(data);
+              if(obj.hasOwnProperty('domain')){
+                resolve(obj.domain);
+              }
+              else{
+                resolve(false);
+              }
+            });
           }
           else{
             resolve(false);

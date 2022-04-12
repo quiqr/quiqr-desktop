@@ -28,7 +28,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 app.setAsDefaultProtocolClient('quiqr');
 
-require('events').EventEmitter.prototype._maxListeners = 15;
+require('events').EventEmitter.prototype._maxListeners = 25;
 
 global.pogoconf = QuiqrAppConfig();
 global.outputConsole = outputConsole;

@@ -217,8 +217,24 @@ export class API {
     return mainProcessBridge.request('createPogoProfile',{obj});
   }
 
+  registerPogoUser(postData){
+    return mainProcessBridge.request('registerPogoUser',{postData});
+  }
+
+  resendConfirmationLinkPogoUser(postData){
+    return mainProcessBridge.request('resendConfirmationLinkPogoUser',{postData});
+  }
+
   registerPogoDomain(postData){
     return mainProcessBridge.request('registerPogoDomain',{postData});
+  }
+
+  connectPogoDomain(postData){
+    return mainProcessBridge.request('connectPogoDomain',{postData});
+  }
+
+  disconnectPogoDomain(postData){
+    return mainProcessBridge.request('disconnectPogoDomain',{postData});
   }
 
   createPogoDomainConf(path: string, domain: string){
