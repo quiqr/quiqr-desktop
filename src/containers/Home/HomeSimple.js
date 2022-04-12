@@ -384,6 +384,8 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   handleConnectDomainClick(){
+    this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+    /*
     var stateUpdate  = {};
     stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
     this.setState(stateUpdate,()=>{
@@ -391,6 +393,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
       //this.setState({oneTimeConnectClick:"Success"});
     });
+    */
   }
 
   handleDeleteSiteFromCloudClick(){
@@ -406,6 +409,9 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   handleDisconnectDomainClick(){
+
+    this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+    /*
     var stateUpdate  = {};
     stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
     stateUpdate.pogoCustomDomain = "not set";
@@ -414,6 +420,7 @@ class Home extends React.Component<HomeProps, HomeState>{
       //service.api.logToConsole("finished disconnecting domain")
       this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
     });
+    */
   }
 
   checkLinkedPogoCloudPath(){

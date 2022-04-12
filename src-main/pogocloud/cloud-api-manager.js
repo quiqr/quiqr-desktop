@@ -8,6 +8,7 @@ const request                   = require('request');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudGitManager           = require('./cloud-git-manager');
+const cloudCacheManager         = require('./cloud-cache-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 
 class CloudApiManager{
@@ -215,6 +216,9 @@ class CloudApiManager{
               let pogopubl = new PogoPublisher({});
               await pogopubl.UnlinkCloudPath();
 
+              //NOTE this is an example how to update cache in the background
+              cloudCacheManager.updateUserRemoteCaches()
+
               resolve(true);
             });
           }
@@ -352,9 +356,15 @@ class CloudApiManager{
               data += chunk;
             });
 
-            response.on('end', () => {
+            response.on('end', async () => {
               let obj = JSON.parse(data);
               if(obj.hasOwnProperty('path')){
+
+                let pogopubl = new PogoPublisher({});
+                await pogopubl.writeDomainInfo(obj.path, obj.path+".quiqr.cloud")
+
+                cloudCacheManager.updateUserRemoteCaches();
+
                 resolve(obj.path);
               }
               else{

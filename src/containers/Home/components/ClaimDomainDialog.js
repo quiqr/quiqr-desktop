@@ -57,10 +57,11 @@ export default class ClaimDomainDialog extends React.Component{
 
       if(path){
 
-        let promise = service.api.createPogoDomainConf(path, path+".quiqr.cloud");
+        this.props.onClaimDomainClick({ pogourl: path });
+        /*let promise = service.api.createPogoDomainConf(path, path+".quiqr.cloud");
         promise.then((path2)=>{
-          this.props.onClaimDomainClick({ pogourl: path2 });
         });
+        */
       }
       else{
         this.setState({
@@ -165,7 +166,7 @@ export default class ClaimDomainDialog extends React.Component{
       />,
       <FlatButton
         disabled={!valid}
-        label="Claim domain"
+        label="Claim Quiqr Subdomain"
         primary={true}
         onClick={this.handleDomainClaimClick}
       />,
