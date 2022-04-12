@@ -72,51 +72,6 @@ export default class ClaimDomainDialog extends React.Component{
       this.setState({ busy: false });
 
     });
-
-    /*
-
-    let data='';
-    let request = net.request({
-      method: 'POST',
-      protocol: this.state.pogoboardConn.protocol,
-      hostname: this.state.pogoboardConn.host,
-      port: this.state.pogoboardConn.port,
-      path: '/site/new',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': postData.length
-      }
-    })
-
-    request.on('response', (response) => {
-
-      response.on('end', () => {
-        let obj = JSON.parse(data);
-        if(obj.hasOwnProperty('path')){
-
-          let promise = service.api.createPogoDomainConf(obj.path, obj.path+".quiqr.cloud");
-          promise.then((path)=>{
-            this.props.onClaimDomainClick({ pogourl: path });
-          });
-        }
-        else{
-          this.setState({
-            failure: true
-          });
-        }
-
-        this.setState({ busy: false });
-      });
-
-      response.on("data", chunk => {
-        data += chunk;
-      });
-
-    })
-    request.write(postData)
-    request.end()
-    */
-
   }
 
   handlepogourlChange(e){
