@@ -15,6 +15,7 @@ const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
+const cloudApiManager           = require('../pogocloud/cloud-api-manager');
 const cloudGitManager           = require('../pogocloud/cloud-git-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 
@@ -227,6 +228,21 @@ api.getQuiqrProfile = async function({},context){
     context.resolve(false);
   }
 }
+
+api.registerPogoDomain = async function({postData},context){
+  try{
+    let path = await cloudApiManager.registerPogoDomain(postData);
+    context.resolve(path);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
+api.getCurrentSiteKey = async function(){
+  return await global.currentSiteKey;
+}
+
 api.createPogoDomainConf = async function({path,domain},context){
   let pogopubl = new PogoPublisher({});
   await pogopubl.writeDomainInfo(path,domain)

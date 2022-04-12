@@ -129,6 +129,71 @@ class CloudApiManager{
 
     });
   }
+
+  async registerPogoDomain(postData){
+
+    return new Promise(resolve => {
+
+      configurationDataProvider.get( async (err, configurations)=>{
+
+        /*
+        let environmentResolver = new EnvironmentResolver();
+        var postData = JSON.stringify({
+          connect_code : connect_code,
+          pubkey: ""+pubkey,
+          pubkey_title: environmentResolver.getUPIS()
+        });
+        */
+          console.log(postData);
+        let data='';
+
+        let url = configurations.global.pogoboardConn.protocol+"//"+
+          configurations.global.pogoboardConn.host+":"+
+          configurations.global.pogoboardConn.port+"/site/new";
+
+        const req = request({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+          },
+          url: url
+        });
+        req.on('error', (e) => {
+          console.log(e);
+          resolve(false);
+        });
+
+        req.on('response', (response) => {
+          console.log(response.statusCode);
+          if(response.statusCode === 200){
+
+            response.on('data',async (chunk) => {
+              data += chunk;
+            });
+
+            response.on('end', () => {
+              let obj = JSON.parse(data);
+              if(obj.hasOwnProperty('path')){
+                resolve(obj.path);
+              }
+              else{
+                resolve(false);
+              }
+            });
+
+          }
+          else{
+            resolve(false);
+          }
+        });
+        req.write(postData)
+        req.end()
+
+      });
+
+    });
+  }
 }
 
 module.exports = new CloudApiManager;

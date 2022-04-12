@@ -217,6 +217,10 @@ export class API {
     return mainProcessBridge.request('createPogoProfile',{obj});
   }
 
+  registerPogoDomain(postData){
+    return mainProcessBridge.request('registerPogoDomain',{postData});
+  }
+
   createPogoDomainConf(path: string, domain: string){
     return mainProcessBridge.request('createPogoDomainConf',{path, domain});
   }

@@ -52,6 +52,29 @@ export default class ClaimDomainDialog extends React.Component{
     }
     var postData = JSON.stringify({sitename : pogourl, username: username, fingerprint: fingerprint});
 
+    let promise = service.api.registerPogoDomain(postData);
+    promise.then((path)=>{
+      service.api.logToConsole(path);
+
+      if(path){
+
+        let promise = service.api.createPogoDomainConf(path, path+".quiqr.cloud");
+        promise.then((path2)=>{
+          this.props.onClaimDomainClick({ pogourl: path2 });
+        });
+      }
+      else{
+        this.setState({
+          failure: true
+        });
+      }
+
+      this.setState({ busy: false });
+
+    });
+
+    /*
+
     let data='';
     let request = net.request({
       method: 'POST',
@@ -92,6 +115,7 @@ export default class ClaimDomainDialog extends React.Component{
     })
     request.write(postData)
     request.end()
+    */
 
   }
 
