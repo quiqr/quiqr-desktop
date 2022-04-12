@@ -646,9 +646,10 @@ resources: []\n\
         mainWindow.webContents.send("frontEndBusy");
         global.pogoconf.setCurrectUsername(null);
         global.pogoconf.setSitesListingView('all');
+
         global.pogoconf.saveState().then( ()=>{
-          global.mainWM.closeSiteAndShowSelectSites();
-          this.createMainMenu();
+          app.relaunch()
+          app.exit()
         });
       }});
 
