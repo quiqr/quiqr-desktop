@@ -647,11 +647,12 @@ class Home extends React.Component<HomeProps, HomeState>{
             }
 
             this.setState({
-              pogoSiteStatus:   obj.pogo_plan_status,
-              pogoUserRole:     obj.role,
-              pogoSitePlan:     obj.pogo_plan_name,
-              pogoCustomDomain: custom_domain,
-              defaultDomain:    defaultDomain,
+              pogoSiteStatus:     obj.pogo_plan_status,
+              pogoStripeSubscrID: obj.pogo_plan_stripe_subscription_id,
+              pogoUserRole:       obj.role,
+              pogoSitePlan:       obj.pogo_plan_name,
+              pogoCustomDomain:   custom_domain,
+              defaultDomain:      defaultDomain,
             },function(){
 
 
@@ -690,7 +691,15 @@ class Home extends React.Component<HomeProps, HomeState>{
   }
 
   handleUnsubscribeClick(){
+
     this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
+    //this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
+    this.setState({
+      oneTimeOnlySiteActive: false,
+      pogoSiteStatus: "no_plan"
+    });
+
+    /*
     service.api.parentTempUnHideMobilePreview();
 
     let userVars = {
@@ -703,6 +712,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     let url = this.state.pogostripeConn.protocol+"//"+
       this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/myaccount/"+requestVars;
     window.require('electron').shell.openExternal(url);
+    */
   }
 
   handleUpgradeLinkedSite(pressed){
@@ -1204,6 +1214,7 @@ class Home extends React.Component<HomeProps, HomeState>{
               username={this.state.username}
               pogoCustomDomain={this.state.pogoCustomDomain}
               pogoSiteStatus={this.state.pogoSiteStatus}
+              pogoStripeSubscrID={this.state.pogoStripeSubscrID}
               sitePath={pogoCloudPath}
               fingerprint={this.state.fingerprint}
               open={this.state.editPlanDialog!=null&&this.state.editPlanDialog.open}

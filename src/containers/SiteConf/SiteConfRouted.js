@@ -1,7 +1,7 @@
 import * as React        from 'react';
 import { Switch, Route } from 'react-router-dom';
-//import  {SiteConf,SiteConfDanger}         from './SiteConf';
-import  SiteConfGeneral   from './SiteConfGeneral';
+import  SiteConfGeneral  from './SiteConfGeneral';
+import  SiteConfModel    from './SiteConfModel';
 import  SiteConfDanger   from './SiteConfDanger';
 
 export class SiteConfRouted extends React.Component {
@@ -18,6 +18,12 @@ export class SiteConfRouted extends React.Component {
 
       <Route path='/siteconf/:site/workspaces/:workspace/general' exact render={ ({match})=> {
         return <SiteConfGeneral
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+      <Route path='/siteconf/:site/workspaces/:workspace/model' exact render={ ({match})=> {
+        return <SiteConfModel
         siteKey={ decodeURIComponent(match.params.site) }
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />

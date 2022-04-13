@@ -35,6 +35,7 @@ class SiteConfGeneral extends React.Component {
       siteconf : {},
       source : {},
       publish : {},
+      parseInfo : {},
       quiqrCloud : {}
     };
   }
@@ -61,6 +62,7 @@ class SiteConfGeneral extends React.Component {
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
       var stateUpdate  = {};
       stateUpdate.siteconf = bundle.site;
+
 
       if(bundle.site.source){
         this.setState({source: bundle.site.source});
@@ -90,7 +92,8 @@ class SiteConfGeneral extends React.Component {
     const { classes } = this.props;
     return (
       <div className={ this.props.classes.container }>
-        <Typography variant="h4">Site Configuration: {this.props.siteKey}</Typography>
+        <Typography variant="h4">Site: {this.props.siteKey}</Typography>
+        <Typography variant="h5">General Configuration</Typography>
 
         <div className={classes.root}>
 

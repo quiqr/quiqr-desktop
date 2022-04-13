@@ -1,7 +1,9 @@
 import SiteConfGeneral from './SiteConfGeneral';
-import SiteConfDanger from './SiteConfDanger';
+import SiteConfModel   from './SiteConfModel';
+import SiteConfDanger  from './SiteConfDanger';
 
 export {SiteConfGeneral}
+export {SiteConfModel}
 export {SiteConfDanger}
 export {SiteConfRouted}  from './SiteConfRouted';
 export {SiteConfSidebar} from './SiteConfSidebar';

@@ -12,6 +12,10 @@ export class API {
     return mainProcessBridge.request('listWorkspaces', {siteKey});
   }
 
+  getWorkspaceModelParseInfo(siteKey: string, workspaceKey: string): AbortablePromise<WorkspaceConfig>{
+    return mainProcessBridge.request('getWorkspaceModelParseInfo', {siteKey, workspaceKey});
+  }
+
   getWorkspaceDetails(siteKey: string, workspaceKey: string): AbortablePromise<WorkspaceConfig>{
     return mainProcessBridge.request('getWorkspaceDetails', {siteKey, workspaceKey});
   }

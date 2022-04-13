@@ -2,7 +2,7 @@ import * as React           from 'react';
 import { Route }            from 'react-router-dom';
 import { Sidebar }          from './../Sidebar';
 import type { SidebarMenu } from './../Sidebar';
-import service              from './../../services/service';
+//import service              from './../../services/service';
 
 
 export class SiteConfSidebar extends React.Component {
@@ -24,8 +24,14 @@ export class SiteConfSidebar extends React.Component {
             active: true,
             label: "General",
             onClick: ()=>{
-              service.api.logToConsole(`${basePath}/general/`);
               history.push(`${basePath}/general/`)
+            }
+          },
+          {
+            active: true,
+            label: "Model",
+            onClick: ()=>{
+              history.push(`${basePath}/model/`)
             }
           },
           /*

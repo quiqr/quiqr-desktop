@@ -3,6 +3,7 @@ import Spinner                from './../../../components/Spinner'
 import service                from './../../../services/service';
 import { Dialog, FlatButton } from 'material-ui-02';
 import Button                 from '@material-ui/core/Button';
+let net = window.require('electron').remote.net;
 
 
 export default class EditPlanDialog extends React.Component{
@@ -24,6 +25,7 @@ export default class EditPlanDialog extends React.Component{
   componentDidMount(){
     service.getConfigurations().then((c)=>{
       var stateUpdate  = {};
+      stateUpdate.pogostripeConn = c.global.pogostripeConn;
       stateUpdate.pogoboardConn = c.global.pogoboardConn;
       this.setState(stateUpdate);
     })
@@ -39,7 +41,30 @@ export default class EditPlanDialog extends React.Component{
       this.setState({firstunsubscribe: false});
     }
     else{
-      this.props.onUnsubscribeClick();
+
+      let unsubVars = {
+        username: this.props.username,
+        fingerprint: this.props.fingerprint,
+        projectPath:  this.props.sitePath,
+      };
+
+      let requestVars =btoa(JSON.stringify(unsubVars));
+      let url = this.state.pogostripeConn.protocol+"//"+ this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/unsubscribe/"+requestVars;
+
+      let data='';
+      const request = net.request(url);
+      request.on('response', (response) => {
+        response.on('end', () => {
+          let obj = JSON.parse(data);
+          service.api.logToConsole(obj.id, "subscription canceled")
+          this.props.onUnsubscribeClick();
+        });
+        response.on("data", chunk => {
+          data += chunk;
+        });
+      })
+      request.end()
+
     }
   }
 
