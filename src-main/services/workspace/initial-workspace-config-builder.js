@@ -48,7 +48,7 @@ class InitialWorkspaceConfigBuilder{
           "key": "frontpage",
           "title": "Front Page",
           "file": "content/_index.md",
-          "_mergeFromPartial": "page"
+          "_mergePartial": "page"
         },
         {
           "key": "mainConfig",
@@ -95,7 +95,7 @@ class InitialWorkspaceConfigBuilder{
         "folder": "content/page/",
         "extension": "md",
         "itemtitle": "Page",
-        "_mergeFromPartial": "page"
+        "_mergePartial": "page"
       }
     ];
 

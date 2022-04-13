@@ -139,7 +139,7 @@ class WorkspaceConfigValidator {
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
         previewUrl: joi.string().trim(),
         fields: joi.array().min(1).required().error(new Error('The singles.fields value is invalid.')),
-        _mergeFromPartial: joi.any().forbidden().error(new Error('The singles.mergeFromPartial value could not be parsed. Check file paths'))
+        _mergePartial: joi.any().forbidden().error(new Error('The singles.mergePartial value could not be parsed. Check file paths'))
       })
     ).error;
 

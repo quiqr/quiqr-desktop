@@ -161,10 +161,17 @@ api.savePrefKey = async function({prefKey, prefValue}, context){
 }
 */
 
+api.getWorkspaceModelParseInfo =  async function({siteKey, workspaceKey}, context){
+  const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
+  let modelParseInfo;
+  modelParseInfo = await workspaceService.getModelParseInfo();
+  context.resolve(modelParseInfo);
+}
+
 
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
-  let configuration ;
+  let configuration;
   try{
     configuration = await workspaceService.getConfigurationsData();
     global.currentSiteKey = siteKey;

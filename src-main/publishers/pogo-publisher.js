@@ -499,7 +499,7 @@ class PogoPublisher {
     var full_gh_url = 'git@gl.quiqr.org:' + group + '/' + repository +'.git';
     var full_gh_dest = resolvedDest + '' + repository;
     var gitignore = "/public\n\
-.sukoh\n";
+.quiqr-cache\n";
 
     var gitlabCi = "include:\n\
   - project: 'system/quiqr-build-include'\n\

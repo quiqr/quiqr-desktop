@@ -16,7 +16,7 @@ const pathHelper                  = require('../utils/path-helper');
 const hugoDownloader              = require('../hugo/hugo-downloader')
 const HugoBuilder                 = require('../hugo/hugo-builder');
 const SiteService                 = require('../services/site/site-service')
-const { WorkspaceConfigProvider } = require('../services/workspace/workspace-config-provider');
+//const { WorkspaceConfigProvider } = require('../services/workspace/workspace-config-provider');
 const PogoPublisher               = require('../publishers/pogo-publisher');
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
@@ -25,7 +25,7 @@ const app = electron.app
 let menuObject = null;
 const apiMain = global.apiMain;
 
-const workspaceConfigProvider = new WorkspaceConfigProvider();
+//const workspaceConfigProvider = new WorkspaceConfigProvider();
 
 let context = {};
 context.reject = function(error){
@@ -236,7 +236,7 @@ class MenuManager {
     await pogopubl.createSiteFromThemeGitUrl();
   }
 
-  //MOVE TO SEPERATE FILE
+  /*
   async generateModel() {
 
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -321,6 +321,7 @@ resources: []\n\
       }
     }
   }
+  */
 
   showVersion(){
     const idPath = path.join(pathHelper.getApplicationResourcesDir(),"all","build-git-id.txt");

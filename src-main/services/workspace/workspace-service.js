@@ -33,6 +33,11 @@ class WorkspaceService{
     workspaceConfigProvider.clearCache();
   }
 
+  async getModelParseInfo(){
+    await workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
+    return workspaceConfigProvider.getModelParseInfo();
+  }
+
   async _smartResolveFormatProvider(filePath , fallbacks ){
     let formatProvider;
     if(contentFormats.isContentFile(filePath)){
@@ -495,9 +500,9 @@ class WorkspaceService{
       folder = collection.folder;
     }
 
-    let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
+    let thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', folder, itemPath, targetPath);
     if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
-      thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', targetPath);
+      thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', targetPath);
     }
 
     let thumbSrcExists = await this.existsPromise(thumbSrc);
@@ -540,7 +545,7 @@ class WorkspaceService{
       return 'NOT_FOUND';
     }
 
-    let thumbSrc = path.join(this.workspacePath, '.sukoh/thumbs', folder, itemPath, targetPath);
+    let thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', folder, itemPath, targetPath);
     let thumbSrcExists = await this.existsPromise(thumbSrc);
     let ext = path.extname(thumbSrc).replace('.','').toLowerCase();
 

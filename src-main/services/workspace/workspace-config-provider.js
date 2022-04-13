@@ -11,16 +11,23 @@ const deepmerge                     = require('deepmerge');
 class WorkspaceConfigProvider{
 
   constructor(){
-    this.cache = {};
-  }
+    this.clearCache();
+   }
 
   clearCache(){
     this.cache = {};
+    this.parseInfo = {};
+    this.parseInfo.baseFile = '';
+    this.parseInfo.includeFiles = [];
+    this.parseInfo.partialFiles = [];
   }
 
   async getConfig(workspacePath, workspaceKey){
 
     let filePath = this._getFilePath(workspacePath);
+
+    this.parseInfo.baseFile = filePath;
+
     let config;
     let token;
 
@@ -62,22 +69,18 @@ Happy Creating.
 ❤️ Quiqr
         `.trim()
         );
-
       }
-
     }
 
     config = this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
     config.path = workspacePath;
     config.key = workspaceKey;
 
-
     this.cache[filePath] = { token, config }
     return config;
-
   }
 
-  //CREATE quiqr/base.yaml
+  //get path of quiqr/base.yml|yaml|toml|json
   _getFilePath(workspacePath){
 
     let fileExpPrimary = path.join(workspacePath,'quiqr','model','base.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
@@ -166,7 +169,8 @@ Happy Creating.
     let fileIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     let files = glob.sync(fileIncludes);
 
-    let newObject = {}
+    let newObject = {};
+
     files.forEach((filename)=>{
 
       let strData = fs.readFileSync(filename,'utf8');
@@ -176,6 +180,8 @@ Happy Creating.
       }
       let mergeData = formatProvider.parse(strData);
 
+      this.parseInfo.includeFiles.push({key:path.parse(filename).name,filename: filename});
+
       newObject[path.parse(filename).name] = deepmerge(mergeData, configObject[path.parse(filename).name]);
 
     });;
@@ -183,12 +189,28 @@ Happy Creating.
     return {...configObject, ...newObject}
   }
 
+
   _mergePartials(mergeKey, workspacePath){
-    if( "_mergeFromPartial" in mergeKey){
-      let filePartial = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergeFromPartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+
+    if( "_mergePartial" in mergeKey){
+
+      let filePartial = "";
+      if(mergeKey._mergePartial.startsWith("file://")) {
+        filePartial = mergeKey._mergePartial.substring(7);
+        //TODO implement relative path
+      }
+      else if(mergeKey._mergePartial.startsWith("http://") ||mergeKey._mergePartial.startsWith("https://") ){
+
+      }
+      else{
+        filePartial = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+      }
 
       let files = glob.sync(filePartial);
+      //console.log(files);
       if( files.length > 0 && fs.existsSync(files[0]) ){
+
+        this.parseInfo.partialFiles.push({key:mergeKey.key, filename: files[0]});
 
         let strData = fs.readFileSync(files[0],'utf8');
         let formatProvider = formatProviderResolver.resolveForFilePath(files[0]);
@@ -210,10 +232,14 @@ Happy Creating.
         mergeKey = newData;
 
         //ONLY WHEN MERGE WAS SUCCESFULL DELETE THE KEY TO PREVENT ERROR.
-        delete mergeKey['_mergeFromPartial'];
+        delete mergeKey['_mergePartial'];
       }
     }
     return mergeKey;
+  }
+
+  getModelParseInfo(){
+    return this.parseInfo;
   }
 }
 
