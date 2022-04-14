@@ -1,5 +1,7 @@
 # Quiqr App CHANGELOG
 
+## **WORK IN PROGRESS**
+- only mac build
 
 ## 0.10.3 (2022-04-14)
 - BREAKING: change mergeFromPartial to mergePartial
