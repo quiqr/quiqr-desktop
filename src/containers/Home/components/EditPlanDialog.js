@@ -56,8 +56,14 @@ export default class EditPlanDialog extends React.Component{
       request.on('response', (response) => {
         response.on('end', () => {
           let obj = JSON.parse(data);
-          service.api.logToConsole(obj.id, "subscription canceled")
-          this.props.onUnsubscribeClick();
+          if(obj.status === 'canceled'){
+            this.props.onUnsubscribeClick();
+          }
+          else {
+            this.setState({
+              failure: true
+            });
+          }
         });
         response.on("data", chunk => {
           data += chunk;
@@ -92,15 +98,7 @@ export default class EditPlanDialog extends React.Component{
       let promise = service.api.deleteSiteFromCloud(postData);
       promise.then((result)=>{
         if(result){
-          service.api.logToConsole('deleted');
           this.props.onDeleteSiteFromCloudClick();
-          /*
-        let promise2 = service.api.UnlinkCloudPath(sitePath);
-        promise2.then(()=>{
-          service.api.logToConsole('disconnect');
-          this.props.onDisconnectDomainClick();
-        });
-        */
         }
         else{
           this.setState({
@@ -143,7 +141,7 @@ export default class EditPlanDialog extends React.Component{
       if(result){
         let promise2 = service.api.createPogoDomainConf(sitePath, sitePath+".quiqr.cloud");
         promise2.then(()=>{
-          service.api.logToConsole('disconnect');
+          //service.api.logToConsole('disconnect');
           this.props.onDisconnectDomainClick();
         });
       }
