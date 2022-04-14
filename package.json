@@ -10,7 +10,7 @@
     "url": "https://github.com/quiqr/quiqr-desktop.git"
   },
   "description": "CMS with a Hugo Engine",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "private": true,
   "dependencies": {
     "7zip-bin": "3.1.0",
