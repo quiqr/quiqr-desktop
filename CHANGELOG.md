@@ -1,4 +1,16 @@
 # Quiqr App CHANGELOG
+
+## **WORK IN PROGRESS**
+- BREAKING: change mergeFromPartial to mergePartial
+- concept: add file:// URI protocol possibility to partial
+- show read only quiqr-model parse information
+- move post-requests to src-main
+- improve quiqrcloud plan:
+  - delete form cloud
+  - unsubscribe plan
+  - move all actions to dialog
+  - chain check delete actions
+
 ## 0.10.2 (2022-04-09)
 - new type: font-picker
 - new type: image-select
