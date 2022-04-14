@@ -208,6 +208,8 @@ async function handlePogoUrl(event, schemeData){
     }
 }
 
+
+/*
 function importPogoFile(path){
 
     if(path.split('.').pop()=='pogosite'){
@@ -224,7 +226,6 @@ function importPogoFile(path){
     }
 }
 
-
 app.on('open-file', (event, path) => {
     event.preventDefault();
 
@@ -233,15 +234,11 @@ app.on('open-file', (event, path) => {
     }
     else{
         app.whenReady().then(() => {
-            /*
-            if (mainWindow === null) {
-                createWindow();
-            }
-            */
-            importPogoFile(path);
+             importPogoFile(path);
         });
     }
 });
+*/
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
