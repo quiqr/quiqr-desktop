@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.10.3 (2022-04-14)
 - BREAKING: change mergeFromPartial to mergePartial
 - concept: add file:// URI protocol possibility to partial
 - show read only quiqr-model parse information
