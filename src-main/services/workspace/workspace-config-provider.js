@@ -78,9 +78,6 @@ Happy Creating.
     config.path = workspacePath;
     config.key = workspaceKey;
 
-    console.log("getGonfig")
-    console.log(config)
-
     this.cache[filePath] = { token, config }
     return config;
   }
@@ -138,15 +135,12 @@ Happy Creating.
 
     let dataPhase1Parse = formatProvider.parse(strData);
     let dataPhase2Merged = await this._postProcessConfigObject(dataPhase1Parse , workspacePath);
-    //console.log(JSON.stringify(dataPhase2Merged));
-    //console.log(JSON.stringify(dataPhase2Merged));
 
     let validator = new WorkspaceConfigValidator();
     let result = validator.validate(dataPhase2Merged);
     if(result)
       throw new Error(result);
 
-    console.log("dataPhase2Merged");
     return dataPhase2Merged;
   }
 
@@ -160,41 +154,53 @@ Happy Creating.
 
     // MERGE INCLUDES
     configOrg = this._loadIncludes(configOrg, workspacePath);
-    //console.log(configOrg.hugover)
 
     let newSingles = [];
-    await Promise.all(configOrg.singles.map(async (x) => {
-      let mp =  await this.getMergePartialResult(x,workspacePath)
-      //console.log(mp)
-      newSingles.push(mp);
-    }));
+    let newCollections = [];
 
+
+    await Promise.all(
+      [
+        configOrg.singles.map(async (x) => {
+          let mp =  await this.getMergePartialResult(x,workspacePath)
+          newSingles.push(mp);
+        }),
+        configOrg.collections.map(async (x) => {
+          let mp =  await this.getMergePartialResult(x,workspacePath)
+          newCollections.push(mp);
+        })
+      ]
+    );
+
+    /*
+    await Promise.all(
+        configOrg.singles.map(async (x) => {
+          let mp =  await this.getMergePartialResult(x,workspacePath)
+          newSingles.push(mp);
+        }),
+    );
+    */
 
     configOrg.singles = newSingles;
-    configOrg.collections = [];
-    //configOrg.singles = [];
+    configOrg.collections = newCollections;
 
     // CLEANUP
     if(configOrg.menu.length < 1) delete configOrg['menu'];
     if(configOrg.collections.length < 1) delete configOrg['collections'];
     if(configOrg.singles.length < 1) delete configOrg['singles'];
 
-
-    console.log("_postProcessConfigObject")
-    console.log(configOrg)
-
     return configOrg;
-    //console.log(configOrg.singles)
-    //console.log(configOrg.singles)
-    //
-    //
+  }
 
+  async getMergePartialResult(mergeKey, workspacePath){
+    let result = await this._mergePartials(mergeKey, workspacePath);
+    return result
+  }
 
-    //})();
-
-    //configOrg.singles = singlesNew;
-
-
+   createPartialsRemoteCacheDir(workspacePath){
+    const filePartialDir = path.join(workspacePath,'quiqr','model','partialsRemoteCache');
+    fs.ensureDirSync(filePartialDir);
+    return filePartialDir;
   }
 
   _loadIncludes(configObject, workspacePath){
@@ -221,19 +227,10 @@ Happy Creating.
     return {...configObject, ...newObject}
   }
 
-  async getMergePartialResult(mergeKey, workspacePath){
-    let result = await this._mergePartials(mergeKey, workspacePath);
-    //await Promise.all(result);
-    return result
+  getEncodedDestinationPath(filePartialDir, mergeKey){
+    let encodeFilename = encodeURIComponent(mergeKey._mergePartial);
+    return path.join(filePartialDir,encodeFilename);
   }
-  /*
-  getMergePartialResult(mergeKey, workspacePath) {
-    this._mergePartials(mergeKey, workspacePath)
-      .then(function(response) {
-        return response;
-      })
-  }
-  */
 
   _mergePartials(mergeKey, workspacePath){
 
@@ -244,17 +241,22 @@ Happy Creating.
         let filePartial = "";
 
         if(mergeKey._mergePartial.startsWith("file://")) {
-          filePartial = mergeKey._mergePartial.substring(7);
-          //TODO implement relative path
+
+          filePartial = this.getEncodedDestinationPath( this.createPartialsRemoteCacheDir(workspacePath), mergeKey );
+
+          if(!fs.existsSync(filePartial) ){
+            console.log("copy file://");
+            await fs.copySync(mergeKey._mergePartial.substring(7), filePartial);
+          }
         }
         else if(mergeKey._mergePartial.startsWith("http://") || mergeKey._mergePartial.startsWith("https://") ){
 
-          const filePartialDir = path.join(workspacePath,'.quiqr-cache','model','partials');
-          await fs.ensureDirSync(filePartialDir);
+          filePartial = this.getEncodedDestinationPath( this.createPartialsRemoteCacheDir(workspacePath), mergeKey );
 
-          let encodeFilename = encodeURIComponent(mergeKey._mergePartial);
-          let destination = path.join(filePartialDir,encodeFilename);
-          filePartial = await this._getRemotePartial(mergeKey._mergePartial, destination);
+          if(!fs.existsSync(filePartial) ){
+            console.log("copy https://");
+            await this._getRemotePartial(mergeKey._mergePartial, filePartial);
+          }
 
         }
         else{
@@ -265,10 +267,6 @@ Happy Creating.
           }
         }
 
-        //console.log(files[0]);
-
-        //console.log("NEXT")
-        //console.log(filePartial);
         if(filePartial && fs.existsSync(filePartial) ){
 
           this.parseInfo.partialFiles.push({key:mergeKey.key, filename: filePartial});
@@ -297,7 +295,6 @@ Happy Creating.
         }
       }
 
-      //console.log(mergeKey)
       resolve(mergeKey);
 
     });
@@ -328,7 +325,6 @@ Happy Creating.
         response.on('end', async () => {
           try{
             fs.writeFileSync( destination, data);
-            //console.log(destination)
             resolve(destination);
           }
           catch(e){
@@ -337,10 +333,8 @@ Happy Creating.
 
         });
         response.on("close", () => {
-          //console.log("close")
         });
         response.on("data", chunk => {
-          //console.log("thefile");
           data += chunk;
         });
       })

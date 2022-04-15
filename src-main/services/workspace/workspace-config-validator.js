@@ -21,8 +21,6 @@ class WorkspaceConfigValidator {
 
   validate(config){
 
-    console.log("VALIDATE")
-    console.log(config)
     this.normalizeConfig(config);
 
     let validationError = joi.validate(config,
