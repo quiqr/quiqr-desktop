@@ -53,6 +53,10 @@ module.exports = function (options) {
     state.experimentalFeatures = toggle;
   }
   /* toggle: bool */
+  function setDisablePartialCache(toggle){
+    state.disablePartialCache = toggle;
+  }
+  /* toggle: bool */
   function setExpPreviewWindow(toggle){
     state.expPreviewWindow = toggle;
   }
@@ -107,6 +111,7 @@ module.exports = function (options) {
     },
     skipWelcomeScreen: false,
     experimentalFeatures: false,
+    disablePartialCache: false,
     expPreviewWindow: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
@@ -121,6 +126,7 @@ module.exports = function (options) {
     get currentUsername() { return state.currentUsername; },
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
     get experimentalFeatures() { return state.experimentalFeatures; },
+    get disablePartialCache() { return state.disablePartialCache; },
     get expPreviewWindow() { return state.expPreviewWindow; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
@@ -133,6 +139,7 @@ module.exports = function (options) {
     setCurrectUsername,
     setSkipWelcomeScreen,
     setExperimentalFeatures,
+    setDisablePartialCache,
     setExpPreviewWindow,
     setDevLocalApi,
     setDevDisableAutoHugoServe,

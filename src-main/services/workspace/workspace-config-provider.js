@@ -8,6 +8,7 @@ const pathHelper                    = require('./../../utils/path-helper');
 const formatProviderResolver        = require('./../../utils/format-provider-resolver');
 const deepmerge                     = require('deepmerge');
 const request                       = require('request');
+const rimraf                        = require("rimraf");
 
 
 class WorkspaceConfigProvider{
@@ -22,6 +23,19 @@ class WorkspaceConfigProvider{
     this.parseInfo.baseFile = '';
     this.parseInfo.includeFiles = [];
     this.parseInfo.partialFiles = [];
+
+    /*
+    try{
+      console.log(this.partialRemoteCacheDir(global.currentSitePath));
+      console.log(global.currentSitePath);
+    }
+    catch(e){
+      //console.log(e)
+    }
+    if(global.currentSitePath && fs.existsSync(this.partialRemoteCacheDir(global.currentSitePath)) ){
+      rimraf.sync(this.partialRemoteCacheDir(global.currentSitePath));
+    }
+    */
   }
 
   async getConfig(workspacePath, workspaceKey){
@@ -188,8 +202,13 @@ Happy Creating.
     return result
   }
 
-   createPartialsRemoteCacheDir(workspacePath){
-    const filePartialDir = path.join(workspacePath,'quiqr','model','partialsRemoteCache');
+  partialRemoteCacheDir(workspacePath){
+    let newPath = path.join(workspacePath,'quiqr','model','partialsRemoteCache');
+    return newPath;
+  }
+
+  createPartialsRemoteCacheDir(workspacePath){
+    const filePartialDir = this.partialRemoteCacheDir(workspacePath)
     fs.ensureDirSync(filePartialDir);
     return filePartialDir;
   }
@@ -235,7 +254,7 @@ Happy Creating.
 
           filePartial = this.getEncodedDestinationPath( this.createPartialsRemoteCacheDir(workspacePath), mergeKey );
 
-          if(!fs.existsSync(filePartial) ){
+          if(global.pogoconf.disablePartialCache || !fs.existsSync(filePartial) ){
             //console.log("copy file://");
             await fs.copySync(mergeKey._mergePartial.substring(7), filePartial);
           }
@@ -244,7 +263,7 @@ Happy Creating.
 
           filePartial = this.getEncodedDestinationPath( this.createPartialsRemoteCacheDir(workspacePath), mergeKey );
 
-          if(!fs.existsSync(filePartial) ){
+          if(global.pogoconf.disablePartialCache || !fs.existsSync(filePartial) ){
             //console.log("copy https://");
             await this._getRemotePartial(mergeKey._mergePartial, filePartial);
           }

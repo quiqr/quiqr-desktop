@@ -479,6 +479,23 @@ resources: []\n\
     })
   }
 
+  openWorkSpaceQuiqrDir(){
+    let wspath = path.join(global.currentSitePath, "quiqr");
+    let lstat = fs.lstatSync(wspath);
+
+    try{
+      let lstat = fs.lstatSync(wspath);
+      if(lstat.isDirectory()){
+        shell.openPath(wspath);
+      }
+      else{
+        shell.openPath(dirname(wspath));
+      }
+    }
+    catch(e){
+      console.log(e);
+    }
+  }
   openWorkSpaceDir(){
     let wspath = global.currentSitePath;
     let lstat = fs.lstatSync(wspath);
@@ -738,6 +755,7 @@ resources: []\n\
     return profilesMenu;
   }
 
+  /*
   createVersionsMenu(){
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
@@ -795,6 +813,7 @@ resources: []\n\
       return [];
     }
   }
+  */
 
   deleteInvalidConfKeys(newConf){
     // REMOVE INVALID KEYS
@@ -882,15 +901,26 @@ resources: []\n\
     });
   }
 
-
-
   toggleExperimental(){
-
     if(global.pogoconf.experimentalFeatures){
       global.pogoconf.setExperimentalFeatures(false);
     }
     else{
       global.pogoconf.setExperimentalFeatures(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      this.createMainMenu();
+    });
+  }
+
+  toggleDisablePartialCache(){
+
+    if(global.pogoconf.disablePartialCache){
+      global.pogoconf.setDisablePartialCache(false);
+    }
+    else{
+      global.pogoconf.setDisablePartialCache(true);
     }
 
     global.pogoconf.saveState().then(()=>{
@@ -969,11 +999,6 @@ resources: []\n\
   createExperimentalMenu(){
     let expMenu = [
       {
-        id: 'switch-profile',
-        label: 'Switch User',
-        submenu: this.createProfilesMenu()
-      },
-      {
         id: 'pulllastgitchanges',
         label: 'Merge Last Changes From Cloud',
         enabled: this.siteIsPogoCloudManaged(),
@@ -1032,6 +1057,14 @@ resources: []\n\
         checked: global.pogoconf.devShowCurrentUser,
         click: async () => {
           this.toggleDevShowCurrentUser()
+        }
+      },
+      {
+        id: 'open-site-conf',
+        label: 'Open Site Config',
+        enabled: this.siteSelected(),
+        click: async () => {
+          this.openWorkSpaceConfig()
         }
       },
       {
@@ -1100,12 +1133,6 @@ resources: []\n\
             click: async () => {
               this.importSiteFromUrl()
             }
-          },
-          {
-            id: 'switch-version',
-            label: 'Site Versions',
-            enabled: this.siteSelected(),
-            submenu: this.createVersionsMenu()
           },
         ]
       }
@@ -1292,6 +1319,11 @@ resources: []\n\
             label: 'Invite',
             submenu: this.inviteMenu()
           },
+          {
+            id: 'switch-profile',
+            label: 'Switch User',
+            submenu: this.createProfilesMenu()
+          },
 
           { type: 'separator' },
 
@@ -1345,60 +1377,67 @@ resources: []\n\
         ]
       },
       {
-        label: 'Expert',
+        label: 'Develop',
         submenu: [
           {
             id: 'start-server',
-            label: 'Restart Preview',
+            label: 'Restart Hugo',
             enabled: this.siteSelected(),
             click: async () => {
               this.startServer()
             }
           },
           {
-            label: 'Stop Preview',
+            label: 'Stop Hugo',
             click: async () => {
               this.stopServer()
             }
           },
-          { type: 'separator' },
+          {
+            label: 'Hugo Server Logs',
+            click: async () => {
+              this.createLogWindow()
+            }
+          },
           {
             id: 'open-site-dir',
-            label: 'Open Site Directory',
+            label: 'Open Hugo Site Directory',
             enabled: this.siteSelected(),
             click: async () => {
               this.openWorkSpaceDir()
             }
           },
+          { type: 'separator' },
           {
-            id: 'open-site-conf',
-            label: 'Open Site Config',
+            id: 'open-quiqr-dir',
+            label: 'Open Quiqr Site Directory',
             enabled: this.siteSelected(),
             click: async () => {
-              this.openWorkSpaceConfig()
+              this.openWorkSpaceQuiqrDir()
             }
           },
           /*
           {
             id: 'clear-config-cache',
             label: 'Clear Model Cache',
+            enabled: this.siteSelected(),
             click: async () => {
               global.apiMain.clearWorkSpaceConfigCache({},context);
             }
           },
           */
-          { type: 'separator' },
           {
-            label: 'Configuration Examples',
+            label: 'Disable Partial Cache',
+            type: "checkbox",
+            checked: global.pogoconf.disablePartialCache,
             click: async () => {
-              this.openCookbooks()
+              this.toggleDisablePartialCache()
             }
           },
-          { type: 'separator' },
           {
-            label: 'Show Logs',
+            label: 'Model Configuration Examples',
             click: async () => {
-              this.createLogWindow()
+              this.openCookbooks()
             }
           },
           { type: 'separator' },

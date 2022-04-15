@@ -134,13 +134,11 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
   });
 }
 
-/*
 api.clearWorkSpaceConfigCache = async function({}, context){
   let workspaceService = new WorkspaceService();
   workspaceService.clearConfigurationsDataCache();
   context.resolve(true);
 }
-*/
 
 
 api.savePrefKey = async function({prefKey, prefValue}, context){

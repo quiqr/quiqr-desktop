@@ -6,8 +6,6 @@ class FileDirUtils{
   async recurForceRemove(path){
     await fs.ensureDir(path);
     await rimraf.sync(path);
-
-
     console.log("created and rm'd dir: " + path);
   }
 

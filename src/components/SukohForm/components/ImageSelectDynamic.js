@@ -69,7 +69,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
       context.node.state['resources'] = [];
     }
 
-    service.api.logToConsole(field.path)
+    //service.api.logToConsole(field.path)
 
     if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
       service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
@@ -153,7 +153,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         if(field.path){
           thumbPath = path.join(field.path, this.props.context.value);
         }
-            service.api.logToConsole(thumbPath);
+        //service.api.logToConsole(thumbPath);
 
         form.props.plugins.getBundleThumbnailSrc(thumbPath)
           .then((src)=>{
