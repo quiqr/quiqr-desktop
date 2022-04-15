@@ -7,12 +7,14 @@ const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builde
 const pathHelper                    = require('./../../utils/path-helper');
 const formatProviderResolver        = require('./../../utils/format-provider-resolver');
 const deepmerge                     = require('deepmerge');
+const request                       = require('request');
+
 
 class WorkspaceConfigProvider{
 
   constructor(){
     this.clearCache();
-   }
+  }
 
   clearCache(){
     this.cache = {};
@@ -72,9 +74,12 @@ Happy Creating.
       }
     }
 
-    config = this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
+    config = await this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
     config.path = workspacePath;
     config.key = workspaceKey;
+
+    console.log("getGonfig")
+    console.log(config)
 
     this.cache[filePath] = { token, config }
     return config;
@@ -123,7 +128,7 @@ Happy Creating.
     return filePathBase;
   }
 
-  _loadConfigurationsData(filePath, workspaceKey, workspacePath){
+  async _loadConfigurationsData(filePath, workspaceKey, workspacePath){
 
     let strData = fs.readFileSync(filePath,'utf8');
     let formatProvider = formatProviderResolver.resolveForFilePath(filePath);
@@ -132,17 +137,20 @@ Happy Creating.
     }
 
     let dataPhase1Parse = formatProvider.parse(strData);
-    let dataPhase2Merged = this._postProcessConfigObject(dataPhase1Parse , workspacePath);
+    let dataPhase2Merged = await this._postProcessConfigObject(dataPhase1Parse , workspacePath);
+    //console.log(JSON.stringify(dataPhase2Merged));
+    //console.log(JSON.stringify(dataPhase2Merged));
 
     let validator = new WorkspaceConfigValidator();
     let result = validator.validate(dataPhase2Merged);
     if(result)
       throw new Error(result);
 
+    console.log("dataPhase2Merged");
     return dataPhase2Merged;
   }
 
-  _postProcessConfigObject(configOrg, workspacePath){
+  async _postProcessConfigObject(configOrg, workspacePath){
 
     if(configOrg){
       if(!configOrg.menu) configOrg.menu = [];
@@ -152,17 +160,41 @@ Happy Creating.
 
     // MERGE INCLUDES
     configOrg = this._loadIncludes(configOrg, workspacePath);
+    //console.log(configOrg.hugover)
 
-    // MERGE PARTIALS
-    configOrg.collections = configOrg.collections.map(x => this._mergePartials(x, workspacePath));
-    configOrg.singles = configOrg.singles.map(x => this._mergePartials(x, workspacePath));
+    let newSingles = [];
+    await Promise.all(configOrg.singles.map(async (x) => {
+      let mp =  await this.getMergePartialResult(x,workspacePath)
+      //console.log(mp)
+      newSingles.push(mp);
+    }));
+
+
+    configOrg.singles = newSingles;
+    configOrg.collections = [];
+    //configOrg.singles = [];
 
     // CLEANUP
     if(configOrg.menu.length < 1) delete configOrg['menu'];
     if(configOrg.collections.length < 1) delete configOrg['collections'];
     if(configOrg.singles.length < 1) delete configOrg['singles'];
 
+
+    console.log("_postProcessConfigObject")
+    console.log(configOrg)
+
     return configOrg;
+    //console.log(configOrg.singles)
+    //console.log(configOrg.singles)
+    //
+    //
+
+
+    //})();
+
+    //configOrg.singles = singlesNew;
+
+
   }
 
   _loadIncludes(configObject, workspacePath){
@@ -189,54 +221,134 @@ Happy Creating.
     return {...configObject, ...newObject}
   }
 
+  async getMergePartialResult(mergeKey, workspacePath){
+    let result = await this._mergePartials(mergeKey, workspacePath);
+    //await Promise.all(result);
+    return result
+  }
+  /*
+  getMergePartialResult(mergeKey, workspacePath) {
+    this._mergePartials(mergeKey, workspacePath)
+      .then(function(response) {
+        return response;
+      })
+  }
+  */
 
   _mergePartials(mergeKey, workspacePath){
 
-    if( "_mergePartial" in mergeKey){
+    return new Promise(async (resolve, reject)=>{
 
-      let filePartial = "";
-      if(mergeKey._mergePartial.startsWith("file://")) {
-        filePartial = mergeKey._mergePartial.substring(7);
-        //TODO implement relative path
-      }
-      else if(mergeKey._mergePartial.startsWith("http://") ||mergeKey._mergePartial.startsWith("https://") ){
+      if( "_mergePartial" in mergeKey){
 
-      }
-      else{
-        filePartial = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-      }
+        let filePartial = "";
 
-      let files = glob.sync(filePartial);
-      //console.log(files);
-      if( files.length > 0 && fs.existsSync(files[0]) ){
-
-        this.parseInfo.partialFiles.push({key:mergeKey.key, filename: files[0]});
-
-        let strData = fs.readFileSync(files[0],'utf8');
-        let formatProvider = formatProviderResolver.resolveForFilePath(files[0]);
-        if(formatProvider==null){
-          formatProvider = formatProviderResolver.getDefaultFormat();
+        if(mergeKey._mergePartial.startsWith("file://")) {
+          filePartial = mergeKey._mergePartial.substring(7);
+          //TODO implement relative path
         }
-        let mergeData = formatProvider.parse(strData);
-        let newData = deepmerge(mergeData, mergeKey);
+        else if(mergeKey._mergePartial.startsWith("http://") || mergeKey._mergePartial.startsWith("https://") ){
 
-        //REMOVE DUPLICATES PREFER FIELDS FROM BASE.JSON OVER PARTIALS FIELDS
-        newData.fields = newData.fields.reverse().filter((field, index, self) =>
-          index === self.findIndex((t) => (
-            t.key === field.key
-          ))
-        )
-        //RESTORE ORDER AGAIN
-        newData.fields = newData.fields.reverse();
+          const filePartialDir = path.join(workspacePath,'.quiqr-cache','model','partials');
+          await fs.ensureDirSync(filePartialDir);
 
-        mergeKey = newData;
+          let encodeFilename = encodeURIComponent(mergeKey._mergePartial);
+          let destination = path.join(filePartialDir,encodeFilename);
+          filePartial = await this._getRemotePartial(mergeKey._mergePartial, destination);
 
-        //ONLY WHEN MERGE WAS SUCCESFULL DELETE THE KEY TO PREVENT ERROR.
-        delete mergeKey['_mergePartial'];
+        }
+        else{
+          let filePartialPattern = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+          let files = glob.sync(filePartialPattern);
+          if( files.length > 0 ){
+            filePartial = files[0];
+          }
+        }
+
+        //console.log(files[0]);
+
+        //console.log("NEXT")
+        //console.log(filePartial);
+        if(filePartial && fs.existsSync(filePartial) ){
+
+          this.parseInfo.partialFiles.push({key:mergeKey.key, filename: filePartial});
+
+          let strData = await fs.readFileSync(filePartial,'utf8');
+          let formatProvider = formatProviderResolver.resolveForFilePath(filePartial);
+          if(formatProvider==null){
+            formatProvider = formatProviderResolver.getDefaultFormat();
+          }
+          let mergeData = formatProvider.parse(strData);
+          let newData = deepmerge(mergeData, mergeKey);
+
+          //REMOVE DUPLICATES PREFER FIELDS FROM BASE.JSON OVER PARTIALS FIELDS
+          newData.fields = newData.fields.reverse().filter((field, index, self) =>
+            index === self.findIndex((t) => (
+              t.key === field.key
+            ))
+          )
+          //RESTORE ORDER AGAIN
+          newData.fields = newData.fields.reverse();
+
+          mergeKey = newData;
+
+          //ONLY WHEN MERGE WAS SUCCESFULL DELETE THE KEY TO PREVENT ERROR.
+          delete mergeKey['_mergePartial'];
+        }
       }
-    }
-    return mergeKey;
+
+      //console.log(mergeKey)
+      resolve(mergeKey);
+
+    });
+
+
   }
+
+  _getRemotePartial(url, destination){
+
+    let data='';
+
+    return new Promise((resolve, reject)=>{
+
+      const req = request({
+        url: url
+      });
+
+      req.on('error', (err) => {
+        service.api.logToConsole(err);
+      });
+
+      req.on('response', (response) => {
+        response.on('error', (error) => {
+          service.api.logToConsole(error);
+          reject(err);
+        })
+
+        response.on('end', async () => {
+          try{
+            fs.writeFileSync( destination, data);
+            //console.log(destination)
+            resolve(destination);
+          }
+          catch(e){
+            console.log(e);
+          }
+
+        });
+        response.on("close", () => {
+          //console.log("close")
+        });
+        response.on("data", chunk => {
+          //console.log("thefile");
+          data += chunk;
+        });
+      })
+      req.end()
+
+    });
+  }
+
 
   getModelParseInfo(){
     return this.parseInfo;

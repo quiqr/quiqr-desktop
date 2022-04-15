@@ -261,6 +261,7 @@ class CloudApiManager{
         });
 
         req.on('response', (response) => {
+          console.log(response.statusCode);
           if(response.statusCode === 200){
             response.on('end', () => {
               resolve(true);

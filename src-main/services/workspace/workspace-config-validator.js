@@ -21,6 +21,8 @@ class WorkspaceConfigValidator {
 
   validate(config){
 
+    console.log("VALIDATE")
+    console.log(config)
     this.normalizeConfig(config);
 
     let validationError = joi.validate(config,
@@ -134,8 +136,8 @@ class WorkspaceConfigValidator {
     validationError = joi.validate(single,
       joi.object().keys({
         key: joi.string().trim().regex(/^[A-Za-z0-9\-_]+$/i).min(3).max(90).required().error(new Error('The single key "'+single.key+'" is invalid.')),
-        title: joi.string().trim().min(3).max(90).required().error(new Error('The singles.title value is invalid.')),
-        file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.')),
+        title: joi.string().trim().min(3).max(90).required().error(new Error('The singles.title value is invalid.'+JSON.stringify(single))),
+        file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.'+JSON.stringify(single))),
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
         previewUrl: joi.string().trim(),
         fields: joi.array().min(1).required().error(new Error('The singles.fields value is invalid.')),
