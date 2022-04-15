@@ -155,34 +155,25 @@ Happy Creating.
     // MERGE INCLUDES
     configOrg = this._loadIncludes(configOrg, workspacePath);
 
-    let newSingles = [];
-    let newCollections = [];
-
+    let mergedDataCollections = [];
+    let mergedDataSingles = [];
 
     await Promise.all(
-      [
-        configOrg.singles.map(async (x) => {
-          let mp =  await this.getMergePartialResult(x,workspacePath)
-          newSingles.push(mp);
-        }),
-        configOrg.collections.map(async (x) => {
-          let mp =  await this.getMergePartialResult(x,workspacePath)
-          newCollections.push(mp);
-        })
-      ]
+      configOrg.collections.map(async (x) => {
+        let mp =  await this.getMergePartialResult(x,workspacePath)
+        mergedDataCollections.push(mp);
+      })
     );
+    configOrg.collections = mergedDataCollections;
 
-    /*
     await Promise.all(
         configOrg.singles.map(async (x) => {
           let mp =  await this.getMergePartialResult(x,workspacePath)
-          newSingles.push(mp);
+          mergedDataSingles.push(mp);
         }),
     );
-    */
 
-    configOrg.singles = newSingles;
-    configOrg.collections = newCollections;
+    configOrg.singles = mergedDataSingles;
 
     // CLEANUP
     if(configOrg.menu.length < 1) delete configOrg['menu'];
@@ -245,7 +236,7 @@ Happy Creating.
           filePartial = this.getEncodedDestinationPath( this.createPartialsRemoteCacheDir(workspacePath), mergeKey );
 
           if(!fs.existsSync(filePartial) ){
-            console.log("copy file://");
+            //console.log("copy file://");
             await fs.copySync(mergeKey._mergePartial.substring(7), filePartial);
           }
         }
@@ -254,7 +245,7 @@ Happy Creating.
           filePartial = this.getEncodedDestinationPath( this.createPartialsRemoteCacheDir(workspacePath), mergeKey );
 
           if(!fs.existsSync(filePartial) ){
-            console.log("copy https://");
+            //console.log("copy https://");
             await this._getRemotePartial(mergeKey._mergePartial, filePartial);
           }
 
