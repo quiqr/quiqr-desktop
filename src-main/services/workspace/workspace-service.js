@@ -259,6 +259,7 @@ class WorkspaceService{
     let collection = (await this.getConfigurationsData())
       .collections.find(x => x.key === collectionKey);
 
+
     if(collection==null)
       throw new Error('Could not find collection.');
     let folder = path.join(this.workspacePath, collection.folder).replace(/\\/g,'/');
@@ -273,7 +274,9 @@ class WorkspaceService{
       let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
 
       //WHEN WE WANT TO IGNORE _index.md front pages
-      //let globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
+      if ('hideIndex' in collection){
+        globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
+      }
 
       let files = await globJob(globExpression, {});
       let retFiles = files.map(function(item){
