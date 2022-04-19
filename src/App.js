@@ -156,9 +156,7 @@ class App extends React.Component<AppProps,AppState>{
     window.require('electron').ipcRenderer.on('redirectSiteConf', this.redirectSiteConf.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
-    window.require('electron').ipcRenderer.on('redirectMountSite',function(event, args){
-      this.history.push(args);
-    }.bind(this));
+
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
       this.history.push(location);
     }.bind(this));
@@ -172,7 +170,7 @@ class App extends React.Component<AppProps,AppState>{
       'redirectSiteConf',
       'setMobileBrowserOpen',
       'setMobileBrowserClose',
-      'redirectMountSite',
+      'redirectToGivenLocation',
     ].forEach((channel)=>{
       window.require('electron').ipcRenderer.removeAllListeners(channel);
     });
@@ -297,11 +295,11 @@ class App extends React.Component<AppProps,AppState>{
   renderHome(match){
     this.getProfile();
     return <Home
-    key={ match.url }
-    quiqrUsername={this.state.quiqrUsername}
-    quiqrFingerprint={this.state.quiqrFingerprint}
-    siteKey={ decodeURIComponent(match.params.site) }
-    workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      key={ match.url }
+      quiqrUsername={this.state.quiqrUsername}
+      quiqrFingerprint={this.state.quiqrFingerprint}
+      siteKey={ decodeURIComponent(match.params.site) }
+      workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }
 
   renderContentSwitch(){
@@ -339,6 +337,15 @@ class App extends React.Component<AppProps,AppState>{
         collectionKey={ decodeURIComponent(match.params.collection) } />
       }} />
 
+      <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item/:refresh' exact render={ ({match})=> {
+        return <CollectionItem
+        key={ match.url }
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
+        collectionKey={ decodeURIComponent(match.params.collection) }
+        collectionItemKey={ decodeURIComponent(match.params.item) } />
+      }} />
+
       <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item' exact render={ ({match})=> {
         return <CollectionItem
         key={ match.url }
@@ -348,12 +355,22 @@ class App extends React.Component<AppProps,AppState>{
         collectionItemKey={ decodeURIComponent(match.params.item) } />
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace/singles/:single' exact render={ ({match})=> {
+      <Route path='/sites/:site/workspaces/:workspace/singles/:single/:refresh' exact render={ ({match})=> {
         return <Single
         key={ match.url }
         siteKey={ decodeURIComponent(match.params.site) }
+        refreshed={ true }
         workspaceKey={ decodeURIComponent(match.params.workspace) }
         singleKey={ decodeURIComponent(match.params.single) } /> }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/singles/:single' render={ ({match})=> {
+        return <Single
+        key={ match.url }
+        siteKey={ decodeURIComponent(match.params.site) }
+        refreshed={ false }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
+        singleKey={ decodeURIComponent(match.params.single) } /> }} />
+
 
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
         return <FormsCookbookRouted />;

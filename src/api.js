@@ -209,6 +209,29 @@ export class API {
     return mainProcessBridge.request('mountWorkspace', {siteKey, workspaceKey});
   }
 
+  shouldReloadForm(reloadForm: bool){
+    return mainProcessBridge.request('shouldReloadForm', {reloadForm});
+  }
+
+  setCurrentFormAccordionIndex(index: string){
+    return mainProcessBridge.request('setCurrentFormAccordionIndex', {index});
+  }
+
+  getCurrentFormAccordionIndex(){
+    return mainProcessBridge.request('getCurrentFormAccordionIndex', {});
+  }
+
+  setCurrentFormNodePath(path: string){
+    return mainProcessBridge.request('setCurrentFormNodePath', {path});
+  }
+
+  getCurrentFormNodePath(){
+    return mainProcessBridge.request('getCurrentFormNodePath', {});
+  }
+  reloadCurrentForm(){
+    return mainProcessBridge.request('reloadCurrentForm', {});
+  }
+
   parentMountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
   }

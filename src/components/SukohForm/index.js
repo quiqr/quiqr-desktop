@@ -1,9 +1,10 @@
-import * as React from 'react';
+import * as React                  from 'react';
 import { Form, ComponentRegistry } from '../HoForm';
-import { FloatingActionButton } from 'material-ui-02/';
-import { FormBreadcumb } from '../Breadcumb';
-import IconCheck from 'material-ui-02/svg-icons/navigation/check';
-import dynamicFormComponents from './components/all'
+import { FloatingActionButton }    from 'material-ui-02/';
+import { FormBreadcumb }           from '../Breadcumb';
+import IconCheck                   from 'material-ui-02/svg-icons/navigation/check';
+import dynamicFormComponents       from './components/all'
+import service                     from './../../services/service'
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
@@ -63,6 +64,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
   }
 
   componentWillMount(){
+    service.api.shouldReloadForm(false);
     document.addEventListener('keydown', this.keydownHandler.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
@@ -100,7 +102,9 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
         data: Object.assign({}, this._valueFactory())
       }
       this.props.onSave.call(this, context);
+      service.api.reloadCurrentForm();
       //let updatedValues = this.props.onSave.call(this, context);
+      //service.api.logToConsole("who was first");
     }
     else{
       this.setState({error: 'Save not implemented'});
@@ -120,26 +124,31 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
     if(!this.state.savedOnce) floatingActionButtonClass+=' zoomIn';
     if(this.state.changed) floatingActionButtonClass+=' rubberBand';
 
+    let refreshed = false;
+    if(this.props.refreshed){
+      refreshed = true;
+    }
 
     return (
       <React.Fragment>
         <Form
-        debug={false}
-        breadcumbComponentType={FormBreadcumb}
-        componentRegistry={componentRegistry}
-        siteKey={this.props.siteKey}
-        workspaceKey={this.props.workspaceKey}
-        collectionKey={this.props.collectionKey}
-        collectionItemKey={this.props.collectionItemKey}
-        fields={this.props.fields}
-        plugins={this.props.plugins}
-        rootName={this.props.rootName}
-        pageUrl={this.props.pageUrl}
-        values={this.props.values}
-        onChange={this.handleFormChange.bind(this)}
-        onOpenInEditor={this.props.onOpenInEditor}
-      />
-          <FloatingActionButton
+          debug={false}
+          breadcumbComponentType={FormBreadcumb}
+          componentRegistry={componentRegistry}
+          siteKey={this.props.siteKey}
+          workspaceKey={this.props.workspaceKey}
+          collectionKey={this.props.collectionKey}
+          refreshed={refreshed}
+          collectionItemKey={this.props.collectionItemKey}
+          fields={this.props.fields}
+          plugins={this.props.plugins}
+          rootName={this.props.rootName}
+          pageUrl={this.props.pageUrl}
+          values={this.props.values}
+          onChange={this.handleFormChange.bind(this)}
+          onOpenInEditor={this.props.onOpenInEditor}
+        />
+        <FloatingActionButton
           style={{
             position:'fixed',
             right:this.state.actionButtonRightPos,
@@ -151,10 +160,10 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
           primary={'true'}
           onClick={()=> this.saveContent()}
         >
-            <IconCheck />
-          </FloatingActionButton>
-          <div style={{height:'70px'}}></div>
-        </React.Fragment>
+          <IconCheck />
+        </FloatingActionButton>
+        <div style={{height:'70px'}}></div>
+      </React.Fragment>
     );
   }
 }

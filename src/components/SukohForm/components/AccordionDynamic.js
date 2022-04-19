@@ -42,7 +42,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       dragFromIndex: null,
       dragToIndex: null,
       dynFields: {},
-      dynFieldsEmpty: []
+      dynFieldsEmpty: [],
+      shouldSaveAccordionState:false
     };
   }
 
@@ -147,6 +148,18 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     this.procDynamicFields();
   }
 
+  getLastOpenState(){
+    service.api.getCurrentFormAccordionIndex().then((pathPlusIndex)=>{
+      if(pathPlusIndex){
+        let arr = pathPlusIndex.split(" ")
+
+        if(arr.length === 2 && arr[1] >=0 && arr[0] === this.props.context.node.field.compositeKey){
+          this.setState({index: parseInt(arr[1])});
+        }
+      }
+    });
+  }
+
   procDynamicFields(){
 
     let {context} = this.props;
@@ -185,6 +198,9 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         await service.api.getDynFormFields( dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
           if (typeof extraFields !== 'undefined') {
 
+            service.api.shouldReloadForm(true);
+            this.setState({shouldSaveAccordionState:true});
+
             extraFields.fields.forEach(function(extrField){
               extrField.compositeKey = field.compositeKey + "." + extrField.key;
               extrField.lazy = true;
@@ -210,6 +226,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
             //this.setState({["dyn-"+componentKey]: newFields});
           }
         });
+
+        this.getLastOpenState();
       }
 
     });
@@ -222,6 +240,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     let {context} = this.props;
     let {node, currentPath} = context;
     let {field} = node;
+    //service.api.logToConsole(context,"context");
+
 
     node.field.fields.forEach(function(fld,idx){
       if(fld.lazyTemp === true){
@@ -235,7 +255,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     }
 
     if(currentPath === context.parentPath){
-      //service.api.logToConsole(field.title,"renderUnOpened" );
       return this.renderUnOpened(field.title, context, node);
 
     } else if(currentPath===context.nodePath){
@@ -283,16 +302,24 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
   }
 
+  handleAccordionClick(context, node){
+    //service.api.logToConsole(node)
+    context.setPath(node)
+  }
+
+
   renderUnOpened(title, context, node){
     return (
       <List style={{marginBottom:16, padding: 0}}><ListItem
-      style={{ border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
-      onClick={ function(){ context.setPath(node) } }
-      leftIcon={<IconFileFolder />}
-      rightIcon={<IconChevronRight />}
-      primaryText={title}
-      secondaryText={context.value.length +' items'}
-    /></List>
+        style={{ border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
+        onClick={
+          ()=>{ this.handleAccordionClick(context,node) }
+        }
+        leftIcon={<IconFileFolder />}
+        rightIcon={<IconChevronRight />}
+        primaryText={title}
+        secondaryText={context.value.length +' items'}
+      /></List>
     );
   }
 
@@ -303,7 +330,16 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     return (
       <Fragment>
 
-        <Accordion index={this.state.index} onChange={(index)=>{ this.setState({index:this.state.index===index?-1:index}); }}>
+        <Accordion
+          index={this.state.index}
+          onChange={
+            (index)=>{
+              this.setState({index:this.state.index===index?-1:index});
+              if(this.state.shouldSaveAccordionState){
+                service.api.setCurrentFormAccordionIndex(field.compositeKey + " " + index);
+                //service.api.logToConsole(field.compositeKey + " " +index, "set index");
+              }
+            }}>
 
           {context.value.map((item: any, childIndex: number)=>{
 
@@ -376,6 +412,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       parent: node
     };
 
+
     let arrayTitle = field.fields.find((x)=> x.arrayTitle===true);
     if(arrayTitle && newNode.state[arrayTitle.key]){
       label = newNode.state[arrayTitle.key];
@@ -392,29 +429,29 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
     return (
       <AccordionItem key={componentKey}
-      label={label}
-      headStyle={headStyle}
-      bodyStyle={{padding:'16px 16px 0px 16px'}}
-      body={ context.renderLevel(newNode) }
-      wrapperProps={{
-        onMouseEnter: this.getOnItemMouseEnter(childIndex)
-      }}
-      headerRightItems={[
-        <FlatButton
-        onClick={(e)=>{e.stopPropagation()}}
-        onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
-        style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
-        <DangerButton
-        onClick={(e, loaded)=>{
-          e.stopPropagation();
-          if(loaded){
-            this.removeItemAtIndex(childIndex)
-          }
+        label={label}
+        headStyle={headStyle}
+        bodyStyle={{padding:'16px 16px 0px 16px'}}
+        body={ context.renderLevel(newNode) }
+        wrapperProps={{
+          onMouseEnter: this.getOnItemMouseEnter(childIndex)
         }}
-        loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
-        button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
-      />
-      ]}
+        headerRightItems={[
+          <FlatButton
+            onClick={(e)=>{e.stopPropagation()}}
+            onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
+            style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
+            <DangerButton
+              onClick={(e, loaded)=>{
+                e.stopPropagation();
+                if(loaded){
+                  this.removeItemAtIndex(childIndex)
+                }
+              }}
+              loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
+              button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
+            />
+        ]}
       />
     );
   };

@@ -1,7 +1,8 @@
-import React from 'react';
-import FlatButton from 'material-ui-02/FlatButton';
+import React                    from 'react';
+import FlatButton               from 'material-ui-02/FlatButton';
 import IconNavigationExpandLess from 'material-ui-02/svg-icons/navigation/expand-less';
 import IconNavigationExpandMore from 'material-ui-02/svg-icons/navigation/expand-more';
+//import service                  from '../services/service';
 
 type AccordionHeaderProps = {
     active: bool, onClick: ()=>void, style: any, headerLeftItems: any, headerRightItems: any
@@ -73,46 +74,49 @@ class AccordionItem extends React.Component{
 
 class Accordion extends React.Component{
 
-    constructor(props){
-        super(props);
-        this.state = { index : -1 };
-    }
+  constructor(props){
+    super(props);
+    this.state = { index : -1 };
+  }
 
-    getOpenedIndex(){
-        if(this.props.index!==undefined){
-            return this.props.index;
+  getOpenedIndex(){
+    if(this.props.index !== undefined){
+      return this.props.index;
+    }
+    else{
+      return this.state.index;
+    }
+  }
+
+  getHandleChange(i){
+
+    return function(e){
+      if(this.props.index !== undefined){
+        if(this.props.onChange){
+          //service.api.logToConsole(i,"handleChange")
+          this.props.onChange(i);
         }
-        else{
-            return this.state.index;
-        }
-    }
+      }
+      else{
+        let index = i !== this.state.index?i:-1;
+        this.setState(Object.assign({}, this.state, {index}))
 
-    getHandleChange(i){
-        return function(e){
-            if(this.props.index!==undefined){
-                if(this.props.onChange){
-                    this.props.onChange(i);
-                }
-            }
-            else{
-                let index = i !== this.state.index?i:-1;
-                this.setState(Object.assign({}, this.state, {index}))
-            }
-        }.bind(this);
-    }
+      }
+    }.bind(this);
+  }
 
-    render(){
-        let openedIndex = this.getOpenedIndex();
-        return <div className="accordion" style={this.props.style}>
-            { this.props.children.map(function(item, index){
-                let active = this.props.forceActive || index === openedIndex;
-                return React.cloneElement(item, {
-                    active,
-                    onHeadClick: this.getHandleChange(index),
-                });
-            }.bind(this)) }
-        </div>
-    }
+  render(){
+    let openedIndex = this.getOpenedIndex();
+    return <div className="accordion" style={this.props.style}>
+      { this.props.children.map((item, index)=>{
+        let active = this.props.forceActive || index === openedIndex;
+        return React.cloneElement(item, {
+          active,
+          onHeadClick: this.getHandleChange(index),
+        });
+      }) }
+    </div>
+  }
 }
 
 export { Accordion, AccordionItem };

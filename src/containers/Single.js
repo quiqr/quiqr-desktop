@@ -68,6 +68,9 @@ class Single extends React.Component<SingleProps,SingleState>{
   }
 
   handleSave(context : any){
+
+    //service.api.logToConsole(context.data);
+    //service.api.logToConsole(context.reloadAfterSave,"reloadAfterSave");
     var { siteKey, workspaceKey, singleKey } = this.props;
 
     let promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
@@ -101,6 +104,7 @@ class Single extends React.Component<SingleProps,SingleState>{
     return(<SukohForm
     debug={false}
     rootName={single.title}
+    refreshed={this.props.refreshed}
     fields={single.fields}
     values={this.state.singleValues}
     pageUrl={previewUrl}

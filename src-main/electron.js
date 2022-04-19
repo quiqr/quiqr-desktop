@@ -34,6 +34,11 @@ global.pogoconf = QuiqrAppConfig();
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
+
+global.currentFormShouldReload = undefined;
+global.currentFormNodePath = undefined;
+global.currentFormAccordionIndex = undefined;
+
 global.currentWorkspaceKey = pogoconf.lastOpenedSite.workspaceKey;
 global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
 global.hugoServer = undefined;

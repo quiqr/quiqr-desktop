@@ -92,10 +92,6 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
       state[key] = field.default || undefined;
     }
 
-    if (typeof field.buttonTitle !== 'string' || !field.buttonTitle instanceof String){
-      field.buttonTitle="Select Image";
-    }
-
     if(!Array.isArray(state['resources'])){
       state['resources'] = [];
     }
@@ -192,6 +188,11 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
     if(currentPath!==context.parentPath){
       return (null);
     }
+
+    if (typeof field.buttonTitle !== 'string' || !field.buttonTitle instanceof String){
+      field.buttonTitle="Select Image";
+    }
+
 
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />)

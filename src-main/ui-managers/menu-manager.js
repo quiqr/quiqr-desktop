@@ -395,7 +395,6 @@ resources: []\n\
           mainWindow.setTitle(`Quiqr - Site: ${newName}`);
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
-          mainWindow.webContents.send("redirectMountSite",newScreenURL);
         }
       });
     }
@@ -877,8 +876,6 @@ resources: []\n\
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
           mainWindow.webContents.send("redirectToGivenLocation","/");
           mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
-          mainWindow.webContents.send("redirectMountSite",newScreenURL);
-
         }
 
       });

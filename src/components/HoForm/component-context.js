@@ -15,6 +15,7 @@ export class ComponentContext<Field: FieldBase>{
 
     form:Form;
     value:any;
+    reloadAfterSave: any;
 
     //remove those?
     renderLevel: any;
@@ -40,6 +41,8 @@ export class ComponentContext<Field: FieldBase>{
 
         //need this to trigger updates
         this.form = form;
+
+        this.reloadAfterSave = false;
 
         //functions borowed from the DynamicForm
         this.renderLevel = form.renderLevel.bind(form); //don't know why, but this solved a huge nasty bug!

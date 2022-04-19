@@ -145,9 +145,9 @@ function getFirstScreenAfterStartup(){
         //TODO catch error when site does not exist
         let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
         //console.log("switch to "+ global.currentSiteKey);
-        mainWindow.webContents.send("redirectMountSite",newScreenURL);
+        mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
         mainWindow.webContents.once('dom-ready', () => {
-          mainWindow.webContents.send("redirectMountSite",newScreenURL);
+          mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
         });
 
         let siteConfig = configurations.sites.find((x)=>x.key===global.currentSiteKey);

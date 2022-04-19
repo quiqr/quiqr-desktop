@@ -340,9 +340,38 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   menuManager.createMainMenu();
 }
 
+api.shouldReloadForm = async function({reloadForm}, context){
+  global.currentFormShouldReload = reloadForm;
+}
+
+api.setCurrentFormNodePath = async function({path}, context){
+  global.currentFormNodePath = path;
+}
+
+api.getCurrentFormNodePath = async function({}, context){
+  context.resolve(global.currentFormNodePath)
+}
+
+api.setCurrentFormAccordionIndex = async function({index}, context){
+  global.currentFormAccordionIndex = index;
+}
+
+api.getCurrentFormAccordionIndex = async function({}, context){
+  context.resolve(global.currentFormAccordionIndex)
+}
+
+api.reloadCurrentForm = async function(context){
+  if(global.currentFormShouldReload === true){
+    mainWindow = global.mainWM.getCurrentInstanceOrNew();
+    let urlpath = "/sites/"+mainWindow.webContents.getURL().split("/refresh-form-").shift();
+    urlpath = "/sites/"+urlpath.split("/sites/").pop()+"/refresh-form-"+Math.random();
+    mainWindow.webContents.send("redirectToGivenLocation", urlpath);
+  }
+}
+
 api.parentMountWorkspace = async function({siteKey, workspaceKey}, context){
   mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  mainWindow.webContents.send("redirectMountSite",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
+  mainWindow.webContents.send("redirectToGivenLocation",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
 api.parentCloseMobilePreview = function(context){

@@ -21,6 +21,7 @@ type FormProps = {
   debug: bool,
   rootName: string,
   componentRegistry: ComponentRegistry,
+  refreshed: bool,
   breadcumbComponentType : BreadcumbComponentType,
   plugins: any,
   onChange? : ( valuesGetter: ()=>any )=>void
@@ -94,6 +95,14 @@ class Form extends React.Component<FormProps,FormState> {
     console.warn(error, info);
   }
 
+  componentDidMount() {
+    if(this.props.refreshed){
+      service.api.getCurrentFormNodePath().then((newNode)=>{
+        this.setState({path: newNode});
+      });
+    }
+  }
+
   static getDerivedStateFromProps(props: FormProps, state: FormState){
     return null;
   }
@@ -109,13 +118,18 @@ class Form extends React.Component<FormProps,FormState> {
   }
 
   setPath(node : DynamicFormNode<FieldBase>){
+
+    //service.api.logToConsole(JSON.stringify(node));
+
     if(this.props.collectionItemKey && node.field.compositeKey === 'root'){
       this.history.push(this.generateParentPath());
     }
     else{
       window.scrollTo(0,0);
       this.currentNode = node;
-      this.setState({path: this.buildPath(node)});
+      this.setState({path: this.buildPath(node)},()=>{
+        service.api.setCurrentFormNodePath(this.state.path);
+      });
     }
   }
 
@@ -131,10 +145,11 @@ class Form extends React.Component<FormProps,FormState> {
       if(currentNode===this.root){
         path = 'ROOT/' + path;
       }
-      else{
-        let componentProplessInstace = this.props.componentRegistry.getProplessInstance(currentNode.field.type);
-        if(componentProplessInstace){
-          let fragment = componentProplessInstace.buildPathFragment(currentNode, nodeLevel++, nodes);
+      else {
+        //service.api.logToConsole(currentNode.field.type, "BUILD PATH");
+        let componentProplessInstance = this.props.componentRegistry.getProplessInstance(currentNode.field.type);
+        if(componentProplessInstance){
+          let fragment = componentProplessInstance.buildPathFragment(currentNode, nodeLevel++, nodes);
           if(fragment) {
             path = fragment + '/' + path;
           }
@@ -166,6 +181,7 @@ class Form extends React.Component<FormProps,FormState> {
 
       let nodePath = this.buildPath(node);
       let parentPath = this.buildPath(node.parent);
+
 
       let context = new ComponentContext(this, node, this.state.path, parentPath, nodePath,component.proplessInstance, onValueChanged);
 
