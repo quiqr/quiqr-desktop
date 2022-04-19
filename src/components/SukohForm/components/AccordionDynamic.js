@@ -197,8 +197,10 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
         await service.api.getDynFormFields( dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
           if (typeof extraFields !== 'undefined') {
+            service.api.logToConsole(context.node.field.compositeKey,"shouldReloadFormtrue")
 
-            service.api.shouldReloadForm(true);
+            service.api.shouldReloadForm(context.node.field.compositeKey);
+
             this.setState({shouldSaveAccordionState:true});
 
             extraFields.fields.forEach(function(extrField){
@@ -224,6 +226,9 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
             let newFields = cleanedFieldFields.concat(extraFields.fields);
             dynFields[componentKey] = newFields;
             //this.setState({["dyn-"+componentKey]: newFields});
+          }
+          else{
+            service.api.logToConsole("shouldReloadFormflase")
           }
         });
 
@@ -337,7 +342,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
               this.setState({index:this.state.index===index?-1:index});
               if(this.state.shouldSaveAccordionState){
                 service.api.setCurrentFormAccordionIndex(field.compositeKey + " " + index);
-                //service.api.logToConsole(field.compositeKey + " " +index, "set index");
               }
             }}>
 

@@ -37,7 +37,10 @@ class SliderDynamic extends BaseDynamic<SliderDynamicField,SliderDynamicState> {
   }
 
   handleChange = (e: Event, value: any)=>{
-    this.props.context.setValue(value, 250);
+    let {context} = this.props;
+
+    context.setValue(value, 250);
+
     this.forceUpdate();
   }
 
@@ -57,32 +60,37 @@ class SliderDynamic extends BaseDynamic<SliderDynamicField,SliderDynamicState> {
 
     return (
       <FormItemWrapper
-      control={
+        control={
 
-        <React.Fragment>
-          <DefaultWrapper>
-            <Typography id="discrete-slider" gutterBottom>
-              {field.title}
-            </Typography>
+          <React.Fragment>
+            <DefaultWrapper>
+              <Typography id="discrete-slider" gutterBottom>
+                {field.title}
+              </Typography>
 
-            <Slider
-            defaultValue={field.default}
-            aria-labelledby="discrete-slider"
-            valueLabelDisplay="auto"
-            value={context.value}
-            onChange={ this.handleChange }
-            step={field.step}
-            marks
-            min={field.min}
-            max={field.max}
-          />
+              <Slider
+                defaultValue={field.default}
+                aria-labelledby="discrete-slider"
+                valueLabelDisplay="auto"
+                value={context.value}
+                onChange={ this.handleChange }
+                onChangeCommitted={ ()=>{
+                  if(field.autoSave === true){
+                    context.saveFormHandler();
+                  }
+                }}
+                step={field.step}
+                marks
+                min={field.min}
+                max={field.max}
+              />
             </DefaultWrapper>
 
           </React.Fragment>
 
-      }
-          iconButtons={iconButtons}
-        />);
+        }
+        iconButtons={iconButtons}
+      />);
   }
 }
 

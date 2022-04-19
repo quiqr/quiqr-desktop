@@ -48,10 +48,17 @@ class ColorToolDynamic extends BaseDynamic {
   }
 
   handleChange = (e: Event, value: any)=>{
-    //service.api.logToConsole(value)
-    //service.api.logToConsole(e.css.backgroundColor)
+    let {context} = this.props;
+    let {node} = context;
+    let {field} = node;
+
     if(e && e.css && e.css.backgroundColor){
-      this.props.context.setValue(e.css.backgroundColor, 250);
+      context.setValue(e.css.backgroundColor, 250);
+
+      if(field.autoSave === true){
+        context.saveFormHandler();
+      }
+
       this.forceUpdate();
     }
   }

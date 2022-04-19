@@ -73,7 +73,7 @@ class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDyn
       <FormItemWrapper
         control={
 
-        <div>
+          <div>
             <label style={{
               alignSelf: 'stretch',
               display:'block',
@@ -94,9 +94,12 @@ class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDyn
               variants={field.variants}
               categories={field.categories}
 
-              onChange={(nextFont) =>
-                  this.props.context.setValue(nextFont.family)
-              }
+              onChange={(nextFont) => {
+                this.props.context.setValue(nextFont.family)
+                if(field.autoSave === true){
+                  context.saveFormHandler();
+                }
+              }}
             />
             <div>
               <p className={"apply-font-"+field.pickerId}>
@@ -105,7 +108,7 @@ class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDyn
               </p>
             </div>
 
-        </div>
+          </div>
 
         }
         iconButtons={iconButtons}

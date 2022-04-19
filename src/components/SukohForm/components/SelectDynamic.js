@@ -55,6 +55,11 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
       if(field.options[index].value!==context.value)
         context.setValue(field.options[index].value)
     }
+
+    if(field.autoSave === true){
+      context.saveFormHandler();
+    }
+
   }
 
   renderComponent(){

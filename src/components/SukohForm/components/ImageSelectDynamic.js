@@ -51,25 +51,12 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
     this.checkThumbs();
   }
 
-  /*
-  componentDidUpdate(preProps: HomeProps){
-    this.checkRootPathFiles();
-  }
-  */
-  /*
-  componentDidUpdate(preProps: HomeProps){
-    this.checkThumbs();
-  }
-  */
-
   checkRootPathFiles(){
     let {context} = this.props;
     let {field} = context.node;
     if(!Array.isArray(context.node.state['resources'])){
       context.node.state['resources'] = [];
     }
-
-    //service.api.logToConsole(field.path)
 
     if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
       service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
@@ -142,14 +129,12 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
 
       if(this.isImage(this.props.context.value)){
 
-
         let thumbPath = this.props.context.value;
         this.setState({srcFile: this.props.context.value });
 
         if(field.path){
           thumbPath = path.join(field.path, this.props.context.value);
         }
-        //service.api.logToConsole(thumbPath);
 
         form.props.plugins.getBundleThumbnailSrc(thumbPath)
           .then((src)=>{
@@ -208,6 +193,9 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
           context.setValue(selected);
           this.checkThumbs();
           this.handleCloseDialog();
+          if(field.autoSave === true){
+            context.saveFormHandler();
+          }
         }}
         handleClose={()=>{
           this.handleCloseDialog();
