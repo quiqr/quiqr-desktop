@@ -169,7 +169,11 @@ class Form extends React.Component<FormProps,FormState> {
   renderField(node : DynamicFormNode<FieldBase>, onValueChanged : ?(value: any) => void){
 
     //INDIANSUMMERRECURSIVE
-    //service.api.logToConsole(node.field.key, "renderField key");
+    //service.api.logToConsole(node.field.title, "renderField key");
+
+    if(!node.field.title){
+      node.field.title = node.field.key
+    }
 
     var {field} = node;
     let component = this.props.componentRegistry.get(field.type);

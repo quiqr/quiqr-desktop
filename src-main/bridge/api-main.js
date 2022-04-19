@@ -362,13 +362,15 @@ api.shouldReloadForm = async function({reloadFormPath}, context){
   global.currentFormShouldReload = reloadFormPath;
 }
 api.reloadCurrentForm = async function({},context){
-  let currentPath = global.currentFormNodePath.endsWith('/') ? global.currentFormNodePath.slice(0, -1) : global.currentFormNodePath;
-  currentPath = currentPath.toLowerCase().replace('/','.');
-  if(global.currentFormShouldReload === currentPath){
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    let urlpath = "/sites/"+mainWindow.webContents.getURL().split("/refresh-form-").shift();
-    urlpath = "/sites/"+urlpath.split("/sites/").pop()+"/refresh-form-"+Math.random();
-    mainWindow.webContents.send("redirectToGivenLocation", urlpath);
+  if(global.currentFormNodePath){
+    let currentPath = global.currentFormNodePath.endsWith('/') ? global.currentFormNodePath.slice(0, -1) : global.currentFormNodePath;
+    currentPath = currentPath.toLowerCase().replace('/','.');
+    if(global.currentFormShouldReload === currentPath){
+      mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      let urlpath = "/sites/"+mainWindow.webContents.getURL().split("/refresh-form-").shift();
+      urlpath = "/sites/"+urlpath.split("/sites/").pop()+"/refresh-form-"+Math.random();
+      mainWindow.webContents.send("redirectToGivenLocation", urlpath);
+    }
   }
 }
 
