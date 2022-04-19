@@ -9,6 +9,38 @@ class InitialWorkspaceConfigBuilder{
     this.workspacePath = workspacePath;
   }
 
+  buildAll(){
+
+    this.buildHomeReadme();
+
+    let {dataBase, formatProvider} = this.buildBase();
+    let dataInclude = this.buildInclude();
+    let dataPartial = this.buildPartials();
+
+    fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model'));
+    fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model','includes'));
+    fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model','partials'));
+
+    let filePathInclude = path.join(this.workspacePath,'quiqr','model','includes','collections.'+formatProvider.defaultExt());
+    let filePathPartial = path.join(this.workspacePath,'quiqr','model','partials', 'page.'+formatProvider.defaultExt());
+    let filePathBase    = path.join(this.workspacePath,'quiqr','model','base.'+formatProvider.defaultExt());
+
+    fs.writeFileSync(
+      filePathBase,
+      formatProvider.dump(dataBase)
+    );
+    fs.writeFileSync(
+      filePathInclude,
+      formatProvider.dump(dataInclude)
+    );
+    fs.writeFileSync(
+      filePathPartial,
+      formatProvider.dump(dataPartial)
+    );
+
+    return filePathBase;
+  }
+
   getConfig(opts){
 
     let rootKeysLower = {};
@@ -135,6 +167,30 @@ class InitialWorkspaceConfigBuilder{
   }
 
   buildHomeReadme(){
+    //THIS SEEMS NEW. CHECK IF README EXIST OR CREATE
+    let readmePath = path.join(this.workspacePath,'quiqr','home','index.md');
+    if( !fs.existsSync(readmePath) ){
+      fs.ensureDirSync(path.join(this.workspacePath,'quiqr','home'));
+      fs.writeFileSync(
+        readmePath,
+        `
+# README FOR NEW SITE
+
+If you're a website developer you can read the [Quiqr Site Developer
+Docs](https://book.quiqr.org/)
+how to customize your Site Admin.
+
+Quiqr is a Desktop App made for [Hugo](https://gohugo.io). Read all about
+[creating Hugo websites](https://gohugo.io/getting-started/quick-start/).
+
+To change this about text, edit this file: *${readmePath}*.
+
+Happy Creating.
+
+❤️ Quiqr
+        `.trim()
+      );
+    }
 
   }
 }
