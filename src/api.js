@@ -28,8 +28,8 @@ export class API {
     return mainProcessBridge.request('logToConsole', {message, label});
   }
 
-  getDynFormFields(searchFormObjectFile: string, searchRootNode: string, searchLevelKeyVal: any){
-    return mainProcessBridge.request('getDynFormFields', {searchFormObjectFile, searchRootNode, searchLevelKeyVal});
+  getDynFormFields(searchRootNode: string, searchLevelKeyVal: any){
+    return mainProcessBridge.request('getDynFormFields', {searchRootNode, searchLevelKeyVal});
   }
 
   importSite(){

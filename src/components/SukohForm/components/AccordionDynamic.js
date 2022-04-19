@@ -165,21 +165,24 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       let componentKey = `item-${childIndex}`;
 
       if("dynFormSearchKey" in field){
-        let dynFormObjectFile = "base"; //search in model/base by default
+        //let dynFormObjectFile = "base"; //search in model/base by default
         let dynFormObjectRoot = "dynamics"; //search in sukoh by default
 
         if("dynFormObjectRoot" in field){
           dynFormObjectRoot = field.dynFormObjectRoot;
         }
+
+        /*
         if("dynFormObjectFile" in field){
           dynFormObjectFile = field.dynFormObjectFile;
         }
+        */
 
         let searchKey = field["dynFormSearchKey"];
         let searchVal = item[searchKey];
         let dynSearchKeyVal = { key: searchKey, val: searchVal }
 
-        await service.api.getDynFormFields( dynFormObjectFile, dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
+        await service.api.getDynFormFields( dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
           if (typeof extraFields !== 'undefined') {
 
             extraFields.fields.forEach(function(extrField){

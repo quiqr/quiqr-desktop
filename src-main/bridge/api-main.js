@@ -179,8 +179,6 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     global.pogoconf.setLastOpenedSite(siteKey, workspaceKey, currentSitePath);
     global.pogoconf.saveState();
 
-
-
     if(global.modelDirWatcher && typeof global.modelDirWatcher.close === 'function'){
       global.modelDirWatcher.close().then(()=>{
         setWatcher(workspaceService);
@@ -444,29 +442,19 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}, context) {
   });
 }
 
-api.getDynFormFields = async function({searchFormObjectFile, searchRootNode, searchLevelKeyVal }, context){
+api.getDynFormFields = async function({searchRootNode, searchLevelKeyVal }, context){
+  const { workspaceService } = await getWorkspaceServicePromise(global.currentSiteKey, global.currentWorkspaceKey);
+  let configuration;
+  try{
+    configuration = await workspaceService.getConfigurationsData();
 
-  let fileExp = path.join(global.currentSitePath, "quiqr", "model", searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-  if(glob.sync(fileExp).length < 1){
-    fileExp = path.join(global.currentSitePath, searchFormObjectFile+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    if(searchRootNode in configuration){
+      let dynConf = configuration[searchRootNode].find(x => x[searchLevelKeyVal['key']] === searchLevelKeyVal['val']);
+      context.resolve(dynConf);
+    }
   }
-  console.log(fileExp);
-
-  //BACKWARDS COMPATIBILITY
-  if(glob.sync(fileExp).length < 1){
-    fileExp = path.join(global.currentSitePath, 'sukoh'+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-  }
-  let filePath = glob.sync(fileExp)[0] ;
-  let strData = fs.readFileSync(filePath,'utf8');
-
-  let formatProvider = await formatProviderResolver.resolveForFilePath(filePath);
-  if(formatProvider==null){
-    formatProvider = await formatProviderResolver.getDefaultFormat();
-  }
-  let returnData = await formatProvider.parse(strData);
-  if(searchRootNode in returnData){
-    let dynConf = returnData[searchRootNode].find(x => x[searchLevelKeyVal['key']] === searchLevelKeyVal['val']);
-    context.resolve(dynConf);
+  catch(e){
+    console.log("could not get configuration for dynformfields")
   }
 }
 

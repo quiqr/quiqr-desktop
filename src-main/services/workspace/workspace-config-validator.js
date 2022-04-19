@@ -30,8 +30,10 @@ class WorkspaceConfigValidator {
         collections: joi.array().required(),
         singles: joi.array().required(),
         dynamics: joi.array(),
-        partials: joi.array(), //FOR NOW BACKWARDS COMPATIBITY SOON UNCOMMENT BELOW
+
+        //partials: joi.array(), //FOR NOW BACKWARDS COMPATIBITY SOON UNCOMMENT BELOW
         // partials: joi.any().forbidden().error(new Error('the main key partials is obsolete. Use dynamics in stead')),
+
         build: joi.array().items(joi.object().keys({
           key:joi.string(),
           config:joi.string().required()

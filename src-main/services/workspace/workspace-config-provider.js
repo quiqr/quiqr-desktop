@@ -158,13 +158,20 @@ Happy Creating.
     return dataPhase2Merged;
   }
 
-  async _postProcessConfigObject(configOrg, workspacePath){
-
+  configObjectSkeleton(configOrg){
     if(configOrg){
       if(!configOrg.menu) configOrg.menu = [];
       if(!configOrg.collections) configOrg.collections = [];
       if(!configOrg.singles) configOrg.singles = [];
+      if(!configOrg.dynamics) configOrg.dynamics = [];
     }
+
+    return configOrg
+  }
+
+  async _postProcessConfigObject(configOrg, workspacePath){
+
+    configOrg = this.configObjectSkeleton(configOrg)
 
     // MERGE INCLUDES
     configOrg = this._loadIncludes(configOrg, workspacePath);
@@ -231,6 +238,11 @@ Happy Creating.
       this.parseInfo.includeFiles.push({key:path.parse(filename).name,filename: filename});
 
       newObject[path.parse(filename).name] = deepmerge(mergeData, configObject[path.parse(filename).name]);
+      if(path.parse(filename).name == 'dynamics' ){
+      //console.log(configObject);
+      //console.log(newObject)
+      }
+
 
     });;
 
