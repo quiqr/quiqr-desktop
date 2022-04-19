@@ -64,7 +64,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
   }
 
   componentWillMount(){
-    service.api.shouldReloadForm(false);
+    service.api.shouldReloadForm(null);
     document.addEventListener('keydown', this.keydownHandler.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
@@ -102,6 +102,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
         data: Object.assign({}, this._valueFactory())
       }
       this.props.onSave.call(this, context);
+
       service.api.reloadCurrentForm();
       //let updatedValues = this.props.onSave.call(this, context);
       //service.api.logToConsole("who was first");
@@ -143,6 +144,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
           fields={this.props.fields}
           plugins={this.props.plugins}
           rootName={this.props.rootName}
+          saveFormHandler={()=>this.saveContent()}
           pageUrl={this.props.pageUrl}
           values={this.props.values}
           onChange={this.handleFormChange.bind(this)}

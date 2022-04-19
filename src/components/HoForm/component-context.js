@@ -90,6 +90,10 @@ export class ComponentContext<Field: FieldBase>{
         this.form.setPath((node/*: any*/));
     }
 
+    saveFormHandler(){
+      this.form.saveFormHandler();
+    }
+
     backOnePath(){
         this.form.setPath((this.currentNode.parent/*: any*/));
     }

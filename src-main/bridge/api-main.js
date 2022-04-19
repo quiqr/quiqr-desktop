@@ -340,9 +340,7 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   menuManager.createMainMenu();
 }
 
-api.shouldReloadForm = async function({reloadForm}, context){
-  global.currentFormShouldReload = reloadForm;
-}
+
 
 api.setCurrentFormNodePath = async function({path}, context){
   global.currentFormNodePath = path;
@@ -360,8 +358,13 @@ api.getCurrentFormAccordionIndex = async function({}, context){
   context.resolve(global.currentFormAccordionIndex)
 }
 
-api.reloadCurrentForm = async function(context){
-  if(global.currentFormShouldReload === true){
+api.shouldReloadForm = async function({reloadFormPath}, context){
+  global.currentFormShouldReload = reloadFormPath;
+}
+api.reloadCurrentForm = async function({},context){
+  let currentPath = global.currentFormNodePath.endsWith('/') ? global.currentFormNodePath.slice(0, -1) : global.currentFormNodePath;
+  currentPath = currentPath.toLowerCase().replace('/','.');
+  if(global.currentFormShouldReload === currentPath){
     mainWindow = global.mainWM.getCurrentInstanceOrNew();
     let urlpath = "/sites/"+mainWindow.webContents.getURL().split("/refresh-form-").shift();
     urlpath = "/sites/"+urlpath.split("/sites/").pop()+"/refresh-form-"+Math.random();

@@ -117,6 +117,7 @@ class Form extends React.Component<FormProps,FormState> {
     return newPath;
   }
 
+
   setPath(node : DynamicFormNode<FieldBase>){
 
     //service.api.logToConsole(JSON.stringify(node));
@@ -257,6 +258,10 @@ class Form extends React.Component<FormProps,FormState> {
     if(this.props.onChange!=null){
       this.props.onChange(this.getFormDocumentClone);
     }
+  }
+
+  saveFormHandler(){
+    this.props.saveFormHandler();
   }
 
   renderBreadcumb(){

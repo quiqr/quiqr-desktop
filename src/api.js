@@ -209,8 +209,8 @@ export class API {
     return mainProcessBridge.request('mountWorkspace', {siteKey, workspaceKey});
   }
 
-  shouldReloadForm(reloadForm: bool){
-    return mainProcessBridge.request('shouldReloadForm', {reloadForm});
+  shouldReloadForm(reloadFormPath: string){
+    return mainProcessBridge.request('shouldReloadForm', {reloadFormPath});
   }
 
   setCurrentFormAccordionIndex(index: string){
