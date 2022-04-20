@@ -523,24 +523,33 @@ class WorkspaceService{
 
     let files = [];
     let folder;
+    let filePath;
+    let src;
 
     let config = await this.getConfigurationsData();
 
     if(collectionKey == ""){
-      src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
-      folder = path.basename(await this.getSingleFolder(collectionItemKey));
+      //src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+      //folder = path.basename(await this.getSingleFolder(collectionItemKey));
+
+      let single = config.singles.find(x => x.key === collectionItemKey);
+      if(single==null)throw new Error('Could not find single.');
+      filePath = path.join(this.workspacePath, single.file);
+
     }
     else {
       let collection = config.collections.find(x => x.key === collectionKey);
       folder = collection.folder;
+      filePath = path.join(this.workspacePath, folder, collectionItemKey);
     }
 
-    let filePath = path.join(this.workspacePath, folder, collectionItemKey);
 
+    console.log(filePath)
     if(await fs.exists(filePath)){
       if(contentFormats.isContentFile(filePath)){
         files = await this.getResourcesFromContent(filePath, [], targetPath);
       }
+    console.log(files)
       return files;
     }
 

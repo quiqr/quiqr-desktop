@@ -116,6 +116,10 @@ class Single extends React.Component<SingleProps,SingleState>{
         return service.api.openFileDialogForSingleAndCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions}, forceFileName);
       },
 
+      getFilesInBundle: function(extensions, targetPath, forceFileName){
+        return service.api.getFilesInBundle(siteKey, workspaceKey, "", singleKey, targetPath, extensions, forceFileName);
+      },
+
       getBundleThumbnailSrc: function(targetPath){
         return service.api.getThumbnailForCollectionItemImage(siteKey,workspaceKey,"",singleKey, targetPath);
       }

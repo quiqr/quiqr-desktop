@@ -51,7 +51,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
     this.checkThumbs();
   }
 
-  checkRootPathFiles(){
+  checkRootPathFiles(reload = false){
     let {context} = this.props;
     let {field} = context.node;
     if(!Array.isArray(context.node.state['resources'])){
@@ -61,7 +61,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
     if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
       service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
 
-        if(this.state.absFiles.length === 0){
+        if(this.state.absFiles.length === 0 || reload){
           let files = _files.map(item => {
             item.filename = item.src;
             item.src = path.join(field.path, item.src);
@@ -74,7 +74,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
     else{
       context.form.props.plugins.getFilesInBundle( field.extensions, field.path, field.forceFileName).then((_files)=>{
 
-        if(this.state.absFiles.length === 0){
+        if(this.state.absFiles.length === 0 || reload){
           let files = _files.map(item => {
             item.filename = item.src;
             item.src = path.join(item.src);
@@ -146,7 +146,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         let thumbPath = this.props.context.value;
         this.setState({srcFile: this.props.context.value });
 
-        if(field.path && field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
+        if(field.path && (field.path.charAt(0) === "/" || field.path.charAt(0) === "\\")){
           thumbPath = path.join(field.path, this.props.context.value);
         }
 
@@ -239,6 +239,8 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
           {this.renderImage()}
 
           <Button style={{marginTop:'5px'}} variant="contained" color="primary" onClick={()=>{
+            //this.checkRootPathFiles(true);
+            //this.checkThumbs();
             let conf = this.state.selectImagesDialogConf;
             conf.visible = true;
 
