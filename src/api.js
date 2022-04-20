@@ -170,6 +170,10 @@ export class API {
     return mainProcessBridge.request('getThumbnailForCollectionItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
   }
 
+  getFilesInBundle(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string, extensions: any, forceFileName: string){
+    return mainProcessBridge.request('getFilesInBundle', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName});
+  }
+
   getFilesFromAbsolutePath(path: string){
     return mainProcessBridge.request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
   }

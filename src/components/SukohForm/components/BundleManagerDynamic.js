@@ -77,6 +77,20 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         }
       });
     }
+    else{
+      context.form.props.plugins.getFilesInBundle( field.extensions, field.path, field.forceFileName).then((_files)=>{
+
+        if(this.state.absFiles.length === 0){
+          let files = _files.map(item => {
+            item.src = path.join(item.src);
+            return item;
+          })
+          this.setState({absFiles: files});
+          context.setValue(files);
+        }
+      });
+
+    }
   }
 
   normalizeState({state, field, stateBuilder} : {state:any, field:BundleManagerDynamicField, stateBuilder: any}){
@@ -91,7 +105,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         field.extensions= [];
       }
       if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
-        stateBuilder.setLevelState(resource, field.fields);
+        //stateBuilder.setLevelState(resource, field.fields);
       }
     }
   }
@@ -113,11 +127,8 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       delete field.extensions;
     }
 
-
-    service.api.logToConsole(field,"FROM BUNDLE MANAGER");
     context.form.props.plugins.openBundleFileDialog({title:field.title, extensions: field.extensions, targetPath: field.path, forceFileName: field.forceFileName})
       .then((files)=>{
-        service.api.logToConsole(files,"FILES BUNDLE MANAGER");
         if(files){
           let currentFiles = context.value.slice();
           for(let f = 0; f < files.length; f++){

@@ -646,6 +646,18 @@ api.getFilesFromAbsolutePath = function({path},promise){
 
 }
 
+api.getFilesInBundle = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName}, promise){
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+    if(err){ promise.reject(err); return; }
+    workspaceService.getFilesInBundle(collectionKey, collectionItemKey, targetPath, extensions, forceFileName)
+      .then((result)=>{
+        promise.resolve(result);
+      })
+      .catch((error)=>{
+        promise.reject(error);
+      });
+  });
+}
 api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, promise){
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ promise.reject(err); return; }

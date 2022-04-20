@@ -71,6 +71,20 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         }
       });
     }
+    else{
+      context.form.props.plugins.getFilesInBundle( field.extensions, field.path, field.forceFileName).then((_files)=>{
+
+        if(this.state.absFiles.length === 0){
+          let files = _files.map(item => {
+            item.filename = item.src;
+            item.src = path.join(item.src);
+            return item;
+          })
+          this.setState({absFiles: files});
+        }
+      });
+    }
+
   }
 
   normalizeState({state, field, stateBuilder} : {state:any, field:ImageSelectDynamicField, stateBuilder: any}){
@@ -89,7 +103,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         field.extensions= [];
       }
       if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
-        stateBuilder.setLevelState(resource, field.fields);
+        //stateBuilder.setLevelState(resource, field.fields);
       }
     }
 
@@ -132,13 +146,12 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
         let thumbPath = this.props.context.value;
         this.setState({srcFile: this.props.context.value });
 
-        if(field.path){
+        if(field.path && field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
           thumbPath = path.join(field.path, this.props.context.value);
         }
 
         form.props.plugins.getBundleThumbnailSrc(thumbPath)
           .then((src)=>{
-            //service.api.logToConsole(src);
             this.setState({src});
           });
       }
@@ -152,7 +165,10 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
   }
 
   renderImage(){
+    //service.api.logToConsole(this.props.context.value);
+
     if(this.isImage(this.props.context.value)){
+
       return (
         <div className="checkered" style={{ maxWidth:'200px', height:'100%', marginBottom:'0px', overflow:'hidden', backgroundColor: '#ccc'}}>
           {

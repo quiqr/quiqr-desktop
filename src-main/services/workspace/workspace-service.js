@@ -192,11 +192,15 @@ class WorkspaceService{
     return merged;
   }
 
-  async getResourcesFromContent(filePath, currentResources = []){
+  async getResourcesFromContent(filePath, currentResources = [], targetPath = null){
     filePath = path.normalize(filePath);
     let directory = path.dirname(filePath);
-    //let globExp = '**/*';
+
     let globExp = '*';
+    if(targetPath){
+      globExp = targetPath+'/*';
+    }
+
     let allFiles = await promisify(glob)(globExp, {nodir:true, absolute:false, root:directory, cwd:directory });
 
     let expression = `_?index[.](${contentFormats.SUPPORTED_CONTENT_EXTENSIONS.join('|')})$`;
@@ -514,6 +518,34 @@ class WorkspaceService{
       fs.remove(thumbSrc);
     }
   }
+
+  async getFilesInBundle(collectionKey, collectionItemKey, targetPath, extensions, forceFileName){
+
+    let files = [];
+    let folder;
+
+    let config = await this.getConfigurationsData();
+
+    if(collectionKey == ""){
+      src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+      folder = path.basename(await this.getSingleFolder(collectionItemKey));
+    }
+    else {
+      let collection = config.collections.find(x => x.key === collectionKey);
+      folder = collection.folder;
+    }
+
+    let filePath = path.join(this.workspacePath, folder, collectionItemKey);
+
+    if(await fs.exists(filePath)){
+      if(contentFormats.isContentFile(filePath)){
+        files = await this.getResourcesFromContent(filePath, [], targetPath);
+      }
+      return files;
+    }
+
+  }
+
 
   //TODO RENAME ALSO USED FOR SINGLES
   async getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath){

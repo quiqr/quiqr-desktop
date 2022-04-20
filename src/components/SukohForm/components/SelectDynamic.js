@@ -47,13 +47,23 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
   handleChange = (e: any, index: number, payload: Array<string>)=>{
     let {context} = this.props;
     let field = context.node.field;
+    let val;
 
     if(field.multiple===true){
       context.setValue(payload)
     }
     else{
-      if(field.options[index].value!==context.value)
-        context.setValue(field.options[index].value)
+
+      if(typeof field.options[index] === "string"){
+        val = field.options[index]
+      }
+      else{
+        val = field.options[index].value
+      }
+
+      if(val !== context.value){
+        context.setValue(val)
+      }
     }
 
     if(field.autoSave === true){
@@ -86,9 +96,20 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
     onChange={this.handleChange}
     fullWidth={true}
   >
-      {field.options.map((option, i)=>(
-        <MenuItem key={i} value={option.value} primaryText={option.text} />
-      ))}
+      {field.options.map((option, i)=>{
+        let val, text;
+        if(typeof option === "string"){
+          val = option
+          text = option
+        }
+        else{
+          val = option.value
+          text = option.text
+        }
+        return (
+          <MenuItem key={i} value={val} primaryText={text} />
+        )
+      })}
         </SelectField>}
         iconButtons={iconButtons}
       />);
