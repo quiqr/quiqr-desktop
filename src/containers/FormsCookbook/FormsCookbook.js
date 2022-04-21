@@ -57,53 +57,56 @@ export class FormsCookbook extends React.Component<FormsCookbookProps, FormsCook
         this.formRef = ref;
     }
 
-    render(){
-        let { sampleKey } = this.props;
-        let sample = (this.props.samples||samples).find(x => x.key===sampleKey);
-        if(sample){
-            return (<React.Fragment>
-                    <Form
-                        ref={this.handleFormRef}
-                        key={sampleKey}
-                        rootName={sample.title}
-                        breadcumbComponentType={FormBreadcumb}
-                        fields={sample.fields}
-                        debug={false}
-                        componentRegistry={componentRegistry}
-                        values={sample.values}
-                        plugins={{
-                            openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
-                                alert('This operation is not supported in the Cookbook. But we\'ll mock something for you.');
-                                return Promise.resolve([`${targetPath}/some-file.${extensions[0]||'png'}`]);
-                            },
-                            getBundleThumbnailSrc: function(targetPath){
-                                return Promise.resolve('data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P48w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
-                            }
-                        }}
-                    />
-                    <MenuBar onViewConfigClick={this.handleOnViewConfigClick} onViewStateClick={this.handleOnViewStateClick} />
-                    <div style={{height:'70px'}} />
-                    <Dialog
-                        title="State"
-                        modal={false}
-                        open={this.state.modal==='state'}
-                        autoScrollBodyContent={true}
-                        onRequestClose={this.handleModalClose}>
-                        {this.state.modal==='state'? (<pre>{JSON.stringify(this.formRef.getFormDocumentClone(), null, ' ')}</pre>) : (null) }
-                    </Dialog>
-                    <Dialog
-                        title="Config"
-                        modal={false}
-                        open={this.state.modal==='config'}
-                        autoScrollBodyContent={true}
-                        onRequestClose={this.handleModalClose}>
-                        {this.state.modal==='config'? (<pre>{JSON.stringify(sample.fields, null, ' ')}</pre>) : (null) }
-                    </Dialog>
-                </React.Fragment>
-            )
-        }
-        return (<p>Sample not found.</p>);
-
+  render(){
+    let { sampleKey } = this.props;
+    let sample = (this.props.samples||samples).find(x => x.key===sampleKey);
+    if(sample){
+      return (<React.Fragment>
+        <Form
+          ref={this.handleFormRef}
+          key={sampleKey}
+          rootName={sample.title}
+          breadcumbComponentType={FormBreadcumb}
+          fields={sample.fields}
+          debug={false}
+          componentRegistry={componentRegistry}
+          values={sample.values}
+          plugins={{
+            openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
+              alert('This operation is not supported in the Cookbook. But we\'ll mock something for you.');
+              return Promise.resolve([`${targetPath}/some-file.${extensions[0]||'png'}`]);
+            },
+            getFilesInBundle: function(extensions, targetPath, forceFileName){
+              return Promise.resolve([{src:`${targetPath}/some-file.${extensions[0]||'png'}`}]);
+            },
+            getBundleThumbnailSrc: function(targetPath){
+              return Promise.resolve('data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P48w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');
+            }
+          }}
+        />
+        <MenuBar onViewConfigClick={this.handleOnViewConfigClick} onViewStateClick={this.handleOnViewStateClick} />
+        <div style={{height:'70px'}} />
+        <Dialog
+          title="State"
+          modal={false}
+          open={this.state.modal==='state'}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleModalClose}>
+          {this.state.modal==='state'? (<pre>{JSON.stringify(this.formRef.getFormDocumentClone(), null, ' ')}</pre>) : (null) }
+        </Dialog>
+        <Dialog
+          title="Config"
+          modal={false}
+          open={this.state.modal==='config'}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleModalClose}>
+          {this.state.modal==='config'? (<pre>{JSON.stringify(sample.fields, null, ' ')}</pre>) : (null) }
+        </Dialog>
+      </React.Fragment>
+      )
     }
+    return (<p>Sample not found.</p>);
+
+  }
 
 }

@@ -432,7 +432,7 @@ class WorkspaceService{
         if(resource.__deleted){
 
           let fullSrc = path.join(directory, resource.src);
-          this.removeThumbnailForItemImage("", singleKey, resource.src);
+          this.removeThumbnailForItemImage(collectionKey, collectionItemKey, resource.src);
           await fs.remove(fullSrc);
         }
       }
@@ -503,6 +503,9 @@ class WorkspaceService{
       folder = path.basename(await this.getSingleFolder(collectionItemKey));
     }
     else {
+
+      let config = await this.getConfigurationsData();
+
       let collection = config.collections.find(x => x.key === collectionKey);
       folder = collection.folder;
     }
