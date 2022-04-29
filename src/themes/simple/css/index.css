@@ -9,6 +9,11 @@ body {
   color: #2f343c;
 }
 
+.sidebar-subheader {
+  color: white;
+  font-weight:700;
+}
+
 listItem{
   padding: 5px;
 }

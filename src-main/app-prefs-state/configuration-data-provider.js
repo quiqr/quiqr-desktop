@@ -28,7 +28,7 @@ else{
 }
 
 const GLOBAL_DEFAULTS = {
-  appTheme: "simple",
+  appTheme: "quiqr10", // default / quiqr10 / simple
   pogostripeConn: pogostripeConn,
   pogoboardConn: pogoboardConn
 }

@@ -411,6 +411,7 @@ resources: []\n\
     mainWindow.webContents.send("redirectToGivenLocation","/prefs");
   }
 
+  /*
   siteConfig() {
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -423,6 +424,7 @@ resources: []\n\
     }
 
   }
+  */
 
   deleteSite() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -1237,7 +1239,11 @@ resources: []\n\
             enabled: this.siteSelected(),
             label: 'Site Configuration',
             click: async () => {
-              this.siteConfig()
+                let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+                //mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
+                var newURL='/sites/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"/siteconf";
+                mainWindow.webContents.send("redirectToGivenLocation", newURL);
+              //this.siteConfig()
             }
           },
           {

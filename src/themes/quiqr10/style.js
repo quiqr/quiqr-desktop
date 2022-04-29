@@ -1,23 +1,27 @@
 //the default locked UI style
 
+const topBarHeight = '52px';
+const sidebarWidth= '280px';
+
 exports.container = {
   position: 'relative',
   display: 'flex',
-  height: 'calc(100vh - 42px)',
-  marginTop: '42px',
+  height: `calc(100vh - ${topBarHeight})`,
+  marginTop: topBarHeight,
   overflowX: 'hidden'
 };
 
 exports.menuContainer = {
-  flex: '0 0 280px',
+  flex: `0 0 ${sidebarWidth}`,
   overflowY:'auto',
   overflowX:'hidden',
   userSelect:'none',
-  background:'linear-gradient(to bottom right, #2a0d56, #16062f)',
+  background:'linear-gradient(to bottom right, #eaebed, #eaebed)',
 };
 
 exports.contentContainer = {
   flex: 'auto',
+  userSelect:'none',
   overflow: 'auto',
   overflowX: 'hidden'
 };

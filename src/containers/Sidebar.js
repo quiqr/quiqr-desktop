@@ -1,27 +1,16 @@
-//@flow
-
 import React from 'react';
-import {List, ListItem } from 'material-ui-02/List';
-import Subheader from 'material-ui-02/Subheader';
-import Border from './../components/Border';
 
-import darkBaseTheme from 'material-ui-02/styles/baseThemes/darkBaseTheme';
+import List from '@material-ui/core/List';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+
+import baseTheme from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import MuiThemeProvider from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui-02/styles/getMuiTheme';
 
 const Fragment = React.Fragment;
-const translucentColor = 'RGBA(255,255,255,1)';
-
-let MenuBorder = ({ children }) => {
-  return <Border style={{margin: '0 16px', borderRadius:3, padding: '1px', borderColor:translucentColor}}>
-    {children}
-  </Border>;
-}
-
-let WhiteSubHeader = ({children}) => {
-  return <Subheader style={{color: translucentColor, fontWeight:300,}}>{children}</Subheader>
-};
-
 
 export type SidebarMenu = {
     title: string,
@@ -36,9 +25,7 @@ export type SidebarMenu = {
 
 export type SidebarProps = {
     menus: Array<SidebarMenu>,
-    //    menuIsLocked: bool,
     onLockMenuClicked: ()=> void,
-    //onToggleItemVisibility: ()=> void,
     hideItems : bool
 }
 
@@ -62,43 +49,51 @@ export class Sidebar extends React.Component<SidebarProps,SidebarState>{
         let menusNodes = menus.map((menu,i)=>{
         return (
             <Fragment key={i+menu.key||i+menu.title}>
-                <WhiteSubHeader>{ menu.title }</WhiteSubHeader>
                 { menu.widget ? (menu.widget) : (null) }
-                { menu.items ? (<MenuBorder>
-                    <List style={{padding: 0}}>
+                { menu.items ? (
+                    <List
+                      style={{padding: 0}}
+                      subheader={
+                        <ListSubheader component="div" id="nested-list-subheader">
+                          { menu.title }
+                        </ListSubheader>
+                      }>
                         { menu.items.map((item, index)=>{
                             return (
-                                <ListItem
-                                    key={index}
-                                    innerDivStyle={{paddingTop:12,paddingBottom:12 }}
-                                    onClick={item.onClick}
-                                    primaryText={item.label}
-                                    //leftIcon={<IconActionList color={translucentColor} />}
-                                />
+
+                              <ListItem
+                                key={index}
+                                button
+                                selected={item.selected}
+                                onClick={item.onClick}
+                              >
+                                <ListItemText primary={item.label} />
+                              </ListItem>
+
                             );
                         }) }
                     </List >
-                </MenuBorder>) : (null) }
+             ) : (null) }
             </Fragment>
         );
     });
 
-    return (
-        <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-            <React.Fragment>
-                <div className={'slideFadeInRight animated'}  style={{position:'relative', opacity: 1}}>
+      return (
+        <MuiThemeProvider muiTheme={getMuiTheme(baseTheme)}>
+          <React.Fragment>
+            <div className={'slideFadeInRight animated'}  style={{position:'relative', opacity: 1}}>
 
-                    <div style={ Object.assign({},
-                        { width:'280px', transition: 'all .2s' },
-                        hideItems? { opacity:0, pointerEvents:'none' } : { opacity:1 }
-                    )}>
+              <div style={ Object.assign({},
+                { width:'280px', transition: 'all .2s' },
+                hideItems? { opacity:0, pointerEvents:'none' } : { opacity:1 }
+              )}>
 
-                    { menusNodes }
+                { menusNodes }
 
-                        <br />
-                    </div>
-                </div>
-            </React.Fragment>
+                <br />
+              </div>
+            </div>
+          </React.Fragment>
         </MuiThemeProvider>
     );
   }

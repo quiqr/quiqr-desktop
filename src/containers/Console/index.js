@@ -1,5 +1,5 @@
 import React from 'react';
-import { consoleService } from '../services/ui-service';
+import { consoleService } from '../../services/ui-service';
 
 const consoleStyle ={
   pre: {

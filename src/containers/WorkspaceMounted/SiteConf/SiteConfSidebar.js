@@ -1,7 +1,7 @@
 import * as React           from 'react';
 import { Route }            from 'react-router-dom';
-import { Sidebar }          from './../Sidebar';
-import type { SidebarMenu } from './../Sidebar';
+import { Sidebar }          from './../../Sidebar';
+import type { SidebarMenu } from './../../Sidebar';
 //import service              from './../../services/service';
 
 
@@ -15,7 +15,7 @@ export class SiteConfSidebar extends React.Component {
 
       let encodedSiteKey = this.props.siteKey;
       let encodedWorkspaceKey = this.props.workspaceKey;
-      let basePath = `/siteconf/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+      let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
 
       let menu: SidebarMenu = {
         title: 'Site Configuration',
@@ -23,6 +23,7 @@ export class SiteConfSidebar extends React.Component {
           {
             active: true,
             label: "General",
+            xxselected: true,
             onClick: ()=>{
               history.push(`${basePath}/general/`)
             }

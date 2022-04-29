@@ -1,5 +1,5 @@
 import React          from 'react';
-import service        from './../../services/service';
+import service        from './../../../services/service';
 import Typography     from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import TextField      from '@material-ui/core/TextField';
@@ -25,7 +25,7 @@ const useStyles = theme => ({
 
 });
 
-class SiteConfModel extends React.Component {
+class SiteConfRouteModel extends React.Component {
 
   history: any;
 
@@ -158,4 +158,4 @@ class SiteConfModel extends React.Component {
   }
 }
 
-export default withStyles(useStyles)(SiteConfModel);
+export default withStyles(useStyles)(SiteConfRouteModel);

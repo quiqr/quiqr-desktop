@@ -6,7 +6,7 @@ import Spinner from '../../Spinner';
 import MovieIcon from '@material-ui/icons/Movie';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import service from '../../../services/service';
+//import service from '../../../services/service';
 
 type BundleImgThumbDynamicField = {
   key: string,

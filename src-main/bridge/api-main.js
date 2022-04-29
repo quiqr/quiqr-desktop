@@ -17,8 +17,7 @@ const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
 const cloudApiManager           = require('../pogocloud/cloud-api-manager');
 const cloudGitManager           = require('../pogocloud/cloud-git-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
-
-const chokidar          = require('chokidar');
+const chokidar                  = require('chokidar');
 
 let api = {};
 

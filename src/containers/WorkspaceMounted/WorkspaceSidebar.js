@@ -7,11 +7,12 @@ import IconOpenBrowser                      from 'material-ui-02/svg-icons/actio
 import IconHome                             from 'material-ui-02/svg-icons/action/home';
 import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
-import service                              from './../services/service'
-import type { SiteConfig, WorkspaceConfig } from './../types'
-import * as Sidebar                         from './Sidebar';
+import service                              from './../../services/service'
+import type { SiteConfig, WorkspaceConfig } from './../../types'
+import * as Sidebar                         from '../Sidebar';
 
-const translucentColor = 'RGBA(255,255,255,.8)';
+//const translucentColor = 'RGBA(255,255,255,.8)';
+const translucentColor = 'RGBA(0,0,0,.8)';
 
 type WorkspaceWidgetProps = {
   onClick : ()=> void,
@@ -145,8 +146,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
     }
   }
 
-
-
   renderSiteMounted(){
 
     let {
@@ -173,61 +172,28 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       onClick={(e,value)=>{ this.toggleMobilePreview() }}
       secondaryText=""
       rightIcon={mobilePreviewToggle}
-      leftIcon={<IconPhone color="white"  />} />
+      leftIcon={<IconPhone xcolor="white"  />} />
     }
-
-
 
       return (
         <div style={{paddingLeft:'0px'}}>
           <List style={{padding: 0}}>
             <ListItem
-            primaryText={siteConfig.name}
-            secondaryText="Publish and help"
+            primaryText="Publish and help"
             onClick={onClick}
-            leftIcon={<IconHome color="white" style={{}} />}
+            leftIcon={<IconHome xcolor="white" style={{}} />}
           />
               { previewWindowItem}
             <ListItem
             primaryText="Preview in browser"
             secondaryText=""
             onClick={ ()=>{this.handleOpenInBrowser()} }
-            leftIcon={<IconOpenBrowser color="white" style={{marginRight:0}} />} />
+            leftIcon={<IconOpenBrowser xcolor="white" style={{marginRight:0}} />} />
         </List>
         <Divider/>
       </div>
       );
-
-    /* activate later
-        return (
-                <div style={{paddingLeft:'0px'}}>
-
-                    <List style={{padding: 0}} dense={true}>
-                        <ListItem secondaryText="Dashboard, options and help" primaryText={siteConfig.name} onClick={onClick} leftIcon={<IconHome color="white" style={{}} />} />
-                    </List>
-
-                    <Divider/>
-
-                </div>
-        );
-        */
   }
-  renderSelectSite(){
-
-    let {
-      onClick,
-    } = this.props;
-
-    return (
-      <List>
-        <ListItem
-        secondaryText={'Select site'}
-        onClick={onClick}
-        rightIcon={<IconActionSetting color={translucentColor} />} />
-    </List>
-    )
-  }
-
   renderEmpty(){
 
     return (
@@ -275,15 +241,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       workspaceConfig,
     } = this.props;
 
-    if(this.state.showEmpty){
-      return (
-        <React.Fragment>
-          {this.renderPartialDevInfo()}
-          {this.renderEmpty()}
-        </React.Fragment>
-      )
-    }
-    else if(siteConfig!=null && workspaceConfig!=null){
+    if(siteConfig!=null && workspaceConfig!=null){
       return (
         <React.Fragment>
           {this.renderPartialDevInfo()}
@@ -295,7 +253,7 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
       return (
         <React.Fragment>
           {this.renderPartialDevInfo()}
-          {this.renderSelectSite()}
+          {this.renderEmpty()}
         </React.Fragment>
       )
     }
@@ -322,11 +280,13 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
   constructor(props : WorkspaceSidebarProps){
     super(props);
+
     this.state = {
       site: null,
       workspace: null,
       error: null
     };
+
   }
 
   componentDidMount(){

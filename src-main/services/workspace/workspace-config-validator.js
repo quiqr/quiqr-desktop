@@ -138,7 +138,7 @@ class WorkspaceConfigValidator {
       joi.object().keys({
         key: joi.string().trim().regex(/^[A-Za-z0-9\-_]+$/i).min(3).max(90).required().error(new Error('The single key "'+single.key+'" is invalid.')),
         title: joi.string().trim().min(3).max(90).required().error(new Error('The singles.title value is invalid.'+JSON.stringify(single))),
-        file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.'+JSON.stringify(single))),
+        file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.:'+JSON.stringify(single))),
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
         previewUrl: joi.string().trim(),
         fields: joi.array().min(1).required().error(new Error('The singles.fields value is invalid.')),

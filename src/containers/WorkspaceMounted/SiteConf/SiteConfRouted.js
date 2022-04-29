@@ -1,8 +1,8 @@
 import * as React        from 'react';
 import { Switch, Route } from 'react-router-dom';
-import  SiteConfGeneral  from './SiteConfGeneral';
-import  SiteConfModel    from './SiteConfModel';
-import  SiteConfDanger   from './SiteConfDanger';
+import  SiteConfRouteGeneral  from './SiteConfRouteGeneral';
+import  SiteConfRouteModel    from './SiteConfRouteModel';
+import  SiteConfRouteDanger   from './SiteConfRouteDanger';
 
 export class SiteConfRouted extends React.Component {
 
@@ -10,26 +10,26 @@ export class SiteConfRouted extends React.Component {
     return (
     <Switch>
 
-      <Route path='/siteconf/:site/workspaces/:workspace' exact render={ ({match})=> {
-        return <SiteConfGeneral
+      <Route path='/sites/:site/workspaces/:workspace/siteconf' exact render={ ({match})=> {
+        return <SiteConfRouteGeneral
         siteKey={ decodeURIComponent(match.params.site) }
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
-      <Route path='/siteconf/:site/workspaces/:workspace/general' exact render={ ({match})=> {
-        return <SiteConfGeneral
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/general' exact render={ ({match})=> {
+        return <SiteConfRouteGeneral
         siteKey={ decodeURIComponent(match.params.site) }
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
-      <Route path='/siteconf/:site/workspaces/:workspace/model' exact render={ ({match})=> {
-        return <SiteConfModel
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/model' exact render={ ({match})=> {
+        return <SiteConfRouteModel
         siteKey={ decodeURIComponent(match.params.site) }
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
-      <Route path='/siteconf/:site/workspaces/:workspace/danger' exact render={ ({match})=> {
-        return <SiteConfDanger
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/danger' exact render={ ({match})=> {
+        return <SiteConfRouteDanger
         siteKey={ decodeURIComponent(match.params.site) }
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />

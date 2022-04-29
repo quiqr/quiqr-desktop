@@ -1,8 +1,8 @@
 import React          from 'react';
-import service        from './../../services/service';
+import service        from './../../../services/service';
 import Typography     from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import FolderPicker from '../../components/FolderPicker';
+import FolderPicker from '../../../components/FolderPicker';
 
 const useStyles = theme => ({
 
@@ -24,7 +24,7 @@ const useStyles = theme => ({
 
 });
 
-class SiteConfDanger extends React.Component {
+class SiteConfRouteDanger extends React.Component {
 
   history: any;
 
@@ -110,4 +110,4 @@ class SiteConfDanger extends React.Component {
 
 }
 
-export default withStyles(useStyles)(SiteConfDanger);
+export default withStyles(useStyles)(SiteConfRouteDanger);

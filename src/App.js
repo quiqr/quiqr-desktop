@@ -2,20 +2,21 @@ import React                                         from 'react';
 import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
-import SelectSite                                    from './containers/SelectSite'
+//import SelectSite                                    from './containers/SelectSite'
+import { SiteLibrarySidebar, SiteLibraryRouted }     from './containers/SiteLibrary'
+import Workspace                                     from './Workspace';
 import Console                                       from './containers/Console';
-import PreviewButtons                                from './containers/PreviewButtons';
+import PreviewButtons                                from './containers/PreviewBrowser/PreviewButtons';
 
-import Home                                          from './containers/Home'
-import Collection                                    from './containers/Collection';
-import CollectionItem                                from './containers/CollectionItem';
-import Single                                        from './containers/Single';
+import TopToolbarLeft                                from './containers/TopToolbarLeft'
+
 import Welcome                                       from './containers/Welcome';
 
-import WorkspaceSidebar                              from './containers/WorkspaceSidebar';
+//import WorkspaceSidebar                              from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 import { PrefsSidebar, PrefsRouted }                 from './containers/Prefs';
-import { SiteConfSidebar, SiteConfRouted }           from './containers/SiteConf';
+
+//import { SiteConfSidebar, SiteConfRouted }           from './containers/WorkspaceMounted/SiteConf';
 
 import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
@@ -133,9 +134,11 @@ class App extends React.Component<AppProps,AppState>{
     this.history.push('/prefs');
   }
 
+  /*
   redirectSiteConf(){
     this.history.push('/siteconf');
   }
+  */
 
   redirectConsole(){
     this.history.push('/console');
@@ -153,12 +156,14 @@ class App extends React.Component<AppProps,AppState>{
     window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
     window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
     window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
-    window.require('electron').ipcRenderer.on('redirectSiteConf', this.redirectSiteConf.bind(this));
+   // window.require('electron').ipcRenderer.on('redirectSiteConf', this.redirectSiteConf.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
 
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
+
       this.history.push(location);
+
     }.bind(this));
   }
   componentWillUnmount(){
@@ -167,7 +172,7 @@ class App extends React.Component<AppProps,AppState>{
       'redirectCookbook',
       'redirectConsole',
       'redirectPrefs',
-      'redirectSiteConf',
+//      'redirectSiteConf',
       'setMobileBrowserOpen',
       'setMobileBrowserClose',
       'redirectToGivenLocation',
@@ -201,25 +206,32 @@ class App extends React.Component<AppProps,AppState>{
     this.setState({forceShowMenu});
   }
 
-  renderWorkspaceSidebar = (history : any, url : string, site : ?string, workspace : ?string)=>{
+  renderTopToolbarLeftSwitch(){
 
-    return <WorkspaceSidebar
-    key={ url }
-    siteKey={ site ? decodeURIComponent(site) : null }
-    workspaceKey={ workspace ? decodeURIComponent(workspace) : null }
-    quiqrUsername={this.state.quiqrUsername}
-    history={history}
-    hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-    menuIsLocked={this.state.menuIsLocked}
-    onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
-    onLockMenuClicked={()=>{this.toggleMenuIsLocked()}} />
+    return (<Switch>
+
+      <Route path='/' exact render={ () => {
+        return <TopToolbarLeft title="Site Library"/>
+      }} />
+
+      <Route path='/selectsite' exact render={ () => {
+        return <TopToolbarLeft title="Site Library"/>
+      }} />
+
+      <Route path="*" component={(data)=>{
+        return null;
+      }} />
+
+    </Switch>);
   }
 
   renderMenuSwitch(){
     return (<Switch>
 
       <Route path="/" exact={true} render={ ({match, history})=> {
-        return this.renderWorkspaceSidebar(history, match.url, null, null);
+        return (
+          <SiteLibrarySidebar />
+        );
       }} />
 
       <Route path="/create-new" exact={true} render={ ({match, history})=> {
@@ -228,10 +240,6 @@ class App extends React.Component<AppProps,AppState>{
 
       <Route path="/welcome" exact={true} render={ ({match, history})=> {
         return null;
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace' render={ ({match, history})=> {
-        return this.renderWorkspaceSidebar(history, match.url, match.params.site, match.params.workspace);
       }} />
 
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
@@ -254,19 +262,6 @@ class App extends React.Component<AppProps,AppState>{
       />);
       }} />
 
-      <Route path='/siteconf/:site/workspaces/:workspace' render={ ({match, history})=> {
-        return (<SiteConfSidebar
-        menus={[]}
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-        menuIsLocked={this.state.menuIsLocked}
-        onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
-        onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
-      />);
-      }} />
-
-
 
     </Switch>);
   }
@@ -274,7 +269,7 @@ class App extends React.Component<AppProps,AppState>{
   renderSelectSites(){
     this.getProfile();
     return (
-      <SelectSite
+      <SiteLibraryRouted
         key={ 'selectSite' }
         quiqrUsername={this.state.quiqrUsername}
       />
@@ -284,22 +279,12 @@ class App extends React.Component<AppProps,AppState>{
   renderCreateSite() {
     this.getProfile();
     return (
-      <SelectSite
+      <SiteLibraryRouted
         key={ 'selectSite' }
         quiqrUsername={this.state.quiqrUsername}
         createSite={ true }
       />
     );
-  }
-
-  renderHome(match){
-    this.getProfile();
-    return <Home
-      key={ match.url }
-      quiqrUsername={this.state.quiqrUsername}
-      quiqrFingerprint={this.state.quiqrFingerprint}
-      siteKey={ decodeURIComponent(match.params.site) }
-      workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }
 
   renderContentSwitch(){
@@ -316,61 +301,9 @@ class App extends React.Component<AppProps,AppState>{
         return this.renderCreateSite();
       }} />
 
-
       <Route path='/welcome' exact render={ () => {
         return <Welcome key={ 'selectSite' } />
       }} />
-
-      <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-        return this.renderHome(match);
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
-        return this.renderHome(match);
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/collections/:collection' exact render={ ({match})=> {
-        return <Collection
-        key={ match.url }
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        collectionKey={ decodeURIComponent(match.params.collection) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item/:refresh' exact render={ ({match})=> {
-        return <CollectionItem
-        key={ match.url }
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        collectionKey={ decodeURIComponent(match.params.collection) }
-        collectionItemKey={ decodeURIComponent(match.params.item) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/collections/:collection/:item' exact render={ ({match})=> {
-        return <CollectionItem
-        key={ match.url }
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        collectionKey={ decodeURIComponent(match.params.collection) }
-        collectionItemKey={ decodeURIComponent(match.params.item) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/singles/:single/:refresh' exact render={ ({match})=> {
-        return <Single
-        key={ match.url }
-        siteKey={ decodeURIComponent(match.params.site) }
-        refreshed={ true }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        singleKey={ decodeURIComponent(match.params.single) } /> }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/singles/:single' render={ ({match})=> {
-        return <Single
-        key={ match.url }
-        siteKey={ decodeURIComponent(match.params.site) }
-        refreshed={ false }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        singleKey={ decodeURIComponent(match.params.single) } /> }} />
-
 
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
         return <FormsCookbookRouted />;
@@ -380,12 +313,6 @@ class App extends React.Component<AppProps,AppState>{
         return <PrefsRouted />;
       }} />
 
-        <Route path='/siteconf/:site/workspaces/:workspace'  render={ ({match})=> {
-          return <SiteConfRouted
-          siteKey={ decodeURIComponent(match.params.site) }
-          workspaceKey={ decodeURIComponent(match.params.workspace) } />
-
-      }} />
 
       <Route path="*" component={(data)=>{
         return <Redirect to='/' />
@@ -464,7 +391,6 @@ class App extends React.Component<AppProps,AppState>{
 
       }} />
 
-
       <Route path='/preview-empty' exact render={ ({match, history}) => {
         this.history = history;
 
@@ -475,7 +401,6 @@ class App extends React.Component<AppProps,AppState>{
           </MuiThemeProvider>
         )
       }} />
-
 
       <Route path='/preview-buttons' exact render={ ({match, history}) => {
         this.history = history;
@@ -500,6 +425,25 @@ class App extends React.Component<AppProps,AppState>{
         )
       }} />
 
+      <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
+        return (
+          <Workspace
+            history={this.history}
+            siteKey={ decodeURIComponent(match.params.site) }
+            workspaceKey={ decodeURIComponent(match.params.workspace) } />
+
+        );
+      }} />
+      <Route path='/sites/:site/workspaces/:workspace/*' exact render={ ({match})=> {
+        return (
+          <Workspace
+            history={this.history}
+            siteKey={ decodeURIComponent(match.params.site) }
+            workspaceKey={ decodeURIComponent(match.params.workspace) } />
+
+        );
+      }} />
+
       <Route
       path="*"
       render={ ({match, history})=>{
@@ -515,6 +459,16 @@ class App extends React.Component<AppProps,AppState>{
           <MuiThemeProvider muiTheme={pogoTheme}>
 
             <div className="App" style={marginStyles}>
+
+              <div className="topToolbar">
+
+                <div className="toolbarLeft">
+                  { this.renderTopToolbarLeftSwitch() }
+                </div>
+
+                <div className="toolbarRight">
+                </div>
+              </div>
 
               <div style={containerStyle}>
 
