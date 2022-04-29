@@ -260,7 +260,7 @@ class MenuManager {
       dialog.showMessageBox(mainWindow, {
         buttons: ["Close"],
         title: "Quiqr will now download hugo " + hugover,
-        message: "Try again when download has finished",
+   *message: "Try again when download has finished",
       });
 
       try{

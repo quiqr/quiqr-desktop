@@ -214,7 +214,7 @@ class App extends React.Component<AppProps,AppState>{
         return <TopToolbarLeft title="Site Library"/>
       }} />
 
-      <Route path='/selectsite' exact render={ () => {
+      <Route path='/sites/*' exact render={ () => {
         return <TopToolbarLeft title="Site Library"/>
       }} />
 
@@ -229,6 +229,16 @@ class App extends React.Component<AppProps,AppState>{
     return (<Switch>
 
       <Route path="/" exact={true} render={ ({match, history})=> {
+        return (
+          <SiteLibrarySidebar />
+        );
+      }} />
+      <Route path="/sites" exact={true} render={ ({match, history})=> {
+        return (
+          <SiteLibrarySidebar />
+        );
+      }} />
+      <Route path="/sites/*" exact={true} render={ ({match, history})=> {
         return (
           <SiteLibrarySidebar />
         );
@@ -293,13 +303,14 @@ class App extends React.Component<AppProps,AppState>{
         return this.renderSelectSites();
       }} />
 
-      <Route path='/selectsite' exact render={ () => {
+      <Route path='/sites/create-new' exact render={ () => {
+        return this.renderCreateSite();
+      }} />
+
+      <Route path='/sites/*' render={ () => {
         return this.renderSelectSites();
       }} />
 
-      <Route path='/create-new' exact render={ () => {
-        return this.renderCreateSite();
-      }} />
 
       <Route path='/welcome' exact render={ () => {
         return <Welcome key={ 'selectSite' } />

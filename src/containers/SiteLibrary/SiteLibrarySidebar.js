@@ -15,21 +15,35 @@ export class SiteLibrarySidebar extends React.Component {
 
       let encodedSiteKey = this.props.siteKey;
       let encodedWorkspaceKey = this.props.workspaceKey;
-      let basePath = `/`;
+      let basePath = `/sites/all`;
 
-      let menu: SidebarMenu = {
-        title: 'On this computer',
-        items: [
-          {
-            active: true,
-            label: "All",
-            onClick: ()=>{
-              history.push(`${basePath}`)
-            }
-          },
-        ]
-      }
+      let menus = [
+        {
+          title: 'On this computer',
+          items: [
+            {
+              active: true,
+              label: "All",
+              onClick: ()=>{
+                history.push(`${basePath}`)
+              }
+            },
+          ]
+        },
+        {
+          title: 'In my cloud',
+          items: [
+            {
+              active: true,
+              label: "Quiqr Cloud",
+              onClick: ()=>{
+                history.push(`${basePath}/quiqr-cloud`)
+              }
+            },
+          ]
+        },
+      ]
 
-      return <Sidebar {...this.props} menus={[menu]} />
+      return <Sidebar {...this.props} menus={menus} />
     }
 }

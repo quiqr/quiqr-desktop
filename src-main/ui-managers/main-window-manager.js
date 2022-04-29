@@ -300,7 +300,7 @@ module.exports = {
 
       mainWindow.webContents.send("disableMobilePreview");
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-      mainWindow.webContents.send("redirectToGivenLocation", '/create-new');
+      mainWindow.webContents.send("redirectToGivenLocation", '/sites/create-new');
 
       mainWindow.setTitle("Quiqr: Create new Quiqr site");
     });
@@ -317,7 +317,7 @@ module.exports = {
 
       mainWindow.webContents.send("disableMobilePreview");
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-      mainWindow.webContents.send("redirectToGivenLocation", '/');
+      mainWindow.webContents.send("redirectToGivenLocation", '/sites/all');
 
       mainWindow.setTitle("Quiqr: Select site");
     });

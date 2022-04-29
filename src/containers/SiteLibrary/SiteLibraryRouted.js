@@ -324,6 +324,46 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
 
   }
 
+  renderDialogs(){
+    let { configurations, createSiteDialog, remoteSiteDialog } = this.state;
+
+    return (
+      <div>
+
+        <div style={styles.selectedSiteCol}>
+          <Wrapper title="">
+            <MessageBlock></MessageBlock>
+          </Wrapper>
+        </div>
+
+        <RemoteSiteDialog
+          open={remoteSiteDialog}
+          configurations={configurations}
+          remoteSiteName={this.state.currentRemoteSite}
+          onCancelClick={()=>this.setState({remoteSiteDialog:false})}
+          mountSite={(siteKey)=>{
+            service.getConfigurations(true).then((c)=>{
+              let site = c.sites.find((x)=>x.key===siteKey);
+              this.mountSite(site);
+            });
+          }}
+        />
+
+        <CreateSiteDialog
+          open={createSiteDialog}
+          //open={true}
+          onCancelClick={()=>this.setState({createSiteDialog:false})}
+          onSubmitClick={this.handleCreateSiteSubmit}
+        />
+
+        {/*this should be moved to a UI service*/}
+        <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
+      </div>
+
+    )
+
+  }
+
   render(){
 
     let { configurations, createSiteDialog, remoteSiteDialog } = this.state;
@@ -334,46 +374,25 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     }
 
     return (
-      <Route render={({history})=>{
 
-        this.history = history;
-        return (
+      <Route path='/sites/:source'
 
-          <div style={ styles.container }>
+        render={ ({match, history})=> {
 
-            {this.renderSelectSites()}
+          this.history = history;
+          let source = decodeURIComponent(match.params.source)
+          return (
 
-            <div style={styles.selectedSiteCol}>
-              <Wrapper title="">
-                <MessageBlock></MessageBlock>
-              </Wrapper>
+            <div style={ styles.container }>
+
+              {this.renderSelectSites(source)}
+
+              {this.renderDialogs()}
+
             </div>
-
-            <RemoteSiteDialog
-            open={remoteSiteDialog}
-            configurations={configurations}
-            remoteSiteName={this.state.currentRemoteSite}
-            onCancelClick={()=>this.setState({remoteSiteDialog:false})}
-            mountSite={(siteKey)=>{
-              service.getConfigurations(true).then((c)=>{
-                let site = c.sites.find((x)=>x.key===siteKey);
-                this.mountSite(site);
-              });
-            }}
-            />
-
-            <CreateSiteDialog
-            open={createSiteDialog}
-            onCancelClick={()=>this.setState({createSiteDialog:false})}
-            onSubmitClick={this.handleCreateSiteSubmit}
-          />
-
-            {/*this should be moved to a UI service*/}
-            <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
-          </div>
-        );
-      }}
-        />
+          );
+        }}
+      />
     );
   }
 
