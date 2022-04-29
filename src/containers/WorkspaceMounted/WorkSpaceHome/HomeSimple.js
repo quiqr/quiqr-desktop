@@ -1,25 +1,25 @@
-import { Route } from 'react-router-dom';
-import React from 'react';
-import service from './../../services/service';
-import { snackMessageService } from './../../services/ui-service';
-import { RaisedButton } from 'material-ui-02/';
-import {List, ListItem} from 'material-ui-02/List';
-import IconAccountCircle from 'material-ui-02/svg-icons/action/account-circle';
-import IconDomain from 'material-ui-02/svg-icons/social/domain';
-import IconPublish from 'material-ui-02/svg-icons/editor/publish';
-import ActionThumbUp from 'material-ui-02/svg-icons/action/thumb-up'
-import muiThemeable from 'material-ui-02/styles/muiThemeable';
-import { Wrapper, InfoLine } from './components/shared';
-import PublishSiteDialog from './components/PublishSiteDialog';
-import RegisterDialog from './components/RegisterDialog';
-import ClaimDomainDialog from './components/ClaimDomainDialog';
-import ConnectDomainDialog from './components/ConnectDomainDialog';
-import EditPlanDialog from './components/EditPlanDialog';
-import BlockDialog from './components/BlockDialog';
-import Spinner from './../../components/Spinner';
-import ProgressDialog from './../../components/ProgressDialog';
-import SnackbarManager from './../../components/SnackbarManager';
-import MarkdownIt from 'markdown-it'
+import { Route }               from 'react-router-dom';
+import React                   from 'react';
+import service                 from './../../../services/service';
+import { snackMessageService } from './../../../services/ui-service';
+import { RaisedButton }        from 'material-ui-02/';
+import {List, ListItem}        from 'material-ui-02/List';
+import IconAccountCircle       from 'material-ui-02/svg-icons/action/account-circle';
+import IconDomain              from 'material-ui-02/svg-icons/social/domain';
+import IconPublish             from 'material-ui-02/svg-icons/editor/publish';
+import ActionThumbUp           from 'material-ui-02/svg-icons/action/thumb-up'
+import muiThemeable            from 'material-ui-02/styles/muiThemeable';
+import { Wrapper, InfoLine }   from './components/shared';
+import PublishSiteDialog       from './components/PublishSiteDialog';
+import RegisterDialog          from './components/RegisterDialog';
+import ClaimDomainDialog       from './components/ClaimDomainDialog';
+import ConnectDomainDialog     from './components/ConnectDomainDialog';
+import EditPlanDialog          from './components/EditPlanDialog';
+import BlockDialog             from './components/BlockDialog';
+import Spinner                 from './../../../components/Spinner';
+import ProgressDialog          from './../../../components/ProgressDialog';
+import SnackbarManager         from './../../../components/SnackbarManager';
+import MarkdownIt              from 'markdown-it'
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
 

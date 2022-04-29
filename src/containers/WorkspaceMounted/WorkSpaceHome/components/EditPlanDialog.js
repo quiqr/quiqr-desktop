@@ -1,6 +1,6 @@
 import * as React             from 'react';
-import Spinner                from './../../../components/Spinner'
-import service                from './../../../services/service';
+import Spinner                from './../../../../components/Spinner'
+import service                from './../../../../services/service';
 import { Dialog, FlatButton } from 'material-ui-02';
 import Button                 from '@material-ui/core/Button';
 let net = window.require('electron').remote.net;

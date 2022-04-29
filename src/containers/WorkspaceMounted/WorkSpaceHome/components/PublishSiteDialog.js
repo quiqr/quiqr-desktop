@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Dialog, FlatButton } from 'material-ui-02';
-import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../types';
+import type { SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../../../types';
 
 type PublishSiteDialogProps = {
     site: SiteConfig,

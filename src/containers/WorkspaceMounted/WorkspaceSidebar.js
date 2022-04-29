@@ -8,8 +8,8 @@ import IconHome                             from 'material-ui-02/svg-icons/actio
 import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
-import type { SiteConfig, WorkspaceConfig } from './../../types'
 import * as Sidebar                         from '../Sidebar';
+import type { SiteConfig, WorkspaceConfig } from './../../types'
 
 //const translucentColor = 'RGBA(255,255,255,.8)';
 const translucentColor = 'RGBA(0,0,0,.8)';

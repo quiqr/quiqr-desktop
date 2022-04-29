@@ -3,21 +3,21 @@ import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
 
-import WorkSpaceHome                                 from './containers/WorkSpaceHome'
-import TopToolbarLeft                                from './containers/TopToolbarLeft'
-import Collection                                    from './containers/Collection';
-import CollectionItem                                from './containers/Collection/CollectionItem';
-import Single                                        from './containers/WorkspaceMounted/Single';
+import WorkSpaceHome                                 from './WorkSpaceHome'
+import TopToolbarLeft                                from '../TopToolbarLeft'
 
-import WorkspaceSidebar                              from './containers/WorkspaceMounted/WorkspaceSidebar';
-import { SiteConfSidebar, SiteConfRouted }           from './containers/WorkspaceMounted/SiteConf';
+import Collection                                    from './Collection';
+import CollectionItem                                from './Collection/CollectionItem';
+import Single                                        from './Single';
+import WorkspaceSidebar                              from './WorkspaceSidebar';
+import { SiteConfSidebar, SiteConfRouted }           from './SiteConf';
 
 import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                              from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme                                   from 'material-ui-02/styles/getMuiTheme';
 
-import service                                       from './services/service';
+import service                                       from '../../services/service';
 
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
@@ -30,7 +30,7 @@ const pogoTheme = getMuiTheme(lightBaseTheme, {
   },
 });
 
-let style = require('./themes/default/style.js');
+let style = require('../../themes/default/style.js');
 
 class WorkSpace extends React.Component{
 
@@ -66,7 +66,7 @@ class WorkSpace extends React.Component{
     service.getConfigurations().then((c)=>{
       var stateUpdate  = {};
       stateUpdate.configurations = c;
-      stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
+      stateUpdate.style = require('../../themes/' + c.global.appTheme + '/style.js');
 
       this.setState(stateUpdate);
     })

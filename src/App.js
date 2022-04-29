@@ -4,7 +4,7 @@ import { Switch, Route }                             from 'react-router-dom'
 //CONTAINERS
 //import SelectSite                                    from './containers/SelectSite'
 import { SiteLibrarySidebar, SiteLibraryRouted }     from './containers/SiteLibrary'
-import Workspace                                     from './Workspace';
+import Workspace                                     from './containers/WorkspaceMounted/Workspace';
 import Console                                       from './containers/Console';
 import PreviewButtons                                from './containers/PreviewBrowser/PreviewButtons';
 

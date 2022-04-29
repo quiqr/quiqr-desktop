@@ -1,18 +1,18 @@
-import * as React from 'react';
-import Spinner from './../../../components/Spinner'
-import service from './../../../services/service';
+import * as React                        from 'react';
+import Spinner                           from './../../../../components/Spinner'
+import service                           from './../../../../services/service';
 import { Dialog, FlatButton, TextField } from 'material-ui-02';
-import IconHttps from 'material-ui-02/svg-icons/action/https';
-import Paper from 'material-ui-02/Paper';
+import IconHttps                         from 'material-ui-02/svg-icons/action/https';
+import Paper                             from 'material-ui-02/Paper';
 let net = window.require('electron').remote.net;
 
-export default class ClaimDomainDialog extends React.Component{
+export default class ConnectDomainDialog extends React.Component{
 
   constructor(props){
     super(props);
     this.state = {
-      pogourl: "",
-      pogourl_err: "",
+      pogoCustomDomain: "",
+      pogoCustomDomain_err: "",
       email_err: "",
       failure: false,
       busy: false,
@@ -32,16 +32,16 @@ export default class ClaimDomainDialog extends React.Component{
     this.props.onCancelClick();
   }
 
-  handleDomainClaimClick = async (context) => {
+  handleConnectDomainClick = async (context) => {
 
     this.setState({
       busy: true
     });
 
-    this.registerDomain(this.state.pogourl, this.props.username, this.props.fingerprint);
+    this.connectDomain(this.props.sitePath, this.props.username, this.props.fingerprint, this.state.pogoCustomDomain);
   }
 
-  registerDomain(pogourl, username, fingerprint){
+  connectDomain(sitePath, username, fingerprint, connectDomainString){
     if(username===""){
       this.setState({
         failure: true
@@ -50,18 +50,16 @@ export default class ClaimDomainDialog extends React.Component{
       this.setState({ busy: false });
       return
     }
-    var postData = JSON.stringify({sitename : pogourl, username: username, fingerprint: fingerprint});
 
-    let promise = service.api.registerPogoDomain(postData);
-    promise.then((path)=>{
+    var postData = JSON.stringify({sitePath : sitePath, username: username, fingerprint: fingerprint, connectDomainString});
 
-      if(path){
-
-        this.props.onClaimDomainClick({ pogourl: path });
-        /*let promise = service.api.createPogoDomainConf(path, path+".quiqr.cloud");
-        promise.then((path2)=>{
+    let promise = service.api.connectPogoDomain(postData);
+    promise.then((domain)=>{
+      if(domain){
+        let promise = service.api.createPogoDomainConf(sitePath, domain);
+        promise.then((path)=>{
+          this.props.onConnectDomainClick();
         });
-        */
       }
       else{
         this.setState({
@@ -70,17 +68,16 @@ export default class ClaimDomainDialog extends React.Component{
       }
 
       this.setState({ busy: false });
-
     });
   }
 
-  handlepogourlChange(e){
+  handlepogoCustomDomainChange(e){
 
     let value = e.target.value;
 
     if(value!==''){
 
-      let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/site/"+value;
+      let url = this.state.pogoboardConn.protocol+"//"+this.state.pogoboardConn.host+":"+this.state.pogoboardConn.port+"/stat/custom-domain/"+value;
       let data='';
       const request = net.request(url);
       request.on('response', (response) => {
@@ -90,12 +87,12 @@ export default class ClaimDomainDialog extends React.Component{
 
           if(obj.status !== "free"){
             this.setState({
-              pogourl_err: "pogourl is "+obj.status
+              pogoCustomDomain_err: "pogoCustomDomain is "+obj.status
             });
           }
           else{
             this.setState({
-              pogourl_err: ""
+              pogoCustomDomain_err: ""
             });
           }
 
@@ -108,14 +105,14 @@ export default class ClaimDomainDialog extends React.Component{
     }
 
     this.setState({
-      pogourl: value,
+      pogoCustomDomain: value,
     });
 
   }
 
   handleTryAgain(){
     this.setState({
-      pogourl: "",
+      pogoCustomDomain: "",
       busy: false,
       failure: false,
     });
@@ -125,19 +122,19 @@ export default class ClaimDomainDialog extends React.Component{
   validate(){
     return !this.state.busy &&
       !this.state.failure &&
-      this.state.pogourl_err === '' &&
-      this.state.pogourl !== ''
+      this.state.pogoCustomDomain_err === '' &&
+      this.state.pogoCustomDomain !== ''
   }
 
   renderForm(){
     //let valid = this.validate();
     let busy = this.state.busy;
-    let previewUrl = this.state.pogourl.replace(/\./g,"-");
+    let previewUrl = this.state.pogoCustomDomain;
     return (
       <div>
-        <TextField disabled={busy} errorText={this.state.pogourl_err} floatingLabelText={'Quiqr URL'} value={this.state.pogourl} onChange={(e)=>{this.handlepogourlChange(e)}} fullWidth />
+        <TextField disabled={busy} errorText={this.state.pogoCustomDomain_err} floatingLabelText={'Custom domain'} value={this.state.pogoCustomDomain} onChange={(e)=>{this.handlepogoCustomDomainChange(e)}} fullWidth />
         <Paper style={{margin:10,padding:"0 7px 7px 7px"}}>
-          <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span>.quiqr.cloud</span>
+          <IconHttps viewBox="-5 0 35 10" color="#666" /><span>https://</span><span style={{color:"green"}}>{previewUrl}</span><span></span>
         </Paper>
       </div>
     )
@@ -166,15 +163,15 @@ export default class ClaimDomainDialog extends React.Component{
       />,
       <FlatButton
         disabled={!valid}
-        label="Claim Quiqr Subdomain"
+        label="Add custom domain"
         primary={true}
-        onClick={this.handleDomainClaimClick}
+        onClick={this.handleConnectDomainClick}
       />,
     ];
 
     return (
       <Dialog
-        title="Claim your Quiqr URL for easy publishing to the web"
+        title="Connect this website to your custom domain"
         open={open}
         actions={actions}>
 
