@@ -3,7 +3,8 @@ import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
 
-import WorkSpaceHome                       from './WorkSpaceHome'
+import Dashboard                           from './Dashboard'
+import Publish                             from './Publish'
 import TopToolbarLeft                      from '../TopToolbarLeft'
 import TopToolbarRight                     from '../TopToolbarRight'
 import Collection                          from './Collection';
@@ -13,9 +14,10 @@ import WorkspaceSidebar                    from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import AppsIcon                            from '@material-ui/icons/Apps';
 import TuneIcon                            from '@material-ui/icons/Tune';
-import LibraryBooks                        from '@material-ui/icons/LibraryBooks';
-import Publish                             from '@material-ui/icons/Publish';
-import OpenInBrowser                       from '@material-ui/icons/OpenInBrowser';
+import LibraryBooksIcon                        from '@material-ui/icons/LibraryBooks';
+import PublishIcon                             from '@material-ui/icons/Publish';
+import OpenInBrowserIcon                       from '@material-ui/icons/OpenInBrowser';
+
 import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 //import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeProvider';
@@ -192,16 +194,16 @@ class WorkSpace extends React.Component{
     return [
       {
         title: "Content",
-        icon: <LibraryBooks style={{ color: iconColor }} />,
+        icon: <LibraryBooksIcon style={{ color: iconColor }} />,
         action: ()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
         }
       },
       {
         title: "Publish",
-        icon: <Publish style={{ color: iconColor }} />,
+        icon: <PublishIcon style={{ color: iconColor }} />,
         action: ()=>{
-          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/publish/front`);
         }
       },
       {
@@ -218,7 +220,7 @@ class WorkSpace extends React.Component{
     return [
       {
         title: "Site Library",
-        icon: <AppsIcon style={{ color: '#000' }} />,
+        icon: <AppsIcon style={{ color: iconColor }} />,
         action: ()=>{
           service.api.redirectTo("/sites/");
         }
@@ -246,7 +248,7 @@ class WorkSpace extends React.Component{
         const toolbarItemsCenter = [
           {
             title: "Preview in Browser",
-            icon: <OpenInBrowser style={{ color: '#000' }} />,
+            icon: <OpenInBrowserIcon style={{ color: iconColor }} />,
             action: ()=>{
               window.require('electron').shell.openExternal('http://localhost:13131');
             }
@@ -296,9 +298,19 @@ class WorkSpace extends React.Component{
     </Switch>);
   }
 
-  renderHome(match){
+  renderDashboard(match){
     this.getProfile();
-    return <WorkSpaceHome
+    return <Dashboard
+      key={ match.url }
+      quiqrUsername={this.state.quiqrUsername}
+      quiqrFingerprint={this.state.quiqrFingerprint}
+      siteKey={ decodeURIComponent(match.params.site) }
+      workspaceKey={ decodeURIComponent(match.params.workspace) } />
+  }
+
+  renderPublish(match){
+    this.getProfile();
+    return <Publish
       key={ match.url }
       quiqrUsername={this.state.quiqrUsername}
       quiqrFingerprint={this.state.quiqrFingerprint}
@@ -309,11 +321,15 @@ class WorkSpace extends React.Component{
   renderContentSwitch(){
     return (<Switch>
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
-        return this.renderHome(match);
+        return this.renderDashboard(match);
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/home/:refresh' exact render={ ({match})=> {
-        return this.renderHome(match);
+        return this.renderDashboard(match);
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/publish/*'  render={ ({match})=> {
+        return this.renderPublish(match);
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/siteconf/*'  render={ ({match})=> {

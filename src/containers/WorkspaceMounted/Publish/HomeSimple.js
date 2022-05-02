@@ -9,7 +9,7 @@ import IconDomain              from 'material-ui-02/svg-icons/social/domain';
 import IconPublish             from 'material-ui-02/svg-icons/editor/publish';
 import ActionThumbUp           from 'material-ui-02/svg-icons/action/thumb-up'
 import muiThemeable            from 'material-ui-02/styles/muiThemeable';
-import { Wrapper, InfoLine }   from './components/shared';
+import { Wrapper }             from './components/shared';
 import PublishSiteDialog       from './components/PublishSiteDialog';
 import RegisterDialog          from './components/RegisterDialog';
 import ClaimDomainDialog       from './components/ClaimDomainDialog';
@@ -1151,14 +1151,9 @@ class Home extends React.Component<HomeProps, HomeState>{
 
             <div style={styles.selectedSiteCol}>
               <Wrapper key={this.state.selectedSite.key}>
-                <InfoLine label="">
-                  <h2 style={{padding:0, margin:0}}>{this.state.selectedSite.name}</h2>
-                </InfoLine>
 
                 { this.renderPogoSiteActionsAndInfo() }
                 { this.renderActionPanel() }
-
-                <div className="markdown" style={ styles.creatorMessage } dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}} />
 
               </Wrapper>
             </div>
