@@ -2,25 +2,10 @@ import React                                from 'react';
 import { Route }                            from 'react-router-dom'
 import { List, ListItem }                   from 'material-ui-02/List';
 import { Divider, Toggle }                  from 'material-ui-02';
-//import IconActionSetting                    from 'material-ui-02/svg-icons/action/settings';
-import IconOpenBrowser                      from 'material-ui-02/svg-icons/action/open-in-browser';
-import IconHome                             from 'material-ui-02/svg-icons/action/home';
 import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
 import * as Sidebar                         from '../Sidebar';
-//import type { WorkspaceConfig } from './../../types'
-
-//const translucentColor = 'RGBA(255,255,255,.8)';
-//const translucentColor = 'RGBA(0,0,0,.8)';
-
-/*
-type WorkspaceWidgetProps = {
-  onClick : ()=> void,
-  //siteConfig : ?SiteConfig,
-  workspaceConfig : ?WorkspaceConfig
-}
-*/
 
 class WorkspaceWidget extends React.Component {
 
@@ -30,7 +15,8 @@ class WorkspaceWidget extends React.Component {
       devDisableAutoHugoServe: false,
       expPreviewWindow: false,
       devLocalApi: false,
-      hugoRunning: false
+      hugoRunning: false,
+      selectedMenuItem: ''
     };
   }
 
@@ -71,7 +57,6 @@ class WorkspaceWidget extends React.Component {
     service.api.getPogoConfKey('devShowCurrentUser').then((value)=>{
       this.setState({devShowCurrentUser: value });
     });
-
   }
 
   componentWillUnmount(){
@@ -81,20 +66,6 @@ class WorkspaceWidget extends React.Component {
     window.require('electron').ipcRenderer.removeListener('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
     window.require('electron').ipcRenderer.removeAllListeners('updateBadges');
     this._ismounted = false;
-  }
-
-  handleOpenInBrowser(){
-    let {
-      siteConfig,
-      workspaceConfig,
-    } = this.props;
-
-    if(!this.state.hugoRunning && !this.state.devDisableAutoHugoServe){
-      service.api.serveWorkspace(siteConfig.key, workspaceConfig.key, "Start HUGO from Sidebar");
-    }
-
-    window.require('electron').shell.openExternal('http://localhost:13131');
-
   }
 
   toggleMobilePreview(){
@@ -150,9 +121,6 @@ class WorkspaceWidget extends React.Component {
 
   renderSiteMounted(){
 
-    let {
-      onClick,
-    } = this.props;
 
 
 
@@ -179,17 +147,7 @@ class WorkspaceWidget extends React.Component {
       return (
         <div style={{paddingLeft:'0px'}}>
           <List style={{padding: 0}}>
-            <ListItem
-            primaryText="Publish and help"
-            onClick={onClick}
-            leftIcon={<IconHome xcolor="white" style={{}} />}
-          />
-              { previewWindowItem}
-            <ListItem
-            primaryText="Preview in browser"
-            secondaryText=""
-            onClick={ ()=>{this.handleOpenInBrowser()} }
-            leftIcon={<IconOpenBrowser xcolor="white" style={{marginRight:0}} />} />
+            { previewWindowItem}
         </List>
         <Divider/>
       </div>
@@ -377,11 +335,11 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     if(this.state.workspace){
 
       if("menu" in this.state.workspace){
-        this.state.workspace.menu.map((menuslot, index) => {
+        this.state.workspace.menu.map((menuslot, mindex) => {
           //collections menu
           menus.push({
             title: menuslot.title,
-            items: menuslot.menuItems.map((menuitem, index) => {
+            items: menuslot.menuItems.map((menuitem, iindex) => {
               let item = null;
               let itemType = null;
 
@@ -397,7 +355,9 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
               if(item){
                 return {
                   label: item.title,
+                  selected: (this.state.selectedMenuItem===`menu-${mindex}-${iindex}` ? true : false),
                   onClick: () => {
+                    this.setState({selectedMenuItem:`menu-${mindex}-${iindex}`})
                     history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
                     this.refresh();
                   },

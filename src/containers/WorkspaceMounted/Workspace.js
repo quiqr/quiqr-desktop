@@ -3,22 +3,26 @@ import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
 
-import WorkSpaceHome                                 from './WorkSpaceHome'
-import TopToolbarLeft                                from '../TopToolbarLeft'
-
-import Collection                                    from './Collection';
-import CollectionItem                                from './Collection/CollectionItem';
-import Single                                        from './Single';
-import WorkspaceSidebar                              from './WorkspaceSidebar';
-import { SiteConfSidebar, SiteConfRouted }           from './SiteConf';
-
-import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
+import WorkSpaceHome                       from './WorkSpaceHome'
+import TopToolbarLeft                      from '../TopToolbarLeft'
+import TopToolbarRight                     from '../TopToolbarRight'
+import Collection                          from './Collection';
+import CollectionItem                      from './Collection/CollectionItem';
+import Single                              from './Single';
+import WorkspaceSidebar                    from './WorkspaceSidebar';
+import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
+import AppsIcon                            from '@material-ui/icons/Apps';
+import TuneIcon                            from '@material-ui/icons/Tune';
+import LibraryBooks                        from '@material-ui/icons/LibraryBooks';
+import Publish                             from '@material-ui/icons/Publish';
+import OpenInBrowser                       from '@material-ui/icons/OpenInBrowser';
+import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 //import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
-import MuiThemeProvider                              from 'material-ui-02/styles/MuiThemeProvider';
-import getMuiTheme                                   from 'material-ui-02/styles/getMuiTheme';
+import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeProvider';
+import getMuiTheme                         from 'material-ui-02/styles/getMuiTheme';
+import service                             from '../../services/service';
 
-import service                                       from '../../services/service';
-
+const iconColor = "#000";
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
     background: {
@@ -167,7 +171,6 @@ class WorkSpace extends React.Component{
   }
 
   renderTopToolbarLeftSwitch(){
-
     let siteName = "";
     if(this.state.site){
       siteName = this.state.site.name;
@@ -180,6 +183,80 @@ class WorkSpace extends React.Component{
           title={siteName}
           siteKey={ decodeURIComponent(match.params.site) }
           workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+    </Switch>);
+  }
+
+  toolbarItemsLeft(siteKey, workspaceKey){
+    return [
+      {
+        title: "Content",
+        icon: <LibraryBooks style={{ color: iconColor }} />,
+        action: ()=>{
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
+        }
+      },
+      {
+        title: "Publish",
+        icon: <Publish style={{ color: iconColor }} />,
+        action: ()=>{
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
+        }
+      },
+      {
+        title: "Config",
+        icon: <TuneIcon style={{ color: iconColor }} />,
+        action: ()=>{
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf`);
+        }
+      }
+    ];
+  }
+
+  toolbarItemsRight(){
+    return [
+      {
+        title: "Site Library",
+        icon: <AppsIcon style={{ color: '#000' }} />,
+        action: ()=>{
+          service.api.redirectTo("/sites/");
+        }
+      }
+    ];
+  }
+
+  renderTopToolbarRightSwitch(){
+
+    return (<Switch>
+
+      <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match, history})=> {
+        const siteKey= decodeURIComponent(match.params.site);
+        const workspaceKey= decodeURIComponent(match.params.workspace);
+        return <TopToolbarRight
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
+          itemsCenter={[]}
+          itemsRight={this.toolbarItemsRight(siteKey, workspaceKey)}
+        />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace' render={ ({match, history})=> {
+        const siteKey= decodeURIComponent(match.params.site);
+        const workspaceKey= decodeURIComponent(match.params.workspace);
+        const toolbarItemsCenter = [
+          {
+            title: "Preview in Browser",
+            icon: <OpenInBrowser style={{ color: '#000' }} />,
+            action: ()=>{
+              window.require('electron').shell.openExternal('http://localhost:13131');
+            }
+          }
+        ];
+        return <TopToolbarRight
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
+          itemsCenter={toolbarItemsCenter}
+          itemsRight={this.toolbarItemsRight(siteKey, workspaceKey)}
+        />
       }} />
 
     </Switch>);
@@ -356,6 +433,7 @@ class WorkSpace extends React.Component{
                 </div>
 
                 <div className="toolbarRight">
+                  { this.renderTopToolbarRightSwitch() }
                 </div>
               </div>
 

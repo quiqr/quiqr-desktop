@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
 import { withStyles } from '@material-ui/core/styles';
 //import Avatar from '@material-ui/core/Avatar';
 
@@ -24,16 +24,11 @@ const useStyles = theme => ({
 class TopToolbarLeft extends React.Component {
   render(){
 
-    const { classes } = this.props;
 
     return (
-      <div className={classes.root}>
-
-        <Typography variant="h6" gutterBottom>
-          {this.props.title}
-        </Typography>
-
-      </div>
+      <Box textOverflow="ellipsis" overflow="hidden" fontWeight="fontWeightMedium" border={0} component="div" fontSize="h6.fontSize" m={2} whiteSpace="nowrap">
+         {this.props.title}
+      </Box>
     );
   }
 }

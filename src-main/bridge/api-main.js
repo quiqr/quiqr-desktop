@@ -348,8 +348,6 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   menuManager.createMainMenu();
 }
 
-
-
 api.setCurrentFormNodePath = async function({path}, context){
   global.currentFormNodePath = path;
 }
@@ -369,6 +367,7 @@ api.getCurrentFormAccordionIndex = async function({}, context){
 api.shouldReloadForm = async function({reloadFormPath}, context){
   global.currentFormShouldReload = reloadFormPath;
 }
+
 api.reloadCurrentForm = async function({},context){
   if(global.currentFormNodePath){
     let currentPath = global.currentFormNodePath.endsWith('/') ? global.currentFormNodePath.slice(0, -1) : global.currentFormNodePath;
@@ -380,6 +379,12 @@ api.reloadCurrentForm = async function({},context){
       mainWindow.webContents.send("redirectToGivenLocation", urlpath);
     }
   }
+}
+
+api.redirectTo = async function({location}, context){
+  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  console.log(location)
+  mainWindow.webContents.send("redirectToGivenLocation",location)
 }
 
 api.parentMountWorkspace = async function({siteKey, workspaceKey}, context){

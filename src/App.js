@@ -224,10 +224,6 @@ class App extends React.Component<AppProps,AppState>{
         return <TopToolbarLeft title="Site Library"/>
       }} />
 
-      <Route path="*" component={(data)=>{
-        return null;
-      }} />
-
     </Switch>);
   }
 

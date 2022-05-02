@@ -240,6 +240,9 @@ export class API {
     return mainProcessBridge.request('reloadCurrentForm', {});
   }
 
+  redirectTo(location){
+    return mainProcessBridge.request('redirectTo', {location});
+  }
   parentMountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
   }

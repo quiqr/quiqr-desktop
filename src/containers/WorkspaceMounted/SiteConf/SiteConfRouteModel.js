@@ -6,6 +6,7 @@ import TextField       from '@material-ui/core/TextField';
 import IconButton      from '@material-ui/core/IconButton';
 import DescriptionIcon from '@material-ui/icons/Description';
 import Grid            from '@material-ui/core/Grid';
+import Box             from '@material-ui/core/Box';
 
 const useStyles = theme => ({
 
@@ -78,8 +79,11 @@ class SiteConfRouteModel extends React.Component {
   }
   renderSection(title, files){
     const { classes } = this.props;
+
+    if(files.length === 0) return null;
+
     return (
-      <React.Fragment>
+        <Box m={2}>
         <Typography variant="h6">{title}</Typography>
 
         <div className={classes.root}>
@@ -113,7 +117,7 @@ class SiteConfRouteModel extends React.Component {
           })}
         </div>
 
-      </React.Fragment>
+      </Box>
     )
   }
 
