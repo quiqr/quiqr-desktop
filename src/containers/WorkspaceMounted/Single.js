@@ -50,7 +50,6 @@ class Single extends React.Component<SingleProps,SingleState>{
     }).catch((e)=>{
 
     });
-
   }
 
   componentWillUnmount(){

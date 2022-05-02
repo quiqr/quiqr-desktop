@@ -1,4 +1,5 @@
 import React                                         from 'react';
+import { withRouter }                       from 'react-router';
 import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
@@ -180,7 +181,7 @@ class WorkSpace extends React.Component{
 
     return (<Switch>
 
-      <Route path='/sites/:site/workspaces/:workspace' render={ ({match, history})=> {
+      <Route path='/sites/:site/workspaces/:workspace' render={ ({match})=> {
         return <TopToolbarLeft
           title={siteName}
           siteKey={ decodeURIComponent(match.params.site) }
@@ -222,7 +223,7 @@ class WorkSpace extends React.Component{
         title: "Site Library",
         icon: <AppsIcon style={{ color: iconColor }} />,
         action: ()=>{
-          service.api.redirectTo("/sites/");
+          service.api.redirectTo("/sites/last");
         }
       }
     ];
@@ -232,7 +233,7 @@ class WorkSpace extends React.Component{
 
     return (<Switch>
 
-      <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match, history})=> {
+      <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match})=> {
         const siteKey= decodeURIComponent(match.params.site);
         const workspaceKey= decodeURIComponent(match.params.workspace);
         return <TopToolbarRight
@@ -242,7 +243,7 @@ class WorkSpace extends React.Component{
         />
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace' render={ ({match, history})=> {
+      <Route path='/sites/:site/workspaces/:workspace' render={ ({match})=> {
         const siteKey= decodeURIComponent(match.params.site);
         const workspaceKey= decodeURIComponent(match.params.workspace);
         const toolbarItemsCenter = [
@@ -265,9 +266,10 @@ class WorkSpace extends React.Component{
   }
 
   renderMenuSwitch(){
+    const {history} = this.props;
     return (<Switch>
 
-      <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match, history})=> {
+      <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match})=> {
         return (<SiteConfSidebar
         menus={[]}
         siteKey={ decodeURIComponent(match.params.site) }
@@ -279,11 +281,11 @@ class WorkSpace extends React.Component{
       />);
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace' render={ ({match, history})=> {
+      <Route path='/sites/:site/workspaces/:workspace' render={ ({match})=> {
         return this.renderWorkspaceSidebar(history, match.url, match.params.site, match.params.workspace);
       }} />
 
-      <Route path='/siteconf/:site/workspaces/:workspace' render={ ({match, history})=> {
+      <Route path='/siteconf/:site/workspaces/:workspace' render={ ({match})=> {
         return (<SiteConfSidebar
         menus={[]}
         siteKey={ decodeURIComponent(match.params.site) }
@@ -434,9 +436,8 @@ class WorkSpace extends React.Component{
     return (<Switch>
       <Route
       path="*"
-      render={ ({match, history})=>{
+      render={ ({match})=>{
 
-        this.history = history;
         return (
           <MuiThemeProvider muiTheme={pogoTheme}>
 
@@ -474,5 +475,6 @@ class WorkSpace extends React.Component{
   }
 }
 
-export default WorkSpace;
+//export default WorkSpace;
+export default withRouter(WorkSpace);
 

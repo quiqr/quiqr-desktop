@@ -1,15 +1,19 @@
-import { Route }                 from 'react-router-dom';
 import React                     from 'react';
+import { Switch, Route }         from 'react-router-dom'
+
 import {List, ListItem}          from 'material-ui-02/List';
 import Subheader                 from 'material-ui-02/Subheader';
 import IconAdd                   from 'material-ui-02/svg-icons/content/add';
 import muiThemeable              from 'material-ui-02/styles/muiThemeable';
+
 import service                   from './../../services/service';
 import { snackMessageService }   from './../../services/ui-service';
+
 import { Wrapper, MessageBlock } from './components/shared';
 import CreateSiteDialog          from './components/CreateSiteDialog';
 import BlockDialog               from './components/BlockDialog';
 import RemoteSiteDialog          from './components/RemoteSiteDialog';
+
 import Spinner                   from './../../components/Spinner';
 
 import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
@@ -82,7 +86,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
       siteCreatorMessage: null,
       remoteSitesAsOwner: [],
       remoteSitesAsMember: [],
-      sitesListingView: 'all'
+      sitesListingView: 'local'
     };
   }
 
@@ -135,9 +139,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     });
   }
 
-  componentWillUnmount(){
-  }
-
   mountSite(site : SiteConfig ){
     this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
     this.setState({currentSiteKey: site.key});
@@ -158,8 +159,8 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
   };
 
   async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-    this.setState({currentWorkspaceKey: workspace.key});
-    await service.api.mountWorkspace(siteKey, workspace.key);
+    //this.setState({currentWorkspaceKey: workspace.key});
+    //await service.api.mountWorkspace(siteKey, workspace.key);
     this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
   }
 
@@ -210,8 +211,18 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     })
   }
 
-  renderSelectSites(){
+  renderSelectSites(source){
     let { selectedSite, configurations } = this.state;
+
+    let listingSource
+    if(source === 'last'){
+      listingSource = this.state.sitesListingView;
+    }
+    else{
+      listingSource = source;
+    }
+
+    service.api.logToConsole(listingSource);
 
     let _configurations = ((configurations: any): Configurations);
     let sites = _configurations.sites || [];
@@ -224,14 +235,16 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
 
     let listTitle = 'All Sites';
 
-    if(this.state.sitesListingView === 'mylocal'){
+    /*
+    if(listingSource === 'local'){
       listTitle = `Your sites (${this.props.quiqrUsername})`;
       sites = sites.filter((site) => {
         return site.owner === this.props.quiqrUsername
       });
     }
+    */
 
-    else if(this.state.sitesListingView === 'myremote'){
+    if(listingSource === 'quiqr-cloud'){
       listTitle = `Available remote sites (${this.props.quiqrUsername})`;
 
       sites = [];
@@ -251,12 +264,14 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
       });
 
     }
+    /*
     else if(this.state.sitesListingView === 'unpublished'){
       listTitle = 'Unpublished sites';
       sites = sites.filter((site) => {
         return site.published === 'no'
       });
     }
+    */
 
     sites.sort(function(a, b){
       var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
@@ -361,7 +376,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
       </div>
 
     )
-
   }
 
   render(){
@@ -374,25 +388,35 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     }
 
     return (
+      <React.Fragment>
 
-      <Route path='/sites/:source'
+        <Switch>
 
-        render={ ({match, history})=> {
+          <Route path='/sites/:source' render={ ({match, history})=> {
+            this.history = history;
+            let source = decodeURIComponent(match.params.source)
+            service.api.logToConsole(source, 'source')
+            return (
+              <div style={ styles.container }>
+                {this.renderSelectSites(source)}
+              </div>
+            );
+          }}
+          />
 
-          this.history = history;
-          let source = decodeURIComponent(match.params.source)
-          return (
+          <Route path='/sites' render={ ({match, history})=> {
+            this.history = history;
+            return (
+              <div style={ styles.container }>
+                {this.renderSelectSites("last")}
+              </div>
+            );
+          }}
+          />
 
-            <div style={ styles.container }>
-
-              {this.renderSelectSites(source)}
-
-              {this.renderDialogs()}
-
-            </div>
-          );
-        }}
-      />
+        </Switch>
+        {this.renderDialogs()}
+      </React.Fragment>
     );
   }
 

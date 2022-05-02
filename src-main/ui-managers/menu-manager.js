@@ -202,7 +202,7 @@ class MenuManager {
 
           dialog.showMessageBox(null, options, async (response) => {
             //select user
-            this.setSitesListingView('myremote');
+            this.setSitesListingView('quiqr-cloud');
           });
 
         });
@@ -615,21 +615,12 @@ resources: []\n\
 
     let _menuContent = [
       {
-        key: "all",
+        key: "local",
         label: "All Sites",
       },
       {
-        key: "unpublished",
-        label: "Unpublished Sites",
-      },
-      {
-        key: "mylocal",
-        label: "Your Sites",
-        enabled: ( this.profileUserName === '' ? false:true ),
-      },
-      {
-        key: "myremote",
-        label: "Available Sites",
+        key: "quiqr-cloud",
+        label: "Quiqr Cloud",
         enabled: ( this.profileUserName === '' ? false:true ),
       },
     ];
@@ -664,7 +655,7 @@ resources: []\n\
       click: async ()=>{
         mainWindow.webContents.send("frontEndBusy");
         global.pogoconf.setCurrectUsername(null);
-        global.pogoconf.setSitesListingView('all');
+        global.pogoconf.setSitesListingView('local');
 
         global.pogoconf.saveState().then( ()=>{
           app.relaunch()

@@ -2,7 +2,6 @@ import React                                         from 'react';
 import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
-//import SelectSite                                    from './containers/SelectSite'
 import { SiteLibrarySidebar, SiteLibraryRouted }     from './containers/SiteLibrary'
 import Workspace                                     from './containers/WorkspaceMounted/Workspace';
 import Console                                       from './containers/Console';
@@ -12,11 +11,8 @@ import TopToolbarLeft                                from './containers/TopToolb
 
 import Welcome                                       from './containers/Welcome';
 
-//import WorkspaceSidebar                              from './containers/WorkspaceSidebar';
 import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
 import { PrefsSidebar, PrefsRouted }                 from './containers/Prefs';
-
-//import { SiteConfSidebar, SiteConfRouted }           from './containers/WorkspaceMounted/SiteConf';
 
 import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
@@ -134,12 +130,6 @@ class App extends React.Component<AppProps,AppState>{
     this.history.push('/prefs');
   }
 
-  /*
-  redirectSiteConf(){
-    this.history.push('/siteconf');
-  }
-  */
-
   redirectConsole(){
     this.history.push('/console');
   }
@@ -163,11 +153,10 @@ class App extends React.Component<AppProps,AppState>{
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
 
       if(this.history){
-      this.history.push(location);
+        this.history.push(location);
       }
-      else{
+      else {
         this.history = ['/'];
-
       }
 
     }.bind(this));
@@ -438,19 +427,19 @@ class App extends React.Component<AppProps,AppState>{
         )
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match})=> {
+      <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match, history})=> {
+        this.history = history;
         return (
           <Workspace
-            history={this.history}
             siteKey={ decodeURIComponent(match.params.site) }
             workspaceKey={ decodeURIComponent(match.params.workspace) } />
 
         );
       }} />
-      <Route path='/sites/:site/workspaces/:workspace/*' exact render={ ({match})=> {
+      <Route path='/sites/:site/workspaces/:workspace/*' exact render={ ({match, history})=> {
+        this.history = history;
         return (
           <Workspace
-            history={this.history}
             siteKey={ decodeURIComponent(match.params.site) }
             workspaceKey={ decodeURIComponent(match.params.workspace) } />
 
