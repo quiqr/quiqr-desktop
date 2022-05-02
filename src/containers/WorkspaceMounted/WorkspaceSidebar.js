@@ -2,25 +2,27 @@ import React                                from 'react';
 import { Route }                            from 'react-router-dom'
 import { List, ListItem }                   from 'material-ui-02/List';
 import { Divider, Toggle }                  from 'material-ui-02';
-import IconActionSetting                    from 'material-ui-02/svg-icons/action/settings';
+//import IconActionSetting                    from 'material-ui-02/svg-icons/action/settings';
 import IconOpenBrowser                      from 'material-ui-02/svg-icons/action/open-in-browser';
 import IconHome                             from 'material-ui-02/svg-icons/action/home';
 import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
 import * as Sidebar                         from '../Sidebar';
-import type { SiteConfig, WorkspaceConfig } from './../../types'
+//import type { WorkspaceConfig } from './../../types'
 
 //const translucentColor = 'RGBA(255,255,255,.8)';
-const translucentColor = 'RGBA(0,0,0,.8)';
+//const translucentColor = 'RGBA(0,0,0,.8)';
 
+/*
 type WorkspaceWidgetProps = {
   onClick : ()=> void,
-  siteConfig : ?SiteConfig,
+  //siteConfig : ?SiteConfig,
   workspaceConfig : ?WorkspaceConfig
 }
+*/
 
-class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
+class WorkspaceWidget extends React.Component {
 
   constructor(props : WorkspaceWidgetProps){
     super(props);
@@ -150,7 +152,6 @@ class WorkspaceWidget extends React.Component<WorkspaceWidgetProps,any> {
 
     let {
       onClick,
-      siteConfig,
     } = this.props;
 
 

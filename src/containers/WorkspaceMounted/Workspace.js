@@ -13,7 +13,7 @@ import WorkspaceSidebar                              from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted }           from './SiteConf';
 
 import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
+//import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                              from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme                                   from 'material-ui-02/styles/getMuiTheme';
 

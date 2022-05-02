@@ -366,7 +366,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
 
   render(){
 
-    let { configurations, createSiteDialog, remoteSiteDialog } = this.state;
+    let { configurations } = this.state;
 
 
     if(configurations==null){
