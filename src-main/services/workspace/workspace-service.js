@@ -547,12 +547,12 @@ class WorkspaceService{
     }
 
 
-    console.log(filePath)
+    //console.log(filePath)
     if(await fs.exists(filePath)){
       if(contentFormats.isContentFile(filePath)){
         files = await this.getResourcesFromContent(filePath, [], targetPath);
       }
-    console.log(files)
+      //console.log(files)
       return files;
     }
 

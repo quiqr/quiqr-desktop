@@ -116,6 +116,10 @@ export class API {
     return mainProcessBridge.request('renameCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
   }
 
+  openFileInEditor(path: string){
+    mainProcessBridge.requestVoid('openFileInEditor', {path});
+  }
+
   openFileExplorer(path: string){
     mainProcessBridge.requestVoid('openFileExplorer', {path});
   }

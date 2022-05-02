@@ -162,7 +162,13 @@ class App extends React.Component<AppProps,AppState>{
 
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
 
+      if(this.history){
       this.history.push(location);
+      }
+      else{
+        this.history = ['/'];
+
+      }
 
     }.bind(this));
   }

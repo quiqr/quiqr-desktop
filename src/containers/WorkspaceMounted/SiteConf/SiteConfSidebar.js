@@ -4,50 +4,50 @@ import { Sidebar }          from './../../Sidebar';
 import type { SidebarMenu } from './../../Sidebar';
 //import service              from './../../services/service';
 
-
 export class SiteConfSidebar extends React.Component {
 
-    render(){
-        return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
+  constructor(props){
+
+    super(props);
+    this.state = {
+      selectedMenuItem: 'general'
     }
+  }
 
-    renderWithRoute(history: {push:(path: string)=>void}){
+  render(){
+    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
+  }
 
-      let encodedSiteKey = this.props.siteKey;
-      let encodedWorkspaceKey = this.props.workspaceKey;
-      let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
+  renderWithRoute(history: {push:(path: string)=>void}){
 
-      let menu: SidebarMenu = {
-        title: 'Site Configuration',
-        items: [
-          {
-            active: true,
-            label: "General",
-            xxselected: true,
-            onClick: ()=>{
-              history.push(`${basePath}/general/`)
-            }
-          },
-          {
-            active: true,
-            label: "Model",
-            onClick: ()=>{
-              history.push(`${basePath}/model/`)
-            }
-          },
-          /*
-          {
-            active: true,
-            label: "Danger",
-            onClick: ()=>{
-              service.api.logToConsole(`${basePath}/danger/`);
-              history.push(`${basePath}/danger/`)
-            }
+    let encodedSiteKey = this.props.siteKey;
+    let encodedWorkspaceKey = this.props.workspaceKey;
+    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
+
+    let menu: SidebarMenu = {
+      title: 'Site Configuration',
+      items: [
+        {
+          active: true,
+          label: "General",
+          selected: (this.state.selectedMenuItem==='general' ? true : false),
+          onClick: ()=>{
+            this.setState({selectedMenuItem:'general'});
+            history.push(`${basePath}/general/`)
           }
-          */
-        ]
-      }
-
-      return <Sidebar {...this.props} menus={[menu]} />
+        },
+        {
+          active: true,
+          label: "Model",
+          selected: (this.state.selectedMenuItem==='model' ? true : false),
+          onClick: ()=>{
+            this.setState({selectedMenuItem:'model'});
+            history.push(`${basePath}/model/`)
+          }
+        },
+      ]
     }
+
+    return <Sidebar {...this.props} menus={[menu]} />
+  }
 }

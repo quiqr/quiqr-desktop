@@ -36,13 +36,14 @@ class WorkspaceConfigProvider{
       rimraf.sync(this.partialRemoteCacheDir(global.currentSitePath));
     }
     */
-  }
+    }
 
   async getConfig(workspacePath, workspaceKey){
 
     let filePath = this._getFilePath(workspacePath);
 
     this.parseInfo.baseFile = filePath;
+
 
     let config;
     let token;
@@ -140,19 +141,19 @@ class WorkspaceConfigProvider{
 
     let mergedDataSingles = [];
     await Promise.all(
-        configOrg.singles.map(async (x) => {
-          let mp =  await this.getMergePartialResult(x,workspacePath)
-          mergedDataSingles.push(mp);
-        }),
+      configOrg.singles.map(async (x) => {
+        let mp =  await this.getMergePartialResult(x,workspacePath)
+        mergedDataSingles.push(mp);
+      }),
     );
     configOrg.singles = mergedDataSingles;
 
     let mergedDataDynamics = [];
     await Promise.all(
-        configOrg.dynamics.map(async (x) => {
-          let mp =  await this.getMergePartialResult(x,workspacePath)
-          mergedDataDynamics.push(mp);
-        }),
+      configOrg.dynamics.map(async (x) => {
+        let mp =  await this.getMergePartialResult(x,workspacePath)
+        mergedDataDynamics.push(mp);
+      }),
     );
     configOrg.dynamics = mergedDataDynamics;
 
@@ -200,8 +201,8 @@ class WorkspaceConfigProvider{
 
       newObject[path.parse(filename).name] = deepmerge(mergeData, configObject[path.parse(filename).name]);
       if(path.parse(filename).name == 'dynamics' ){
-      //console.log(configObject);
-      //console.log(newObject)
+        //console.log(configObject);
+        //console.log(newObject)
       }
 
 
@@ -281,8 +282,6 @@ class WorkspaceConfigProvider{
       resolve(mergeKey);
 
     });
-
-
   }
 
   _getRemotePartial(url, destination){

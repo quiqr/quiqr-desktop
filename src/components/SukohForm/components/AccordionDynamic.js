@@ -304,7 +304,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     } else {
       return (null);
     }
-
   }
 
   handleAccordionClick(context, node){

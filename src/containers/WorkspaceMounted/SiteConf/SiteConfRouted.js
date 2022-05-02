@@ -6,6 +6,7 @@ import  SiteConfRouteDanger   from './SiteConfRouteDanger';
 
 export class SiteConfRouted extends React.Component {
 
+
   render(){
     return (
     <Switch>

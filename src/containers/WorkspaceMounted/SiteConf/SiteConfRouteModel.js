@@ -1,9 +1,11 @@
-import React          from 'react';
-import service        from './../../../services/service';
-import Typography     from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
-import TextField      from '@material-ui/core/TextField';
-//import Button         from '@material-ui/core/Button';
+import React           from 'react';
+import service         from './../../../services/service';
+import Typography      from '@material-ui/core/Typography';
+import { withStyles }  from '@material-ui/core/styles';
+import TextField       from '@material-ui/core/TextField';
+import IconButton      from '@material-ui/core/IconButton';
+import DescriptionIcon from '@material-ui/icons/Description';
+import Grid            from '@material-ui/core/Grid';
 
 const useStyles = theme => ({
 
@@ -15,6 +17,10 @@ const useStyles = theme => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
+  },
+
+  iconButton: {
+    padding: 10,
   },
 
   textField: {
@@ -70,9 +76,48 @@ class SiteConfRouteModel extends React.Component {
   componentWillUnmount(){
     service.unregisterListener(this);
   }
+  renderSection(title, files){
+    const { classes } = this.props;
+    return (
+      <React.Fragment>
+        <Typography variant="h6">{title}</Typography>
+
+        <div className={classes.root}>
+          {files.map((item, index)=>{
+            return (
+          <Grid container  spacing={1} alignItems="flex-end">
+            <Grid item xs={11}>
+              <TextField
+                id="standard-full-width"
+                label={item.key}
+                style={{ margin: 8 }}
+                value={item.filename}
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }} />
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton color="primary" className={classes.iconButton} aria-label="directions"
+                onClick={()=>{
+                  service.api.openFileInEditor(item.filename);
+                }}>
+                <DescriptionIcon
+                  style={{ color: '#000' }}
+                />
+              </IconButton>
+            </Grid>
+          </Grid>
+            )
+          })}
+        </div>
+
+      </React.Fragment>
+    )
+  }
 
   render(){
-    const { classes } = this.props;
 
     let includeFiles = [];
     let partialFiles = [];
@@ -83,75 +128,13 @@ class SiteConfRouteModel extends React.Component {
 
     return (
       <div className={ this.props.classes.container }>
+
         <Typography variant="h4">Site: {this.props.siteKey}</Typography>
         <Typography variant="h5">Model Configuration</Typography>
 
-        <div className={classes.root}>
-
-          <Typography variant="h6">Base</Typography>
-
-          <TextField
-            id="standard-full-width"
-            label="Base File"
-            style={{ margin: 8 }}
-            value={this.state.parseInfo.baseFile}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
-
-          <Typography variant="h6">Include Files</Typography>
-
-          {includeFiles.map((item, index)=>{
-
-            return (
-                <TextField
-                  key={'include-item-'+index}
-                  id="standard-full-width"
-                  label={item.key}
-                  style={{ margin: 8 }}
-                  fullWidth
-                  disabled
-                  value={item.filename}
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }} />
-            );
-          })}
-
-          <Typography variant="h6">Partial Files</Typography>
-
-          {partialFiles.map((item, index)=>{
-
-            return (
-                <TextField
-                  key={'partial-item-'+index}
-                  id="standard-full-width"
-                  label={item.key}
-                  style={{ margin: 8 }}
-                  fullWidth
-                  disabled
-                  value={item.filename}
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }} />
-            );
-          })}
-
-
-        </div>
-
-        {/*
-        <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleNewSiteClick}>
-          Save Configuration
-        </Button>
-        */}
-
-
+        {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile}])}
+        {this.renderSection("Include Files", includeFiles)}
+        {this.renderSection("Partial Files", partialFiles)}
 
       </div>
     );

@@ -119,6 +119,15 @@ api.openFileExplorer = function({path}, context){
   }
 }
 
+api.openFileInEditor = function({path},context){
+  try{
+    shell.openPath(path);
+  }
+  catch(e){
+    console.log(e);
+  }
+}
+
 api.listWorkspaces = async function({siteKey}, context){
   let service = await getSiteServicePromise(siteKey);
   let workspaces = await service.listWorkspaces();
