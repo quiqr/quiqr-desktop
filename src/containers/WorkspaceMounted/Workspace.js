@@ -269,6 +269,10 @@ class WorkSpace extends React.Component{
     const {history} = this.props;
     return (<Switch>
 
+      <Route path='/sites/:site/workspaces/:workspace/publish' render={ ({match})=> {
+        return null;
+      }} />
+
       <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match})=> {
         return (<SiteConfSidebar
         menus={[]}
