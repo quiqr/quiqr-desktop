@@ -7,15 +7,6 @@ import { Dialog, RaisedButton } from 'material-ui-02';
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
-type FormsCookbookProps = {
-    sampleKey: any,
-    samples?: Array<any>
-}
-
-type FormsCookbookState = {
-    modal: null|'config'|'state'
-}
-
 const MenuBar = (props: { onViewStateClick: ()=>void, onViewConfigClick: ()=>void}) =>{
     return <div style={{
         background:'white',
@@ -32,11 +23,11 @@ const MenuBar = (props: { onViewStateClick: ()=>void, onViewConfigClick: ()=>voi
     </div>
 }
 
-export class FormsCookbook extends React.Component<FormsCookbookProps, FormsCookbookState>{
+export class FormsCookbook extends React.Component{
 
     formRef: any;
 
-    constructor(props: FormsCookbookProps){
+    constructor(props){
         super(props);
         this.state = {modal: null};
     }

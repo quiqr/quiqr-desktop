@@ -1,33 +1,18 @@
 import * as React from 'react';
-
 import { Popover, Menu, MenuItem } from 'material-ui-02/';
 
-type TriggerWithOptionsProps = {
-    options: Array<string>,
-    onOptionClick: (index: number)=>?bool,
-    triggerType: any,
-    triggerProps: any,
-    menuProps?: any,
-    popoverProps?: any
-}
+export class TriggerWithOptions extends React.Component {
 
-type TriggerWithOptionsState = {
-    open: bool,
-    anchorEl: ?any
-}
-
-export class TriggerWithOptions extends React.Component<TriggerWithOptionsProps, TriggerWithOptionsState> {
-
-  constructor(props: TriggerWithOptionsProps) {
+  constructor(props) {
     super(props);
 
     this.state = {
-        anchorEl: null,
-        open: false,
+      anchorEl: null,
+      open: false,
     };
   }
 
-  handleTriggerClick = (event: any) => {
+  handleTriggerClick = (event) => {
     event.preventDefault();
 
     this.setState({
@@ -42,10 +27,10 @@ export class TriggerWithOptions extends React.Component<TriggerWithOptionsProps,
     });
   };
 
-  handleMenuItemClick = (event: any, menuItem: any, index: number)=>{
-      let result = this.props.onOptionClick(index);
-      if(result!==false)
-        this.setState({open:false});
+  handleMenuItemClick = (event, menuItem, index)=>{
+    let result = this.props.onOptionClick(index);
+    if(result!==false)
+      this.setState({open:false});
   }
 
   render() {
@@ -54,8 +39,8 @@ export class TriggerWithOptions extends React.Component<TriggerWithOptionsProps,
     return (
       <React.Fragment>
         <TriggerType
-            {...triggerProps}
-            onClick={this.handleTriggerClick}
+          {...triggerProps}
+          onClick={this.handleTriggerClick}
         />
         <Popover
           {...popoverProps}

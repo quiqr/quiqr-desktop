@@ -3,38 +3,27 @@ import { Route } from 'react-router-dom';
 import Sidebar from './../Sidebar';
 import { samples } from './samples'
 
-type FormsCookbookSidebarProps = {
-    menuIsLocked: bool,
-    onLockMenuClicked: ()=> void,
-    onToggleItemVisibility: ()=> void,
-    hideItems : bool
-};
+export class FormsCookbookSidebar extends React.Component{
 
-type FormsCookbookSidebarState = {
+  render(){
+    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
+  }
 
-}
+  renderWithRoute(history){
 
-export class FormsCookbookSidebar extends React.Component<FormsCookbookSidebarProps, FormsCookbookSidebarState>{
-
-    render(){
-        return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
-    }
-
-    renderWithRoute(history: {push:(path: string)=>void}){
-
-        let menu = {
-            title: 'Forms Cookbook',
-            items: samples.map((sample)=>{
-                return {
-                    active: false,
-                    label: sample.title,
-                    onClick: ()=>{
-                        history.push('/forms-cookbook/'+sample.key)
-                    }
-                }
-            })
+    let menu = {
+      title: 'Forms Cookbook',
+      items: samples.map((sample)=>{
+        return {
+          active: false,
+          label: sample.title,
+          onClick: ()=>{
+            history.push('/forms-cookbook/'+sample.key)
+          }
         }
-
-        return <Sidebar {...this.props} menus={[menu]} />
+      })
     }
+
+    return <Sidebar {...this.props} menus={[menu]} />
+  }
 }

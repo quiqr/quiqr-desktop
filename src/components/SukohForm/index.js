@@ -8,25 +8,9 @@ import service                     from './../../services/service'
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
-type SukohFormProps = {
-  onSave: ({data:any, accept:any, reject:any})=>void,
-  fields: any,
-  plugins: {[key:string]: Function},
-  rootName: string,
-  values: {}
-}
+export class SukohForm extends React.Component{
 
-type SukohFormState = {
-  changed: bool,
-  error: ?string,
-  savedOnce: bool
-}
-
-export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
-
-  _valueFactory: ()=>any;
-
-  constructor(props: SukohFormProps){
+  constructor(props){
     super(props);
     this.state = {
       actionButtonRightPos:380,
@@ -112,7 +96,7 @@ export class SukohForm extends React.Component<SukohFormProps, SukohFormState>{
     }
   }
 
-  handleFormChange(valueFactory: ()=>any){
+  handleFormChange(valueFactory){
     this._valueFactory = valueFactory;
     if(!this.state.changed){
       this.setState({changed:true});

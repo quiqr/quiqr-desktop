@@ -5,8 +5,6 @@ import muiThemeable            from 'material-ui-02/styles/muiThemeable';
 import Spinner                 from './../../../components/Spinner';
 import MarkdownIt              from 'markdown-it'
 
-import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
-
 const md = new MarkdownIt({html:true});
 
 const styles = {
@@ -44,25 +42,7 @@ const styles = {
   }
 }
 
-type HomeProps = {
-  muiTheme : any,
-  siteKey : string,
-  workspaceKey : string
-}
-
-type HomeState = {
-  configurations?: Configurations | EmptyConfigurations,
-  selectedSite?: SiteConfig,
-  selectedSiteWorkspaces?: Array<any>,
-  selectedWorkspace?: WorkspaceHeader,
-  selectedWorkspaceDetails?: WorkspaceConfig,
-  publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
-  registerDialog?: { open: bool },
-  claimDomainDialog?: { open: bool },
-  blockingOperation: ?string //this should be moved to a UI service
-}
-
-class Home extends React.Component<HomeProps, HomeState>{
+class Home extends React.Component{
 
   history: any;
 
@@ -76,7 +56,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     };
   }
 
-  componentDidUpdate(preProps: HomeProps){
+  componentDidUpdate(preProps){
     if(this._ismounted && preProps.siteKey !== this.props.siteKey){
       this.checkSiteInProps();
     }

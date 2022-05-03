@@ -2,19 +2,6 @@ import * as React from 'react';
 import { Dialog, FlatButton, TextField } from 'material-ui-02';
 import FolderSourceForm from './components/FolderSourceForm';
 
-type CreateSiteDialogProps = {
-  open: bool,
-  onCancelClick: ()=>void,
-  onSubmitClick: (model: any)=>void
-}
-
-type CreateSiteDialogState = {
-  formIsValid: bool,
-  model: any,
-  sourceIndex: number,
-  key: string
-}
-
 const SITE_SOURCES = [
   { key:'folder', title:'Folder', enabled: true, form: FolderSourceForm, description:'' }
 ];
@@ -26,15 +13,15 @@ const INITIAL_STATE = {
   key:''
 };
 
-export default class CreateSiteDialog extends React.Component<CreateSiteDialogProps,CreateSiteDialogState>{
+export default class CreateSiteDialog extends React.Component{
 
-  constructor(props: CreateSiteDialogProps){
+  constructor(props){
     super(props);
 
     this.state = JSON.parse(JSON.stringify(INITIAL_STATE));
   }
 
-  handleFormChange(model: any, valid: bool){
+  handleFormChange(model, valid){
     this.setState({ model, formIsValid: valid });
   }
 

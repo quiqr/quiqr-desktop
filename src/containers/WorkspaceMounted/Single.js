@@ -3,23 +3,9 @@ import service from './../../services/service'
 import { snackMessageService } from './../../services/ui-service'
 import { SukohForm } from './../../components/SukohForm';
 import Spinner from './../../components/Spinner';
-import type { WorkspaceConfig, SingleConfig } from './../types';
 
-type SingleProps = {
-  siteKey : string,
-  workspaceKey: string,
-  singleKey: string
-}
-
-type SingleState = {
-  selectedWorkspaceDetails : ?WorkspaceConfig,
-  single : ?SingleConfig,
-  singleValues: any
-}
-
-
-class Single extends React.Component<SingleProps,SingleState>{
-  constructor(props : SingleProps){
+class Single extends React.Component{
+  constructor(props){
     super(props);
     this.state = {
       selectedWorkspaceDetails: null,
@@ -56,7 +42,7 @@ class Single extends React.Component<SingleProps,SingleState>{
     service.unregisterListener(this);
   }
 
-  handleOpenInEditor(context: any){
+  handleOpenInEditor(context){
     var { siteKey, workspaceKey, singleKey } = this.props;
 
     let promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
@@ -66,7 +52,7 @@ class Single extends React.Component<SingleProps,SingleState>{
     })
   }
 
-  handleSave(context : any){
+  handleSave(context){
 
     //service.api.logToConsole(context.data);
     //service.api.logToConsole(context.reloadAfterSave,"reloadAfterSave");

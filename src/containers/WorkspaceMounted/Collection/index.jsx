@@ -13,20 +13,8 @@ const Fragment = React.Fragment;
 
 const MAX_RECORDS = 200;
 
-type MakePageBundleItemKeyDialogProps = {
-  busy: bool,
-  itemLabel: string,
-  handleClose: ()=> void,
-  handleConfirm: (string)=> void
-}
-
-type MakePageBundleItemKeyDialogState = {
-  value:string,
-  valid: ?bool
-}
-
-class MakePageBundleItemKeyDialog extends React.Component<MakePageBundleItemKeyDialogProps,MakePageBundleItemKeyDialogState>{
-  constructor(props : MakePageBundleItemKeyDialogProps){
+class MakePageBundleItemKeyDialog extends React.Component{
+  constructor(props){
     super(props);
     this.state = {
       value:'',
@@ -68,30 +56,7 @@ class MakePageBundleItemKeyDialog extends React.Component<MakePageBundleItemKeyD
   }
 }
 
-type CollectionProps = {
-  siteKey : string,
-  workspaceKey : string,
-  collectionKey : string
-}
-
-type CollectionState = {
-  selectedWorkspaceDetails: null,
-  filter: string,
-  items: ?Array<{label:string, key:string }>,
-  filteredItems: Array<{key:string, label:string}>,
-  trunked: bool,
-  view: ?{ key: ?string, item: any },
-  modalBusy: bool,
-  dirs: Array<string>
-}
-
-class CollectionListItems extends React.PureComponent<{
-  filteredItems: Array<any>,
-  onItemClick: (item: any)=>void,
-  onRenameItemClick: (item: any)=>void,
-  onDeleteItemClick: (item: any)=>void,
-  onMakePageBundleItemClick: (item: any)=>void,
-}> {
+class CollectionListItems extends React.PureComponent {
   render(){
     let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
 
@@ -150,12 +115,12 @@ class CollectionListItems extends React.PureComponent<{
   }
 }
 
-class Collection extends React.Component<CollectionProps,CollectionState>{
+class Collection extends React.Component{
 
   filterDebounce = new Debounce(200);
   history: any;
 
-  constructor(props : CollectionProps){
+  constructor(props){
     super(props);
     this.state = {
       selectedWorkspaceDetails: null,

@@ -6,8 +6,6 @@ import IconBack                                                                 
 import { IconButton }                                                              from 'material-ui-02';
 import { ComponentContext }                                                        from './component-context';
 import { Debounce }                                                                from './debounce';
-import type { FieldBase, FieldBaseGroup, DynamicFormNode, BreadcumbComponentType } from './types';
-import { ComponentRegistry }                                                       from './component-registry';
 import { FormStateBuilder }                                                        from './form-state-builder';
 import service                                                                     from '../../services/service';
 import { FieldsExtender }                                                          from './fields-extender';
@@ -15,32 +13,15 @@ import { FieldsExtender }                                                       
 const Fragment = React.Fragment;
 const componentMarginTop = '16px';
 
-type FormProps = {
-  values: any,
-  fields: Array<any>,
-  debug: bool,
-  rootName: string,
-  componentRegistry: ComponentRegistry,
-  refreshed: bool,
-  breadcumbComponentType : BreadcumbComponentType,
-  plugins: any,
-  onChange? : ( valuesGetter: ()=>any )=>void
-}
+class Form extends React.Component {
 
-type FormState = {
-  path: string,
-  document: any,
-  fields: Array<any>, //we're going to use the fields from the state instead of the fields from props - it can't mutate
-  renderError: ?string
-}
-
-class Form extends React.Component<FormProps,FormState> {
-
+  /*
   currentNode : DynamicFormNode<FieldBase>;
   root : DynamicFormNode<FieldBase>;
   cache: any = {};
   stateBuilder: FormStateBuilder;
   forceUpdateThis: ()=>void;
+  */
 
   constructor(props : FormProps) {
 
@@ -118,7 +99,7 @@ class Form extends React.Component<FormProps,FormState> {
   }
 
 
-  setPath(node : DynamicFormNode<FieldBase>){
+  setPath(node){
 
     //service.api.logToConsole(JSON.stringify(node));
 
@@ -134,7 +115,7 @@ class Form extends React.Component<FormProps,FormState> {
     }
   }
 
-  buildPath(currentNode : ?DynamicFormNode<FieldBase>) : string{
+  buildPath(currentNode){
     if(currentNode==null)
       return '';
     let path = '';
@@ -166,7 +147,7 @@ class Form extends React.Component<FormProps,FormState> {
     return path;
   }
 
-  renderField(node : DynamicFormNode<FieldBase>, onValueChanged : ?(value: any) => void){
+  renderField(node, onValueChanged){
 
     //INDIANSUMMERRECURSIVE
     //service.api.logToConsole(node.field.title, "renderField key");
@@ -231,7 +212,7 @@ class Form extends React.Component<FormProps,FormState> {
    * @uiState - item in e.g. accordion, matches last number in breadcumb number
    * @parent - the previous renderLevel context object
    */
-  renderLevel({ field, state, uiState, parent}: DynamicFormNode<FieldBaseGroup>): React.Node {
+  renderLevel({ field, state, uiState, parent}) {
 
     //INDIANSUMMERRECURSIVE
     //service.api.logToConsole(uiState, "uistate");

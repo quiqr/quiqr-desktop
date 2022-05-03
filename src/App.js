@@ -22,8 +22,6 @@ import getMuiTheme                                   from 'material-ui-02/styles
 import Redirect                                      from 'react-router-dom/Redirect';
 import service                                       from './services/service';
 
-import type { EmptyConfigurations, Configurations }  from './types';
-
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
     background: {
@@ -46,23 +44,12 @@ const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
   },
 });
 
-type AppProps = {
-}
-
-type AppState = {
-  configurations?: Configurations | EmptyConfigurations,
-  maximized : bool,
-  menuIsLocked: bool,
-  forceShowMenu: bool,
-  skipMenuTransition: bool
-}
-
 let style = require('./themes/default/style.js');
 let trySet = false;
 
-class App extends React.Component<AppProps,AppState>{
+class App extends React.Component{
 
-  constructor(props : any ){
+  constructor(props){
     super(props);
 
     let win = window.require('electron').remote.getCurrentWindow();

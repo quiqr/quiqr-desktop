@@ -4,22 +4,8 @@ import { snackMessageService } from './../../../services/ui-service'
 import { SukohForm } from './../../../components/SukohForm';
 import Spinner from './../../../components/Spinner'
 
-import type { WorkspaceConfig } from './../../types';
-
-type CollectionItemProps = {
-  siteKey: string,
-  workspaceKey: string,
-  collectionKey: string,
-  collectionItemKey: string
-}
-
-type CollectionItemState = {
-  selectedWorkspaceDetails: ?WorkspaceConfig,
-  collectionItemValues: any
-}
-
-class CollectionItem extends React.Component<CollectionItemProps,CollectionItemState>{
-  constructor(props : CollectionItemProps){
+class CollectionItem extends React.Component{
+  constructor(props){
     super(props);
     this.state = {
       selectedWorkspaceDetails: null,

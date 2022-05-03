@@ -2,20 +2,8 @@ import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import { Dialog, FlatButton } from 'material-ui-02';
 
-type DeleteItemKeyDialogProps = {
-  busy: bool,
-  itemLabel: string,
-  handleClose: ()=> void,
-  handleConfirm: (string)=> void
-}
-
-type DeleteItemKeyDialogState = {
-  value:string,
-  valid: ?bool
-}
-
-class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps,DeleteItemKeyDialogState>{
-  constructor(props : DeleteItemKeyDialogProps){
+class DeleteItemKeyDialog extends React.Component{
+  constructor(props){
     super(props);
     this.state = {
       value:'',
@@ -38,29 +26,29 @@ class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps,Delet
 
     return (
       <Dialog
-      title={"Delete Item"}
-      modal={true}
-      open={true}
-      onRequestClose={this.handleClose}
-      actions={[
-        <FlatButton
-        disabled={busy}
-        primary={true}
-        label="Cancel"
-        onClick={this.handleClose.bind(this)} />,
-        <FlatButton
-        disabled={busy}
-        primary={true}
-        label="Delete"
-        onClick={this.handleConfirm.bind(this)}  />
-      ]}
+        title={"Delete Item"}
+        modal={true}
+        open={true}
+        onRequestClose={this.handleClose}
+        actions={[
+          <FlatButton
+            disabled={busy}
+            primary={true}
+            label="Cancel"
+            onClick={this.handleClose.bind(this)} />,
+            <FlatButton
+              disabled={busy}
+              primary={true}
+              label="Delete"
+              onClick={this.handleConfirm.bind(this)}  />
+        ]}
       >
-          {this.state.valid? undefined :
-              <p>Do you really want to delete <b>"{itemLabel}"</b>?</p>}
+        {this.state.valid? undefined :
+        <p>Do you really want to delete <b>"{itemLabel}"</b>?</p>}
 
-          { busy ? <Spinner /> : undefined }
+        { busy ? <Spinner /> : undefined }
 
-        </Dialog>
+      </Dialog>
     );
   }
 }

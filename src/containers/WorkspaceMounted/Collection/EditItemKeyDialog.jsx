@@ -2,24 +2,9 @@ import * as React from 'react';
 import Spinner from './../../../components/Spinner'
 import { Dialog, FlatButton, TextField } from 'material-ui-02';
 
-type EditItemKeyDialogProps = {
-  busy: bool,
-  value:?string,
-  title:string,
-  confirmLabel: string,
-  handleClose: ()=> void,
-  handleConfirm: (value:string, initialValue:string)=> void
-}
+class EditItemKeyDialog extends React.Component{
 
-type EditItemKeyDialogState = {
-  value:string,
-  initialValue: string,
-  valid: ?bool
-}
-
-class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemKeyDialogState>{
-
-  constructor(props : EditItemKeyDialogProps){
+  constructor(props ){
     super(props);
     this.state = {
       value:props.value||'',
@@ -76,12 +61,12 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
       errorText = '';
       keyField = (
         <TextField
-        floatingLabelFixed={true}
-        floatingLabelText="item key"
-        value={this.state.titleToKey}
-        disabled={true}
-        fullWidth={true}
-      />
+          floatingLabelFixed={true}
+          floatingLabelText="item key"
+          value={this.state.titleToKey}
+          disabled={true}
+          fullWidth={true}
+        />
       )
     }
     else{
@@ -90,16 +75,16 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
 
     return (
       <Dialog
-      title={this.props.title}
-      modal={true}
-      open={true}
-      onRequestClose={this.handleClose}
-      actions={[
-        <FlatButton disabled={busy} primary={true} label="Cancel" onClick={this.handleClose.bind(this)} />,
-        <FlatButton disabled={busy||!valid} primary={true} label={confirmLabel} onClick={this.handleConfirm.bind(this)}  />
-      ]}
+        title={this.props.title}
+        modal={true}
+        open={true}
+        onRequestClose={this.handleClose}
+        actions={[
+          <FlatButton disabled={busy} primary={true} label="Cancel" onClick={this.handleClose.bind(this)} />,
+          <FlatButton disabled={busy||!valid} primary={true} label={confirmLabel} onClick={this.handleConfirm.bind(this)}  />
+        ]}
       >
-          <TextField
+        <TextField
           floatingLabelText={this.props.textfieldlabel}
           value={this.state.value}
           errorText={valid? undefined : errorText}
@@ -109,11 +94,11 @@ class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps,EditItemK
           underlineShow={true}
           fullWidth={true}
         />
-            {keyField}
+        {keyField}
 
-            { busy? <Spinner /> : undefined }
+        { busy? <Spinner /> : undefined }
 
-          </Dialog>
+      </Dialog>
     );
   }
 }
