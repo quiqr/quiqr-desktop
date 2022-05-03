@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Route } from 'react-router-dom';
-import { Sidebar } from './../Sidebar';
-import type { SidebarMenu } from './../Sidebar';
+import Sidebar from './../Sidebar';
 import { samples } from './samples'
 
 type FormsCookbookSidebarProps = {
@@ -23,7 +22,7 @@ export class FormsCookbookSidebar extends React.Component<FormsCookbookSidebarPr
 
     renderWithRoute(history: {push:(path: string)=>void}){
 
-        let menu: SidebarMenu = {
+        let menu = {
             title: 'Forms Cookbook',
             items: samples.map((sample)=>{
                 return {

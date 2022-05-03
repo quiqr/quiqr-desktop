@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Route } from 'react-router-dom';
-import { Sidebar } from './../Sidebar';
-import type { SidebarMenu } from './../Sidebar';
+import Sidebar from './../Sidebar';
 
 export class PrefsSidebar extends React.Component {
 
@@ -11,7 +10,7 @@ export class PrefsSidebar extends React.Component {
 
     renderWithRoute(history: {push:(path: string)=>void}){
 
-        let menu: SidebarMenu = {
+        let menu = {
             title: 'Preferences',
             items: [{
                     active: true,

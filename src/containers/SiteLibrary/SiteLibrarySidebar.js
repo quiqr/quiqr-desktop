@@ -1,6 +1,6 @@
 import * as React           from 'react';
 import { Route }            from 'react-router-dom';
-import { Sidebar }          from './../Sidebar';
+import Sidebar           from './../Sidebar';
 //import service              from './../../services/service';
 
 

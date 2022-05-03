@@ -5,7 +5,7 @@ import { Divider, Toggle }                  from 'material-ui-02';
 import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
-import * as Sidebar                         from '../Sidebar';
+import Sidebar                         from '../Sidebar';
 
 class WorkspaceWidget extends React.Component {
 
@@ -309,7 +309,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
 
-    let menus: Array<Sidebar.SidebarMenu> = [];
+    let menus: Array = [];
 
     //append workspace widget
     menus.push({
@@ -418,7 +418,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
     }
 
     return (<React.Fragment>
-      <Sidebar.Sidebar
+      <Sidebar
       hideItems={this.props.hideItems}
       menuIsLocked={this.props.menuIsLocked}
       menus={menus}

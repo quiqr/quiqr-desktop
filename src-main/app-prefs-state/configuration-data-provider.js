@@ -45,6 +45,8 @@ function validateSite(site) {
     build: Joi.array(),
     publish: Joi.array(),
 
+    tags: Joi.array(),
+
     //0 = never published
     //1 = publication time unknown
     //other = publication time stamp (end polling)
