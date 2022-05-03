@@ -70,6 +70,15 @@ class SiteService{
     }
   }
 
+  async saveSiteConf(newConf){
+    let configJsonPath = pathHelper.getRoot() + 'config.'+this._config.key+'.json';
+    delete newConf['configPath']
+    delete newConf['owner']
+    delete newConf['published']
+    delete newConf['publishKey']
+    await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
+  }
+
   async publish(publishKey){
     let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
     if(publishConfig==null)

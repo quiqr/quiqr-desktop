@@ -14,8 +14,8 @@ import { snackMessageService } from './../../services/ui-service';
 import CreateSiteDialog        from './components/CreateSiteDialog';
 import BlockDialog             from './../../components/BlockDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
-
-import Spinner                   from './../../components/Spinner';
+import EditTagsDialogs         from './components/EditTagsDialogs';
+import Spinner                 from './../../components/Spinner';
 
 export class SiteLibraryRouted extends React.Component{
 
@@ -27,6 +27,8 @@ export class SiteLibraryRouted extends React.Component{
       showSpinner: false,
       remoteSiteDialog: false,
       createSiteDialog: false,
+      editTagsDialog: false,
+      dialogSiteConf: {},
       currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
@@ -56,6 +58,16 @@ export class SiteLibraryRouted extends React.Component{
     }
   }
 
+  updateLocalSites(){
+    service.getConfigurations(true).then((c)=>{
+      var stateUpdate  = {};
+      stateUpdate.configurations = c;
+
+      this.setState(stateUpdate);
+    });
+
+  }
+
   componentWillUpdate(nextProps, nextState) {
 
     if(this.props.createSite !== nextProps.createSite){
@@ -69,16 +81,12 @@ export class SiteLibraryRouted extends React.Component{
 
   componentWillMount(){
     this.updateRemoteSites(this.props.quiqrUsername);
+    this.updateLocalSites();
+
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });
 
-    service.getConfigurations(true).then((c)=>{
-      var stateUpdate  = {};
-      stateUpdate.configurations = c;
-
-      this.setState(stateUpdate);
-    });
 
     service.api.readConfPrefKey('sitesListingView').then((view)=>{
       this.setState({sitesListingView: view });
@@ -157,41 +165,44 @@ export class SiteLibraryRouted extends React.Component{
     })
   }
 
-  renderItemMenu(index){
+  renderItemMenu(index, siteconfig){
 
     return (
-    <div>
-      <IconButton
-        onClick={(event)=>{
-          this.setState({anchorEl:event.currentTarget, menuOpen:index})
-          service.api.logToConsole('open');
-        }}
-        aria-label="more"
-        aria-controls="long-menu"
-        aria-haspopup="true"
-      >
-        <MoreVertIcon />
-      </IconButton>
-      <Menu
-        anchorEl={this.state.anchorEl}
-        open={(this.state.menuOpen===index?true:false)}
-        keepMounted
-        onClose={()=>{
-          this.setState({menuOpen:null});
-          service.api.logToConsole("jojo");
+      <div>
+        <IconButton
+          onClick={(event)=>{
+            this.setState({anchorEl:event.currentTarget, menuOpen:index})
+          }}
+          aria-label="more"
+          aria-controls="long-menu"
+          aria-haspopup="true"
+        >
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={(this.state.menuOpen===index?true:false)}
+          keepMounted
+          onClose={()=>{
+            this.setState({menuOpen:null});
 
-        }}
-      >
-        <MenuItem key="rename">
-          Rename
-        </MenuItem>
+          }}
+        >
+          <MenuItem key="rename">
+            Rename
+          </MenuItem>
 
-        <MenuItem key="tags">
-          Edit Tags
-        </MenuItem>
-      </Menu>
-    </div>
-  );}
+          <MenuItem key="tags"
+            onClick={
+              ()=>{
+                this.setState({editTagsDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+              }
+            }>
+            Edit Tags
+          </MenuItem>
+        </Menu>
+      </div>
+    );}
 
   renderSelectSites(source, sourceArgument){
     let { selectedSite, configurations } = this.state;
@@ -255,54 +266,66 @@ export class SiteLibraryRouted extends React.Component{
     })
 
     return (
-        <List
-          style={{padding: 0}}
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader">
-              { listTitle }
-            </ListSubheader>
-          }>
+      <List
+        style={{padding: 0}}
+        subheader={
+          <ListSubheader component="div" id="nested-list-subheader">
+            { listTitle }
+          </ListSubheader>
+        }>
 
-          { (sites).map((site, index)=>{
-            let selected = site===selectedSite;
+        { (sites).map((site, index)=>{
+          let selected = site===selectedSite;
 
-            return (
+          return (
 
-              <ListItem
-                id={"siteselectable-"+site.name}
-                key={index}
-                selected={selected}
-                onClick={ ()=>{
-                  if(site.remote){
-                    this.setState({remoteSiteDialog:true});
-                    this.setState({currentRemoteSite:site.name})
-                  }
-                  else{
-                    this.mountSite(site)
-                  }
-                }}
+            <ListItem
+              id={"siteselectable-"+site.name}
+              key={index}
+              selected={selected}
+              onClick={ ()=>{
+                if(site.remote){
+                  this.setState({remoteSiteDialog:true});
+                  this.setState({currentRemoteSite:site.name})
+                }
+                else{
+                  this.mountSite(site)
+                }
+              }}
+              button={true}>
+              <ListItemText primary={site.name} />
+              {(site.remote?null:
+              <ListItemSecondaryAction>
+                {this.renderItemMenu(index,site)}
+              </ListItemSecondaryAction>
+              )}
 
-                button >
-                <ListItemText primary={site.name} />
-            <ListItemSecondaryAction>
-                {this.renderItemMenu(index)}
-            </ListItemSecondaryAction>
+            </ListItem>
 
-              </ListItem>
+          );
+        })}
 
-            );
-          })}
-
-        </List>
+      </List>
     );
 
   }
 
   renderDialogs(){
-    let { configurations, createSiteDialog, remoteSiteDialog } = this.state;
+    let { configurations, createSiteDialog, remoteSiteDialog, editTagsDialog, dialogSiteConf} = this.state;
 
     return (
       <div>
+
+        <EditTagsDialogs
+          open={editTagsDialog}
+          siteconf={dialogSiteConf}
+          onCancelClick={()=>this.setState({editTagsDialog:false})}
+          onSavedClick={()=>{
+            this.setState({editTagsDialog:false});
+            //this.updateLocalSites();
+            service.api.redirectTo("/sites/last", true);
+          }}
+        />
 
         <RemoteSiteDialog
           open={remoteSiteDialog}
@@ -319,13 +342,11 @@ export class SiteLibraryRouted extends React.Component{
 
         <CreateSiteDialog
           open={createSiteDialog}
-          //open={true}
           onCancelClick={()=>this.setState({createSiteDialog:false})}
           onSubmitClick={this.handleCreateSiteSubmit}
         />
 
-        {/*this should be moved to a UI service*/}
-        <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}<span> </span></BlockDialog>
+        <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}</BlockDialog>
       </div>
 
     )
@@ -359,7 +380,7 @@ export class SiteLibraryRouted extends React.Component{
             let source = decodeURIComponent(match.params.source)
             let sourceArgument = decodeURIComponent(match.params.args)
             return (
-                this.renderSelectSites(source, sourceArgument)
+              this.renderSelectSites(source, sourceArgument)
             );
           }}
           />

@@ -379,9 +379,12 @@ api.reloadCurrentForm = async function({},context){
   }
 }
 
-api.redirectTo = async function({location}, context){
+api.redirectTo = async function({location,forceRefresh}, context){
   mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  console.log(location)
+  if(forceRefresh === true){
+    console.log("force")
+    mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
+  }
   mainWindow.webContents.send("redirectToGivenLocation",location)
 }
 
@@ -700,6 +703,17 @@ api.setPublishStatus = async function({status}, context){
   let pogopubl = new PogoPublisher({});
   await pogopubl.writePublishStatus(status)
   context.resolve(true);
+}
+
+api.saveSiteConf = function({siteKey, newConf}, context){
+  getSiteService(siteKey, function(err, siteService){
+    if(err){ context.reject(err); return; }
+    siteService.saveSiteConf(newConf).then(()=>{
+      context.resolve();
+    }, ()=>{
+      context.reject(err);
+    });
+  });
 }
 
 api.publishSite = function({siteKey, publishKey}, context){

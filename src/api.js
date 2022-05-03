@@ -188,6 +188,10 @@ export class API {
     return mainProcessBridge.request('createSite', siteConfig);
   }
 
+  saveSiteConf(siteKey: string, newConf: any){
+    return mainProcessBridge.request('saveSiteConf', {siteKey, newConf});
+  }
+
   publishSite(siteKey: string, publishKey: string){
     return mainProcessBridge.request('publishSite', {siteKey, publishKey});
   }
@@ -239,8 +243,8 @@ export class API {
     return mainProcessBridge.request('reloadCurrentForm', {});
   }
 
-  redirectTo(location){
-    return mainProcessBridge.request('redirectTo', {location});
+  redirectTo(location, forceRefresh){
+    return mainProcessBridge.request('redirectTo', {location, forceRefresh});
   }
   parentMountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
