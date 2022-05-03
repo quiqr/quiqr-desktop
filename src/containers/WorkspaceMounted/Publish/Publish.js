@@ -10,7 +10,6 @@ import IconPublish             from 'material-ui-02/svg-icons/editor/publish';
 import ActionThumbUp           from 'material-ui-02/svg-icons/action/thumb-up'
 import muiThemeable            from 'material-ui-02/styles/muiThemeable';
 
-import { Wrapper }             from './components/shared';
 import PublishSiteDialog       from './components/PublishSiteDialog';
 import RegisterDialog          from './components/RegisterDialog';
 import ClaimDomainDialog       from './components/ClaimDomainDialog';
@@ -21,11 +20,7 @@ import BlockDialog             from './../../../components/BlockDialog';
 import Spinner                 from './../../../components/Spinner';
 import ProgressDialog          from './../../../components/ProgressDialog';
 import SnackbarManager         from './../../../components/SnackbarManager';
-import MarkdownIt              from 'markdown-it'
 
-import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
-
-const md = new MarkdownIt({html:true});
 let net = window.require('electron').remote.net;
 
 const styles = {
@@ -64,23 +59,6 @@ const styles = {
   }
 }
 
-type HomeProps = {
-  muiTheme : any,
-  siteKey : string,
-  workspaceKey : string
-}
-
-type HomeState = {
-  configurations?: Configurations | EmptyConfigurations,
-  selectedSite?: SiteConfig,
-  selectedSiteWorkspaces?: Array<any>,
-  selectedWorkspace?: WorkspaceHeader,
-  selectedWorkspaceDetails?: WorkspaceConfig,
-  publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
-  registerDialog?: { open: bool },
-  claimDomainDialog?: { open: bool },
-  blockingOperation: ?string //this should be moved to a UI service
-}
 
 function NotificationPanel(props){
   return (
@@ -90,7 +68,7 @@ function NotificationPanel(props){
   )
 }
 
-class Publish extends React.Component<HomeProps, HomeState>{
+class Publish extends React.Component{
 
   history: any;
 
@@ -122,7 +100,6 @@ class Publish extends React.Component<HomeProps, HomeState>{
         visible: false,
       },
 
-      siteCreatorMessage: null
     };
   }
 
@@ -193,11 +170,6 @@ class Publish extends React.Component<HomeProps, HomeState>{
 
       this.setState({currentSiteKey: siteKey});
       this.setState({currentWorkspaceKey: workspaceKey});
-
-      service.getSiteCreatorMessage(siteKey, workspaceKey).then((message)=>{
-        let siteCreatorMessage = md.render(message);
-        this.setState({siteCreatorMessage:siteCreatorMessage});
-      });
 
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
         var stateUpdate  = {};
@@ -1150,14 +1122,11 @@ class Publish extends React.Component<HomeProps, HomeState>{
 
         return (
           <div style={ styles.container }>
-
             <div style={styles.selectedSiteCol}>
-              <Wrapper key={this.state.selectedSite.key}>
-
+              <div style={Object.assign({padding:'16px 0', paddingTop: '16px'})}>
                 { this.renderPogoSiteActionsAndInfo() }
                 { this.renderActionPanel() }
-
-              </Wrapper>
+              </div>
             </div>
 
             {/* HIDDEN DIALOGS BELOW */}

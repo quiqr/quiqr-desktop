@@ -1,22 +1,7 @@
 import * as React from 'react';
-//import {TextField } from 'material-ui-02';
 import FolderPicker from './../../../../../components/FolderPicker';
 
-type FolderSourceFormModel = {
-  folderPath: string,
-  theme: string
-}
-
-type FolderSourceFormProps = {
-  onFormChange: (model: FolderSourceFormModel, valid: bool)=>void,
-  model: FolderSourceFormModel
-}
-
-type FolderSourceFormState = {
-
-}
-
-export default class FolderSourceForm extends React.Component<FolderSourceFormProps,FolderSourceFormState>{
+export default class FolderSourceForm extends React.Component{
 
   validateModel(model: FolderSourceFormModel){
     let isValid = true;
@@ -43,10 +28,10 @@ export default class FolderSourceForm extends React.Component<FolderSourceFormPr
     return (<React.Fragment>
       <div>
         <FolderPicker
-        label={"Site Folder"}
-        selectedFolder={model.folderPath}
-        onFolderSelected={this.handleFolderSelected} />
+          label={"Site Folder"}
+          selectedFolder={model.folderPath}
+          onFolderSelected={this.handleFolderSelected} />
       </div>
-      </React.Fragment>)
+    </React.Fragment>)
   }
 }
