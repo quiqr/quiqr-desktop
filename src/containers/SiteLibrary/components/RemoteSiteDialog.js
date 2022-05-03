@@ -1,10 +1,16 @@
-import * as React            from 'react';
-import Spinner               from '../../../components/Spinner'
-import service               from '../../../services/service';
-import { Dialog, TextField } from 'material-ui-02';
-import SharedMaterialStyles  from '../../../shared-material-styles';
-import { withStyles }        from '@material-ui/core/styles';
-import Button            from '@material-ui/core/Button';
+import * as React           from 'react';
+import service              from '../../../services/service';
+import SharedMaterialStyles from '../../../shared-material-styles';
+
+import { withStyles }       from '@material-ui/core/styles';
+import TextField            from '@material-ui/core/TextField';
+import Button               from '@material-ui/core/Button';
+import Box                  from '@material-ui/core/Box';
+import Dialog               from '@material-ui/core/Dialog';
+import DialogActions        from '@material-ui/core/DialogActions';
+import DialogContent        from '@material-ui/core/DialogContent';
+import DialogContentText    from '@material-ui/core/DialogContentText';
+import DialogTitle          from '@material-ui/core/DialogTitle';
 
 const localStyles = {
 }
@@ -152,15 +158,19 @@ class RemoteSiteDialog extends React.Component{
 
   renderForm(){
     return (
-      <div>
-        Download <strong>{this.props.remoteSiteName}</strong> to your local computer for editing and previewing
+      <Box>
+        <Box my={3}>Download <strong>{this.props.remoteSiteName}</strong> to your local computer for editing and previewing.</Box>
+
         <TextField
-        floatingLabelText="Name of local site copy"
-        errorText={this.state.errorTextSiteName}
-        onChange={(e)=>{this.handleNameChange(e)}}
-        value={this.state.newSiteName}
-        fullWidth />
-      </div>
+          id="standard-full-width"
+          label="Name of local site copy"
+          value={this.state.newSiteName}
+          onChange={(e)=>{this.handleNameChange(e)}}
+          error={(this.state.errorTextSiteName===""?false:true)}
+          helperText={this.state.errorTextSiteName}
+          />
+
+      </Box>
     )
   }
 
@@ -204,7 +214,6 @@ class RemoteSiteDialog extends React.Component{
   render(){
 
     let { open, classes } = this.props;
-    let busy = this.state.busy;
     let failure = this.state.failure;
 
     const actions = [
@@ -229,13 +238,22 @@ class RemoteSiteDialog extends React.Component{
 
     return (
       <Dialog
-      title={"Download "+this.props.remoteSiteName+""}
       open={open}
-      actions={actions}>
-
-      { failure? this.renderFailure() : this.renderBody() }
-      { busy? <Spinner /> : undefined }
-    </Dialog>
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      fullWidth={true}
+      maxWidth={"sm"}
+    >
+        <DialogTitle id="alert-dialog-title">{"Download "+this.props.remoteSiteName+""}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            { failure? this.renderFailure() : this.renderBody() }
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {actions}
+        </DialogActions>
+      </Dialog>
     );
   }
 }

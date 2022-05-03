@@ -1,2 +1,2 @@
-import HomeSimple from './HomeSimple';
-export default HomeSimple;
+import Publish from './Publish';
+export default Publish;

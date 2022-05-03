@@ -5,18 +5,19 @@ import { Divider, Toggle }                  from 'material-ui-02';
 import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
-import Sidebar                         from '../Sidebar';
+import Sidebar                              from '../Sidebar';
 
 class WorkspaceWidget extends React.Component {
 
-  constructor(props : WorkspaceWidgetProps){
+  constructor(props){
     super(props);
     this.state = {
       devDisableAutoHugoServe: false,
       expPreviewWindow: false,
       devLocalApi: false,
       hugoRunning: false,
-      selectedMenuItem: ''
+      selectedMenuItem: '',
+      error: null
     };
   }
 
@@ -126,38 +127,33 @@ class WorkspaceWidget extends React.Component {
 
     //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
-    let mobilePreviewToggle = <Toggle
-    toggled={this.state.mobilePreviewActive}
-    onToggle={(e,value)=>{ this.toggleMobilePreview() }}
-    style={{marginRight: 24}}
-    labelPosition='right' />
+    let mobilePreviewToggle = <Toggle toggled={this.state.mobilePreviewActive} onToggle={(e,value)=>{ this.toggleMobilePreview() }} style={{marginRight: 24}} labelPosition='right' />
 
+      let previewWindowItem = "";
 
-
-    let previewWindowItem = "";
     if(this.state.expPreviewWindow){
       previewWindowItem = <ListItem
-      primaryText="Preview on the side"
-      onClick={(e,value)=>{ this.toggleMobilePreview() }}
-      secondaryText=""
-      rightIcon={mobilePreviewToggle}
-      leftIcon={<IconPhone xcolor="white"  />} />
+        primaryText="Preview on the side"
+        onClick={(e,value)=>{ this.toggleMobilePreview() }}
+        secondaryText=""
+        rightIcon={mobilePreviewToggle}
+        leftIcon={<IconPhone xcolor="white"  />} />
     }
 
-      return (
-        <div style={{paddingLeft:'0px'}}>
-          <List style={{padding: 0}}>
-            { previewWindowItem}
+    return (
+      <div style={{paddingLeft:'0px'}}>
+        <List style={{padding: 0}}>
+          { previewWindowItem}
         </List>
         <Divider/>
       </div>
-      );
+    );
   }
   renderEmpty(){
 
     return (
       <List>
-        </List>
+      </List>
     )
   }
 
@@ -219,25 +215,9 @@ class WorkspaceWidget extends React.Component {
   }
 }
 
-type WorkspaceSidebarProps = {
-  siteKey : ?string,
-  workspaceKey : ?string,
-  history: any,
-  onLockMenuClicked: ()=> void,
-  onToggleItemVisibility: ()=> void,
-  hideItems : bool
-}
+class WorkspaceSidebar extends React.Component{
 
-type WorkspaceSidebarState = {
-  site : any,
-  workspace : any,
-  error: any
-}
-
-
-class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSidebarState>{
-
-  constructor(props : WorkspaceSidebarProps){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -278,11 +258,13 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
         stateUpdate.site = bundle.site;
         stateUpdate.workspace = bundle.workspaceDetails;
+        stateUpdate.error = null;
         if(this._ismounted){
           this.setState(stateUpdate);
         }
       }).catch(e=>{
         if(this._ismounted){
+
           this.setState({site: null, workspace: null, error: e});
         }
       });
@@ -296,10 +278,10 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
   }
 
   render(){
-  if(this.state.showEmpty){
-    return (<div />);
-  }
-  else{}
+    if(this.state.showEmpty){
+      return (<div />);
+    }
+    else{}
     return (<Route render={({history})=>{ return this.renderWithRoute(history) }} />);
   }
 
@@ -316,19 +298,19 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
       //title: 'Current website',
       widget: (
         <WorkspaceWidget
-        siteConfig={this.state.site}
-        workspaceConfig={this.state.workspace}
-        quiqrUsername={this.props.quiqrUsername}
-        onClick={()=>{
-          if(this.state.error!=null){
-            history.push('/');
-            this.refresh();
-          }
-          else if(this.state.site!=null){
-            history.push(basePath);
-            this.refresh();
-          }
-        }} />
+          siteConfig={this.state.site}
+          workspaceConfig={this.state.workspace}
+          quiqrUsername={this.props.quiqrUsername}
+          onClick={()=>{
+            if(this.state.error!=null){
+              history.push('/');
+              this.refresh();
+            }
+            else if(this.state.site!=null){
+              history.push(basePath);
+              this.refresh();
+            }
+          }} />
       )
     });
 
@@ -419,18 +401,21 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps,WorkspaceSi
 
     return (<React.Fragment>
       <Sidebar
-      hideItems={this.props.hideItems}
-      menuIsLocked={this.props.menuIsLocked}
-      menus={menus}
-      onLockMenuClicked={this.props.onLockMenuClicked}
-      onToggleItemVisibility={this.props.onToggleItemVisibility}
-    />
-        { this.state.error && (<p style={{
+        hideItems={this.props.hideItems}
+        menuIsLocked={this.props.menuIsLocked}
+        menus={menus}
+        onLockMenuClicked={this.props.onLockMenuClicked}
+        onToggleItemVisibility={this.props.onToggleItemVisibility}
+      />
+      { this.state.error && (
+        <p style={{
           color: '#EC407A', padding: '10px', margin: '16px',
           fontSize:'14px', border: 'solid 1px #EC407A',
           borderRadius:3
-        }}>{this.state.error}</p>) }
-      </React.Fragment>
+        }}>{this.state.error}</p>)
+      }
+
+    </React.Fragment>
     )
   }
 }

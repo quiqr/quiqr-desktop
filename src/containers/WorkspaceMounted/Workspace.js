@@ -103,8 +103,8 @@ class WorkSpace extends React.Component{
       let stateUpdate = {};
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
         stateUpdate.site = bundle.site;
-
         stateUpdate.workspace = bundle.workspaceDetails;
+        stateUpdate.error = null;
         if(this._ismounted){
           this.setState(stateUpdate);
         }
@@ -289,18 +289,6 @@ class WorkSpace extends React.Component{
         return this.renderWorkspaceSidebar(history, match.url, match.params.site, match.params.workspace);
       }} />
 
-      <Route path='/siteconf/:site/workspaces/:workspace' render={ ({match})=> {
-        return (<SiteConfSidebar
-        menus={[]}
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-        menuIsLocked={this.state.menuIsLocked}
-        onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
-        onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
-      />);
-      }} />
-
     </Switch>);
   }
 
@@ -465,6 +453,12 @@ class WorkSpace extends React.Component{
                 </div>
 
                 <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+                  { this.state.error && (<p style={{
+                    color: '#EC407A', padding: '10px', margin: '16px',
+                    fontSize:'14px', border: 'solid 1px #EC407A',
+                    borderRadius:3
+                  }}>{this.state.error}</p>) }
+
                   { this.renderContentSwitch() }
                 </div>
 

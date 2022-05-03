@@ -1,56 +1,21 @@
-import React                     from 'react';
-import { Switch, Route }         from 'react-router-dom'
-
-import {List, ListItem}          from 'material-ui-02/List';
-import Subheader                 from 'material-ui-02/Subheader';
-import IconAdd                   from 'material-ui-02/svg-icons/content/add';
-import muiThemeable              from 'material-ui-02/styles/muiThemeable';
-
-import service                   from './../../services/service';
-import { snackMessageService }   from './../../services/ui-service';
-
-import { Wrapper, MessageBlock } from './components/shared';
-import CreateSiteDialog          from './components/CreateSiteDialog';
-import BlockDialog               from './components/BlockDialog';
-import RemoteSiteDialog          from './components/RemoteSiteDialog';
+import React                   from 'react';
+import { Switch, Route }       from 'react-router-dom'
+import List                    from '@material-ui/core/List';
+import ListSubheader           from '@material-ui/core/ListSubheader';
+import ListItem                from '@material-ui/core/ListItem';
+import ListItemText            from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import IconButton              from '@material-ui/core/IconButton';
+import Menu                    from '@material-ui/core/Menu';
+import MenuItem                from '@material-ui/core/MenuItem';
+import MoreVertIcon            from '@material-ui/icons/MoreVert';
+import service                 from './../../services/service';
+import { snackMessageService } from './../../services/ui-service';
+import CreateSiteDialog        from './components/CreateSiteDialog';
+import BlockDialog             from './../../components/BlockDialog';
+import RemoteSiteDialog        from './components/RemoteSiteDialog';
 
 import Spinner                   from './../../components/Spinner';
-
-const styles = {
-  container:{
-    display:'flex',
-    height: '100%'
-  },
-  sitesCol: {
-    flex: '0 0 100%',
-    overflowY:'auto',
-    overflowX:'hidden',
-    userSelect:'none',
-    borderRight: 'solid 1px #e0e0e0',
-    background:'#fafafa'
-  },
-  selectedSiteCol: {
-    flex: 'auto',
-    overflow: 'auto'
-  },
-  siteActiveStyle: {
-    fontWeight: 'bold',
-    backgroundColor: 'white',
-    borderBottom: 'solid 1px #e0e0e0',
-    borderTop: 'solid 1px #e0e0e0',
-    position: 'relative'
-  },
-  siteInactiveStyle: {
-    borderBottom: 'solid 1px transparent',
-    borderTop: 'solid 1px transparent'
-  },
-  creatorMessage: {
-    borderBottom: 'solid 1px transparent',
-    borderTop: 'solid 1px #ccc',
-    padding: '0 20px ',
-    fontSize: '80%'
-  }
-}
 
 export class SiteLibraryRouted extends React.Component{
 
@@ -192,6 +157,42 @@ export class SiteLibraryRouted extends React.Component{
     })
   }
 
+  renderItemMenu(index){
+
+    return (
+    <div>
+      <IconButton
+        onClick={(event)=>{
+          this.setState({anchorEl:event.currentTarget, menuOpen:index})
+          service.api.logToConsole('open');
+        }}
+        aria-label="more"
+        aria-controls="long-menu"
+        aria-haspopup="true"
+      >
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        anchorEl={this.state.anchorEl}
+        open={(this.state.menuOpen===index?true:false)}
+        keepMounted
+        onClose={()=>{
+          this.setState({menuOpen:null});
+          service.api.logToConsole("jojo");
+
+        }}
+      >
+        <MenuItem key="rename">
+          Rename
+        </MenuItem>
+
+        <MenuItem key="tags">
+          Edit Tags
+        </MenuItem>
+      </Menu>
+    </div>
+  );}
+
   renderSelectSites(source, sourceArgument){
     let { selectedSite, configurations } = this.state;
 
@@ -254,37 +255,45 @@ export class SiteLibraryRouted extends React.Component{
     })
 
     return (
-      <div style={ styles.sitesCol }>
-        <List>
-          <Subheader>{listTitle}</Subheader>
+        <List
+          style={{padding: 0}}
+          subheader={
+            <ListSubheader component="div" id="nested-list-subheader">
+              { listTitle }
+            </ListSubheader>
+          }>
+
           { (sites).map((site, index)=>{
             let selected = site===selectedSite;
 
-            return (<ListItem
-            id={"siteselectable-"+site.name}
-            key={index}
-            style={selected? styles.siteActiveStyle : styles.siteInactiveStyle }
-            onClick={ ()=>{
-              if(site.remote){
-                this.setState({remoteSiteDialog:true});
-                this.setState({currentRemoteSite:site.name})
-              }
-              else{
-                this.mountSite(site)
-              }
-            }}
-            primaryText={ site.name }
-            secondaryText={ "" } />);
+            return (
+
+              <ListItem
+                id={"siteselectable-"+site.name}
+                key={index}
+                selected={selected}
+                onClick={ ()=>{
+                  if(site.remote){
+                    this.setState({remoteSiteDialog:true});
+                    this.setState({currentRemoteSite:site.name})
+                  }
+                  else{
+                    this.mountSite(site)
+                  }
+                }}
+
+                button >
+                <ListItemText primary={site.name} />
+            <ListItemSecondaryAction>
+                {this.renderItemMenu(index)}
+            </ListItemSecondaryAction>
+
+              </ListItem>
+
+            );
           })}
 
-            <ListItem
-            key="add-site"
-            style={ styles.siteInactiveStyle }
-            rightIcon={<IconAdd />}
-            onClick={ this.handleAddSiteClick.bind(this) }
-            primaryText="New" />
-          </List>
-          </div>
+        </List>
     );
 
   }
@@ -294,12 +303,6 @@ export class SiteLibraryRouted extends React.Component{
 
     return (
       <div>
-
-        <div style={styles.selectedSiteCol}>
-          <Wrapper title="">
-            <MessageBlock></MessageBlock>
-          </Wrapper>
-        </div>
 
         <RemoteSiteDialog
           open={remoteSiteDialog}
@@ -346,9 +349,7 @@ export class SiteLibraryRouted extends React.Component{
             this.history = history;
             let source = decodeURIComponent(match.params.source)
             return (
-              <div style={ styles.container }>
-                {this.renderSelectSites(source, null)}
-              </div>
+              this.renderSelectSites(source, null)
             );
           }}
           />
@@ -358,9 +359,7 @@ export class SiteLibraryRouted extends React.Component{
             let source = decodeURIComponent(match.params.source)
             let sourceArgument = decodeURIComponent(match.params.args)
             return (
-              <div style={ styles.container }>
-                {this.renderSelectSites(source, sourceArgument)}
-              </div>
+                this.renderSelectSites(source, sourceArgument)
             );
           }}
           />
@@ -368,9 +367,7 @@ export class SiteLibraryRouted extends React.Component{
           <Route path='/sites' render={ ({match, history})=> {
             this.history = history;
             return (
-              <div style={ styles.container }>
-                {this.renderSelectSites("last",null)}
-              </div>
+              this.renderSelectSites("last",null)
             );
           }}
           />
@@ -380,7 +377,6 @@ export class SiteLibraryRouted extends React.Component{
       </React.Fragment>
     );
   }
-
 }
 
-export default muiThemeable()(SiteLibraryRouted);
+export default SiteLibraryRouted;

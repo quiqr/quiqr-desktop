@@ -121,7 +121,9 @@ class Home extends React.Component<HomeProps, HomeState>{
         stateUpdate.selectedWorkspaceDetails = bundle.workspaceDetails;
 
         this.setState(stateUpdate);
-      })
+      }).catch(e=>{
+        this.setState({site: null, workspace: null, error: e});
+      });
     }
     else{
       service.getConfigurations(true).then((c)=>{
@@ -137,7 +139,11 @@ class Home extends React.Component<HomeProps, HomeState>{
 
     let { configurations } = this.state;
 
-    if( this.state.showSpinner || configurations == null || this.state.selectedSite == null ){
+    if(this.state.error){
+      return null
+
+    }
+    else if( this.state.showSpinner || configurations == null || this.state.selectedSite == null ){
       return <Spinner />
     }
 
