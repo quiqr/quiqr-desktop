@@ -26,7 +26,7 @@ const useStyles = theme => ({
   },
 });
 
- class Sidebar extends React.Component{
+class Sidebar extends React.Component{
 
   constructor(props){
     super(props);
@@ -36,8 +36,67 @@ const useStyles = theme => ({
     };
   }
 
-  render(){
+  renderFlatItem(item, index){
+    return (
+      <ListItem
+        key={index}
+        selected={item.selected}
+        onClick={ item.onClick }
+        button >
+        <ListItemText primary={item.label} />
+      </ListItem>
+    )
+
+  }
+
+  renderNetstedItems(item, index){
     const { classes } = this.props;
+    return (
+      <React.Fragment>
+        <ListItem
+          key={index}
+          button
+          selected={item.selected}
+          onClick={()=>{
+            if(this.state.open === index){
+              this.setState({open:null});
+            }
+            else{
+              this.setState({open:index});
+            }
+          }}
+        >
+          <ListItemText primary={item.label} />
+
+          {(this.state.open === index ? <ExpandLess /> : <ExpandMore />)}
+
+        </ListItem>
+
+        <Collapse in={(this.state.open === index ? true : false)} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            { item.childItems.map((itemChild, index)=>{
+
+              return (
+                <ListItem
+                  onClick={ itemChild.onClick }
+                  selected={itemChild.selected}
+                  button className={classes.nested} >
+                  <ListItemText primary={itemChild.label} />
+                </ListItem>
+              )
+
+
+            })}
+
+          </List>
+        </Collapse>
+      </React.Fragment>
+    )
+
+
+  }
+
+  render(){
 
     let { hideItems, menus } = this.props;
     let menusNodes = menus.map((menu,i)=>{
@@ -53,38 +112,12 @@ const useStyles = theme => ({
                 </ListSubheader>
               }>
               { menu.items.map((item, index)=>{
-                return (
-
-                  <React.Fragment>
-                    <ListItem
-                      key={index}
-                      button
-                      selected={item.selected}
-                      onClick={()=>{
-
-                        //item.onClick
-                        this.setState({open:(this.state.open?false:true)})
-                      }}
-                    >
-                      <ListItemText primary={item.label} />
-
-                      {this.state.open ? <ExpandLess /> : <ExpandMore />}
-
-                    </ListItem>
-
-                    <Collapse in={this.state.open} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding>
-                        <ListItem button className={classes.nested} >
-                          <ListItemIcon>
-                            <StarBorder />
-                          </ListItemIcon>
-                          <ListItemText primary="Starred" />
-                        </ListItem>
-                      </List>
-                    </Collapse>
-                  </React.Fragment>
-
-                );
+                if(item.childItems){
+                  return this.renderNetstedItems(item, index)
+                }
+                else{
+                  return this.renderFlatItem(item, index)
+                }
               }) }
             </List >
           ) : (null) }

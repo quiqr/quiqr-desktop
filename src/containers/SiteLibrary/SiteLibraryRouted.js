@@ -131,6 +131,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     service.getConfigurations(true).then((c)=>{
       var stateUpdate  = {};
       stateUpdate.configurations = c;
+
       this.setState(stateUpdate);
     });
 
@@ -151,6 +152,10 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
         this.selectWorkspace(site.key, workspaces[0]);
       }
     });
+  }
+
+  indexTags(){
+
   }
 
   handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
@@ -211,7 +216,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     })
   }
 
-  renderSelectSites(source){
+  renderSelectSites(source, sourceArgument){
     let { selectedSite, configurations } = this.state;
 
     let listingSource
@@ -221,8 +226,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     else{
       listingSource = source;
     }
-
-    service.api.logToConsole(listingSource);
 
     let _configurations = ((configurations: any): Configurations);
     let sites = _configurations.sites || [];
@@ -234,15 +237,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     }
 
     let listTitle = 'All Sites';
-
-    /*
-    if(listingSource === 'local'){
-      listTitle = `Your sites (${this.props.quiqrUsername})`;
-      sites = sites.filter((site) => {
-        return site.owner === this.props.quiqrUsername
-      });
-    }
-    */
+      service.api.logToConsole(listingSource)
 
     if(listingSource === 'quiqr-cloud'){
       listTitle = `Available remote sites (${this.props.quiqrUsername})`;
@@ -262,16 +257,17 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
           remote: true
         })
       });
+    }
+    else if (listingSource === 'tags'){
+      listTitle = `Available remote sites (${this.props.quiqrUsername})`;
+      listTitle = 'Sites in tags: '+ sourceArgument;
+      sites = sites.filter((site) => {
+       if (site.tags && site.tags.includes(sourceArgument)){
+         return true;
+       }
+      });
 
     }
-    /*
-    else if(this.state.sitesListingView === 'unpublished'){
-      listTitle = 'Unpublished sites';
-      sites = sites.filter((site) => {
-        return site.published === 'no'
-      });
-    }
-    */
 
     sites.sort(function(a, b){
       var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
@@ -288,27 +284,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
           <Subheader>{listTitle}</Subheader>
           { (sites).map((site, index)=>{
             let selected = site===selectedSite;
-
-
-            /*
-            let sourcePath = '';
-            if(site.source && site.source.path){
-              sourcePath = site.source.path
-            }
-            */
-
-            /*
-            let owner = 'user: unknown';
-            if(site.published === 'no' ){
-              owner = "unpublished";
-            }
-            else{
-              owner = 'user: unknown';
-              if(site.owner !== '' ){
-                owner = "user: " + site.owner;
-              }
-            }
-            */
 
             return (<ListItem
             id={"siteselectable-"+site.name}
@@ -392,13 +367,26 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
 
         <Switch>
 
-          <Route path='/sites/:source' render={ ({match, history})=> {
+          <Route path='/sites/:source' exact render={ ({match, history})=> {
             this.history = history;
             let source = decodeURIComponent(match.params.source)
-            service.api.logToConsole(source, 'source')
+            //service.api.logToConsole(source, 'source')
             return (
               <div style={ styles.container }>
-                {this.renderSelectSites(source)}
+                {this.renderSelectSites(source, null)}
+              </div>
+            );
+          }}
+          />
+
+          <Route path='/sites/:source/:args' exact render={ ({match, history})=> {
+            this.history = history;
+            let source = decodeURIComponent(match.params.source)
+            let sourceArgument = decodeURIComponent(match.params.args)
+            //service.api.logToConsole(source, 'source')
+            return (
+              <div style={ styles.container }>
+                {this.renderSelectSites(source, sourceArgument)}
               </div>
             );
           }}

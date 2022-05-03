@@ -133,7 +133,7 @@ class SiteConfRouteModel extends React.Component {
     return (
       <div className={ this.props.classes.container }>
 
-        <Typography variant="h4">Site: {this.props.siteKey}</Typography>
+        <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">Model Configuration</Typography>
 
         {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile}])}

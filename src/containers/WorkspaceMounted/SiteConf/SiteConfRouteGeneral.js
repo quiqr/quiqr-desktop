@@ -92,7 +92,7 @@ class SiteConfRouteGeneral extends React.Component {
     const { classes } = this.props;
     return (
       <div className={ this.props.classes.container }>
-        <Typography variant="h4">Site: {this.props.siteKey}</Typography>
+        <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">General Configuration</Typography>
 
         <div className={classes.root}>

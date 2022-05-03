@@ -1,7 +1,7 @@
 import * as React           from 'react';
 import { Route }            from 'react-router-dom';
 import Sidebar           from './../Sidebar';
-//import service              from './../../services/service';
+import service              from './../../services/service';
 
 
 export class SiteLibrarySidebar extends React.Component {
@@ -9,10 +9,28 @@ export class SiteLibrarySidebar extends React.Component {
 
     super(props);
     this.state = {
-      selectedMenuItem: 'local-all'
+      selectedMenuItem: 'local-all',
+      tags: []
     }
   }
 
+  componentWillMount(){
+    let tags = [];
+    service.getConfigurations(true).then((c)=>{
+
+      c.sites.map((site,index)=>{
+        if(site.tags){
+          site.tags.map((t,index2)=>{
+            if(!tags.includes(t)){
+              tags.push(t);
+            }
+          })
+        }
+
+      })
+      this.setState({tags:tags});
+    });
+  }
 
   render(){
     return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
@@ -21,6 +39,22 @@ export class SiteLibrarySidebar extends React.Component {
   renderWithRoute(history: {push:(path: string)=>void}){
 
     let basePath = `/sites`;
+
+    let tagsMenus = [];
+    this.state.tags.map((tag,index)=>{
+
+      tagsMenus.push(
+        {
+          active: true,
+          label: tag,
+          selected: (this.state.selectedMenuItem === 'local-tags-'+index ? true : false),
+          onClick: ()=>{
+            this.setState({selectedMenuItem:'local-tags-'+index});
+            history.push(`${basePath}/tags/${tag}`)
+          }
+        }
+      );
+    });
 
     let menus = [
       {
@@ -35,6 +69,11 @@ export class SiteLibrarySidebar extends React.Component {
               history.push(`${basePath}/local`)
             }
           },
+          {
+            active: true,
+            label: "Tags",
+            childItems: tagsMenus,
+          }
         ]
       },
       {
