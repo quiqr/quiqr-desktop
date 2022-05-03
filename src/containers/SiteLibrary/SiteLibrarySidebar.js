@@ -10,24 +10,28 @@ export class SiteLibrarySidebar extends React.Component {
     super(props);
     this.state = {
       selectedMenuItem: 'local-all',
-      tags: []
+      tags: [],
     }
   }
 
   componentWillMount(){
+    service.api.readConfPrefKey('sitesListingView').then((view)=>{
+      this.setState({selectedMenuItem: view });
+    });
+
     let tags = [];
     service.getConfigurations(true).then((c)=>{
 
-      c.sites.map((site,index)=>{
+      c.sites.forEach((site)=>{
         if(site.tags){
-          site.tags.map((t,index2)=>{
+          site.tags.forEach((t)=>{
             if(!tags.includes(t)){
               tags.push(t);
             }
           })
         }
-
       })
+
       this.setState({tags:tags});
     });
   }
@@ -36,20 +40,24 @@ export class SiteLibrarySidebar extends React.Component {
     return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
   }
 
+  saveSelectedMenuItem(item){
+    service.api.saveConfPrefKey("sitesListingView",item);
+    this.setState({selectedMenuItem:item});
+  }
+
   renderWithRoute(history: {push:(path: string)=>void}){
 
     let basePath = `/sites`;
 
     let tagsMenus = [];
-    this.state.tags.map((tag,index)=>{
-
+    this.state.tags.forEach((tag,index)=>{
       tagsMenus.push(
         {
           active: true,
           label: tag,
-          selected: (this.state.selectedMenuItem === 'local-tags-'+index ? true : false),
+          selected: (this.state.selectedMenuItem === 'local-tags-'+tag ? true : false),
           onClick: ()=>{
-            this.setState({selectedMenuItem:'local-tags-'+index});
+            this.saveSelectedMenuItem('local-tags-'+tag);
             history.push(`${basePath}/tags/${tag}`)
           }
         }
@@ -65,7 +73,7 @@ export class SiteLibrarySidebar extends React.Component {
             label: "All",
             selected: (this.state.selectedMenuItem==='local-all' ? true : false),
             onClick: ()=>{
-              this.setState({selectedMenuItem:'local-all'});
+              this.saveSelectedMenuItem('local-all');
               history.push(`${basePath}/local`)
             }
           },
@@ -84,7 +92,7 @@ export class SiteLibrarySidebar extends React.Component {
             label: "Quiqr Cloud",
             selected: (this.state.selectedMenuItem==='quiqr-cloud' ? true : false),
             onClick: ()=>{
-              this.setState({selectedMenuItem:'quiqr-cloud'});
+              this.saveSelectedMenuItem('quiqr-cloud');
               history.push(`${basePath}/quiqr-cloud`)
             }
           },

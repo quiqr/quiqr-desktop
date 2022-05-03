@@ -1166,8 +1166,12 @@ resources: []\n\
         submenu: [
           {
             id: 'switch-select-sites-view',
-            label: 'Open Site',
-            submenu: this.createViewSitesMenu()
+            label: 'Site Library',
+            click: async () => {
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              global.mainWM.closeSiteAndShowSelectSites();
+            }
+
           },
           {
             label: 'New',

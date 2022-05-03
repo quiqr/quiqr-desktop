@@ -24,7 +24,7 @@ class WorkspaceWidget extends React.Component {
     this._ismounted = true;
   }
   componentWillMount(){
-    service.api.getPogoConfKey('expPreviewWindow').then((value)=>{
+    service.api.readConfKey('expPreviewWindow').then((value)=>{
       this.setState({expPreviewWindow: value });
       if(!value){
         this.disableMobilePreview();
@@ -48,13 +48,13 @@ class WorkspaceWidget extends React.Component {
   }
 
   updateBadges(){
-    service.api.getPogoConfKey('devLocalApi').then((devLocalApi)=>{
+    service.api.readConfKey('devLocalApi').then((devLocalApi)=>{
       this.setState({devLocalApi: devLocalApi });
     });
-    service.api.getPogoConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
+    service.api.readConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
       this.setState({devDisableAutoHugoServe: devDisableAutoHugoServe });
     });
-    service.api.getPogoConfKey('devShowCurrentUser').then((value)=>{
+    service.api.readConfKey('devShowCurrentUser').then((value)=>{
       this.setState({devShowCurrentUser: value });
     });
   }

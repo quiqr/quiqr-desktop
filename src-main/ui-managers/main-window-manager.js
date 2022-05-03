@@ -317,7 +317,7 @@ module.exports = {
 
       mainWindow.webContents.send("disableMobilePreview");
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-      mainWindow.webContents.send("redirectToGivenLocation", '/sites/all');
+      mainWindow.webContents.send("redirectToGivenLocation", '/sites/last');
 
       mainWindow.setTitle("Quiqr: Select site");
     });

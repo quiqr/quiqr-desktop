@@ -96,7 +96,7 @@ class Home extends React.Component<HomeProps, HomeState>{
     if(siteKey && workspaceKey){
 
       if(this.state.currentSiteKey !== siteKey){
-        service.api.getPogoConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
+        service.api.readConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
           if(!devDisableAutoHugoServe){
             service.api.serveWorkspace(siteKey, workspaceKey, "Start Hugo from Home");
           }

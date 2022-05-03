@@ -1,24 +1,14 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
-import List from '@material-ui/core/List';
+import List          from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-
-import Box from '@material-ui/core/Box';
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import StarBorder from '@material-ui/icons/StarBorder';
-
-
-/*
-import baseTheme from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import MuiThemeProvider from 'material-ui-02/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui-02/styles/getMuiTheme';
-*/
+import ListItem      from '@material-ui/core/ListItem';
+import ListItemText  from '@material-ui/core/ListItemText';
+import Box           from '@material-ui/core/Box';
+import Collapse      from '@material-ui/core/Collapse';
+import ExpandLess    from '@material-ui/icons/ExpandLess';
+import ExpandMore    from '@material-ui/icons/ExpandMore';
 
 const useStyles = theme => ({
   nested: {
@@ -51,6 +41,24 @@ class Sidebar extends React.Component{
 
   renderNetstedItems(item, index){
     const { classes } = this.props;
+    let initOpen;
+    let childItems = item.childItems.map((itemChild, index)=>{
+
+      if(itemChild.selected){
+        initOpen = true;
+      }
+
+      return (
+        <ListItem
+          onClick={ itemChild.onClick }
+          selected={itemChild.selected}
+          button className={classes.nested} >
+          <ListItemText primary={itemChild.label} />
+        </ListItem>
+      )
+    })
+
+
     return (
       <React.Fragment>
         <ListItem
@@ -58,6 +66,7 @@ class Sidebar extends React.Component{
           button
           selected={item.selected}
           onClick={()=>{
+            initOpen = false;
             if(this.state.open === index){
               this.setState({open:null});
             }
@@ -68,32 +77,17 @@ class Sidebar extends React.Component{
         >
           <ListItemText primary={item.label} />
 
-          {(this.state.open === index ? <ExpandLess /> : <ExpandMore />)}
+          {( (initOpen || this.state.open === index) ? <ExpandLess /> : <ExpandMore />)}
 
         </ListItem>
 
-        <Collapse in={(this.state.open === index ? true : false)} timeout="auto" unmountOnExit>
+        <Collapse in={( (initOpen || this.state.open === index) ? true : false)} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            { item.childItems.map((itemChild, index)=>{
-
-              return (
-                <ListItem
-                  onClick={ itemChild.onClick }
-                  selected={itemChild.selected}
-                  button className={classes.nested} >
-                  <ListItemText primary={itemChild.label} />
-                </ListItem>
-              )
-
-
-            })}
-
+            {childItems}
           </List>
         </Collapse>
       </React.Fragment>
     )
-
-
   }
 
   render(){

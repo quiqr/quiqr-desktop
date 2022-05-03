@@ -62,7 +62,7 @@ class Prefs extends React.Component {
 
   componentDidMount(){
 
-    service.api.getPogoConfKey('prefs').then((value)=>{
+    service.api.readConfKey('prefs').then((value)=>{
       service.api.logToConsole(value);
       this.setState({prefs: value });
 
@@ -81,7 +81,7 @@ class Prefs extends React.Component {
   }
 
   handleFolderSelected(folder){
-    service.api.savePrefKey("dataFolder",folder);
+    service.api.saveConfPrefKey("dataFolder",folder);
     this.setState({prefsDataFolder: folder });
   }
 

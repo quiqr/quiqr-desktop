@@ -16,8 +16,6 @@ import RemoteSiteDialog          from './components/RemoteSiteDialog';
 
 import Spinner                   from './../../components/Spinner';
 
-import type { EmptyConfigurations, Configurations, SiteConfig, WorkspaceHeader, WorkspaceConfig } from './../../types';
-
 const styles = {
   container:{
     display:'flex',
@@ -54,24 +52,7 @@ const styles = {
   }
 }
 
-type SelectSiteProps = {
-  muiTheme : any,
-  siteKey : string,
-  workspaceKey : string
-}
-
-type SelectSiteState = {
-  configurations?: Configurations | EmptyConfigurations,
-  selectedSite?: SiteConfig,
-  selectedSiteWorkspaces?: Array<any>,
-  selectedWorkspace?: WorkspaceHeader,
-  selectedWorkspaceDetails?: WorkspaceConfig,
-  createSiteDialog: bool,
-  publishSiteDialog?: { workspace: WorkspaceConfig, workspaceHeader: WorkspaceHeader, open: bool },
-  blockingOperation: ?string //this should be moved to a UI service
-}
-
-export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSiteState>{
+export class SiteLibraryRouted extends React.Component{
 
   constructor(props){
     super(props);
@@ -86,7 +67,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
       siteCreatorMessage: null,
       remoteSitesAsOwner: [],
       remoteSitesAsMember: [],
-      sitesListingView: 'local'
+      sitesListingView: ''
     };
   }
 
@@ -107,7 +88,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
         remoteSitesAsOwner: [],
         remoteSitesAsMember: []
       });
-
     }
   }
 
@@ -135,12 +115,12 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
       this.setState(stateUpdate);
     });
 
-    service.api.getPogoConfKey('sitesListingView').then((view)=>{
+    service.api.readConfPrefKey('sitesListingView').then((view)=>{
       this.setState({sitesListingView: view });
     });
   }
 
-  mountSite(site : SiteConfig ){
+  mountSite(site ){
     this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
     this.setState({currentSiteKey: site.key});
 
@@ -154,18 +134,14 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     });
   }
 
-  indexTags(){
-
-  }
-
   handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
     e.stopPropagation();
     this.selectWorkspace(siteKey, workspace);
   };
 
-  async selectWorkspace(siteKey: string, workspace : WorkspaceHeader ){
-    //this.setState({currentWorkspaceKey: workspace.key});
-    //await service.api.mountWorkspace(siteKey, workspace.key);
+  async selectWorkspace(siteKey: string, workspace ){
+    this.setState({currentWorkspaceKey: workspace.key});
+    await service.api.mountWorkspace(siteKey, workspace.key);
     this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
   }
 
@@ -222,12 +198,16 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     let listingSource
     if(source === 'last'){
       listingSource = this.state.sitesListingView;
+      if(listingSource.includes("local-tags-")){
+        sourceArgument = listingSource.split("tags-")[1];
+        listingSource = "tags";
+      }
     }
     else{
       listingSource = source;
     }
 
-    let _configurations = ((configurations: any): Configurations);
+    let _configurations = configurations;
     let sites = _configurations.sites || [];
     if(configurations==null){
       return <Spinner />
@@ -237,9 +217,8 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
     }
 
     let listTitle = 'All Sites';
-      service.api.logToConsole(listingSource)
 
-    if(listingSource === 'quiqr-cloud'){
+    if(listingSource === 'quiqr-cloud' || (listingSource ==='last' && this.state.sitesListingView === 'quiqr-cloud')){
       listTitle = `Available remote sites (${this.props.quiqrUsername})`;
 
       sites = [];
@@ -259,14 +238,10 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
       });
     }
     else if (listingSource === 'tags'){
-      listTitle = `Available remote sites (${this.props.quiqrUsername})`;
-      listTitle = 'Sites in tags: '+ sourceArgument;
+      listTitle = 'Sites in tag: '+ sourceArgument;
       sites = sites.filter((site) => {
-       if (site.tags && site.tags.includes(sourceArgument)){
-         return true;
-       }
+        return (site.tags && site.tags.includes(sourceArgument))
       });
-
     }
 
     sites.sort(function(a, b){
@@ -370,7 +345,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
           <Route path='/sites/:source' exact render={ ({match, history})=> {
             this.history = history;
             let source = decodeURIComponent(match.params.source)
-            //service.api.logToConsole(source, 'source')
             return (
               <div style={ styles.container }>
                 {this.renderSelectSites(source, null)}
@@ -383,7 +357,6 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
             this.history = history;
             let source = decodeURIComponent(match.params.source)
             let sourceArgument = decodeURIComponent(match.params.args)
-            //service.api.logToConsole(source, 'source')
             return (
               <div style={ styles.container }>
                 {this.renderSelectSites(source, sourceArgument)}
@@ -396,7 +369,7 @@ export class SiteLibraryRouted extends React.Component<SelectSiteProps, SelectSi
             this.history = history;
             return (
               <div style={ styles.container }>
-                {this.renderSelectSites("last")}
+                {this.renderSelectSites("last",null)}
               </div>
             );
           }}

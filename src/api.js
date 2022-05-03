@@ -102,15 +102,17 @@ export class API {
     return mainProcessBridge.request('makePageBundleCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey});
   }
 
-  savePrefKey(prefKey: string, prefValue: string){
-    return mainProcessBridge.request('savePrefKey', {prefKey, prefValue});
+  readConfKey(confkey: string){
+    return mainProcessBridge.request('readConfKey', {confkey});
   }
 
-  /*
-  prefKeyValue(prefKey: string){
-    return mainProcessBridge.request('prefKeyValue', {prefKey});
+  readConfPrefKey(confkey: string){
+    return mainProcessBridge.request('readConfPrefKey', {confkey});
   }
-  */
+
+  saveConfPrefKey(prefKey: string, prefValue: string){
+    return mainProcessBridge.request('saveConfPrefKey', {prefKey, prefValue});
+  }
 
   renameCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, collectionItemNewKey: string){
     return mainProcessBridge.request('renameCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
@@ -182,9 +184,6 @@ export class API {
     return mainProcessBridge.request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
   }
 
-  getPogoConfKey(confkey: string){
-    return mainProcessBridge.request('getPogoConfKey', {confkey});
-  }
   createSite(siteConfig: any){
     return mainProcessBridge.request('createSite', siteConfig);
   }

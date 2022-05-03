@@ -149,23 +149,29 @@ api.clearWorkSpaceConfigCache = async function({}, context){
 }
 
 
-api.savePrefKey = async function({prefKey, prefValue}, context){
+api.readConfKey = async function({confkey},context){
+  try{
+    context.resolve(global.pogoconf[confkey]);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
+api.readConfPrefKey = async function({confkey},context){
+  try{
+    context.resolve(global.pogoconf.prefs[confkey]);
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
+
+api.saveConfPrefKey = async function({prefKey, prefValue}, context){
   global.pogoconf.setPrefkey(prefKey, prefValue);
   global.pogoconf.saveState();
   context.resolve(true);
 }
-
-/*
-api.prefKey = async function({prefKey}, context){
-  return global.pogoconf.prefKeyValue(prefKey);
-}
-
-api.savePrefKey = async function({prefKey, prefValue}, context){
-  global.pogoconf.setPrefkey(prefKey, prefValue);
-  global.pogoconf.saveState();
-  context.resolve(true);
-}
-*/
 
 api.getWorkspaceModelParseInfo =  async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
@@ -312,15 +318,7 @@ api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
 }
 
-//TODO test again and use confkey
-api.getPogoConfKey = async function({confkey},context){
-  try{
-    context.resolve(global.pogoconf[confkey]);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
+
 
 api.getUserRemoteSites = async function({username},context){
   try{
