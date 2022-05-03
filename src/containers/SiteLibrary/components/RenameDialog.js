@@ -1,7 +1,7 @@
 import * as React           from 'react';
 import service              from '../../../services/service';
 import SharedMaterialStyles from '../../../shared-material-styles';
-import Chips                from '../../../components/Chips';
+import TextField            from '@material-ui/core/TextField';
 import { withStyles }       from '@material-ui/core/styles';
 import Button               from '@material-ui/core/Button';
 import Box                  from '@material-ui/core/Box';
@@ -15,7 +15,7 @@ const localStyles = {
 }
 const styles = {...SharedMaterialStyles, ...localStyles}
 
-class EditTagsDialogs extends React.Component{
+class RenameDialog extends React.Component{
 
   constructor(props){
     super(props);
@@ -30,8 +30,7 @@ class EditTagsDialogs extends React.Component{
   }
   componentWillUpdate(nextProps, nextState) {
     if(this.props.siteconf.key !== nextProps.siteconf.key){
-      let siteconf = nextProps.siteconf;
-      if(!siteconf.tags) siteconf.tags = [];
+      //let siteconf = nextProps.siteconf;
       this.setState({siteconf: nextProps.siteconf, execButtonsDisabled: true});
     }
   }
@@ -43,33 +42,27 @@ class EditTagsDialogs extends React.Component{
       </div>
     )
   }
+  validateSiteName(newName){
+    let errorTextSiteName = "";
+    let execButtonsDisabled = false;
 
-  handlePushItem(val){
-    if(val==="") return;
-    let siteconf = this.state.siteconf;
-    let copy = siteconf.tags.slice(0);
-    copy.push(val);
-    siteconf.tags = copy
-    this.setState({siteconf:siteconf, execButtonsDisabled: false});
+    if(this.state.localsites && this.state.localsites.includes(newName)){
+      errorTextSiteName = "Name is already used locally."
+      execButtonsDisabled = true;
+    }
+    this.setState({
+      execButtonsDisabled: execButtonsDisabled,
+      errorTextSiteName: errorTextSiteName
+    });
   }
 
-  handleSwap(e: Event, {index, otherIndex}: {index: number, otherIndex: number}){
-    let siteconf = this.state.siteconf;
-    let val = siteconf.tags.slice(0);
-    let temp = val[otherIndex];
-    val[otherIndex] = val[index];
-    val[index] = temp;
+  handleNameChange(e){
+    this.validateSiteName(e.target.value);
 
-    siteconf.tags = val
-    this.setState({siteconf:siteconf, execButtonsDisabled: false});
-  }
-
-  handleRequestDelete(index: number){
     let siteconf = this.state.siteconf;
-    let copy = siteconf.tags.slice(0);
-    copy.splice(index,1);
-    siteconf.tags = copy
-    this.setState({siteconf:siteconf, execButtonsDisabled: false});
+
+    siteconf.name = e.target.value
+    this.setState({ siteconf: siteconf });
   }
 
   saveSiteConf(){
@@ -79,19 +72,18 @@ class EditTagsDialogs extends React.Component{
   }
 
   renderBody(){
-    let field = {title: "tags"}
     return (
       <Box>
-        <Chips
-          items={this.state.siteconf.tags}
-          sortable={true}
-          underlineShow={true}
-          fullWidth={true}
-          field={field}
-          onRequestDelete={this.handleRequestDelete.bind(this)}
-          onPushItem={this.handlePushItem.bind(this)}
-          onSwap={this.handleSwap.bind(this)}
-        />
+        <TextField
+          id="standard-full-width"
+          label="Site Name"
+          fullWidth
+          value={this.state.siteconf.name}
+          onChange={(e)=>{this.handleNameChange(e)}}
+          error={(this.state.errorTextSiteName===""?false:true)}
+          helperText={this.state.errorTextSiteName}
+          />
+
       </Box>
     )
   }
@@ -125,7 +117,7 @@ class EditTagsDialogs extends React.Component{
         fullWidth={true}
         maxWidth={"sm"} >
 
-        <DialogTitle id="alert-dialog-title">{"Edit tags of site: "+siteconf.name}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Edit site name: "+siteconf.name}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             { failure? this.renderFailure() : this.renderBody() }
@@ -138,4 +130,4 @@ class EditTagsDialogs extends React.Component{
     );
   }
 }
-export default withStyles(styles)(EditTagsDialogs)
+export default withStyles(styles)(RenameDialog)

@@ -15,6 +15,7 @@ import CreateSiteDialog        from './components/CreateSiteDialog';
 import BlockDialog             from './../../components/BlockDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
 import EditTagsDialogs         from './components/EditTagsDialogs';
+import RenameDialog            from './components/RenameDialog';
 import Spinner                 from './../../components/Spinner';
 
 export class SiteLibraryRouted extends React.Component{
@@ -28,6 +29,7 @@ export class SiteLibraryRouted extends React.Component{
       remoteSiteDialog: false,
       createSiteDialog: false,
       editTagsDialog: false,
+      renameDialog: false,
       dialogSiteConf: {},
       currentRemoteSite: '',
       publishSiteDialog: undefined,
@@ -188,7 +190,12 @@ export class SiteLibraryRouted extends React.Component{
 
           }}
         >
-          <MenuItem key="rename">
+          <MenuItem key="rename"
+            onClick={
+              ()=>{
+                this.setState({renameDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+              }
+            }>
             Rename
           </MenuItem>
 
@@ -311,25 +318,32 @@ export class SiteLibraryRouted extends React.Component{
   }
 
   renderDialogs(){
-    let { configurations, createSiteDialog, remoteSiteDialog, editTagsDialog, dialogSiteConf} = this.state;
 
     return (
       <div>
 
+        <RenameDialog
+          open={this.state.renameDialog}
+          siteconf={this.state.dialogSiteConf}
+          onCancelClick={()=>this.setState({renameDialog:false})}
+          onSavedClick={()=>{
+            this.setState({renameDialog:false});
+            this.updateLocalSites();
+          }}
+        />
         <EditTagsDialogs
-          open={editTagsDialog}
-          siteconf={dialogSiteConf}
+          open={this.state.editTagsDialog}
+          siteconf={this.state.dialogSiteConf}
           onCancelClick={()=>this.setState({editTagsDialog:false})}
           onSavedClick={()=>{
             this.setState({editTagsDialog:false});
-            //this.updateLocalSites();
             service.api.redirectTo("/sites/last", true);
           }}
         />
 
         <RemoteSiteDialog
-          open={remoteSiteDialog}
-          configurations={configurations}
+          open={this.remoteSiteDialog}
+          configurations={this.state.configurations}
           remoteSiteName={this.state.currentRemoteSite}
           onCancelClick={()=>this.setState({remoteSiteDialog:false})}
           mountSite={(siteKey)=>{
@@ -341,7 +355,7 @@ export class SiteLibraryRouted extends React.Component{
         />
 
         <CreateSiteDialog
-          open={createSiteDialog}
+          open={this.state.createSiteDialog}
           onCancelClick={()=>this.setState({createSiteDialog:false})}
           onSubmitClick={this.handleCreateSiteSubmit}
         />
