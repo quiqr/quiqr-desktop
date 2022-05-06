@@ -33,6 +33,22 @@ class WorkspaceService{
     workspaceConfigProvider.clearCache();
   }
 
+  async getCreatorMessage(){
+    let indexPath = this.workspacePath + "/quiqr/home/index.md"
+    try {
+      if (fs.existsSync(indexPath)) {
+        let data = await fs.readFileSync(indexPath,'utf8');
+        let obj = await this._smartParse(indexPath, ['md'], data);
+        return obj.mainContent.toString();
+      }
+    } catch(err) {
+      console.error(err);
+      console.error('error checking');
+    }
+    return '';
+
+  }
+
   async getModelParseInfo(){
     await workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
     return workspaceConfigProvider.getModelParseInfo();

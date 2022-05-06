@@ -1,24 +1,21 @@
-import React                                         from 'react';
-import { withRouter }                       from 'react-router';
-import { Switch, Route }                             from 'react-router-dom'
-
-//CONTAINERS
-
+import React                               from 'react';
+import { withRouter }                      from 'react-router';
+import { Switch, Route }                   from 'react-router-dom'
 import Dashboard                           from './Dashboard'
 import Publish                             from './Publish'
 import TopToolbarLeft                      from '../TopToolbarLeft'
-import TopToolbarRight                     from '../TopToolbarRight'
+import {TopToolbarRight, ToolbarButton}    from '../TopToolbarRight'
 import Collection                          from './Collection';
 import CollectionItem                      from './Collection/CollectionItem';
 import Single                              from './Single';
 import WorkspaceSidebar                    from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import AppsIcon                            from '@material-ui/icons/Apps';
+import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
 import TuneIcon                            from '@material-ui/icons/Tune';
-import LibraryBooksIcon                        from '@material-ui/icons/LibraryBooks';
-import PublishIcon                             from '@material-ui/icons/Publish';
-import OpenInBrowserIcon                       from '@material-ui/icons/OpenInBrowser';
-
+import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
+import PublishIcon                         from '@material-ui/icons/Publish';
+import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
 import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 //import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeProvider';
@@ -193,40 +190,48 @@ class WorkSpace extends React.Component{
 
   toolbarItemsLeft(siteKey, workspaceKey){
     return [
-      {
-        title: "Content",
-        icon: <LibraryBooksIcon style={{ color: iconColor }} />,
-        action: ()=>{
+      <ToolbarButton
+        action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
-        }
-      },
-      {
-        title: "Publish",
-        icon: <PublishIcon style={{ color: iconColor }} />,
-        action: ()=>{
+        }}
+        title="Content"
+        icon={<LibraryBooksIcon style={{ color: iconColor }} />}
+      />,
+      <ToolbarButton
+        action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/publish/front`);
-        }
-      },
-      {
-        title: "Config",
-        icon: <TuneIcon style={{ color: iconColor }} />,
-        action: ()=>{
-          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf`);
-        }
-      }
+        }}
+        title="Publish"
+        icon={<PublishIcon style={{ color: iconColor }} />}
+      />,
+      <ToolbarButton
+        action={()=>{
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
+        }}
+        title="Config"
+        icon={<TuneIcon style={{ color: iconColor }} />}
+      />,
     ];
   }
 
   toolbarItemsRight(){
+
     return [
-      {
-        title: "Site Library",
-        icon: <AppsIcon style={{ color: iconColor }} />,
-        action: ()=>{
+      <ToolbarButton
+        action={()=>{
           service.api.redirectTo("/sites/last");
-        }
-      }
-    ];
+        }}
+        title="Site Library"
+        icon={<AppsIcon style={{ color: iconColor }} />}
+      />,
+        <ToolbarButton
+        action={()=>{
+          service.api.redirectTo(`/prefs/`);
+        }}
+        title="Preferences"
+        icon={<SettingsApplicationsIcon style={{ color: iconColor }} />}
+      />,
+  ];
   }
 
   renderTopToolbarRightSwitch(){
@@ -239,7 +244,7 @@ class WorkSpace extends React.Component{
         return <TopToolbarRight
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
           itemsCenter={[]}
-          itemsRight={this.toolbarItemsRight(siteKey, workspaceKey)}
+          itemsRight={this.toolbarItemsRight()}
         />
       }} />
 
@@ -247,18 +252,19 @@ class WorkSpace extends React.Component{
         const siteKey= decodeURIComponent(match.params.site);
         const workspaceKey= decodeURIComponent(match.params.workspace);
         const toolbarItemsCenter = [
-          {
-            title: "Preview in Browser",
-            icon: <OpenInBrowserIcon style={{ color: iconColor }} />,
-            action: ()=>{
+          <ToolbarButton
+            action={()=>{
               window.require('electron').shell.openExternal('http://localhost:13131');
-            }
-          }
+            }}
+            title="Preview in Browser"
+            icon={<OpenInBrowserIcon style={{ color: iconColor }} />}
+          />
         ];
+
         return <TopToolbarRight
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
           itemsCenter={toolbarItemsCenter}
-          itemsRight={this.toolbarItemsRight(siteKey, workspaceKey)}
+          itemsRight={this.toolbarItemsRight()}
         />
       }} />
 

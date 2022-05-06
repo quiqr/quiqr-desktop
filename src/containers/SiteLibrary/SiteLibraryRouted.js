@@ -1,5 +1,7 @@
 import React                   from 'react';
+import Typography from '@material-ui/core/Typography';
 import { Switch, Route }       from 'react-router-dom'
+import Box                    from '@material-ui/core/Box';
 import List                    from '@material-ui/core/List';
 import ListSubheader           from '@material-ui/core/ListSubheader';
 import ListItem                from '@material-ui/core/ListItem';
@@ -7,18 +9,33 @@ import ListItemText            from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton              from '@material-ui/core/IconButton';
 import Menu                    from '@material-ui/core/Menu';
+import Grid                    from '@material-ui/core/Grid';
+import Paper                    from '@material-ui/core/Paper';
 import MenuItem                from '@material-ui/core/MenuItem';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
-import service                 from './../../services/service';
-import { snackMessageService } from './../../services/ui-service';
 import CreateSiteDialog        from './components/CreateSiteDialog';
-import BlockDialog             from './../../components/BlockDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
 import EditTagsDialogs         from './components/EditTagsDialogs';
 import RenameDialog            from './components/RenameDialog';
+import CardItem                from './components/CardItem';
+import BlockDialog             from './../../components/BlockDialog';
 import Spinner                 from './../../components/Spinner';
+import service                 from './../../services/service';
+import { snackMessageService } from './../../services/ui-service';
+import { withStyles } from '@material-ui/core/styles';
 
-export class SiteLibraryRouted extends React.Component{
+const useStyles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+});
+
+class SiteLibraryRouted extends React.Component{
 
   constructor(props){
     super(props);
@@ -120,14 +137,6 @@ export class SiteLibraryRouted extends React.Component{
     this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
   }
 
-  handleAddSiteClick(){
-    this.setState({createSiteDialog: true});
-  }
-
-  handleRemoteSiteClick(){
-    this.setState({remoteSiteDialog: true});
-  }
-
   handleCreateSiteSubmit = (data)=>{
     let siteKey = data.key;
     this.setState({createSiteDialog:false, blockingOperation:'Creating site...'})
@@ -212,7 +221,7 @@ export class SiteLibraryRouted extends React.Component{
     );}
 
   renderSelectSites(source, sourceArgument){
-    let { selectedSite, configurations } = this.state;
+    let { configurations } = this.state;
 
     let listingSource
     if(source === 'last'){
@@ -273,6 +282,41 @@ export class SiteLibraryRouted extends React.Component{
     })
 
     return (
+      (this.props.activeLibraryView === "cards" ? this.renderCards(sites, listTitle) : this.renderList(sites, listTitle))
+
+    );
+
+  }
+  renderCards(sites, listTitle){
+    const { classes } = this.props;
+    return (
+
+      <Box m={3}>
+      <Box my={3}>
+        <Typography variant="h6" >{listTitle}</Typography>
+      </Box>
+
+        <Grid container spacing={3} >
+          {sites.map((site, index)=>{
+
+            return (
+              <Grid item>
+                <CardItem
+                  site={site}
+                />
+              </Grid>
+            )
+          })}
+        </Grid>
+      </Box>
+
+    );
+  }
+
+  renderList(sites, listTitle){
+    //let { selectedSite } = this.state;
+    return (
+
       <List
         style={{padding: 0}}
         subheader={
@@ -282,14 +326,14 @@ export class SiteLibraryRouted extends React.Component{
         }>
 
         { (sites).map((site, index)=>{
-          let selected = site===selectedSite;
+          //let selected = site===selectedSite;
 
           return (
 
             <ListItem
               id={"siteselectable-"+site.name}
               key={index}
-              selected={selected}
+              //selected={selected}
               onClick={ ()=>{
                 if(site.remote){
                   this.setState({remoteSiteDialog:true});
@@ -313,7 +357,7 @@ export class SiteLibraryRouted extends React.Component{
         })}
 
       </List>
-    );
+    )
 
   }
 
@@ -342,7 +386,7 @@ export class SiteLibraryRouted extends React.Component{
         />
 
         <RemoteSiteDialog
-          open={this.remoteSiteDialog}
+          open={this.state.remoteSiteDialog}
           configurations={this.state.configurations}
           remoteSiteName={this.state.currentRemoteSite}
           onCancelClick={()=>this.setState({remoteSiteDialog:false})}
@@ -414,4 +458,4 @@ export class SiteLibraryRouted extends React.Component{
   }
 }
 
-export default SiteLibraryRouted;
+export default withStyles(useStyles)(SiteLibraryRouted);

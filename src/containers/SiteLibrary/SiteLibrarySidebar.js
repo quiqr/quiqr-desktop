@@ -98,6 +98,34 @@ export class SiteLibrarySidebar extends React.Component {
           },
         ]
       },
+      {
+        title: 'Quiqr Templates',
+        items: [
+          {
+            active: true,
+            label: "Quiqr Community Templates",
+            selected: (this.state.selectedMenuItem==='templates-quiqr-community' ? true : false),
+            onClick: ()=>{
+              this.saveSelectedMenuItem('templates-quiqr-community');
+              history.push(`${basePath}/templates/quiqr-community`)
+            }
+          },
+        ]
+      },
+      {
+        title: 'Hugo Templates',
+        items: [
+          {
+            active: true,
+            label: "Themes from gohugo.io",
+            selected: (this.state.selectedMenuItem==='themes-gohugo-io' ? true : false),
+            onClick: ()=>{
+              this.saveSelectedMenuItem('themes-gohugo-io');
+              history.push(`${basePath}/themes/gohugo-io`)
+            }
+          },
+        ]
+      },
     ]
 
     return <Sidebar {...this.props} menus={menus} />

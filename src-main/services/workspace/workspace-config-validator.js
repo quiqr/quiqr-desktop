@@ -115,7 +115,6 @@ class WorkspaceConfigValidator {
       if(validationError) return validationError.message;
     }
     else{
-      //data files, dataformat must be empty or match extension
       if(collection.dataformat && collection.dataformat != collection.extension){
         return 'The dataformat value does not match the extension value.';
       }
@@ -149,7 +148,7 @@ class WorkspaceConfigValidator {
     if(validationError) return validationError.message;
 
     let extension = path.extname(single.file).replace('.','');
-    if(single.file.startsWith('content')){
+    if(single.file.startsWith('content') || single.file.startsWith('quiqr/home')){
       //content file, dataformat must be provided
       validationError = joi.validate(single.dataformat,
         joi.string().trim().regex(validationUtils.dataFormatReg).required().error(new Error('The dataformat value is invalid.'))
@@ -158,7 +157,6 @@ class WorkspaceConfigValidator {
       if(validationError) return validationError.message;
     }
     else{
-      //data file, dataformat must be empty or match extension
       if(single.dataformat && single.dataformat!==extension)
         return 'The dataformat value does not match the file value.' + single.dataformat;
 

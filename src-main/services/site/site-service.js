@@ -33,20 +33,6 @@ class SiteService{
 
   }
 
-  async getCreatorMessage(){
-
-    let indexPath = this._config.source.path + "/quiqr/home/index.md"
-    try {
-      if (fs.existsSync(indexPath)) {
-        var data = fs.readFileSync(indexPath);
-        return data.toString();
-      }
-    } catch(err) {
-      console.error('error checking');
-    }
-    return '';
-
-  }
 
   _findFirstMatchOrDefault(arr, key){
     let result;

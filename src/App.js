@@ -2,7 +2,9 @@ import React                                         from 'react';
 import { Switch, Route }                             from 'react-router-dom'
 
 //CONTAINERS
-import { SiteLibrarySidebar, SiteLibraryRouted }     from './containers/SiteLibrary'
+import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight }     from './containers/SiteLibrary'
+import {TopToolbarRight, ToolbarButton}    from './containers/TopToolbarRight'
+import AppsIcon                            from '@material-ui/icons/Apps';
 import Workspace                                     from './containers/WorkspaceMounted/Workspace';
 import Console                                       from './containers/Console';
 import PreviewButtons                                from './containers/PreviewBrowser/PreviewButtons';
@@ -21,6 +23,7 @@ import getMuiTheme                                   from 'material-ui-02/styles
 
 import Redirect                                      from 'react-router-dom/Redirect';
 import service                                       from './services/service';
+const iconColor = "#000";
 
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
@@ -55,6 +58,7 @@ class App extends React.Component{
     let win = window.require('electron').remote.getCurrentWindow();
 
     this.state = {
+      libraryView: "list",
       maximized:win.isMaximized(),
       style: style,
       menuIsLocked: true,
@@ -129,6 +133,12 @@ class App extends React.Component{
   }
 
   componentWillMount(){
+
+    service.api.readConfPrefKey('libraryView').then((view)=>{
+      this.setState({libraryView: view });
+    });
+
+
     window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
     window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
     window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
@@ -202,6 +212,39 @@ class App extends React.Component{
 
     </Switch>);
   }
+  renderTopToolbarRightSwitch(){
+
+    return (<Switch>
+      <Route path='/prefs' exact render={ () => {
+        const rightButtons = [
+          <ToolbarButton
+            action={()=>{
+              service.api.redirectTo("/sites/last");
+            }}
+            title="Site Library"
+            icon={<AppsIcon style={{ color: iconColor }} />}
+          />
+        ];
+
+        return <TopToolbarRight
+          itemsLeft={[]}
+          itemsCenter={[]}
+          itemsRight={rightButtons}
+        />
+
+
+
+      }} />
+
+
+      <Route path='/sites/*' exact render={ () => {
+        return <SiteLibraryToolbarRight
+          handleChange={(v)=>this.handleLibraryViewChange(v)}
+          activeLibraryView={ this.state.libraryView} />
+      }} />
+
+    </Switch>);
+  }
 
   renderMenuSwitch(){
     return (<Switch>
@@ -254,10 +297,16 @@ class App extends React.Component{
     </Switch>);
   }
 
+  handleLibraryViewChange(view){
+    service.api.saveConfPrefKey("libraryView",view);
+    this.setState({libraryView: view})
+  }
+
   renderSelectSites(){
     this.getProfile();
     return (
       <SiteLibraryRouted
+        activeLibraryView={ this.state.libraryView}
         key={ 'selectSite' }
         quiqrUsername={this.state.quiqrUsername}
       />
@@ -268,6 +317,7 @@ class App extends React.Component{
     this.getProfile();
     return (
       <SiteLibraryRouted
+        view={ this.state.libraryView}
         key={ 'selectSite' }
         quiqrUsername={this.state.quiqrUsername}
         createSite={ true }
@@ -456,6 +506,7 @@ class App extends React.Component{
                 </div>
 
                 <div className="toolbarRight">
+                  { this.renderTopToolbarRightSwitch() }
                 </div>
               </div>
 
