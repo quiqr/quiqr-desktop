@@ -202,7 +202,6 @@ class MenuManager {
 
           dialog.showMessageBox(null, options, async (response) => {
             //select user
-            this.setSitesListingView('quiqr-cloud');
           });
 
         });
@@ -599,48 +598,49 @@ resources: []\n\
     console.log(subdir);
   }
 
-  async setSitesListingView(view){
+  async setRole(role){
 
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("frontEndBusy");
 
-    global.pogoconf.setSitesListingView(view)
+    global.pogoconf.setPrefkey("applicationRole", role);
+
     global.pogoconf.saveState().then( ()=>{
       this.createMainMenu();
-      global.mainWM.closeSiteAndShowSelectSites();
+      console.log("Role changed, should restart?")
     });
   }
 
-  createViewSitesMenu(){
+  createRolesSelectionMenu(){
 
     let _menuContent = [
       {
-        key: "local",
-        label: "All Sites",
+        key: "contentEditor",
+        label: "Content Editor",
       },
       {
-        key: "quiqr-cloud",
-        label: "Quiqr Cloud",
-        enabled: ( this.profileUserName === '' ? false:true ),
+        key: "siteDeveloper",
+        label: "Site Developer",
       },
     ];
 
-    let viewSitesMenu = [];
+    let rolesMenu = [];
     _menuContent.forEach((itemContent)=>{
-      viewSitesMenu.push({
-        id: `view-sites-${itemContent.key}`,
+      rolesMenu.push({
+        id: `roles-${itemContent.key}`,
         label: itemContent.label,
         type: "checkbox",
         enabled: itemContent.enabled,
-        checked: (itemContent.key===global.pogoconf.sitesListingView),
+        checked: (itemContent.key===global.pogoconf.prefs["applicationRole"]),
         click: async () => {
-          this.setSitesListingView(itemContent.key);
+          this.setRole(itemContent.key);
         }
       });
     });
 
-    return viewSitesMenu;
+    return rolesMenu;
   }
+
 
   createProfilesMenu(){
 
@@ -655,7 +655,6 @@ resources: []\n\
       click: async ()=>{
         mainWindow.webContents.send("frontEndBusy");
         global.pogoconf.setCurrectUsername(null);
-        global.pogoconf.setSitesListingView('local');
 
         global.pogoconf.saveState().then( ()=>{
           app.relaunch()
@@ -1017,6 +1016,10 @@ resources: []\n\
         }
       },
       {
+        label: "Role",
+        submenu: this.createRolesSelectionMenu()
+      },
+      {
         id: 'cacheremoteuserinfo',
         enabled: ( this.profileUserName === '' ? false:true ),
         label: 'Sync Remote User Data',
@@ -1185,7 +1188,6 @@ resources: []\n\
                   let mainWindow = global.mainWM.getCurrentInstanceOrNew();
                   mainWindow.webContents.send("frontEndBusy");
 
-                  global.pogoconf.setSitesListingView('unpublished')
                   global.pogoconf.saveState().then( ()=>{
                     this.createMainMenu();
                     global.mainWM.closeSiteAndCreateNew();
