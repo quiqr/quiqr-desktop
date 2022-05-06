@@ -155,7 +155,15 @@ api.clearWorkSpaceConfigCache = async function({}, context){
   context.resolve(true);
 }
 
+api.matchRole = async function({role},context){
 
+  try{
+    context.resolve((role === global.pogoconf.prefs["applicationRole"]));
+  }
+  catch(err){
+    context.reject(err);
+  }
+}
 api.readConfKey = async function({confkey},context){
   try{
     context.resolve(global.pogoconf[confkey]);

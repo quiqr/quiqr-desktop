@@ -16,7 +16,7 @@ describe('Application launch', function () {
 
   afterEach(function () {
     if (this.app && this.app.isRunning()) {
-        return this.app.stop()
+      return this.app.stop()
     }
   })
 
@@ -27,46 +27,46 @@ describe('Application launch', function () {
   })
 
   it('opens forms cookbook', function () {
-      this.app.webContents.send("redirectCookbook");
+    this.app.webContents.send("redirectToGivenLocation", "/forms-cookbook");
 
-      return this.app.client.getText('#root > div > div > div.hideScrollbar > div > div > div:nth-child(1)').then(function (text) {
-          return assert.equal(text, 'Forms Cookbook')
-      })
+    return this.app.client.getText('#root > div > div > div.hideScrollbar > div > div > div:nth-child(1)').then(function (text) {
+      return assert.equal(text, 'Forms Cookbook')
+    })
   })
 
   it('opens test-website a few times end in site', async function () {
 
-      var times = 5;
-      for(var i=0; i < times; i++){
-          this.app.webContents.send("redirectHome");
-          this.app.client.click('#siteselectable-quiqr-test-website');
-          await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
-      }
+    var times = 5;
+    for(var i=0; i < times; i++){
+      this.app.webContents.send("redirectToGivenLocation", "/");
+      this.app.client.click('#siteselectable-quiqr-test-website');
+      await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
+    }
 
-      this.app.client.getText("#sidebar-item-openinbrowser > div > div > div").then(function (text) {
-          return assert.equal(text, 'Open in Browser');
-      })
+    this.app.client.getText("#sidebar-item-openinbrowser > div > div > div").then(function (text) {
+      return assert.equal(text, 'Open in Browser');
+    })
 
   })
   it('opens test-website a few times end in select', async function () {
 
-      var times = 5;
-      for(var i=0; i < times; i++){
-          this.app.webContents.send("redirectHome");
-          this.app.client.click('#siteselectable-quiqr-test-website');
-          await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
-      }
-      this.app.webContents.send("redirectHome");
-      await this.app.client.waitUntilTextExists('.App', 'select a website', 5000);
+    var times = 5;
+    for(var i=0; i < times; i++){
+      this.app.webContents.send("redirectToGivenLocation", "/");
+      this.app.client.click('#siteselectable-quiqr-test-website');
+      await this.app.client.waitUntilTextExists('#sidebar-item-openinbrowser', 'Open in Browser', 5000);
+    }
+    this.app.webContents.send("redirectToGivenLocation", "/");
+    await this.app.client.waitUntilTextExists('.App', 'select a website', 5000);
 
-      this.app.client.getText("#root > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div:nth-child(1)").then(function (text) {
-          return assert.equal(text, 'All Sites');
-      })
+    this.app.client.getText("#root > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div:nth-child(1)").then(function (text) {
+      return assert.equal(text, 'All Sites');
+    })
 
   })
 
   it('create new site, open it and delete afterwards', async function () {
-      this.app.webContents.send("redirectHome");
+    this.app.webContents.send("redirectToGivenLocation", "/");
   })
 
 })

@@ -102,6 +102,10 @@ export class API {
     return mainProcessBridge.request('makePageBundleCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey});
   }
 
+  matchRole(role: string){
+    return mainProcessBridge.request('matchRole', {role});
+  }
+
   readConfKey(confkey: string){
     return mainProcessBridge.request('readConfKey', {confkey});
   }

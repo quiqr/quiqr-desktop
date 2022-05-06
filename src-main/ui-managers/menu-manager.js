@@ -41,7 +41,7 @@ class MenuManager {
   openCookbooks() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
-    mainWindow.webContents.send("redirectCookbook")
+    mainWindow.webContents.send("redirectToGivenLocation", "/forms-cookbook");
   }
   stopServer() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -463,15 +463,15 @@ resources: []\n\
     let logWindow = logWindowManager.getCurrentInstanceOrNew();
 
     if (logWindow) {
-      logWindow.webContents.send("redirectConsole")
+      logWindow.webContents.send("redirectToGivenLocation", "/console")
     }
 
     logWindow.once('ready-to-show', () => {
-      logWindow.webContents.send("redirectConsole")
+      logWindow.webContents.send("redirectToGivenLocation", "/console")
     })
 
     logWindow.webContents.on('did-finish-load',() => {
-      logWindow.webContents.send("redirectConsole")
+      logWindow.webContents.send("redirectToGivenLocation", "/console")
     })
 
     logWindow.on('closed', () => {
@@ -634,6 +634,8 @@ resources: []\n\
         checked: (itemContent.key===global.pogoconf.prefs["applicationRole"]),
         click: async () => {
           this.setRole(itemContent.key);
+          let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+          mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
         }
       });
     });

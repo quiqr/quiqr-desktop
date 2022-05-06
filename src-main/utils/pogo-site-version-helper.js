@@ -43,7 +43,7 @@ class PogoSiteVersionHelper{
 
             outputConsole.appendLine('linked to site version: '+versionDir);
 
-            mainWindow.webContents.send("redirectHome");
+            mainWindow.webContents.send("redirectToGivenLocation", "/");
         }
         else{
             dialog.showMessageBox(mainWindow, {

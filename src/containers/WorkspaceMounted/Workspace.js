@@ -159,6 +159,7 @@ class WorkSpace extends React.Component{
 
     return <WorkspaceSidebar
       key={ url }
+      applicationRole={ this.props.applicationRole }
       siteKey={ site ? decodeURIComponent(site) : null }
       site={this.state.site}
       workspaceKey={ workspace ? decodeURIComponent(workspace) : null }

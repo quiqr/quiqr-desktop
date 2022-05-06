@@ -7,6 +7,7 @@ import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
 import Sidebar                              from '../Sidebar';
 
+
 class WorkspaceWidget extends React.Component {
 
   constructor(props){
@@ -31,6 +32,8 @@ class WorkspaceWidget extends React.Component {
         this.disableMobilePreview();
       }
     });
+
+
 
     this.updateBadges();
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
@@ -121,9 +124,6 @@ class WorkspaceWidget extends React.Component {
   }
 
   renderSiteMounted(){
-
-
-
 
     //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
@@ -318,43 +318,47 @@ class WorkspaceSidebar extends React.Component{
 
       if("menu" in this.state.workspace){
         this.state.workspace.menu.map((menuslot, mindex) => {
-          //collections menu
-          menus.push({
-            title: menuslot.title,
-            items: menuslot.menuItems.map((menuitem, iindex) => {
-              let item = null;
-              let itemType = null;
 
-              if(this.state.workspace.collections.some(e => e.key === menuitem.key)) {
-                item = this.state.workspace.collections.find(e => e.key === menuitem.key);
-                itemType = "collections";
-              }
-              else if(this.state.workspace.singles.some(e => e.key === menuitem.key)) {
-                item = this.state.workspace.singles.find(e => e.key === menuitem.key);
-                itemType = "singles";
-              }
+          //service.api.logToConsole(this.props.applicationRole, "state app role");
+          //service.api.logToConsole(menuslot.matchRole, "menuslot app role");
+          if(typeof menuslot.matchRole === 'undefined' || this.props.applicationRole === menuslot.matchRole){
+            menus.push({
+              title: menuslot.title,
+              items: menuslot.menuItems.map((menuitem, iindex) => {
+                let item = null;
+                let itemType = null;
 
-              if(item){
-                return {
-                  label: item.title,
-                  selected: (this.state.selectedMenuItem===`menu-${mindex}-${iindex}` ? true : false),
-                  onClick: () => {
-                    this.setState({selectedMenuItem:`menu-${mindex}-${iindex}`})
-                    history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
-                    this.refresh();
-                  },
-                  active: false
+                if(this.state.workspace.collections.some(e => e.key === menuitem.key)) {
+                  item = this.state.workspace.collections.find(e => e.key === menuitem.key);
+                  itemType = "collections";
                 }
-              }
-              else{
-                return {
-                  label: menuitem.key +' (missing)',
-                  active: false
+                else if(this.state.workspace.singles.some(e => e.key === menuitem.key)) {
+                  item = this.state.workspace.singles.find(e => e.key === menuitem.key);
+                  itemType = "singles";
                 }
-              }
 
-            })
-          });
+                if(item){
+                  return {
+                    label: item.title,
+                    selected: (this.state.selectedMenuItem===`menu-${mindex}-${iindex}` ? true : false),
+                    onClick: () => {
+                      this.setState({selectedMenuItem:`menu-${mindex}-${iindex}`})
+                      history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
+                      this.refresh();
+                    },
+                    active: false
+                  }
+                }
+                else{
+                  return {
+                    label: menuitem.key +' (missing)',
+                    active: false
+                  }
+                }
+
+              })
+            });
+          }
           return null;
 
         });

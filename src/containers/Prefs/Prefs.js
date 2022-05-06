@@ -63,7 +63,6 @@ class Prefs extends React.Component {
   componentDidMount(){
 
     service.api.readConfKey('prefs').then((value)=>{
-      service.api.logToConsole(value);
       this.setState({prefs: value });
 
       if(value.dataFolder){

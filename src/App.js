@@ -23,6 +23,8 @@ import getMuiTheme                                   from 'material-ui-02/styles
 
 import Redirect                                      from 'react-router-dom/Redirect';
 import service                                       from './services/service';
+
+const defaultApplicationRole = "contentEditor";
 const iconColor = "#000";
 
 const pogoTheme = getMuiTheme(lightBaseTheme, {
@@ -58,6 +60,7 @@ class App extends React.Component{
     let win = window.require('electron').remote.getCurrentWindow();
 
     this.state = {
+      applicationRole: defaultApplicationRole,
       libraryView: "list",
       maximized:win.isMaximized(),
       style: style,
@@ -79,6 +82,7 @@ class App extends React.Component{
     console.log('App MOUNTED');
     this._ismounted = true;
 
+
     service.getConfigurations().then((c)=>{
       var stateUpdate  = {};
       stateUpdate.configurations = c;
@@ -87,6 +91,15 @@ class App extends React.Component{
       this.setState(stateUpdate);
     })
     this.getProfile();
+    this.setApplicationRole();
+
+  }
+
+  setApplicationRole(){
+    service.api.readConfPrefKey('applicationRole').then((role)=>{
+      if(!role) role = defaultApplicationRole;
+      this.setState({applicationRole: role });
+    });
   }
 
   getProfile(){
@@ -108,23 +121,6 @@ class App extends React.Component{
     return true;
   }
 
-  //REDIRECTS FROM BACKGROUND
-  redirectHome(){
-    this.history.push('/');
-  }
-
-  redirectCookbook(){
-    this.history.push('/forms-cookbook');
-  }
-
-  redirectPrefs(){
-    this.history.push('/prefs');
-  }
-
-  redirectConsole(){
-    this.history.push('/console');
-  }
-
   setMobileBrowserOpen(){
     this.setState({mobileBrowserActive: true});
   }
@@ -138,33 +134,21 @@ class App extends React.Component{
       this.setState({libraryView: view });
     });
 
-
-    window.require('electron').ipcRenderer.on('redirectHome', this.redirectHome.bind(this));
-    window.require('electron').ipcRenderer.on('redirectCookbook', this.redirectCookbook.bind(this));
-    window.require('electron').ipcRenderer.on('redirectConsole', this.redirectConsole.bind(this));
-    window.require('electron').ipcRenderer.on('redirectPrefs', this.redirectPrefs.bind(this));
-   // window.require('electron').ipcRenderer.on('redirectSiteConf', this.redirectSiteConf.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
+    window.require('electron').ipcRenderer.on('redirectToGivenLocation',(event, location)=>{
 
-    window.require('electron').ipcRenderer.on('redirectToGivenLocation',function(event, location){
-
+      this.setApplicationRole();
       if(this.history){
         this.history.push(location);
       }
       else {
         this.history = ['/'];
       }
-
-    }.bind(this));
+    });
   }
   componentWillUnmount(){
     [
-      'redirectHome',
-      'redirectCookbook',
-      'redirectConsole',
-      'redirectPrefs',
-//      'redirectSiteConf',
       'setMobileBrowserOpen',
       'setMobileBrowserClose',
       'redirectToGivenLocation',
@@ -468,6 +452,7 @@ class App extends React.Component{
         this.history = history;
         return (
           <Workspace
+            applicationRole={ this.state.applicationRole }
             siteKey={ decodeURIComponent(match.params.site) }
             workspaceKey={ decodeURIComponent(match.params.workspace) } />
 
@@ -477,6 +462,7 @@ class App extends React.Component{
         this.history = history;
         return (
           <Workspace
+            applicationRole={ this.state.applicationRole }
             siteKey={ decodeURIComponent(match.params.site) }
             workspaceKey={ decodeURIComponent(match.params.workspace) } />
 
