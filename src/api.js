@@ -176,8 +176,11 @@ export class API {
     );
   }
 
-  getThumbnailForCollectionItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){
-    return mainProcessBridge.request('getThumbnailForCollectionItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
+  getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
+    return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 30000});
+  }
+  getThumbnailForCollectionOrSingleItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){
+    return mainProcessBridge.request('getThumbnailForCollectionOrSingleItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
   }
 
   getFilesInBundle(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string, extensions: any, forceFileName: string){

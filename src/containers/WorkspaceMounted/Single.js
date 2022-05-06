@@ -54,8 +54,6 @@ class Single extends React.Component{
 
   handleSave(context){
 
-    //service.api.logToConsole(context.data);
-    //service.api.logToConsole(context.reloadAfterSave,"reloadAfterSave");
     var { siteKey, workspaceKey, singleKey } = this.props;
 
     let promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
@@ -106,7 +104,7 @@ class Single extends React.Component{
       },
 
       getBundleThumbnailSrc: function(targetPath){
-        return service.api.getThumbnailForCollectionItemImage(siteKey,workspaceKey,"",singleKey, targetPath);
+        return service.api.getThumbnailForCollectionOrSingleItemImage(siteKey,workspaceKey,"",singleKey, targetPath);
       }
     }}
   />

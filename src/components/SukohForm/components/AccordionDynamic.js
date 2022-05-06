@@ -101,7 +101,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     //REMOVE ADDED LAZY ELEMENTS, WERE GOING TO ADD THEM AGAIN
     context.node.field.fields.forEach(function(fld,idx){
       if(fld.lazy === true){
-        //service.api.logToConsole(fld.compositeKey,"comp to remove");
         delete context.node.field.fields[idx];
       }
     });
@@ -185,19 +184,12 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
           dynFormObjectRoot = field.dynFormObjectRoot;
         }
 
-        /*
-        if("dynFormObjectFile" in field){
-          dynFormObjectFile = field.dynFormObjectFile;
-        }
-        */
-
         let searchKey = field["dynFormSearchKey"];
         let searchVal = item[searchKey];
         let dynSearchKeyVal = { key: searchKey, val: searchVal }
 
         await service.api.getDynFormFields( dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
           if (typeof extraFields !== 'undefined') {
-            //service.api.logToConsole(context.node.field.compositeKey,"shouldReloadFormtrue")
 
             service.api.shouldReloadForm(context.node.field.compositeKey);
 
@@ -225,10 +217,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
             let newFields = cleanedFieldFields.concat(extraFields.fields);
             dynFields[componentKey] = newFields;
-            //this.setState({["dyn-"+componentKey]: newFields});
           }
           else{
-            //service.api.logToConsole("shouldReloadFormflase")
           }
         });
 
@@ -245,12 +235,9 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     let {context} = this.props;
     let {node, currentPath} = context;
     let {field} = node;
-    //service.api.logToConsole(context,"context");
-
 
     node.field.fields.forEach(function(fld,idx){
       if(fld.lazyTemp === true){
-        //service.api.logToConsole(fld.compositeKey,"comp to remove");
         delete node.field.fields[idx];
       }
     });
@@ -307,7 +294,6 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
   }
 
   handleAccordionClick(context, node){
-    //service.api.logToConsole(node)
     context.setPath(node)
   }
 
@@ -392,19 +378,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
       else{
         field.fields = this.state.dynFieldsEmpty;
       }
-      //service.api.logToConsole(componentKey, "componentKey");
-      //service.api.logToConsole(Object.keys(this.state.dynFieldsEmpty).length, "dynFieldsLength");
-      //service.api.logToConsole(this.state.dynFields, "dynFields");
     }
-
-    /*
-    service.api.logToConsole("=============")
-    service.api.logToConsole("START FOREACH")
-    field.fields.forEach(function(fld){
-      service.api.logToConsole(fld.key, "fieldtitle")
-
-    });
-    */
 
     let label = 'Untitled';
 

@@ -23,27 +23,13 @@ class WorkspaceConfigProvider{
     this.parseInfo.baseFile = '';
     this.parseInfo.includeFiles = [];
     this.parseInfo.partialFiles = [];
-
-    /*
-    try{
-      console.log(this.partialRemoteCacheDir(global.currentSitePath));
-      console.log(global.currentSitePath);
-    }
-    catch(e){
-      //console.log(e)
-    }
-    if(global.currentSitePath && fs.existsSync(this.partialRemoteCacheDir(global.currentSitePath)) ){
-      rimraf.sync(this.partialRemoteCacheDir(global.currentSitePath));
-    }
-    */
-    }
+  }
 
   async getConfig(workspacePath, workspaceKey){
 
     let filePath = this._getFilePath(workspacePath);
 
     this.parseInfo.baseFile = filePath;
-
 
     let config;
     let token;

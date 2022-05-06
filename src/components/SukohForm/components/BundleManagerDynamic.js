@@ -150,10 +150,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   removeItemWithValue(state: any){
     state.__deleted = true;
     let { context } = this.props;
-    service.api.logToConsole(state, "removeItemWithValue state")
-
     context.setValue(context.value);
-    service.api.logToConsole(context.value, "removeItemWithValue context/value")
   }
 
   renderComponent(){
@@ -255,7 +252,6 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
   }
   setValue(context: ComponentContext<BundleManagerDynamicField>, value: any){
     context.node.state['resources'] = value;
-    //service.api.logToConsole(context.node.state);
   }
   clearValue(context: ComponentContext<BundleManagerDynamicField>){
     delete context.node.state['resources'];

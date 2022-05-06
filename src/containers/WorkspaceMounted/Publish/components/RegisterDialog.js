@@ -39,11 +39,9 @@ export default class RegisterDialog extends React.Component{
     let promise = service.api.createKeyPair();
 
     promise.then((pubkey)=>{
-      service.api.logToConsole("frontend:pubkeyok");
       this.registerUserPost(this.state.username, this.state.email, pubkey.pubkey, pubkey.pubkey_title);
 
     }, (e)=>{
-      service.api.logToConsole("frontend:" + e);
       this.setState({
         busy: false
       });
@@ -55,7 +53,6 @@ export default class RegisterDialog extends React.Component{
 
     let promise = service.api.registerPogoUser(postData);
     promise.then((userObj)=>{
-      service.api.logToConsole(userObj);
       if(userObj){
         let promise = service.api.createPogoProfile(userObj);
         promise.then(()=>{

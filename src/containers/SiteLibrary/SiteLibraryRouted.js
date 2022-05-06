@@ -10,7 +10,6 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton              from '@material-ui/core/IconButton';
 import Menu                    from '@material-ui/core/Menu';
 import Grid                    from '@material-ui/core/Grid';
-import Paper                    from '@material-ui/core/Paper';
 import MenuItem                from '@material-ui/core/MenuItem';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
 import CreateSiteDialog        from './components/CreateSiteDialog';
@@ -25,14 +24,6 @@ import { snackMessageService } from './../../services/ui-service';
 import { withStyles } from '@material-ui/core/styles';
 
 const useStyles = theme => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
 });
 
 class SiteLibraryRouted extends React.Component{
@@ -190,6 +181,7 @@ class SiteLibraryRouted extends React.Component{
         >
           <MoreVertIcon />
         </IconButton>
+
         <Menu
           anchorEl={this.state.anchorEl}
           open={(this.state.menuOpen===index?true:false)}
@@ -302,7 +294,11 @@ class SiteLibraryRouted extends React.Component{
             return (
               <Grid item>
                 <CardItem
+                  siteClick={()=>{
+                    this.handleSiteClick(site);
+                  }}
                   site={site}
+                  itemMenu={this.renderItemMenu(index, site)}
                 />
               </Grid>
             )
@@ -312,9 +308,17 @@ class SiteLibraryRouted extends React.Component{
 
     );
   }
+  handleSiteClick(site){
+    if(site.remote){
+      this.setState({remoteSiteDialog:true});
+      this.setState({currentRemoteSite:site.name})
+    }
+    else{
+      this.mountSite(site)
+    }
+  }
 
   renderList(sites, listTitle){
-    //let { selectedSite } = this.state;
     return (
 
       <List
@@ -333,15 +337,8 @@ class SiteLibraryRouted extends React.Component{
             <ListItem
               id={"siteselectable-"+site.name}
               key={index}
-              //selected={selected}
               onClick={ ()=>{
-                if(site.remote){
-                  this.setState({remoteSiteDialog:true});
-                  this.setState({currentRemoteSite:site.name})
-                }
-                else{
-                  this.mountSite(site)
-                }
+                this.handleSiteClick(site)
               }}
               button={true}>
               <ListItemText primary={site.name} />

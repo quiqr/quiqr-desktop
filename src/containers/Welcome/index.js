@@ -16,7 +16,6 @@ const useStyles = makeStyles({...SharedMaterialStyles, ...localStyles})
 class Welcome extends React.Component {
 
   constructor(props){
-    service.api.logToConsole(SharedMaterialStyles);
     super(props);
     this.state = {};
   }

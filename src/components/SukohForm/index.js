@@ -89,7 +89,6 @@ export class SukohForm extends React.Component{
 
       service.api.reloadCurrentForm();
       //let updatedValues = this.props.onSave.call(this, context);
-      //service.api.logToConsole("who was first");
     }
     else{
       this.setState({error: 'Save not implemented'});

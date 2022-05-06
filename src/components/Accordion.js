@@ -93,7 +93,6 @@ class Accordion extends React.Component{
     return function(e){
       if(this.props.index !== undefined){
         if(this.props.onChange){
-          //service.api.logToConsole(i,"handleChange")
           this.props.onChange(i);
         }
       }

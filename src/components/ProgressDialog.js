@@ -36,7 +36,6 @@ export default class ProgressDialog extends React.Component{
       visible: false,
     };
     this.setState({confObj:confObj});
-    service.api.logToConsole("hal;lo\njojojo");
   };
 
   render(){

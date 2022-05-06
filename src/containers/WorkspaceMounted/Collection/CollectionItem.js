@@ -124,7 +124,7 @@ class CollectionItem extends React.Component{
         return service.api.getFilesInBundle(siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName);
       },
       getBundleThumbnailSrc: function(targetPath){
-        return service.api.getThumbnailForCollectionItemImage(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath);
+        return service.api.getThumbnailForCollectionOrSingleItemImage(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath);
       }
     }}
     onSave={this.handleSave.bind(this)}

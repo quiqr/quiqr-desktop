@@ -63,7 +63,6 @@ class UniqDynamic extends BaseDynamic<UniqDynamicField,UniqDynamicState> {
 
 
     if(!context.value || context.value === '' || typeof context.value == 'undefined'){
-      //service.api.logToConsole(context.value);
       context.value = this.createToken();
       this.props.context.setValue(context.value);
     }

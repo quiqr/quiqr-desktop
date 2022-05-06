@@ -165,7 +165,6 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
   }
 
   renderImage(){
-    //service.api.logToConsole(this.props.context.value);
 
     if(this.isImage(this.props.context.value)){
 

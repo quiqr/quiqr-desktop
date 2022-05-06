@@ -24,6 +24,10 @@ class WorkspaceService{
     this.siteKey = siteKey;
   }
 
+  getWorkspacePath(){
+    return this.workspacePath;
+  }
+
   //Get the workspace configurations data to be used by the client
   getConfigurationsData(){
     return workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
@@ -574,36 +578,40 @@ class WorkspaceService{
 
   }
 
-
-  //TODO RENAME ALSO USED FOR SINGLES
-  async getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath){
-
-    let config = await this.getConfigurationsData();
-
-    let src;
-    let folder;
-    let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
+  //if collectionKey is "" its a SINGLE
+  async getThumbnailForCollectionOrSingleItemImage(collectionKey, itemKey, targetPath){
+    let itemPath = itemKey.replace(/\/[^\/]+$/,'');
 
     if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
-      src = path.join(this.workspacePath, targetPath);
-      folder = "";
-      itemPath =  "";
+      return this.getThumbnailForAbsoluteImgPath(path.join(this.workspacePath, targetPath), targetPath);
     }
+
     else if(collectionKey == ""){
-      src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
-      folder = path.basename(await this.getSingleFolder(collectionItemKey));
+      return this.getThumbnailForAbsoluteImgPath(
+        path.join(await this.getSingleFolder(itemKey), targetPath), //complete path
+        targetPath, // targetPath
+        path.basename(await this.getSingleFolder(itemKey)), //folder
+        itemPath
+      );
     }
+
     else {
+      let config = await this.getConfigurationsData();
       let collection = config.collections.find(x => x.key === collectionKey);
-      folder = collection.folder;
+      if(collection==null) throw new Error('Could not find collection.');
+      let folder = collection.folder;
 
-      if(collection==null)
-        throw new Error('Could not find collection.');
-
-      src = path.join(this.workspacePath, collection.folder, itemPath, targetPath);
+      return this.getThumbnailForAbsoluteImgPath(
+        path.join(this.workspacePath, collection.folder, itemPath, targetPath), //completePath
+        targetPath,
+        folder,
+        itemPath
+      );
     }
+  }
 
-    let srcExists = await this.existsPromise(src);
+  async getThumbnailForAbsoluteImgPath(completePath, targetPath, folder="", itemPath=""){
+    let srcExists = await this.existsPromise(completePath);
     if(!srcExists){
       return 'NOT_FOUND';
     }
@@ -620,7 +628,7 @@ class WorkspaceService{
 
       if(!thumbSrcExists){
         try{
-          await createThumbnailJob(src, thumbSrc);
+          await createThumbnailJob(completePath, thumbSrc);
         }
         catch(e){
           return 'NOT_FOUND';
@@ -635,8 +643,8 @@ class WorkspaceService{
     let base64 = buffer.toString('base64');
 
     return `data:${mime};base64,${base64}`;
-
   }
+
 
   _findFirstMatchOrDefault(arr, key){
     let result;

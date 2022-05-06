@@ -319,8 +319,6 @@ class WorkspaceSidebar extends React.Component{
       if("menu" in this.state.workspace){
         this.state.workspace.menu.map((menuslot, mindex) => {
 
-          //service.api.logToConsole(this.props.applicationRole, "state app role");
-          //service.api.logToConsole(menuslot.matchRole, "menuslot app role");
           if(typeof menuslot.matchRole === 'undefined' || this.props.applicationRole === menuslot.matchRole){
             menus.push({
               title: menuslot.title,

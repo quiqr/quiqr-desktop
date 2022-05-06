@@ -125,6 +125,8 @@ function get(callback, {invalidateCache} = {}){
           }
         }
         site.configPath = file;
+        site.etalage = getEtalage(site);
+        //console.log(site);
         configurations.sites.push(site);
       }
       catch(e){
@@ -154,6 +156,32 @@ function get(callback, {invalidateCache} = {}){
   configurationCache = configurations;
   callback(undefined, configurations);
 }
+
+function getEtalage(site){
+  let etalagePath = path.join(site.source.path,"/quiqr/etalage/etalage.json");
+  let etalageScreenshotsPath = path.join(site.source.path,"/quiqr/etalage/screenshots/");
+
+
+  if(fs.existsSync(etalagePath)){
+    let strData = fs.readFileSync(etalagePath, {encoding: 'utf-8'});
+    let formatProvider = formatProviderResolver.resolveForFilePath(etalagePath);
+    let etalage = formatProvider.parse(strData);
+
+    const screenshotPattern = (etalageScreenshotsPath + '*.{png,jpg,jpeg,gif}').replace(/\\/gi,'/');
+    let files = glob.sync(screenshotPattern)
+      .map((x)=>{
+        let y = path.normalize(x);
+        return y.substr(site.source.path.length, x.length)
+      });
+    etalage.screenshots = files;
+
+    return etalage;
+  }
+  return {};
+}
+
+
+
 function getPromise(options) {
   return new Promise((resolve, reject)=>{
     get((err, data)=>{

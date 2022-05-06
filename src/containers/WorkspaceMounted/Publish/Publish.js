@@ -249,7 +249,6 @@ class Publish extends React.Component{
 
 
   startDomVerificationPolling(celebrate){
-    //service.api.logToConsole("domainVerification status poll");
     if(this.state.pogoCustomDomainDNSStatus === "reachable"){
       let time=3000;
       this.timeout = setTimeout(() => {
@@ -259,7 +258,6 @@ class Publish extends React.Component{
   }
 
   startPublishPolling(celebrate){
-    //service.api.logToConsole("site publish status poll");
     let site = this.state.selectedSite;
     if(site.hasOwnProperty('publishStatus') && site.publishStatus === 2){
       let time=3000;
@@ -270,7 +268,6 @@ class Publish extends React.Component{
   }
 
   startPendingUpgradePolling(celebrate){
-    //service.api.logToConsole("site upgrade status poll");
 
     if(this.state.pogoSiteStatus === "no_plan"){
       let time=3000;
@@ -281,7 +278,6 @@ class Publish extends React.Component{
   }
 
   startUnconfirmedUserPolling(celebrate){
-    //service.api.logToConsole("user status poll");
 
     if(this.state.pogoAccountStatus === "unconfirmed_member"){
 
@@ -346,7 +342,6 @@ class Publish extends React.Component{
 
         this.setState(stateUpdate,()=>{
           snackMessageService.addSnackMessage('You just got yourself a shiny new site in the Quiqr Cloud.');
-          //service.api.logToConsole("start checking once")
           this.getRemoteSiteStatus(false);
 
           if(this.state.buttonPressed === 'publish'){
@@ -359,42 +354,15 @@ class Publish extends React.Component{
 
   handleConnectDomainClick(){
     this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
-    /*
-    var stateUpdate  = {};
-    stateUpdate.connectDomainDialog = {...this.state.connectDomainDialog, open:false};
-    this.setState(stateUpdate,()=>{
-      //service.api.logToConsole("finished connecting domain")
-      this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
-      //this.setState({oneTimeConnectClick:"Success"});
-    });
-    */
   }
 
   handleDeleteSiteFromCloudClick(){
-    /*
-    var stateUpdate  = {};
-    stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
-    stateUpdate.pogoCustomDomain = "not set";
-    stateUpdate.defaultDomain = `${this.getPogoCloudPath()}.quiqr.cloud`;
-    */
     this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
-    //this.setState(stateUpdate,()=>{
-    //});
   }
 
   handleDisconnectDomainClick(){
 
     this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
-    /*
-    var stateUpdate  = {};
-    stateUpdate.disconnectDomainDialog = {...this.state.disconnectDomainDialog, open:false};
-    stateUpdate.pogoCustomDomain = "not set";
-    stateUpdate.defaultDomain = `${this.getPogoCloudPath()}.quiqr.cloud`;
-    this.setState(stateUpdate,()=>{
-      //service.api.logToConsole("finished disconnecting domain")
-      this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
-    });
-    */
   }
 
   checkLinkedPogoCloudPath(){
@@ -405,9 +373,6 @@ class Publish extends React.Component{
         && site.publish[0].config.hasOwnProperty('path')){
 
         return true;
-      }
-      else{
-        //service.api.logToConsole("site is not in the pogocloud")
       }
     }
     return false;
@@ -438,7 +403,6 @@ class Publish extends React.Component{
       this.state.pogostripeConn.host+":"+
       this.state.pogostripeConn.port+"/myaccount-status/"+requestVars;
 
-    //service.api.logToConsole(url);
     let data='';
 
     try {
@@ -448,7 +412,6 @@ class Publish extends React.Component{
 
       request.on('response', (response) => {
         response.on('end', () => {
-          console.log(data);
           let obj = JSON.parse(data);
 
           this.setState({stripe_customer_id: obj.stripe_customer_id});
@@ -478,10 +441,8 @@ class Publish extends React.Component{
 
   getRemoteDomainVerification(celebrate){
 
-    //service.api.logToConsole("getRemoteVerificationStatus")
 
     if(this.state.pogoCustomDomain === "not set"){
-      //service.api.logToConsole("nocustomdomain")
       return
     }
 
@@ -492,14 +453,12 @@ class Publish extends React.Component{
     const request = net.request(url);
 
     request.on('error', (err) => {
-      //service.api.logToConsole("eerrrr");
       this.setState({pogoCustomDomainDNSStatus:"unreachable"});
       this.startDomVerificationPolling(true);
     });
 
     request.on('response', (response) => {
       response.on('error', (error) => {
-        //service.api.logToConsole("eerrrr");
       })
 
       response.on('end', () => {
@@ -515,7 +474,6 @@ class Publish extends React.Component{
         }
       });
       response.on("close", () => {
-        //service.api.logToConsole("close");
       });
       response.on("data", chunk => {
         data += chunk;
@@ -529,7 +487,6 @@ class Publish extends React.Component{
       return;
     }
 
-    //service.api.logToConsole("getRemotePublishStatus")
     if(!this.checkLinkedPogoCloudPath()){
       return;
     }
@@ -563,7 +520,6 @@ class Publish extends React.Component{
       request.end()
 
     } catch (e) {
-      //service.api.logToConsole('catch');
     }
   }
 
@@ -636,8 +592,6 @@ class Publish extends React.Component{
 
               }
               else {
-                //else if (this.state.pogoSiteStatus === 'no_plan'){
-                //service.api.logToConsole(this.state.pogoSiteStatus)
                 this.startPendingUpgradePolling(true);
               }
 
@@ -659,7 +613,6 @@ class Publish extends React.Component{
       request.end()
 
     } catch (e) {
-      //service.api.logToConsole.log('catch', e);
     }
 
   }
@@ -667,26 +620,10 @@ class Publish extends React.Component{
   handleUnsubscribeClick(){
 
     this.setState({editPlanDialog: {...this.state.editPlanDialog, open:false}});
-    //this.history.push('/sites/'+this.state.currentSiteKey+'/workspaces/'+this.state.currentWorkspaceKey+"/home/"+Math.random());
     this.setState({
       oneTimeOnlySiteActive: false,
       pogoSiteStatus: "no_plan"
     });
-
-    /*
-    service.api.parentTempUnHideMobilePreview();
-
-    let userVars = {
-      username: this.state.username,
-      fingerprint: this.state.fingerprint,
-    };
-
-    let requestVars =btoa(JSON.stringify(userVars));
-
-    let url = this.state.pogostripeConn.protocol+"//"+
-      this.state.pogostripeConn.host+":"+this.state.pogostripeConn.port+"/myaccount/"+requestVars;
-    window.require('electron').shell.openExternal(url);
-    */
   }
 
   handleUpgradeLinkedSite(pressed){

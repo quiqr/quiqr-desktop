@@ -687,10 +687,23 @@ api.getFilesInBundle = function({siteKey, workspaceKey, collectionKey, collectio
       });
   });
 }
-api.getThumbnailForCollectionItemImage = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, promise){
+api.getThumbnailForPath = function({siteKey, workspaceKey, targetPath}, promise){
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ promise.reject(err); return; }
-    workspaceService.getThumbnailForCollectionItemImage(collectionKey, collectionItemKey, targetPath)
+
+    workspaceService.getThumbnailForAbsoluteImgPath(path.join(workspaceService.getWorkspacePath(),targetPath), targetPath)
+      .then((result)=>{
+        promise.resolve(result);
+      })
+      .catch((error)=>{
+        promise.reject(error);
+      });
+  });
+}
+api.getThumbnailForCollectionOrSingleItemImage = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, promise){
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+    if(err){ promise.reject(err); return; }
+    workspaceService.getThumbnailForCollectionOrSingleItemImage(collectionKey, collectionItemKey, targetPath)
       .then((result)=>{
         promise.resolve(result);
       })

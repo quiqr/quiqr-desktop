@@ -114,7 +114,6 @@ class RemoteSiteDialog extends React.Component{
         downloading: false,
         failure: true,
       });
-      service.api.logToConsole("FE: error cloning");
     }
   }
 
@@ -144,7 +143,6 @@ class RemoteSiteDialog extends React.Component{
         cancelText: "Close",
         failure: true,
       });
-      service.api.logToConsole("FE: error cloning unmanaged");
     }
   }
 

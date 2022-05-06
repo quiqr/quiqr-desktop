@@ -100,9 +100,6 @@ class Form extends React.Component {
 
 
   setPath(node){
-
-    //service.api.logToConsole(JSON.stringify(node));
-
     if(this.props.collectionItemKey && node.field.compositeKey === 'root'){
       this.history.push(this.generateParentPath());
     }
@@ -128,7 +125,6 @@ class Form extends React.Component {
         path = 'ROOT/' + path;
       }
       else {
-        //service.api.logToConsole(currentNode.field.type, "BUILD PATH");
         let componentProplessInstance = this.props.componentRegistry.getProplessInstance(currentNode.field.type);
         if(componentProplessInstance){
           let fragment = componentProplessInstance.buildPathFragment(currentNode, nodeLevel++, nodes);
@@ -148,9 +144,6 @@ class Form extends React.Component {
   }
 
   renderField(node, onValueChanged){
-
-    //INDIANSUMMERRECURSIVE
-    //service.api.logToConsole(node.field.title, "renderField key");
 
     if(!node.field.title){
       node.field.title = node.field.key
@@ -214,16 +207,12 @@ class Form extends React.Component {
    */
   renderLevel({ field, state, uiState, parent}) {
 
-    //INDIANSUMMERRECURSIVE
-    //service.api.logToConsole(uiState, "uistate");
-    if(this.props.debug)
-      service.api.logToConsole('RENDER LEVEL');
+    if(this.props.debug) service.api.logToConsole('RENDER LEVEL');
 
     const fieldsElements = field.fields.map(function(childField){
       let data = {field:childField, state:state, uiState, parent};
       let field = this.renderField(data);
-      if(this.props.debug)
-        service.api.logToConsole('FIELD', data, field, this.buildPath(data));
+      if(this.props.debug) service.api.logToConsole('FIELD', data, field, this.buildPath(data));
       return field;
     }.bind(this));
 

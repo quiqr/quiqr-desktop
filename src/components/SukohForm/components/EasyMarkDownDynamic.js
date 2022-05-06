@@ -39,9 +39,6 @@ class EasyMarkdownDynamic extends BaseDynamic<EasyMarkdownDynamicField,EasyMarkd
 
   handleChange = (e: Event, value: any)=>{
     this.forceUpdate();
-    //service.api.logToConsole(value)
-    //service.api.logToConsole(e)
-
     this.props.context.setValue(e, 250);
   }
 
