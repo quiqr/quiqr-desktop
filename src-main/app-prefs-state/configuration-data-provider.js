@@ -162,6 +162,7 @@ function getEtalage(site){
   let etalageDir = path.join(site.source.path,"/quiqr/etalage");
   let etalagePath = path.join(site.source.path,"/quiqr/etalage/etalage.json");
   let etalageScreenshotsPath = path.join(site.source.path,"/quiqr/etalage/screenshots/");
+  let etalageFaviconPath = path.join(site.source.path,"/quiqr/etalage/favicon/");
   let etalage = {}
 
   if(fs.existsSync(etalagePath)){
@@ -177,6 +178,15 @@ function getEtalage(site){
       return y.substr(site.source.path.length, x.length)
     });
   etalage.screenshots = files;
+
+
+  const faviconPattern = (etalageFaviconPath + '*.{png,jpg,jpeg,gif,ico}').replace(/\\/gi,'/');
+  let files2 = glob.sync(faviconPattern)
+    .map((x)=>{
+      let y = path.normalize(x);
+      return y.substr(site.source.path.length, x.length)
+    });
+  etalage.favicons = files2;
 
   return etalage;
 

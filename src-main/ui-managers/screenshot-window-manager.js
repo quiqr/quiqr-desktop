@@ -4,6 +4,7 @@ const url                       = require('url')
 const path                      = require('path')
 const fs                        = require('fs-extra')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
+const request = require('request')
 
 let screenshotWindow;
 
@@ -11,9 +12,9 @@ function capture(targetPath){
   console.log('capture')
   screenshotWindow.webContents.capturePage().then(image => {
 
-    if (!fs.existsSync(path.dirname(targetPath))) fs.mkdirSync(path.dirname(targetPath), {recursive: true});
+    if (!fs.existsSync(path.join(targetPath, 'screenshots'))) fs.mkdirSync(path.join(targetPath,'screenshots'), {recursive: true});
 
-    fs.writeFile(targetPath, image.toJPEG(75), (err) => {
+    fs.writeFile(path.join(targetPath, 'screenshots', 'quiqr-generated-screenshot.jpg'), image.toJPEG(75), (err) => {
       if (err){
         console.log(err)
         screenshotWindow.close();
@@ -22,10 +23,9 @@ function capture(targetPath){
       screenshotWindow.close();
     })
   })
-
 }
 
-function createScreenshot (host, port, targetPath) {
+function createScreenshotAndFavicon(host, port, targetPath) {
   screenshotWindow = new BrowserWindow({
     show: false,
     frame: true,
@@ -46,11 +46,34 @@ function createScreenshot (host, port, targetPath) {
 
     if(screenshotWindow) screenshotWindow.loadURL(url);
 
-    screenshotWindow.webContents.executeJavaScript("document.body.style.overflow = 'hidden'");
+    if(screenshotWindow){
+      screenshotWindow.webContents.executeJavaScript("document.body.style.overflow = 'hidden'");
 
-    setTimeout(()=>{
-      capture(targetPath);
-    }, 2000);
+      setTimeout(()=>{
+        capture(path.join(targetPath));
+      }, 2000);
+
+      screenshotWindow.webContents.once('page-favicon-updated', async (event, urls) => {
+        console.log("FAVICON")
+        if(urls.length > 0){
+          console.log(urls)
+          if (!fs.existsSync(path.join(targetPath, 'favicon'))) fs.mkdirSync(path.join(targetPath, 'favicon'), {recursive: true});
+          urls.forEach((favUrl)=>{
+            faviconFile = favUrl.split('/').pop();
+            request.head(favUrl, (err, res, body) => {
+              const req = request.get(favUrl)
+                .on('response', function (res) {
+                  if (res.statusCode === 200) {
+                    req.pipe(fs.createWriteStream(path.join(targetPath,'favicon', faviconFile )))
+                  }
+                })
+                .on('close',()=>{ console.log("favicon downloaded")});
+            })
+
+          })
+        }
+      });
+    }
 
   });
   client.on('error', (error) => {
@@ -67,7 +90,7 @@ function createScreenshot (host, port, targetPath) {
 }
 
 module.exports = {
-  createScreenshot: (host, port, targetPath)=>{
-    createScreenshot(host, port, targetPath)
+  createScreenshotAndFavicon: (host, port, targetPath)=>{
+    createScreenshotAndFavicon(host, port, targetPath)
   }
 }

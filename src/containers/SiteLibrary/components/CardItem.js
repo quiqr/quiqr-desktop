@@ -48,19 +48,21 @@ class CardItem extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      expanded: false
+      expanded: false,
+      screenshot: "",
+      favicon: ""
     }
   }
   componentDidMount(){
     this._ismounted = true;
     this.getScreenshot();
+    this.getFavicon();
   }
 
   getScreenshot(){
     if(this.props.site.etalage && this.props.site.etalage.screenshots && this.props.site.etalage.screenshots.length > 0){
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.screenshots[0]).then((img)=>{
-        let screenshot = img;
-        this.setState({screenshot:screenshot});
+        this.setState({screenshot:img});
       })
     }
     else{
@@ -68,22 +70,41 @@ class CardItem extends React.Component {
     }
   }
 
+  getFavicon(){
+    if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
+      service.api.logToConsole(this.props.site)
+      service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
+        this.setState({favicon:img});
+      })
+    }
+    else{
+      this.setState({favicon:""});
+    }
+  }
+
   componentDidUpdate(preProps){
     if(this._ismounted && preProps.site.key !== this.props.site.key){
       this.getScreenshot();
+      this.getFavicon();
     }
   }
 
   render(){
     const { classes } = this.props;
 
+    let siteAvatar = ( <Avatar aria-label="recipe" className={classes.avatar}>
+      {this.props.site.name.charAt(0)}
+    </Avatar>
+    )
+
+    if(this.state.favicon !== ""){
+      siteAvatar = <Avatar aria-label="recipe" className={classes.avatar} src={this.state.favicon} />
+    }
     return (
       <Card className={classes.root}>
         <CardHeader
           avatar={
-            <Avatar aria-label="recipe" className={classes.avatar}>
-              {this.props.site.name.charAt(0)}
-            </Avatar>
+            siteAvatar
           }
           action={
             this.props.itemMenu

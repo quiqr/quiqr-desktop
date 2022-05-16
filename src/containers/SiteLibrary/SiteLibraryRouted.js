@@ -1,12 +1,9 @@
 import React                   from 'react';
-import Typography from '@material-ui/core/Typography';
+import Typography              from '@material-ui/core/Typography';
 import { Switch, Route }       from 'react-router-dom'
-import Box                    from '@material-ui/core/Box';
+import Box                     from '@material-ui/core/Box';
 import List                    from '@material-ui/core/List';
 import ListSubheader           from '@material-ui/core/ListSubheader';
-import ListItem                from '@material-ui/core/ListItem';
-import ListItemText            from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton              from '@material-ui/core/IconButton';
 import Menu                    from '@material-ui/core/Menu';
 import Grid                    from '@material-ui/core/Grid';
@@ -16,12 +13,13 @@ import CreateSiteDialog        from './components/CreateSiteDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
 import EditTagsDialogs         from './components/EditTagsDialogs';
 import RenameDialog            from './components/RenameDialog';
+import SiteListItem            from './components/SiteListItem';
 import CardItem                from './components/CardItem';
 import BlockDialog             from './../../components/BlockDialog';
 import Spinner                 from './../../components/Spinner';
 import service                 from './../../services/service';
 import { snackMessageService } from './../../services/ui-service';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles }          from '@material-ui/core/styles';
 
 const useStyles = theme => ({
 });
@@ -330,24 +328,17 @@ class SiteLibraryRouted extends React.Component{
 
         { (sites).map((site, index)=>{
           //let selected = site===selectedSite;
-
           return (
 
-            <ListItem
-              id={"siteselectable-"+site.name}
-              key={index}
-              onClick={ ()=>{
-                this.handleSiteClick(site)
-              }}
-              button={true}>
-              <ListItemText primary={site.name} />
-              {(site.remote?null:
-              <ListItemSecondaryAction>
-                {this.renderItemMenu(index,site)}
-              </ListItemSecondaryAction>
-              )}
 
-            </ListItem>
+            <SiteListItem
+                  siteClick={()=>{
+                    this.handleSiteClick(site);
+                  }}
+                  site={site}
+                  itemMenu={this.renderItemMenu(index, site)}
+                />
+
 
           );
         })}

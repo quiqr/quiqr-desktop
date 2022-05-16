@@ -6,7 +6,7 @@ const fssimple                        = require('fs');
 const rimraf                          = require("rimraf");
 const fm                              = require('front-matter')
 const { promisify }                   = require('util');
-const Jimp                            = require("jimp");
+//const Jimp                            = require("jimp");
 const formatProviderResolver          = require('./../../utils/format-provider-resolver');
 const { WorkspaceConfigProvider }     = require('./workspace-config-provider');
 const contentFormats                  = require('./../../utils/content-formats');
@@ -517,9 +517,6 @@ class WorkspaceService{
     });
   }
 
-  async removeImageCacheForPath(){
-
-  }
 
   async removeThumbnailForItemImage(collectionKey, collectionItemKey, targetPath){
     let folder;
@@ -735,18 +732,28 @@ class WorkspaceService{
     });
   }
 
-  async genereateEtalageImages(){
-
-    let thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', 'quiqr', 'etalage', 'screenshots');
+  async removeThumbCache(relativePath){
+    let thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', relativePath);
     let thumbSrcExists = await this.existsPromise(thumbSrc);
     if(thumbSrcExists){
-      fs.remove(thumbSrc);
+      let lstat = fs.lstatSync(thumbSrc);
+      if(lstat.isDirectory()){
+        await rimraf.sync(thumbSrc);
+      }
+      else{
+        fs.remove(thumbSrc);
+      }
     }
+  }
 
-    let screenshotDir = path.join(this.workspacePath, 'quiqr', 'etalage', 'screenshots');
-    screenshotWindow.createScreenshot('localhost', 13131, path.join(screenshotDir, 'quiqr-generated.jpg') )
+  async genereateEtalageImages(){
 
-    console.log("favicon")
+    this.removeThumbCache(path.join('quiqr', 'etalage', 'screenshots'));
+    this.removeThumbCache(path.join('quiqr', 'etalage', 'favicon'));
+
+    let etalageDir = path.join(this.workspacePath, 'quiqr', 'etalage' );
+    screenshotWindow.createScreenshotAndFavicon('localhost', 13131, path.join(etalageDir) )
+
   }
 }
 

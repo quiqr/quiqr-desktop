@@ -42,7 +42,6 @@
     "material-ui-02": "npm:material-ui@^0.20.2",
     "material-ui-color": "^1.2.0",
     "mkdirp": "0.5.1",
-    "parse-favicon": "^5.0.3",
     "react-simplemde-editor": "^5.0.2",
     "request": "2.87.0",
     "rimraf": "^3.0.2",
