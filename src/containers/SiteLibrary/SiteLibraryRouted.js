@@ -280,7 +280,6 @@ class SiteLibraryRouted extends React.Component{
 
   }
   renderCards(sites, listTitle){
-    const { classes } = this.props;
     return (
 
       <Box m={3}>

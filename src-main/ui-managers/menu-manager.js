@@ -16,7 +16,6 @@ const pathHelper                  = require('../utils/path-helper');
 const hugoDownloader              = require('../hugo/hugo-downloader')
 const HugoBuilder                 = require('../hugo/hugo-builder');
 const SiteService                 = require('../services/site/site-service')
-//const { WorkspaceConfigProvider } = require('../services/workspace/workspace-config-provider');
 const PogoPublisher               = require('../publishers/pogo-publisher');
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
@@ -24,8 +23,6 @@ const { EnvironmentResolver }     = require('../utils/environment-resolver');
 const app = electron.app
 let menuObject = null;
 const apiMain = global.apiMain;
-
-//const workspaceConfigProvider = new WorkspaceConfigProvider();
 
 let context = {};
 context.reject = function(error){
@@ -348,6 +345,7 @@ resources: []\n\
     dialog.showMessageBox(options)
   }
 
+  /* TODO USE API */
   async renameSite(){
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
@@ -1416,6 +1414,14 @@ resources: []\n\
             enabled: this.siteSelected(),
             click: async () => {
               this.openWorkSpaceQuiqrDir()
+            }
+          },
+          {
+            id: 'populate-etale-visuals',
+            label: 'Create Etalage Preview',
+            enabled: this.siteSelected(),
+            click: async () => {
+              global.apiMain.genereateEtalageImages({siteKey:global.currentSiteKey, workspaceKey: global.currentWorkspaceKey},context);
             }
           },
           /*

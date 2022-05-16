@@ -29,8 +29,6 @@ class SiteService{
 
   async mountWorkspace(workspaceKey){
     await this._getSiteSource().mountWorkspace(workspaceKey);
-
-
   }
 
 

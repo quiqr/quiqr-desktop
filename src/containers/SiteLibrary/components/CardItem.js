@@ -1,18 +1,15 @@
 import React from 'react';
 import clsx from 'clsx';
-import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
+//import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-import Collapse from '@material-ui/core/Collapse';
+//import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
+//import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import service              from '../../../services/service';
 
@@ -79,7 +76,6 @@ class CardItem extends React.Component {
 
   render(){
     const { classes } = this.props;
-    let screenshot = '';
 
     return (
       <Card className={classes.root}>

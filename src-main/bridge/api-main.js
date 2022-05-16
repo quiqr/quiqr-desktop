@@ -149,11 +149,13 @@ api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
   */
 }
 
+/*
 api.clearWorkSpaceConfigCache = async function({}, context){
   let workspaceService = new WorkspaceService();
   workspaceService.clearConfigurationsDataCache();
   context.resolve(true);
 }
+*/
 
 api.matchRole = async function({role},context){
 
@@ -465,6 +467,7 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
     if(!workspaceService){ return; }
 
     workspaceService.serve(serveKey).then(()=>{
+
       context.resolve();
     }, ()=>{
       context.reject(err); return
@@ -732,6 +735,25 @@ api.setPublishStatus = async function({status}, context){
   await pogopubl.writePublishStatus(status)
   context.resolve(true);
 }
+
+api.genereateEtalageImages = async function({siteKey, workspaceKey}, context){
+
+  const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
+  workspaceService.genereateEtalageImages();
+  context.resolve(true);
+
+  /*
+  getSiteService(siteKey, function(err, siteService){
+    if(err){ context.reject(err); return; }
+    siteService.genereateEtalageImages().then(()=>{
+      context.resolve();
+    }, ()=>{
+      context.reject(err);
+    });
+  });
+  */
+}
+
 
 api.saveSiteConf = function({siteKey, newConf}, context){
   getSiteService(siteKey, function(err, siteService){

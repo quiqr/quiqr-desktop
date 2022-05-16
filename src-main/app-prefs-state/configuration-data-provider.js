@@ -158,26 +158,28 @@ function get(callback, {invalidateCache} = {}){
 }
 
 function getEtalage(site){
+
+  let etalageDir = path.join(site.source.path,"/quiqr/etalage");
   let etalagePath = path.join(site.source.path,"/quiqr/etalage/etalage.json");
   let etalageScreenshotsPath = path.join(site.source.path,"/quiqr/etalage/screenshots/");
-
+  let etalage = {}
 
   if(fs.existsSync(etalagePath)){
     let strData = fs.readFileSync(etalagePath, {encoding: 'utf-8'});
     let formatProvider = formatProviderResolver.resolveForFilePath(etalagePath);
-    let etalage = formatProvider.parse(strData);
-
-    const screenshotPattern = (etalageScreenshotsPath + '*.{png,jpg,jpeg,gif}').replace(/\\/gi,'/');
-    let files = glob.sync(screenshotPattern)
-      .map((x)=>{
-        let y = path.normalize(x);
-        return y.substr(site.source.path.length, x.length)
-      });
-    etalage.screenshots = files;
-
-    return etalage;
+    etalage = formatProvider.parse(strData);
   }
-  return {};
+
+  const screenshotPattern = (etalageScreenshotsPath + '*.{png,jpg,jpeg,gif}').replace(/\\/gi,'/');
+  let files = glob.sync(screenshotPattern)
+    .map((x)=>{
+      let y = path.normalize(x);
+      return y.substr(site.source.path.length, x.length)
+    });
+  etalage.screenshots = files;
+
+  return etalage;
+
 }
 
 

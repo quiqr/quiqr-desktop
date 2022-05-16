@@ -14,6 +14,7 @@ const pathHelper                      = require('./../../utils/path-helper');
 const { createThumbnailJob, globJob } = require('./../../jobs');
 const HugoBuilder                     = require('./../../hugo/hugo-builder');
 const HugoServer                      = require('./../../hugo/hugo-server');
+const screenshotWindow                = require('./../../ui-managers/screenshot-window-manager');
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
 
@@ -516,6 +517,10 @@ class WorkspaceService{
     });
   }
 
+  async removeImageCacheForPath(){
+
+  }
+
   async removeThumbnailForItemImage(collectionKey, collectionItemKey, targetPath){
     let folder;
     let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
@@ -537,7 +542,6 @@ class WorkspaceService{
 
     let thumbSrcExists = await this.existsPromise(thumbSrc);
     if(thumbSrcExists){
-
       fs.remove(thumbSrc);
     }
   }
@@ -686,9 +690,19 @@ class WorkspaceService{
 
       global.hugoServer = new HugoServer(JSON.parse(JSON.stringify(hugoServerConfig)));
 
-      global.hugoServer.serve(function(err, stdout, stderr){
+      global.hugoServer.serve((err, stdout, stderr)=>{
         if(err) reject(err);
-        else{ resolve(); }
+        else{
+
+          //make screenshot it no screenshots are made already
+          let screenshotDir = path.join(this.workspacePath, 'quiqr', 'etalage', 'screenshots');
+          if (!fs.existsSync(screenshotDir)) {
+            console.log("autocreate screenshots");
+            this.genereateEtalageImages();
+          }
+
+          resolve();
+        }
       });
     });
   }
@@ -719,6 +733,20 @@ class WorkspaceService{
         (err)=>reject(err)
       );
     });
+  }
+
+  async genereateEtalageImages(){
+
+    let thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', 'quiqr', 'etalage', 'screenshots');
+    let thumbSrcExists = await this.existsPromise(thumbSrc);
+    if(thumbSrcExists){
+      fs.remove(thumbSrc);
+    }
+
+    let screenshotDir = path.join(this.workspacePath, 'quiqr', 'etalage', 'screenshots');
+    screenshotWindow.createScreenshot('localhost', 13131, path.join(screenshotDir, 'quiqr-generated.jpg') )
+
+    console.log("favicon")
   }
 }
 
