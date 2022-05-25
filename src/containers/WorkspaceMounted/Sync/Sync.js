@@ -68,7 +68,7 @@ function NotificationPanel(props){
   )
 }
 
-class Publish extends React.Component{
+class Sync extends React.Component{
 
   history: any;
 
@@ -1156,4 +1156,4 @@ class Publish extends React.Component{
   }
 }
 
-export default muiThemeable()(Publish);
+export default muiThemeable()(Sync);

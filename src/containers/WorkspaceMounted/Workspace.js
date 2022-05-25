@@ -2,7 +2,7 @@ import React                               from 'react';
 import { withRouter }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
 import Dashboard                           from './Dashboard'
-import Publish                             from './Publish'
+import Sync                                from './Sync'
 import TopToolbarLeft                      from '../TopToolbarLeft'
 import {TopToolbarRight, ToolbarButton}    from '../TopToolbarRight'
 import Collection                          from './Collection';
@@ -11,10 +11,10 @@ import Single                              from './Single';
 import WorkspaceSidebar                    from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import AppsIcon                            from '@material-ui/icons/Apps';
-import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
+import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
 import TuneIcon                            from '@material-ui/icons/Tune';
 import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
-import PublishIcon                         from '@material-ui/icons/Publish';
+import SyncIcon                         from '@material-ui/icons/Sync';
 import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
 import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 //import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
@@ -200,10 +200,10 @@ class WorkSpace extends React.Component{
       />,
       <ToolbarButton
         action={()=>{
-          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/publish/front`);
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/front`);
         }}
-        title="Publish"
-        icon={<PublishIcon style={{ color: iconColor }} />}
+        title="Sync"
+        icon={<SyncIcon style={{ color: iconColor }} />}
       />,
       <ToolbarButton
         action={()=>{
@@ -276,7 +276,7 @@ class WorkSpace extends React.Component{
     const {history} = this.props;
     return (<Switch>
 
-      <Route path='/sites/:site/workspaces/:workspace/publish' render={ ({match})=> {
+      <Route path='/sites/:site/workspaces/:workspace/sync' render={ ({match})=> {
         return null;
       }} />
 
@@ -309,9 +309,9 @@ class WorkSpace extends React.Component{
       workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }
 
-  renderPublish(match){
+  renderSync(match){
     this.getProfile();
-    return <Publish
+    return <Sync
       key={ match.url }
       quiqrUsername={this.state.quiqrUsername}
       quiqrFingerprint={this.state.quiqrFingerprint}
@@ -329,8 +329,8 @@ class WorkSpace extends React.Component{
         return this.renderDashboard(match);
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace/publish/*'  render={ ({match})=> {
-        return this.renderPublish(match);
+      <Route path='/sites/:site/workspaces/:workspace/sync/*'  render={ ({match})=> {
+        return this.renderSync(match);
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/siteconf/*'  render={ ({match})=> {
