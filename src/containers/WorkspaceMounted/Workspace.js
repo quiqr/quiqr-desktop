@@ -2,7 +2,7 @@ import React                               from 'react';
 import { withRouter }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
 import Dashboard                           from './Dashboard'
-import Sync                                from './Sync'
+//import Sync                                from './Sync'
 import TopToolbarLeft                      from '../TopToolbarLeft'
 import {TopToolbarRight, ToolbarButton}    from '../TopToolbarRight'
 import Collection                          from './Collection';
@@ -10,6 +10,7 @@ import CollectionItem                      from './Collection/CollectionItem';
 import Single                              from './Single';
 import WorkspaceSidebar                    from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
+import { SyncSidebar, SyncRouted }         from './Sync';
 import AppsIcon                            from '@material-ui/icons/Apps';
 import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
 import TuneIcon                            from '@material-ui/icons/Tune';
@@ -273,11 +274,21 @@ class WorkSpace extends React.Component{
   }
 
   renderMenuSwitch(){
-    const {history} = this.props;
+    const {history, site} = this.props;
     return (<Switch>
 
       <Route path='/sites/:site/workspaces/:workspace/sync' render={ ({match})=> {
-        return null;
+        return (<SyncSidebar
+          menus={[]}
+          site={ this.state.site }
+          workspace={ this.state.workspace }
+          siteKey={ decodeURIComponent(match.params.site) }
+          workspaceKey={ decodeURIComponent(match.params.workspace) }
+          hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
+          menuIsLocked={this.state.menuIsLocked}
+          onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
+          onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
+        />);
       }} />
 
       <Route path='/sites/:site/workspaces/:workspace/siteconf' render={ ({match})=> {
@@ -311,7 +322,7 @@ class WorkSpace extends React.Component{
 
   renderSync(match){
     this.getProfile();
-    return <Sync
+    return <SyncRouted
       key={ match.url }
       quiqrUsername={this.state.quiqrUsername}
       quiqrFingerprint={this.state.quiqrFingerprint}
