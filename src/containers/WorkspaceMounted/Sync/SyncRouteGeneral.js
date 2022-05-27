@@ -52,16 +52,8 @@ class SyncRouteGeneral extends React.Component {
 
     if(this.state.addRefresh !== this.props.addRefresh) {
 
-      this.setState({
-        addRefresh: this.props.addRefresh,
-        serverDialog: {
-          open:true,
-          modAction: "Add",
-          serverTitle: "Sync Server",
-          closeText: "Close"
-        }
-      })
-    }
+      this.openAddServerDialog();
+     }
 
     if(preProps.site !== this.props.site) {
       this.initState();
@@ -70,6 +62,20 @@ class SyncRouteGeneral extends React.Component {
 
   componentDidMount(){
     this.initState();
+  }
+
+  openAddServerDialog(){
+     this.setState({
+        addRefresh: this.props.addRefresh,
+        serverDialog: {
+          open:true,
+          modAction: "Add",
+          serverTitle: "Sync Server",
+          closeText: "Close"
+        }
+      })
+
+
   }
 
   initState(){
@@ -159,7 +165,9 @@ class SyncRouteGeneral extends React.Component {
       content = (
 
         <div><p>No sync server is configured. Add one first.</p>
-        <Button color="primary" variant="contained">add sync server</Button>
+          <Button onClick={()=>{
+            this.openAddServerDialog();
+          }} color="primary" variant="contained">add sync server</Button>
         </div>
     )
     }
