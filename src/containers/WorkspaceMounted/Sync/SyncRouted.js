@@ -1,31 +1,31 @@
 import * as React        from 'react';
 import { Switch, Route } from 'react-router-dom';
 import  SyncRouteGeneral  from './SyncRouteGeneral';
-import  SyncRouteModel    from './SyncRouteModel';
 
 export class SyncRouted extends React.Component {
-
-
   render(){
     return (
     <Switch>
 
-      <Route path='/sites/:site/workspaces/:workspace/siteconf' exact render={ ({match})=> {
+
+      <Route path='/sites/:site/workspaces/:workspace/sync/add/:refresh' exact render={ ({match})=> {
         return <SyncRouteGeneral
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          {...this.props}
+          addRefresh={ decodeURIComponent(match.params.refresh) }
+          />
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/general' exact render={ ({match})=> {
+      <Route path='/sites/:site/workspaces/:workspace/sync/list/:syncConfKey' exact render={ ({match})=> {
         return <SyncRouteGeneral
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          {...this.props}
+          syncConfKey={ decodeURIComponent(match.params.syncConfKey) }
+          />
       }} />
 
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/model' exact render={ ({match})=> {
-        return <SyncRouteModel
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      <Route path='/sites/:site/workspaces/:workspace/sync/' exact render={ ({match})=> {
+        return <SyncRouteGeneral
+          {...this.props}
+          />
       }} />
 
     </Switch>

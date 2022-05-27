@@ -1,9 +1,11 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
+import Divider          from '@material-ui/core/Divider';
 import List          from '@material-ui/core/List';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem      from '@material-ui/core/ListItem';
+import ListItemIcon  from '@material-ui/core/ListItemIcon';
 import ListItemText  from '@material-ui/core/ListItemText';
 import Box           from '@material-ui/core/Box';
 import Collapse      from '@material-ui/core/Collapse';
@@ -27,12 +29,21 @@ class Sidebar extends React.Component{
   }
 
   renderFlatItem(item, index){
+    let icon = null;
+    if(item.icon){
+      icon = (
+          <ListItemIcon>
+            {item.icon}
+          </ListItemIcon>
+      )
+    }
     return (
       <ListItem
         key={index}
         selected={item.selected}
         onClick={ item.onClick }
         button >
+        {icon}
         <ListItemText primary={item.label} />
       </ListItem>
     )
@@ -106,7 +117,13 @@ class Sidebar extends React.Component{
                 </ListSubheader>
               }>
               { menu.items.map((item, index)=>{
-                if(item.childItems){
+                if(item.spacer){
+                  return <Box py={3}/>
+                }
+                if(item.divider){
+                  return <Divider />
+                }
+                else if(item.childItems){
                   return this.renderNetstedItems(item, index)
                 }
                 else{

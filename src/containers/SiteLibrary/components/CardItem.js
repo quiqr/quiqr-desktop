@@ -101,7 +101,10 @@ class CardItem extends React.Component {
       siteAvatar = <Avatar aria-label="recipe" className={classes.avatar} src={this.state.favicon} />
     }
     return (
-      <Card className={classes.root}>
+      <Card 
+
+      elevation={5}
+        className={classes.root}>
         <CardHeader
           avatar={
             siteAvatar

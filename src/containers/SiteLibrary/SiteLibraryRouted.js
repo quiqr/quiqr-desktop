@@ -4,10 +4,10 @@ import { Switch, Route }       from 'react-router-dom'
 import Box                     from '@material-ui/core/Box';
 import List                    from '@material-ui/core/List';
 import ListSubheader           from '@material-ui/core/ListSubheader';
-import IconButton              from '@material-ui/core/IconButton';
-import Menu                    from '@material-ui/core/Menu';
 import Grid                    from '@material-ui/core/Grid';
+import Menu                    from '@material-ui/core/Menu';
 import MenuItem                from '@material-ui/core/MenuItem';
+import IconButton              from '@material-ui/core/IconButton';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
 import CreateSiteDialog        from './components/CreateSiteDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';

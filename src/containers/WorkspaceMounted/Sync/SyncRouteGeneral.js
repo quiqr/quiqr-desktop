@@ -1,9 +1,17 @@
-import React          from 'react';
-import service        from './../../../services/service';
-import Typography     from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
-import TextField      from '@material-ui/core/TextField';
-//import Button         from '@material-ui/core/Button';
+import React            from 'react';
+import service          from './../../../services/service';
+import Typography       from '@material-ui/core/Typography';
+import { withStyles }   from '@material-ui/core/styles';
+import TextField        from '@material-ui/core/TextField';
+import MainPublishCard  from './components/MainPublishCard';
+import SyncServerDialog from './components/SyncServerDialog';
+import LogoQuiqrCloud   from './components/LogoQuiqrCloud';
+import IconButton       from '@material-ui/core/IconButton';
+import MoreVertIcon     from '@material-ui/icons/MoreVert';
+import Menu             from '@material-ui/core/Menu';
+import MenuItem         from '@material-ui/core/MenuItem';
+import Button           from '@material-ui/core/Button';
+
 
 const useStyles = theme => ({
 
@@ -32,146 +40,158 @@ class SyncRouteGeneral extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      siteconf : {},
-      source : {},
-      publish : {},
-      parseInfo : {},
-      quiqrCloud : {}
+      site : {
+        publish: []
+      },
+      serverDialog: {},
+
     };
   }
 
-  componentDidUpdate(preProps: HomeProps){
-    if(this._ismounted && preProps.siteKey !== this.props.siteKey){
-      this.checkSiteInProps();
+  componentDidUpdate(preProps){
+
+    if(this.state.addRefresh !== this.props.addRefresh) {
+
+      this.setState({
+        addRefresh: this.props.addRefresh,
+        serverDialog: {
+          open:true,
+          modAction: "Add",
+          serverTitle: "Sync Server",
+          closeText: "Close"
+        }
+      })
+    }
+
+    if(preProps.site !== this.props.site) {
+      this.initState();
     }
   }
 
   componentDidMount(){
-    this.checkSiteInProps();
-    this._ismounted = true;
+    this.initState();
   }
 
-  checkSiteInProps(){
+  initState(){
 
-    var { siteKey, workspaceKey } = this.props;
-
-    this.setState({
-      siteKey: this.props.siteKey
-    })
-
-    service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      var stateUpdate  = {};
-      stateUpdate.siteconf = bundle.site;
-
-
-      if(bundle.site.source){
-        this.setState({source: bundle.site.source});
-      }
-      if(bundle.site.publish){
-        this.setState({publish: bundle.site.publish});
-
-        if(bundle.site.publish[0]
-          && bundle.site.publish[0].config
-          && bundle.site.publish[0].config.type === "quiqr"){
-          this.setState({quiqrCloud: bundle.site.publish[0].config});
-        }
-      }
-
-      this.setState(stateUpdate);
-    })
+    if(this.props.site){
+      this.setState({
+        site: this.props.site
+      });
+    }
+  }
+  closeServerDialog(){
   }
 
-  handleFolderSelected(folder){
-  }
+  renderMainCard(publishConf){
 
-  componentWillUnmount(){
-    service.unregisterListener(this);
+    return <MainPublishCard
+    publishPath={publishConf.config.path}
+    liveURL={"https://"+publishConf.config.defaultDomain}
+    serviceLogo={<LogoQuiqrCloud />}
+    onPublish={()=>{
+      service.api.logToConsole(publishConf, "pupConf");
+    }}
+    itemMenu={
+      <div>
+      <IconButton
+      onClick={(event)=>{
+        this.setState({anchorEl:event.currentTarget, menuOpen:publishConf.key})
+      }}
+      aria-label="more"
+      aria-controls="long-menu"
+      aria-haspopup="true"
+      >
+        <MoreVertIcon />
+      </IconButton>
+
+      <Menu
+        anchorEl={this.state.anchorEl}
+        open={(this.state.menuOpen===publishConf.key?true:false)}
+        keepMounted
+        onClose={()=>{
+          this.setState({menuOpen:null});
+
+        }}
+      >
+        <MenuItem key="edit"
+          onClick={
+            ()=>{
+              this.setState({
+                menuOpen:null,
+                serverDialog: {
+                  open:true,
+                  modAction: "Edit",
+                  serverTitle: "Quiqr Cloud Server",
+                  closeText: "Close"
+                }
+              })
+            }
+          }
+        >
+          Edit
+        </MenuItem>
+
+        <MenuItem key="delete"
+          onClick={
+            ()=>{
+              this.setState({
+                menuOpen:null,
+              })
+            }
+          }>
+          Delete
+        </MenuItem>
+      </Menu>
+      </div>
+    }
+
+      />
   }
 
   render(){
     const { classes } = this.props;
+    const { site, serverDialog } = this.state;
+    let content = null;
+
+    if(site.publish.length < 1){
+      //no target setup yet
+      content = (
+
+        <div><p>No sync server is configured. Add one first.</p>
+        <Button color="primary" variant="contained">add sync server</Button>
+        </div>
+    )
+    }
+    else if(site.publish.length === 1){
+      //show first target
+      content = this.renderMainCard(site.publish[0])
+    }
+    else{
+      //get last used target of syncConfKey
+    }
+
     return (
-      <div className={ this.props.classes.container }>
-        <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
-        <Typography variant="h5">General Configuration</Typography>
+      <React.Fragment>
+        <div className={ this.props.classes.container }>
+          <Typography variant="h5">Sync Website - {this.state.site.name}</Typography>
+          <span>{this.props.syncConfKey}</span>
 
-        <div className={classes.root}>
-
-          <TextField
-            id="standard-full-width"
-            label="Site key"
-            style={{ margin: 8 }}
-            value={this.state.siteconf.key}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
-
-          <TextField
-            id="standard-full-width"
-            label="Site Name"
-            style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.siteconf.name}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
-
-          <TextField
-            id="standard-full-width"
-            label="Source Directory"
-            style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.source.path}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
-
-          <TextField
-            id="standard-full-width"
-            label="Quiqr Cloud Path"
-            style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.quiqrCloud.path}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
-
-          <TextField
-            id="standard-full-width"
-            label="Quiqr Cloud Path"
-            style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.quiqrCloud.defaultDomain}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
+          {content}
 
         </div>
 
-        {/*
-        <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleNewSiteClick}>
-          Save Configuration
-        </Button>
-        */}
+        <SyncServerDialog
+          {...serverDialog}
+          onClose={()=>{
+            this.setState({serverDialog: {
+              open:false
+            }})
+          }}
 
+        />
 
-
-      </div>
+      </React.Fragment>
     );
   }
 }

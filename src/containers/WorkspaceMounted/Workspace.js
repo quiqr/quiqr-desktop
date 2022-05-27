@@ -201,7 +201,7 @@ class WorkSpace extends React.Component{
       />,
       <ToolbarButton
         action={()=>{
-          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/front`);
+          service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`);
         }}
         title="Sync"
         icon={<SyncIcon style={{ color: iconColor }} />}
@@ -324,6 +324,8 @@ class WorkSpace extends React.Component{
     this.getProfile();
     return <SyncRouted
       key={ match.url }
+      site={ this.state.site }
+      workspace={ this.state.workspace }
       quiqrUsername={this.state.quiqrUsername}
       quiqrFingerprint={this.state.quiqrFingerprint}
       siteKey={ decodeURIComponent(match.params.site) }
