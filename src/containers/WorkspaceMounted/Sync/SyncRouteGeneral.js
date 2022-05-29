@@ -3,7 +3,6 @@ import { Route }        from 'react-router-dom';
 import service          from './../../../services/service';
 import Typography       from '@material-ui/core/Typography';
 import { withStyles }   from '@material-ui/core/styles';
-import TextField        from '@material-ui/core/TextField';
 import MainPublishCard  from './components/MainPublishCard';
 import SyncServerDialog from './components/SyncServerDialog';
 import LogoQuiqrCloud   from './components/quiqr-cloud/LogoQuiqrCloud';
@@ -84,7 +83,29 @@ class SyncRouteGeneral extends React.Component {
       });
     }
   }
-  closeServerDialog(){
+
+  savePublishData(key,data){
+    let site= this.state.site;
+    let encodedSiteKey = this.props.siteKey;
+    let encodedWorkspaceKey = this.props.workspaceKey;
+
+    if(!key){
+      key = `publ-${Math.random()}`;
+    }
+
+    const publConfIndex = site.publish.findIndex( ({ k }) => k === key );
+    if(publConfIndex !== -1){
+      site.publish[publConfIndex] = {key:key, config: data};
+    }
+    else{
+      site.publish.push({key:key, config: data});
+    }
+
+    service.api.saveSiteConf(this.state.site.key, this.state.site).then(()=>{
+      let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
+      this.history.push(`${basePath}/list/${key}`)
+    });
+
   }
 
   renderMainCard(publishConf){
@@ -154,7 +175,6 @@ class SyncRouteGeneral extends React.Component {
   }
 
   render(){
-    const { classes } = this.props;
     const { site, serverDialog } = this.state;
     let encodedSiteKey = this.props.siteKey;
     let encodedWorkspaceKey = this.props.workspaceKey;
@@ -169,7 +189,6 @@ class SyncRouteGeneral extends React.Component {
           <Button onClick={()=>{
             let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
             this.history.push(`${basePath}/add/x${Math.random()}`)
-            //this.openAddServerDialog();
           }} color="primary" variant="contained">add sync server</Button>
         </div>
     )
@@ -199,6 +218,13 @@ class SyncRouteGeneral extends React.Component {
 
             <SyncServerDialog
               {...serverDialog}
+              onSave={(publishKey,publishConfig)=>{
+                this.savePublishData(publishKey,publishConfig);
+                this.setState({serverDialog: {
+                  open:false
+                }})
+
+              }}
               onClose={()=>{
                 this.setState({serverDialog: {
                   open:false

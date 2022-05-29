@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Route }  from 'react-router-dom';
 import Sidebar    from './../../Sidebar';
-import service    from './../../../services/service';
+//import service    from './../../../services/service';
 import AddIcon from '@material-ui/icons/Add';
 import IconQuiqr from './components/quiqr-cloud/IconQuiqr';
+import IconGitHub from './components/github-pages/IconGitHub';
 
 export class SyncSidebar extends React.Component {
 
@@ -55,19 +56,22 @@ export class SyncSidebar extends React.Component {
         label = publ.config.path;
         icon = <IconQuiqr/>
       }
-      else{
-        label = "someconf"
+      else if(publ.config && publ.config.type === "github" ){
+        label = publ.config.username+"/"+publ.config.repository;
+        icon = <IconGitHub/>
       }
-      targets.push({
-        active: true,
-        icon: icon,
-        label: label,
-        selected: (this.state.selectedMenuItem==='general' ? true : false),
-        onClick: ()=>{
-          this.setState({selectedMenuItem:'general'});
-          history.push(`${basePath}/list/${publ.key}/`)
-        }
-      });
+      if(label){
+        targets.push({
+          active: true,
+          icon: icon,
+          label: label,
+          selected: (this.state.selectedMenuItem===publ.key ? true : false),
+          onClick: ()=>{
+            this.setState({selectedMenuItem:publ.key});
+            history.push(`${basePath}/list/${publ.key}/`)
+          }
+        });
+      }
     })
 
     let menus = [{
@@ -79,9 +83,6 @@ export class SyncSidebar extends React.Component {
         items: [
           {
             spacer: true,
-          },
-          {
-            divider: true,
           },
           {
             icon: <AddIcon />,

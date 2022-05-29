@@ -1,22 +1,15 @@
 import * as React          from 'react';
-import service             from '../../../../../services/service';
+//import service             from '../../../../../services/service';
 import TextField           from '@material-ui/core/TextField';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
 import Box                 from '@material-ui/core/Box';
-import Grid                from '@material-ui/core/Grid';
-import Paper               from '@material-ui/core/Paper';
-import Typography          from '@material-ui/core/Typography';
-import DialogTitle         from '@material-ui/core/DialogTitle';
-import CardLogoGitHubPages from './CardLogoGitHubPages'
-import FormLogoGitHubPages from './FormLogoGitHubPages'
 import clsx                from 'clsx';
 import OutlinedInput       from '@material-ui/core/OutlinedInput';
 import InputLabel          from '@material-ui/core/InputLabel';
 import InputAdornment      from '@material-ui/core/InputAdornment';
 import Switch              from '@material-ui/core/Switch';
 import FormControlLabel    from '@material-ui/core/FormControlLabel';
-import FormHelperText      from '@material-ui/core/FormHelperText';
 import FormControl         from '@material-ui/core/FormControl';
 import Visibility          from '@material-ui/icons/Visibility';
 import VisibilityOff       from '@material-ui/icons/VisibilityOff';
@@ -72,7 +65,7 @@ class GitHubPagesForm extends React.Component{
   updatePubData(newData){
     let pubData = {...this.state.pubData, ...newData};
     this.setState({pubData: pubData}, this.props.setData(pubData));
-    if(pubData.username != '' && pubData.repository !='' && pubData.branch != ''){
+    if(pubData.username !== '' && pubData.repository !=='' && pubData.branch !== ''){
       this.props.setSaveEnabled(true);
     }
     else{
@@ -81,7 +74,7 @@ class GitHubPagesForm extends React.Component{
   }
 
   render(){
-    let { classes, modAction } = this.props;
+    let { classes } = this.props;
 
     return (
       <React.Fragment>

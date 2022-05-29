@@ -274,7 +274,7 @@ class WorkSpace extends React.Component{
   }
 
   renderMenuSwitch(){
-    const {history, site} = this.props;
+    const {history} = this.props;
     return (<Switch>
 
       <Route path='/sites/:site/workspaces/:workspace/sync' render={ ({match})=> {
