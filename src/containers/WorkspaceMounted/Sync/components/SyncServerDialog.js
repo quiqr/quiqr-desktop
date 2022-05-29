@@ -14,6 +14,7 @@ import DialogContentText   from '@material-ui/core/DialogContentText';
 import CardLogoGitHubPages from './github-pages/CardLogoGitHubPages'
 import FormLogoGitHubPages from './github-pages/FormLogoGitHubPages'
 import GitHubPagesForm     from './github-pages/GitHubPagesForm'
+import QuiqrCloudForm      from './quiqr-cloud/QuiqrCloudForm'
 import CardLogoQuiqrCloud  from './quiqr-cloud/CardLogoQuiqrCloud'
 import FormLogoQuiqrCloud  from './quiqr-cloud/FormLogoQuiqrCloud'
 
@@ -114,18 +115,15 @@ class SyncServerDialog extends React.Component{
       if(this.state.serverType === 'quiqr'){
         serverTitle = "Quiqr Cloud Server";
         serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
-        content = (
-          <div>
-            <TextField
-              id="username-organization"
-              label="Username / Organization"
-              defaultValue=""
-              helperText="GitHub username or organization containing the target repository"
-              variant="outlined"
-            />
-          </div>
-
-        )
+        content = <QuiqrCloudForm
+            publishConf={this.props.publishConf}
+            modAction={this.props.modAction}
+            setSaveEnabled={(enabled)=>{
+              this.setState({saveEnabled:enabled});
+            }}
+            setData={(pubData)=>{
+              this.setState({pubData:pubData});
+            }} />
       }
       else if (this.state.serverType === 'github'){
         serverTitle = "GitHub Pages Server";
