@@ -3,7 +3,7 @@ import { Route }  from 'react-router-dom';
 import Sidebar    from './../../Sidebar';
 import service    from './../../../services/service';
 import AddIcon from '@material-ui/icons/Add';
-import IconQuiqr from './components/IconQuiqr';
+import IconQuiqr from './components/quiqr-cloud/IconQuiqr';
 
 export class SyncSidebar extends React.Component {
 

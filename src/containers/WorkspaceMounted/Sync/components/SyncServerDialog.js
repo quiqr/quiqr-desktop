@@ -1,22 +1,23 @@
-import * as React           from 'react';
-import service              from '../../../../services/service';
-import TextField            from '@material-ui/core/TextField';
-import { withStyles }       from '@material-ui/core/styles';
-import Button               from '@material-ui/core/Button';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import Box                  from '@material-ui/core/Box';
-import Grid                  from '@material-ui/core/Grid';
-import Paper                  from '@material-ui/core/Paper';
-import Typography                  from '@material-ui/core/Typography';
-import Dialog               from '@material-ui/core/Dialog';
-import DialogActions        from '@material-ui/core/DialogActions';
-import DialogContent        from '@material-ui/core/DialogContent';
-import DialogContentText    from '@material-ui/core/DialogContentText';
-import DialogTitle          from '@material-ui/core/DialogTitle';
-import CardLogoGitHubPages  from './CardLogoGitHubPages'
-import CardLogoQuiqrCloud   from './CardLogoQuiqrCloud'
-import FormLogoGitHubPages  from './FormLogoGitHubPages'
-import FormLogoQuiqrCloud   from './FormLogoQuiqrCloud'
+import * as React          from 'react';
+import service             from '../../../../services/service';
+import TextField           from '@material-ui/core/TextField';
+import { withStyles }      from '@material-ui/core/styles';
+import Button              from '@material-ui/core/Button';
+import MuiDialogTitle      from '@material-ui/core/DialogTitle';
+import Box                 from '@material-ui/core/Box';
+import Grid                from '@material-ui/core/Grid';
+import Paper               from '@material-ui/core/Paper';
+import Typography          from '@material-ui/core/Typography';
+import Dialog              from '@material-ui/core/Dialog';
+import DialogActions       from '@material-ui/core/DialogActions';
+import DialogContent       from '@material-ui/core/DialogContent';
+import DialogContentText   from '@material-ui/core/DialogContentText';
+import DialogTitle         from '@material-ui/core/DialogTitle';
+import CardLogoGitHubPages from './github-pages/CardLogoGitHubPages'
+import FormLogoGitHubPages from './github-pages/FormLogoGitHubPages'
+import GitHubPagesForm     from './github-pages/GitHubPagesForm'
+import CardLogoQuiqrCloud  from './quiqr-cloud/CardLogoQuiqrCloud'
+import FormLogoQuiqrCloud  from './quiqr-cloud/FormLogoQuiqrCloud'
 
 const useStyles = theme => ({
 
@@ -28,6 +29,10 @@ const useStyles = theme => ({
     position: 'absolute',
     right: theme.spacing(3),
     top: theme.spacing(3),
+  },
+
+  textfield: {
+    margin: theme.spacing(1),
   },
 
   paper: {
@@ -47,6 +52,8 @@ class SyncServerDialog extends React.Component{
 
     this.state = {
       serverType: null,
+      saveEnabled: false,
+      pubData: {},
       dialogSize: "sm",
     }
   }
@@ -60,8 +67,8 @@ class SyncServerDialog extends React.Component{
           <Grid item xs={6}>
             <Paper
               onClick={()=>{
-                this.setState({serverType: 'github-pages',
-
+                this.setState({
+                  serverType: 'github-pages',
                   dialogSize: "md",
                 })
               }}
@@ -92,9 +99,12 @@ class SyncServerDialog extends React.Component{
   render(){
     let { open, classes, modAction, serverTitle, closeText } = this.props;
     let content, serverFormLogo = null;
+    let saveButtonHidden = true;
 
     if(this.state.serverType){
       if(this.state.serverType === 'quiqr-cloud'){
+        serverTitle = "Quiqr Cloud Server";
+        serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
         content = (
           <div>
             <TextField
@@ -107,40 +117,19 @@ class SyncServerDialog extends React.Component{
           </div>
 
         )
-        serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
-
       }
       else if (this.state.serverType === 'github-pages'){
-        content = (
-          <React.Fragment>
-            <Box my={2}>
-              <TextField
-                id="username-organization"
-                label="Username / Organization"
-                defaultValue=""
-                helperText="GitHub username or organization containing the target repository"
-                variant="outlined"
-              />
-            </Box>
-            <Box my={2}>
-              <TextField
-                id="repository"
-                label="Repository"
-                defaultValue=""
-                helperText="Target Repository"
-                variant="outlined"
-              />
-              <TextField
-                id="branch"
-                label="Branch"
-                defaultValue=""
-                helperText="Target Branch"
-                variant="outlined"
-              />
-            </Box>
-          </React.Fragment>
-        )
+        serverTitle = "GitHub Pages Server";
         serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
+          content = <GitHubPagesForm 
+            modAction={this.props.modAction} 
+            setSaveEnabled={(enabled)=>{
+              this.setState({saveEnabled:enabled});
+            }}
+            setData={(pubData)=>{
+              this.setState({pubData:pubData});
+          }} />
+        saveButtonHidden = false;
       }
 
     }
@@ -152,6 +141,14 @@ class SyncServerDialog extends React.Component{
       <Button color="primary" onClick={this.props.onClose}>
         {closeText}
       </Button>,
+      (saveButtonHidden?null:
+        <Button color="primary" hidden={saveButtonHidden} disabled={!this.state.saveEnabled} onClick={()=>{
+
+          service.api.logToConsole(this.state.pubData, "newPubData");
+
+          }}>
+          {"save"}
+        </Button>),
     ];
 
     return (
@@ -166,9 +163,6 @@ class SyncServerDialog extends React.Component{
           <Typography variant="h6">{modAction + " " + serverTitle}</Typography>
           {serverFormLogo}
         </MuiDialogTitle>
-
-
-
 
         <DialogContent>
           {content}

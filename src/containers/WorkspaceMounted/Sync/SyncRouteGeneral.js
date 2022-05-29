@@ -1,11 +1,12 @@
 import React            from 'react';
+import { Route }        from 'react-router-dom';
 import service          from './../../../services/service';
 import Typography       from '@material-ui/core/Typography';
 import { withStyles }   from '@material-ui/core/styles';
 import TextField        from '@material-ui/core/TextField';
 import MainPublishCard  from './components/MainPublishCard';
 import SyncServerDialog from './components/SyncServerDialog';
-import LogoQuiqrCloud   from './components/LogoQuiqrCloud';
+import LogoQuiqrCloud   from './components/quiqr-cloud/LogoQuiqrCloud';
 import IconButton       from '@material-ui/core/IconButton';
 import MoreVertIcon     from '@material-ui/icons/MoreVert';
 import Menu             from '@material-ui/core/Menu';
@@ -51,7 +52,6 @@ class SyncRouteGeneral extends React.Component {
   componentDidUpdate(preProps){
 
     if(this.state.addRefresh !== this.props.addRefresh) {
-
       this.openAddServerDialog();
      }
 
@@ -71,11 +71,9 @@ class SyncRouteGeneral extends React.Component {
           open:true,
           modAction: "Add",
           serverTitle: "Sync Server",
-          closeText: "Close"
+          closeText: "Cancel"
         }
       })
-
-
   }
 
   initState(){
@@ -158,6 +156,9 @@ class SyncRouteGeneral extends React.Component {
   render(){
     const { classes } = this.props;
     const { site, serverDialog } = this.state;
+    let encodedSiteKey = this.props.siteKey;
+    let encodedWorkspaceKey = this.props.workspaceKey;
+
     let content = null;
 
     if(site.publish.length < 1){
@@ -166,7 +167,9 @@ class SyncRouteGeneral extends React.Component {
 
         <div><p>No sync server is configured. Add one first.</p>
           <Button onClick={()=>{
-            this.openAddServerDialog();
+            let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
+            this.history.push(`${basePath}/add/x${Math.random()}`)
+            //this.openAddServerDialog();
           }} color="primary" variant="contained">add sync server</Button>
         </div>
     )
@@ -180,26 +183,33 @@ class SyncRouteGeneral extends React.Component {
     }
 
     return (
-      <React.Fragment>
-        <div className={ this.props.classes.container }>
-          <Typography variant="h5">Sync Website - {this.state.site.name}</Typography>
-          <span>{this.props.syncConfKey}</span>
+      <Route render={({history})=>{
 
-          {content}
+        this.history = history;
+        return (
 
-        </div>
+          <React.Fragment>
+            <div className={ this.props.classes.container }>
+              <Typography variant="h5">Sync Website - {this.state.site.name}</Typography>
+              <span>{this.props.syncConfKey}</span>
 
-        <SyncServerDialog
-          {...serverDialog}
-          onClose={()=>{
-            this.setState({serverDialog: {
-              open:false
-            }})
-          }}
+              {content}
 
-        />
+            </div>
 
-      </React.Fragment>
+            <SyncServerDialog
+              {...serverDialog}
+              onClose={()=>{
+                this.setState({serverDialog: {
+                  open:false
+                }})
+              }}
+
+            />
+
+          </React.Fragment>
+        )
+      }}/>
     );
   }
 }
