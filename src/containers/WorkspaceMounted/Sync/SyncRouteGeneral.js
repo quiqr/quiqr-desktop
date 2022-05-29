@@ -18,7 +18,6 @@ import DialogTitle         from '@material-ui/core/DialogTitle';
 import DialogContent       from '@material-ui/core/DialogContent';
 import DialogContentText   from '@material-ui/core/DialogContentText';
 
-
 const useStyles = theme => ({
 
   container:{
@@ -126,21 +125,25 @@ class SyncRouteGeneral extends React.Component {
 
   renderMainCard(publishConf){
 
-    let serviceLogo;
+    let serviceLogo, title, liveUrl;
 
     if(publishConf.config.type === 'quiqr'){
       serviceLogo = <FormLogoQuiqrCloud />
+      title = publishConf.config.path;
+      liveUrl="https://"+publishConf.config.defaultDomain;
     }
     else if(publishConf.config.type === 'github'){
       serviceLogo = <FormLogoGitHubPages />
+      title = publishConf.config.username +"/" + publishConf.config.repository;
+      liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
     }
 
     return <MainPublishCard
-      publishPath={publishConf.config.path}
-      liveURL={"https://"+publishConf.config.defaultDomain}
+      title={title}
+      liveURL={liveUrl}
       serviceLogo={serviceLogo}
       onPublish={()=>{
-        service.api.logToConsole(publishConf, "pupConf");
+        //service.api.logToConsole(publishConf, "pupConf");
       }}
       itemMenu={
         <div>
@@ -173,13 +176,14 @@ class SyncRouteGeneral extends React.Component {
                       open:true,
                       modAction: "Edit",
                       serverTitle: "Quiqr Cloud Server",
-                      closeText: "Close"
+                      closeText: "Cancel",
+                      publishConf: publishConf
                     }
                   })
                 }
               }
             >
-              Edit
+              Edit Configuration
             </MenuItem>
 
             <MenuItem key="delete"
@@ -192,7 +196,7 @@ class SyncRouteGeneral extends React.Component {
                   })
                 }
               }>
-              Delete
+              Delete Configuration
             </MenuItem>
           </Menu>
         </div>
@@ -222,7 +226,7 @@ class SyncRouteGeneral extends React.Component {
     else{
       if(this.props.syncConfKey){
         const publConf = site.publish.find( ({ key }) => key === this.props.syncConfKey );
-        service.api.logToConsole(publConf, "selected PUb conf")
+        //service.api.logToConsole(publConf, "selected PUb conf")
         if(publConf){
           content = this.renderMainCard(publConf);
         }
@@ -249,8 +253,8 @@ class SyncRouteGeneral extends React.Component {
 
             <SyncServerDialog
               {...serverDialog}
-              onSave={(publishKey,publishConfig)=>{
-                this.savePublishData(publishKey,publishConfig);
+              onSave={(publishKey, publishConfig)=>{
+                this.savePublishData(publishKey, publishConfig);
                 this.setState({serverDialog: {
                   open:false
                 }})

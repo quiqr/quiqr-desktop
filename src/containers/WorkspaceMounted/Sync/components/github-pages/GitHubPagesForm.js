@@ -62,6 +62,13 @@ class GitHubPagesForm extends React.Component{
       }
     }
   }
+
+  componentDidMount(){
+    if(this.props.publishConf){
+      this.setState({pubData: this.props.publishConf.config});
+    }
+  }
+
   updatePubData(newData){
     let pubData = {...this.state.pubData, ...newData};
     this.setState({pubData: pubData}, this.props.setData(pubData));

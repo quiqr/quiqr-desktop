@@ -46,7 +46,7 @@ class MainPublishCard extends React.Component {
           action={
             this.props.itemMenu
           }
-          title={<div >{this.props.publishPath}<br/><Button color="primary" onClick={()=>{
+          title={<div >{this.props.title}<br/><Button color="primary" onClick={()=>{
             window.require('electron').shell.openExternal(this.props.liveURL);
           }}>{this.props.liveURL}</Button></div>}
           subheader=""

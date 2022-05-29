@@ -56,6 +56,17 @@ class SyncServerDialog extends React.Component{
     }
   }
 
+  componentDidUpdate(preProps){
+    if(this.props.publishConf && preProps.publishConf !== this.props.publishConf) {
+      service.api.logToConsole(this.props.publishConf);
+      this.setState({
+        serverType: this.props.publishConf.config.type,
+        publishKey: this.props.publishConf.key,
+        dialogSize: "md",
+      });
+    }
+  }
+
   renderServerCards(){
     const {classes} = this.props;
     return (
@@ -66,7 +77,7 @@ class SyncServerDialog extends React.Component{
             <Paper
               onClick={()=>{
                 this.setState({
-                  serverType: 'github-pages',
+                  serverType: 'github',
                   dialogSize: "md",
                 })
               }}
@@ -79,7 +90,7 @@ class SyncServerDialog extends React.Component{
           <Grid item xs={6}>
             <Paper
               onClick={()=>{
-                this.setState({serverType: 'quiqr-cloud',
+                this.setState({serverType: 'quiqr',
                   dialogSize: "md",
                 })
               }}
@@ -100,7 +111,7 @@ class SyncServerDialog extends React.Component{
     let saveButtonHidden = true;
 
     if(this.state.serverType){
-      if(this.state.serverType === 'quiqr-cloud'){
+      if(this.state.serverType === 'quiqr'){
         serverTitle = "Quiqr Cloud Server";
         serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
         content = (
@@ -116,10 +127,11 @@ class SyncServerDialog extends React.Component{
 
         )
       }
-      else if (this.state.serverType === 'github-pages'){
+      else if (this.state.serverType === 'github'){
         serverTitle = "GitHub Pages Server";
         serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
           content = <GitHubPagesForm
+            publishConf={this.props.publishConf}
             modAction={this.props.modAction}
             setSaveEnabled={(enabled)=>{
               this.setState({saveEnabled:enabled});
@@ -141,8 +153,7 @@ class SyncServerDialog extends React.Component{
       </Button>,
       (saveButtonHidden?null:
         <Button color="primary" hidden={saveButtonHidden} disabled={!this.state.saveEnabled} onClick={()=>{
-          service.api.logToConsole(this.state.pubData, "newPubData");
-          this.props.onSave(null, this.state.pubData);
+          this.props.onSave(this.state.publishKey, this.state.pubData);
           }}>
           {"save"}
         </Button>),
