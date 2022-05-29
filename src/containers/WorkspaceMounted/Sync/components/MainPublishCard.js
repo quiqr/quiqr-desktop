@@ -18,7 +18,9 @@ const useStyles = theme => ({
     backgroundColor: '#ccc',
     justifyContent: 'center',
     height: 100,
-    padding: 30
+    padding: 30,
+    '&> svg': {
+    }
   },
   media: {
   },

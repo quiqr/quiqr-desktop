@@ -1,16 +1,22 @@
-import React            from 'react';
-import { Route }        from 'react-router-dom';
-import service          from './../../../services/service';
-import Typography       from '@material-ui/core/Typography';
-import { withStyles }   from '@material-ui/core/styles';
-import MainPublishCard  from './components/MainPublishCard';
-import SyncServerDialog from './components/SyncServerDialog';
-import LogoQuiqrCloud   from './components/quiqr-cloud/LogoQuiqrCloud';
-import IconButton       from '@material-ui/core/IconButton';
-import MoreVertIcon     from '@material-ui/icons/MoreVert';
-import Menu             from '@material-ui/core/Menu';
-import MenuItem         from '@material-ui/core/MenuItem';
-import Button           from '@material-ui/core/Button';
+import React               from 'react';
+import { Route }           from 'react-router-dom';
+import service             from './../../../services/service';
+import Typography          from '@material-ui/core/Typography';
+import { withStyles }      from '@material-ui/core/styles';
+import MainPublishCard     from './components/MainPublishCard';
+import SyncServerDialog    from './components/SyncServerDialog';
+import FormLogoQuiqrCloud  from './components/quiqr-cloud/FormLogoQuiqrCloud';
+import FormLogoGitHubPages from './components/github-pages/FormLogoGitHubPages';
+import IconButton          from '@material-ui/core/IconButton';
+import MoreVertIcon        from '@material-ui/icons/MoreVert';
+import Menu                from '@material-ui/core/Menu';
+import MenuItem            from '@material-ui/core/MenuItem';
+import Button              from '@material-ui/core/Button';
+import Dialog              from '@material-ui/core/Dialog';
+import DialogActions       from '@material-ui/core/DialogActions';
+import DialogTitle         from '@material-ui/core/DialogTitle';
+import DialogContent       from '@material-ui/core/DialogContent';
+import DialogContentText   from '@material-ui/core/DialogContentText';
 
 
 const useStyles = theme => ({
@@ -44,7 +50,6 @@ class SyncRouteGeneral extends React.Component {
         publish: []
       },
       serverDialog: {},
-
     };
   }
 
@@ -61,6 +66,7 @@ class SyncRouteGeneral extends React.Component {
 
   componentDidMount(){
     this.initState();
+    this.basePath = `/sites/${this.props.siteKey}/workspaces/${this.props.workspaceKey}/sync`;
   }
 
   openAddServerDialog(){
@@ -84,101 +90,119 @@ class SyncRouteGeneral extends React.Component {
     }
   }
 
-  savePublishData(key,data){
+  savePublishData(inkey,data){
     let site= this.state.site;
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
 
-    if(!key){
-      key = `publ-${Math.random()}`;
+    if(!inkey){
+      inkey = `publ-${Math.random()}`;
     }
 
-    const publConfIndex = site.publish.findIndex( ({ k }) => k === key );
+    const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
     if(publConfIndex !== -1){
-      site.publish[publConfIndex] = {key:key, config: data};
+      site.publish[publConfIndex] = {key:inkey, config: data};
     }
     else{
-      site.publish.push({key:key, config: data});
+      site.publish.push({key:inkey, config: data});
     }
 
     service.api.saveSiteConf(this.state.site.key, this.state.site).then(()=>{
-      let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
-      this.history.push(`${basePath}/list/${key}`)
+      this.history.push(`${this.basePath}/list/${inkey}`)
     });
+  }
+
+  deletePublishConfiguration(inkey){
+    let site= this.state.site;
+
+    const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
+    if(publConfIndex > -1){
+      site.publish.splice(publConfIndex, 1);
+
+      service.api.saveSiteConf(this.state.site.key, this.state.site).then(()=>{
+        this.history.push(`${this.basePath}/`)
+      });
+    }
 
   }
 
   renderMainCard(publishConf){
 
-    return <MainPublishCard
-    publishPath={publishConf.config.path}
-    liveURL={"https://"+publishConf.config.defaultDomain}
-    serviceLogo={<LogoQuiqrCloud />}
-    onPublish={()=>{
-      service.api.logToConsole(publishConf, "pupConf");
-    }}
-    itemMenu={
-      <div>
-      <IconButton
-      onClick={(event)=>{
-        this.setState({anchorEl:event.currentTarget, menuOpen:publishConf.key})
-      }}
-      aria-label="more"
-      aria-controls="long-menu"
-      aria-haspopup="true"
-      >
-        <MoreVertIcon />
-      </IconButton>
+    let serviceLogo;
 
-      <Menu
-        anchorEl={this.state.anchorEl}
-        open={(this.state.menuOpen===publishConf.key?true:false)}
-        keepMounted
-        onClose={()=>{
-          this.setState({menuOpen:null});
-
-        }}
-      >
-        <MenuItem key="edit"
-          onClick={
-            ()=>{
-              this.setState({
-                menuOpen:null,
-                serverDialog: {
-                  open:true,
-                  modAction: "Edit",
-                  serverTitle: "Quiqr Cloud Server",
-                  closeText: "Close"
-                }
-              })
-            }
-          }
-        >
-          Edit
-        </MenuItem>
-
-        <MenuItem key="delete"
-          onClick={
-            ()=>{
-              this.setState({
-                menuOpen:null,
-              })
-            }
-          }>
-          Delete
-        </MenuItem>
-      </Menu>
-      </div>
+    if(publishConf.config.type === 'quiqr'){
+      serviceLogo = <FormLogoQuiqrCloud />
+    }
+    else if(publishConf.config.type === 'github'){
+      serviceLogo = <FormLogoGitHubPages />
     }
 
-      />
+    return <MainPublishCard
+      publishPath={publishConf.config.path}
+      liveURL={"https://"+publishConf.config.defaultDomain}
+      serviceLogo={serviceLogo}
+      onPublish={()=>{
+        service.api.logToConsole(publishConf, "pupConf");
+      }}
+      itemMenu={
+        <div>
+          <IconButton
+            onClick={(event)=>{
+              this.setState({anchorEl:event.currentTarget, menuOpen:publishConf.key})
+            }}
+            aria-label="more"
+            aria-controls="long-menu"
+            aria-haspopup="true"
+          >
+            <MoreVertIcon />
+          </IconButton>
+
+          <Menu
+            anchorEl={this.state.anchorEl}
+            open={(this.state.menuOpen===publishConf.key?true:false)}
+            keepMounted
+            onClose={()=>{
+              this.setState({menuOpen:null});
+
+            }}
+          >
+            <MenuItem key="edit"
+              onClick={
+                ()=>{
+                  this.setState({
+                    menuOpen:null,
+                    serverDialog: {
+                      open:true,
+                      modAction: "Edit",
+                      serverTitle: "Quiqr Cloud Server",
+                      closeText: "Close"
+                    }
+                  })
+                }
+              }
+            >
+              Edit
+            </MenuItem>
+
+            <MenuItem key="delete"
+              onClick={
+                ()=>{
+                  this.setState({
+                    menuOpen:null,
+                    deleteDialogOpen: true,
+                    keyForDeletion: publishConf.key
+                  })
+                }
+              }>
+              Delete
+            </MenuItem>
+          </Menu>
+        </div>
+      }
+
+    />
   }
 
   render(){
     const { site, serverDialog } = this.state;
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
-
     let content = null;
 
     if(site.publish.length < 1){
@@ -187,18 +211,26 @@ class SyncRouteGeneral extends React.Component {
 
         <div><p>No sync server is configured. Add one first.</p>
           <Button onClick={()=>{
-            let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
-            this.history.push(`${basePath}/add/x${Math.random()}`)
+            this.history.push(`${this.basePath}/add/x${Math.random()}`)
           }} color="primary" variant="contained">add sync server</Button>
         </div>
     )
     }
     else if(site.publish.length === 1){
-      //show first target
       content = this.renderMainCard(site.publish[0])
     }
     else{
-      //get last used target of syncConfKey
+      if(this.props.syncConfKey){
+        const publConf = site.publish.find( ({ key }) => key === this.props.syncConfKey );
+        service.api.logToConsole(publConf, "selected PUb conf")
+        if(publConf){
+          content = this.renderMainCard(publConf);
+        }
+      }
+      else{
+        //get last used target of syncConfKey
+
+      }
     }
 
     return (
@@ -210,7 +242,6 @@ class SyncRouteGeneral extends React.Component {
           <React.Fragment>
             <div className={ this.props.classes.container }>
               <Typography variant="h5">Sync Website - {this.state.site.name}</Typography>
-              <span>{this.props.syncConfKey}</span>
 
               {content}
 
@@ -232,6 +263,28 @@ class SyncRouteGeneral extends React.Component {
               }}
 
             />
+
+            <Dialog
+              open={this.state.deleteDialogOpen}
+              onClose={()=>{this.setState({deleteDialogOpen:false})}}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete this configuration?"}</DialogTitle>
+              <DialogContent>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={()=>{this.setState({deleteDialogOpen:false})}} color="primary">
+                  Cancel
+                </Button>
+                <Button onClick={()=>{
+                  this.setState({deleteDialogOpen:false})
+                  this.deletePublishConfiguration(this.state.keyForDeletion);
+                  }} color="primary">
+                  Delete
+                </Button>
+              </DialogActions>
+            </Dialog>
 
           </React.Fragment>
         )
