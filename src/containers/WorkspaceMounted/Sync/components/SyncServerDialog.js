@@ -1,6 +1,5 @@
 import * as React          from 'react';
 import service             from '../../../../services/service';
-import TextField           from '@material-ui/core/TextField';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
 import MuiDialogTitle      from '@material-ui/core/DialogTitle';
@@ -28,10 +27,6 @@ const useStyles = theme => ({
     position: 'absolute',
     right: theme.spacing(3),
     top: theme.spacing(3),
-  },
-
-  textfield: {
-    margin: theme.spacing(1),
   },
 
   paper: {

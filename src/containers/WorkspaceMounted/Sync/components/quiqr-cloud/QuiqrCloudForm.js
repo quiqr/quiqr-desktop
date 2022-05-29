@@ -4,16 +4,8 @@ import TextField           from '@material-ui/core/TextField';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
 import Box                 from '@material-ui/core/Box';
-import clsx                from 'clsx';
-import OutlinedInput       from '@material-ui/core/OutlinedInput';
 import InputLabel          from '@material-ui/core/InputLabel';
-import InputAdornment      from '@material-ui/core/InputAdornment';
-import Switch              from '@material-ui/core/Switch';
-import FormControlLabel    from '@material-ui/core/FormControlLabel';
 import FormControl         from '@material-ui/core/FormControl';
-import Visibility          from '@material-ui/icons/Visibility';
-import VisibilityOff       from '@material-ui/icons/VisibilityOff';
-import IconButton          from '@material-ui/core/IconButton';
 import MenuItem            from '@material-ui/core/MenuItem';
 import Select              from '@material-ui/core/Select';
 
@@ -26,6 +18,7 @@ const useStyles = theme => ({
 
   textfield: {
     margin: theme.spacing(1),
+    backgroundColor: 'white',
   },
 
   keyField: {
@@ -99,8 +92,8 @@ class QuiqrCloudForm extends React.Component{
         <Box my={2}>
           <TextField
             id="path"
-            label="Quiqr Cloud Project Name"
-            helperText="Path"
+            label="Quiqr Cloud Site Name"
+            helperText=""
             variant="outlined"
             className={classes.textfield}
             value={this.state.pubData.path}
@@ -108,7 +101,36 @@ class QuiqrCloudForm extends React.Component{
               this.updatePubData({repository: e.target.value });
             }}
         />
-          <Button className={classes.keyButton} variant="contained">Copy</Button>
+          <Button className={classes.keyButton} variant="contained">Delete Site from cloud</Button>
+        </Box>
+
+        <Box my={2} p={2} sx={{
+        }}>
+          <Button style={{float:"right"}} className={classes.keyButton} variant="contained">Unsubscribe</Button>
+          <Box p={2} style={{
+            borderRadius: '10px',
+            maxWidth: "70ch",
+            height: "170px",
+            width: "70ch",
+            backgroundColor: '#ebf7eb',
+            display: "block-inline"
+          }}>
+
+            <h3 style={{color: "#66bb6"}}>Quiqr Cloud Level 2</h3>
+            <TextField
+              id="path"
+              label="Custom Domain Name"
+              helperText=""
+              variant="outlined"
+              className={classes.textfield}
+              value={this.state.pubData.defaultDomain}
+              onChange={(e)=>{
+                this.updatePubData({repository: e.target.value });
+              }}
+            />
+            <Button className={classes.keyButton} variant="contained">Disconnect Custom Domain Name</Button>
+          </Box>
+
         </Box>
 
       </React.Fragment>
