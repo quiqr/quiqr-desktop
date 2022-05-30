@@ -3,7 +3,6 @@ const path                                      = require('path');
 const fs                                        = require('fs-extra');
 const fssimple                                  = require('fs');
 const ProgressBar                               = require('electron-progressbar');
-//const rimraf                                    = require("rimraf");
 const spawn                                     = require("child_process").spawn;
 const spawnAw                                   = require('await-spawn')
 const toml                                      = require('toml');
@@ -15,7 +14,7 @@ const outputConsole                             = require('../logger/output-cons
 const hugoDownloader                            = require('../hugo/hugo-downloader')
 const HugoBuilder                               = require('../hugo/hugo-builder');
 const Embgit                                    = require('../embgit/embgit');
-const cloudSiteconfigManager                    = require('../pogocloud/cloud-siteconfig-manager');
+const cloudSiteconfigManager                    = require('../sync/quiqr-cloud/cloud-siteconfig-manager');
 
 class PogoPublisher {
 

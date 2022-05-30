@@ -5,6 +5,7 @@ import Typography          from '@material-ui/core/Typography';
 import { withStyles }      from '@material-ui/core/styles';
 import MainPublishCard     from './components/MainPublishCard';
 import SyncServerDialog    from './components/SyncServerDialog';
+import SyncBusyDialog      from './components/SyncBusyDialog';
 import FormLogoQuiqrCloud  from './components/quiqr-cloud/FormLogoQuiqrCloud';
 import FormLogoGitHubPages from './components/github-pages/FormLogoGitHubPages';
 import IconButton          from '@material-ui/core/IconButton';
@@ -16,6 +17,7 @@ import Dialog              from '@material-ui/core/Dialog';
 import DialogActions       from '@material-ui/core/DialogActions';
 import DialogTitle         from '@material-ui/core/DialogTitle';
 import DialogContent       from '@material-ui/core/DialogContent';
+import { snackMessageService } from './../../../services/ui-service';
 
 const useStyles = theme => ({
 
@@ -48,6 +50,7 @@ class SyncRouteGeneral extends React.Component {
         publish: []
       },
       serverDialog: {},
+      serverBusyDialog: {},
     };
   }
 
@@ -88,6 +91,38 @@ class SyncRouteGeneral extends React.Component {
     }
   }
 
+  publishAction(publishConf){
+    const build=null;
+
+    this.setState({
+      serverBusyDialog: {
+        open:true,
+        serverType: publishConf.config.type,
+      }
+    })
+
+    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, build).then(()=>{
+      this.setState({blockingOperation: 'Publishing site...'});
+
+      service.api.publishSite(this.props.siteKey, publishConf.key).then(()=>{
+        //this.startPublishPolling(true);
+      });
+
+    }).then(()=>{
+
+    }).catch(()=>{
+      snackMessageService.addSnackMessage('Publish failed.');
+
+    }).then(()=>{
+      this.setState({
+        serverBusyDialog: {
+          open:false,
+          serverType: null,
+        }
+      })
+    })
+  }
+
   savePublishData(inkey,data){
     let site= this.state.site;
 
@@ -119,7 +154,6 @@ class SyncRouteGeneral extends React.Component {
         this.history.push(`${this.basePath}/`)
       });
     }
-
   }
 
   renderMainCard(publishConf){
@@ -143,6 +177,7 @@ class SyncRouteGeneral extends React.Component {
       serviceLogo={serviceLogo}
       onPublish={()=>{
         //service.api.logToConsole(publishConf, "pupConf");
+        this.publishAction(publishConf);
       }}
       itemMenu={
         <div>
@@ -249,6 +284,16 @@ class SyncRouteGeneral extends React.Component {
               {content}
 
             </div>
+
+            <SyncBusyDialog
+              {...this.state.serverBusyDialog}
+              onClose={()=>{
+                this.setState({serverBusyDialog: {
+                  open:false
+                }})
+              }}
+            />
+
 
             <SyncServerDialog
               {...serverDialog}

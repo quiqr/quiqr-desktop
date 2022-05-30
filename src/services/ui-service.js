@@ -1,13 +1,7 @@
-/* @flow */
-
 import {BaseService} from './base-service';
 import mainProcessBridge from './../utils/main-process-bridge';
 
 class SnackMessageService extends BaseService {
-
-    /* :: _snackMessageQueue : Array<any> */
-    /* :: _currentSnackMessage : any */
-    /* :: _previousSnackMessage : any */
 
     constructor(){
 
@@ -30,8 +24,8 @@ class SnackMessageService extends BaseService {
     }
 
     addSnackMessage(
-        message /* : string */,
-        {action, onActionClick, autoHideDuration=3000} /* : { action? : string, onActionClick? : ()=>void, autoHideDuration? : number } */ = {} ){
+        message ,
+        {action, onActionClick, autoHideDuration=3000} = {} ){
         this._snackMessageQueue.push({message, action, onActionClick, autoHideDuration});
         if(this._tryAssingCurrentSnack())
             this._notifyChanges();
@@ -76,7 +70,7 @@ class ConsoleService extends BaseService {
         mainProcessBridge.addMessageHandler('console', this._onConsole.bind(this));
     }
 
-    _onConsole({line} /* : { line: string } */){
+    _onConsole({line}){
         //throttle this?
         this._consoleBuffer.push({id:this.consoleMessageLastId++, line});
         if(this._consoleTimeout)

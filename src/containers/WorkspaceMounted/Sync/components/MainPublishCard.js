@@ -58,7 +58,7 @@ class MainPublishCard extends React.Component {
         <CardContent>
         </CardContent>
         <CardActions>
-          <Button variant="contained" color="primary" onClick={this.props.onPublish}>
+          <Button variant="contained" color="primary" onClick={()=>{this.props.onPublish()}}>
             Publish
           </Button>
         </CardActions>

@@ -1,6 +1,6 @@
-const pathHelper    = require('../utils/path-helper');
-const outputConsole = require('../logger/output-console');
-const fileDirUtils  = require('../utils/file-dir-utils');
+const outputConsole = require('../../logger/output-console');
+const pathHelper    = require('../../utils/path-helper');
+const fileDirUtils  = require('../../utils/file-dir-utils');
 const fssimple      = require('fs');
 
 class CloudSiteconfigManager {

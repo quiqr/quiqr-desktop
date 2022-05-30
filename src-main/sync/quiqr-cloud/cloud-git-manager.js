@@ -2,13 +2,13 @@ const fs                      = require('fs-extra');
 const spawnAw                 = require('await-spawn')
 const path                    = require('path');
 const del                     = require('del');
-const Embgit                  = require('../embgit/embgit');
-const pathHelper              = require('../utils/path-helper');
-const outputConsole           = require('../logger/output-console');
-const fileDirUtils            = require('../utils/file-dir-utils');
+const Embgit                  = require('../../embgit/embgit');
+const pathHelper              = require('../../utils/path-helper');
+const fileDirUtils            = require('../../utils/file-dir-utils');
+const { EnvironmentResolver } = require('../../utils/environment-resolver');
+const outputConsole           = require('../../logger/output-console');
 const cloudSiteconfigManager  = require('./cloud-siteconfig-manager');
-const cloudCacheManager       = require('../pogocloud/cloud-cache-manager');
-const { EnvironmentResolver } = require('../utils/environment-resolver');
+const cloudCacheManager       = require('./cloud-cache-manager');
 
 class CloudGitManager {
 

@@ -5,11 +5,11 @@
  */
 const { app, shell }            = require('electron')
 const request                   = require('request');
-const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
-const PogoPublisher             = require('../publishers/pogo-publisher');
+const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
+const PogoPublisher             = require('../../publishers/pogo-publisher');
 const cloudGitManager           = require('./cloud-git-manager');
 const cloudCacheManager         = require('./cloud-cache-manager');
-const { EnvironmentResolver }   = require('../utils/environment-resolver');
+const { EnvironmentResolver }   = require('../../utils/environment-resolver');
 
 class CloudApiManager{
 

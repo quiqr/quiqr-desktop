@@ -9,10 +9,10 @@ const fssimple                  = require('fs');
 const request                   = require('request');
 const glob                      = require('glob');
 const path                      = require('path');
-const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
-const pathHelper                = require('../utils/path-helper');
-const RequestHelper             = require('../utils/request-helper');
-const PogoPublisher             = require('../publishers/pogo-publisher');
+const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
+const pathHelper                = require('../../utils/path-helper');
+const RequestHelper             = require('../../utils/request-helper');
+const PogoPublisher             = require('../../publishers/pogo-publisher');
 const cloudGitManager           = require('./cloud-git-manager');
 
 class CloudCacheManager{

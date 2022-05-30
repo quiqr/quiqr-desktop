@@ -257,8 +257,12 @@ export class API {
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
   }
 
-  createKeyPair(){
-    return mainProcessBridge.request('createKeyPair',{}, {timeout:90000});
+  createKeyPairGithub(){
+    return mainProcessBridge.request('createKeyPairGithub',{}, {timeout:90000});
+  }
+
+  createKeyPairQC(){
+    return mainProcessBridge.request('createKeyPairQC',{}, {timeout:90000});
   }
 
   createPogoProfile(obj: any){

@@ -54,7 +54,7 @@ class SyncServerDialog extends React.Component{
 
   componentDidUpdate(preProps){
     if(this.props.publishConf && preProps.publishConf !== this.props.publishConf) {
-      service.api.logToConsole(this.props.publishConf);
+      //service.api.logToConsole(this.props.publishConf);
       this.setState({
         serverType: this.props.publishConf.config.type,
         publishKey: this.props.publishConf.key,

@@ -36,7 +36,7 @@ export default class RegisterDialog extends React.Component{
       busy: true
     });
 
-    let promise = service.api.createKeyPair();
+    let promise = service.api.createKeyPairQC();
 
     promise.then((pubkey)=>{
       this.registerUserPost(this.state.username, this.state.email, pubkey.pubkey, pubkey.pubkey_title);

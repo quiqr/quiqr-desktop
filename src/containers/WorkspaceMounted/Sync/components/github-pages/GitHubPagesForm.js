@@ -1,5 +1,5 @@
 import * as React          from 'react';
-//import service             from '../../../../../services/service';
+import service             from '../../../../../services/service';
 import TextField           from '@material-ui/core/TextField';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
@@ -15,7 +15,9 @@ import Visibility          from '@material-ui/icons/Visibility';
 import VisibilityOff       from '@material-ui/icons/VisibilityOff';
 import IconButton          from '@material-ui/core/IconButton';
 import MenuItem            from '@material-ui/core/MenuItem';
+import LinearProgress      from '@material-ui/core/LinearProgress';
 import Select              from '@material-ui/core/Select';
+import Paper               from '@material-ui/core/Paper';
 
 const useStyles = theme => ({
 
@@ -26,6 +28,18 @@ const useStyles = theme => ({
 
   textfield: {
     margin: theme.spacing(1),
+  },
+
+  progressLabel:{
+    marginLeft: theme.spacing(3),
+    //marginTop: theme.spacing(1),
+    backgroundColor: "white",
+  },
+
+  paper:{
+    margin: theme.spacing(1),
+    width: '60ch',
+    padding: theme.spacing(3),
   },
 
   keyField: {
@@ -56,28 +70,60 @@ class GitHubPagesForm extends React.Component{
         repository:'',
         branch:'main',
         deployPrivateKey:'',
-        deployPublicKey:'',
+        deployPublicKey:'xxxx',
         publishScope:'build',
         setGitHubActions: false,
+        keyPairBusy: true,
       }
     }
+  }
+
+  getKeyPair(){
+    this.setState({
+      keyPairBusy: true
+    });
+
+    let promise = service.api.createKeyPairGithub();
+
+    promise.then((resp)=>{
+      this.updatePubData({deployPrivateKey: resp.keyPair[0], deployPublicKey: resp.keyPair[1] },
+        ()=>{
+          this.setState({ keyPairBusy: false })
+          //service.api.logToConsole(this.state.pubData, "keypair2")
+        }
+      );
+
+    }, (e)=>{
+          service.api.logToConsole(e, "ERRR")
+      this.setState({
+        keyPairBusy: false
+      });
+    })
   }
 
   componentDidMount(){
     if(this.props.publishConf){
       this.setState({pubData: this.props.publishConf.config});
     }
+    else{
+      this.getKeyPair();
+    }
   }
 
-  updatePubData(newData){
+  updatePubData(newData, callback=null){
     let pubData = {...this.state.pubData, ...newData};
-    this.setState({pubData: pubData}, this.props.setData(pubData));
-    if(pubData.username !== '' && pubData.repository !=='' && pubData.branch !== ''){
-      this.props.setSaveEnabled(true);
-    }
-    else{
-      this.props.setSaveEnabled(false);
-    }
+    this.setState({pubData: pubData}, ()=>{
+      this.props.setData(pubData);
+
+      if(pubData.username !== '' && pubData.repository !=='' && pubData.branch !== ''){
+        this.props.setSaveEnabled(true);
+      }
+      else{
+        this.props.setSaveEnabled(false);
+      }
+      typeof callback === 'function' && callback();
+    });
+
   }
 
   render(){
@@ -109,7 +155,7 @@ class GitHubPagesForm extends React.Component{
             onChange={(e)=>{
               this.updatePubData({repository: e.target.value });
             }}
-        />
+          />
           <TextField
             id="branch"
             label="Branch"
@@ -125,72 +171,89 @@ class GitHubPagesForm extends React.Component{
 
         <Box my={2}>
 
-        <FormControl className={clsx(classes.margin, classes.keyField)} variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-password">Deploy Public Key</InputLabel>
-          <OutlinedInput
-            id="outlined-adornment-password"
-            type={this.state.showPassword ? 'text' : 'password'}
-            value={this.state.pubData.deployPublicKey}
-            onChange={(e)=>{
-              this.updatePubData({deployPublicKey: e.target.value });
-            }}
+          {(this.state.keyPairBusy ? 
+            <FormControl className={classes.margin}>
+              <InputLabel shrink htmlFor="progress" className={classes.progressLabel}>
+                Deploy Public Key
+              </InputLabel>
+              <Paper variant="outlined" id="progress" elevation={1} className={classes.paper}>
+                <LinearProgress   />
+              </Paper>
+            </FormControl>
+            :
 
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle deploy key visibility"
-                  onClick={()=>{
-                    this.setState({ showPassword: !this.state.showPassword });
+          <React.Fragment>
+          <FormControl className={clsx(classes.margin, classes.keyField)} variant="outlined">
+            <InputLabel htmlFor="outlined-adornment-password">Deploy Public Key</InputLabel>
 
-                  }}
-                  onMouseDown={(event)=>{
-                    event.preventDefault();
-                  }}
-                  edge="end"
-                >
-                  {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            }
-            labelWidth={70}
-          />
-        </FormControl>
-          <Button className={classes.keyButton} variant="contained">Copy</Button>
-          <Button className={classes.keyButton}  color="secondary" variant="contained">Re-generate</Button>
+            <OutlinedInput
+              id="outlined-adornment-password"
+              type={this.state.showPassword ? 'text' : 'password'}
+              value={this.state.pubData.deployPublicKey}
+              onChange={(e)=>{
+                //this.updatePubData({deployPublicKey: e.target.value });
+              }}
+
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle deploy key visibility"
+                    onClick={()=>{
+                      this.setState({ showPassword: !this.state.showPassword });
+
+                    }}
+                    onMouseDown={(event)=>{
+                      event.preventDefault();
+                    }}
+                    edge="end"
+                  >
+                    {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              labelWidth={140}
+            />
+          </FormControl>
+          </React.Fragment>
+          )}
+          <Button className={classes.keyButton} disabled={this.state.keyPairBusy} variant="contained">Copy</Button>
+          <Button className={classes.keyButton} onClick={()=>{this.getKeyPair()}} disabled={this.state.keyPairBusy} color="secondary" variant="contained">Re-generate</Button>
+
         </Box>
 
         <Box my={2}>
-          <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              value={this.state.pubData.publishScope}
-              onChange={(e)=>{
-                this.updatePubData({publishScope: e.target.value });
-              }}
-              label="Publish Source and Build"
-            >
-              <MenuItem value="build">Publish only build files</MenuItem>
-              <MenuItem value="source">Publish only source files</MenuItem>
-              <MenuItem value="build_and_source">Publish source and build files</MenuItem>
-            </Select>
-          </FormControl>
 
-          <FormControlLabel className={classes.keyButton}
-            control={
-              <Switch
-                checked={this.state.pubData.setGitHubActions}
-                onChange={()=>{
-                  this.updatePubData({setGitHubActions: !this.state.pubData.setGitHubActions });
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                value={this.state.pubData.publishScope}
+                onChange={(e)=>{
+                  this.updatePubData({publishScope: e.target.value });
                 }}
+                label="Publish Source and Build"
+              >
+                <MenuItem value="build">Publish only build files</MenuItem>
+                <MenuItem value="source">Publish only source files</MenuItem>
+                <MenuItem value="build_and_source">Publish source and build files</MenuItem>
+              </Select>
+            </FormControl>
 
-                name="configureActions"
-                color="primary"
-              />
-            }
-            label="Configure GitHub Actions"
-          />
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.pubData.setGitHubActions}
+                  onChange={()=>{
+                    this.updatePubData({setGitHubActions: !this.state.pubData.setGitHubActions });
+                  }}
+
+                  name="configureActions"
+                  color="primary"
+                />
+              }
+              label="Configure GitHub Actions"
+            />
         </Box>
 
       </React.Fragment>

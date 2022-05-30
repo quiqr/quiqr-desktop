@@ -13,9 +13,10 @@ const formatProviderResolver    = require('../utils/format-provider-resolver');
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
 const PogoPublisher             = require('../publishers/pogo-publisher');
-const cloudCacheManager         = require('../pogocloud/cloud-cache-manager');
-const cloudApiManager           = require('../pogocloud/cloud-api-manager');
-const cloudGitManager           = require('../pogocloud/cloud-git-manager');
+const cloudCacheManager         = require('../sync/quiqr-cloud/cloud-cache-manager');
+const cloudApiManager           = require('../sync/quiqr-cloud/cloud-api-manager');
+const cloudGitManager           = require('../sync/quiqr-cloud/cloud-git-manager');
+const GithubKeyManager          = require('../sync/github/github-key-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 const chokidar                  = require('chokidar');
 
@@ -234,7 +235,15 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   context.resolve(configuration);
 }
 
-api.createKeyPair = async function({},context){
+
+api.createKeyPairGithub = async function({},context){
+  let keyPair = await GithubKeyManager.keyPairGen();
+  //0 is the private key
+  //1 is the public key
+  context.resolve({keyPair});
+}
+
+api.createKeyPairQC = async function({},context){
   let pubkey = await cloudGitManager.keygen();
   let environmentResolver = new EnvironmentResolver();
   let pubkey_title = environmentResolver.getUPIS()
