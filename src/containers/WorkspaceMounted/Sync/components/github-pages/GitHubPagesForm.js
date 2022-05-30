@@ -67,6 +67,7 @@ class GitHubPagesForm extends React.Component{
       pubData:{
         type: 'github',
         username:'',
+        email:'',
         repository:'',
         branch:'main',
         deployPrivateKey:'',
@@ -115,7 +116,7 @@ class GitHubPagesForm extends React.Component{
     this.setState({pubData: pubData}, ()=>{
       this.props.setData(pubData);
 
-      if(pubData.username !== '' && pubData.repository !=='' && pubData.branch !== ''){
+      if(pubData.username !== '' && pubData.repository !=='' && pubData.branch !== '' && pubData.email !== ''){
         this.props.setSaveEnabled(true);
       }
       else{
@@ -141,6 +142,17 @@ class GitHubPagesForm extends React.Component{
             value={this.state.pubData.username}
             onChange={(e)=>{
               this.updatePubData({username: e.target.value });
+            }}
+          />
+          <TextField
+            id="email"
+            label="E-mail"
+            helperText="E-mail address to use for commit messsages"
+            variant="outlined"
+            className={classes.textfield}
+            value={this.state.pubData.email}
+            onChange={(e)=>{
+              this.updatePubData({email: e.target.value });
             }}
           />
         </Box>
@@ -171,7 +183,7 @@ class GitHubPagesForm extends React.Component{
 
         <Box my={2}>
 
-          {(this.state.keyPairBusy ? 
+          {(this.state.keyPairBusy ?
             <FormControl className={classes.margin}>
               <InputLabel shrink htmlFor="progress" className={classes.progressLabel}>
                 Deploy Public Key
@@ -216,7 +228,13 @@ class GitHubPagesForm extends React.Component{
           </FormControl>
           </React.Fragment>
           )}
-          <Button className={classes.keyButton} disabled={this.state.keyPairBusy} variant="contained">Copy</Button>
+          <Button className={classes.keyButton} disabled={this.state.keyPairBusy} onClick={()=>{
+
+            const {clipboard} = window.require('electron')
+            clipboard.writeText(this.state.pubData.deployPublicKey)
+            //service.api.logToConsole(this.state.pubData.deployPublicKey);
+
+          }} variant="contained">Copy</Button>
           <Button className={classes.keyButton} onClick={()=>{this.getKeyPair()}} disabled={this.state.keyPairBusy} color="secondary" variant="contained">Re-generate</Button>
 
         </Box>

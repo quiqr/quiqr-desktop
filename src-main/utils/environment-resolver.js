@@ -36,14 +36,14 @@ class EnvironmentResolver{
         return {platform, arch};
     }
 
-    getUPIS(){
+    getUQIS(){
       let computerName = os.hostname()
       if(computerName.includes('.')) computerName = computerName.split('.')[0];
       const computerPlatform = os.platform()
       const computerRelease = os.release()
       const username = os.userInfo().username;
       const appVersion = app.getVersion();
-      return `${username}@${computerName}+${computerPlatform}+${computerRelease}+poppyapp-${appVersion}`;
+      return `${username}@${computerName}+${computerPlatform}+${computerRelease}+quiqr-desktop-app-${appVersion}`;
     }
 }
 

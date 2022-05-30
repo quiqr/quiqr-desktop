@@ -14,10 +14,10 @@ class GithubKeyManager {
     const tempDir = pathHelper.getTempDir();
 
     try {
-      let gencmd = await spawnAw( gitBin, [ "keygen" ], {cwd: tempDir});
+      let gencmd = await spawnAw( gitBin, [ "keygen_ecdsa" ], {cwd: tempDir});
       outputConsole.appendLine('Keygen success ...');
-      privKey = await fs.readFileSync(path.join(tempDir,"/id_rsa_pogo"), {encoding: 'utf8'});
-      pubKey = await fs.readFileSync(path.join(tempDir,"/id_rsa_pogo.pub"), {encoding: 'utf8'});
+      privKey = await fs.readFileSync(path.join(tempDir,"/id_ecdsa_quiqr"), {encoding: 'utf8'});
+      pubKey = await fs.readFileSync(path.join(tempDir,"/id_ecdsa_quiqr.pub"), {encoding: 'utf8'});
       //console.log(pubKey);
       //console.log(privKey);
     } catch (e) {
@@ -25,8 +25,8 @@ class GithubKeyManager {
     }
 
     try {
-      await fs.unlinkSync(path.join(tempDir,"/id_rsa_pogo.pub"));
-      await fs.unlinkSync(path.join(tempDir,"/id_rsa_pogo"));
+      await fs.unlinkSync(path.join(tempDir,"/id_ecdsa_quiqr"));
+      await fs.unlinkSync(path.join(tempDir,"/id_ecdsa_quiqr.pub"));
     } catch (e) {
       outputConsole.appendLine('no key were there ...:' + e);
     }

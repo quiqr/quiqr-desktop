@@ -326,7 +326,7 @@ resources: []\n\
     let buildDate = "";
 
     let environmentResolver = new EnvironmentResolver();
-    const upis = `\n\nUPIS: ${environmentResolver.getUPIS()}\n`;
+    const upis = `\n\nUQIS: ${environmentResolver.getUQIS()}\n`;
 
     if(fs.existsSync(idPath)){
       buildGitId = "\nBuild ID " + fssimple.readFileSync(idPath, {encoding:'utf8', flag:'r'})

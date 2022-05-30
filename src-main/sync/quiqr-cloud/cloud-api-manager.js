@@ -90,7 +90,7 @@ class CloudApiManager{
         var postData = JSON.stringify({
           connect_code : connect_code,
           pubkey: ""+pubkey,
-          pubkey_title: environmentResolver.getUPIS()
+          pubkey_title: environmentResolver.getUQIS()
         });
 
         let url = configurations.global.pogoboardConn.protocol+"//"+

@@ -67,8 +67,8 @@ class CloudGitManager {
     Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
 
     const environmentResolver = new EnvironmentResolver();
-    const UPIS = environmentResolver.getUPIS();
-    const message = "merge from " + UPIS;
+    const UQIS = environmentResolver.getUQIS();
+    const message = "merge from " + UQIS;
 
     return new Promise( async (resolve, reject)=>{
       try {

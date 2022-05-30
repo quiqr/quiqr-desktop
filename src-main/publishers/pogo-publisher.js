@@ -437,6 +437,11 @@ class PogoPublisher {
     await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 
+
+
+
+
+
   async publish(context){
 
     let mainWindow = global.mainWM.getCurrentInstance();
@@ -497,6 +502,7 @@ class PogoPublisher {
     var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
     var full_gh_url = 'git@gl.quiqr.org:' + group + '/' + repository +'.git';
     var full_gh_dest = resolvedDest + '' + repository;
+
     var gitignore = "/public\n\
 .quiqr-cache\n";
 
@@ -596,8 +602,8 @@ class PogoPublisher {
             var spawn = require("child_process").spawn;
 
             const environmentResolver = new EnvironmentResolver();
-            const UPIS = environmentResolver.getUPIS();
-            let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', "publication from " + UPIS, full_gh_dest]);
+            const UQIS = environmentResolver.getUQIS();
+            let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', "publication from " + UQIS, full_gh_dest]);
 
             clonecmd3.stdout.on("data", (data) => {
             });

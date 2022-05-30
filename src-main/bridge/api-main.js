@@ -246,7 +246,7 @@ api.createKeyPairGithub = async function({},context){
 api.createKeyPairQC = async function({},context){
   let pubkey = await cloudGitManager.keygen();
   let environmentResolver = new EnvironmentResolver();
-  let pubkey_title = environmentResolver.getUPIS()
+  let pubkey_title = environmentResolver.getUQIS()
   context.resolve({pubkey, pubkey_title});
 }
 

@@ -20,10 +20,6 @@ class Welcome extends React.Component {
     this.state = {};
   }
 
-  handleLinkThemeGallery = ()=>{
-    window.require('electron').shell.openExternal("https://router.poppygo.app/theme-gallery");
-  }
-
   handleLinkPoppyWebsite = ()=>{
     window.require('electron').shell.openExternal("https://book.quiqr.org/");
   }
