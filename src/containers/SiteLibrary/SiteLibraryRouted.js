@@ -145,11 +145,15 @@ class SiteLibraryRouted extends React.Component{
     });
   }
 
+  /*
   handlePublishSiteCancelClick = () => {
     service.api.parentTempUnHideMobilePreview();
     this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
   }
+  */
 
+
+  /*
   handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
     service.api.parentTempUnHideMobilePreview();
     this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
@@ -164,6 +168,7 @@ class SiteLibraryRouted extends React.Component{
       this.setState({blockingOperation: null});
     })
   }
+  */
 
   renderItemMenu(index, siteconfig){
 

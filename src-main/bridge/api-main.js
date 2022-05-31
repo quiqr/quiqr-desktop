@@ -775,10 +775,10 @@ api.saveSiteConf = function({siteKey, newConf}, context){
   });
 }
 
-api.publishSite = function({siteKey, publishKey}, context){
+api.publishSite = function({siteKey, publishConf}, context){
   getSiteService(siteKey, function(err, siteService){
     if(err){ context.reject(err); return; }
-    siteService.publish(publishKey).then(()=>{
+    siteService.publish(publishConf).then(()=>{
       context.resolve();
     }, ()=>{
       context.reject(err);

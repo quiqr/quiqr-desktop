@@ -199,9 +199,10 @@ export class API {
     return mainProcessBridge.request('saveSiteConf', {siteKey, newConf});
   }
 
-  publishSite(siteKey: string, publishKey: string){
-    return mainProcessBridge.request('publishSite', {siteKey, publishKey});
+  publishSite(siteKey: string, publishConf: any){
+    return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 30000});
   }
+
   setPublishStatus(status){
     return mainProcessBridge.request('setPublishStatus', {status});
   }

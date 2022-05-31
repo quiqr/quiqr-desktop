@@ -4,9 +4,19 @@ const fssimple = require('fs');
 
 class FileDirUtils{
   async recurForceRemove(path){
-    await fs.ensureDir(path);
-    await rimraf.sync(path);
-    console.log("created and rm'd dir: " + path);
+
+    if(fs.existsSync(path)){
+      let lstat = fs.lstatSync(path);
+      if(lstat.isDirectory()){
+        //await fs.ensureDir(path);
+        await rimraf.sync(path);
+        console.log("rm'd dir: " + path);
+      }
+      else if(lstat.isFile()){
+        fs.unlinkSync(path)
+        console.log("rm'd file: " + path);
+      }
+    }
   }
 
   async fileRegexRemove(path, regex){

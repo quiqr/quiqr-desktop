@@ -64,19 +64,21 @@ class SiteService{
     await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
   }
 
-  async publish(publishKey){
-    let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
+  async publish(publishConfig){
+    //let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
+    /*
     if(publishConfig==null)
       throw new Error(`Could not find a publisher config for key '${publishKey}'.`);
     if(publishConfig.config==null)
       throw new Error(`The matcher publisher config does not have a property config.`);
+    */
 
     let from = pathHelper.getLastBuildDir();
     if(from==null)
       throw new Error('Could not resolve the last build directory.');
 
     let publisher = publisherFactory.getPublisher(publishConfig.config);
-    return await publisher.publish({siteKey: this._config.key, publishKey, from });
+    return await publisher.publish({siteKey: this._config.key, publishKey: publishConfig.key, from });
   }
 }
 

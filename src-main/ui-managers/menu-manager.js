@@ -232,93 +232,6 @@ class MenuManager {
     await pogopubl.createSiteFromThemeGitUrl();
   }
 
-  /*
-  async generateModel() {
-
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    const dialog = electron.dialog;
-    let config = await workspaceConfigProvider.getConfig(global.currentSitePath, global.currentWorkspaceKey);
-    let hugover = 'extended_0.80.0';
-    let modelPath = path.join(pathHelper.getTempDir(),"model");
-    let modelFile = path.join(modelPath, "sukoh.json");
-    let menuFile = path.join(modelPath, "zpogomenu.json");
-    let hugoBuilderConfig = {
-      config: config.build[0]['config'],
-      workspacePath: global.currentSitePath,
-      destination: modelPath,
-      hugover: hugover
-    }
-
-    const exec = pathHelper.getHugoBinForVer(hugover);
-
-    if(!fs.existsSync(exec)){
-      const dialog = electron.dialog;
-      dialog.showMessageBox(mainWindow, {
-        buttons: ["Close"],
-        title: "Quiqr will now download hugo " + hugover,
-   *message: "Try again when download has finished",
-      });
-
-      try{
-        hugoDownloader.downloader.download(hugover);
-        this.generateModel();
-      }
-      catch(e){
-        // warn about HugoDownloader error?
-      }
-    }
-    else{
-      // write .images.md for managing images in static folder
-      const staticDir = path.join(global.currentSitePath, "static");
-      const imageDir =  path.join(global.currentSitePath, "static", "images");
-      const imgDir =  path.join(global.currentSitePath, "static", "img");
-      const imageFile = path.join(global.currentSitePath, "static", "images", ".pogo-images.md");
-      const imgFile = path.join(global.currentSitePath, "static", "img", ".pogo-images.md");
-      const imageFile2 = path.join(global.currentSitePath, "static", ".pogo-images.md");
-      const imageFileContent = "---\n\
-description: this file is a helper file for the Quiqr asset manager\n\
-resources: []\n\
----\n\
-\n";
-      if (fs.existsSync (imageDir)){
-        fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
-      }
-      if (fs.existsSync (imgDir)){
-        fs.writeFileSync(imgFile , imageFileContent , 'utf-8');
-      }
-      if (fs.existsSync(staticDir)){
-        fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');
-      };
-
-      let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
-      await hugoBuilder.buildModel();
-
-      if(!fs.existsSync(modelFile)){
-        dialog.showMessageBox(mainWindow, {
-          type: 'error',
-          buttons: ["Close"],
-          title: "Warning",
-          message: "Failed to generate sukoh.json.",
-        });
-      }
-      else {
-        let options  = {
-          title: "Please confirm",
-          buttons: ["Yes","Cancel"],
-          message: "Copy sukoh.json to "+global.currentSitePath+"? (Previous json will be overwritten)"
-        }
-        let response = dialog.showMessageBox(options)
-        if(response === 1) return;
-
-        fs.copySync(modelFile, path.join(global.currentSitePath,"quiqr","model", "base.json"));
-        if (fs.existsSync(menuFile)){
-          fs.copySync(menuFile, path.join(global.currentSitePath, "zpogomenu.json"));
-        }
-      }
-    }
-  }
-  */
-
   showVersion(){
     const idPath = path.join(pathHelper.getApplicationResourcesDir(),"all","build-git-id.txt");
     const datePath = path.join(pathHelper.getApplicationResourcesDir(),"all", "build-date.txt");
@@ -407,21 +320,6 @@ resources: []\n\
     mainWindow.webContents.send("disableMobilePreview");
     mainWindow.webContents.send("redirectToGivenLocation","/prefs");
   }
-
-  /*
-  siteConfig() {
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-      mainWindow.webContents.send("disableMobilePreview");
-      //mainWindow.webContents.send("redirectToGivenLocation","/siteconf");
-
-      //var newURL='/siteconf/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
-      let newScreenURL = `/siteconf/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-      mainWindow.webContents.send("redirectToGivenLocation", newScreenURL);
-    }
-
-  }
-  */
 
   deleteSite() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
@@ -745,66 +643,6 @@ resources: []\n\
 
     return profilesMenu;
   }
-
-  /*
-  createVersionsMenu(){
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let siteKey = global.currentSiteKey;
-      let siteService = null;
-      configurationDataProvider.get((err, configurations)=>{
-        if(configurations.empty===true) throw new Error('Configurations is empty.');
-        if(err) { reject(err); return; }
-        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-
-        if(siteData==null) {
-          //throw new Error('Could not find site is empty.');
-        }
-        else{
-          siteService = new SiteService(siteData);
-        }
-
-      });
-
-      if(siteService == null){
-        return;
-      }
-
-      let currentPath = siteService._config.source.path;
-      let currentVersion = siteService._config.source.path.split("/").pop();
-
-
-      let versionsMenu = [];
-
-      if(path.resolve(currentPath, '..').split("/").pop()==='sources'){
-        let sources = path.resolve(currentPath, '..');
-        var files = fs.readdirSync(sources);
-        files.forEach( (f) => {
-          let label = "";
-          let checked = false;
-          if(lstatSync(path.join(sources,f)).isDirectory()){
-            label = f;
-            if(f == currentVersion){
-              checked = true;
-            }
-            versionsMenu.push({
-              id: f,
-              type: "checkbox",
-              label: label,
-              checked: checked,
-              click: async () => {
-                pogoversions.setSiteVersion(f);
-              }
-            });
-          }
-        });
-      }
-      return versionsMenu;
-    }
-    else {
-      return [];
-    }
-  }
-  */
 
   deleteInvalidConfKeys(newConf){
     // REMOVE INVALID KEYS
@@ -1424,16 +1262,6 @@ resources: []\n\
               global.apiMain.genereateEtalageImages({siteKey:global.currentSiteKey, workspaceKey: global.currentWorkspaceKey},context);
             }
           },
-          /*
-          {
-            id: 'clear-config-cache',
-            label: 'Clear Model Cache',
-            enabled: this.siteSelected(),
-            click: async () => {
-              global.apiMain.clearWorkSpaceConfigCache({},context);
-            }
-          },
-          */
           {
             label: 'Disable Partial Cache',
             type: "checkbox",
