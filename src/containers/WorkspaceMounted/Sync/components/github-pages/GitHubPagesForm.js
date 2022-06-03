@@ -177,6 +177,8 @@ class GitHubPagesForm extends React.Component{
               this.updatePubData({repository: e.target.value });
             }}
           />
+
+          {/*
           <TextField
             id="branch"
             label="Branch"
@@ -188,6 +190,7 @@ class GitHubPagesForm extends React.Component{
             variant="outlined"
             className={classes.textfield}
           />
+          */}
         </Box>
 
         <Box my={2}>

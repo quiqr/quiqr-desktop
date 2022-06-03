@@ -297,6 +297,15 @@ class App extends React.Component{
     );
   }
 
+  renderImportSite() {
+    return (
+      <SiteLibraryRouted
+        view={ this.state.libraryView}
+        key={ 'selectSite' }
+        importSite={ true }
+      />
+    );
+  }
   renderCreateSite() {
     this.getProfile();
     return (
@@ -317,6 +326,10 @@ class App extends React.Component{
 
       <Route path='/sites/create-new' exact render={ () => {
         return this.renderCreateSite();
+      }} />
+
+      <Route path='/sites/import-site' exact render={ () => {
+        return this.renderImportSite();
       }} />
 
       <Route path='/sites/*' render={ () => {

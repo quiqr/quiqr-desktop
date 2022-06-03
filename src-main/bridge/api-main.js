@@ -491,10 +491,10 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
   });
 }
 
-api.buildWorkspace = function({siteKey, workspaceKey, buildKey}, context){
+api.buildWorkspace = function({siteKey, workspaceKey, buildKey, extraConfig}, context){
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ context.reject(err); return; }
-    workspaceService.build(buildKey).then(()=>{
+    workspaceService.build(buildKey, extraConfig).then(()=>{
       context.resolve();
     }, ()=>{
       context.reject(err); return

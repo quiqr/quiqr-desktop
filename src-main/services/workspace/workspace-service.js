@@ -704,7 +704,8 @@ class WorkspaceService{
     });
   }
 
-  async build(buildKey) {
+  async build(buildKey, extraConfig={}) {
+    console.log(buildKey)
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
 
@@ -721,6 +722,9 @@ class WorkspaceService{
         workspacePath: this.workspacePath,
         hugover: workspaceDetails.hugover,
         destination: destination
+      }
+      if(extraConfig.overrideBaseURLSwitch){
+        hugoBuilderConfig.baseUrl = extraConfig.overrideBaseURL;
       }
 
       let hugoBuilder = new HugoBuilder(hugoBuilderConfig);

@@ -11,6 +11,7 @@ import IconButton              from '@material-ui/core/IconButton';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
 import CreateSiteDialog        from './components/CreateSiteDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
+import ImportSiteDialog        from './components/ImportSiteDialog';
 import EditTagsDialogs         from './components/EditTagsDialogs';
 import RenameDialog            from './components/RenameDialog';
 import SiteListItem            from './components/SiteListItem';
@@ -37,6 +38,7 @@ class SiteLibraryRouted extends React.Component{
       editTagsDialog: false,
       renameDialog: false,
       dialogSiteConf: {},
+      dialogImportSite: {},
       currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
@@ -80,6 +82,11 @@ class SiteLibraryRouted extends React.Component{
 
     if(this.props.createSite !== nextProps.createSite){
       this.setState({createSiteDialog: nextProps.createSite});
+    }
+
+    if(this.props.importSite !== nextProps.importSite){
+      service.api.logToConsole("IMRPOT")
+      this.setState({dialogImportSite: {open: nextProps.importSite}});
     }
 
     if(this.props.quiqrUsername !== nextProps.quiqrUsername){
@@ -144,31 +151,6 @@ class SiteLibraryRouted extends React.Component{
       this.setState({ blockingOperation:null})
     });
   }
-
-  /*
-  handlePublishSiteCancelClick = () => {
-    service.api.parentTempUnHideMobilePreview();
-    this.setState({publishSiteDialog: {...this.state.publishSiteDialog, open:false}});
-  }
-  */
-
-
-  /*
-  handleBuildAndPublishClick = ({siteKey, workspaceKey, build, publish}) => {
-    service.api.parentTempUnHideMobilePreview();
-    this.setState({blockingOperation: 'Building site...', publishSiteDialog: undefined});
-    service.api.buildWorkspace(siteKey, workspaceKey, build).then(()=>{
-      this.setState({blockingOperation: 'Publishing site...'});
-      return service.api.publishSite(siteKey, publish);
-    }).then(()=>{
-      snackMessageService.addSnackMessage('Site successfully published.');
-    }).catch(()=>{
-      snackMessageService.addSnackMessage('Publish failed.');
-    }).then(()=>{
-      this.setState({blockingOperation: null});
-    })
-  }
-  */
 
   renderItemMenu(index, siteconfig){
 
@@ -394,6 +376,12 @@ class SiteLibraryRouted extends React.Component{
           open={this.state.createSiteDialog}
           onCancelClick={()=>this.setState({createSiteDialog:false})}
           onSubmitClick={this.handleCreateSiteSubmit}
+        />
+
+        <ImportSiteDialog
+          open={this.state.dialogImportSite.open}
+          onClose={()=>this.setState({dialogImportSite:{open:false}})}
+          //onSubmitClick={this.handleCreateSiteSubmit}
         />
 
         <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}</BlockDialog>

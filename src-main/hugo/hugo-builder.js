@@ -48,6 +48,12 @@ class HugoBuilder{
       hugoArgs.push('--config');
       hugoArgs.push(this.config.config);
     }
+    if(this.config.baseUrl){
+      hugoArgs.push('--baseURL');
+      hugoArgs.push(this.config.baseUrl);
+    }
+    console.log(this.config)
+    console.log(hugoArgs)
 
     const exec = pathHelper.getHugoBinForVer(this.config.hugover);
     if(!fs.existsSync(exec)){

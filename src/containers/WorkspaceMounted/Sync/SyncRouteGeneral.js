@@ -102,7 +102,7 @@ class SyncRouteGeneral extends React.Component {
       }
     })
 
-    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, build).then(()=>{
+    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, build, publishConf.config).then(()=>{
 
       service.api.publishSite(this.props.siteKey, publishConf).then(()=>{
         this.setState({
