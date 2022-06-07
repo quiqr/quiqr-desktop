@@ -10,12 +10,12 @@ import Dialog              from '@material-ui/core/Dialog';
 import DialogActions       from '@material-ui/core/DialogActions';
 import DialogContent       from '@material-ui/core/DialogContent';
 import DialogContentText   from '@material-ui/core/DialogContentText';
-import CardLogoGitHubPages from './github-pages/CardLogoGitHubPages'
-import FormLogoGitHubPages from './github-pages/FormLogoGitHubPages'
+import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
+import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
 import GitHubPagesForm     from './github-pages/GitHubPagesForm'
 import QuiqrCloudForm      from './quiqr-cloud/QuiqrCloudForm'
-import CardLogoQuiqrCloud  from './quiqr-cloud/CardLogoQuiqrCloud'
-import FormLogoQuiqrCloud  from './quiqr-cloud/FormLogoQuiqrCloud'
+import CardLogoQuiqrCloud  from '../../../../svg-assets/CardLogoQuiqrCloud'
+import FormLogoQuiqrCloud  from '../../../../svg-assets/FormLogoQuiqrCloud'
 
 const useStyles = theme => ({
 

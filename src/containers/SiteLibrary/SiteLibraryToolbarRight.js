@@ -1,4 +1,5 @@
 import * as React                                                 from 'react';
+import { Route }  from 'react-router-dom';
 import service                                                    from './../../services/service';
 import {TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup} from '../TopToolbarRight'
 import SettingsApplicationsIcon                                   from '@material-ui/icons/SettingsApplications';
@@ -16,11 +17,15 @@ export class SiteLibraryToolbarRight extends React.Component {
   }
 
   render(){
+    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
+  }
+
+  renderWithRoute(history: {push:(path: string)=>void}){
 
     const leftButtons = [
       <ToolbarButton
         action={()=>{
-          service.api.redirectTo(`/sites/import-site`);
+          service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);
         }}
         title="Import"
         icon={<InputIcon style={{ color: iconColor }} />}
@@ -49,7 +54,7 @@ export class SiteLibraryToolbarRight extends React.Component {
     const rightButtons = [
       <ToolbarButton
         action={()=>{
-          service.api.redirectTo(`/prefs/`);
+          history.push('/prefs/')
         }}
         title="Preferences"
         icon={<SettingsApplicationsIcon style={{ color: iconColor }} />}

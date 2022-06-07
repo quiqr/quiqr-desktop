@@ -8,8 +8,8 @@ import Dialog              from '@material-ui/core/Dialog';
 import DialogActions       from '@material-ui/core/DialogActions';
 import DialogContent       from '@material-ui/core/DialogContent';
 import DialogContentText   from '@material-ui/core/DialogContentText';
-import FormLogoGitHubPages from './github-pages/FormLogoGitHubPages'
-import FormLogoQuiqrCloud  from './quiqr-cloud/FormLogoQuiqrCloud'
+import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
+import FormLogoQuiqrCloud  from '../../../../svg-assets/FormLogoQuiqrCloud'
 import LinearProgress      from '@material-ui/core/LinearProgress';
 
 const useStyles = theme => ({

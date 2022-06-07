@@ -3,8 +3,8 @@ import { Route }  from 'react-router-dom';
 import Sidebar    from './../../Sidebar';
 //import service    from './../../../services/service';
 import AddIcon from '@material-ui/icons/Add';
-import IconQuiqr from './components/quiqr-cloud/IconQuiqr';
-import IconGitHub from './components/github-pages/IconGitHub';
+import IconQuiqr from '../../../svg-assets/IconQuiqr';
+import IconGitHub from '../../../svg-assets/IconGitHub';
 
 export class SyncSidebar extends React.Component {
 

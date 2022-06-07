@@ -328,7 +328,7 @@ class App extends React.Component{
         return this.renderCreateSite();
       }} />
 
-      <Route path='/sites/import-site' exact render={ () => {
+      <Route path='/sites/import-site/:refresh' exact render={ () => {
         return this.renderImportSite();
       }} />
 

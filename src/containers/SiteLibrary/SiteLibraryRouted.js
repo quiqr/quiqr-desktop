@@ -11,7 +11,7 @@ import IconButton              from '@material-ui/core/IconButton';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
 import CreateSiteDialog        from './components/CreateSiteDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
-import ImportSiteDialog        from './components/ImportSiteDialog';
+import ImportSiteDialog        from './components/Import/ImportSiteDialog';
 import EditTagsDialogs         from './components/EditTagsDialogs';
 import RenameDialog            from './components/RenameDialog';
 import SiteListItem            from './components/SiteListItem';
@@ -399,11 +399,21 @@ class SiteLibraryRouted extends React.Component{
       return <Spinner />
     }
 
+    let refresh;
+
     return (
       <React.Fragment>
 
         <Switch>
 
+          <Route path='/sites/import-site/:refresh' exact render={ ({match, history})=> {
+            this.history = history;
+            let refresh = decodeURIComponent(match.params.refresh)
+            return (
+              this.renderSelectSites(refresh, null)
+            );
+          }}
+          />
           <Route path='/sites/:source' exact render={ ({match, history})=> {
             this.history = history;
             let source = decodeURIComponent(match.params.source)
@@ -432,6 +442,7 @@ class SiteLibraryRouted extends React.Component{
           />
 
         </Switch>
+
         {this.renderDialogs()}
       </React.Fragment>
     );
