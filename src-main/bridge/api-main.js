@@ -14,6 +14,7 @@ const hugoDownloader            = require('../hugo/hugo-downloader')
 const formatProviderResolver    = require('../utils/format-provider-resolver');
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
+const gitImporter                = require('../import/git-importer');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudCacheManager         = require('../sync/quiqr-cloud/cloud-cache-manager');
 const cloudApiManager           = require('../sync/quiqr-cloud/cloud-api-manager');
@@ -114,6 +115,7 @@ api.checkFreeSiteName = function({proposedSiteName}, context){
       else{
         response.nameFree = true;
       }
+      context.resolve(response)
     })
     .catch((err)=>{
       context.reject(err);
@@ -491,6 +493,19 @@ api.importSiteAction = function(context){
     pogozipper.importSite()
   });
 }
+
+api.importSiteFromPublicGitUrl = function({siteName, url}, context){
+  //console.log(siteName)
+
+  gitImporter.importSiteFromPublicGitUrl(url, siteName)
+    .then((siteKey)=>{
+      context.resolve(siteKey);
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
+
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){

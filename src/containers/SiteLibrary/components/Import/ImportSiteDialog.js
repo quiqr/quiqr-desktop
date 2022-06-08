@@ -433,8 +433,28 @@ class ImportSiteDialog extends React.Component{
 
               }}
             />
+            {(this.state.importTypeGitImportingBusy ? <CircularProgress size={20} /> : null)}
           </Box>
-          <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport?false:true)} color="primary">Import Site</Button>
+          <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport?false:true)} onClick={()=>{
+
+            this.setState({
+              importTypeGitImportingBusy: true
+            });
+
+            service.api.importSiteFromPublicGitUrl(this.state.importSiteName, this.state.importTypeGitLastValidatedUrl)
+              .then((siteKey)=>{
+                this.setState({
+                  importTypeGitImportingBusy: false,
+                });
+              })
+              .catch((siteKey)=>{
+                this.setState({
+                  importTypeGitImportingBusy: false,
+                });
+              });
+
+
+          }} color="primary">Import Site</Button>
 
         </Box>
 

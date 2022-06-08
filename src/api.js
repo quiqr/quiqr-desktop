@@ -35,6 +35,11 @@ export class API {
   importSite(){
     return mainProcessBridge.request('importSiteAction');
   }
+
+  importSiteFromPublicGitUrl(siteName: string, url: string){
+    return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url});
+  }
+
   getCurrentSiteKey(){
     return mainProcessBridge.request('getCurrentSiteKey');
   }

@@ -1,53 +1,61 @@
-const fs                = require('fs-extra');
-const fssimple             = require('fs');
-const path              = require('path');
-const pathHelper        = require('./../../utils/path-helper');
+const fs                        = require('fs-extra');
+const fssimple                  = require('fs');
+const path                      = require('path');
+const pathHelper                = require('../../utils/path-helper');
+const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 
 /*
 
-This service containes utility functions for creating and manipulating unmounted sites
+This service class containes utility functions for creating and manipulating unmounted sites
 
 */
 
 class LibraryService{
 
   async checkDuplicateSiteConfAttrStringValue(attr, value){
-    configurationDataProvider.get(function(err, data){
-      if(err){
-        context.reject(err);
-      }
-      else {
-        let duplicate;
-        let response;
+    return new Promise((resolve, reject) => {
 
-        duplicate = data.sites.find((x)=>x[attr].toLowerCase() === value.toLowerCase());
-        if(duplicate){
-          response = true;
+      configurationDataProvider.get(function(err, data){
+        if(err){
+          reject(err);
         }
-        else{
-          response = false;
-        }
+        else {
+          let duplicate;
+          let response;
 
-        context.resolve(response);
-      }
-    }, {invalidateCache: false});
+          duplicate = data.sites.find((x)=>x[attr].toLowerCase() === value.toLowerCase());
+          if(duplicate){
+            response = true;
+          }
+          else{
+            response = false;
+          }
+
+          resolve(response);
+        }
+      }, {invalidateCache: false});
+    });
   }
 
   async createSiteKeyFromName(name){
+    return new Promise((resolve, reject) => {
 
     var newKey = name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
     console.log(newKey)
 
-    libraryService.checkDuplicateSiteConfAttrStringValue('key', newKey)
+    this.checkDuplicateSiteConfAttrStringValue('key', newKey)
       .then((duplicate)=>{
         if(duplicate){
           newKey = newKey + '-' + pathHelper.randomPathSafeString(4);
         }
-        context.resolve(newKey);
+        resolve(newKey);
       })
       .catch((err)=>{
-        context.reject(err);
+        reject(err);
       })
+
+
+    });
   }
 
 
