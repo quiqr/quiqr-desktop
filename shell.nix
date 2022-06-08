@@ -31,6 +31,10 @@ let
       vendorSha256 = "sha256:0l5fcx74fqp622q7lm4qanmg9ax03s14vcf4hx4r4qnmvs2r2pw8";
       #vendorSha256 = lib.fakeSha256;
 
+      postInstall = ''
+         cp "$out/bin/src" "$out/bin/embgit"
+      '';
+
       meta = with lib; {
         description = ''
           Embedded Git for electron apps
@@ -56,7 +60,7 @@ in
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_9}/bin/";
     #NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
-    #EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
-    EMBGIT_PATH="${myPackages.embgit}/bin/src"; #STUPID HACK
+    EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
+    #EMBGIT_PATH="${myPackages.embgit}/bin/src"; #STUPID HACK
     HUGO_PATH="${pkgs.hugo}/bin/hugo";
   }
