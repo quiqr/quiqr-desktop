@@ -69,7 +69,7 @@ class CardItem extends React.Component {
 
   getFavicon(){
     if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
-      service.api.logToConsole(this.props.site)
+      //service.api.logToConsole(this.props.site)
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
         this.setState({favicon:img});
       })
@@ -98,9 +98,9 @@ class CardItem extends React.Component {
       siteAvatar = <Avatar aria-label="recipe" className={classes.avatar} src={this.state.favicon} />
     }
     return (
-      <Card 
+      <Card
 
-      elevation={5}
+        elevation={5}
         className={classes.root}>
         <CardHeader
           avatar={

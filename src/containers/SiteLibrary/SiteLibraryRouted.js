@@ -85,7 +85,6 @@ class SiteLibraryRouted extends React.Component{
     }
 
     if(this.props.importSite !== nextProps.importSite){
-      service.api.logToConsole("IMRPOT")
       this.setState({dialogImportSite: {open: nextProps.importSite}});
     }
 
