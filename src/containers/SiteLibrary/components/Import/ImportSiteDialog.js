@@ -9,6 +9,7 @@ import Button            from '@material-ui/core/Button';
 import Typography        from '@material-ui/core/Typography';
 import FolderIcon        from '@material-ui/icons/Folder';
 import Box               from '@material-ui/core/Box';
+import Chip              from '@material-ui/core/Chip';
 import Grid              from '@material-ui/core/Grid';
 import Paper             from '@material-ui/core/Paper';
 import CircularProgress             from '@material-ui/core/CircularProgress';
@@ -16,7 +17,7 @@ import Table             from '@material-ui/core/Table';
 import TableRow             from '@material-ui/core/TableRow';
 import TableCell             from '@material-ui/core/TableCell';
 import TableBody             from '@material-ui/core/TableBody';
-import TableHead             from '@material-ui/core/TableHead';
+//import TableHead             from '@material-ui/core/TableHead';
 import TableContainer             from '@material-ui/core/TableContainer';
 import Card             from '@material-ui/core/Card';
 import CardContent             from '@material-ui/core/CardContent';
@@ -72,6 +73,8 @@ const useStyles = theme => ({
   }
 });
 
+const regexpHttp      = new RegExp('^http(s?)://', 'i')
+
 class ImportSiteDialog extends React.Component{
 
   constructor(props){
@@ -85,14 +88,19 @@ class ImportSiteDialog extends React.Component{
       importType: 'git',
       importTypeGitUrl: '',
       importTypeGitBusy: false,
+      importTypeGitReadyForValidation: false,
+      importTypeGitLastValidatedUrl: '',
+      importTypeGitReadyForImport: false,
       importTypeGitProvider: '',
       importTypeGitErrorText: '',
+      importTypeGitScreenshot: null,
 
       importHugoVersion: '',
       importHugoTheme: '',
 
       importQuiqrModel: '',
       importQuiqrForms: '',
+      importSiteName: '',
     }
   }
 
@@ -101,12 +109,18 @@ class ImportSiteDialog extends React.Component{
       importTypeGitProvider: '',
       importTypeGitErrorText: '',
       importTypeGitBusy: false,
+      importTypeGitLastValidatedUrl: '',
+      importTypeGitReadyForValidation: false,
+      importTypeGitReadyForImport: false,
+      importTypeGitScreenshot: null,
 
       importHugoVersion: '',
       importHugoTheme: '',
 
       importQuiqrModel: '',
       importQuiqrForms: '',
+
+      importSiteName: '',
     })
 
   }
@@ -118,44 +132,53 @@ class ImportSiteDialog extends React.Component{
 
     this.resetImportTypeGitState();
 
-    const regexpHttp      = new RegExp('^http(s?)://', 'i')
     const regexpGitHub    = new RegExp('^https://github.com/', 'i')
     const regexpGitLab    = new RegExp('^https://gitlab.com/', 'i')
     const regexpSourceHut = new RegExp('^https://git.sr.ht/', 'i')
 
-    //is this a valid public git url
-    if(!regexpHttp.test(url)){
-      this.setState({importTypeGitErrorText: 'URL is invalid. Currently only http:// or https:// are supported.'});
-    }
     //who is the provider?
-    else{
-
-      this.setState({importTypeGitBusy: true});
-
-      if(regexpGitHub.test(url)){
-        this.setState({importTypeGitProvider: 'GitHub'});
-      }
-      else if(regexpGitLab.test(url)){
-        this.setState({importTypeGitProvider: 'GitLab'});
-      }
-      else if(regexpSourceHut.test(url)){
-        this.setState({importTypeGitProvider: 'SourceHut'});
-      }
 
 
+    this.setState({importTypeGitBusy: true});
 
-      //does it contain hugo config
-      //does it contain quiqr model
-      //does it contain quiqr etalage
-
-
-      //use embgit to test
-
-
+    if(regexpGitHub.test(url)){
+      this.setState({importTypeGitProvider: 'GitHub'});
+    }
+    else if(regexpGitLab.test(url)){
+      this.setState({importTypeGitProvider: 'GitLab'});
+    }
+    else if(regexpSourceHut.test(url)){
+      this.setState({importTypeGitProvider: 'SourceHut'});
     }
 
+    var urlparts = url.split('/');
+    var lastSegment = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
+    if(lastSegment.includes(".")) lastSegment = lastSegment.split(".").pop();
+    if(lastSegment !== ""){
+      this.setState({importSiteName:lastSegment});
+    }
 
-
+    service.api.quiqr_git_repo_show(url)
+      .then((response)=>{
+        if(response){
+          this.setState({
+            importTypeGitScreenshot: (response.Screenshot ? response.Screenshot:null),
+            importHugoVersion: (response.HugoVersion ? response.HugoVersion:null),
+            importHugoTheme: (response.HugoTheme ? response.HugoTheme:null),
+            importQuiqrModel: (response.QuiqrModel? response.QuiqrModel:null),
+            importQuiqrForms: (response.QuiqrFormsEndPoints ? response.QuiqrFormsEndPoints:null),
+            importTypeGitBusy: false,
+            importTypeGitLastValidatedUrl: url,
+            importTypeGitReadyForImport: true,
+          })
+        }
+      })
+      .catch((e)=>{
+        this.setState({
+          importTypeGitErrorText: "It seems that the URL does not point to a valid git repository",
+          importTypeGitBusy: false
+        });
+      });
   }
 
   renderCards(){
@@ -233,6 +256,7 @@ class ImportSiteDialog extends React.Component{
 
     const {classes} = this.props;
 
+
     if(this.state.importType==="git"){
       return (
         <Box>
@@ -250,11 +274,40 @@ class ImportSiteDialog extends React.Component{
               variant="outlined"
               onChange={(e)=>{
                 this.setState({importTypeGitUrl: e.target.value});
+
+                if(e.target.value && e.target.value !== ''){
+                  if(this.state.importTypeGitLastValidatedUrl !== e.target.value){
+
+                    //is this a valid public git url
+                    if(!regexpHttp.test(e.target.value)){
+                      this.setState({
+                        importTypeGitErrorText: 'URL is invalid. Currently only http:// or https:// are supported.',
+                        importTypeGitReadyForValidation: false,
+                      });
+                    }
+                    else{
+                      this.setState({
+                        importTypeGitErrorText: '',
+                        importTypeGitReadyForValidation: true,
+                      });
+                    }
+
+                  }
+                  else{
+                    this.setState({
+                      importTypeGitErrorText: '',
+                      importTypeGitReadyForValidation: false,
+                    });
+                  }
+
+                }
+
+
               }}
               error={(this.state.importTypeGitErrorText === '' ? false : true)}
               helperText={this.state.importTypeGitErrorText}
             />
-            <Button variant="contained" className={classes.rightButton} color="primary" onClick={()=>{
+            <Button variant="contained" disabled={(this.state.importTypeGitBusy || !this.state.importTypeGitReadyForValidation ? true : false)} className={classes.rightButton} color="primary" onClick={()=>{
               this.validateURL(this.state.importTypeGitUrl);
             }}>Validate Remote Repository</Button>
 
@@ -265,7 +318,7 @@ class ImportSiteDialog extends React.Component{
             <Card className={classes.root} variant="outlined" style={{backgroundColor:'#eee'}}>
               <CardMedia
                 className={classes.cover}
-                image={ScreenShotPlaceholder}
+                image={(this.state.importTypeGitScreenshot?this.state.importTypeGitScreenshot:ScreenShotPlaceholder)}
                 title="site screenshot"
               />
               <div className={classes.details}>
@@ -275,6 +328,15 @@ class ImportSiteDialog extends React.Component{
                   <TableContainer xcomponent={Paper}>
                     <Table className={classes.table} size="small" aria-label="a dense table">
                       <TableBody>
+
+                        <TableRow>
+                          <TableCell align="right">
+                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                              Git URL
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="left">{this.state.importTypeGitLastValidatedUrl}</TableCell>
+                        </TableRow>
 
                         <TableRow>
                           <TableCell align="right">
@@ -339,14 +401,14 @@ class ImportSiteDialog extends React.Component{
               fullWidth
               id="standard-full-width"
               label="Name"
-              value={this.state.sitename}
-              disabled
+              value={this.state.importSiteName}
+              disabled={(this.state.importTypeGitReadyForImport?false:true)}
               variant="outlined"
               error={(this.state.importNameErrorText === '' ? false : true)}
               helperText={this.state.importNameErrorText}
             />
           </Box>
-          <Button variant="contained" disabled color="primary">Import Site</Button>
+          <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport?false:true)} color="primary">Import Site</Button>
 
         </Box>
 
@@ -360,14 +422,14 @@ class ImportSiteDialog extends React.Component{
 
   render(){
 
-    let { open, classes } = this.props;
+    let { open } = this.props;
     let importButtonHidden = true;
 
     const actions = [
       <Button color="primary" onClick={()=>{
         this.setState({importTypeGitBusy: false })
         this.props.onClose();
-        }}>
+      }}>
         {"cancel"}
       </Button>,
       (importButtonHidden ? null :

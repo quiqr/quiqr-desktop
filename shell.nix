@@ -16,17 +16,20 @@ let
 
   myPackages = lib.fix' (self: with self;
   {
-    embgit = pkgs.buildGoModule rec {
+    embgit = pkgs.buildGo118Module rec {
+    #embgit = pkgs.buildGoModule rec {
       name = "embgit";
-      version = "0.3.6";
+      version = "0.4.2";
 
       src = pkgs.fetchgit {
         url = "https://github.com/quiqr/embgit.git";
         rev = "${version}";
-        sha256 = "sha256:1fr8p7p9czf3bw0k432kc2lcnv3kglkn5wnxw3gir935nn56iyk6";
+        sha256 = "sha256:1hzk5w08gbqac6paax5k8b57p6zfw2fg5jgcgw4g3c2139ns36i3";
+        #sha256 = lib.fakeSha256;
       };
 
-      vendorSha256 = "sha256:1298s8hyrw7v09hyc4ddkwxdwf0k294n95kv65467y0niw98j6sg";
+      vendorSha256 = "sha256:0l5fcx74fqp622q7lm4qanmg9ax03s14vcf4hx4r4qnmvs2r2pw8";
+      #vendorSha256 = lib.fakeSha256;
 
       meta = with lib; {
         description = ''
@@ -53,6 +56,7 @@ in
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_9}/bin/";
     #NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
-    EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
+    #EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
+    EMBGIT_PATH="${myPackages.embgit}/bin/src"; #STUPID HACK
     HUGO_PATH="${pkgs.hugo}/bin/hugo";
   }

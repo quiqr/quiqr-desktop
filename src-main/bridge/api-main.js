@@ -6,6 +6,7 @@ const {shell}                   = require('electron');
 const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
+const Embgit                    = require('../embgit/embgit')
 const WorkspaceService          = require('../services/workspace/workspace-service')
 const siteSourceBuilderFactory  = require('../site-sources/builders/site-source-builder-factory');
 const hugoDownloader            = require('../hugo/hugo-downloader')
@@ -685,6 +686,16 @@ api.getFilesFromAbsolutePath = function({path},promise){
       });
   });
 
+}
+
+api.quiqr_git_repo_show = function({url}, promise){
+  Embgit.quiqr_repo_show(url)
+    .then((response)=>{
+      promise.resolve(response);
+    })
+    .catch((err)=>{
+      promise.reject(err);
+    })
 }
 
 api.getFilesInBundle = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName}, promise){

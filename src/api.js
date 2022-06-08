@@ -175,6 +175,9 @@ export class API {
 
     );
   }
+  quiqr_git_repo_show(url: string){
+    return mainProcessBridge.request('quiqr_git_repo_show', {url});
+  }
 
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 30000});

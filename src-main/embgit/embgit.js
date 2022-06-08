@@ -97,7 +97,20 @@ class Embgit{
         }
       }
     });
+  }
 
+  async quiqr_repo_show(url){
+    const git_bin = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let cmd = await spawnAw( git_bin, [ "quiqr_repo_show", url ]);
+        const response = JSON.parse(cmd.toString());
+        resolve(response)
+      } catch (e) {
+        await outputConsole.appendLine(git_bin + " quiqr_repo_show " + url );
+        reject(e)
+      }
+    });
   }
 
   async pull(destination_path){
