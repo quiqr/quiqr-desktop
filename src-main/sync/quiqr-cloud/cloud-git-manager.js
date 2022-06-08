@@ -7,8 +7,8 @@ const pathHelper              = require('../../utils/path-helper');
 const fileDirUtils            = require('../../utils/file-dir-utils');
 const { EnvironmentResolver } = require('../../utils/environment-resolver');
 const outputConsole           = require('../../logger/output-console');
-const cloudSiteconfigManager  = require('./cloud-siteconfig-manager');
 const cloudCacheManager       = require('./cloud-cache-manager');
+const libraryService          = require('../../services/library/library-service');
 
 class CloudGitManager {
 
@@ -31,6 +31,31 @@ class CloudGitManager {
     return pathSiteSource;
   }
 
+  createConfManaged(siteKey, siteName, pathSource, remotePath){
+
+    //TODO REMOVE we use full path
+    if(remotePath.includes("/")){
+      remotePath = remotePath.split("/").pop();
+    }
+
+    let newConf = {};
+    newConf.key = siteKey;
+    newConf.name = siteName;
+    newConf.source = {};
+    newConf.source.type = 'folder';
+    newConf.source.path = pathSource;
+    newConf.publish = [];
+    newConf.publish.push({});
+    newConf.publish[0].key = 'quiqr-cloud';
+    newConf.publish[0].config = {};
+    newConf.publish[0].config.type = "quiqr";
+    newConf.publish[0].config.path = remotePath;
+    newConf.lastPublish = 0;
+
+    return newConf;
+  }
+
+
   clonePogoCloudSite(cloudPath, siteName, managed = true){
 
     const siteKey = this.newSiteKeyFromPath(cloudPath);
@@ -48,12 +73,12 @@ class CloudGitManager {
         let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
 
         if(managed){
-          newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
+          newConf = this.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
         }
         else{
-          newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey, siteName, pathSiteSource);
+          newConf = libraryService.createConfUnmanaged(siteKey, siteName, pathSiteSource);
         }
-        await cloudSiteconfigManager.writeConf(newConf,siteKey);
+        await libraryService.writeSiteConf(newConf,siteKey);
         resolve(newConf);
       } catch (e) {
         console.log("Clone Error:"+siteKey);

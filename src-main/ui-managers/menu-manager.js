@@ -12,11 +12,10 @@ const cloudCacheManager           = require('../sync/quiqr-cloud/cloud-cache-man
 const cloudApiManager             = require('../sync/quiqr-cloud/cloud-api-manager');
 const cloudGitManager             = require('../sync/quiqr-cloud/cloud-git-manager');
 const PogoPublisher               = require('../publishers/pogo-publisher');
-const pogoversions                = require('../utils/pogo-site-version-helper');
 const pathHelper                  = require('../utils/path-helper');
 const hugoDownloader              = require('../hugo/hugo-downloader')
-const HugoBuilder                 = require('../hugo/hugo-builder');
 const SiteService                 = require('../services/site/site-service')
+const libraryService                 = require('../services/library/library-service')
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
@@ -275,7 +274,7 @@ class MenuManager {
           let currentName = siteService._config.name;
 
           // REMOVE INVALID KEYS
-          this.deleteInvalidConfKeys(newConf);
+          libraryService.deleteInvalidConfKeys(newConf);
 
           const prompt = require('electron-prompt');
           var newName = await prompt({
@@ -293,7 +292,7 @@ class MenuManager {
             return;
           }
 
-          let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+          let configFilePath = pathHelper.getSiteMountConfigPath(siteKey);
           newConf.name = newName;
 
           //TODO USE GENERAL
@@ -337,7 +336,7 @@ class MenuManager {
       let response = dialog.showMessageBox(options)
       if(response === 1) return;
 
-      fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
+      fs.remove(pathHelper.getSiteMountConfigPath(global.currentSiteKey));
 
       var rimraf = require("rimraf");
       rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, ()=>{
@@ -410,7 +409,7 @@ class MenuManager {
     }
   }
   openWorkSpaceConfig(){
-    let wspath = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
+    let wspath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     try{
       shell.openPath(wspath);
     }
@@ -644,14 +643,6 @@ class MenuManager {
     return profilesMenu;
   }
 
-  deleteInvalidConfKeys(newConf){
-    // REMOVE INVALID KEYS
-    delete newConf['configPath']
-    delete newConf['owner']
-    delete newConf['published']
-    delete newConf['publishKey']
-  }
-
   async editProjectPath(){
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
@@ -671,7 +662,7 @@ class MenuManager {
             currentPath = newConf.publish[0].config.path
           }
 
-          this.deleteInvalidConfKeys(newConf);
+          libraryService.deleteInvalidConfKeys(newConf);
 
           const prompt = require('electron-prompt');
           var newPath = await prompt({
@@ -690,7 +681,7 @@ class MenuManager {
             return;
           }
 
-          let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+          let configFilePath = pathHelper.getSiteMountConfigPath(siteKey);
 
           newConf.publish[0].key = "quiqr-cloud"
           newConf.publish[0].config = {}

@@ -22,9 +22,9 @@ class FolderSiteSourceBuilder {
             ]
         };
 
-        let configPath = `${pathHelper.getRoot()}config.${config.key}.json`;
+        let configPath = pathHelper.getSiteMountConfigPath(config.key);
         fs.ensureDirSync(pathHelper.getRoot());
-        fs.writeFileSync(configPath, JSON.stringify(siteConfig,null,'  '), 'utf8');
+        fs.writeFileSync(configPath, JSON.stringify(siteConfig, null, '  '), 'utf8');
     }
 
 }

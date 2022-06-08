@@ -124,7 +124,7 @@ class PathHelper{
     return userHome +'/.ssh/known_hosts';
   }
 
-  getKeyPath(siteKey){
+  getSiteMountConfigPath(siteKey){
     return this.getRoot()+'config.'+siteKey+'.json';
   }
 

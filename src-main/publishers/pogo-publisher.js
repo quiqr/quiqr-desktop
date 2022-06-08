@@ -14,7 +14,7 @@ const outputConsole                             = require('../logger/output-cons
 const hugoDownloader                            = require('../hugo/hugo-downloader')
 const HugoBuilder                               = require('../hugo/hugo-builder');
 const Embgit                                    = require('../embgit/embgit');
-const cloudSiteconfigManager                    = require('../sync/quiqr-cloud/cloud-siteconfig-manager');
+const libraryService                            = require('../services/library/library-service');
 
 class PogoPublisher {
 
@@ -48,7 +48,7 @@ class PogoPublisher {
   }
 
   async writePublishDate(publDate){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.lastPublish = publDate;
@@ -59,7 +59,7 @@ class PogoPublisher {
   }
 
   async writePublishStatus(status){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.publishStatus = status;
@@ -68,7 +68,7 @@ class PogoPublisher {
 
 
   async writeDomainInfo(pogoDomain, domain){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.publish = [];
@@ -84,7 +84,7 @@ class PogoPublisher {
   }
 
   async UnlinkCloudPath(){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.lastPublish = 0,
@@ -106,7 +106,6 @@ class PogoPublisher {
     //create new site with hugo
     //clone theme into new site
     //copy exampleSite
-    //run brechts wunder script
 
     let mainWindow = global.mainWM.getCurrentInstance();
     let hugover = 'extended_0.77.0';
@@ -122,7 +121,6 @@ class PogoPublisher {
 
       try{
         hugoDownloader.downloader.download(hugover);
-        this.generateModel();
       }
       catch(e){
         // warn about HugoDownloader error?
@@ -246,7 +244,7 @@ class PogoPublisher {
       progressBar._window.hide();
       progressBar.close();
 
-      if(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+      if(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
         const options = {
           type: 'question',
           buttons: ['Cancel', 'Overwrite', 'Keep both'],
@@ -263,7 +261,7 @@ class PogoPublisher {
           else if(response ===2){
 
             let extraPlus = 0
-            while(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+            while(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
               extraPlus = extraPlus++;
 
               let numLength = 0;
@@ -376,7 +374,7 @@ class PogoPublisher {
     let siteKey = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
     console.log("guesedKey:"+siteKey);
 
-    if(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+    if(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
       const options = {
         type: 'question',
         buttons: ['Cancel', 'Overwrite', 'Keep both'],
@@ -393,7 +391,7 @@ class PogoPublisher {
         else if(response ===2){
 
           let extraPlus = 0
-          while(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+          while(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
             extraPlus = extraPlus++;
 
             let numLength = 0;
@@ -433,8 +431,8 @@ class PogoPublisher {
     await fs.ensureDir(pathSite);
     await fs.ensureDir(pathSiteSources);
     await fs.moveSync(full_gh_dest, pathSource);
-    let newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey,siteKey, pathSource);
-    await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+    let newConf = libraryService.createConfUnmanaged(siteKey,siteKey, pathSource);
+    await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 
 

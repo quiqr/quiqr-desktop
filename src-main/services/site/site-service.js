@@ -54,25 +54,7 @@ class SiteService{
     }
   }
 
-  async saveSiteConf(newConf){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+this._config.key+'.json';
-    delete newConf['configPath']
-    delete newConf['owner']
-    delete newConf['published']
-    delete newConf['publishKey']
-    delete newConf['etalage']
-    await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-  }
-
   async publish(publishConfig){
-    //let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
-    /*
-    if(publishConfig==null)
-      throw new Error(`Could not find a publisher config for key '${publishKey}'.`);
-    if(publishConfig.config==null)
-      throw new Error(`The matcher publisher config does not have a property config.`);
-    */
-
     let from = pathHelper.getLastBuildDir();
     if(from==null)
       throw new Error('Could not resolve the last build directory.');

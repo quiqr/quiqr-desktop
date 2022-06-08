@@ -114,6 +114,10 @@ export class API {
     return mainProcessBridge.request('readConfPrefKey', {confkey});
   }
 
+  checkFreeSiteName(proposedSiteName: string){
+    return mainProcessBridge.request('checkFreeSiteName', {proposedSiteName});
+  }
+
   saveConfPrefKey(prefKey: string, prefValue: string){
     return mainProcessBridge.request('saveConfPrefKey', {prefKey, prefValue});
   }

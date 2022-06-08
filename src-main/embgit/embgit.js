@@ -117,10 +117,10 @@ class Embgit{
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
-        let clonecmd = await spawnAw( git_bin, [ "pull", "-s" ,"-i", userconf.privateKey, destination_path ]);
+        let cmd = await spawnAw( git_bin, [ "pull", "-s" ,"-i", userconf.privateKey, destination_path ]);
         await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
         outputConsole.appendLine('Pull success ...');
-        console.log(clonecmd.toString());
+        console.log(cmd.toString());
         resolve(true)
       } catch (e) {
         await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
@@ -130,6 +130,28 @@ class Embgit{
     });
 
   }
+
+  async cloneFromPublicUrl(url, destination_path){
+    const gitBin = this.getGitBin();
+
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let cmd = await spawnAw( gitBin, [ "clone", "-s" , url , destination_path ]);
+        await outputConsole.appendLine(git_bin + " clone -s " + url + " " + destination_path );
+        outputConsole.appendLine('Clone success ...');
+        resolve(true)
+      } catch (e) {
+        await outputConsole.appendLine(git_bin + " clone -s " + url + " " + destination_path );
+        await outputConsole.appendLine('Clone error ...:' + e);
+        console.log(e.stderr.toString())
+        reject(e);
+      }
+    });
+
+  }
+
+
+
   async cloneWithKey(url, destination_path){
     const git_bin = this.getGitBin();
     return new Promise( async (resolve, reject)=>{

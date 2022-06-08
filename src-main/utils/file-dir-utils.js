@@ -26,7 +26,7 @@ class FileDirUtils{
   }
 
   async ensureEmptyDir(destination_path){
-    outputConsole.appendLine('Creating empty directory at: ' + destination_path);
+    //outputConsole.appendLine('Creating empty directory at: ' + destination_path);
     await fs.ensureDir(destination_path);
     await fs.emptyDir(destination_path);
     await fs.ensureDir(destination_path);

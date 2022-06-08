@@ -90,6 +90,7 @@ class ImportSiteDialog extends React.Component{
       importTypeGitReadyForValidation: false,
       importTypeGitLastValidatedUrl: '',
       importTypeGitReadyForImport: false,
+      importTypeGitReadyForNaming: false,
       importTypeGitProvider: '',
       importTypeGitErrorText: '',
       importTypeGitScreenshot: null,
@@ -111,6 +112,7 @@ class ImportSiteDialog extends React.Component{
       importTypeGitLastValidatedUrl: '',
       importTypeGitReadyForValidation: false,
       importTypeGitReadyForImport: false,
+      importTypeGitReadyForNaming: false,
       importTypeGitScreenshot: null,
 
       importHugoVersion: '',
@@ -118,6 +120,8 @@ class ImportSiteDialog extends React.Component{
 
       importQuiqrModel: '',
       importQuiqrForms: '',
+
+      importNameErrorText: "",
 
       importSiteName: '',
     })
@@ -137,7 +141,6 @@ class ImportSiteDialog extends React.Component{
 
     //who is the provider?
 
-
     this.setState({importTypeGitBusy: true});
 
     if(regexpGitHub.test(url)){
@@ -151,10 +154,10 @@ class ImportSiteDialog extends React.Component{
     }
 
     var urlparts = url.split('/');
-    var lastSegment = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
-    if(lastSegment.includes(".")) lastSegment = lastSegment.split(".").pop();
-    if(lastSegment !== ""){
-      this.setState({importSiteName:lastSegment});
+    var siteNameFromUrl = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
+    if(siteNameFromUrl.includes(".")) siteNameFromUrl = siteNameFromUrl.split(".").pop();
+    if(siteNameFromUrl !== ""){
+      this.setState({importSiteName:siteNameFromUrl});
     }
 
     service.api.quiqr_git_repo_show(url)
@@ -168,8 +171,9 @@ class ImportSiteDialog extends React.Component{
             importQuiqrForms: (response.QuiqrFormsEndPoints ? response.QuiqrFormsEndPoints:null),
             importTypeGitBusy: false,
             importTypeGitLastValidatedUrl: url,
-            importTypeGitReadyForImport: true,
+            importTypeGitReadyForNaming: true,
           })
+          this.checkFreeSiteName(siteNameFromUrl);
         }
       })
       .catch((e)=>{
@@ -178,6 +182,25 @@ class ImportSiteDialog extends React.Component{
           importTypeGitBusy: false
         });
       });
+  }
+
+  checkFreeSiteName(name){
+    service.api.checkFreeSiteName(name)
+      .then((res)=>{
+        service.api.logToConsole(res);
+        if(res.nameFree){
+          this.setState({
+            importTypeGitReadyForImport: true,
+            importNameErrorText: "",
+          })
+        }
+        else{
+          this.setState({
+            importTypeGitReadyForImport: false,
+            importNameErrorText: "Site name is already in use. Please choose another name.",
+          })
+        }
+      })
   }
 
   renderCards(){
@@ -389,11 +412,8 @@ class ImportSiteDialog extends React.Component{
                 </CardContent>
               </div>
 
-
             </Card>
-
           </Box>
-
 
           <Box my={3}>
             <TextField
@@ -401,10 +421,17 @@ class ImportSiteDialog extends React.Component{
               id="standard-full-width"
               label="Name"
               value={this.state.importSiteName}
-              disabled={(this.state.importTypeGitReadyForImport?false:true)}
+              disabled={(this.state.importTypeGitReadyForNaming?false:true)}
               variant="outlined"
               error={(this.state.importNameErrorText === '' ? false : true)}
               helperText={this.state.importNameErrorText}
+              onChange={(e)=>{
+                service.api.logToConsole("change");
+                this.setState({importSiteName: e.target.value})
+                this.checkFreeSiteName(e.target.value);
+
+
+              }}
             />
           </Box>
           <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport?false:true)} color="primary">Import Site</Button>

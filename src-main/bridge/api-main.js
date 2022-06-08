@@ -6,6 +6,7 @@ const {shell}                   = require('electron');
 const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
+const libraryService            = require('../services/library/library-service')
 const Embgit                    = require('../embgit/embgit')
 const WorkspaceService          = require('../services/workspace/workspace-service')
 const siteSourceBuilderFactory  = require('../site-sources/builders/site-source-builder-factory');
@@ -95,6 +96,28 @@ function setWatcher(workspaceService){
     .on('add', path => clearWorkSpaceConfigCache(workspaceService))
     .on('change', path => clearWorkSpaceConfigCache(workspaceService))
     .on('unlink', path => clearWorkSpaceConfigCache(workspaceService));
+}
+
+api.checkFreeSiteName = function({proposedSiteName}, context){
+
+  libraryService.checkDuplicateSiteConfAttrStringValue('name', proposedSiteName)
+    .then((duplicate)=>{
+
+      let response = {
+        proposedSiteName: proposedSiteName,
+        nameFree: false,
+      }
+
+      if(duplicate){
+        response.nameFree = false;
+      }
+      else{
+        response.nameFree = true;
+      }
+    })
+    .catch((err)=>{
+      context.reject(err);
+    })
 }
 
 api.getConfigurations = function(options, context){
@@ -757,33 +780,19 @@ api.setPublishStatus = async function({status}, context){
 }
 
 api.genereateEtalageImages = async function({siteKey, workspaceKey}, context){
-
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   workspaceService.genereateEtalageImages();
   context.resolve(true);
-
-  /*
-  getSiteService(siteKey, function(err, siteService){
-    if(err){ context.reject(err); return; }
-    siteService.genereateEtalageImages().then(()=>{
-      context.resolve();
-    }, ()=>{
-      context.reject(err);
-    });
-  });
-  */
 }
 
-
 api.saveSiteConf = function({siteKey, newConf}, context){
-  getSiteService(siteKey, function(err, siteService){
-    if(err){ context.reject(err); return; }
-    siteService.saveSiteConf(newConf).then(()=>{
+  libraryService.writeSiteConf(newConf, siteKey)
+    .then(()=>{
       context.resolve();
-    }, ()=>{
+    })
+    .catch((err)=>{
       context.reject(err);
     });
-  });
 }
 
 api.publishSite = function({siteKey, publishConf}, context){

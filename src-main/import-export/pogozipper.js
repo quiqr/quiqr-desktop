@@ -64,7 +64,7 @@ class Pogozipper{
         await fileDirUtils.fileRegexRemove(tmppath, /.gitmodules/);
         await fileDirUtils.fileRegexRemove(tmppath, /.DS_Store/);
 
-        let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+        let configJsobPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
         const conftxt = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
         var newConf = JSON.parse(conftxt);
         console.log("read and parsed conf file");
@@ -162,7 +162,7 @@ class Pogozipper{
         var newConf = JSON.parse(conftxt);
         newConf.source.path = pathSource;
 
-        let newConfigJsobPath = pathHelper.getRoot()+'config.'+siteKey+'.json';
+        let newConfigJsobPath = pathHelper.getSiteMountConfigPath(siteKey);
         await fssimple.writeFileSync(newConfigJsobPath, JSON.stringify(newConf), { encoding: "utf8"});
 
         outputConsole.appendLine('wrote new site configuration');
@@ -308,10 +308,6 @@ class Pogozipper{
         await fileDirUtils.fileRegexRemove(tmppath, /.DS_Store/);
 
         var zip = new AdmZip();
-
-        //let configJsobPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
-        //const newConfJson = fssimple.readFileSync(configJsobPath, {encoding:'utf8', flag:'r'});
-        //await zip.addFile('config.'+global.currentSiteKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
 
         await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
 
