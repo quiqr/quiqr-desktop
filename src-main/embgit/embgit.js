@@ -1,9 +1,8 @@
 const path                                      = require('path');
 const rootPath                                  = require('electron-root-path').rootPath;
-const spawn                                     = require("child_process").spawn;
 const spawnAw                                   = require('await-spawn')
 const pathHelper                                = require('../utils/path-helper');
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../utils/environment-resolver');
+const { EnvironmentResolver, PLATFORMS }        = require('../utils/environment-resolver');
 
 let userconf = {
   email:   "anonymous@quiqr.org",
@@ -64,16 +63,17 @@ class Embgit{
     return cmd;
   }
 
+  //TODO TEST22
   async reset_hard(destination_path){
-    const git_bin = this.getGitBin();
-    return new Promise( async (resolve, reject)=>{
+    const gitBinary = this.getGitBin();
+    return new Promise( async (resolve )=>{
       try {
-        let cmd = await spawnAw( git_bin, [ "reset_hard", destination_path ]);
-        outputConsole.appendLine('Reset success ...');
+        let cmd = await spawnAw( gitBinary, [ "reset_hard", destination_path ]);
+        global.outputConsole.appendLine('Reset success ...');
         console.log(cmd.toString());
         resolve(true)
       } catch (e) {
-        await outputConsole.appendLine(git_bin + " reset_hard  " + destination_path );
+        global.outputConsole.appendLine(gitBinary + " reset_hard  " + destination_path );
         console.log("ERROR")
         console.log(e.stdout.toString())
       }
@@ -81,53 +81,90 @@ class Embgit{
 
   }
 
+  //TODO TEST22
   async commit(destination_path, message){
-    const git_bin = this.getGitBin();
-    return new Promise( async (resolve, reject)=>{
+    const gitBinary = this.getGitBin();
+    return new Promise( async (resolve)=>{
       try {
-        let cmd = await spawnAw( git_bin, [ "commit", "-a" ,"-n", global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', message, destination_path ]);
-        outputConsole.appendLine('Commit success ...');
+        let cmd = await spawnAw( gitBinary, [ "commit", "-a" ,"-n", global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', message, destination_path ]);
+        global.outputConsole.appendLine('Commit success ...');
         console.log(cmd.toString());
         resolve(true)
       } catch (e) {
-        await outputConsole.appendLine(git_bin + " commit -s -i " + userconf.privateKey + " " + destination_path );
+        global.outputConsole.appendLine(gitBinary + " commit -s -i " + userconf.privateKey + " " + destination_path );
         console.log(e.stdout.toString())
         if(e.stdout.toString().includes("already up-to-date")) {
           console.log("no changed");
         }
       }
     });
+  }
 
+  //TODO TEST22
+  async quiqr_repo_show(url){
+    const gitBinary = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let cmd = await spawnAw( gitBinary, [ "quiqr_repo_show", url ]);
+        global.outputConsole.appendLine(gitBinary + " quiqr_repo_show " + url );
+        const response = JSON.parse(cmd.toString());
+        resolve(response)
+      } catch (e) {
+        global.outputConsole.appendLine(gitBinary + " quiqr_repo_show " + url );
+        reject(e)
+      }
+    });
   }
 
   async pull(destination_path){
-    const git_bin = this.getGitBin();
+    const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
-        let clonecmd = await spawnAw( git_bin, [ "pull", "-s" ,"-i", userconf.privateKey, destination_path ]);
-        await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
-        outputConsole.appendLine('Pull success ...');
-        console.log(clonecmd.toString());
+        const cmd = await spawnAw( gitBinary, [ "pull", "-s" ,"-i", userconf.privateKey, destination_path ]);
+        global.outputConsole.appendLine(gitBinary + " pull -s -i " + userconf.privateKey + " " + destination_path );
+        global.outputConsole.appendLine('Pull success ...');
+        console.log(cmd.toString());
         resolve(true)
       } catch (e) {
-        await outputConsole.appendLine(git_bin + " pull -s -i " + userconf.privateKey + " " + destination_path );
-        //await outputConsole.appendLine('Pull error ...:' + e);
+        global.outputConsole.appendLine(gitBinary + " pull -s -i " + userconf.privateKey + " " + destination_path );
         reject(e);
       }
     });
 
   }
-  async cloneWithKey(url, destination_path){
-    const git_bin = this.getGitBin();
+
+  //TODO TEST22
+  async cloneFromPublicUrl(url, destination_path){
+    const gitBinary = this.getGitBin();
+
     return new Promise( async (resolve, reject)=>{
       try {
-        let cmd = await spawnAw( git_bin, [ "clone", "-s" ,"-i", userconf.privateKey, url , destination_path ]);
-        await outputConsole.appendLine(git_bin + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
-        outputConsole.appendLine('Clone success ...');
+        await spawnAw( gitBinary, [ "clone", "-s" , url , destination_path ]);
+        global.outputConsole.appendLine(gitBinary + " clone -s " + url + " " + destination_path );
+        global.outputConsole.appendLine('Clone success ...');
         resolve(true)
       } catch (e) {
-        await outputConsole.appendLine(git_bin + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
-        await outputConsole.appendLine('Clone error ...:' + e);
+        global.outputConsole.appendLine(gitBinary + " clone -s " + url + " " + destination_path );
+        global.outputConsole.appendLine('Clone error ...:' + e);
+        console.log(e.stderr.toString())
+        reject(e);
+      }
+    });
+
+  }
+
+  //TODO TEST22
+  async cloneWithKey(url, destination_path){
+    const gitBinary = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        await spawnAw( gitBinary, [ "clone", "-s" ,"-i", userconf.privateKey, url , destination_path ]);
+        global.outputConsole.appendLine(gitBinary + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
+        global.outputConsole.appendLine('Clone success ...');
+        resolve(true)
+      } catch (e) {
+        global.outputConsole.appendLine(gitBinary + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
+        global.outputConsole.appendLine('Clone error ...:' + e);
         console.log(e.stderr.toString())
         reject(e);
       }

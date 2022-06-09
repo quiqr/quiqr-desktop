@@ -1,24 +1,21 @@
 class FolderSiteSource {
 
-    constructor(config){
-        this.config = config;
-    }
+  constructor(config){
+    this.config = config;
+  }
 
-    listWorkspaces(){
-        return Promise.resolve([{ 'key': 'source', 'path': this.config.path, 'state':'mounted' }]);
-    }
+  listWorkspaces(){
+    return Promise.resolve([{ 'key': 'source', 'path': this.config.path, 'state':'mounted' }]);
+  }
 
-    mountWorkspace(key){
-        return Promise.resolve(undefined);
-    }
+  mountWorkspace(key){
+    console.log(key)
+    return Promise.resolve(undefined);
+  }
 
-    unmountWorkspace(key){
-        return Promise.resolve(undefined);
-    }
-
-    update(){
-        return Promise.resolve();
-    }
+  update(){
+    return Promise.resolve();
+  }
 }
 
 module.exports = FolderSiteSource;

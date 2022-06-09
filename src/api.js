@@ -35,6 +35,11 @@ export class API {
   importSite(){
     return mainProcessBridge.request('importSiteAction');
   }
+
+  importSiteFromPublicGitUrl(siteName: string, url: string){
+    return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url});
+  }
+
   getCurrentSiteKey(){
     return mainProcessBridge.request('getCurrentSiteKey');
   }
@@ -51,8 +56,8 @@ export class API {
     return mainProcessBridge.request('updateMobilePreviewUrl', {url});
   }
 
-  buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string){
-    return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey});
+  buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: any){
+    return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey, extraConfig});
   }
 
   saveSingle(siteKey: string, workspaceKey: string, singleKey: string, document: string){
@@ -112,6 +117,10 @@ export class API {
 
   readConfPrefKey(confkey: string){
     return mainProcessBridge.request('readConfPrefKey', {confkey});
+  }
+
+  checkFreeSiteName(proposedSiteName: string){
+    return mainProcessBridge.request('checkFreeSiteName', {proposedSiteName});
   }
 
   saveConfPrefKey(prefKey: string, prefValue: string){
@@ -175,6 +184,9 @@ export class API {
 
     );
   }
+  quiqr_git_repo_show(url: string){
+    return mainProcessBridge.request('quiqr_git_repo_show', {url});
+  }
 
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 30000});
@@ -199,9 +211,10 @@ export class API {
     return mainProcessBridge.request('saveSiteConf', {siteKey, newConf});
   }
 
-  publishSite(siteKey: string, publishKey: string){
-    return mainProcessBridge.request('publishSite', {siteKey, publishKey});
+  publishSite(siteKey: string, publishConf: any){
+    return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 30000});
   }
+
   setPublishStatus(status){
     return mainProcessBridge.request('setPublishStatus', {status});
   }
@@ -258,6 +271,7 @@ export class API {
   }
 
   createKeyPairGithub(){
+
     return mainProcessBridge.request('createKeyPairGithub',{}, {timeout:90000});
   }
 

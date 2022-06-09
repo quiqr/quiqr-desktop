@@ -1,23 +1,24 @@
-import React               from 'react';
-import { Route }           from 'react-router-dom';
-import service             from './../../../services/service';
-import Typography          from '@material-ui/core/Typography';
-import { withStyles }      from '@material-ui/core/styles';
-import MainPublishCard     from './components/MainPublishCard';
-import SyncServerDialog    from './components/SyncServerDialog';
-import SyncBusyDialog      from './components/SyncBusyDialog';
-import FormLogoQuiqrCloud  from './components/quiqr-cloud/FormLogoQuiqrCloud';
-import FormLogoGitHubPages from './components/github-pages/FormLogoGitHubPages';
-import IconButton          from '@material-ui/core/IconButton';
-import MoreVertIcon        from '@material-ui/icons/MoreVert';
-import Menu                from '@material-ui/core/Menu';
-import MenuItem            from '@material-ui/core/MenuItem';
-import Button              from '@material-ui/core/Button';
-import Dialog              from '@material-ui/core/Dialog';
-import DialogActions       from '@material-ui/core/DialogActions';
-import DialogTitle         from '@material-ui/core/DialogTitle';
-import DialogContent       from '@material-ui/core/DialogContent';
+import React                   from 'react';
+import { Route }               from 'react-router-dom';
+import service                 from './../../../services/service';
+import Typography              from '@material-ui/core/Typography';
+import { withStyles }          from '@material-ui/core/styles';
+import MainPublishCard         from './components/MainPublishCard';
+import SyncServerDialog        from './components/SyncServerDialog';
+import SyncBusyDialog          from './components/SyncBusyDialog';
+import FormLogoQuiqrCloud      from '../../../svg-assets/FormLogoQuiqrCloud';
+import FormLogoGitHubPages     from '../../../svg-assets/FormLogoGitHubPages';
+import IconButton              from '@material-ui/core/IconButton';
+import MoreVertIcon            from '@material-ui/icons/MoreVert';
+import Menu                    from '@material-ui/core/Menu';
+import MenuItem                from '@material-ui/core/MenuItem';
+import Button                  from '@material-ui/core/Button';
+import Dialog                  from '@material-ui/core/Dialog';
+import DialogActions           from '@material-ui/core/DialogActions';
+import DialogTitle             from '@material-ui/core/DialogTitle';
+import DialogContent           from '@material-ui/core/DialogContent';
 import { snackMessageService } from './../../../services/ui-service';
+import SnackbarManager         from './../../../components/SnackbarManager';
 
 const useStyles = theme => ({
 
@@ -101,26 +102,26 @@ class SyncRouteGeneral extends React.Component {
       }
     })
 
-    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, build).then(()=>{
-      this.setState({blockingOperation: 'Publishing site...'});
+    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, build, publishConf.config).then(()=>{
 
-      service.api.publishSite(this.props.siteKey, publishConf.key).then(()=>{
-        //this.startPublishPolling(true);
+      service.api.publishSite(this.props.siteKey, publishConf).then(()=>{
+        this.setState({
+          serverBusyDialog: {
+            open:false,
+            serverType: null,
+          }
+        })
+
+      }).catch(()=>{
+        snackMessageService.addSnackMessage('Publish failed.');
+        this.setState({
+          serverBusyDialog: {
+            open:false,
+            serverType: null,
+          }
+        })
       });
-
-    }).then(()=>{
-
-    }).catch(()=>{
-      snackMessageService.addSnackMessage('Publish failed.');
-
-    }).then(()=>{
-      this.setState({
-        serverBusyDialog: {
-          open:false,
-          serverType: null,
-        }
-      })
-    })
+    });
   }
 
   savePublishData(inkey,data){
@@ -278,6 +279,9 @@ class SyncRouteGeneral extends React.Component {
         return (
 
           <React.Fragment>
+
+            <SnackbarManager />
+
             <div className={ this.props.classes.container }>
               <Typography variant="h5">Sync Website - {this.state.site.name}</Typography>
 

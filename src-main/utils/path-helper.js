@@ -1,10 +1,10 @@
-const electron                                  = require('electron')
-const path                                      = require('path');
-const userHome                                  = require('user-home');
-const fs                                        = require('fs-extra');
-const rootPath                                  = require('electron-root-path').rootPath;
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
-const QuiqrAppConfig                            = require('../app-prefs-state/quiqr-app-config');
+const electron                           = require('electron')
+const path                               = require('path');
+const userHome                           = require('user-home');
+const fs                                 = require('fs-extra');
+const rootPath                           = require('electron-root-path').rootPath;
+const { EnvironmentResolver, PLATFORMS } = require('./environment-resolver');
+const QuiqrAppConfig                     = require('../app-prefs-state/quiqr-app-config');
 
 const pogoconf = QuiqrAppConfig();
 
@@ -13,7 +13,6 @@ class PathHelper{
   /* DIRS */
   getRoot(){
 
-    let dataFolder = "";
     let thedir = "";
 
     let prefs = pogoconf.prefs;
@@ -81,7 +80,8 @@ class PathHelper{
 
     let enviromnent = new EnvironmentResolver().resolve();
 
-    if(process.env.NODE_ENV === 'production'){
+    //TODO TEST22
+    if(global.process.env.NODE_ENV === 'production'){
       if(enviromnent.platform == PLATFORMS.macOS){
         return path.join(rootPath, 'Contents','Resources');
       }
@@ -124,7 +124,7 @@ class PathHelper{
     return userHome +'/.ssh/known_hosts';
   }
 
-  getKeyPath(siteKey){
+  getSiteMountConfigPath(siteKey){
     return this.getRoot()+'config.'+siteKey+'.json';
   }
 
@@ -139,7 +139,8 @@ class PathHelper{
       return global.process.env.HUGO_PATH;
     }
 
-    let platform = process.platform.toLowerCase();
+    //TODO TEST22
+    let platform = global.process.platform.toLowerCase();
     if(platform.startsWith('win')){
       return this.getHugoBinDirForVer(version) + 'hugo.exe';
     }

@@ -92,8 +92,9 @@ function get(callback, {invalidateCache} = {}){
 
   let ownerslookupHash = {};
   let lookuploaded = false;
+
   try{
-    ownerslookUpData = fs.readFileSync(pathHelper.ownersLookupCacheFilePath(), {encoding: 'utf-8'});
+    let ownerslookUpData = fs.readFileSync(pathHelper.ownersLookupCacheFilePath(), {encoding: 'utf-8'});
     ownerslookupHash = JSON.parse(ownerslookUpData);
     lookuploaded = true;
   }
@@ -159,7 +160,6 @@ function get(callback, {invalidateCache} = {}){
 
 function getEtalage(site){
 
-  let etalageDir = path.join(site.source.path,"/quiqr/etalage");
   let etalagePath = path.join(site.source.path,"/quiqr/etalage/etalage.json");
   let etalageScreenshotsPath = path.join(site.source.path,"/quiqr/etalage/screenshots/");
   let etalageFaviconPath = path.join(site.source.path,"/quiqr/etalage/favicon/");

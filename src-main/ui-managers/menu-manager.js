@@ -1,8 +1,7 @@
-const electron                    = require('electron')
-const Menu                        = electron.Menu
+const electron                    = require('electron');
+const Menu                        = electron.Menu;
 const path                        = require("path");
-const { lstatSync, readdirSync }  = require('fs')
-const rimraf                      = require("rimraf");
+const { lstatSync }               = require('fs')
 const fssimple                    = require('fs');
 const fs                          = require('fs-extra');
 const { shell }                   = require('electron')
@@ -12,17 +11,14 @@ const cloudCacheManager           = require('../sync/quiqr-cloud/cloud-cache-man
 const cloudApiManager             = require('../sync/quiqr-cloud/cloud-api-manager');
 const cloudGitManager             = require('../sync/quiqr-cloud/cloud-git-manager');
 const PogoPublisher               = require('../publishers/pogo-publisher');
-const pogoversions                = require('../utils/pogo-site-version-helper');
 const pathHelper                  = require('../utils/path-helper');
-const hugoDownloader              = require('../hugo/hugo-downloader')
-const HugoBuilder                 = require('../hugo/hugo-builder');
 const SiteService                 = require('../services/site/site-service')
+const libraryService              = require('../services/library/library-service')
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
 const app = electron.app
 let menuObject = null;
-const apiMain = global.apiMain;
 
 let context = {};
 context.reject = function(error){
@@ -41,16 +37,8 @@ class MenuManager {
     mainWindow.webContents.send("redirectToGivenLocation", "/forms-cookbook");
   }
   stopServer() {
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-
     if(global.hugoServer){
-      global.hugoServer.stopIfRunning((err, stdout, stderr) => {
-        if(err){
-          console.log(err)
-        }
-
-        else{ resolve(); }
-      });
+      global.hugoServer.stopIfRunning();
 
       global.mainWM.reloadMobilePreview();
     }
@@ -61,6 +49,8 @@ class MenuManager {
       global.hugoServer.serve((err, stdout, stderr) => {
         if(err){
           console.log(err)
+          console.log(stdout)
+          console.log(stderr)
         }
       });
     }
@@ -114,6 +104,30 @@ class MenuManager {
       });
     }
   }
+
+  /*
+  updateMenu(currentSiteKey){
+    return;
+
+    let siteRelatedMenuIds = [
+      'export-site',
+      'delete-site',
+      'export-theme',
+      'import-theme',
+      'export-content',
+      'import-content',
+      'start-server',
+      'open-site-dir',
+      'open-site-conf',
+      'auto-create-model',
+    ];
+    siteRelatedMenuIds.forEach((id)=>{
+      let myItem = menuObject.getMenuItemById(id);
+      myItem.enabled = (currentSiteKey?true:false);
+    });
+
+  }
+  */
 
 
   async requestUserConnectCode(){
@@ -197,9 +211,7 @@ class MenuManager {
             detail: 'Connection was successful',
           };
 
-          dialog.showMessageBox(null, options, async (response) => {
-            //select user
-          });
+          dialog.showMessageBox(null, options, () => {});
 
         });
 
@@ -216,9 +228,7 @@ class MenuManager {
           detail: 'Connect code was invalid',
         };
 
-        dialog.showMessageBox(null, options, async (response) => {
-          //select user
-        });
+        dialog.showMessageBox(null, options, () => {});
       }
 
       this.createMainMenu();
@@ -231,93 +241,6 @@ class MenuManager {
     let pogopubl = new PogoPublisher({});
     await pogopubl.createSiteFromThemeGitUrl();
   }
-
-  /*
-  async generateModel() {
-
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    const dialog = electron.dialog;
-    let config = await workspaceConfigProvider.getConfig(global.currentSitePath, global.currentWorkspaceKey);
-    let hugover = 'extended_0.80.0';
-    let modelPath = path.join(pathHelper.getTempDir(),"model");
-    let modelFile = path.join(modelPath, "sukoh.json");
-    let menuFile = path.join(modelPath, "zpogomenu.json");
-    let hugoBuilderConfig = {
-      config: config.build[0]['config'],
-      workspacePath: global.currentSitePath,
-      destination: modelPath,
-      hugover: hugover
-    }
-
-    const exec = pathHelper.getHugoBinForVer(hugover);
-
-    if(!fs.existsSync(exec)){
-      const dialog = electron.dialog;
-      dialog.showMessageBox(mainWindow, {
-        buttons: ["Close"],
-        title: "Quiqr will now download hugo " + hugover,
-   *message: "Try again when download has finished",
-      });
-
-      try{
-        hugoDownloader.downloader.download(hugover);
-        this.generateModel();
-      }
-      catch(e){
-        // warn about HugoDownloader error?
-      }
-    }
-    else{
-      // write .images.md for managing images in static folder
-      const staticDir = path.join(global.currentSitePath, "static");
-      const imageDir =  path.join(global.currentSitePath, "static", "images");
-      const imgDir =  path.join(global.currentSitePath, "static", "img");
-      const imageFile = path.join(global.currentSitePath, "static", "images", ".pogo-images.md");
-      const imgFile = path.join(global.currentSitePath, "static", "img", ".pogo-images.md");
-      const imageFile2 = path.join(global.currentSitePath, "static", ".pogo-images.md");
-      const imageFileContent = "---\n\
-description: this file is a helper file for the Quiqr asset manager\n\
-resources: []\n\
----\n\
-\n";
-      if (fs.existsSync (imageDir)){
-        fs.writeFileSync(imageFile , imageFileContent , 'utf-8');
-      }
-      if (fs.existsSync (imgDir)){
-        fs.writeFileSync(imgFile , imageFileContent , 'utf-8');
-      }
-      if (fs.existsSync(staticDir)){
-        fs.writeFileSync(imageFile2 , imageFileContent , 'utf-8');
-      };
-
-      let hugoBuilder = new HugoBuilder(hugoBuilderConfig);
-      await hugoBuilder.buildModel();
-
-      if(!fs.existsSync(modelFile)){
-        dialog.showMessageBox(mainWindow, {
-          type: 'error',
-          buttons: ["Close"],
-          title: "Warning",
-          message: "Failed to generate sukoh.json.",
-        });
-      }
-      else {
-        let options  = {
-          title: "Please confirm",
-          buttons: ["Yes","Cancel"],
-          message: "Copy sukoh.json to "+global.currentSitePath+"? (Previous json will be overwritten)"
-        }
-        let response = dialog.showMessageBox(options)
-        if(response === 1) return;
-
-        fs.copySync(modelFile, path.join(global.currentSitePath,"quiqr","model", "base.json"));
-        if (fs.existsSync(menuFile)){
-          fs.copySync(menuFile, path.join(global.currentSitePath, "zpogomenu.json"));
-        }
-      }
-    }
-  }
-  */
 
   showVersion(){
     const idPath = path.join(pathHelper.getApplicationResourcesDir(),"all","build-git-id.txt");
@@ -351,18 +274,18 @@ resources: []\n\
 
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
-      let siteService = null;
       configurationDataProvider.get(async (err, configurations)=>{
         if(configurations.empty===true) throw new Error('Configurations is empty.');
-        if(err) { reject(err); return; }
+        if(err) return;
         let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
 
-        if(siteData=siteService = new SiteService(siteData)){
+        let siteService = new SiteService(siteData);
+        if(siteService){
           let newConf = siteService._config;
           let currentName = siteService._config.name;
 
           // REMOVE INVALID KEYS
-          this.deleteInvalidConfKeys(newConf);
+          libraryService.deleteInvalidConfKeys(newConf);
 
           const prompt = require('electron-prompt');
           var newName = await prompt({
@@ -380,13 +303,14 @@ resources: []\n\
             return;
           }
 
-          let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+          let configFilePath = pathHelper.getSiteMountConfigPath(siteKey);
           newConf.name = newName;
 
           //TODO USE GENERAL
           await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
-          outputConsole.appendLine('rename site to: '+newName);
+          //TODO TEST22
+          global.outputConsole.appendLine('rename site to: '+newName);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
           mainWindow.setTitle(`Quiqr - Site: ${newName}`);
@@ -408,25 +332,9 @@ resources: []\n\
     mainWindow.webContents.send("redirectToGivenLocation","/prefs");
   }
 
-  /*
-  siteConfig() {
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-      mainWindow.webContents.send("disableMobilePreview");
-      //mainWindow.webContents.send("redirectToGivenLocation","/siteconf");
-
-      //var newURL='/siteconf/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
-      let newScreenURL = `/siteconf/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-      mainWindow.webContents.send("redirectToGivenLocation", newScreenURL);
-    }
-
-  }
-  */
-
   deleteSite() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     mainWindow.webContents.send("disableMobilePreview");
-    let dir;
 
     const dialog = electron.dialog;
 
@@ -439,7 +347,7 @@ resources: []\n\
       let response = dialog.showMessageBox(options)
       if(response === 1) return;
 
-      fs.remove(pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json');
+      fs.remove(pathHelper.getSiteMountConfigPath(global.currentSiteKey));
 
       var rimraf = require("rimraf");
       rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, ()=>{
@@ -479,7 +387,6 @@ resources: []\n\
 
   openWorkSpaceQuiqrDir(){
     let wspath = path.join(global.currentSitePath, "quiqr");
-    let lstat = fs.lstatSync(wspath);
 
     try{
       let lstat = fs.lstatSync(wspath);
@@ -487,7 +394,7 @@ resources: []\n\
         shell.openPath(wspath);
       }
       else{
-        shell.openPath(dirname(wspath));
+        shell.openPath(path.dirname(wspath));
       }
     }
     catch(e){
@@ -496,7 +403,6 @@ resources: []\n\
   }
   openWorkSpaceDir(){
     let wspath = global.currentSitePath;
-    let lstat = fs.lstatSync(wspath);
 
     try{
       let lstat = fs.lstatSync(wspath);
@@ -504,7 +410,7 @@ resources: []\n\
         shell.openPath(wspath);
       }
       else{
-        shell.openPath(dirname(wspath));
+        shell.openPath(path.dirname(wspath));
       }
     }
     catch(e){
@@ -512,7 +418,7 @@ resources: []\n\
     }
   }
   openWorkSpaceConfig(){
-    let wspath = pathHelper.getRoot()+'config.'+global.currentSiteKey+'.json';
+    let wspath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     try{
       shell.openPath(wspath);
     }
@@ -523,13 +429,7 @@ resources: []\n\
 
   async selectSitesWindow () {
     if(global.hugoServer){
-      global.hugoServer.stopIfRunning((err, stdout, stderr)=>{
-        if(err){
-          console.log(err)
-        }
-
-        else{ resolve(); }
-      });
+      global.hugoServer.stopIfRunning();
     }
 
     global.mainWM.closeSiteAndShowSelectSites();
@@ -545,19 +445,24 @@ resources: []\n\
     }
   }
 
+  /*
   userIsOwner(siteKey, user){
     return true;
   }
+  */
 
   siteIsPogoCloudManaged(){
 
     if(global.currentSiteKey && global.currentSiteKey !== ""){
 
+      //TODO ??
       return true;
 
+      /*
       configurationDataProvider.get((err, configurations)=>{
         let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-        if(siteData.hasOwnProperty("publish") && siteData.publish[0].hasOwnProperty("config") && siteData.publish[0].config.hasOwnProperty("path")){
+        //TODO TEST22
+        if('publish' in siteData && 'config' in siteData.publish[0] && 'path' in siteData.publish[0].config){
           if(this.userIsOwner(global.currentSiteKey, this.profileUserName)){
             return true;
           }
@@ -566,30 +471,9 @@ resources: []\n\
           return false;
         }
       });
+      */
     }
     return false;
-  }
-
-  updateMenu(currentSiteKey){
-    return;
-
-    let siteRelatedMenuIds = [
-      'export-site',
-      'delete-site',
-      'export-theme',
-      'import-theme',
-      'export-content',
-      'import-content',
-      'start-server',
-      'open-site-dir',
-      'open-site-conf',
-      'auto-create-model',
-    ];
-    siteRelatedMenuIds.forEach((id)=>{
-      let myItem = menuObject.getMenuItemById(id);
-      myItem.enabled = (currentSiteKey?true:false);
-    });
-
   }
 
   async selectSiteVersion(subdir){
@@ -707,7 +591,6 @@ resources: []\n\
 
   connectProfilesMenu(){
 
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     let profilesMenu = [];
 
     profilesMenu.push({
@@ -731,7 +614,6 @@ resources: []\n\
 
   inviteMenu(){
 
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
     let profilesMenu = [];
 
     profilesMenu.push({
@@ -746,94 +628,31 @@ resources: []\n\
     return profilesMenu;
   }
 
-  /*
-  createVersionsMenu(){
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let siteKey = global.currentSiteKey;
-      let siteService = null;
-      configurationDataProvider.get((err, configurations)=>{
-        if(configurations.empty===true) throw new Error('Configurations is empty.');
-        if(err) { reject(err); return; }
-        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-
-        if(siteData==null) {
-          //throw new Error('Could not find site is empty.');
-        }
-        else{
-          siteService = new SiteService(siteData);
-        }
-
-      });
-
-      if(siteService == null){
-        return;
-      }
-
-      let currentPath = siteService._config.source.path;
-      let currentVersion = siteService._config.source.path.split("/").pop();
-
-
-      let versionsMenu = [];
-
-      if(path.resolve(currentPath, '..').split("/").pop()==='sources'){
-        let sources = path.resolve(currentPath, '..');
-        var files = fs.readdirSync(sources);
-        files.forEach( (f) => {
-          let label = "";
-          let checked = false;
-          if(lstatSync(path.join(sources,f)).isDirectory()){
-            label = f;
-            if(f == currentVersion){
-              checked = true;
-            }
-            versionsMenu.push({
-              id: f,
-              type: "checkbox",
-              label: label,
-              checked: checked,
-              click: async () => {
-                pogoversions.setSiteVersion(f);
-              }
-            });
-          }
-        });
-      }
-      return versionsMenu;
-    }
-    else {
-      return [];
-    }
-  }
-  */
-
-  deleteInvalidConfKeys(newConf){
-    // REMOVE INVALID KEYS
-    delete newConf['configPath']
-    delete newConf['owner']
-    delete newConf['published']
-    delete newConf['publishKey']
-  }
-
   async editProjectPath(){
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
     if(global.currentSiteKey && global.currentWorkspaceKey){
       let siteKey = global.currentSiteKey;
-      let siteService = null;
       configurationDataProvider.get(async (err, configurations) => {
         if(configurations.empty===true) throw new Error('Configurations is empty.');
-        if(err) { reject(err); return; }
+
+        if(err) return;
+
         let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
 
-        if(siteData=siteService = new SiteService(siteData)){
+        //TODO TEST22
+        let siteService = new SiteService(siteData)
+        if(siteService){
           let newConf = siteService._config;
 
           let currentPath = "";
-          if(newConf.hasOwnProperty("publish") && newConf.publish[0].hasOwnProperty("config") &&  newConf.publish[0].config.hasOwnProperty("path")){
+
+          //TODO TEST22
+          if('publish' in newConf && 'config' in newConf.publish[0] && 'path' in newConf.publish[0].config){
             currentPath = newConf.publish[0].config.path
           }
 
-          this.deleteInvalidConfKeys(newConf);
+          libraryService.deleteInvalidConfKeys(newConf);
 
           const prompt = require('electron-prompt');
           var newPath = await prompt({
@@ -852,7 +671,7 @@ resources: []\n\
             return;
           }
 
-          let configFilePath = path.join(pathHelper.getRoot(),'config.'+siteKey+'.json');
+          let configFilePath = pathHelper.getSiteMountConfigPath(siteKey);
 
           newConf.publish[0].key = "quiqr-cloud"
           newConf.publish[0].config = {}
@@ -863,7 +682,8 @@ resources: []\n\
           //TODO USE GENERAL
           await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
-          outputConsole.appendLine('rename projectpath to: '+newPath);
+          //TODO TEST22
+          global.outputConsole.appendLine('rename projectpath to: '+newPath);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
           mainWindow.webContents.send("redirectToGivenLocation","/");
@@ -941,9 +761,8 @@ resources: []\n\
         detail: 'You should restart Quiqr to make changes effective.',
       };
 
-      dialog.showMessageBox(null, options, async (response) => {
-      });
-
+      //TODO TEST22
+      dialog.showMessageBox(null, options, () => {});
 
       this.createMainMenu();
     });
@@ -1138,7 +957,8 @@ resources: []\n\
 
   mainMenuArray(){
 
-    const isMac = process.platform === 'darwin'
+    //TODO TEST22
+    const isMac = global.process.platform === 'darwin'
 
     const template = [
       ...(isMac ? [{
@@ -1171,7 +991,8 @@ resources: []\n\
             id: 'switch-select-sites-view',
             label: 'Site Library',
             click: async () => {
-              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              //TODO TEST22
+              //TODO this seems smarter. Implement at other places
               global.mainWM.closeSiteAndShowSelectSites();
             }
 
@@ -1424,16 +1245,6 @@ resources: []\n\
               global.apiMain.genereateEtalageImages({siteKey:global.currentSiteKey, workspaceKey: global.currentWorkspaceKey},context);
             }
           },
-          /*
-          {
-            id: 'clear-config-cache',
-            label: 'Clear Model Cache',
-            enabled: this.siteSelected(),
-            click: async () => {
-              global.apiMain.clearWorkSpaceConfigCache({},context);
-            }
-          },
-          */
           {
             label: 'Disable Partial Cache',
             type: "checkbox",
@@ -1465,7 +1276,8 @@ resources: []\n\
         submenu: this.createExperimentalMenu()
       }] : []),
 
-      ...(process.env.REACT_DEV_URL ? [{
+      //TODO TEST22
+      ...(global.process.env.REACT_DEV_URL ? [{
         label: 'DevMenu',
         submenu: this.createDevMenu()
       }] : []),

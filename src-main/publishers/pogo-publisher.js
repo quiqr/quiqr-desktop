@@ -5,16 +5,14 @@ const fssimple                                  = require('fs');
 const ProgressBar                               = require('electron-progressbar');
 const spawn                                     = require("child_process").spawn;
 const spawnAw                                   = require('await-spawn')
-const toml                                      = require('toml');
 const fileDirUtils                              = require('../utils/file-dir-utils');
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../utils/environment-resolver');
+const { EnvironmentResolver }                   = require('../utils/environment-resolver');
 const formatProviderResolver                    = require('../utils/format-provider-resolver');
 const pathHelper                                = require('../utils/path-helper');
 const outputConsole                             = require('../logger/output-console');
 const hugoDownloader                            = require('../hugo/hugo-downloader')
-const HugoBuilder                               = require('../hugo/hugo-builder');
 const Embgit                                    = require('../embgit/embgit');
-const cloudSiteconfigManager                    = require('../sync/quiqr-cloud/cloud-siteconfig-manager');
+const libraryService                            = require('../services/library/library-service');
 
 class PogoPublisher {
 
@@ -48,7 +46,7 @@ class PogoPublisher {
   }
 
   async writePublishDate(publDate){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.lastPublish = publDate;
@@ -59,7 +57,7 @@ class PogoPublisher {
   }
 
   async writePublishStatus(status){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.publishStatus = status;
@@ -68,7 +66,7 @@ class PogoPublisher {
 
 
   async writeDomainInfo(pogoDomain, domain){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.publish = [];
@@ -84,7 +82,7 @@ class PogoPublisher {
   }
 
   async UnlinkCloudPath(){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+global.currentSiteKey+'.json';
+    let configJsonPath = pathHelper.getSiteMountConfigPath(global.currentSiteKey);
     const conftxt = await fs.readFileSync(configJsonPath, {encoding:'utf8', flag:'r'});
     var newConf = JSON.parse(conftxt);
     newConf.lastPublish = 0,
@@ -106,7 +104,6 @@ class PogoPublisher {
     //create new site with hugo
     //clone theme into new site
     //copy exampleSite
-    //run brechts wunder script
 
     let mainWindow = global.mainWM.getCurrentInstance();
     let hugover = 'extended_0.77.0';
@@ -122,7 +119,6 @@ class PogoPublisher {
 
       try{
         hugoDownloader.downloader.download(hugover);
-        this.generateModel();
       }
       catch(e){
         // warn about HugoDownloader error?
@@ -182,18 +178,14 @@ class PogoPublisher {
         .on('aborted', function(value) {
           console.info(`aborted... ${value}`);
         })
-        .on('progress', function(value) {
-        });
 
       progressBar.value += 10;
       progressBar.detail = 'Preparing download';
 
-      var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
       let themeName = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
       console.log("guesedKey:"+themeName);
 
-      var temp_gh_dest = pathHelper.getRoot()+'temp/';
       var full_gh_dest = pathHelper.getRoot()+'temp/siteFromTheme/';
       var full_gh_themes_dest = pathHelper.getRoot()+'temp/siteFromTheme/themes/'+themeName;
 
@@ -201,10 +193,6 @@ class PogoPublisher {
       await fs.emptyDir(full_gh_dest);
       await fs.ensureDir(full_gh_dest);
       await fs.ensureDir(full_gh_dest + '/themes');
-
-      let hugoBuilderConfig = {
-        hugover: hugover
-      }
 
       var git_bin = Embgit.getGitBin();
 
@@ -216,7 +204,7 @@ class PogoPublisher {
       await outputConsole.appendLine('Cloning from: ' + full_gh_url);
 
       try {
-        let clonecmd = await spawnAw( git_bin, [ "clone", full_gh_url , full_gh_themes_dest ]);
+        await spawnAw( git_bin, [ "clone", full_gh_url , full_gh_themes_dest ]);
         outputConsole.appendLine('Clone success ...');
       } catch (e) {
         await outputConsole.appendLine(git_bin+ " clone " + full_gh_url + " " + full_gh_themes_dest );
@@ -246,7 +234,7 @@ class PogoPublisher {
       progressBar._window.hide();
       progressBar.close();
 
-      if(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+      if(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
         const options = {
           type: 'question',
           buttons: ['Cancel', 'Overwrite', 'Keep both'],
@@ -257,13 +245,10 @@ class PogoPublisher {
         };
 
         dialog.showMessageBox(null, options, async (response) => {
-          if(response === 1){
-
-          }
-          else if(response ===2){
+          if(response ===2){
 
             let extraPlus = 0
-            while(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+            while(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
               extraPlus = extraPlus++;
 
               let numLength = 0;
@@ -272,7 +257,7 @@ class PogoPublisher {
               }
 
               if(numLength>0){
-                keyNumpart = Number(siteKey.slice(-numLength));
+                let keyNumpart = Number(siteKey.slice(-numLength));
                 keyNumpart = keyNumpart+extraPlus;
                 siteKey = siteKey.substring(0, siteKey.length - numLength)+keyNumpart.toString();
               }
@@ -336,8 +321,6 @@ class PogoPublisher {
       .on('aborted', function(value) {
         console.info(`aborted... ${value}`);
       })
-      .on('progress', function(value) {
-      });
 
     progressBar.value += 10;
     progressBar.detail = 'Preparing download';
@@ -345,7 +328,6 @@ class PogoPublisher {
     var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
 
     var full_gh_dest = pathHelper.getRoot()+'temp/siteFromUrl/';
-    var full_gh_dest = full_gh_dest;
 
     var git_bin = Embgit.getGitBin();
 
@@ -361,7 +343,7 @@ class PogoPublisher {
     await outputConsole.appendLine('Cloning from: ' + full_gh_url);
 
     try {
-      let clonecmd = await spawnAw( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
+      await spawnAw( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
       outputConsole.appendLine('Clone success ...');
     } catch (e) {
       await outputConsole.appendLine(git_bin+ " clone -s -i " + pogokeypath + " " + full_gh_url + " " + full_gh_dest );
@@ -376,7 +358,7 @@ class PogoPublisher {
     let siteKey = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
     console.log("guesedKey:"+siteKey);
 
-    if(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+    if(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
       const options = {
         type: 'question',
         buttons: ['Cancel', 'Overwrite', 'Keep both'],
@@ -387,13 +369,10 @@ class PogoPublisher {
       };
 
       dialog.showMessageBox(null, options, async (response) => {
-        if(response === 1){
-
-        }
-        else if(response ===2){
+        if(response ===2){
 
           let extraPlus = 0
-          while(fs.existsSync(pathHelper.getKeyPath(siteKey))){
+          while(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
             extraPlus = extraPlus++;
 
             let numLength = 0;
@@ -402,7 +381,7 @@ class PogoPublisher {
             }
 
             if(numLength>0){
-              keyNumpart = Number(siteKey.slice(-numLength));
+              let keyNumpart = Number(siteKey.slice(-numLength));
               keyNumpart = keyNumpart+extraPlus;
               siteKey = siteKey.substring(0, siteKey.length - numLength)+keyNumpart.toString();
             }
@@ -425,7 +404,6 @@ class PogoPublisher {
 
   //TODO MOVE TO OTHER FILE
   async createNewWithTempDirAndKey(siteKey, full_gh_dest){
-    let newPath = '';
     var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
     var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
     var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
@@ -433,8 +411,8 @@ class PogoPublisher {
     await fs.ensureDir(pathSite);
     await fs.ensureDir(pathSiteSources);
     await fs.moveSync(full_gh_dest, pathSource);
-    let newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey,siteKey, pathSource);
-    await fssimple.writeFileSync(pathHelper.getKeyPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+    let newConf = libraryService.createConfUnmanaged(siteKey,siteKey, pathSource);
+    await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 
 
@@ -538,8 +516,6 @@ class PogoPublisher {
 
     let clonecmd = spawn( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
 
-    clonecmd.stdout.on("data", (data) => {
-    });
     clonecmd.stderr.on("data", (err) => {
       outputConsole.appendLine('Clone error ...:' + err);
     });
@@ -585,10 +561,6 @@ class PogoPublisher {
         var spawn = require("child_process").spawn;
         let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
 
-        clonecmd2.stdout.on("data", (data) => {
-        });
-        clonecmd2.stderr.on("data", (err) => {
-        });
         clonecmd2.on("exit", (code) => {
           if(code==0){
 
@@ -605,10 +577,6 @@ class PogoPublisher {
             const UQIS = environmentResolver.getUQIS();
             let clonecmd3 = spawn( git_bin, [ "commit", '-a' , '-n', global.pogoconf.currentUsername, '-e',global.pogoconf.currentUsername+'@quiqr.cloud', '-m', "publication from " + UQIS, full_gh_dest]);
 
-            clonecmd3.stdout.on("data", (data) => {
-            });
-            clonecmd3.stderr.on("data", (err) => {
-            });
             clonecmd3.on("exit", (code) => {
 
               if(code==0){
@@ -619,11 +587,7 @@ class PogoPublisher {
                 let clonecmd4 = spawn( git_bin, [ "push","-s", "-i", pogokeypath, full_gh_dest ]);
                 outputConsole.appendLine(git_bin+" push -i "+ pogokeypath +" "+ full_gh_dest);
 
-                clonecmd4.stdout.on("data", (data) => {
-                });
-                clonecmd4.stderr.on("data", (err) => {
-                });
-                clonecmd4.on("exit", (err) => {
+                clonecmd4.on("exit", () => {
 
                   if(code==0){
                     outputConsole.appendLine('git-push finished ... changes are published.');

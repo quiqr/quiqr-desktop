@@ -10,10 +10,9 @@ exports.api = function(){
 exports.bind = function(){
 
   let handlers = {};
-  //const apiMain = global.apiMain;
 
-  function addListener(key/*: string*/){
-    if(apiMain.hasOwnProperty(key)){
+  function addListener(key){
+    if(key in apiMain){
 
       if(enableLogging)
         console.log('IPC_MAIN_BIND_LISTENER: '+key);
@@ -52,7 +51,7 @@ exports.bind = function(){
     else{
       throw `Could not find API method for key '${key}'.`;
     }
-  };
+  }
 
   for(var key in apiMain){
     if(!key.startsWith('_'))

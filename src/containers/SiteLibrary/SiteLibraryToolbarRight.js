@@ -1,9 +1,11 @@
-import * as React           from 'react';
-import service              from './../../services/service';
-import {TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup}    from '../TopToolbarRight'
-import SettingsApplicationsIcon from '@material-ui/icons/SettingsApplications';
-import ViewListIcon      from '@material-ui/icons/ViewList';
-import ViewModuleIcon    from '@material-ui/icons/ViewModule';
+import * as React                                                 from 'react';
+import { Route }  from 'react-router-dom';
+import service                                                    from './../../services/service';
+import {TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup} from '../TopToolbarRight'
+import SettingsApplicationsIcon                                   from '@material-ui/icons/SettingsApplications';
+import InputIcon                                                  from '@material-ui/icons/Input';
+import ViewListIcon                                               from '@material-ui/icons/ViewList';
+import ViewModuleIcon                                             from '@material-ui/icons/ViewModule';
 
 const iconColor = "#000";
 
@@ -15,8 +17,20 @@ export class SiteLibraryToolbarRight extends React.Component {
   }
 
   render(){
+    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
+  }
+
+  renderWithRoute(history: {push:(path: string)=>void}){
 
     const leftButtons = [
+      <ToolbarButton
+        action={()=>{
+          service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);
+        }}
+        title="Import"
+        icon={<InputIcon style={{ color: iconColor }} />}
+      />,
+
     ]
     const centerButtons = [
       <ToolbarToggleButtonGroup
@@ -40,7 +54,7 @@ export class SiteLibraryToolbarRight extends React.Component {
     const rightButtons = [
       <ToolbarButton
         action={()=>{
-          service.api.redirectTo(`/prefs/`);
+          history.push('/prefs/')
         }}
         title="Preferences"
         icon={<SettingsApplicationsIcon style={{ color: iconColor }} />}

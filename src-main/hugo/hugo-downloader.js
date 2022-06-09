@@ -40,7 +40,7 @@ class OfficialHugoUnpacker{
         packagePath = path.normalize(packagePath);
         let output = path.dirname(packagePath);
         return new Promise((resolve,reject)=>{
-            execFile(path7za, ['e', packagePath, '-o'+output, '*', '-r', '-y' ], (error, stdout, stderr)=>{
+            execFile(path7za, ['e', packagePath, '-o'+output, '*', '-r', '-y' ], (error)=>{
                 if(error) reject(error);
                 else resolve();
             });
@@ -55,7 +55,7 @@ class OfficialHugoUnpacker{
             });
         }).then((tarFile)=>{
             return new Promise((resolve, reject)=>{
-                execFile(path7za, ['e', tarFile, '-o'+output, 'hugo*', '-r', '-y' ], (error, stdout, stderr)=>{
+                execFile(path7za, ['e', tarFile, '-o'+output, 'hugo*', '-r', '-y' ], (error)=>{
                     if(error){ reject(error); return; }
                     fs.chmodSync(packagePath.replace('download.partial','hugo'),722);
                     resolve();
@@ -68,7 +68,7 @@ class OfficialHugoUnpacker{
         packagePath = path.normalize(packagePath);
         let output = path.dirname(packagePath);
         return new Promise((resolve,reject)=>{
-            execFile(path7za, ['e', packagePath, '-o'+output, '*.exe', '-r', '-y' ], (error, stdout, stderr)=>{
+            execFile(path7za, ['e', packagePath, '-o'+output, '*.exe', '-r', '-y' ], (error)=>{
                 if(error)
                     reject(error);
                 else
@@ -164,8 +164,6 @@ class HugoDownloader{
                 .on('aborted', function(value) {
                     console.info(`aborted... ${value}`);
                 })
-                .on('progress', function(value) {
-                });
 
 
             outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);

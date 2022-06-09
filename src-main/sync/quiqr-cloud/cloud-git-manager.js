@@ -1,14 +1,11 @@
 const fs                      = require('fs-extra');
-const spawnAw                 = require('await-spawn')
+const spawnAw                 = require('await-spawn');
 const path                    = require('path');
 const del                     = require('del');
 const Embgit                  = require('../../embgit/embgit');
 const pathHelper              = require('../../utils/path-helper');
-const fileDirUtils            = require('../../utils/file-dir-utils');
-const { EnvironmentResolver } = require('../../utils/environment-resolver');
 const outputConsole           = require('../../logger/output-console');
-const cloudSiteconfigManager  = require('./cloud-siteconfig-manager');
-const cloudCacheManager       = require('./cloud-cache-manager');
+const libraryService          = require('../../services/library/library-service');
 
 class CloudGitManager {
 
@@ -31,6 +28,31 @@ class CloudGitManager {
     return pathSiteSource;
   }
 
+  createConfManaged(siteKey, siteName, pathSource, remotePath){
+
+    //TODO REMOVE we use full path
+    if(remotePath.includes("/")){
+      remotePath = remotePath.split("/").pop();
+    }
+
+    let newConf = {};
+    newConf.key = siteKey;
+    newConf.name = siteName;
+    newConf.source = {};
+    newConf.source.type = 'folder';
+    newConf.source.path = pathSource;
+    newConf.publish = [];
+    newConf.publish.push({});
+    newConf.publish[0].key = 'quiqr-cloud';
+    newConf.publish[0].config = {};
+    newConf.publish[0].config.type = "quiqr";
+    newConf.publish[0].config.path = remotePath;
+    newConf.lastPublish = 0;
+
+    return newConf;
+  }
+
+
   clonePogoCloudSite(cloudPath, siteName, managed = true){
 
     const siteKey = this.newSiteKeyFromPath(cloudPath);
@@ -40,24 +62,25 @@ class CloudGitManager {
 
     let newConf;
 
-    return new Promise( async (resolve, reject)=>{
+    return new Promise( (resolve, reject)=>{
       try {
-        await del.sync([temp_clone_path],{force:true});
-        await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
+        del.sync([temp_clone_path],{force:true});
+        Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
 
-        let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
+        //TODO TEST22
+        let pathSiteSource = this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
 
         if(managed){
-          newConf = cloudSiteconfigManager.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
+          newConf = this.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
         }
         else{
-          newConf = cloudSiteconfigManager.createConfUnmanaged(siteKey, siteName, pathSiteSource);
+          newConf = libraryService.createConfUnmanaged(siteKey, siteName, pathSiteSource);
         }
-        await cloudSiteconfigManager.writeConf(newConf,siteKey);
+        libraryService.writeSiteConf(newConf,siteKey);
         resolve(newConf);
-      } catch (e) {
+      } catch (err) {
         console.log("Clone Error:"+siteKey);
-        reject(e);
+        reject(err);
       }
     });
   }
@@ -66,29 +89,25 @@ class CloudGitManager {
 
     Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
 
-    const environmentResolver = new EnvironmentResolver();
-    const UQIS = environmentResolver.getUQIS();
-    const message = "merge from " + UQIS;
-
-    return new Promise( async (resolve, reject)=>{
+    return new Promise( (resolve, reject)=>{
       try {
-        //await Embgit.pull(site.source.path).then(async(e)=>{
-          //resolve("merged_with_remote");
-        //});
-        await Embgit.reset_hard(site.source.path).then(async (e)=>{
+        Embgit.reset_hard(site.source.path).then(async ()=>{
           await Embgit.pull(site.source.path);
           console.log("pulled succesfully")
           resolve("reset-and-pulled-from-remote");
         });
-      } catch (e) {
+      } catch (err) {
         console.log("Pull Error:"+site.key);
 
-        console.log(e.stdout.toString())
-        if(e.stdout.toString().includes("already up-to-date")) {
+        console.log(err.stdout.toString())
+        if(err.stdout.toString().includes("already up-to-date")) {
           resolve("no_changes")
         }
-        else if(e.stdout.toString().includes("non-fast-forward update")){
+        else if(err.stdout.toString().includes("non-fast-forward update")){
           resolve("non_fast_forward");
+        }
+        else{
+          reject(err)
         }
       }
     });
@@ -101,7 +120,7 @@ class CloudGitManager {
     var sukohdir = pathHelper.getRoot();
 
     try {
-      let gencmd = await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
+      await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
       outputConsole.appendLine('Keygen success ...');
       pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"), {encoding: 'utf8'});
       console.log(pubkey);

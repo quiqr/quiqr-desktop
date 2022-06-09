@@ -3,12 +3,9 @@ import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
-//import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-//import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-//import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import service              from '../../../services/service';
@@ -72,7 +69,7 @@ class CardItem extends React.Component {
 
   getFavicon(){
     if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
-      service.api.logToConsole(this.props.site)
+      //service.api.logToConsole(this.props.site)
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
         this.setState({favicon:img});
       })
@@ -101,9 +98,9 @@ class CardItem extends React.Component {
       siteAvatar = <Avatar aria-label="recipe" className={classes.avatar} src={this.state.favicon} />
     }
     return (
-      <Card 
+      <Card
 
-      elevation={5}
+        elevation={5}
         className={classes.root}>
         <CardHeader
           avatar={

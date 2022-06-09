@@ -64,6 +64,7 @@ class GitHubPagesForm extends React.Component{
 
     this.state = {
       showPassword: false,
+      setGitHubActionsSwitchEnable: false,
       pubData:{
         type: 'github',
         username:'',
@@ -75,6 +76,8 @@ class GitHubPagesForm extends React.Component{
         publishScope:'build',
         setGitHubActions: false,
         keyPairBusy: true,
+        overrideBaseURLSwitch: false,
+        overrideBaseURL: '',
       }
     }
   }
@@ -105,6 +108,12 @@ class GitHubPagesForm extends React.Component{
   componentDidMount(){
     if(this.props.publishConf){
       this.setState({pubData: this.props.publishConf.config});
+      if(this.props.publishConf.config.publishScope !== "build"){
+        this.setState({
+          setGitHubActionsSwitchEnable:true
+        });
+      }
+
     }
     else{
       this.getKeyPair();
@@ -168,6 +177,8 @@ class GitHubPagesForm extends React.Component{
               this.updatePubData({repository: e.target.value });
             }}
           />
+
+          {/*
           <TextField
             id="branch"
             label="Branch"
@@ -179,6 +190,7 @@ class GitHubPagesForm extends React.Component{
             variant="outlined"
             className={classes.textfield}
           />
+          */}
         </Box>
 
         <Box my={2}>
@@ -240,15 +252,30 @@ class GitHubPagesForm extends React.Component{
         </Box>
 
         <Box my={2}>
-
-            <FormControl variant="outlined" className={classes.formControl}>
+                      <FormControl variant="outlined" className={classes.formControl}>
               <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
               <Select
                 labelId="demo-simple-select-outlined-label"
                 id="demo-simple-select-outlined"
                 value={this.state.pubData.publishScope}
                 onChange={(e)=>{
-                  this.updatePubData({publishScope: e.target.value });
+                  if(e.target.value === "build"){
+                    this.updatePubData({
+                      publishScope: e.target.value,
+                      setGitHubActions: false,
+                    });
+                    this.setState({
+                      setGitHubActionsSwitchEnable: false
+                    });
+                  }
+                  else{
+                    this.updatePubData({
+                      publishScope: e.target.value,
+                    });
+                    this.setState({
+                      setGitHubActionsSwitchEnable:true
+                    });
+                  }
                 }}
                 label="Publish Source and Build"
               >
@@ -258,12 +285,14 @@ class GitHubPagesForm extends React.Component{
               </Select>
             </FormControl>
 
-            <FormControlLabel className={classes.keyButton}
+
+          <FormControlLabel className={classes.keyButton}
               control={
                 <Switch
                   checked={this.state.pubData.setGitHubActions}
-                  onChange={()=>{
-                    this.updatePubData({setGitHubActions: !this.state.pubData.setGitHubActions });
+                  disabled={!this.state.setGitHubActionsSwitchEnable}
+                  onChange={(e)=>{
+                    this.updatePubData({setGitHubActions: e.target.checked });
                   }}
 
                   name="configureActions"
@@ -272,6 +301,48 @@ class GitHubPagesForm extends React.Component{
               }
               label="Configure GitHub Actions"
             />
+        </Box>
+
+        <Box my={2}>
+
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.pubData.overrideBaseURLSwitch}
+                  onChange={(e)=>{
+                    if(this.state.pubData.overrideBaseURLSwitch){
+                      this.updatePubData({
+                        overrideBaseURLSwitch: e.target.checked,
+                        overrideBaseURL: "",
+                      });
+                    }
+                    else{
+                      this.updatePubData({
+                        overrideBaseURLSwitch: e.target.checked,
+                      });
+                    }
+                  }}
+
+                  name="overrideBaseURLSwitch"
+                  color="primary"
+                />
+              }
+              label="Override BaseURL"
+            />
+
+          <TextField
+            id="baseUrl"
+            label="BaseURL"
+            disabled={!this.state.pubData.overrideBaseURLSwitch}
+            onChange={(e)=>{
+              this.updatePubData({overrideBaseURL: e.target.value });
+            }}
+            value={this.state.pubData.overrideBaseURL}
+            helperText="Override Hugo Configuration with new baseURL"
+            variant="outlined"
+            className={classes.textfield}
+          />
+
         </Box>
 
       </React.Fragment>

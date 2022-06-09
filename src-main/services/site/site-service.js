@@ -1,5 +1,3 @@
-const fs                = require('fs-extra');
-const path              = require('path');
 const publisherFactory  = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 const pathHelper        = require('./../../utils/path-helper');
@@ -31,7 +29,6 @@ class SiteService{
     await this._getSiteSource().mountWorkspace(workspaceKey);
   }
 
-
   _findFirstMatchOrDefault(arr, key){
     let result;
 
@@ -54,29 +51,13 @@ class SiteService{
     }
   }
 
-  async saveSiteConf(newConf){
-    let configJsonPath = pathHelper.getRoot() + 'config.'+this._config.key+'.json';
-    delete newConf['configPath']
-    delete newConf['owner']
-    delete newConf['published']
-    delete newConf['publishKey']
-    delete newConf['etalage']
-    await fs.writeFileSync(configJsonPath, JSON.stringify(newConf), { encoding: "utf8"});
-  }
-
-  async publish(publishKey){
-    let publishConfig = this._findFirstMatchOrDefault(this._config.publish, publishKey);
-    if(publishConfig==null)
-      throw new Error(`Could not find a publisher config for key '${publishKey}'.`);
-    if(publishConfig.config==null)
-      throw new Error(`The matcher publisher config does not have a property config.`);
-
+  async publish(publishConfig){
     let from = pathHelper.getLastBuildDir();
     if(from==null)
       throw new Error('Could not resolve the last build directory.');
 
     let publisher = publisherFactory.getPublisher(publishConfig.config);
-    return await publisher.publish({siteKey: this._config.key, publishKey, from });
+    return await publisher.publish({siteKey: this._config.key, publishKey: publishConfig.key, from });
   }
 }
 

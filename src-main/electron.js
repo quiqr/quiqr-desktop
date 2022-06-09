@@ -1,16 +1,9 @@
 const electron          = require('electron')
-const BrowserWindow     = electron.BrowserWindow;
 const unhandled         = require('electron-unhandled');
 const contextMenu       = require('electron-context-menu');
-const request           = require('request');
-const fs                = require('fs-extra');
-const fssimple          = require('fs');
-const ProgressBar       = require('electron-progressbar');
 const ipcMainBinder     = require('./bridge/ipc-main-binder');
 const mainWindowManager = require('./ui-managers/main-window-manager');
 const menuManager       = require('./ui-managers/menu-manager');
-const pogozipper        = require('./import-export/pogozipper');
-const pathHelper        = require('./utils/path-helper');
 const QuiqrAppConfig    = require('./app-prefs-state/quiqr-app-config');
 const outputConsole     = require('./logger/output-console');
 const apiMain           = require('./bridge/api-main');
@@ -20,8 +13,10 @@ unhandled();
 const app = electron.app
 
 if(app.isPackaged) {
-    process.env.NODE_ENV = 'production';
+  process.env.NODE_ENV = 'production';
 }
+
+
 
 // FIXME TODO this is to solve the 2021q3 Lets Encrypt problems
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -30,7 +25,8 @@ app.setAsDefaultProtocolClient('quiqr');
 
 require('events').EventEmitter.prototype._maxListeners = 25;
 
-global.pogoconf = QuiqrAppConfig();
+let pogoconf = QuiqrAppConfig();
+global.pogoconf = pogoconf;
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
@@ -52,86 +48,87 @@ global.modelDirWatcher = undefined;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-let previewWindow;
-let logWindow;
 function createWindow () {
-    mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    mainWindow.on('closed', function () {
-        mainWindow = null
-    })
+  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  mainWindow.on('closed', function () {
+    mainWindow = null
+  })
 
-    contextMenu(mainWindow);
+  contextMenu(mainWindow);
 }
 
+/*
 function downloadFile(file_url , targetPath){
 
-    if(file_url.includes("picdrop.t3lab.com")){
-        let urlarr = file_url.split('picdrop.t3lab.com')
-        file_url = 'https://picdrop.t3lab.com'+urlarr[1];
+  if(file_url.includes("picdrop.t3lab.com")){
+    let urlarr = file_url.split('picdrop.t3lab.com')
+    file_url = 'https://picdrop.t3lab.com'+urlarr[1];
+  }
+
+  if(file_url.includes("download.pogotheme.com")){
+    let urlarr = file_url.split('download.pogotheme.com')
+    file_url = 'https://download.pogotheme.com'+urlarr[1];
+  }
+
+  let progressBar = new ProgressBar({
+    indeterminate: false,
+    text: 'Downloading '+file_url+' ..',
+    detail: 'Preparing upload..',
+    browserWindow: {
+      frame: false,
+      parent: mainWindow,
+      webPreferences: {
+        nodeIntegration: true
+      }
     }
+  });
 
-    if(file_url.includes("download.pogotheme.com")){
-        let urlarr = file_url.split('download.pogotheme.com')
-        file_url = 'https://download.pogotheme.com'+urlarr[1];
-    }
+  var received_bytes = 0;
+  var total_bytes = 0;
 
-    let progressBar = new ProgressBar({
-        indeterminate: false,
-        text: 'Downloading '+file_url+' ..',
-        detail: 'Preparing upload..',
-        browserWindow: {
-            frame: false,
-            parent: mainWindow,
-            webPreferences: {
-                nodeIntegration: true
-            }
-        }
-    });
+  var req = request({
+    method: 'GET',
+    uri: file_url
+  });
 
-    var received_bytes = 0;
-    var total_bytes = 0;
+  var out = fssimple.createWriteStream(targetPath);
+  req.pipe(out);
 
-    var req = request({
-        method: 'GET',
-        uri: file_url
-    });
+  req.on('response', function ( data ) {
+    total_bytes = parseInt(data.headers['content-length' ]);
+  });
 
-    var out = fssimple.createWriteStream(targetPath);
-    req.pipe(out);
+  req.on('data', function(chunk) {
+    received_bytes += chunk.length;
+    showProgress(progressBar,received_bytes, total_bytes);
+  });
 
-    req.on('response', function ( data ) {
-        total_bytes = parseInt(data.headers['content-length' ]);
-    });
-
-    req.on('data', function(chunk) {
-        received_bytes += chunk.length;
-        showProgress(progressBar,received_bytes, total_bytes);
-    });
-
-    out.on('finish', () =>{
-        progressBar.setCompleted();
-        progressBar._window.hide();
-        importPogoFile(targetPath);
-    });
+  out.on('finish', () =>{
+    progressBar.setCompleted();
+    progressBar._window.hide();
+    importPogoFile(targetPath);
+  });
 }
 
+
 function formatBytes(bytes, decimals = 1) {
-    if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) return '0 Bytes';
 
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 function showProgress(progressBar,received,total){
-    var percentage = (received * 100) / total;
-    progressBar.value = percentage;
-    progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
+  var percentage = (received * 100) / total;
+  progressBar.value = percentage;
+  progressBar.detail = percentage.toFixed(1) + "% | " + formatBytes(received) + " of " + formatBytes(total);
 }
+*/
 
 
 
@@ -139,82 +136,81 @@ function showProgress(progressBar,received,total){
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
-    createWindow();
-    menuManager.createMainMenu();
+  createWindow();
+  menuManager.createMainMenu();
 })
 
 app.on('before-quit', function () {
-    if(global.hugoServer){
-        global.hugoServer.stopIfRunning(function(err, stdout, stderr){
-            if(err) reject(err);
-            else{ resolve(); }
-        });
-    }
+  if(global.hugoServer){
+    global.hugoServer.stopIfRunning();
+  }
 })
 
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-    app.quit();
+  app.quit();
 })
 
 app.on('activate', function () {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (mainWindow === null) {
-        createWindow();
-    }
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (mainWindow === null) {
+    createWindow();
+  }
 })
 
+/*
 app.on('open-url', function(event, schemeData){
 
-    if(app.isReady()){
-        handlePogoUrl(event, schemeData);
-    }
-    else{
-        app.whenReady().then(()=>{
-            handlePogoUrl(event, schemeData);
-        });
-    }
+  if(app.isReady()){
+    handlePogoUrl(event, schemeData);
+  }
+  else{
+    app.whenReady().then(()=>{
+      handlePogoUrl(event, schemeData);
+    });
+  }
 });
+*/
 
 // Iterate over arguments and look out for uris
 function openUrlFromArgv(argv) {
-    for (let i = 1; i < argv.length; i++) {
-        let arg = argv[i]
-        if (!arg.startsWith('quiqr:') && !arg.startsWith('quiqr:')) {
-            console.log("open-url: URI doesn't start with quiqr:", arg)
-            continue
-        }
-
-        console.log('open-url: Detected URI: ', arg)
-        app.emit('open-url', null, arg)
+  for (let i = 1; i < argv.length; i++) {
+    let arg = argv[i]
+    if (!arg.startsWith('quiqr:') && !arg.startsWith('quiqr:')) {
+      console.log("open-url: URI doesn't start with quiqr:", arg)
+      continue
     }
+
+    console.log('open-url: Detected URI: ', arg)
+    app.emit('open-url', null, arg)
+  }
 }
 
 openUrlFromArgv(process.argv)
 
 app.on('second-instance', function(event, argv){
-    console.log('Someone tried to run a second instance')
-    openUrlFromArgv(argv)
+  console.log('Someone tried to run a second instance')
+  openUrlFromArgv(argv)
 })
 
+/*
 async function handlePogoUrl(event, schemeData){
 
-    const remoteFileURL = schemeData.substr(10);
-    if(remoteFileURL === "continue"){
-        // do nothing just get focus back
-    }
-    else{
-        const remoteFileName = remoteFileURL.split('/').pop();
-        await fs.ensureDir(pathHelper.getTempDir());
-        const tmppath = pathHelper.getTempDir() + remoteFileName;
-        downloadFile(remoteFileURL, tmppath);
-    }
+  const remoteFileURL = schemeData.substr(10);
+  if(remoteFileURL === "continue"){
+    // do nothing just get focus back
+  }
+  else{
+    const remoteFileName = remoteFileURL.split('/').pop();
+    await fs.ensureDir(pathHelper.getTempDir());
+    const tmppath = pathHelper.getTempDir() + remoteFileName;
+    downloadFile(remoteFileURL, tmppath);
+  }
 }
 
 
-/*
 function importPogoFile(path){
 
     if(path.split('.').pop()=='pogosite'){

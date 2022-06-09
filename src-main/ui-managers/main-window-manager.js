@@ -1,4 +1,3 @@
-const electron                       = require('electron');
 const { BrowserView, BrowserWindow } = require('electron');
 const windowStateKeeper              = require('electron-window-state');
 const url                            = require('url')
@@ -10,6 +9,7 @@ const configurationDataProvider      = require('../app-prefs-state/configuration
 let mainWindow;
 let mainWindowState;
 let mobilePreviewView;
+let mobilePreviewTopBarView;
 let mobilePreviewViewUrl;
 let mobilePreviewViewActive = false;
 
@@ -34,16 +34,6 @@ function showPreviewWaitForServer(previewWindow){
         <p>It can take a minute or two the first time.</p>
         </body>
     </html>`));
-}
-
-
-function showTesting(mainWindow){
-  mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
-<body style="font-family: sans-serif; padding: 2em">
-<h1>Testing</h1>
-<p>Testing...</p>
-</body>
-</html>`));
 }
 
 function showLookingForServer(mainWindow, port){
@@ -94,7 +84,7 @@ function getLocation(locPath = ''){
         }
       }
       );
-      client.on('error', (error) => {
+      client.on('error', () => {
         setTimeout(tryConnection, 1000);
       });
       tryConnection();
@@ -163,11 +153,10 @@ function getFirstScreenAfterStartup(){
 
 function createWindow () {
 
-  let icon;
   if(process.env.REACT_DEV_URL)
-    icon = path.normalize(__dirname + "/../public/icon.png");
 
-  configurationDataProvider.get(function(err, configurations){
+  //TODO TEST22
+  //configurationDataProvider.get(function(err, configurations){
 
     // Load the previous state with fallback to defaults
     mainWindowState = windowStateKeeper({
@@ -205,7 +194,7 @@ function createWindow () {
     mainWindow.addBrowserView(mobilePreviewTopBarView);
     mainWindow.show();
 
-  });
+  //});
 
   getLocation();
 
@@ -304,7 +293,7 @@ module.exports = {
       mainWindow.setTitle("Quiqr: Create new Quiqr site");
     });
 
-    menuManager.updateMenu(null);
+    //menuManager.updateMenu(null);
     menuManager.createMainMenu();
   },
   closeSiteAndShowSelectSites: function(){
@@ -321,7 +310,7 @@ module.exports = {
       mainWindow.setTitle("Quiqr: Select site");
     });
 
-    menuManager.updateMenu(null);
+    //menuManager.updateMenu(null);
     menuManager.createMainMenu();
   },
 
@@ -352,7 +341,7 @@ module.exports = {
         mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
       }
       );
-      client.on('error', (error) => {
+      client.on('error', () => {
         mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
         //setTimeout(tryConnection, 1000);
       });
@@ -388,7 +377,7 @@ module.exports = {
         mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
       }
       );
-      client.on('error', (error) => {
+      client.on('error', () => {
         mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
         //setTimeout(tryConnection, 1000);
       });
