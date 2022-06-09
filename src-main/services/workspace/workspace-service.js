@@ -661,8 +661,7 @@ class WorkspaceService{
     }
   }
 
-  async serve(serveKey){
-    console.log(serveKey);
+  async serve(){
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
 
@@ -680,10 +679,8 @@ class WorkspaceService{
 
       global.hugoServer = new HugoServer(JSON.parse(JSON.stringify(hugoServerConfig)));
 
-      global.hugoServer.serve((err, stdout, stderr)=>{
+      global.hugoServer.serve((err)=>{
         if(err){
-          console.log(stdout)
-          console.log(stderr)
           reject(err);
         }
         else{

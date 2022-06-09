@@ -7,13 +7,13 @@ const request = require('request')
 let screenshotWindow;
 
 function capture(targetPath){
-  console.log('capture')
   screenshotWindow.webContents.capturePage().then(image => {
 
     if (!fs.existsSync(path.join(targetPath, 'screenshots'))) fs.mkdirSync(path.join(targetPath,'screenshots'), {recursive: true});
 
     fs.writeFile(path.join(targetPath, 'screenshots', 'quiqr-generated-screenshot.jpg'), image.toJPEG(75), (err) => {
       if (err){
+        console.log("Screenshot ERR:")
         console.log(err)
         screenshotWindow.close();
       }

@@ -46,11 +46,9 @@ class MenuManager {
   }
   startServer() {
     if(global.hugoServer){
-      global.hugoServer.serve((err, stdout, stderr) => {
+      global.hugoServer.serve((err) => {
         if(err){
           console.log(err)
-          console.log(stdout)
-          console.log(stderr)
         }
       });
     }
@@ -666,7 +664,6 @@ class MenuManager {
             type: 'input'
           }, mainWindow);
 
-          console.log(newPath);
           if(!newPath || newPath===""){
             return;
           }
@@ -814,22 +811,27 @@ class MenuManager {
 
           configurationDataProvider.get(async (err, configurations)=>{
             let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-            cloudGitManager.pullFastForwardMerge(siteData).then((status)=>{
-              if(status === "non_fast_forward"){
-                const dialog = electron.dialog;
-                const options = {
-                  type: 'warning',
-                  buttons: [ 'CLOSE'],
-                  defaultId: 1,
-                  title: 'Merge failed',
-                  message: 'Could not merge remote code.',
-                  detail: 'Nothing changed locally. When you publish, remote changes will be overwritten.',
-                };
+            cloudGitManager.pullFastForwardMerge(siteData)
+              .then((status)=>{
+                if(status === "non_fast_forward"){
+                  const dialog = electron.dialog;
+                  const options = {
+                    type: 'warning',
+                    buttons: [ 'CLOSE'],
+                    defaultId: 1,
+                    title: 'Merge failed',
+                    message: 'Could not merge remote code.',
+                    detail: 'Nothing changed locally. When you publish, remote changes will be overwritten.',
+                  };
 
-                dialog.showMessageBox(null, options)
-              }
+                  dialog.showMessageBox(null, options)
+                }
 
-            });
+              })
+              .catch((err)=>{
+                console.log("ERR pullFastForwardMerge")
+                console.log(err)
+              });
           });
 
         }

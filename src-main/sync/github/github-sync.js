@@ -101,7 +101,7 @@ class GithubSync {
   async publish_step3_add_commit_push(tmpkeypathPrivate, fullDestinationPath){
 
 
-    await spawnAw( gitBin, [ "alladd" , fullDestinationPath]);
+    await spawnAw( gitBin, [ "add_all" , fullDestinationPath]);
     outputConsole.appendLine('git-add finished ...');
 
     await spawnAw( gitBin, [ "commit", '-a' , '-n', this._config.username, '-e', this._config.email, '-m', "'publication from " + UQIS +"'", fullDestinationPath]);

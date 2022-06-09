@@ -62,13 +62,13 @@ class CloudGitManager {
 
     let newConf;
 
-    return new Promise( (resolve, reject)=>{
+    return new Promise( async (resolve, reject)=>{
       try {
         del.sync([temp_clone_path],{force:true});
-        Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
+        await Embgit.cloneWithKey( this.cloudPathToUrl(cloudPath), temp_clone_path);
 
         //TODO TEST22
-        let pathSiteSource = this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
+        let pathSiteSource = await this.createGitManagedSiteWithSiteKeyFromTempPath(temp_clone_path, siteKey);
 
         if(managed){
           newConf = this.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
@@ -92,9 +92,14 @@ class CloudGitManager {
     return new Promise( (resolve, reject)=>{
       try {
         Embgit.reset_hard(site.source.path).then(async ()=>{
-          await Embgit.pull(site.source.path);
-          console.log("pulled succesfully")
-          resolve("reset-and-pulled-from-remote");
+          Embgit.pull(site.source.path)
+            .then(()=>{
+              console.log("pulled succesfully")
+              resolve("reset-and-pulled-from-remote");
+            })
+            .catch((err)=>{
+              reject(err);
+            })
         });
       } catch (err) {
         console.log("Pull Error:"+site.key);
@@ -123,7 +128,6 @@ class CloudGitManager {
       await spawnAw( git_bin, [ "keygen" ], {cwd: sukohdir});
       outputConsole.appendLine('Keygen success ...');
       pubkey = await fs.readFileSync(path.join(sukohdir,"/id_rsa_pogo.pub"), {encoding: 'utf8'});
-      console.log(pubkey);
     } catch (e) {
       outputConsole.appendLine('keygen error ...:' + e);
     }
@@ -146,6 +150,7 @@ class CloudGitManager {
       let gencmd = await spawnAw( git_bin, [ "fingerprint", "-i", path.join(sukohdir,"/id_rsa_pogo") ], {cwd: sukohdir});
       fingerprint = gencmd.toString().replace(/\n/g,"");
     } catch (e) {
+      console.log("ERR getKeyFingerprint:");
       console.log(e);
     }
 

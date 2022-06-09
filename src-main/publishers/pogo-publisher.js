@@ -559,7 +559,7 @@ class PogoPublisher {
         mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
         var spawn = require("child_process").spawn;
-        let clonecmd2 = spawn( git_bin, [ "alladd" , full_gh_dest]);
+        let clonecmd2 = spawn( git_bin, [ "add_all" , full_gh_dest]);
 
         clonecmd2.on("exit", (code) => {
           if(code==0){

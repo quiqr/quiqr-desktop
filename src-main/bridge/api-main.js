@@ -473,8 +473,6 @@ api.importSiteAction = function(){
 }
 
 api.importSiteFromPublicGitUrl = function({siteName, url}, context){
-  //console.log(siteName)
-
   gitImporter.importSiteFromPublicGitUrl(url, siteName)
     .then((siteKey)=>{
       context.resolve(siteKey);

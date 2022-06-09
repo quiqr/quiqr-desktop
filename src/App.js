@@ -79,7 +79,6 @@ class App extends React.Component{
   }
 
   componentDidMount(){
-    console.log('App MOUNTED');
     this._ismounted = true;
 
 

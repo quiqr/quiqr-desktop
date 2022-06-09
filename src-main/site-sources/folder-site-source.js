@@ -8,8 +8,7 @@ class FolderSiteSource {
     return Promise.resolve([{ 'key': 'source', 'path': this.config.path, 'state':'mounted' }]);
   }
 
-  mountWorkspace(key){
-    console.log(key)
+  mountWorkspace(){
     return Promise.resolve(undefined);
   }
 

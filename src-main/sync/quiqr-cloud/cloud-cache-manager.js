@@ -19,7 +19,6 @@ class CloudCacheManager{
         if(profileUserName){
 
           let fingerprint = await cloudGitManager.getKeyFingerprint();
-          console.log(fingerprint);
           let userVars = {
             username: profileUserName,
             fingerprint: fingerprint,

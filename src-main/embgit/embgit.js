@@ -33,7 +33,6 @@ class Embgit{
       cmd = global.process.env.EMBGIT_PATH;
     }
     else{
-      //TODO USE ENVIRONMENT UTIL
       switch(enviromnent.platform){
         case PLATFORMS.linux: {
           platform = 'linux';
@@ -63,7 +62,6 @@ class Embgit{
     return cmd;
   }
 
-  //TODO TEST22
   async reset_hard(destination_path){
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve )=>{
@@ -81,7 +79,7 @@ class Embgit{
 
   }
 
-  //TODO TEST22
+  /*
   async commit(destination_path, message){
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve)=>{
@@ -99,8 +97,8 @@ class Embgit{
       }
     });
   }
+  */
 
-  //TODO TEST22
   async quiqr_repo_show(url){
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
@@ -133,7 +131,6 @@ class Embgit{
 
   }
 
-  //TODO TEST22
   async cloneFromPublicUrl(url, destination_path){
     const gitBinary = this.getGitBin();
 
@@ -153,7 +150,6 @@ class Embgit{
 
   }
 
-  //TODO TEST22
   async cloneWithKey(url, destination_path){
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{

@@ -119,13 +119,6 @@ class WorkSpace extends React.Component{
     this._ismounted = false;
   }
 
-
-
-
-
-
-
-
   getProfile(){
     let getProfile = service.api.getQuiqrProfile();
 
