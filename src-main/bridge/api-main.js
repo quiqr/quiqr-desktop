@@ -752,7 +752,8 @@ api.getThumbnailForPath = function({siteKey, workspaceKey, targetPath}, promise)
         promise.resolve(result);
       })
       .catch((error)=>{
-        promise.reject(error);
+        console.log(error)
+        //promise.reject(error);
       });
   });
 }

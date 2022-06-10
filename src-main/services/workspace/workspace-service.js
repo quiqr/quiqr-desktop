@@ -626,15 +626,19 @@ class WorkspaceService{
           return 'NOT_FOUND';
         }
       }
+
+      if (ext === "svg") ext = "svg+xml";
+
+      let mime = `image/${ext}`;
+      let buffer = await promisify(fs.readFile)(thumbSrc);
+      let base64 = buffer.toString('base64');
+
+      return `data:${mime};base64,${base64}`;
+    }
+    else{
+      return 'NO_IMAGE';
     }
 
-    if (ext === "svg") ext = "svg+xml";
-
-    let mime = `image/${ext}`;
-    let buffer = await promisify(fs.readFile)(thumbSrc);
-    let base64 = buffer.toString('base64');
-
-    return `data:${mime};base64,${base64}`;
   }
 
 

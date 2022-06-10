@@ -10,7 +10,7 @@ import service              from '../../../services/service';
 import { withStyles } from '@material-ui/core/styles';
 
 const useStyles = theme => ({
-  avatar: {
+  avatarNoFavicon: {
     backgroundColor: red[500],
   }
 });
@@ -50,13 +50,13 @@ class SiteListItem extends React.Component {
   render(){
     const { classes } = this.props;
 
-    let siteAvatar = ( <Avatar aria-label="recipe" className={classes.avatar}>
+    let siteAvatar = ( <Avatar aria-label="recipe"  variant="rounded" className={classes.avatarNoFavicon}>
       {this.props.site.name.charAt(0)}
     </Avatar>
     )
 
     if(this.state.favicon !== ""){
-      siteAvatar = <Avatar aria-label="recipe" className={classes.avatar} src={this.state.favicon} />
+      siteAvatar = <Avatar aria-label="recipe" variant="rounded" src={this.state.favicon} />
     }
     return (
 
