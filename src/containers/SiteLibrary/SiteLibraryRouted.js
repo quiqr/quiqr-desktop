@@ -107,11 +107,17 @@ class SiteLibraryRouted extends React.Component{
     });
   }
 
-  mountSite(site ){
+  mountSiteByKey(siteKey){
+    service.getConfigurations(true).then((c)=>{
+      let site = c.sites.find((x)=>x.key===siteKey);
+      this.mountSite(site);
+    });
+  }
+
+  mountSite(site){
     this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
     this.setState({currentSiteKey: site.key});
 
-    //load all site configuration to enforce validation
     service.api.listWorkspaces(site.key).then((workspaces)=>{
 
       this.setState({selectedSiteWorkspaces: workspaces});
@@ -364,10 +370,7 @@ class SiteLibraryRouted extends React.Component{
           remoteSiteName={this.state.currentRemoteSite}
           onCancelClick={()=>this.setState({remoteSiteDialog:false})}
           mountSite={(siteKey)=>{
-            service.getConfigurations(true).then((c)=>{
-              let site = c.sites.find((x)=>x.key===siteKey);
-              this.mountSite(site);
-            });
+            this.mountSiteByKey(siteKey);
           }}
         />
 
@@ -380,6 +383,10 @@ class SiteLibraryRouted extends React.Component{
         <ImportSiteDialog
           open={this.state.dialogImportSite.open}
           onClose={()=>this.setState({dialogImportSite:{open:false}})}
+          mountSite={(siteKey)=>{
+            this.mountSiteByKey(siteKey);
+          }}
+
           //onSubmitClick={this.handleCreateSiteSubmit}
         />
 

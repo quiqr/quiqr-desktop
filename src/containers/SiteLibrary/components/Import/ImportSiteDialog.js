@@ -31,7 +31,6 @@ const useStyles = theme => ({
   root: {
     margin: 0,
     display: 'flex',
-    //padding: theme.spacing(2),
   },
   details: {
     display: 'flex',
@@ -42,9 +41,6 @@ const useStyles = theme => ({
     marginLeft: theme.spacing(1),
     width: 400,
     height: 55,
-    //paddingLeft: 10,
-    //paddingRight: 10,
-    //whiteSpace: 'nowrap',
   },
 
   content: {
@@ -90,6 +86,7 @@ class ImportSiteDialog extends React.Component{
       importTypeGitLastValidatedUrl: '',
       importTypeGitReadyForImport: false,
       importTypeGitReadyForNaming: false,
+      importTypeGitImportingBusy: false,
       importTypeGitProvider: '',
       importTypeGitErrorText: '',
       importTypeGitScreenshot: null,
@@ -112,6 +109,7 @@ class ImportSiteDialog extends React.Component{
       importTypeGitReadyForValidation: false,
       importTypeGitReadyForImport: false,
       importTypeGitReadyForNaming: false,
+      importTypeGitImportingBusy: false,
       importTypeGitScreenshot: null,
 
       importHugoVersion: '',
@@ -125,9 +123,6 @@ class ImportSiteDialog extends React.Component{
       importSiteName: '',
     })
 
-  }
-
-  componentWillMount(){
   }
 
   validateURL(url){
@@ -186,7 +181,6 @@ class ImportSiteDialog extends React.Component{
   checkFreeSiteName(name){
     service.api.checkFreeSiteName(name)
       .then((res)=>{
-        service.api.logToConsole(res);
         if(res.nameFree){
           this.setState({
             importTypeGitReadyForImport: true,
@@ -202,7 +196,8 @@ class ImportSiteDialog extends React.Component{
       })
   }
 
-  renderCards(){
+
+  renderStep1Cards(){
     const {classes} = this.props;
     return (
 
@@ -273,7 +268,7 @@ class ImportSiteDialog extends React.Component{
     )
   }
 
-  renderForm(){
+  renderStep2Form(){
 
     const {classes} = this.props;
 
@@ -425,7 +420,6 @@ class ImportSiteDialog extends React.Component{
               error={(this.state.importNameErrorText === '' ? false : true)}
               helperText={this.state.importNameErrorText}
               onChange={(e)=>{
-                service.api.logToConsole("change");
                 this.setState({importSiteName: e.target.value})
                 this.checkFreeSiteName(e.target.value);
 
@@ -434,7 +428,7 @@ class ImportSiteDialog extends React.Component{
             />
             {(this.state.importTypeGitImportingBusy ? <CircularProgress size={20} /> : null)}
           </Box>
-          <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport?false:true)} onClick={()=>{
+          <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport && !this.state.importTypeGitImportingBusy ? false : true)} onClick={()=>{
 
             this.setState({
               importTypeGitImportingBusy: true
@@ -444,6 +438,7 @@ class ImportSiteDialog extends React.Component{
               .then((siteKey)=>{
                 this.setState({
                   importTypeGitImportingBusy: false,
+                  newSiteKey: siteKey,
                 });
               })
               .catch((siteKey)=>{
@@ -465,23 +460,49 @@ class ImportSiteDialog extends React.Component{
     }
   }
 
+  async handleOpenNewSite(){
+    this.props.mountSite(this.state.newSiteKey)
+    this.props.onClose();
+  }
+
+  renderStep3ImportFinished(){
+    return (
+      <div>
+        The site has been succesfully imported. <Button onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.importSiteName} now</Button>.
+      </div>
+    )
+  }
+
   render(){
 
     let { open } = this.props;
     let importButtonHidden = true;
+    let closeText = "cancel";
+    let content;
+
+    if(!this.state.newSiteKey && !this.state.importType){
+      content = this.renderStep1Cards()
+
+    }
+    else if(!this.state.newSiteKey){
+      content = this.renderStep2Form();
+    }
+    else{
+      content = this.renderStep3ImportFinished();
+      importButtonHidden = false;
+      closeText = "close";
+    }
 
     const actions = [
       <Button color="primary" onClick={()=>{
         this.setState({importTypeGitBusy: false })
         this.props.onClose();
       }}>
-        {"cancel"}
+        {closeText}
       </Button>,
       (importButtonHidden ? null :
-        <Button color="primary" disabled={!this.state.importButtonEnabled} onClick={()=>{
-
-        }}>
-          {"save"}
+        <Button color="primary" onClick={()=>{this.handleOpenNewSite()}}>
+          {"open "+ this.state.importSiteName}
         </Button>),
     ];
 
@@ -496,7 +517,7 @@ class ImportSiteDialog extends React.Component{
         <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {(this.state.importType ? this.renderForm() : this.renderCards())}
+            {content}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
