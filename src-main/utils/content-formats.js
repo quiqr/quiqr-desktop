@@ -1,5 +1,3 @@
-let path = require('path');
-
 const SUPPORTED_CONTENT_EXTENSIONS = ['md','markdown','html'];
 
 module.exports.SUPPORTED_CONTENT_EXTENSIONS = SUPPORTED_CONTENT_EXTENSIONS;

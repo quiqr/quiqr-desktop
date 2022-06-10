@@ -1,21 +1,19 @@
 const electron                  = require('electron');
 const BrowserWindow             = electron.BrowserWindow;
-const url                       = require('url')
 const path                      = require('path')
 const fs                        = require('fs-extra')
-const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const request = require('request')
 
 let screenshotWindow;
 
 function capture(targetPath){
-  console.log('capture')
   screenshotWindow.webContents.capturePage().then(image => {
 
     if (!fs.existsSync(path.join(targetPath, 'screenshots'))) fs.mkdirSync(path.join(targetPath,'screenshots'), {recursive: true});
 
     fs.writeFile(path.join(targetPath, 'screenshots', 'quiqr-generated-screenshot.jpg'), image.toJPEG(75), (err) => {
       if (err){
+        console.log("Screenshot ERR:")
         console.log(err)
         screenshotWindow.close();
       }
@@ -59,8 +57,9 @@ function createScreenshotAndFavicon(host, port, targetPath) {
           console.log(urls)
           if (!fs.existsSync(path.join(targetPath, 'favicon'))) fs.mkdirSync(path.join(targetPath, 'favicon'), {recursive: true});
           urls.forEach((favUrl)=>{
-            faviconFile = favUrl.split('/').pop();
-            request.head(favUrl, (err, res, body) => {
+            const faviconFile = favUrl.split('/').pop();
+
+            request.head(favUrl, () => {
               const req = request.get(favUrl)
                 .on('response', function (res) {
                   if (res.statusCode === 200) {

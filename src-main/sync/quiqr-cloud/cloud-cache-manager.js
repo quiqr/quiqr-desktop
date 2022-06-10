@@ -1,18 +1,10 @@
-/* Copyright Quiqr 2021
- *
- * pim@quiqr.org
- *
- */
-const { app, shell }            = require('electron')
 const fs                        = require('fs-extra');
-const fssimple                  = require('fs');
 const request                   = require('request');
 const glob                      = require('glob');
 const path                      = require('path');
 const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 const pathHelper                = require('../../utils/path-helper');
 const RequestHelper             = require('../../utils/request-helper');
-const PogoPublisher             = require('../../publishers/pogo-publisher');
 const cloudGitManager           = require('./cloud-git-manager');
 
 class CloudCacheManager{
@@ -20,15 +12,13 @@ class CloudCacheManager{
   async updateUserRemoteCaches(){
 
     return new Promise(resolve => {
-      let sites = [];
-      let profileUserName;
+      let profileUserName = global.pogoconf.currentUsername;
 
       configurationDataProvider.get(async (err, configurations)=>{
 
-        if(profileUserName = global.pogoconf.currentUsername){
+        if(profileUserName){
 
           let fingerprint = await cloudGitManager.getKeyFingerprint();
-          console.log(fingerprint);
           let userVars = {
             username: profileUserName,
             fingerprint: fingerprint,
@@ -110,8 +100,9 @@ class CloudCacheManager{
               ownerslookupdata.sitesUnpublished.push(site.key);
             }
           }
-          catch{
+          catch(err){
             console.log("no path");
+            console.log(err);
           }
         });
       }
@@ -131,7 +122,7 @@ class CloudCacheManager{
             });
           }
           catch(e){
-            outputConsole.appendLine(`Cache file is invalid '${file}': ${e.toString()}`);
+            global.outputConsole.appendLine(`Cache file is invalid '${file}': ${e.toString()}`);
           }
         }
       }

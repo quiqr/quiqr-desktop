@@ -69,7 +69,6 @@ class CardItem extends React.Component {
 
   getFavicon(){
     if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
-      //service.api.logToConsole(this.props.site)
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
         this.setState({favicon:img});
       })

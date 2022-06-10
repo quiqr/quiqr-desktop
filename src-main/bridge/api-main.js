@@ -1,7 +1,6 @@
 const fs                        = require('fs-extra');
 const {dirname}                 = require('path');
 const path                      = require('path');
-const glob                      = require('glob');
 const {shell}                   = require('electron');
 const util                      = require('util')
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
@@ -11,7 +10,6 @@ const Embgit                    = require('../embgit/embgit')
 const WorkspaceService          = require('../services/workspace/workspace-service')
 const siteSourceBuilderFactory  = require('../site-sources/builders/site-source-builder-factory');
 const hugoDownloader            = require('../hugo/hugo-downloader')
-const formatProviderResolver    = require('../utils/format-provider-resolver');
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
 const gitImporter                = require('../import/git-importer');
@@ -88,15 +86,38 @@ function clearWorkSpaceConfigCache(workspaceService){
 function setWatcher(workspaceService){
   let watchDir = path.join(global.currentSitePath,"quiqr/model");
   const watchOptions = {
-    ignored: /(^|[\/\\])\../, // ignore dotfiles
+    ignored: /(^|[/\\])\../, // ignore dotfiles
     persistent: true
   };
 
   global.modelDirWatcher = chokidar.watch(watchDir, watchOptions );
   global.modelDirWatcher
-    .on('add', path => clearWorkSpaceConfigCache(workspaceService))
-    .on('change', path => clearWorkSpaceConfigCache(workspaceService))
-    .on('unlink', path => clearWorkSpaceConfigCache(workspaceService));
+    .on('add', () => clearWorkSpaceConfigCache(workspaceService))
+    .on('change', () => clearWorkSpaceConfigCache(workspaceService))
+    .on('unlink', () => clearWorkSpaceConfigCache(workspaceService));
+}
+
+api.checkFreeSiteName = function({proposedSiteName}, context){
+
+  libraryService.checkDuplicateSiteConfAttrStringValue('name', proposedSiteName)
+    .then((duplicate)=>{
+
+      let response = {
+        proposedSiteName: proposedSiteName,
+        nameFree: false,
+      }
+
+      if(duplicate){
+        response.nameFree = false;
+      }
+      else{
+        response.nameFree = true;
+      }
+      context.resolve(response)
+    })
+    .catch((err)=>{
+      context.reject(err);
+    })
 }
 
 api.checkFreeSiteName = function({proposedSiteName}, context){
@@ -142,15 +163,17 @@ api.openFileExplorer = function({path}, context){
     }
   }
   catch(e){
+    context.reject(e);
     console.log(e);
   }
 }
 
-api.openFileInEditor = function({path},context){
+api.openFileInEditor = function({path}, context){
   try{
     shell.openPath(path);
   }
   catch(e){
+    context.reject(e)
     console.log(e);
   }
 }
@@ -165,24 +188,9 @@ api.listWorkspaces = async function({siteKey}, context){
 api.getCreatorMessage = async function({siteKey, workspaceKey}, context){
 
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
-  message = await workspaceService.getCreatorMessage();
+  const message = await workspaceService.getCreatorMessage();
   context.resolve(message);
-
-  /*
-  let siteService = await getSiteServicePromise(siteKey);
-  siteService.getCreatorMessage().then(function(message){
-    context.resolve(message);
-  });
-  */
 }
-
-/*
-api.clearWorkSpaceConfigCache = async function({}, context){
-  let workspaceService = new WorkspaceService();
-  workspaceService.clearConfigurationsDataCache();
-  context.resolve(true);
-}
-*/
 
 api.matchRole = async function({role},context){
 
@@ -234,7 +242,7 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     global.currentWorkspaceKey = workspaceKey;
     global.currentSitePath = configuration.path;
 
-    global.pogoconf.setLastOpenedSite(siteKey, workspaceKey, currentSitePath);
+    global.pogoconf.setLastOpenedSite(siteKey, workspaceKey, global.currentSitePath);
     global.pogoconf.saveState();
 
     if(global.modelDirWatcher && typeof global.modelDirWatcher.close === 'function'){
@@ -262,14 +270,14 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
 }
 
 
-api.createKeyPairGithub = async function({},context){
+api.createKeyPairGithub = async function(_, context){
   let keyPair = await GithubKeyManager.keyPairGen();
   //0 is the private key
   //1 is the public key
   context.resolve({keyPair});
 }
 
-api.createKeyPairQC = async function({},context){
+api.createKeyPairQC = async function(_, context){
   let pubkey = await cloudGitManager.keygen();
   let environmentResolver = new EnvironmentResolver();
   let pubkey_title = environmentResolver.getUQIS()
@@ -282,7 +290,7 @@ api.createPogoProfile = async function(profile,context){
   context.resolve(true);
 }
 
-api.getQuiqrProfile = async function({},context){
+api.getQuiqrProfile = async function(_, context){
   let pogopubl = new PogoPublisher({});
   let profile = await pogopubl.readProfile();
 
@@ -392,38 +400,41 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   global.currentSiteKey = siteKey;
   global.currentWorkspaceKey = workspaceKey;
 
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   mainWindow.setTitle(`Quiqr - Site: ${siteConfig.name}`);
-  menuManager.updateMenu(siteKey);
+  //menuManager.updateMenu(siteKey);
   menuManager.createMainMenu();
 }
 
 api.setCurrentFormNodePath = async function({path}, context){
   global.currentFormNodePath = path;
+  context.resolve(true);
 }
 
-api.getCurrentFormNodePath = async function({}, context){
+api.getCurrentFormNodePath = async function(_, context){
   context.resolve(global.currentFormNodePath)
 }
 
 api.setCurrentFormAccordionIndex = async function({index}, context){
   global.currentFormAccordionIndex = index;
+  context.resolve(true);
 }
 
-api.getCurrentFormAccordionIndex = async function({}, context){
+api.getCurrentFormAccordionIndex = async function(_, context){
   context.resolve(global.currentFormAccordionIndex)
 }
 
 api.shouldReloadForm = async function({reloadFormPath}, context){
   global.currentFormShouldReload = reloadFormPath;
+  context.resolve(true);
 }
 
-api.reloadCurrentForm = async function({},context){
+api.reloadCurrentForm = async function(){
   if(global.currentFormNodePath){
     let currentPath = global.currentFormNodePath.endsWith('/') ? global.currentFormNodePath.slice(0, -1) : global.currentFormNodePath;
     currentPath = currentPath.toLowerCase().replace('/','.');
     if(global.currentFormShouldReload === currentPath){
-      mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
       let urlpath = "/sites/"+mainWindow.webContents.getURL().split("/refresh-form-").shift();
       urlpath = "/sites/"+urlpath.split("/sites/").pop()+"/refresh-form-"+Math.random();
       mainWindow.webContents.send("redirectToGivenLocation", urlpath);
@@ -431,8 +442,8 @@ api.reloadCurrentForm = async function({},context){
   }
 }
 
-api.redirectTo = async function({location,forceRefresh}, context){
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+api.redirectTo = async function({location,forceRefresh}){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   if(forceRefresh === true){
     console.log("force")
     mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
@@ -440,63 +451,51 @@ api.redirectTo = async function({location,forceRefresh}, context){
   mainWindow.webContents.send("redirectToGivenLocation",location)
 }
 
-api.parentMountWorkspace = async function({siteKey, workspaceKey}, context){
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+api.parentMountWorkspace = async function({siteKey, workspaceKey}){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   mainWindow.webContents.send("redirectToGivenLocation",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
-api.parentCloseMobilePreview = function(context){
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+api.parentCloseMobilePreview = function(){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   mainWindow.webContents.send("disableMobilePreview")
 }
 
-api.parentTempHideMobilePreview = function(context){
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+api.parentTempHideMobilePreview = function(){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   mainWindow.webContents.send("tempHideMobilePreview")
 }
 
-api.parentTempUnHideMobilePreview = function(context){
-  mainWindow = global.mainWM.getCurrentInstanceOrNew();
+api.parentTempUnHideMobilePreview = function(){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   mainWindow.webContents.send("tempUnHideMobilePreview")
 }
 
-api.openMobilePreview = function(context){
-  return new Promise((resolve, reject)=>{
-    global.mainWM.openMobilePreview();
-  });
+api.openMobilePreview = function(){
+  global.mainWM.openMobilePreview();
 }
-api.closeMobilePreview = function(context){
-  return new Promise((resolve, reject)=>{
-    global.mainWM.closeMobilePreview();
-  });
+api.closeMobilePreview = function(){
+  global.mainWM.closeMobilePreview();
 }
 
-api.updateMobilePreviewUrl = function({url}, context){
-  return new Promise((resolve, reject)=>{
-    global.mainWM.setMobilePreviewUrl(url);
-  });
+api.updateMobilePreviewUrl = function({url}){
+  global.mainWM.setMobilePreviewUrl(url);
 }
 
-api.logToConsole = function({message, label}, context){
+api.logToConsole = function({message, label}){
 
   if(label){
     console.log("\b--- " + label.toUpperCase() + " --> ");
-  }
-  else{
   }
   console.log(util.inspect(message, false, null, true));
 }
 
 
-api.importSiteAction = function(context){
-  return new Promise((resolve, reject)=>{
-    pogozipper.importSite()
-  });
+api.importSiteAction = function(){
+  pogozipper.importSite()
 }
 
 api.importSiteFromPublicGitUrl = function({siteName, url}, context){
-  //console.log(siteName)
-
   gitImporter.importSiteFromPublicGitUrl(url, siteName)
     .then((siteKey)=>{
       context.resolve(siteKey);
@@ -523,10 +522,6 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
       .catch((error)=>{
         context.reject(error);
       });
-  });
-
-  return new Promise((resolve, reject)=>{
-    global.mainWM.closeMobilePreview();
   });
 }
 
@@ -774,7 +769,7 @@ api.getThumbnailForCollectionOrSingleItemImage = function({siteKey, workspaceKey
   });
 }
 
-api.invalidateCache = function(context){
+api.invalidateCache = function(){
   configurationDataProvider.invalidateCache();
 }
 

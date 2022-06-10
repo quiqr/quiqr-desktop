@@ -271,6 +271,7 @@ export class API {
   }
 
   createKeyPairGithub(){
+
     return mainProcessBridge.request('createKeyPairGithub',{}, {timeout:90000});
   }
 
@@ -311,7 +312,7 @@ export class API {
   }
 
   getQuiqrProfile(){
-    return mainProcessBridge.request('getQuiqrProfile',{});
+    return mainProcessBridge.request('getQuiqrProfile');
   }
 
   cloneRemoteAsManagedSite(cloudPath: string, siteName: string){
@@ -328,7 +329,6 @@ export class API {
   invalidateCache(){
     return mainProcessBridge.request('invalidateCache');
   }
-
 
 }
 

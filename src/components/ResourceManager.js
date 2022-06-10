@@ -7,55 +7,7 @@ import FileIcon from 'material-ui-02/svg-icons/editor/insert-drive-file';
 
 const Fragment = React.Fragment;
 
-// return <ResourceManager
-        //     fileTree={[
-        //         { name:"images", files: [
-        //             { name:"file1.png" },
-        //             { name:"file2.png" },
-        //             { name:"file3.png" },
-        //             { name:"file4.png" },
-        //             { name:"featured", files:[
-        //                 { name:"file1.png" },
-        //                 { name:"file2.png" },
-        //                 { name:"file3.png" },
-        //                 { name:"file4.png" }
-        //             ] }
-        //         ]},
-        //         { name:"css", files: [
-        //             { name:"file1.png" },
-        //             { name:"file2.png" },
-        //             { name:"file3.png" }
-        //         ]},
-        //         { name:"xxx.md" },
-        //         { name:"extra.md" },
-        //         { name:"aaa.md" },
-        //         { name:"zzz.md" }
-
-        //     ]}
-        //     currentPath={['images','featured']}
-        //     handleItemClick={(item)=>console.log(item)}
-        //     handleBreadcumbItemClick={(item)=>console.log(item)}
-        // />
-
 class ResourceManager extends React.Component{
-
-    //storedFiles
-    /*
-        [
-            { name:"images", files: [
-                { name:"file1.png" },
-                { name:"file2.png" },
-                { name:"file3.png" }
-            ]},
-            { name:"css", files: [
-                { name:"style.css" }
-            ]},
-            { name:"second.md" }
-            { name:"extra.md" }
-
-        ]
-    */
-
 
     getHandleItemClick(type, fileName){
         return () =>{
@@ -72,10 +24,6 @@ class ResourceManager extends React.Component{
         }
     }
 
-
-    //current path: [images][featured], branchPath: [images] = ancestor
-    //current path: [images][featured], branchPath: [images] = same
-    //current path: [photos], branchPath: [images] = none
     isAncestorOrSame(branchPath, currentPath){
         if(branchPath.length>currentPath.length)
             return -1;//none

@@ -14,12 +14,10 @@ class GithubKeyManager {
     const tempDir = pathHelper.getTempDir();
 
     try {
-      let gencmd = await spawnAw( gitBin, [ "keygen_ecdsa" ], {cwd: tempDir});
+      await spawnAw( gitBin, [ "keygen_ecdsa" ], {cwd: tempDir});
       outputConsole.appendLine('Keygen success ...');
       privKey = await fs.readFileSync(path.join(tempDir,"/id_ecdsa_quiqr"), {encoding: 'utf8'});
       pubKey = await fs.readFileSync(path.join(tempDir,"/id_ecdsa_quiqr.pub"), {encoding: 'utf8'});
-      //console.log(pubKey);
-      //console.log(privKey);
     } catch (e) {
       outputConsole.appendLine('keygen error ...:' + e);
     }

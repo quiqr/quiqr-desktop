@@ -4,7 +4,7 @@ const request                   = require('request');
 class RequestHelper{
 
   dumpJSONBodyFromGetRequestToFileAndReturn(url, filePath){
-    return new Promise( async (resolve, reject)=>{
+    return new Promise((resolve, reject)=>{
       try {
         const req = request({
           method: 'GET',

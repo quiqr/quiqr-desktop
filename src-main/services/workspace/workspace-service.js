@@ -1,12 +1,11 @@
 const path                            = require('path');
 const glob                            = require('glob');
-const { shell, nativeImage }          = require('electron');
+const { shell }                       = require('electron');
 const fs                              = require('fs-extra');
 const fssimple                        = require('fs');
 const rimraf                          = require("rimraf");
 const fm                              = require('front-matter')
 const { promisify }                   = require('util');
-//const Jimp                            = require("jimp");
 const formatProviderResolver          = require('./../../utils/format-provider-resolver');
 const { WorkspaceConfigProvider }     = require('./workspace-config-provider');
 const contentFormats                  = require('./../../utils/content-formats');
@@ -238,7 +237,6 @@ class WorkspaceService{
 
     let config = await this.getConfigurationsData();
     let collection = config.collections.find(x => x.key === collectionKey);
-    let keyExt = path.extname(collectionItemKey);
     if(collection==null)
       throw new Error('Could not find collection.');
     let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
@@ -307,7 +305,7 @@ class WorkspaceService{
       let retFiles = files.map(function(item){
 
         let key = item.replace(folder,'').replace(/^\//,'');
-        let label = key.replace(/^\/?(.+)\/[^\/]+$/,'$1');
+        let label = key.replace(/^\/?(.+)\/[^/]+$/,'$1');
 
         let sortval = null;
         if ('sortkey' in collection){
@@ -480,7 +478,7 @@ class WorkspaceService{
         if(collection==null)
           throw new Error('Could not find collection.');
 
-        let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^\/]+$/,'') , targetPath);
+        let pathFromItemRoot = path.join(collectionItemKey.replace(/\/[^/]+$/,'') , targetPath);
         filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
       }
     }
@@ -502,7 +500,7 @@ class WorkspaceService{
       }
 
       await fs.copy(from, to);
-    };
+    }
 
     return files.map(x => {
       return path.join(targetPath, path.basename(x)).replace(/\\/g,'/');
@@ -520,7 +518,7 @@ class WorkspaceService{
 
   async removeThumbnailForItemImage(collectionKey, collectionItemKey, targetPath){
     let folder;
-    let itemPath = collectionItemKey.replace(/\/[^\/]+$/,'');
+    let itemPath = collectionItemKey.replace(/\/[^/]+$/,'');
     if(collectionKey == ""){
       folder = path.basename(await this.getSingleFolder(collectionItemKey));
     }
@@ -544,22 +542,19 @@ class WorkspaceService{
   }
 
   async getFilesInBundle(collectionKey, collectionItemKey, targetPath, extensions, forceFileName){
+    console.log(forceFileName);
+    console.log(extensions);
 
     let files = [];
     let folder;
     let filePath;
-    let src;
 
     let config = await this.getConfigurationsData();
 
     if(collectionKey == ""){
-      //src =  path.join(await this.getSingleFolder(collectionItemKey), targetPath);
-      //folder = path.basename(await this.getSingleFolder(collectionItemKey));
-
       let single = config.singles.find(x => x.key === collectionItemKey);
       if(single==null)throw new Error('Could not find single.');
       filePath = path.join(this.workspacePath, single.file);
-
     }
     else {
       let collection = config.collections.find(x => x.key === collectionKey);
@@ -567,21 +562,17 @@ class WorkspaceService{
       filePath = path.join(this.workspacePath, folder, collectionItemKey);
     }
 
-
-    //console.log(filePath)
     if(await fs.exists(filePath)){
       if(contentFormats.isContentFile(filePath)){
         files = await this.getResourcesFromContent(filePath, [], targetPath);
       }
-      //console.log(files)
       return files;
     }
-
   }
 
   //if collectionKey is "" its a SINGLE
   async getThumbnailForCollectionOrSingleItemImage(collectionKey, itemKey, targetPath){
-    let itemPath = itemKey.replace(/\/[^\/]+$/,'');
+    let itemPath = itemKey.replace(/\/[^/]+$/,'');
 
     if(targetPath.charAt(0)=="/" || targetPath.charAt(0)=="\\"){
       return this.getThumbnailForAbsoluteImgPath(path.join(this.workspacePath, targetPath), targetPath);
@@ -669,7 +660,7 @@ class WorkspaceService{
     }
   }
 
-  async serve(serveKey){
+  async serve(){
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
 
@@ -687,8 +678,10 @@ class WorkspaceService{
 
       global.hugoServer = new HugoServer(JSON.parse(JSON.stringify(hugoServerConfig)));
 
-      global.hugoServer.serve((err, stdout, stderr)=>{
-        if(err) reject(err);
+      global.hugoServer.serve((err)=>{
+        if(err){
+          reject(err);
+        }
         else{
 
           //make screenshot it no screenshots are made already

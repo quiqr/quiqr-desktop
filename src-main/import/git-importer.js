@@ -7,14 +7,14 @@ const libraryService            = require('../services/library/library-service')
 class GitImporter {
 
   importSiteFromPublicGitUrl(url, siteName){
-    return new Promise( async (resolve, reject)=>{
+    return new Promise( (resolve, reject)=>{
       try{
         const tempCloneDir = path.join(pathHelper.getTempDir(), 'siteFromGit');
         console.log(tempCloneDir)
-        await del.sync([tempCloneDir],{force:true});
-        await Embgit.cloneFromPublicUrl( url, tempCloneDir);
-        siteKey = await libraryService.createSiteKeyFromName(siteName);
-        await libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir);
+        del.sync([tempCloneDir],{force:true});
+        Embgit.cloneFromPublicUrl( url, tempCloneDir);
+        let siteKey = libraryService.createSiteKeyFromName(siteName);
+        libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir);
         console.log(siteKey)
         resolve(siteKey);
       }

@@ -1,9 +1,3 @@
-/* Copyright Quiqr 2021-2022
- *
- * pim@quiqr.org
- *
- */
-const { app, shell }            = require('electron')
 const request                   = require('request');
 const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 const PogoPublisher             = require('../../publishers/pogo-publisher');
@@ -15,16 +9,16 @@ class CloudApiManager{
 
   sendInvitationMail(email,siteKey){
 
-    let profileUserName;
     configurationDataProvider.get( async (err, configurations)=>{
 
       let siteData = configurations.sites.find((x)=>x.key===siteKey);
-      if(siteData.hasOwnProperty("publish") &&
-        siteData.publish[0].hasOwnProperty("config") &&
-        siteData.publish[0].config.hasOwnProperty("path")){
+      if('publish' in siteData &&
+        'config' in siteData.publish[0] &&
+        'path' in siteData.publish[0].config){
         let sitePath = siteData.publish[0].config.path;
 
-        if(profileUserName = global.pogoconf.currentUsername){
+        const profileUserName = global.pogoconf.currentUsername;
+        if(profileUserName){
 
           let fingerprint = await cloudGitManager.getKeyFingerprint();
           let userVars = {
@@ -37,18 +31,10 @@ class CloudApiManager{
             configurations.global.pogoboardConn.host+":"+
             configurations.global.pogoboardConn.port+"/site/invite-member/"+sitePath+"/"+email+"/"+requestVars;
 
-          const req = request({
+          request({
             method: 'GET',
             url: url
           });
-          req.on('response', (response) => {
-            if(response.statusCode === 200){
-              response.on('data',(chunk) => {
-
-              });
-            }
-          });
-
         }
       }
 
@@ -57,24 +43,17 @@ class CloudApiManager{
 
   requestConnectMail(email){
 
-    configurationDataProvider.get( function(err, configurations){
+    configurationDataProvider.get( (err, configurations)=>{
 
       let url = configurations.global.pogoboardConn.protocol+"//"+
         configurations.global.pogoboardConn.host+":"+
         configurations.global.pogoboardConn.port+"/connect/"+email;
 
-      const req = request({
+      request({
         method: 'GET',
         url: url
       });
-      req.on('response', (response) => {
-        if(response.statusCode === 200){
-          response.on('data',(chunk) => {
-
-          });
-        }
-      });
-    }.bind(this));
+    });
   }
 
   async connectWithCodeSuccessFul(connect_code){
@@ -149,7 +128,7 @@ class CloudApiManager{
           },
           url: url
         });
-        req.on('error', (e) => {
+        req.on('error', () => {
           resolve(false);
         });
 
@@ -162,7 +141,7 @@ class CloudApiManager{
 
             response.on('end', () => {
               let obj = JSON.parse(data);
-              if(obj.hasOwnProperty('username')){
+              if('username' in obj){
                 resolve(obj);
               }
               else{
@@ -188,8 +167,6 @@ class CloudApiManager{
     return new Promise(resolve => {
 
       configurationDataProvider.get( async (err, configurations)=>{
-
-        let data='';
 
         let url = configurations.global.pogoboardConn.protocol+"//"+
           configurations.global.pogoboardConn.host+":"+
@@ -240,8 +217,6 @@ class CloudApiManager{
 
       configurationDataProvider.get( async (err, configurations)=>{
 
-        let data='';
-
         let url = configurations.global.pogoboardConn.protocol+"//"+
           configurations.global.pogoboardConn.host+":"+
           configurations.global.pogoboardConn.port+'/site/disconnect-domain';
@@ -286,8 +261,6 @@ class CloudApiManager{
     return new Promise(resolve => {
 
       configurationDataProvider.get( async (err, configurations)=>{
-
-        let data='';
 
         let url = configurations.global.pogoboardConn.protocol+"//"+
           configurations.global.pogoboardConn.host+":"+
@@ -359,7 +332,7 @@ class CloudApiManager{
 
             response.on('end', async () => {
               let obj = JSON.parse(data);
-              if(obj.hasOwnProperty('path')){
+              if('path' in obj){
 
                 let pogopubl = new PogoPublisher({});
                 await pogopubl.writeDomainInfo(obj.path, obj.path+".quiqr.cloud")
@@ -420,7 +393,7 @@ class CloudApiManager{
 
             response.on('end', () => {
               let obj = JSON.parse(data);
-              if(obj.hasOwnProperty('domain')){
+              if('domain' in obj){
                 resolve(obj.domain);
               }
               else{

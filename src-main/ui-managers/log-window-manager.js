@@ -3,7 +3,6 @@ const BrowserWindow             = electron.BrowserWindow;
 const url                       = require('url')
 const path                      = require('path')
 const fs                        = require('fs-extra')
-const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 
 let logWindow;
 
@@ -77,7 +76,7 @@ function createWindow () {
         if(logWindow) logWindow.loadURL(url);
       }
       );
-      client.on('error', (error) => {
+      client.on('error', () => {
         setTimeout(tryConnection, 1000);
       });
       tryConnection();

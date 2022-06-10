@@ -1,14 +1,11 @@
-const electron                                  = require('electron')
-const path                                      = require('path');
-const rootPath                                  = require('electron-root-path').rootPath;
-const ProgressBar                               = require('electron-progressbar');
-const fs                                        = require('fs-extra');
-const spawnAw                                   = require('await-spawn')
-const outputConsole                             = require('../../logger/output-console');
-const Embgit                                    = require('../../embgit/embgit');
-const pathHelper                                = require('../../utils/path-helper');
-const fileDirUtils                              = require('../../utils/file-dir-utils');
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('../../utils/environment-resolver');
+const path                    = require('path');
+const fs                      = require('fs-extra');
+const spawnAw                 = require('await-spawn')
+const outputConsole           = require('../../logger/output-console');
+const Embgit                  = require('../../embgit/embgit');
+const pathHelper              = require('../../utils/path-helper');
+const fileDirUtils            = require('../../utils/file-dir-utils');
+const { EnvironmentResolver } = require('../../utils/environment-resolver');
 
 const gitBin = Embgit.getGitBin();
 const environmentResolver = new EnvironmentResolver();
@@ -25,7 +22,7 @@ class GithubSync {
     const resolvedDest = await this._ensureSyncRepoDir(context.siteKey);
     const fullGitHubUrl = 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
     const fullDestinationPath = path.join(resolvedDest , this._config.repository);
-    mainWindow = global.mainWM.getCurrentInstance();
+    let mainWindow = global.mainWM.getCurrentInstance();
 
     outputConsole.appendLine('START GITHUB SYNC');
     outputConsole.appendLine('-----------------');
@@ -66,7 +63,7 @@ class GithubSync {
       outputConsole.appendLine(gitBin+ " clone -s -s -i " + tmpkeypathPrivate + " " + fullGitHubUrl + " " + fullDestinationPath );
       //-s insecure (ignore hostkey)
       //-i use private file
-      let clonecmd = await spawnAw( gitBin, [ "clone", "-s", "-i", tmpkeypathPrivate, fullGitHubUrl , fullDestinationPath ]);
+      await spawnAw( gitBin, [ "clone", "-s", "-i", tmpkeypathPrivate, fullGitHubUrl , fullDestinationPath ]);
       outputConsole.appendLine('1st Clone success ...');
     } catch (e) {
       outputConsole.appendLine('1st Clone error ...:' + e);
@@ -104,14 +101,14 @@ class GithubSync {
   async publish_step3_add_commit_push(tmpkeypathPrivate, fullDestinationPath){
 
 
-    let clonecmd2 = await spawnAw( gitBin, [ "alladd" , fullDestinationPath]);
+    await spawnAw( gitBin, [ "add_all" , fullDestinationPath]);
     outputConsole.appendLine('git-add finished ...');
 
-    let clonecmd3 = await spawnAw( gitBin, [ "commit", '-a' , '-n', this._config.username, '-e', this._config.email, '-m', "'publication from " + UQIS +"'", fullDestinationPath]);
+    await spawnAw( gitBin, [ "commit", '-a' , '-n', this._config.username, '-e', this._config.email, '-m', "'publication from " + UQIS +"'", fullDestinationPath]);
     outputConsole.appendLine(gitBin+" commit -a -n "+ this._config.username + " -e " + this._config.email + " -m 'publication from "+ UQIS +"' " + fullDestinationPath);
     outputConsole.appendLine('git-commit finished ...');
 
-    let clonecmd4 = await spawnAw( gitBin, [ "push","-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
+    await spawnAw( gitBin, [ "push","-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
     outputConsole.appendLine(gitBin+" push -i "+ tmpkeypathPrivate +" "+ fullDestinationPath);
     outputConsole.appendLine('git-commit push finished ...');
 
@@ -126,8 +123,6 @@ class GithubSync {
     }
   }
 
-  async _github_action_workflow_build(fullDestinationPath){
-  }
   async _github_action_workflow_source(fullDestinationPath){
 
     const hugoversion = '0.81.0';

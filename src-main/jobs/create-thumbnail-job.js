@@ -15,7 +15,7 @@ const action  = async ({src , dest}) => {
     else{
       let resizePromise = new Promise((resolve, reject)=>{
         jimp.read(src, function (err, lenna) {
-          if (err) 
+          if (err)
           {
             console.log(err)
           }
@@ -33,7 +33,7 @@ const action  = async ({src , dest}) => {
       await resizePromise;
     }
 
-    let thumbExistsPromise = new Promise((resolve, reject)=>{
+    let thumbExistsPromise = new Promise((resolve)=>{
       fs.exists(dest,(exists)=> resolve(exists));
     });
 

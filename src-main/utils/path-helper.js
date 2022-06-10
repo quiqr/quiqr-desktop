@@ -1,10 +1,10 @@
-const electron                                  = require('electron')
-const path                                      = require('path');
-const userHome                                  = require('user-home');
-const fs                                        = require('fs-extra');
-const rootPath                                  = require('electron-root-path').rootPath;
-const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./environment-resolver');
-const QuiqrAppConfig                            = require('../app-prefs-state/quiqr-app-config');
+const electron                           = require('electron')
+const path                               = require('path');
+const userHome                           = require('user-home');
+const fs                                 = require('fs-extra');
+const rootPath                           = require('electron-root-path').rootPath;
+const { EnvironmentResolver, PLATFORMS } = require('./environment-resolver');
+const QuiqrAppConfig                     = require('../app-prefs-state/quiqr-app-config');
 
 const pogoconf = QuiqrAppConfig();
 
@@ -13,7 +13,6 @@ class PathHelper{
   /* DIRS */
   getRoot(){
 
-    let dataFolder = "";
     let thedir = "";
 
     let prefs = pogoconf.prefs;
@@ -135,8 +134,8 @@ class PathHelper{
   getHugoBinForVer(version){
 
     // CUSTOM PATH TO HUGO E.G. for nix developments
-    if(global.process.env.HUGO_PATH){
-      return global.process.env.HUGO_PATH;
+    if(process.env.HUGO_PATH){
+      return process.env.HUGO_PATH;
     }
 
     let platform = process.platform.toLowerCase();

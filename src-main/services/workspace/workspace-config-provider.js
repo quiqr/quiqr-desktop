@@ -4,11 +4,9 @@ const glob                          = require('glob');
 const { FileCacheToken }            = require('./file-cache-token');
 const WorkspaceConfigValidator      = require('./workspace-config-validator');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
-const pathHelper                    = require('./../../utils/path-helper');
 const formatProviderResolver        = require('./../../utils/format-provider-resolver');
 const deepmerge                     = require('deepmerge');
 const request                       = require('request');
-const rimraf                        = require("rimraf");
 
 
 class WorkspaceConfigProvider{
@@ -192,7 +190,7 @@ class WorkspaceConfigProvider{
       }
 
 
-    });;
+    });
 
     return {...configObject, ...newObject}
   }
@@ -204,7 +202,7 @@ class WorkspaceConfigProvider{
 
   _mergePartials(mergeKey, workspacePath){
 
-    return new Promise(async (resolve, reject)=>{
+    return new Promise(async (resolve)=>{
 
       if( "_mergePartial" in mergeKey){
 
@@ -281,13 +279,12 @@ class WorkspaceConfigProvider{
       });
 
       req.on('error', (err) => {
-        service.api.logToConsole(err);
+        console.log(err)
       });
 
       req.on('response', (response) => {
         response.on('error', (error) => {
-          service.api.logToConsole(error);
-          reject(err);
+          reject(error);
         })
 
         response.on('end', async () => {

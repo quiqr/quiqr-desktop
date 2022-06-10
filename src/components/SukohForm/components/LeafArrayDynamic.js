@@ -60,7 +60,6 @@ class LeafArrayDynamic extends BaseDynamic {
 
   getOnItemChange(index){
     return (value : any) => {
-      console.log(value, index);
       let context = this.props.context;
       let copy = context.value.slice(0);
       copy[index] = value;

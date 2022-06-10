@@ -1,8 +1,5 @@
-const path           = require('path');
 const fs             = require('fs-extra');
-const rimraf         = require("rimraf");
 const { execFile }   = require('child_process');
-const hugoDownloader = require('./hugo-downloader')
 const pathHelper     = require('./../utils/path-helper');
 
 class HugoBuilder{
@@ -30,7 +27,7 @@ class HugoBuilder{
           windowsHide: true,
           timeout: 60000, //1 minute
         },
-        (error, stdout, stderr) => {
+        (error) => {
           if(error){
             reject(error);
             return;
@@ -70,7 +67,7 @@ class HugoBuilder{
           windowsHide: true,
           timeout: 60000, //1 minute
         },
-        (error, stdout, stderr) => {
+        (error) => {
           if(error){
             reject(error);
             return;

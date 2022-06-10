@@ -15,7 +15,7 @@ const ARCHS = {
 
 class EnvironmentResolver{
     resolve(){
-        let platform = process.platform;
+        let platform = global.process.platform;
         if(platform.startsWith("win")){
             platform=PLATFORMS.windows;
         }
@@ -29,7 +29,7 @@ class EnvironmentResolver{
             throw new Error('Could not resolve environment. Platform not supported.');
         }
 
-        let arch = ARCHS[process.arch];
+        let arch = ARCHS[global.process.arch];
         if(arch===undefined)
             throw new Error('Could not resolve environment. Arch not supported.');
 

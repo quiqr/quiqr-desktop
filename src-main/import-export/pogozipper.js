@@ -1,11 +1,5 @@
-/* Copyright Quiqr 2021
- *
- * pim@quiqr.org
- *
- */
 const electron             = require('electron')
 const dialog               = electron.dialog;
-const app                  = electron.app
 const fs                   = require('fs-extra');
 const fssimple             = require('fs');
 const AdmZip               = require('adm-zip');
@@ -17,10 +11,11 @@ const PogoSiteExtension    = "pogosite";
 const PogoThemeExtension   = "pogotheme";
 const PogoContentExtension = "pogocontent";
 
+const mainWindow           = global.mainWindow;
+
 class Pogozipper{
 
     async exportSite() {
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -77,7 +72,7 @@ class Pogozipper{
         await zip.addFile('config.'+newKey+'.json', Buffer.alloc(newConfJson.length, newConfJson), "");
 
         await zip.addLocalFolder(tmppath);
-        var willSendthis = zip.toBuffer();
+        //var willSendthis = zip.toBuffer();
 
         var exportFilePath = path+"/"+newKey+"."+PogoSiteExtension;
         await zip.writeZip(exportFilePath);
@@ -92,7 +87,6 @@ class Pogozipper{
 
     async importSite(path=null) {
 
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
@@ -187,7 +181,6 @@ class Pogozipper{
         //stop preview
 
         if(!this.checkCurrentSiteKey()) {return;}
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
@@ -223,7 +216,7 @@ class Pogozipper{
         });
 
         if(siteKey == ""){
-            dialog.showMessageBox(mainwindow, {
+            dialog.showMessageBox(mainWindow, {
                 type: 'warning',
                 buttons: ["Close"],
                 title: "Failed task",
@@ -256,7 +249,6 @@ class Pogozipper{
     }
 
     checkCurrentSiteKey(){
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(global.currentSiteKey){
             return true;
@@ -274,7 +266,6 @@ class Pogozipper{
     }
 
     async exportTheme() {
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -312,7 +303,7 @@ class Pogozipper{
         await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
 
         await zip.addLocalFolder(tmppath);
-        var willSendthis = zip.toBuffer();
+        //var willSendthis = zip.toBuffer();
 
         var exportFilePath = path+"/"+global.currentSiteKey+"."+PogoThemeExtension;
         await zip.writeZip(exportFilePath);
@@ -327,7 +318,6 @@ class Pogozipper{
     }
 
     async exportContent() {
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!this.checkCurrentSiteKey()) {return;}
 
@@ -367,7 +357,7 @@ class Pogozipper{
         await zip.addFile("sitekey", Buffer.alloc(global.currentSiteKey.length, global.currentSiteKey), "");
 
         await zip.addLocalFolder(tmppath);
-        var willSendthis = zip.toBuffer();
+        //var willSendthis = zip.toBuffer();
 
         var exportFilePath = path+"/"+global.currentSiteKey+"."+PogoContentExtension;
         await zip.writeZip(exportFilePath);
@@ -385,7 +375,6 @@ class Pogozipper{
         //stop preview
 
         if(!this.checkCurrentSiteKey()) {return;}
-        const mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
         if(!path){
             let files = dialog.showOpenDialog(mainWindow, {
@@ -421,7 +410,7 @@ class Pogozipper{
         });
 
         if(siteKey == ""){
-            dialog.showMessageBox(mainwindow, {
+            dialog.showMessageBox(mainWindow, {
                 type: 'warning',
                 buttons: ["Close"],
                 title: "Failed task",

@@ -1,5 +1,3 @@
-const fs                = require('fs-extra');
-const path              = require('path');
 const publisherFactory  = require('./../../publishers/publisher-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 const pathHelper        = require('./../../utils/path-helper');
@@ -30,7 +28,6 @@ class SiteService{
   async mountWorkspace(workspaceKey){
     await this._getSiteSource().mountWorkspace(workspaceKey);
   }
-
 
   _findFirstMatchOrDefault(arr, key){
     let result;

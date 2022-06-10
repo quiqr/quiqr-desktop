@@ -1,5 +1,3 @@
-const { BrowserWindow, ipcMain } = require('electron');
-const crypto = require("crypto");
 const BackgroundJobRunner = require('./background-job-runner');
 
 class JobsManager{
