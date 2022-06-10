@@ -84,6 +84,7 @@ export class SiteLibrarySidebar extends React.Component {
           }
         ]
       },
+      /*
       {
         title: 'In my cloud',
         items: [
@@ -98,6 +99,7 @@ export class SiteLibrarySidebar extends React.Component {
           },
         ]
       },
+      */
       {
         title: 'Quiqr Templates',
         items: [
@@ -112,6 +114,7 @@ export class SiteLibrarySidebar extends React.Component {
           },
         ]
       },
+      /*
       {
         title: 'Hugo Templates',
         items: [
@@ -126,6 +129,7 @@ export class SiteLibrarySidebar extends React.Component {
           },
         ]
       },
+      */
     ]
 
     return <Sidebar {...this.props} menus={menus} />

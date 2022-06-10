@@ -1,9 +1,10 @@
 import * as React                                                 from 'react';
-import { Route }  from 'react-router-dom';
+import { Route }                                                  from 'react-router-dom';
 import service                                                    from './../../services/service';
 import {TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup} from '../TopToolbarRight'
 import SettingsApplicationsIcon                                   from '@material-ui/icons/SettingsApplications';
 import InputIcon                                                  from '@material-ui/icons/Input';
+import AddIcon                                                    from '@material-ui/icons/Add';
 import ViewListIcon                                               from '@material-ui/icons/ViewList';
 import ViewModuleIcon                                             from '@material-ui/icons/ViewModule';
 
@@ -23,6 +24,15 @@ export class SiteLibraryToolbarRight extends React.Component {
   renderWithRoute(history: {push:(path: string)=>void}){
 
     const leftButtons = [
+      <ToolbarButton
+        action={()=>{
+          service.api.redirectTo(`/sites/new-site/x${Math.random()}`, true);
+        }}
+        title="New"
+        icon={<AddIcon style={{ color: iconColor }} />}
+      />,
+
+
       <ToolbarButton
         action={()=>{
           service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);

@@ -40,6 +40,10 @@ export class API {
     return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url});
   }
 
+  newSiteFromPublicHugoThemeUrl(siteName: string, url: string, themeInfo: any){
+    return mainProcessBridge.request('newSiteFromPublicHugoThemeUrl', {siteName, url, themeInfo});
+  }
+
   getCurrentSiteKey(){
     return mainProcessBridge.request('getCurrentSiteKey');
   }
@@ -186,6 +190,10 @@ export class API {
   }
   quiqr_git_repo_show(url: string){
     return mainProcessBridge.request('quiqr_git_repo_show', {url});
+  }
+
+  hugotheme_git_repo_show(url: string){
+    return mainProcessBridge.request('hugotheme_git_repo_show', {url});
   }
 
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){

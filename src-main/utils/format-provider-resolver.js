@@ -286,6 +286,7 @@ class FormatProviderResolver{
         return this.resolveForExtension(ext);
     }
 
+
     resolveForMdFileString(fileContent/*: string*/)/*: ?FormatProvider*/{
         if(fileContent===undefined)
             return null;

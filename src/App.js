@@ -285,26 +285,20 @@ class App extends React.Component{
     this.setState({libraryView: view})
   }
 
-  renderSelectSites(){
+  renderSelectSites(openDialog){
+
     this.getProfile();
     return (
       <SiteLibraryRouted
         activeLibraryView={ this.state.libraryView}
         key={ 'selectSite' }
         quiqrUsername={this.state.quiqrUsername}
+        newSite={ (openDialog === 'newSiteDialog' ? true : false ) }
+        importSite={ (openDialog === 'importSiteDialog' ? true : false ) }
       />
     );
   }
 
-  renderImportSite() {
-    return (
-      <SiteLibraryRouted
-        view={ this.state.libraryView}
-        key={ 'selectSite' }
-        importSite={ true }
-      />
-    );
-  }
   renderCreateSite() {
     this.getProfile();
     return (
@@ -327,8 +321,13 @@ class App extends React.Component{
         return this.renderCreateSite();
       }} />
 
+      <Route path='/sites/new-site/:refresh' exact render={ () => {
+        return this.renderSelectSites('newSiteDialog');
+      }} />
+
       <Route path='/sites/import-site/:refresh' exact render={ () => {
-        return this.renderImportSite();
+        return this.renderSelectSites('importSiteDialog');
+        //return this.renderImportSite();
       }} />
 
       <Route path='/sites/*' render={ () => {

@@ -12,6 +12,7 @@ import MoreVertIcon            from '@material-ui/icons/MoreVert';
 import CreateSiteDialog        from './components/CreateSiteDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
 import ImportSiteDialog        from './components/Import/ImportSiteDialog';
+import NewSiteDialog           from './components/New/NewSiteDialog';
 import EditTagsDialogs         from './components/EditTagsDialogs';
 import RenameDialog            from './components/RenameDialog';
 import SiteListItem            from './components/SiteListItem';
@@ -39,6 +40,7 @@ class SiteLibraryRouted extends React.Component{
       renameDialog: false,
       dialogSiteConf: {},
       dialogImportSite: {},
+      dialogNewSite: {},
       currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
@@ -82,6 +84,11 @@ class SiteLibraryRouted extends React.Component{
 
     if(this.props.createSite !== nextProps.createSite){
       this.setState({createSiteDialog: nextProps.createSite});
+    }
+
+    if(this.props.newSite !== nextProps.newSite){
+      service.api.logToConsole("newSite")
+      this.setState({dialogNewSite: {open: nextProps.newSite}});
     }
 
     if(this.props.importSite !== nextProps.importSite){
@@ -229,7 +236,7 @@ class SiteLibraryRouted extends React.Component{
     let listTitle = 'All Sites';
 
     if(listingSource === 'quiqr-cloud' || (listingSource ==='last' && this.state.sitesListingView === 'quiqr-cloud')){
-      listTitle = `Available remote sites (${this.props.quiqrUsername})`;
+      listTitle = `Available remote sites ${(this.props.quiqrUsername? "for " + this.props.quiqrUsername:'')}`;
 
       sites = [];
       this.state.remoteSitesAsOwner.forEach((remotesite)=>{
@@ -380,14 +387,20 @@ class SiteLibraryRouted extends React.Component{
           onSubmitClick={this.handleCreateSiteSubmit}
         />
 
+        <NewSiteDialog
+          open={this.state.dialogNewSite.open}
+          onClose={()=>this.setState({dialogNewSite:{open:false}})}
+          mountSite={(siteKey)=>{
+            this.mountSiteByKey(siteKey);
+          }}
+        />
+
         <ImportSiteDialog
           open={this.state.dialogImportSite.open}
           onClose={()=>this.setState({dialogImportSite:{open:false}})}
           mountSite={(siteKey)=>{
             this.mountSiteByKey(siteKey);
           }}
-
-          //onSubmitClick={this.handleCreateSiteSubmit}
         />
 
         <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}</BlockDialog>

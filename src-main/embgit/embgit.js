@@ -79,17 +79,31 @@ class Embgit{
 
   }
 
-
-  async quiqr_repo_show(url){
+  async repo_show_quiqrsite(url){
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
-        let cmd = await spawnAw( gitBinary, [ "quiqr_repo_show", url ]);
-        global.outputConsole.appendLine(gitBinary + " quiqr_repo_show " + url );
+        let cmd = await spawnAw( gitBinary, [ "repo_show_quiqrsite", url ]);
+        global.outputConsole.appendLine(gitBinary + " repo_show_quiqrsite " + url );
         const response = JSON.parse(cmd.toString());
         resolve(response)
       } catch (e) {
-        global.outputConsole.appendLine(gitBinary + " quiqr_repo_show " + url );
+        global.outputConsole.appendLine(gitBinary + " repo_show_quiqrsite " + url );
+        reject(e)
+      }
+    });
+  }
+
+  async repo_show_hugotheme(url){
+    const gitBinary = this.getGitBin();
+    return new Promise( async (resolve, reject)=>{
+      try {
+        let cmd = await spawnAw( gitBinary, [ "repo_show_hugotheme", url ]);
+        global.outputConsole.appendLine(gitBinary + " repo_show_hugotheme " + url );
+        const response = JSON.parse(cmd.toString());
+        resolve(response)
+      } catch (e) {
+        global.outputConsole.appendLine(gitBinary + " repo_show_hugotheme " + url );
         reject(e)
       }
     });

@@ -14,21 +14,28 @@ class InitialWorkspaceConfigBuilder{
     this.buildHomeReadme();
 
     let {dataBase, formatProvider} = this.buildBase();
+
+    /*
     let dataInclude = this.buildInclude();
     let dataPartial = this.buildPartials();
+    */
 
     fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model'));
     fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model','includes'));
     fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model','partials'));
 
+    /*
     let filePathInclude = path.join(this.workspacePath,'quiqr','model','includes','collections.'+formatProvider.defaultExt());
     let filePathPartial = path.join(this.workspacePath,'quiqr','model','partials', 'page.'+formatProvider.defaultExt());
+    */
     let filePathBase    = path.join(this.workspacePath,'quiqr','model','base.'+formatProvider.defaultExt());
+
 
     fs.writeFileSync(
       filePathBase,
       formatProvider.dump(dataBase)
     );
+    /*
     fs.writeFileSync(
       filePathInclude,
       formatProvider.dump(dataInclude)
@@ -37,6 +44,7 @@ class InitialWorkspaceConfigBuilder{
       filePathPartial,
       formatProvider.dump(dataPartial)
     );
+    */
 
     return filePathBase;
   }
@@ -60,14 +68,6 @@ class InitialWorkspaceConfigBuilder{
       ],
       "menu":[
         {
-          "key": "content",
-          "title": "Content",
-          "menuItems": [
-            {"key":"frontpage"},
-            {"key":"pages"},
-          ]
-        },
-        {
           "key": "settings",
           "title": "Settings",
           "menuItems": [
@@ -77,22 +77,12 @@ class InitialWorkspaceConfigBuilder{
       ],
       "singles":[
         {
-          "key": "frontpage",
-          "title": "Front Page",
-          "file": "content/_index.md",
-          "_mergePartial": "page"
-        },
-        {
           "key": "mainConfig",
           "title": "Site Configuration",
           "file": `config.${opts.ext}`,
           "fields":[
             { "key": getBestKey("title"), "title":"Site Title", "type":"string", "tip":"Your page title." },
             { "key": getBestKey("baseURL"), "title":"Base URL", "type":"string", "tip":"Your site URL." },
-            { "key": getBestKey("theme"), "title":"Theme", "type":"readonly", "tip":"The current theme." },
-            { "key": getBestKey("languageCode"), "title":"Language Code", "type":"readonly" },
-            { "key": getBestKey("googleAnalytics"), "title":"Google Analytics", "type":"string", "tip":"Provide a Google Analitics Tracking Code to enable analytics." },
-            { "key": getBestKey("enableRobotsTXT"), "title":"Enable Robots", "type":"boolean", "default":true, "tip":"If you want you page to be indexed, keep this enabled." }
           ]
         }
       ]

@@ -508,6 +508,15 @@ api.importSiteFromPublicGitUrl = function({siteName, url}, context){
       context.reject(err);
     });
 }
+api.newSiteFromPublicHugoThemeUrl = function({siteName, url, themeInfo}, context){
+  gitImporter.newSiteFromPublicHugoThemeUrl(url, siteName, themeInfo)
+    .then((siteKey)=>{
+      context.resolve(siteKey);
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
 
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
@@ -725,8 +734,19 @@ api.getFilesFromAbsolutePath = function({path},promise){
 
 }
 
+
 api.quiqr_git_repo_show = function({url}, promise){
-  Embgit.quiqr_repo_show(url)
+  Embgit.repo_show_quiqrsite(url)
+    .then((response)=>{
+      promise.resolve(response);
+    })
+    .catch((err)=>{
+      promise.reject(err);
+    })
+}
+
+api.hugotheme_git_repo_show = function({url}, promise){
+  Embgit.repo_show_hugotheme(url)
     .then((response)=>{
       promise.resolve(response);
     })
