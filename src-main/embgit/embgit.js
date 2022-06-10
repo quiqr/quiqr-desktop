@@ -29,8 +29,8 @@ class Embgit{
     let cmd;
 
     // CUSTOM PATH TO EMBGIT E.G. for nix developments
-    if(global.process.env.EMBGIT_PATH){
-      cmd = global.process.env.EMBGIT_PATH;
+    if(process.env.EMBGIT_PATH){
+      cmd = process.env.EMBGIT_PATH;
     }
     else{
       switch(enviromnent.platform){

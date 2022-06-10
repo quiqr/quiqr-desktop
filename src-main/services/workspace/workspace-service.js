@@ -542,7 +542,6 @@ class WorkspaceService{
   }
 
   async getFilesInBundle(collectionKey, collectionItemKey, targetPath, extensions, forceFileName){
-    //TODO TEST22
     console.log(forceFileName);
     console.log(extensions);
 

@@ -266,7 +266,7 @@ class MenuManager {
     dialog.showMessageBox(options)
   }
 
-  /* TODO USE API */
+  /* TODO MOVE TO LIBRARY POPUP */
   async renameSite(){
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
@@ -307,7 +307,6 @@ class MenuManager {
           //TODO USE GENERAL
           await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
 
-          //TODO TEST22
           global.outputConsole.appendLine('rename site to: '+newName);
 
           let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
@@ -459,7 +458,6 @@ class MenuManager {
       /*
       configurationDataProvider.get((err, configurations)=>{
         let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-        //TODO TEST22
         if('publish' in siteData && 'config' in siteData.publish[0] && 'path' in siteData.publish[0].config){
           if(this.userIsOwner(global.currentSiteKey, this.profileUserName)){
             return true;
@@ -626,72 +624,7 @@ class MenuManager {
     return profilesMenu;
   }
 
-  async editProjectPath(){
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
 
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let siteKey = global.currentSiteKey;
-      configurationDataProvider.get(async (err, configurations) => {
-        if(configurations.empty===true) throw new Error('Configurations is empty.');
-
-        if(err) return;
-
-        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-
-        //TODO TEST22
-        let siteService = new SiteService(siteData)
-        if(siteService){
-          let newConf = siteService._config;
-
-          let currentPath = "";
-
-          //TODO TEST22
-          if('publish' in newConf && 'config' in newConf.publish[0] && 'path' in newConf.publish[0].config){
-            currentPath = newConf.publish[0].config.path
-          }
-
-          libraryService.deleteInvalidConfKeys(newConf);
-
-          const prompt = require('electron-prompt');
-          var newPath = await prompt({
-            title: 'project path',
-            label: 'key:',
-            value: currentPath,
-            inputAttrs: {
-              type: 'text',
-              required: true
-            },
-            type: 'input'
-          }, mainWindow);
-
-          if(!newPath || newPath===""){
-            return;
-          }
-
-          let configFilePath = pathHelper.getSiteMountConfigPath(siteKey);
-
-          newConf.publish[0].key = "quiqr-cloud"
-          newConf.publish[0].config = {}
-          newConf.publish[0].config.path = newPath
-          newConf.publish[0].config.type = "quiqr"
-          newConf.publish[0].config.defaultDomain = newPath.replace('.','-') + ".quiqr.cloud"
-
-          //TODO USE GENERAL
-          await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
-
-          //TODO TEST22
-          global.outputConsole.appendLine('rename projectpath to: '+newPath);
-
-          let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-          mainWindow.webContents.send("redirectToGivenLocation","/");
-          mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
-        }
-
-      });
-
-    }
-
-  }
 
   togglePreviewWindow(){
 
@@ -758,7 +691,6 @@ class MenuManager {
         detail: 'You should restart Quiqr to make changes effective.',
       };
 
-      //TODO TEST22
       dialog.showMessageBox(null, options, () => {});
 
       this.createMainMenu();
@@ -934,14 +866,6 @@ class MenuManager {
             }
           },
           {
-            id: 'add-project-path',
-            label: 'Edit Project Path',
-            enabled: this.siteSelected(),
-            click: async () => {
-              this.editProjectPath()
-            }
-          },
-          {
             id: 'import-site-from-url',
             label: 'Import Site From PogoURL',
             click: async () => {
@@ -959,8 +883,7 @@ class MenuManager {
 
   mainMenuArray(){
 
-    //TODO TEST22
-    const isMac = global.process.platform === 'darwin'
+    const isMac = process.platform === 'darwin'
 
     const template = [
       ...(isMac ? [{
@@ -993,7 +916,6 @@ class MenuManager {
             id: 'switch-select-sites-view',
             label: 'Site Library',
             click: async () => {
-              //TODO TEST22
               //TODO this seems smarter. Implement at other places
               global.mainWM.closeSiteAndShowSelectSites();
             }
@@ -1278,8 +1200,7 @@ class MenuManager {
         submenu: this.createExperimentalMenu()
       }] : []),
 
-      //TODO TEST22
-      ...(global.process.env.REACT_DEV_URL ? [{
+      ...(process.env.REACT_DEV_URL ? [{
         label: 'DevMenu',
         submenu: this.createDevMenu()
       }] : []),

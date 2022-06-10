@@ -59,7 +59,6 @@ function createScreenshotAndFavicon(host, port, targetPath) {
           urls.forEach((favUrl)=>{
             const faviconFile = favUrl.split('/').pop();
 
-            //TODO TEST22
             request.head(favUrl, () => {
               const req = request.get(favUrl)
                 .on('response', function (res) {

@@ -80,8 +80,7 @@ class PathHelper{
 
     let enviromnent = new EnvironmentResolver().resolve();
 
-    //TODO TEST22
-    if(global.process.env.NODE_ENV === 'production'){
+    if(process.env.NODE_ENV === 'production'){
       if(enviromnent.platform == PLATFORMS.macOS){
         return path.join(rootPath, 'Contents','Resources');
       }
@@ -135,12 +134,11 @@ class PathHelper{
   getHugoBinForVer(version){
 
     // CUSTOM PATH TO HUGO E.G. for nix developments
-    if(global.process.env.HUGO_PATH){
-      return global.process.env.HUGO_PATH;
+    if(process.env.HUGO_PATH){
+      return process.env.HUGO_PATH;
     }
 
-    //TODO TEST22
-    let platform = global.process.platform.toLowerCase();
+    let platform = process.platform.toLowerCase();
     if(platform.startsWith('win')){
       return this.getHugoBinDirForVer(version) + 'hugo.exe';
     }

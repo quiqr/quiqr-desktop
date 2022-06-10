@@ -200,8 +200,6 @@ class WorkspaceConfigProvider{
     return path.join(filePartialDir,encodeFilename);
   }
 
-  //TODO REFACTOR ESLINT
-  //TODO TEST22
   _mergePartials(mergeKey, workspacePath){
 
     return new Promise(async (resolve)=>{
