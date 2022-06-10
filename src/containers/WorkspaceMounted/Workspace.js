@@ -214,7 +214,7 @@ class WorkSpace extends React.Component{
     return [
       <ToolbarButton
         action={()=>{
-          service.api.redirectTo("/sites/last");
+          service.api.openSiteLibrary();
         }}
         title="Site Library"
         icon={<AppsIcon style={{ color: iconColor }} />}

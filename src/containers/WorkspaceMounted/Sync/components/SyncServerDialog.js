@@ -14,7 +14,7 @@ import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
 import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
 import GitHubPagesForm     from './github-pages/GitHubPagesForm'
 import QuiqrCloudForm      from './quiqr-cloud/QuiqrCloudForm'
-import CardLogoQuiqrCloud  from '../../../../svg-assets/CardLogoQuiqrCloud'
+//import CardLogoQuiqrCloud  from '../../../../svg-assets/CardLogoQuiqrCloud'
 import FormLogoQuiqrCloud  from '../../../../svg-assets/FormLogoQuiqrCloud'
 
 const useStyles = theme => ({
@@ -83,6 +83,9 @@ class SyncServerDialog extends React.Component{
               <CardLogoGitHubPages />
             </Paper>
           </Grid>
+
+          {/*
+
           <Grid item xs={6}>
             <Paper
               onClick={()=>{
@@ -96,6 +99,7 @@ class SyncServerDialog extends React.Component{
               <CardLogoQuiqrCloud />
             </Paper>
           </Grid>
+          */}
         </Grid>
       </React.Fragment>
     )

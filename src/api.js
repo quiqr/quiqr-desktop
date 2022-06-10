@@ -236,6 +236,10 @@ export class API {
     return mainProcessBridge.request('getHugoTemplates', null, {timeout: 30000});
   }
 
+  openSiteLibrary(){
+    return mainProcessBridge.request('openSiteLibrary');
+  }
+
   mountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('mountWorkspace', {siteKey, workspaceKey});
   }

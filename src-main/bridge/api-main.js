@@ -389,6 +389,10 @@ api.getUserRemoteSites = async function({username},context){
   }
 }
 
+api.openSiteLibrary = async function(){
+  global.mainWM.closeSiteAndShowSelectSites();
+}
+
 api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   let siteService = await getSiteServicePromise(siteKey);
   bindResponseToContext(

@@ -285,6 +285,7 @@ class ImportSiteDialog extends React.Component{
             <TextField
               fullWidth
               id="standard-full-width"
+              autoFocus
               label="Git URL"
               value={this.state.importTypeGitUrl}
               variant="outlined"
