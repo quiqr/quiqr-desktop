@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.11.2 (2022-06-13)
 - fix empty page in library after startup
 - fix production
 
