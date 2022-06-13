@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix empty page in library after startup
+- fix production
+
 ## 0.11.1 (2022-06-13)
 - fix missing resources/all dir for buildinfo.js
 
