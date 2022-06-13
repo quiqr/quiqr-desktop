@@ -450,6 +450,13 @@ class SiteLibraryRouted extends React.Component{
           }}
           />
 
+          <Route path='/' render={ ({match, history})=> {
+            this.history = history;
+            return (
+              this.renderSelectSites("last",null)
+            );
+          }}
+          />
           <Route path='/sites' render={ ({match, history})=> {
             this.history = history;
             return (

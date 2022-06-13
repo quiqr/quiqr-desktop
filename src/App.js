@@ -219,6 +219,11 @@ class App extends React.Component{
 
       }} />
 
+      <Route path="/" exact={true} render={ ({match, history})=> {
+        return <SiteLibraryToolbarRight
+          handleChange={(v)=>this.handleLibraryViewChange(v)}
+          activeLibraryView={ this.state.libraryView} />
+      }} />
 
       <Route path='/sites/*' exact render={ () => {
         return <SiteLibraryToolbarRight
@@ -231,6 +236,7 @@ class App extends React.Component{
 
   renderMenuSwitch(){
     return (<Switch>
+
 
       <Route path="/" exact={true} render={ ({match, history})=> {
         return (
@@ -333,7 +339,6 @@ class App extends React.Component{
       <Route path='/sites/*' render={ () => {
         return this.renderSelectSites();
       }} />
-
 
       <Route path='/welcome' exact render={ () => {
         return <Welcome key={ 'selectSite' } />
