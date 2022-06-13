@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.11.0 (2022-06-13)
 
 - add disable model cache option
 - dynamics can now be defined in model/includes/
