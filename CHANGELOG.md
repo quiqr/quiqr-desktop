@@ -1,4 +1,50 @@
 # Quiqr App CHANGELOG
+
+## **WORK IN PROGRESS**
+
+- add disable model cache option
+- dynamics can now be defined in model/includes/
+- implement mergePartials in dynamics, refactor initial config provider
+- save accordion state with dynamic fields
+- autoSave for all relevant field types
+- hideIndex for collection
+- accordion dynamic reload fixes
+- use key for title when not set
+- update license
+- fix relative paths for bundle-image-mananager and image-select
+- add bugfixes to single
+- fix cookbook
+- big ux refactor
+- refactor site config, add open in editor
+- add top toolbar right
+- renamed publish to sync
+- seperate component for publish
+- fix routings
+- implemented site tags
+- remember site library state
+- cleanup remote content menu in publish
+- edit tags is working
+- add site rename dialog
+- UI improvements
+- new role selectionmenu
+- implement roles in sidebar menu
+- first version cards listing
+- autogenerate etalage screenshot
+- implemented favicon detection and display
+- first work on the new sync sidebarmenu
+- add publish github
+- show GH card
+- edit configuration
+- start with quiqr cloud form
+- github sync, WIP almost finisged
+- import from git
+- fix embgit name
+- refactor, almost finsished import git url
+- add lint to servemain
+- upgrade react-script to align eslint versions
+- fix 4 dependabot security issues
+- implemented new site from hugo theme
+
 ## 0.10.4 (2022-04-14)
 - only mac build
 
