@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardActions from '@material-ui/core/CardActions';
@@ -98,9 +99,9 @@ class CardItem extends React.Component {
     }
     return (
       <Card
-
         elevation={5}
         className={classes.root}>
+        <CardActionArea>
         <CardHeader
           avatar={
             siteAvatar
@@ -137,6 +138,7 @@ class CardItem extends React.Component {
             <KeyboardArrowRightIcon />
           </IconButton>
         </CardActions>
+        </CardActionArea>
       </Card>
     );
   }
