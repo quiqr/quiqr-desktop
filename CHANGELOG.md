@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+
+## **WORK IN PROGRESS**
+- fix missing resources/all dir for buildinfo.js
+
 ## 0.11.0 (2022-06-13)
 
 - add disable model cache option
