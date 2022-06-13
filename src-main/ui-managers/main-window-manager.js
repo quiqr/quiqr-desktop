@@ -153,13 +153,11 @@ function getFirstScreenAfterStartup(){
 
 function createWindow () {
 
-  if(process.env.REACT_DEV_URL)
-
-    // Load the previous state with fallback to defaults
-    mainWindowState = windowStateKeeper({
-      defaultWidth: 800,
-      defaultHeight: 600
-    });
+  // Load the previous state with fallback to defaults
+  mainWindowState = windowStateKeeper({
+    defaultWidth: 800,
+    defaultHeight: 600
+  });
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
