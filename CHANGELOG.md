@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.11.1 (2022-06-13)
 - fix missing resources/all dir for buildinfo.js
 
 ## 0.11.0 (2022-06-13)
