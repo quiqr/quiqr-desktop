@@ -268,7 +268,7 @@ class SiteLibraryRouted extends React.Component{
     let listingSource
     if(source === 'last'){
       listingSource = this.state.sitesListingView;
-      if(listingSource.includes("local-tags-")){
+      if(listingSource && listingSource.includes("local-tags-")){
         sourceArgument = listingSource.split("tags-")[1];
         listingSource = "tags";
       }
