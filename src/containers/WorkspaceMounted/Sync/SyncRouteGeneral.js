@@ -78,10 +78,8 @@ class SyncRouteGeneral extends React.Component {
   checkLastOpenedPublishConf(){
     service.api.readConfKey('lastOpenedPublishTargetForSite').then((value)=>{
       if(value){
-        service.api.logToConsole(value, "lastKey");
         if(this.props.siteKey in value){
           this.setState({lastOpenedPublishedKey: value[this.props.siteKey]});
-          service.api.logToConsole(value[this.props.siteKey], "lastKey");
         }
       }
 
