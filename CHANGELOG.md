@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.11.4 (2022-06-14)
 
 - fix problem in react-scripts
 
