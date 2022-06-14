@@ -65,7 +65,14 @@ class WorkSpace extends React.Component{
   }
 
   componentDidMount(){
+
     this._ismounted = true;
+
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showEmpty: true});
+    });
+    service.registerListener(this);
+
     this.refresh();
 
     service.getConfigurations().then((c)=>{
@@ -87,12 +94,6 @@ class WorkSpace extends React.Component{
         this.refresh();
       }
     }
-  }
-  componentWillMount(){
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showEmpty: true});
-    });
-    service.registerListener(this);
   }
 
   refresh(){
@@ -186,6 +187,7 @@ class WorkSpace extends React.Component{
   toolbarItemsLeft(siteKey, workspaceKey){
     return [
       <ToolbarButton
+        key="buttonContent"
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
         }}
@@ -193,6 +195,7 @@ class WorkSpace extends React.Component{
         icon={<LibraryBooksIcon style={{ color: iconColor }} />}
       />,
       <ToolbarButton
+        key="buttonSync"
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`);
         }}
@@ -200,6 +203,7 @@ class WorkSpace extends React.Component{
         icon={<SyncIcon style={{ color: iconColor }} />}
       />,
       <ToolbarButton
+        key="buttonSiteConf"
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
         }}
@@ -213,6 +217,7 @@ class WorkSpace extends React.Component{
 
     return [
       <ToolbarButton
+        key="buttonLibrary"
         action={()=>{
           service.api.openSiteLibrary();
         }}
@@ -220,6 +225,7 @@ class WorkSpace extends React.Component{
         icon={<AppsIcon style={{ color: iconColor }} />}
       />,
         <ToolbarButton
+        key="buttonPrefs"
         action={()=>{
           service.api.redirectTo(`/prefs/`);
         }}
@@ -237,6 +243,8 @@ class WorkSpace extends React.Component{
         const siteKey= decodeURIComponent(match.params.site);
         const workspaceKey= decodeURIComponent(match.params.workspace);
         return <TopToolbarRight
+
+          key="toolbar-right-workspace-siteconf"
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
           itemsCenter={[]}
           itemsRight={this.toolbarItemsRight()}
@@ -248,6 +256,7 @@ class WorkSpace extends React.Component{
         const workspaceKey= decodeURIComponent(match.params.workspace);
         const toolbarItemsCenter = [
           <ToolbarButton
+            key="buttonPreview"
             action={()=>{
               window.require('electron').shell.openExternal('http://localhost:13131');
             }}
@@ -257,6 +266,7 @@ class WorkSpace extends React.Component{
         ];
 
         return <TopToolbarRight
+          key="toolbar-right-workspace-dashboard"
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
           itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight()}

@@ -13,18 +13,16 @@ class CollectionItem extends React.Component{
     };
   }
 
-  componentWillMount(){
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showSpinner: true});
-    });
-    service.registerListener(this);
-  }
-
   componentWillUnmount(){
     service.unregisterListener(this);
   }
 
   componentDidMount(){
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showSpinner: true});
+    });
+    service.registerListener(this);
+
     var stateUpdate  = {};
     var { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 

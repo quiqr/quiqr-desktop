@@ -94,7 +94,9 @@ class RenameDialog extends React.Component{
     let failure = this.state.failure;
 
     const actions = [
-      <Button className={classes.primaryFlatButton} onClick={()=>{
+      <Button
+        key={"menuAction1"+siteconf.name}
+        className={classes.primaryFlatButton} onClick={()=>{
         this.setState({
           open: false
         },()=>{
@@ -104,7 +106,9 @@ class RenameDialog extends React.Component{
         {this.state.cancelText}
       </Button>,
 
-      <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.saveSiteConf()} >
+      <Button
+        key={"menuAction2"+siteconf.name}
+        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.saveSiteConf()} >
         SAVE
       </Button>,
     ];

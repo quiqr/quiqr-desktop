@@ -14,7 +14,7 @@ export class SiteLibrarySidebar extends React.Component {
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
     service.api.readConfPrefKey('sitesListingView').then((view)=>{
       this.setState({selectedMenuItem: view });
     });

@@ -5,21 +5,13 @@ import App from './App';
 import service from './services/service';
 
 service.getConfigurations().then((c) => {
-    require('./themes/' + c.global.appTheme + '/css/index.css');
-    require('./themes/' + c.global.appTheme + '/css/bootstrap-grid.css');
+  require('./themes/' + c.global.appTheme + '/css/index.css');
+  require('./themes/' + c.global.appTheme + '/css/bootstrap-grid.css');
 })
-
-const isDev = window.require('electron-is-dev');
-if(isDev){
-    console.log('Running in development');
-}
-else{
-    console.log('Running in production');
-}
 
 ReactDOM.render(
   <BrowserRouter>
     <App />
-   </BrowserRouter>,
+  </BrowserRouter>,
   document.getElementById('root')
 );

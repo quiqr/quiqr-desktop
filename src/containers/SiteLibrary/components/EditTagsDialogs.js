@@ -102,17 +102,21 @@ class EditTagsDialogs extends React.Component{
     let failure = this.state.failure;
 
     const actions = [
-      <Button className={classes.primaryFlatButton} onClick={()=>{
-        this.setState({
-          open: false
-        },()=>{
-          this.props.onCancelClick();
-        });
-      }}>
+      <Button
+        key={"menuAction1"+siteconf.name}
+        className={classes.primaryFlatButton} onClick={()=>{
+          this.setState({
+            open: false
+          },()=>{
+            this.props.onCancelClick();
+          });
+        }}>
         {this.state.cancelText}
       </Button>,
 
-      <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.saveSiteConf()} >
+      <Button
+        key={"menuAction2"+siteconf.name}
+        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.saveSiteConf()} >
         SAVE
       </Button>,
     ];

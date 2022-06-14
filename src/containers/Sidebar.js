@@ -39,7 +39,7 @@ class Sidebar extends React.Component{
     }
     return (
       <ListItem
-        key={index}
+        key={"itemFlat"+item.label}
         selected={item.selected}
         onClick={ item.onClick }
         button >
@@ -61,6 +61,7 @@ class Sidebar extends React.Component{
 
       return (
         <ListItem
+          key={"itemNestChild"+itemChild.label}
           onClick={ itemChild.onClick }
           selected={itemChild.selected}
           button className={classes.nested} >
@@ -71,9 +72,8 @@ class Sidebar extends React.Component{
 
 
     return (
-      <React.Fragment>
+      <React.Fragment key={"itemNestOut"+item.label} >
         <ListItem
-          key={index}
           button
           selected={item.selected}
           onClick={()=>{

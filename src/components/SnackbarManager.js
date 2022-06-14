@@ -11,7 +11,7 @@ const styles = {
 
 class SnackbarManager extends React.Component{
 
-  componentWillMount(){
+  componentDidMount(){
     snackMessageService.registerListener(this);
   }
 

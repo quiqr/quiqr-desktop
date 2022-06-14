@@ -535,14 +535,18 @@ class NewSiteDialog extends React.Component{
     }
 
     const actions = [
-      <Button color="primary" onClick={()=>{
-        this.setState({newTypeHugoThemeBusy: false })
-        this.props.onClose();
-      }}>
+      <Button
+        key={"actionNewDialog1"}
+        color="primary" onClick={()=>{
+          this.setState({newTypeHugoThemeBusy: false })
+          this.props.onClose();
+        }}>
         {closeText}
       </Button>,
       (newButtonHidden ? null :
-        <Button color="primary" onClick={()=>{this.handleOpenNewSite()}}>
+        <Button
+          key={"actionNewDialog2"}
+          color="primary" onClick={()=>{this.handleOpenNewSite()}}>
           {"open "+ this.state.newSiteName}
         </Button>),
     ];

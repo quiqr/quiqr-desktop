@@ -1,9 +1,15 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- show mousefeedback when clicking card in Library
+
 ## 0.11.2 (2022-06-13)
+
 - fix empty page in library after startup
 - fix production
 
 ## 0.11.1 (2022-06-13)
+
 - fix missing resources/all dir for buildinfo.js
 
 ## 0.11.0 (2022-06-13)

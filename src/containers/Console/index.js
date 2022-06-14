@@ -28,7 +28,7 @@ class ConsoleOutput extends React.Component{
 
   }
 
-  componentWillMount(){
+  componentDidMount(){
     consoleService.registerListener(this);
   }
 

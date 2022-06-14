@@ -45,6 +45,7 @@ class SiteConfRouteModel extends React.Component {
       parseInfo : {},
       quiqrCloud : {}
     };
+    this._ismounted = false;
   }
 
   componentDidUpdate(preProps: HomeProps){
@@ -56,6 +57,10 @@ class SiteConfRouteModel extends React.Component {
   componentDidMount(){
     this.checkSiteInProps();
     this._ismounted = true;
+  }
+  componentWillUnmount(){
+    this._ismounted = false;
+    service.unregisterListener(this);
   }
 
   checkSiteInProps(){
@@ -74,9 +79,6 @@ class SiteConfRouteModel extends React.Component {
   handleFolderSelected(folder){
   }
 
-  componentWillUnmount(){
-    service.unregisterListener(this);
-  }
   renderSection(title, files){
     const { classes } = this.props;
 

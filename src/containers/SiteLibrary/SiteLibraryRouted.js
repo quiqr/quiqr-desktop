@@ -39,8 +39,12 @@ class SiteLibraryRouted extends React.Component{
       editTagsDialog: false,
       renameDialog: false,
       dialogSiteConf: {},
-      dialogImportSite: {},
-      dialogNewSite: {},
+      dialogImportSite: {
+        open: false
+      },
+      dialogNewSite: {
+        open: false
+      },
       currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
@@ -48,6 +52,22 @@ class SiteLibraryRouted extends React.Component{
       remoteSitesAsMember: [],
       sitesListingView: ''
     };
+  }
+
+  componentDidMount(){
+
+    this.updateRemoteSites(this.props.quiqrUsername);
+    this.updateLocalSites();
+
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showSpinner: true});
+    });
+
+
+    service.api.readConfPrefKey('sitesListingView').then((view)=>{
+      this.setState({sitesListingView: view });
+    });
+
   }
 
   updateRemoteSites(username){
@@ -99,21 +119,6 @@ class SiteLibraryRouted extends React.Component{
       this.updateRemoteSites(nextProps.quiqrUsername);
     }
   }
-
-  componentWillMount(){
-    this.updateRemoteSites(this.props.quiqrUsername);
-    this.updateLocalSites();
-
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showSpinner: true});
-    });
-
-
-    service.api.readConfPrefKey('sitesListingView').then((view)=>{
-      this.setState({sitesListingView: view });
-    });
-  }
-
   mountSiteByKey(siteKey){
     service.getConfigurations(true).then((c)=>{
       let site = c.sites.find((x)=>x.key===siteKey);
@@ -162,6 +167,54 @@ class SiteLibraryRouted extends React.Component{
     }).then(()=>{
       this.setState({ blockingOperation:null})
     });
+  }
+
+  renderItemMenuButton(index, siteconfig){
+    return (
+      <IconButton
+        onClick={(event)=>{
+          this.setState({anchorEl:event.currentTarget, menuOpen:index})
+        }}
+        aria-label="more"
+        aria-controls="long-menu"
+        aria-haspopup="true"
+      >
+        <MoreVertIcon />
+      </IconButton>
+    );
+  }
+
+  renderItemMenuItems(index, siteconfig){
+
+    return (
+      <Menu
+        anchorEl={this.state.anchorEl}
+        open={(this.state.menuOpen===index?true:false)}
+        keepMounted
+        onClose={()=>{
+          this.setState({menuOpen:null});
+
+        }}
+      >
+        <MenuItem key="rename"
+          onClick={
+            ()=>{
+              this.setState({renameDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+            }
+          }>
+          Rename
+        </MenuItem>
+
+        <MenuItem key="tags"
+          onClick={
+            ()=>{
+              this.setState({editTagsDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+            }
+          }>
+          Edit Tags
+        </MenuItem>
+      </Menu>
+    );
   }
 
   renderItemMenu(index, siteconfig){
@@ -276,6 +329,7 @@ class SiteLibraryRouted extends React.Component{
     );
 
   }
+
   renderCards(sites, listTitle){
     return (
 
@@ -288,13 +342,17 @@ class SiteLibraryRouted extends React.Component{
           {sites.map((site, index)=>{
 
             return (
-              <Grid item>
+              <Grid
+                key={"siteCardA"+index}
+                item
+              >
                 <CardItem
                   siteClick={()=>{
                     this.handleSiteClick(site);
                   }}
                   site={site}
-                  itemMenu={this.renderItemMenu(index, site)}
+                  itemMenuButton={this.renderItemMenuButton(index, site)}
+                  itemMenuItems={this.renderItemMenuItems(index, site)}
                 />
               </Grid>
             )
@@ -326,18 +384,18 @@ class SiteLibraryRouted extends React.Component{
         }>
 
         { (sites).map((site, index)=>{
-          //let selected = site===selectedSite;
           return (
 
-
             <SiteListItem
-                  siteClick={()=>{
-                    this.handleSiteClick(site);
-                  }}
-                  site={site}
-                  itemMenu={this.renderItemMenu(index, site)}
-                />
+              key={"sitelistitem"+index}
 
+              siteClick={()=>{
+                this.handleSiteClick(site);
+              }}
+              site={site}
+              itemMenuButton={this.renderItemMenuButton(index, site)}
+              itemMenuItems={ this.renderItemMenuItems(index, site)}
+            />
 
           );
         })}

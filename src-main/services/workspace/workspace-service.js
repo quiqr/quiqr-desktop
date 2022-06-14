@@ -43,7 +43,12 @@ class WorkspaceService{
       if (fs.existsSync(indexPath)) {
         let data = await fs.readFileSync(indexPath,'utf8');
         let obj = await this._smartParse(indexPath, ['md'], data);
-        return obj.mainContent.toString();
+        if('mainContent' in obj){
+          return obj.mainContent.toString();
+        }
+        else{
+          return data;
+        }
       }
     } catch(err) {
       console.error(err);
@@ -101,7 +106,8 @@ class WorkspaceService{
     }
     let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
     if(formatProvider===undefined)
-      throw new Error('Could not resolve a FormatProvider to parse.');
+      return {};
+      //throw new Error('Could not resolve a FormatProvider to parse.');
     if(contentFormats.isContentFile(filePath)){
       return formatProvider.parseFromMdFileString(str);
     }

@@ -53,15 +53,9 @@ class Prefs extends React.Component {
     };
   }
 
-  componentDidUpdate(preProps: PrefsProps){
-  }
-
-  componentWillMount(){
-    service.registerListener(this);
-  }
-
   componentDidMount(){
 
+    service.registerListener(this);
     service.api.readConfKey('prefs').then((value)=>{
       this.setState({prefs: value });
 

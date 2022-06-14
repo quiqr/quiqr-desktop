@@ -33,7 +33,7 @@ class RemoteSiteDialog extends React.Component{
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
     let localsites = [];
     service.getConfigurations(true).then((c)=>{
 
@@ -215,7 +215,9 @@ class RemoteSiteDialog extends React.Component{
     let failure = this.state.failure;
 
     const actions = [
-      <Button className={classes.primaryFlatButton} onClick={()=>{
+      <Button
+        key={"menuAction1a"}
+    className={classes.primaryFlatButton} onClick={()=>{
         this.setState({
           open: false
         },()=>{
@@ -225,11 +227,15 @@ class RemoteSiteDialog extends React.Component{
       {this.state.cancelText}
       </Button>,
 
-      <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >
+      <Button
+        key={"menuAction2a"}
+        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >
         DOWNLOAD
         </Button>,
 
-      <Button disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadCopy()} >
+      <Button
+        key={"menuAction3a"}
+        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadCopy()} >
         DOWNLOAD AND COPY AS NEW SITE
         </Button>,
     ];

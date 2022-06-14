@@ -54,13 +54,13 @@ class Home extends React.Component{
       buttonPressed: "",
       siteCreatorMessage: null
     };
+    this._ismounted = false;
   }
 
   componentDidUpdate(preProps){
     if(this._ismounted && preProps.siteKey !== this.props.siteKey){
       this.checkSiteInProps();
     }
-
   }
 
   componentDidMount(){
@@ -68,6 +68,9 @@ class Home extends React.Component{
     this._ismounted = true;
   }
 
+  componentWillUnmount(){
+    this._ismounted = false;
+  }
 
   checkSiteInProps(){
 

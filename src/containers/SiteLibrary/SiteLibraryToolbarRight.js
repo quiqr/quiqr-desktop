@@ -25,6 +25,7 @@ export class SiteLibraryToolbarRight extends React.Component {
 
     const leftButtons = [
       <ToolbarButton
+        key="buttonNewSite"
         action={()=>{
           service.api.redirectTo(`/sites/new-site/x${Math.random()}`, true);
         }}
@@ -34,6 +35,7 @@ export class SiteLibraryToolbarRight extends React.Component {
 
 
       <ToolbarButton
+        key="buttonImportSite"
         action={()=>{
           service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);
         }}
@@ -44,7 +46,7 @@ export class SiteLibraryToolbarRight extends React.Component {
     ]
     const centerButtons = [
       <ToolbarToggleButtonGroup
-
+        key="buttonViewGroup"
         activeOption={this.props.activeLibraryView}
         handleChange={this.props.handleChange}
         optionItems={[
@@ -63,6 +65,7 @@ export class SiteLibraryToolbarRight extends React.Component {
 
     const rightButtons = [
       <ToolbarButton
+        key="buttonPrefs"
         action={()=>{
           history.push('/prefs/')
         }}
@@ -72,6 +75,7 @@ export class SiteLibraryToolbarRight extends React.Component {
     ];
 
     return <TopToolbarRight
+      key="toolbar-right-new-site"
       itemsLeft={leftButtons}
       itemsCenter={centerButtons}
       itemsRight={rightButtons}

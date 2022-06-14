@@ -159,14 +159,12 @@ class Collection extends React.Component{
     this.setState({view:undefined, modalBusy:false});
   }
 
-  componentWillMount(){
+  componentDidMount(){
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });
     service.registerListener(this);
-  }
 
-  componentDidMount(){
     this.refreshItems();
   }
 

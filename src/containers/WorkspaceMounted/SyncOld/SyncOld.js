@@ -101,6 +101,7 @@ class Sync extends React.Component{
       },
 
     };
+    this._ismounted = false;
   }
 
   componentDidUpdate(preProps: HomeProps){
@@ -113,18 +114,8 @@ class Sync extends React.Component{
     }
   }
 
-  componentWillMount(){
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showSpinner: true});
-    });
-
-    window.require('electron').ipcRenderer.on('setProgressDialogConfHome', (event, confObj)=>{
-      this.setState({progressDialogConf: confObj});
-    });
-
-  }
-
   componentWillUnmount(){
+    this._ismounted = false;
     [
       'frontEndBusy',
       'setProgressDialogConf',
@@ -134,6 +125,14 @@ class Sync extends React.Component{
   }
 
   componentDidMount(){
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showSpinner: true});
+    });
+
+    window.require('electron').ipcRenderer.on('setProgressDialogConfHome', (event, confObj)=>{
+      this.setState({progressDialogConf: confObj});
+    });
+
     this.checkSiteInProps();
     this._ismounted = true;
     this.setUser(this.props.quiqrUsername, this.props.quiqrFingerprint);

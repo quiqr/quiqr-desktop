@@ -77,7 +77,7 @@ class SyncRouteGeneral extends React.Component {
         serverDialog: {
           open:true,
           modAction: "Add",
-          serverTitle: "Sync Server",
+          serverTitle: "Sync Target",
           closeText: "Cancel"
         }
       })

@@ -50,6 +50,10 @@ class SiteConfRouteGeneral extends React.Component {
     this.checkSiteInProps();
     this._ismounted = true;
   }
+  componentWillUnmount(){
+    this._ismounted = false;
+    service.unregisterListener(this);
+  }
 
   checkSiteInProps(){
 
@@ -84,9 +88,6 @@ class SiteConfRouteGeneral extends React.Component {
   handleFolderSelected(folder){
   }
 
-  componentWillUnmount(){
-    service.unregisterListener(this);
-  }
 
   render(){
     const { classes } = this.props;

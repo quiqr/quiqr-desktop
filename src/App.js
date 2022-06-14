@@ -79,7 +79,25 @@ class App extends React.Component{
   }
 
   componentDidMount(){
+
     this._ismounted = true;
+
+    service.api.readConfPrefKey('libraryView').then((view)=>{
+      this.setState({libraryView: view });
+    });
+
+    window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
+    window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
+    window.require('electron').ipcRenderer.on('redirectToGivenLocation',(event, location)=>{
+
+      this.setApplicationRole();
+      if(this.history){
+        this.history.push(location);
+      }
+      else {
+        this.history = ['/'];
+      }
+    });
 
 
     service.getConfigurations().then((c)=>{
@@ -92,6 +110,16 @@ class App extends React.Component{
     this.getProfile();
     this.setApplicationRole();
 
+  }
+
+  componentWillUnmount(){
+    [
+      'setMobileBrowserOpen',
+      'setMobileBrowserClose',
+      'redirectToGivenLocation',
+    ].forEach((channel)=>{
+      window.require('electron').ipcRenderer.removeAllListeners(channel);
+    });
   }
 
   setApplicationRole(){
@@ -127,34 +155,6 @@ class App extends React.Component{
     this.setState({mobileBrowserActive: false});
   }
 
-  componentWillMount(){
-
-    service.api.readConfPrefKey('libraryView').then((view)=>{
-      this.setState({libraryView: view });
-    });
-
-    window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
-    window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
-    window.require('electron').ipcRenderer.on('redirectToGivenLocation',(event, location)=>{
-
-      this.setApplicationRole();
-      if(this.history){
-        this.history.push(location);
-      }
-      else {
-        this.history = ['/'];
-      }
-    });
-  }
-  componentWillUnmount(){
-    [
-      'setMobileBrowserOpen',
-      'setMobileBrowserClose',
-      'redirectToGivenLocation',
-    ].forEach((channel)=>{
-      window.require('electron').ipcRenderer.removeAllListeners(channel);
-    });
-  }
 
   closeWindow(){
     window.require('electron').remote.getCurrentWindow().close();

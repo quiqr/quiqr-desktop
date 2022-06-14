@@ -32,10 +32,6 @@ export class SukohForm extends React.Component{
     }
   }
 
-  componentDidMount(){
-    this._ismounted=true;
-  }
-
   setMobileBrowserOpen(){
     if(this._ismounted){
       this.setState({actionButtonRightPos:380});
@@ -47,7 +43,8 @@ export class SukohForm extends React.Component{
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
+    this._ismounted=true;
     service.api.shouldReloadForm(null);
     document.addEventListener('keydown', this.keydownHandler.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));

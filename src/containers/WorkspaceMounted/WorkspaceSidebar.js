@@ -23,17 +23,12 @@ class WorkspaceWidget extends React.Component {
   }
 
   componentDidMount(){
-    this._ismounted = true;
-  }
-  componentWillMount(){
     service.api.readConfKey('expPreviewWindow').then((value)=>{
       this.setState({expPreviewWindow: value });
       if(!value){
         this.disableMobilePreview();
       }
     });
-
-
 
     this.updateBadges();
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
@@ -229,6 +224,11 @@ class WorkspaceSidebar extends React.Component{
   }
 
   componentDidMount(){
+    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
+      this.setState({showEmpty: true});
+    });
+    service.registerListener(this);
+
     this._ismounted = true;
     this.refresh();
   }
@@ -242,13 +242,6 @@ class WorkspaceSidebar extends React.Component{
         this.refresh();
       }
     }
-  }
-  componentWillMount(){
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showEmpty: true});
-    });
-    //window.require('electron').ipcRenderer.on('unselectSite', this.unselectSite.bind(this));
-    service.registerListener(this);
   }
 
   refresh = ()=>{
@@ -273,7 +266,6 @@ class WorkspaceSidebar extends React.Component{
 
   componentWillUnmount(){
     service.unregisterListener(this);
-    //window.require('electron').ipcRenderer.removeListener('unselectSite', this.unselectSite.bind(this));
     this._ismounted = false;
   }
 

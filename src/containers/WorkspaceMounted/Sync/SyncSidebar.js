@@ -86,7 +86,7 @@ export class SyncSidebar extends React.Component {
           },
           {
             icon: <AddIcon />,
-            label: "ADD SYNC SERVER",
+            label: "ADD SYNC TARGET",
             onClick: ()=>{
               this.setState({selectedMenuItem:'general'});
               history.push(`${basePath}/add/x${Math.random()}`)

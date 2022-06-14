@@ -13,14 +13,13 @@ class Single extends React.Component{
       singleValues: null
     };
   }
-  componentWillMount(){
+
+  componentDidMount(){
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });
     service.registerListener(this);
-  }
 
-  componentDidMount(){
     var stateUpdate  = {};
     var { siteKey, workspaceKey, singleKey } = this.props;
 

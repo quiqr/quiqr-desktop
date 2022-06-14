@@ -495,14 +495,18 @@ class ImportSiteDialog extends React.Component{
     }
 
     const actions = [
-      <Button color="primary" onClick={()=>{
-        this.setState({importTypeGitBusy: false })
-        this.props.onClose();
-      }}>
+      <Button
+        key={"importSiteDialogAction1"}
+        color="primary" onClick={()=>{
+          this.setState({importTypeGitBusy: false })
+          this.props.onClose();
+        }}>
         {closeText}
       </Button>,
       (importButtonHidden ? null :
-        <Button color="primary" onClick={()=>{this.handleOpenNewSite()}}>
+        <Button
+          key={"importSiteDialogAction2"}
+          color="primary" onClick={()=>{this.handleOpenNewSite()}}>
           {"open "+ this.state.importSiteName}
         </Button>),
     ];

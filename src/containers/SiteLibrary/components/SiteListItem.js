@@ -23,22 +23,28 @@ class SiteListItem extends React.Component {
     this.state = {
       favicon: ""
     }
+    this._ismounted = false;
   }
+
   componentDidMount(){
     this._ismounted = true;
     this.getFavicon();
   }
 
+  componentWillUnmount(){
+    this._ismounted = false;
+  }
+
   getFavicon(){
-    if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
-      //service.api.logToConsole(this.props.site)
-      service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
-        this.setState({favicon:img});
-      })
-    }
-    else{
-      this.setState({favicon:""});
-    }
+      if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
+        //service.api.logToConsole(this.props.site)
+        service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
+        this._ismounted && this.setState({favicon:img});
+        })
+      }
+      else{
+        this._ismounted && this.setState({favicon:""});
+      }
   }
 
   componentDidUpdate(preProps){
@@ -60,26 +66,29 @@ class SiteListItem extends React.Component {
     }
     return (
 
-      <ListItem
-        id={"list-siteselectable-"+this.props.site.name}
-        key={"sitelistitem-"+this.props.site.key}
-        onClick={ this.props.siteClick }
-        button={true}>
+      <React.Fragment>
+        <ListItem
+          id={"list-siteselectable-"+this.props.site.name}
+          key={"sitelistitem-"+this.props.site.key}
+          onClick={ this.props.siteClick }
+          button={true}>
 
-        <ListItemAvatar>
-          {siteAvatar}
-        </ListItemAvatar>
+          <ListItemAvatar>
+            {siteAvatar}
+          </ListItemAvatar>
 
-        <ListItemText primary={this.props.site.name} />
-        {(this.props.site.remote?null:
-        <ListItemSecondaryAction>
-          {
-            this.props.itemMenu
-          }
-        </ListItemSecondaryAction>
-        )}
+          <ListItemText primary={this.props.site.name} />
+          {(this.props.site.remote?null:
+          <ListItemSecondaryAction>
+            {
+              this.props.itemMenuButton
+            }
+          </ListItemSecondaryAction>
+          )}
 
-      </ListItem>
+        </ListItem>
+        {this.props.itemMenuItems}
+      </React.Fragment>
     );
   }
 

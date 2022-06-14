@@ -1,15 +1,12 @@
-import React from 'react';
-import clsx from 'clsx';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardActions from '@material-ui/core/CardActions';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import { red } from '@material-ui/core/colors';
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
-import service              from '../../../services/service';
+import React                 from 'react';
+import Card                  from '@material-ui/core/Card';
+import CardActionArea        from '@material-ui/core/CardActionArea';
+import CardHeader            from '@material-ui/core/CardHeader';
+import CardMedia             from '@material-ui/core/CardMedia';
+import Avatar                from '@material-ui/core/Avatar';
+import { red }               from '@material-ui/core/colors';
+import service               from '../../../services/service';
+import ScreenShotPlaceholder from '../../../img-assets/screenshot-placeholder.png';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -47,9 +44,10 @@ class CardItem extends React.Component {
     super(props);
     this.state = {
       expanded: false,
-      screenshot: "",
+      screenshot: ScreenShotPlaceholder,
       favicon: ""
     }
+    this._ismounted = false;
   }
   componentDidMount(){
     this._ismounted = true;
@@ -57,25 +55,29 @@ class CardItem extends React.Component {
     this.getFavicon();
   }
 
+  componentWillUnmount(){
+    this._ismounted = false;
+  }
+
   getScreenshot(){
     if(this.props.site.etalage && this.props.site.etalage.screenshots && this.props.site.etalage.screenshots.length > 0){
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.screenshots[0]).then((img)=>{
-        this.setState({screenshot:img});
+        this._ismounted && this.setState({screenshot:img});
       })
     }
-    else{
-      this.setState({screenshot:""});
+    else {
+      this._ismounted && this.setState({screenshot:ScreenShotPlaceholder});
     }
   }
 
   getFavicon(){
     if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
-        this.setState({favicon:img});
+        this._ismounted && this.setState({favicon:img});
       })
     }
     else{
-      this.setState({favicon:""});
+      this._ismounted && this.setState({favicon:""});
     }
   }
 
@@ -98,48 +100,31 @@ class CardItem extends React.Component {
       siteAvatar = <Avatar aria-label="recipe" variant="rounded" src={this.state.favicon} />
     }
     return (
-      <Card
-        elevation={5}
-        className={classes.root}>
-        <CardActionArea>
-        <CardHeader
-          avatar={
-            siteAvatar
-          }
-          action={
-            this.props.itemMenu
-          }
-          title={<div onClick={this.props.siteClick}>{this.props.site.name}</div>}
-          subheader=""
-        />
+      <React.Fragment>
+        {this.props.itemMenuItems}
+        <Card
+          elevation={5}
+          className={classes.root}>
+            <CardHeader
+              avatar={
+                siteAvatar
+              }
+              action={
+                this.props.itemMenuButton
+              }
+              title={<div onClick={this.props.siteClick}>{this.props.site.name}</div>}
+              subheader=""
+            />
+          <CardActionArea>
 
-        <CardMedia onClick={this.props.siteClick}
-          className={classes.media}
-          image={this.state.screenshot}
-          title="Site screenshot"
-        />
-
-        {/*
-        <CardContent>
-          <Box style={{height:'50px'}}>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {this.props.site.etalage.description}
-          </Typography>
-          </Box>
-        </CardContent>
-        */}
-        <CardActions disableSpacing>
-          <IconButton
-            className={clsx(classes.expand, {
-              [classes.expandOpen]: this.state.expanded,
-            })}
-            onClick={this.props.siteClick}
-          >
-            <KeyboardArrowRightIcon />
-          </IconButton>
-        </CardActions>
-        </CardActionArea>
-      </Card>
+            <CardMedia onClick={this.props.siteClick}
+              className={classes.media}
+              image={this.state.screenshot}
+              title="Site screenshot"
+            />
+          </CardActionArea>
+        </Card>
+      </React.Fragment>
     );
   }
 

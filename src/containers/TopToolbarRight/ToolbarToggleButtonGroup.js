@@ -29,7 +29,7 @@ class ToolbarToggleButtonGroup extends React.Component {
       <Box display="flex" justifyContent="center" flexDirection="column" border={0} m={0.6} px={1}>
         <ToggleButtonGroup value={activeOption} exclusive size="small">
           {optionItems.map((item, index)=>{
-            return (<ToggleButton value={item.value} aria-label={item.value}
+            return (<ToggleButton key={"view"+index} value={item.value} aria-label={item.value}
             onClick={()=>this.props.handleChange(item.value)} >
             {item.icon}
           </ToggleButton>)
