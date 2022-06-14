@@ -12,8 +12,8 @@ const cloudApiManager             = require('../sync/quiqr-cloud/cloud-api-manag
 const cloudGitManager             = require('../sync/quiqr-cloud/cloud-git-manager');
 const PogoPublisher               = require('../publishers/pogo-publisher');
 const pathHelper                  = require('../utils/path-helper');
-const SiteService                 = require('../services/site/site-service')
-const libraryService              = require('../services/library/library-service')
+//const SiteService                 = require('../services/site/site-service')
+//const libraryService              = require('../services/library/library-service')
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
@@ -52,11 +52,6 @@ class MenuManager {
         }
       });
     }
-  }
-
-  async importSiteFromUrl(){
-    let pogopubl = new PogoPublisher({});
-    await pogopubl.siteFromPogoUrl();
   }
 
   async inviteUserForSite(){
@@ -102,31 +97,6 @@ class MenuManager {
       });
     }
   }
-
-  /*
-  updateMenu(currentSiteKey){
-    return;
-
-    let siteRelatedMenuIds = [
-      'export-site',
-      'delete-site',
-      'export-theme',
-      'import-theme',
-      'export-content',
-      'import-content',
-      'start-server',
-      'open-site-dir',
-      'open-site-conf',
-      'auto-create-model',
-    ];
-    siteRelatedMenuIds.forEach((id)=>{
-      let myItem = menuObject.getMenuItemById(id);
-      myItem.enabled = (currentSiteKey?true:false);
-    });
-
-  }
-  */
-
 
   async requestUserConnectCode(){
 
@@ -235,10 +205,12 @@ class MenuManager {
     }
   }
 
+  /*
   async createSiteFromThemeGitUrl(){
     let pogopubl = new PogoPublisher({});
     await pogopubl.createSiteFromThemeGitUrl();
   }
+  */
 
 
   showVersion(){
@@ -265,58 +237,6 @@ class MenuManager {
       message: "Quiqr Desktop\n\nVersion: " + app.getVersion() + buildGitId + buildDate + upis
     }
     dialog.showMessageBox(options)
-  }
-
-  /* TODO MOVE TO LIBRARY POPUP */
-  async renameSite(){
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-
-    if(global.currentSiteKey && global.currentWorkspaceKey){
-      let siteKey = global.currentSiteKey;
-      configurationDataProvider.get(async (err, configurations)=>{
-        if(configurations.empty===true) throw new Error('Configurations is empty.');
-        if(err) return;
-        let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-
-        let siteService = new SiteService(siteData);
-        if(siteService){
-          let newConf = siteService._config;
-          let currentName = siteService._config.name;
-
-          // REMOVE INVALID KEYS
-          libraryService.deleteInvalidConfKeys(newConf);
-
-          const prompt = require('electron-prompt');
-          var newName = await prompt({
-            title: 'New site name',
-            label: 'key:',
-            value: currentName,
-            inputAttrs: {
-              type: 'text',
-              required: true
-            },
-            type: 'input'
-          }, mainWindow);
-
-          if(!newName || newName===""){
-            return;
-          }
-
-          let configFilePath = pathHelper.getSiteMountConfigPath(siteKey);
-          newConf.name = newName;
-
-          //TODO USE GENERAL
-          await fssimple.writeFileSync(configFilePath, JSON.stringify(newConf), { encoding: "utf8"});
-
-          global.outputConsole.appendLine('rename site to: '+newName);
-
-          let newScreenURL = `/sites/${decodeURIComponent(global.currentSiteKey)}/workspaces/${decodeURIComponent(global.currentWorkspaceKey)}`;
-          mainWindow.setTitle(`Quiqr - Site: ${newName}`);
-          mainWindow.webContents.send("redirectToGivenLocation","/");
-          mainWindow.webContents.send("redirectToGivenLocation",newScreenURL);
-        }
-      });
-    }
   }
 
   async unlinkSiteDomain(){
@@ -788,6 +708,81 @@ class MenuManager {
           this.togglePreviewWindow()
         }
       },
+      { type: 'separator' },
+      {
+        label: 'Import',
+        submenu: [
+          {
+            label: 'Import Site',
+            click: async () => {
+              pogozipper.importSite()
+            }
+          },
+          {
+            id: 'import-theme',
+            enabled: this.siteSelected(),
+            label: 'Import Theme',
+            click: async () => {
+              pogozipper.importTheme()
+            }
+          },
+          {
+            id: 'import-content',
+            enabled: this.siteSelected(),
+            label: 'Import Content',
+            click: async () => {
+              pogozipper.importContent()
+            }
+          },
+        ]
+      },
+      {
+        label: 'Export',
+        submenu: [
+          {
+            id: 'export-site',
+            label: 'Export Site',
+            enabled: this.siteSelected(),
+            click: async () => {
+              pogozipper.exportSite()
+            }
+          },
+          {
+            id: 'export-theme',
+            enabled: this.siteSelected(),
+            label: 'Export Theme',
+            click: async () => {
+              pogozipper.exportTheme()
+            }
+          },
+          {
+            id: 'export-content',
+            enabled: this.siteSelected(),
+            label: 'Export Content',
+            click: async () => {
+              pogozipper.exportContent()
+            }
+          },
+        ]
+      },
+      { type: 'separator' },
+      {
+        id: 'connect-user',
+        label: 'Connect User',
+        submenu: this.connectProfilesMenu()
+      },
+      {
+        id: 'invite',
+        label: 'Invite',
+        submenu: this.inviteMenu()
+      },
+      {
+        id: 'switch-profile',
+        label: 'Switch User',
+        submenu: this.createProfilesMenu()
+      },
+
+
     ];
 
     return expMenu;
@@ -865,13 +860,6 @@ class MenuManager {
               this.unlinkSiteDomain()
             }
           },
-          {
-            id: 'import-site-from-url',
-            label: 'Import Site From PogoURL',
-            click: async () => {
-              this.importSiteFromUrl()
-            }
-          },
         ]
       }
 
@@ -921,71 +909,34 @@ class MenuManager {
             }
 
           },
-          {
-            label: 'New',
-            submenu: [
-              {
-                id: 'create-new-pick-folder',
-                label: 'New From Hugo Directory',
-
-                click: async () => {
-
-                  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-                  mainWindow.webContents.send("frontEndBusy");
-
-                  global.pogoconf.saveState().then( ()=>{
-                    this.createMainMenu();
-                    global.mainWM.closeSiteAndCreateNew();
-                  });
-                }
-              },
-              {
-                id: 'create-new-from-hugo-theme-url',
-                label: 'New From Hugo Theme Git URL',
-                click: async () => {
-                  this.createSiteFromThemeGitUrl();
-                }
-              },
-            ]
-          },
           { type: 'separator' },
           {
-            id: 'home-site',
-            label: 'Site Dashboard',
-            enabled: this.siteSelected(),
+            label: 'New Quiqr Site',
+            id: 'new-site',
             click: async () => {
               let mainWindow = global.mainWM.getCurrentInstanceOrNew();
               mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-              var newURL='/sites/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
+              var newURL='/sites/new-site/x-'+Math.random();
               mainWindow.webContents.send("redirectToGivenLocation", newURL);
             }
           },
+          {
+            label: 'Import Quiqr Site',
+            id: 'import-site',
+            click: async () => {
+              let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+              mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
+              var newURL='/sites/import-site/x-'+Math.random();
+              mainWindow.webContents.send("redirectToGivenLocation", newURL);
+            }
+          },
+          { type: 'separator' },
           {
             id: 'close-site',
             label: 'Close Site',
             enabled: this.siteSelected(),
             click: async () => {
               this.selectSitesWindow();
-            }
-          },
-          {
-            id: 'rename-site',
-            label: 'Rename Site',
-            enabled: this.siteSelected(),
-            click: async () => {
-              this.renameSite()
-            }
-          },
-          {
-            id: 'config-site',
-            enabled: this.siteSelected(),
-            label: 'Site Configuration',
-            click: async () => {
-                let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-                //mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-                var newURL='/sites/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"/siteconf";
-                mainWindow.webContents.send("redirectToGivenLocation", newURL);
-              //this.siteConfig()
             }
           },
           {
@@ -996,80 +947,6 @@ class MenuManager {
               this.deleteSite()
             }
           },
-          { type: 'separator' },
-          {
-            label: 'Import',
-            submenu: [
-              {
-                label: 'Import Site',
-                click: async () => {
-                  pogozipper.importSite()
-                }
-              },
-              {
-                id: 'import-theme',
-                enabled: this.siteSelected(),
-                label: 'Import Theme',
-                click: async () => {
-                  pogozipper.importTheme()
-                }
-              },
-              {
-                id: 'import-content',
-                enabled: this.siteSelected(),
-                label: 'Import Content',
-                click: async () => {
-                  pogozipper.importContent()
-                }
-              },
-            ]
-          },
-          {
-            label: 'Export',
-            submenu: [
-              {
-                id: 'export-site',
-                label: 'Export Site',
-                enabled: this.siteSelected(),
-                click: async () => {
-                  pogozipper.exportSite()
-                }
-              },
-              {
-                id: 'export-theme',
-                enabled: this.siteSelected(),
-                label: 'Export Theme',
-                click: async () => {
-                  pogozipper.exportTheme()
-                }
-              },
-              {
-                id: 'export-content',
-                enabled: this.siteSelected(),
-                label: 'Export Content',
-                click: async () => {
-                  pogozipper.exportContent()
-                }
-              },
-            ]
-          },
-          { type: 'separator' },
-          {
-            id: 'connect-user',
-            label: 'Connect User',
-            submenu: this.connectProfilesMenu()
-          },
-          {
-            id: 'invite',
-            label: 'Invite',
-            submenu: this.inviteMenu()
-          },
-          {
-            id: 'switch-profile',
-            label: 'Switch User',
-            submenu: this.createProfilesMenu()
-          },
-
           { type: 'separator' },
 
           isMac ? { role: 'close' } : { role: 'quit' }
@@ -1095,15 +972,6 @@ class MenuManager {
       {
         label: 'View',
         submenu: [
-
-          { role: 'reload' },
-
-          { type: 'separator' },
-
-          { role: 'resetzoom' },
-          { role: 'zoomin' },
-          { role: 'zoomout' },
-          { type: 'separator' },
           { role: 'togglefullscreen' }
         ]
       },

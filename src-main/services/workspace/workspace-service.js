@@ -547,9 +547,13 @@ class WorkspaceService{
     }
   }
 
+  //TODO FIXME remove unneeded last two arguments
   async getFilesInBundle(collectionKey, collectionItemKey, targetPath, extensions, forceFileName){
-    console.log(forceFileName);
-    console.log(extensions);
+    const show = false;
+    if(show){
+      console.log(forceFileName);
+      console.log(extensions);
+    }
 
     let files = [];
     let folder;
@@ -708,7 +712,7 @@ class WorkspaceService{
   }
 
   async build(buildKey, extraConfig={}) {
-    console.log(buildKey)
+    //console.log(buildKey)
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
 
