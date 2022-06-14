@@ -1,6 +1,11 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 
+- add Hugo Version select in new site
+- show last used publish conf
+- add timeout on embgit show repo
+- add sync-to-folder target
+
 ## 0.11.4 (2022-06-14)
 
 - fix problem in react-scripts
