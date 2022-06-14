@@ -16,6 +16,7 @@ module.exports = function (options) {
 
   function resetStateToDefault() {
     state.lastOpenedSite = {siteKey: null, workspaceKey: null, sitePath: null};
+    state.lastOpenedPublishTargetForSite = {};
   }
 
   function validateState() {
@@ -42,6 +43,7 @@ module.exports = function (options) {
   function setLastOpenedSite(siteKey,workspaceKey, sitePath){
     state.lastOpenedSite = {siteKey: siteKey, workspaceKey: workspaceKey, sitePath: sitePath};
   }
+
 
   function setSkipWelcomeScreen(skip){
     state.skipWelcomeScreen = skip;
@@ -79,6 +81,10 @@ module.exports = function (options) {
     state.prefs[prefKey] = prefValue;
   }
 
+  function setLastOpenedPublishTargetForSite(siteKey,publishKey){
+    state.lastOpenedPublishTargetForSite[siteKey] = publishKey;
+  }
+
 
   /*
    * END SETTINGS METHODS
@@ -100,6 +106,8 @@ module.exports = function (options) {
     prefs: {
       dataFolder: "~/QuiqrData"
     },
+    lastOpenedPublishTargetForSite: {
+    },
     skipWelcomeScreen: false,
     experimentalFeatures: false,
     disablePartialCache: false,
@@ -113,6 +121,7 @@ module.exports = function (options) {
 
   return {
     get lastOpenedSite() { return state.lastOpenedSite; },
+    get lastOpenedPublishTargetForSite() { return state.lastOpenedPublishTargetForSite; },
     get prefs() { return state.prefs; },
     get currentUsername() { return state.currentUsername; },
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
@@ -126,6 +135,7 @@ module.exports = function (options) {
       return state.sitesListingView;
     },
     setLastOpenedSite,
+    setLastOpenedPublishTargetForSite,
     setPrefkey,
     setCurrectUsername,
     setSkipWelcomeScreen,

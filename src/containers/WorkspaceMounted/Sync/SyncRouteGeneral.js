@@ -53,6 +53,7 @@ class SyncRouteGeneral extends React.Component {
       },
       serverDialog: {},
       serverBusyDialog: {},
+      lastOpenedPublishedKey: null,
     };
   }
 
@@ -60,28 +61,43 @@ class SyncRouteGeneral extends React.Component {
 
     if(this.state.addRefresh !== this.props.addRefresh) {
       this.openAddServerDialog();
-     }
+    }
 
     if(preProps.site !== this.props.site) {
       this.initState();
+      this.checkLastOpenedPublishConf();
     }
   }
 
   componentDidMount(){
     this.initState();
+    this.checkLastOpenedPublishConf();
     this.basePath = `/sites/${this.props.siteKey}/workspaces/${this.props.workspaceKey}/sync`;
   }
 
-  openAddServerDialog(){
-     this.setState({
-        addRefresh: this.props.addRefresh,
-        serverDialog: {
-          open:true,
-          modAction: "Add",
-          serverTitle: "Sync Target",
-          closeText: "Cancel"
+  checkLastOpenedPublishConf(){
+    service.api.readConfKey('lastOpenedPublishTargetForSite').then((value)=>{
+      if(value){
+        service.api.logToConsole(value, "lastKey");
+        if(this.props.siteKey in value){
+          this.setState({lastOpenedPublishedKey: value[this.props.siteKey]});
+          service.api.logToConsole(value[this.props.siteKey], "lastKey");
         }
-      })
+      }
+
+    });
+  }
+
+  openAddServerDialog(){
+    this.setState({
+      addRefresh: this.props.addRefresh,
+      serverDialog: {
+        open:true,
+        modAction: "Add",
+        serverTitle: "Sync Target",
+        closeText: "Cancel"
+      }
+    })
   }
 
   initState(){
@@ -91,6 +107,7 @@ class SyncRouteGeneral extends React.Component {
         site: this.props.site
       });
     }
+
   }
 
   publishAction(publishConf){
@@ -164,17 +181,17 @@ class SyncRouteGeneral extends React.Component {
 
     if(publishConf.config.type === 'quiqr'){
       serviceLogo = <FormLogoQuiqrCloud />
-      title = publishConf.config.path;
+        title = publishConf.config.path;
       liveUrl="https://"+publishConf.config.defaultDomain;
     }
     else if(publishConf.config.type === 'github'){
       serviceLogo = <FormLogoGitHubPages />
-      title = publishConf.config.username +"/" + publishConf.config.repository;
+        title = publishConf.config.username +"/" + publishConf.config.repository;
       liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
     }
     else if(publishConf.config.type === 'folder'){
       serviceLogo = <FolderIcon />
-      title = publishConf.config.path;
+        title = publishConf.config.path;
       liveUrl= ''
     }
 
@@ -185,7 +202,6 @@ class SyncRouteGeneral extends React.Component {
       liveURL={liveUrl}
       serviceLogo={serviceLogo}
       onPublish={()=>{
-        //service.api.logToConsole(publishConf, "pupConf");
         this.publishAction(publishConf);
       }}
       itemMenu={
@@ -261,23 +277,26 @@ class SyncRouteGeneral extends React.Component {
             this.history.push(`${this.basePath}/add/x${Math.random()}`)
           }} color="primary" variant="contained">add sync server</Button>
         </div>
-    )
+      )
     }
     else if(site.publish.length === 1){
       content = this.renderMainCard(site.publish[0])
     }
-    else{
-      if(this.props.syncConfKey){
-        const publConf = site.publish.find( ({ key }) => key === this.props.syncConfKey );
-        //service.api.logToConsole(publConf, "selected PUb conf")
-        if(publConf){
-          content = this.renderMainCard(publConf);
-        }
+    else if(this.props.syncConfKey){
+      const publConf = site.publish.find( ({ key }) => key === this.props.syncConfKey );
+      if(publConf){
+        content = this.renderMainCard(publConf);
       }
-      else{
-        //get last used target of syncConfKey
+    }
+    else if(this.state.lastOpenedPublishedKey){
+      const publConf = site.publish.find( ({ key }) => key === this.state.lastOpenedPublishedKey );
+      if(publConf){
+        content = this.renderMainCard(publConf);
+      }
+    }
 
-      }
+    if(!content){
+      content = this.renderMainCard(site.publish[0])
     }
 
     return (
@@ -340,7 +359,7 @@ class SyncRouteGeneral extends React.Component {
                 <Button onClick={()=>{
                   this.setState({deleteDialogOpen:false})
                   this.deletePublishConfiguration(this.state.keyForDeletion);
-                  }} color="primary">
+                }} color="primary">
                   Delete
                 </Button>
               </DialogActions>

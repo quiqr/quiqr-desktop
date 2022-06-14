@@ -23,9 +23,6 @@ class FolderSync {
     outputConsole.appendLine('-----------------');
     outputConsole.appendLine('');
 
-    //mainWindow.webContents.send("updateProgress", 'Get remote files..', 20);
-    //await this.publish_step1_initial_clone(tmpkeypathPrivate, fullGitHubUrl, fullDestinationPath);
-
     mainWindow.webContents.send("updateProgress", 'Prepare files before uploading..', 30);
     if(this._config.publishScope === "build"){
       await this.publish_step2_preprare_dircontents_build(context, fullDestinationPath)
@@ -33,8 +30,6 @@ class FolderSync {
     else{
       await this.publish_step2_preprare_dircontents_source(context, fullDestinationPath)
     }
-    //mainWindow.webContents.send("updateProgress", 'Upload files to remote server..', 70);
-    //await this.publish_step3_add_commit_push(tmpkeypathPrivate, fullDestinationPath)
 
     return true;
   }
@@ -82,7 +77,6 @@ class FolderSync {
     return true;
   }
 
-  //move .git, copy all, remove .git, restore .git (no beauty prize)
   async _syncSourceToDestination(sourcePath, fullDestinationPath){
     await fs.copySync(sourcePath, fullDestinationPath);
     outputConsole.appendLine('synced source to destination ...');

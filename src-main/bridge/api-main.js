@@ -833,6 +833,10 @@ api.saveSiteConf = function({siteKey, newConf}, context){
 api.publishSite = function({siteKey, publishConf}, context){
   getSiteService(siteKey, function(err, siteService){
     if(err){ context.reject(err); return; }
+
+    global.pogoconf.setLastOpenedPublishTargetForSite(siteKey, publishConf.key);
+    global.pogoconf.saveState();
+
     siteService.publish(publishConf).then(()=>{
       context.resolve();
     }, ()=>{
