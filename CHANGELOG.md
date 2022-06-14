@@ -1,7 +1,10 @@
 # Quiqr App CHANGELOG
+
 ## **WORK IN PROGRESS**
 
 - show mousefeedback when clicking card in Library
+- fix react errors and depreciations
+- fix problem preventing starting on a mac
 
 ## 0.11.2 (2022-06-13)
 
