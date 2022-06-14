@@ -9,11 +9,11 @@ class InitialWorkspaceConfigBuilder{
     this.workspacePath = workspacePath;
   }
 
-  buildAll(){
+  buildAll(hugoVersion="0.88.1"){
 
     this.buildHomeReadme();
 
-    let {dataBase, formatProvider} = this.buildBase();
+    let {dataBase, formatProvider} = this.buildBase(hugoVersion);
 
     /*
     let dataInclude = this.buildInclude();
@@ -124,7 +124,7 @@ class InitialWorkspaceConfigBuilder{
     return data;
   }
 
-  buildBase(){
+  buildBase(hugoVersion){
     let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     let hugoConfigPath = glob.sync(hugoConfigExp)[0];
     let formatProvider;
@@ -149,7 +149,7 @@ class InitialWorkspaceConfigBuilder{
     let dataBase = this.getConfig({
       configFile: relHugoConfigPath,
       ext: formatProvider.defaultExt(),
-      hugover: '0.88.1',
+      hugover: hugoVersion,
       hugoConfigData }
     );
 

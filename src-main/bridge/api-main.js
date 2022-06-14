@@ -1,8 +1,10 @@
 const fs                        = require('fs-extra');
+const fssimple                    = require('fs');
 const {dirname}                 = require('path');
 const path                      = require('path');
 const {shell}                   = require('electron');
 const util                      = require('util')
+const pathHelper                = require('../utils/path-helper');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
 const libraryService            = require('../services/library/library-service')
@@ -151,6 +153,20 @@ api.getConfigurations = function(options, context){
       context.resolve(data);
   }, options);
 }
+
+api.getFilteredHugoVersions = async function(_,context){
+
+  const jsonFile = path.join(pathHelper.getApplicationResourcesDir(),"all","filteredHugoVersions.json");
+  let filteredVersions = ["v0.100.2"];
+
+  if(fs.existsSync(jsonFile)){
+    const jsonContent = await fssimple.readFileSync(jsonFile, {encoding:'utf8', flag:'r'})
+    filteredVersions = JSON.parse(jsonContent);
+  }
+
+  context.resolve(filteredVersions)
+}
+
 
 api.openFileExplorer = function({path}, context){
   try{
@@ -449,7 +465,6 @@ api.reloadCurrentForm = async function(){
 api.redirectTo = async function({location,forceRefresh}){
   let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   if(forceRefresh === true){
-    console.log("force")
     mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
   }
   mainWindow.webContents.send("redirectToGivenLocation",location)
@@ -508,8 +523,8 @@ api.importSiteFromPublicGitUrl = function({siteName, url}, context){
       context.reject(err);
     });
 }
-api.newSiteFromPublicHugoThemeUrl = function({siteName, url, themeInfo}, context){
-  gitImporter.newSiteFromPublicHugoThemeUrl(url, siteName, themeInfo)
+api.newSiteFromPublicHugoThemeUrl = function({siteName, url, themeInfo, hugoVersion}, context){
+  gitImporter.newSiteFromPublicHugoThemeUrl(url, siteName, themeInfo, hugoVersion)
     .then((siteKey)=>{
       context.resolve(siteKey);
     })

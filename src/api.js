@@ -36,12 +36,16 @@ export class API {
     return mainProcessBridge.request('importSiteAction');
   }
 
+  getFilteredHugoVersions(){
+    return mainProcessBridge.request('getFilteredHugoVersions');
+  }
+
   importSiteFromPublicGitUrl(siteName: string, url: string){
     return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url});
   }
 
-  newSiteFromPublicHugoThemeUrl(siteName: string, url: string, themeInfo: any){
-    return mainProcessBridge.request('newSiteFromPublicHugoThemeUrl', {siteName, url, themeInfo});
+  newSiteFromPublicHugoThemeUrl(siteName: string, url: string, themeInfo: any, hugoVersion){
+    return mainProcessBridge.request('newSiteFromPublicHugoThemeUrl', {siteName, url, themeInfo, hugoVersion});
   }
 
   getCurrentSiteKey(){

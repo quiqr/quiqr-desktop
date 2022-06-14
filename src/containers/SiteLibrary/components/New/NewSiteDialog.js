@@ -8,7 +8,7 @@ import TextField             from '@material-ui/core/TextField';
 import Button                from '@material-ui/core/Button';
 import Typography            from '@material-ui/core/Typography';
 //import FolderIcon            from '@material-ui/icons/Folder';
-import BuildIcon             from '@material-ui/icons/Build';
+//import BuildIcon             from '@material-ui/icons/Build';
 import Box                   from '@material-ui/core/Box';
 import Grid                  from '@material-ui/core/Grid';
 import Paper                 from '@material-ui/core/Paper';
@@ -26,6 +26,12 @@ import DialogActions         from '@material-ui/core/DialogActions';
 import DialogContent         from '@material-ui/core/DialogContent';
 import DialogContentText     from '@material-ui/core/DialogContentText';
 import DialogTitle           from '@material-ui/core/DialogTitle';
+import Select                from '@material-ui/core/Select';
+import Switch              from '@material-ui/core/Switch';
+import FormControlLabel    from '@material-ui/core/FormControlLabel';
+import FormControl         from '@material-ui/core/FormControl';
+import MenuItem            from '@material-ui/core/MenuItem';
+import InputLabel          from '@material-ui/core/InputLabel';
 
 const useStyles = theme => ({
 
@@ -65,7 +71,19 @@ const useStyles = theme => ({
     '&:hover': {
       backgroundColor:"#ccc"
     }
-  }
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 300,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+  keyButton: {
+    margin: theme.spacing(1),
+    marginTop: theme.spacing(2),
+  },
+
 });
 
 const regexpHttp      = new RegExp('^http(s?)://', 'i')
@@ -77,7 +95,7 @@ class NewSiteDialog extends React.Component{
 
     this.state = {
       title: "New Quiqr Site",
-
+      filteredHugoVersions: [],
       newNameErrorText: '',
 
       newType: '',
@@ -92,7 +110,8 @@ class NewSiteDialog extends React.Component{
       newTypeHugoThemeErrorText: '',
       newTypeHugoThemeScreenshot: null,
 
-      newHugoVersion: '',
+      hugoExtended: '',
+      hugoVersion: '',
       newHugoTheme: '',
 
       newQuiqrModel: '',
@@ -129,6 +148,12 @@ class NewSiteDialog extends React.Component{
       newSiteName: '',
     })
 
+  }
+
+  componentDidMount(){
+    service.api.getFilteredHugoVersions().then((versions)=>{
+      this.setState({filteredHugoVersions: versions});
+    });
   }
 
   validateURL(url){
@@ -212,7 +237,6 @@ class NewSiteDialog extends React.Component{
       })
   }
 
-
   renderStep1Cards(){
     const {classes} = this.props;
     return (
@@ -220,6 +244,7 @@ class NewSiteDialog extends React.Component{
       <Box y={2}>
         <p>Choose the source you want to new from...</p>
         <Grid container  spacing={2}>
+          {/*
           <Grid item xs={6}>
             <Paper
               onClick={()=>{
@@ -240,6 +265,7 @@ class NewSiteDialog extends React.Component{
               </Box>
             </Paper>
           </Grid>
+          */}
 
           <Grid item xs={6}>
             <Paper
@@ -291,6 +317,13 @@ class NewSiteDialog extends React.Component{
   renderStep2Form(){
 
     const {classes} = this.props;
+
+    const filteredVersionItems = this.state.filteredHugoVersions.map((version, index)=>{
+      return(
+        <MenuItem key={"version-"+version} value={version}>{version}</MenuItem>
+      )
+
+    });
 
     if(this.state.newType==="hugotheme"){
       return (
@@ -469,13 +502,63 @@ class NewSiteDialog extends React.Component{
             />
             {(this.state.newTypeHugoThemeNewingBusy ? <CircularProgress size={20} /> : null)}
           </Box>
-          <Button variant="contained" disabled={(this.state.newTypeHugoThemeReadyForNew && !this.state.newTypeHugoThemeNewingBusy ? false : true)} onClick={()=>{
+
+          <Box my={2}>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="demo-simple-select-outlined-label">Hugo Version</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                value={this.state.hugoVersion}
+                onChange={(e)=>{
+                  const featureVersion = Number(e.target.value.split(".")[1])
+                  if(featureVersion > 42){
+                    this.setState({
+                      hugoVersion: e.target.value,
+                      hugoExtendedEnabled: true
+                    })
+                  }
+                  else{
+                    this.setState({
+                      hugoVersion: e.target.value,
+                      hugoExtendedEnabled: false,
+                      hugoExtended: false,
+                    })
+                  }
+                }}
+                label="Publish Source and Build"
+              >
+                {filteredVersionItems}
+              </Select>
+            </FormControl>
+
+
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.hugoExtended}
+                  disabled={!this.state.hugoExtendedEnabled}
+                  onChange={(e)=>{
+                    this.setState({hugoExtended: e.target.checked });
+                  }}
+
+                  name="configureActions"
+                  color="primary"
+                />
+              }
+              label="Hugo Extended"
+            />
+          </Box>
+
+          <Button variant="contained" disabled={(this.state.hugoVersion !== '' && this.state.newTypeHugoThemeReadyForNew && !this.state.newTypeHugoThemeNewingBusy ? false : true)} onClick={()=>{
 
             this.setState({
               newTypeHugoThemeNewingBusy: true
             });
 
-            service.api.newSiteFromPublicHugoThemeUrl(this.state.newSiteName, this.state.newTypeHugoThemeLastValidatedUrl, this.state.newHugoThemeInfoDict)
+            const hugoVersion = (this.state.hugoExtended ? "extended_" : "") + this.state.hugoVersion.replace("v",'')
+
+            service.api.newSiteFromPublicHugoThemeUrl(this.state.newSiteName, this.state.newTypeHugoThemeLastValidatedUrl, this.state.newHugoThemeInfoDict, hugoVersion)
               .then((siteKey)=>{
                 this.setState({
                   newTypeHugoThemeNewingBusy: false,

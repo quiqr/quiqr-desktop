@@ -107,7 +107,6 @@ class SiteLibraryRouted extends React.Component{
     }
 
     if(this.props.newSite !== nextProps.newSite){
-      service.api.logToConsole("newSite")
       this.setState({dialogNewSite: {open: nextProps.newSite}});
     }
 

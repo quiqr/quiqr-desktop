@@ -49,7 +49,7 @@ const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
   },
 });
 
-let style = require('./themes/default/style.js');
+let style = require('./themes/quiqr10/style.js');
 let trySet = false;
 
 class App extends React.Component{
@@ -129,6 +129,7 @@ class App extends React.Component{
     });
   }
 
+  //TODO REMOVE
   getProfile(){
     let getProfile = service.api.getQuiqrProfile();
 

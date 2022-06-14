@@ -1,6 +1,7 @@
 {
-  "homepage": "./",
+  "homepage": "https://quiqr.org",
   "name": "quiqr",
+  "license": "MIT",
   "author": {
     "name": "Pim Snel",
     "email": "info@quiqr.org"
@@ -80,10 +81,11 @@
     "_copy-electron-code": "copyfiles -u 1 \"./src-main/**/*\" \"./build/electron/\"",
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
+    "_hugo_versions": "node scripts/getHugoVersions.js",
     "_mac-notarize": "node scripts/notarize.js",
     "_electron-lint": "cross-env NODE_ENV=development eslint ./src-main",
     "servemain": "npm run _electron-lint && npm run _electron-dev",
-    "build": "npm run clean && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info",
+    "build": "npm run clean && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit && npm run _build_info && npm run _hugo_versions",
     "dist": "electron-builder",
     "packdev": "electron-builder -p never",
     "release": "release-script --addPlaceholder",

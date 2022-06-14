@@ -1,13 +1,13 @@
 import * as React            from 'react';
 import service               from '../../../../services/service';
 import LogosGitServices      from '../../../../svg-assets/LogosGitServices';
-import IconQuiqr             from '../../../../svg-assets/IconQuiqr';
+//import IconQuiqr             from '../../../../svg-assets/IconQuiqr';
 import ScreenShotPlaceholder from '../../../../img-assets/screenshot-placeholder.png';
 import { withStyles }        from '@material-ui/core/styles';
 import TextField             from '@material-ui/core/TextField';
 import Button                from '@material-ui/core/Button';
 import Typography            from '@material-ui/core/Typography';
-import FolderIcon            from '@material-ui/icons/Folder';
+//import FolderIcon            from '@material-ui/icons/Folder';
 import Box                   from '@material-ui/core/Box';
 import Grid                  from '@material-ui/core/Grid';
 import Paper                 from '@material-ui/core/Paper';
@@ -79,7 +79,7 @@ class ImportSiteDialog extends React.Component{
 
       importNameErrorText: '',
 
-      importType: 'git',
+      importType: '',
       importTypeGitUrl: '',
       importTypeGitBusy: false,
       importTypeGitReadyForValidation: false,
@@ -225,6 +225,7 @@ class ImportSiteDialog extends React.Component{
             </Paper>
           </Grid>
 
+          {/*
           <Grid item xs={6}>
             <Paper
               onClick={()=>{
@@ -244,6 +245,9 @@ class ImportSiteDialog extends React.Component{
 
             </Paper>
           </Grid>
+          */}
+
+          {/*
 
           <Grid item xs={6}>
             <Paper
@@ -263,6 +267,7 @@ class ImportSiteDialog extends React.Component{
               </Box>
             </Paper>
           </Grid>
+          */}
         </Grid>
       </Box>
     )
