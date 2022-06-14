@@ -3,24 +3,7 @@ import service from './../../services/service';
 import Typography from '@material-ui/core/Typography';
 
 import { withStyles } from '@material-ui/core/styles';
-//import { createTheme } from '@material-ui/core/styles';
-//import purple from '@material-ui/core/colors/purple';
-//import green from '@material-ui/core/colors/green';
 import FolderPicker from '../../components/FolderPicker';
-
-/*
-const theme = createTheme({
-  spacing: 4,
-  palette: {
-    primary: {
-      main: purple[500],
-    },
-    secondary: {
-      main: green[500],
-    },
-  },
-});
-*/
 
 const useStyles = theme => ({
 

@@ -2,9 +2,10 @@ import * as React from 'react';
 import { Route }  from 'react-router-dom';
 import Sidebar    from './../../Sidebar';
 //import service    from './../../../services/service';
-import AddIcon from '@material-ui/icons/Add';
-import IconQuiqr from '../../../svg-assets/IconQuiqr';
+import AddIcon    from '@material-ui/icons/Add';
+import IconQuiqr  from '../../../svg-assets/IconQuiqr';
 import IconGitHub from '../../../svg-assets/IconGitHub';
+import FolderIcon from '@material-ui/icons/Folder';
 
 export class SyncSidebar extends React.Component {
 
@@ -60,6 +61,12 @@ export class SyncSidebar extends React.Component {
         label = publ.config.username+"/"+publ.config.repository;
         icon = <IconGitHub/>
       }
+      else if(publ.config && publ.config.type === "folder" ){
+        label = publ.config.path;
+        icon = <FolderIcon/>
+      }
+
+      label = (label.length >  20 ? `${label.substring(0, 20)}...` : label);
       if(label){
         targets.push({
           active: true,

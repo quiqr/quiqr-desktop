@@ -19,6 +19,7 @@ import DialogTitle             from '@material-ui/core/DialogTitle';
 import DialogContent           from '@material-ui/core/DialogContent';
 import { snackMessageService } from './../../../services/ui-service';
 import SnackbarManager         from './../../../components/SnackbarManager';
+import FolderIcon              from '@material-ui/icons/Folder';
 
 const useStyles = theme => ({
 
@@ -171,6 +172,13 @@ class SyncRouteGeneral extends React.Component {
       title = publishConf.config.username +"/" + publishConf.config.repository;
       liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
     }
+    else if(publishConf.config.type === 'folder'){
+      serviceLogo = <FolderIcon />
+      title = publishConf.config.path;
+      liveUrl= ''
+    }
+
+    title = (title.length >  20 ? `${title.substring(0, 20)}...` : title);
 
     return <MainPublishCard
       title={title}
