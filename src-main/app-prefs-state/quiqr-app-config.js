@@ -43,42 +43,33 @@ module.exports = function (options) {
     state.lastOpenedSite = {siteKey: siteKey, workspaceKey: workspaceKey, sitePath: sitePath};
   }
 
-  /* skip: bool */
   function setSkipWelcomeScreen(skip){
     state.skipWelcomeScreen = skip;
   }
 
-  /* toggle: bool */
   function setExperimentalFeatures(toggle){
     state.experimentalFeatures = toggle;
   }
-  /* toggle: bool */
   function setDisablePartialCache(toggle){
     state.disablePartialCache = toggle;
   }
-  /* toggle: bool */
   function setExpPreviewWindow(toggle){
     state.expPreviewWindow = toggle;
   }
-  /* toggle: bool */
   function setDevLocalApi (toggle){
     state.devLocalApi = toggle;
   }
-  /* toggle: bool */
   function setDevDisableAutoHugoServe(toggle){
     state.devDisableAutoHugoServe = toggle;
   }
-  /* toggle: bool */
   function setDevShowCurrentUser(toggle){
     state.devShowCurrentUser = toggle;
   }
 
-  /* view: string (all, mylocal, myremote)  */
   function setSitesListingView(view){
     state.sitesListingView = view;
   }
 
-  /* currentUsername: string  */
   function setCurrectUsername(username){
     state.currentUsername = username;
   }
