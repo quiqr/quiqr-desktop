@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- fix problem in react-scripts
+
 ## 0.11.3 (2022-06-14)
 
 - show mousefeedback when clicking card in Library
