@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.12.0 (2022-06-14)
 
 - add Hugo Version select in new site
 - show last used publish conf
