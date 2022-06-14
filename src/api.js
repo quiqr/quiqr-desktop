@@ -193,11 +193,11 @@ export class API {
     );
   }
   quiqr_git_repo_show(url: string){
-    return mainProcessBridge.request('quiqr_git_repo_show', {url});
+    return mainProcessBridge.request('quiqr_git_repo_show', {url}, {timeout: 30000});
   }
 
   hugotheme_git_repo_show(url: string){
-    return mainProcessBridge.request('hugotheme_git_repo_show', {url});
+    return mainProcessBridge.request('hugotheme_git_repo_show', {url}, {timeout: 30000});
   }
 
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
