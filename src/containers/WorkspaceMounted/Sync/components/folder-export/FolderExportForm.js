@@ -92,72 +92,71 @@ class FolderExportForm extends React.Component{
     return (
       <React.Fragment>
 
-          <div style={{marginTop:"20px"}}>
-            Quiqr Data Folder
-            <FolderPicker
-            label="Quiqr Data Folder"
+        <div style={{marginTop:"20px"}}>
+          <FolderPicker
+            label="Export folder"
             selectedFolder={this.state.pubData.path}
-              onFolderSelected={(folder)=>{
-                this.updatePubData({path: folder });
-              }} />
-          </div>
+            onFolderSelected={(folder)=>{
+              this.updatePubData({path: folder });
+            }} />
+        </div>
 
 
         <Box my={2}>
-                      <FormControl variant="outlined" className={classes.formControl}>
-              <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
-              <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                value={this.state.pubData.publishScope}
-                onChange={(e)=>{
-                  if(e.target.value === "build"){
-                    this.updatePubData({
-                      publishScope: e.target.value,
-                    });
-                  }
-                  else{
-                    this.updatePubData({
-                      publishScope: e.target.value,
-                    });
-                  }
-                }}
-                label="Publish Source and Build"
-              >
-                <MenuItem value="build">Publish only build files</MenuItem>
-                <MenuItem value="source">Publish only source files</MenuItem>
-                <MenuItem value="build_and_source">Publish source and build files</MenuItem>
-              </Select>
-            </FormControl>
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              value={this.state.pubData.publishScope}
+              onChange={(e)=>{
+                if(e.target.value === "build"){
+                  this.updatePubData({
+                    publishScope: e.target.value,
+                  });
+                }
+                else{
+                  this.updatePubData({
+                    publishScope: e.target.value,
+                  });
+                }
+              }}
+              label="Publish Source and Build"
+            >
+              <MenuItem value="build">Publish only build files</MenuItem>
+              <MenuItem value="source">Publish only source files</MenuItem>
+              <MenuItem value="build_and_source">Publish source and build files</MenuItem>
+            </Select>
+          </FormControl>
 
         </Box>
 
         <Box my={2}>
 
-            <FormControlLabel className={classes.keyButton}
-              control={
-                <Switch
-                  checked={this.state.pubData.overrideBaseURLSwitch}
-                  onChange={(e)=>{
-                    if(this.state.pubData.overrideBaseURLSwitch){
-                      this.updatePubData({
-                        overrideBaseURLSwitch: e.target.checked,
-                        overrideBaseURL: "",
-                      });
-                    }
-                    else{
-                      this.updatePubData({
-                        overrideBaseURLSwitch: e.target.checked,
-                      });
-                    }
-                  }}
+          <FormControlLabel className={classes.keyButton}
+            control={
+              <Switch
+                checked={this.state.pubData.overrideBaseURLSwitch}
+                onChange={(e)=>{
+                  if(this.state.pubData.overrideBaseURLSwitch){
+                    this.updatePubData({
+                      overrideBaseURLSwitch: e.target.checked,
+                      overrideBaseURL: "",
+                    });
+                  }
+                  else{
+                    this.updatePubData({
+                      overrideBaseURLSwitch: e.target.checked,
+                    });
+                  }
+                }}
 
-                  name="overrideBaseURLSwitch"
-                  color="primary"
-                />
-              }
-              label="Override BaseURL"
-            />
+                name="overrideBaseURLSwitch"
+                color="primary"
+              />
+            }
+            label="Override BaseURL"
+          />
 
           <TextField
             id="baseUrl"

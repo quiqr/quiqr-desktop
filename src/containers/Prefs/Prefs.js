@@ -76,7 +76,6 @@ class Prefs extends React.Component {
         <div className={classes.root}>
 
           <div style={{marginTop:"20px"}}>
-            Quiqr Data Folder
             <FolderPicker
             label="Quiqr Data Folder"
             selectedFolder={this.state.prefsDataFolder}

@@ -200,8 +200,12 @@ export class API {
     return mainProcessBridge.request('hugotheme_git_repo_show', {url}, {timeout: 30000});
   }
 
+  hugosite_dir_show(folder: string){
+    return mainProcessBridge.request('hugosite_dir_show', {folder}, {timeout: 30000});
+  }
+
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
-    return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 30000});
+    return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 40000});
   }
   getThumbnailForCollectionOrSingleItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForCollectionOrSingleItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});

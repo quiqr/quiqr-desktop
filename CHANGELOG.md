@@ -1,7 +1,10 @@
 # Quiqr App CHANGELOG
+
 ## **WORK IN PROGRESS**
 
 - simplified menu
+- log to console main-api request timeouts
+- minimal windows sizes
 
 ## 0.12.0 (2022-06-14)
 

@@ -202,6 +202,7 @@ class App extends React.Component{
       <Route path='/prefs' exact render={ () => {
         const rightButtons = [
           <ToolbarButton
+            key={"toolbarbutton-library"}
             action={()=>{
               service.api.redirectTo("/sites/last");
             }}

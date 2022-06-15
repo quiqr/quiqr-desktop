@@ -770,6 +770,41 @@ api.hugotheme_git_repo_show = function({url}, promise){
     })
 }
 
+
+api.hugosite_dir_show = function({folder}, promise){
+
+  let response={
+    dirExist: false,
+    hugoConfigExists: false,
+    hugoConfigParsed: {},
+    hugoThemeDirExists: false,
+    hugoContentDirExists: false,
+    hugoDataDirExists: false,
+    hugoStaticDirExists: false,
+    quiqrDirExists: false,
+  }
+
+  let lstat = fs.lstatSync(folder);
+  if(lstat.isDirectory()){
+    response.dirExist = true;
+  }
+  else{
+    promise.reject("Directory does not exist");
+  }
+
+  lstat = fs.lstatSync(path.join(folder, "themes"));
+  if(lstat.isDirectory()){
+    response.hugoThemeDirExists = true;
+  }
+  else{
+    promise.reject("Directory does not exist");
+  }
+
+  promise.resolve(response);
+
+
+}
+
 api.getFilesInBundle = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName}, promise){
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ promise.reject(err); return; }

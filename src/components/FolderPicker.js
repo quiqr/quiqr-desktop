@@ -1,7 +1,6 @@
 import * as React       from 'react';
-import { RaisedButton } from 'material-ui-02';
+import Button       from '@material-ui/core/Button';
 import TextField       from '@material-ui/core/TextField';
-//import service          from '../services/service';
 
 export default class FolderPicker extends React.Component{
 
@@ -30,21 +29,33 @@ export default class FolderPicker extends React.Component{
   }
 
   render(){
-    let { selectedFolder, label } = this.props;
+    let { selectedFolder, label, outlined } = this.props;
+
+    if(outlined){
+
+    }
+    else{
+
+    }
 
     return (
       <div style={{display:'flex' }}>
         <TextField
           readOnly fullWidth
+          variant="outlined"
           value={selectedFolder||''}
-          floatingLabelText={label}
-          floatingLabelFixed
+          label={label}
+          xfloatingLabelText={label}
+          xfloatingLabelFixed
           onClick={this.handleTextFieldClick.bind(this)}
           style={{flex:'1 0 500px',  flexDirection: 'row'}} />
-        <RaisedButton
+        <Button
+          variant="contained"
           onClick={this.handlePickFileClick.bind(this) }
           style={{flex:'140px 0 0', alignSelf: 'flex-end', marginLeft: '8px', marginBottom:'8px'}}
-          label="Pick Folder" />
+        >
+          Pick Folder
+        </Button>
       </div>
     )
   }
