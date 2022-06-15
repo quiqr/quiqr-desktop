@@ -159,7 +159,6 @@ function createWindow () {
     defaultHeight: 600
   });
 
-  // Create the browser window.
   mainWindow = new BrowserWindow({
     show: false,
     frame: true,
@@ -171,6 +170,8 @@ function createWindow () {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
+    minWidth: 1055,
+    minHeight: 700,
 
   });
 

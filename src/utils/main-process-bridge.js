@@ -89,6 +89,7 @@ class MainProcessBridge{
       this.ipcRenderer.send('message', {data, token, handler:method});
       let timeoutId = setTimeout(function(){
         if(this._eraseCallback(token)){
+          console.log(method)
           reject('timeout');
           promise.forceAbort = function(){};
         }
