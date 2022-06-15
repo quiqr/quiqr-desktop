@@ -1,0 +1,182 @@
+import * as React            from 'react';
+import service               from '../../../../services/service';
+import ScreenShotPlaceholder from '../../../../img-assets/screenshot-placeholder.png';
+import { withStyles }        from '@material-ui/core/styles';
+import Typography            from '@material-ui/core/Typography';
+import Box                   from '@material-ui/core/Box';
+import CircularProgress      from '@material-ui/core/CircularProgress';
+import Table                 from '@material-ui/core/Table';
+import TableRow              from '@material-ui/core/TableRow';
+import TableCell             from '@material-ui/core/TableCell';
+import TableBody             from '@material-ui/core/TableBody';
+import TableContainer        from '@material-ui/core/TableContainer';
+import Card                  from '@material-ui/core/Card';
+import CardContent           from '@material-ui/core/CardContent';
+import CardMedia             from '@material-ui/core/CardMedia';
+import FolderPicker          from '../../../../components/FolderPicker';
+
+const useStyles = theme => ({
+
+  root: {
+    margin: 0,
+    display: 'flex',
+  },
+  details: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  content: {
+    flex: '1 0 auto',
+  },
+  cover: {
+    width: 351,
+  },
+
+});
+
+
+class FolderFormPartial extends React.Component{
+
+  constructor(props){
+    super(props);
+
+    this.state = {
+      newType: '',
+      newTypeFolderBusy: false,
+      newTypeFolderScreenshot: null,
+    }
+  }
+
+  resetNewTypeFolderState(){
+    this.setState({
+      newTypeFolderBusy: false,
+      newTypeFolderScreenshot: null,
+    })
+  }
+
+  validateDir(path){
+
+    this.resetNewTypeFolderState();
+    this.setState({newTypeFolderBusy: true});
+
+    service.api.hugosite_dir_show(path)
+      .then((response)=>{
+        if(response){
+          this.setState({
+            newTypeFolderScreenshot: (response.Screenshot ? response.Screenshot:null),
+            newTypeFolderBusy: false,
+            newFolderSiteTitle: response.siteTitle,
+          })
+
+          this.props.onValidationDone({
+            newTypeFolderReadyForNaming:true,
+            newTypeFolderLastValidatedPath: path,
+            newFolderInfoDict: response,
+          })
+
+        }
+      })
+      .catch((e)=>{
+        service.api.logToConsole(e);
+        this.setState({
+          newTypeFolderErrorText: "It seems that the directory does not point to a directory with a Hugo site",
+          newTypeFolderBusy: false
+        });
+      });
+  }
+
+  render(){
+
+    const {classes} = this.props;
+
+    return (
+      <React.Fragment>
+        <Box my={3}>
+          <p>
+            Select a folder on your computer with a Hugo site.
+          </p>
+        </Box>
+        <Box my={3} sx={{display:'flex'}}>
+
+          <FolderPicker
+            label="Folder with Hugo Site"
+            selectedFolder={this.state.newFolderPath}
+            onFolderSelected={(folder)=>{
+              this.setState({newFolderPath: folder})
+              this.validateDir(folder);
+            }} />
+
+        </Box>
+
+        <Box my={3}>
+          <Card className={classes.root} variant="outlined" style={{backgroundColor:'#eee'}}>
+            <CardMedia
+              className={classes.cover}
+              image={(this.state.newTypeFolderScreenshot?this.state.newTypeFolderScreenshot:ScreenShotPlaceholder)}
+              title="site screenshot"
+            />
+            <div className={classes.details}>
+              <CardContent className={classes.content}>
+
+                <TableContainer>
+                  <Table className={classes.table} size="small" aria-label="a dense table">
+                    <TableBody>
+
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Site Title
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{(this.state.newTypeFolderBusy ? <CircularProgress size={20} /> : null)} {this.state.newFolderSiteTitle}
+                        </TableCell>
+                      </TableRow>
+
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                           Theme
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{(this.state.newFolderThemeDir ? "Present" : "")}</TableCell>
+                      </TableRow>
+
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Content
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{(this.state.newFolderContentDir ? "Present" : "")}</TableCell>
+                      </TableRow>
+
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Data
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{(this.state.newFolderDataDir ? "Present" : "")}</TableCell>
+                      </TableRow>
+
+
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+
+              </CardContent>
+            </div>
+
+          </Card>
+        </Box>
+
+      </React.Fragment>
+    )
+
+  }
+
+}
+
+export default withStyles(useStyles)(FolderFormPartial);
+
