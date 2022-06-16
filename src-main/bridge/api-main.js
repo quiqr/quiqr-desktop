@@ -10,7 +10,6 @@ const SiteService               = require('../services/site/site-service')
 const libraryService            = require('../services/library/library-service')
 const Embgit                    = require('../embgit/embgit')
 const WorkspaceService          = require('../services/workspace/workspace-service')
-const siteSourceBuilderFactory  = require('../site-sources/builders/site-source-builder-factory');
 const hugoDownloader            = require('../hugo/hugo-downloader')
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
@@ -832,16 +831,6 @@ api.getThumbnailForCollectionOrSingleItemImage = function({siteKey, workspaceKey
 
 api.invalidateCache = function(){
   configurationDataProvider.invalidateCache();
-}
-
-
-api.createSite = function(config, context){
-  siteSourceBuilderFactory.get(config.sourceType).build(config).then(() =>{
-    configurationDataProvider.invalidateCache();
-    context.resolve();
-  }, (err)=>{
-    context.reject(err);
-  });
 }
 
 api.setPublishStatus = async function({status}, context){

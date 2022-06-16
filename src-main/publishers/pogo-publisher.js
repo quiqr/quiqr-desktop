@@ -1,18 +1,12 @@
 const electron                                  = require('electron')
 const path                                      = require('path');
 const fs                                        = require('fs-extra');
-const fssimple                                  = require('fs');
-const ProgressBar                               = require('electron-progressbar');
 const spawn                                     = require("child_process").spawn;
-const spawnAw                                   = require('await-spawn')
 const fileDirUtils                              = require('../utils/file-dir-utils');
 const { EnvironmentResolver }                   = require('../utils/environment-resolver');
-const formatProviderResolver                    = require('../utils/format-provider-resolver');
 const pathHelper                                = require('../utils/path-helper');
 const outputConsole                             = require('../logger/output-console');
-const hugoDownloader                            = require('../hugo/hugo-downloader')
 const Embgit                                    = require('../embgit/embgit');
-const libraryService                            = require('../services/library/library-service');
 
 class PogoPublisher {
 
@@ -99,327 +93,6 @@ class PogoPublisher {
 
   isNumber(n) { return /^-?[\d.]+(?:e-?\d+)?$/.test(n); }
 
-  async createSiteFromThemeGitUrl(){
-    //check hugo
-    //create new site with hugo
-    //clone theme into new site
-    //copy exampleSite
-
-    let mainWindow = global.mainWM.getCurrentInstance();
-    let hugover = 'extended_0.77.0';
-    const exec = pathHelper.getHugoBinForVer(hugover);
-
-    if(!fs.existsSync(exec)){
-      const dialog = electron.dialog;
-      dialog.showMessageBox(mainWindow, {
-        buttons: ["Close"],
-        title: "Quiqr will now download hugo " + hugover,
-        message: "Try again when download has finished",
-      });
-
-      try{
-        hugoDownloader.downloader.download(hugover);
-      }
-      catch(e){
-        // warn about HugoDownloader error?
-      }
-    }
-    else{
-      const prompt = require('electron-prompt');
-      let full_gh_url = await prompt({
-        title: 'Enter theme git url',
-        label: 'url:',
-        value: "",
-        inputAttrs: {
-          type: 'text',
-          required: true
-        },
-        type: 'input'
-      }, mainWindow);
-
-      if(!full_gh_url || full_gh_url===""){
-        return;
-      }
-
-      let siteKey = await prompt({
-        title: 'Enter new site name',
-        label: 'name:',
-        value: "",
-        inputAttrs: {
-          type: 'text',
-          required: true
-        },
-        type: 'input'
-      }, mainWindow);
-
-      if(!siteKey || siteKey===""){
-        return;
-      }
-
-      const dialog = electron.dialog;
-
-      var progressBar = new ProgressBar({
-        indeterminate: false,
-        text: 'Creating your site..',
-        abortOnError: true,
-        detail: 'Creating quiqr website',
-        browserWindow: {
-          frame: false,
-          parent: mainWindow,
-          webPreferences: {
-            nodeIntegration: true
-          }
-        }
-      });
-
-      progressBar.on('completed', function() {
-        progressBar.detail = 'Site has been created.';
-      })
-        .on('aborted', function(value) {
-          console.info(`aborted... ${value}`);
-        })
-
-      progressBar.value += 10;
-      progressBar.detail = 'Preparing download';
-
-
-      let themeName = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
-      console.log("guesedKey:"+themeName);
-
-      var full_gh_dest = pathHelper.getRoot()+'temp/siteFromTheme/';
-      var full_gh_themes_dest = pathHelper.getRoot()+'temp/siteFromTheme/themes/'+themeName;
-
-      await fs.ensureDir(full_gh_dest);
-      await fs.emptyDir(full_gh_dest);
-      await fs.ensureDir(full_gh_dest);
-      await fs.ensureDir(full_gh_dest + '/themes');
-
-      var git_bin = Embgit.getGitBin();
-
-      outputConsole.appendLine('Creating empty directory at: ' + full_gh_dest);
-
-      progressBar.value += 10;
-      progressBar.detail = 'Getting live site files for synchronization';
-
-      await outputConsole.appendLine('Cloning from: ' + full_gh_url);
-
-      try {
-        await spawnAw( git_bin, [ "clone", full_gh_url , full_gh_themes_dest ]);
-        outputConsole.appendLine('Clone success ...');
-      } catch (e) {
-        await outputConsole.appendLine(git_bin+ " clone " + full_gh_url + " " + full_gh_themes_dest );
-        await outputConsole.appendLine('Clone error ...:' + e);
-        return;
-      }
-
-      await fs.copySync(full_gh_themes_dest+"/exampleSite", full_gh_dest);
-
-      try{
-        let strData = fs.readFileSync(full_gh_dest+"/config.toml", {encoding: 'utf-8'});
-        let formatProvider = formatProviderResolver.resolveForFilePath(full_gh_dest+"/config.toml");
-        let hconfig = formatProvider.parse(strData);
-        hconfig.theme = themeName;
-        hconfig.baseURL = "/"
-        fs.writeFileSync(
-          full_gh_dest+"/config.toml",
-          formatProvider.dump(hconfig)
-        );
-      }
-      catch(e){
-        console.log("no config.toml in exampleSite");
-      }
-
-      progressBar.value = 100;
-      progressBar.setCompleted();
-      progressBar._window.hide();
-      progressBar.close();
-
-      if(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
-        const options = {
-          type: 'question',
-          buttons: ['Cancel', 'Overwrite', 'Keep both'],
-          defaultId: 2,
-          title: 'Site key exist',
-          message: 'A site with this key exists.',
-          detail: 'Do you want to overwrite this site or keep both?',
-        };
-
-        dialog.showMessageBox(null, options, async (response) => {
-          if(response ===2){
-
-            let extraPlus = 0
-            while(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
-              extraPlus = extraPlus++;
-
-              let numLength = 0;
-              while(this.isNumber(siteKey.slice(-numLength+1))){
-                numLength = numLength++;
-              }
-
-              if(numLength>0){
-                let keyNumpart = Number(siteKey.slice(-numLength));
-                keyNumpart = keyNumpart+extraPlus;
-                siteKey = siteKey.substring(0, siteKey.length - numLength)+keyNumpart.toString();
-              }
-              else{
-                siteKey = siteKey+".1"
-              }
-            }
-
-            await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
-          }
-          else{
-            return;
-          }
-        });
-      }
-      else{
-        await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
-      }
-    }
-    return;
-  }
-
-  async siteFromPogoUrl(){
-    let mainWindow = global.mainWM.getCurrentInstance();
-
-    const prompt = require('electron-prompt');
-    let full_gh_url = await prompt({
-      title: 'Enter git url',
-      label: 'url:',
-      value: "",
-      inputAttrs: {
-        type: 'text',
-        required: true
-      },
-      type: 'input'
-    }, mainWindow);
-
-    if(!full_gh_url || full_gh_url===""){
-      return;
-    }
-
-    const dialog = electron.dialog;
-
-    var progressBar = new ProgressBar({
-      indeterminate: false,
-      text: 'Importing your site..',
-      abortOnError: true,
-      detail: 'importing from Quiqr servers',
-      browserWindow: {
-        frame: false,
-        parent: mainWindow,
-        webPreferences: {
-          nodeIntegration: true
-        }
-      }
-    });
-
-    progressBar.on('completed', function() {
-      progressBar.detail = 'Site has been imported.';
-    })
-      .on('aborted', function(value) {
-        console.info(`aborted... ${value}`);
-      })
-
-    progressBar.value += 10;
-    progressBar.detail = 'Preparing download';
-
-    var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
-
-    var full_gh_dest = pathHelper.getRoot()+'temp/siteFromUrl/';
-
-    var git_bin = Embgit.getGitBin();
-
-    outputConsole.appendLine('Creating empty directory at: ' + full_gh_dest);
-
-    await fs.ensureDir(full_gh_dest);
-    await fs.emptyDir(full_gh_dest);
-    await fs.ensureDir(full_gh_dest);
-
-    progressBar.value += 10;
-    progressBar.detail = 'Getting live site files for synchronization';
-
-    await outputConsole.appendLine('Cloning from: ' + full_gh_url);
-
-    try {
-      await spawnAw( git_bin, [ "clone", "-s" ,"-i", pogokeypath, full_gh_url , full_gh_dest ]);
-      outputConsole.appendLine('Clone success ...');
-    } catch (e) {
-      await outputConsole.appendLine(git_bin+ " clone -s -i " + pogokeypath + " " + full_gh_url + " " + full_gh_dest );
-      await outputConsole.appendLine('Clone error ...:' + e);
-    }
-
-    progressBar.value = 100;
-    progressBar.setCompleted();
-    progressBar._window.hide();
-    progressBar.close();
-
-    let siteKey = full_gh_url.substring(full_gh_url.lastIndexOf('/') + 1).split('.').slice(0, -1).join('.');
-    console.log("guesedKey:"+siteKey);
-
-    if(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
-      const options = {
-        type: 'question',
-        buttons: ['Cancel', 'Overwrite', 'Keep both'],
-        defaultId: 2,
-        title: 'Site key exist',
-        message: 'A site with this key exists.',
-        detail: 'Do you want to overwrite this site or keep both?',
-      };
-
-      dialog.showMessageBox(null, options, async (response) => {
-        if(response ===2){
-
-          let extraPlus = 0
-          while(fs.existsSync(pathHelper.getSiteMountConfigPath(siteKey))){
-            extraPlus = extraPlus++;
-
-            let numLength = 0;
-            while(this.isNumber(siteKey.slice(-numLength+1))){
-              numLength = numLength++;
-            }
-
-            if(numLength>0){
-              let keyNumpart = Number(siteKey.slice(-numLength));
-              keyNumpart = keyNumpart+extraPlus;
-              siteKey = siteKey.substring(0, siteKey.length - numLength)+keyNumpart.toString();
-            }
-            else{
-              siteKey = siteKey+".1"
-            }
-          }
-
-          await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
-        }
-        else{
-          return;
-        }
-      });
-    }
-    else{
-      await this.createNewWithTempDirAndKey(siteKey, full_gh_dest);
-    }
-  }
-
-  //TODO MOVE TO OTHER FILE
-  async createNewWithTempDirAndKey(siteKey, full_gh_dest){
-    var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
-    var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
-    var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
-    var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
-    await fs.ensureDir(pathSite);
-    await fs.ensureDir(pathSiteSources);
-    await fs.moveSync(full_gh_dest, pathSource);
-    let newConf = libraryService.createMountConfUnmanaged(siteKey,siteKey, pathSource);
-    await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
-  }
-
-
-
-
-
-
   async publish(context){
 
     let mainWindow = global.mainWM.getCurrentInstance();
@@ -434,39 +107,6 @@ class PogoPublisher {
       percent: 5,
     };
     mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
-
-    //mainWindow.webContents.send("progressBar");
-
-    /*
-    var progressBar = new ProgressBar({
-      indeterminate: false,
-      text: 'Publishing your site..',
-      abortOnError: true,
-      detail: 'Uploading to Quiqr servers',
-      browserWindow: {
-        frame: false,
-        parent: mainWindow,
-        webPreferences: {
-          nodeIntegration: true
-        }
-      }
-    });
-    */
-
-    /*progressBar.on('completed', function() {
-      progressBar.detail = 'Your site has been uploaded.';
-    })
-      .on('aborted', function(value) {
-        console.info(`aborted... ${value}`);
-      })
-      .on('progress', function(value) {
-      });
-      */
-
-    /*
-    progressBar.value += 10;
-    progressBar.detail = 'Preparing upload';
-    */
 
     progressDialogConfObj.message = 'Preparing upload';
     progressDialogConfObj.percent = 15;
@@ -504,10 +144,6 @@ class PogoPublisher {
     await fs.emptyDir(resolvedDest);
     await fs.ensureDir(resolvedDest);
 
-    /*
-    progressBar.value += 10;
-    progressBar.detail = 'Getting live site files for synchronization';
-    */
     progressDialogConfObj.message =  'Getting live site files for synchronization';
     progressDialogConfObj.percent =  25;
     mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
@@ -523,8 +159,6 @@ class PogoPublisher {
       if(code==0){
         outputConsole.appendLine('Clone succes ...');
 
-        //progressBar.value += 10;
-        //progressBar.detail = 'Synchronizing your last changes';
         progressDialogConfObj.message =  'Synchronizing your last changes';
         progressDialogConfObj.percent =  35;
         mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
@@ -551,9 +185,6 @@ class PogoPublisher {
         outputConsole.appendLine('context.from is: ' + context.from);
         outputConsole.appendLine('copy finished, going to git-add ...');
 
-
-        //progressBar.value += 10;
-        //progressBar.detail = 'Copying your changes to Quiqr servers';
         progressDialogConfObj.message =  'Copying your changes to Quiqr servers';
         progressDialogConfObj.percent =  55;
         mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
@@ -565,8 +196,6 @@ class PogoPublisher {
           if(code==0){
 
             outputConsole.appendLine('git-add finished, going to git-commit ...');
-            //progressBar.value += 10;
-            //progressBar.detail = 'Apply changes';
             progressDialogConfObj.message =  'Apply changes';
             progressDialogConfObj.percent =  65;
             mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
@@ -591,11 +220,6 @@ class PogoPublisher {
 
                   if(code==0){
                     outputConsole.appendLine('git-push finished ... changes are published.');
-                    //progressBar.value = 100;
-                    //progressBar.detail = 'Successfully copied your changes';
-                    //progressBar.setCompleted();
-                    //progressBar._window.hide();
-                    //progressBar.close();
 
                     progressDialogConfObj.message =  'Successfully copied your changes';
                     progressDialogConfObj.percent =  90;
@@ -608,22 +232,11 @@ class PogoPublisher {
                     progressDialogConfObj.visible = false;
                     mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
-                    //mainWindow.webContents.send("closeProgressDialog");
-                    /*
-                    dialog.showMessageBox(mainWindow, {
-                      title: 'Quiqr',
-                      type: 'info',
-                      message: "Succesfully published your changes. \n They will be visible in a minute or two.",
-                    });
-                    */
-
                   }
                   else{
                     this.writePublishStatus(7);
                     outputConsole.appendLine('ERROR: Could not git-push ...');
 
-                    //progressBar._window.hide();
-                    //progressBar.close();
                     progressDialogConfObj.visible = false;
                     mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
@@ -638,8 +251,6 @@ class PogoPublisher {
               else {
                 this.writePublishStatus(8);
                 outputConsole.appendLine('ERROR: Could not git-commit ...');
-                //progressBar._window.hide();
-                //progressBar.close();
                 progressDialogConfObj.visible = false;
                 mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
                 dialog.showMessageBox(mainWindow, {
@@ -653,8 +264,6 @@ class PogoPublisher {
           }
           else {
             outputConsole.appendLine('ERROR: Could not git-add ...');
-            //progressBar._window.hide();
-            //progressBar.close();
             progressDialogConfObj.visible = false;
             mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
             dialog.showMessageBox(mainWindow, {
@@ -668,8 +277,6 @@ class PogoPublisher {
       else {
         outputConsole.appendLine('Could not clone destination repository');
         outputConsole.appendLine(`${git_bin} clone -i ${pogokeypath} ${full_gh_url} ${full_gh_dest}`);
-        //progressBar._window.hide();
-        //progressBar.close();
         progressDialogConfObj.visible = false;
         mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
         dialog.showMessageBox(mainWindow, {

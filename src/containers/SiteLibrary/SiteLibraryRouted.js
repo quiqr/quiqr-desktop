@@ -9,7 +9,6 @@ import Menu                    from '@material-ui/core/Menu';
 import MenuItem                from '@material-ui/core/MenuItem';
 import IconButton              from '@material-ui/core/IconButton';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
-import CreateSiteDialog        from './components/CreateSiteDialog';
 import RemoteSiteDialog        from './components/RemoteSiteDialog';
 import ImportSiteDialog        from './components/Import/ImportSiteDialog';
 import NewSiteDialog           from './components/New/NewSiteDialog';
@@ -35,7 +34,6 @@ class SiteLibraryRouted extends React.Component{
       currentSiteKey: null,
       showSpinner: false,
       remoteSiteDialog: false,
-      createSiteDialog: false,
       editTagsDialog: false,
       renameDialog: false,
       dialogSiteConf: {},
@@ -102,10 +100,6 @@ class SiteLibraryRouted extends React.Component{
 
   componentWillUpdate(nextProps, nextState) {
 
-    if(this.props.createSite !== nextProps.createSite){
-      this.setState({createSiteDialog: nextProps.createSite});
-    }
-
     if(this.props.newSite !== nextProps.newSite){
       this.setState({dialogNewSite: {open: nextProps.newSite}});
     }
@@ -147,25 +141,6 @@ class SiteLibraryRouted extends React.Component{
     this.setState({currentWorkspaceKey: workspace.key});
     await service.api.mountWorkspace(siteKey, workspace.key);
     this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
-  }
-
-  handleCreateSiteSubmit = (data)=>{
-    let siteKey = data.key;
-    this.setState({createSiteDialog:false, blockingOperation:'Creating site...'})
-
-    service.api.createSite(data).then( ()=> {
-      service.getConfigurations(true).then((c)=>{
-        let site = c.sites.find((x)=>x.key===siteKey);
-        this.mountSite(site);
-      });
-
-    }).then(configurations=>{
-      this.setState({configurations});
-    }).catch((e)=>{
-      alert('Failed to create site');
-    }).then(()=>{
-      this.setState({ blockingOperation:null})
-    });
   }
 
   renderItemMenuButton(index, siteconfig){
@@ -436,12 +411,6 @@ class SiteLibraryRouted extends React.Component{
           mountSite={(siteKey)=>{
             this.mountSiteByKey(siteKey);
           }}
-        />
-
-        <CreateSiteDialog
-          open={this.state.createSiteDialog}
-          onCancelClick={()=>this.setState({createSiteDialog:false})}
-          onSubmitClick={this.handleCreateSiteSubmit}
         />
 
         <NewSiteDialog

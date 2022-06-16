@@ -272,24 +272,6 @@ module.exports = {
     return mainWindow;
   },
 
-
-  closeSiteAndCreateNew: function(){
-    global.pogoconf.setLastOpenedSite(null, null, null);
-    global.pogoconf.saveState().then( ()=>{
-      global.currentSitePath = null;
-      global.currentSiteKey = null;
-      global.currentWorkspaceKey = null;
-
-      mainWindow.webContents.send("disableMobilePreview");
-      mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-      mainWindow.webContents.send("redirectToGivenLocation", '/sites/create-new');
-
-      mainWindow.setTitle("Quiqr: Create new Quiqr site");
-    });
-
-    //menuManager.updateMenu(null);
-    menuManager.createMainMenu();
-  },
   closeSiteAndShowSelectSites: function(){
     global.pogoconf.setLastOpenedSite(null, null, null);
     global.pogoconf.saveState().then( ()=>{

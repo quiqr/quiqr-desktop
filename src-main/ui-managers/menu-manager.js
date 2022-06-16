@@ -205,14 +205,6 @@ class MenuManager {
     }
   }
 
-  /*
-  async createSiteFromThemeGitUrl(){
-    let pogopubl = new PogoPublisher({});
-    await pogopubl.createSiteFromThemeGitUrl();
-  }
-  */
-
-
   showVersion(){
     const idPath = path.join(pathHelper.getApplicationResourcesDir(),"all","build-git-id.txt");
     const datePath = path.join(pathHelper.getApplicationResourcesDir(),"all", "build-date.txt");

@@ -307,26 +307,10 @@ class App extends React.Component{
     );
   }
 
-  renderCreateSite() {
-    this.getProfile();
-    return (
-      <SiteLibraryRouted
-        view={ this.state.libraryView}
-        key={ 'selectSite' }
-        quiqrUsername={this.state.quiqrUsername}
-        createSite={ true }
-      />
-    );
-  }
-
   renderContentSwitch(){
     return (<Switch>
       <Route path='/' exact render={ () => {
         return this.renderSelectSites();
-      }} />
-
-      <Route path='/sites/create-new' exact render={ () => {
-        return this.renderCreateSite();
       }} />
 
       <Route path='/sites/new-site/:refresh' exact render={ () => {

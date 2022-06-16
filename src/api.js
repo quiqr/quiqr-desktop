@@ -223,10 +223,6 @@ export class API {
     return mainProcessBridge.request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
   }
 
-  createSite(siteConfig: any){
-    return mainProcessBridge.request('createSite', siteConfig);
-  }
-
   saveSiteConf(siteKey: string, newConf: any){
     return mainProcessBridge.request('saveSiteConf', {siteKey, newConf});
   }
