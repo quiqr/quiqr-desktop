@@ -1,5 +1,5 @@
 const fs                        = require('fs-extra');
-const fssimple                    = require('fs');
+const fssimple                  = require('fs');
 const {dirname}                 = require('path');
 const path                      = require('path');
 const {shell}                   = require('electron');
@@ -14,7 +14,8 @@ const siteSourceBuilderFactory  = require('../site-sources/builders/site-source-
 const hugoDownloader            = require('../hugo/hugo-downloader')
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
-const gitImporter                = require('../import/git-importer');
+const gitImporter               = require('../import/git-importer');
+const folderImporter            = require('../import/folder-importer');
 const PogoPublisher             = require('../publishers/pogo-publisher');
 const cloudCacheManager         = require('../sync/quiqr-cloud/cloud-cache-manager');
 const cloudApiManager           = require('../sync/quiqr-cloud/cloud-api-manager');
@@ -533,6 +534,15 @@ api.newSiteFromPublicHugoThemeUrl = function({siteName, url, themeInfo, hugoVers
     });
 }
 
+api.newSiteFromLocalDirectory = function({siteName, directory, generateQuiqrModel, hugoVersion}, context){
+  folderImporter.newSiteFromLocalDirectory(directory, siteName, generateQuiqrModel, hugoVersion)
+    .then((siteKey)=>{
+      context.resolve(siteKey);
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
@@ -770,39 +780,15 @@ api.hugotheme_git_repo_show = function({url}, promise){
     })
 }
 
-
 api.hugosite_dir_show = function({folder}, promise){
 
-  let response={
-    dirExist: false,
-    hugoConfigExists: false,
-    hugoConfigParsed: {},
-    hugoThemeDirExists: false,
-    hugoContentDirExists: false,
-    hugoDataDirExists: false,
-    hugoStaticDirExists: false,
-    quiqrDirExists: false,
-  }
-
-  let lstat = fs.lstatSync(folder);
-  if(lstat.isDirectory()){
-    response.dirExist = true;
-  }
-  else{
-    promise.reject("Directory does not exist");
-  }
-
-  lstat = fs.lstatSync(path.join(folder, "themes"));
-  if(lstat.isDirectory()){
-    response.hugoThemeDirExists = true;
-  }
-  else{
-    promise.reject("Directory does not exist");
-  }
-
-  promise.resolve(response);
-
-
+  folderImporter.siteDirectoryInspect(folder)
+    .then((response)=>{
+      promise.resolve(response);
+    })
+    .catch((err)=>{
+      promise.reject(err);
+    })
 }
 
 api.getFilesInBundle = function({siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName}, promise){

@@ -48,6 +48,10 @@ export class API {
     return mainProcessBridge.request('newSiteFromPublicHugoThemeUrl', {siteName, url, themeInfo, hugoVersion});
   }
 
+  newSiteFromLocalDirectory(siteName: string, directory: string, generateQuiqrModel: bool, hugoVersion: string){
+    return mainProcessBridge.request('newSiteFromLocalDirectory', {siteName, directory, generateQuiqrModel, hugoVersion});
+  }
+
   getCurrentSiteKey(){
     return mainProcessBridge.request('getCurrentSiteKey');
   }

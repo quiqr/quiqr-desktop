@@ -63,10 +63,14 @@ class NewSiteDialog extends React.Component{
       newTypeHugoThemeLastValidatedUrl: '',
       newTypeHugoThemeReadyForNew: false,
       newReadyForNaming: false,
-      newTypeHugoThemeNewingBusy: false,
+      newLastStepBusy: false,
+
+      hugoVersionSelectDisable: false,
 
       hugoExtended: '',
       hugoVersion: '',
+
+      generateQuiqrModel: false,
       newSiteName: '',
     }
   }
@@ -200,17 +204,49 @@ class NewSiteDialog extends React.Component{
     else if(this.state.newType==="folder"){
 
       fromForm = (
-      <FolderFormPartial
+        <FolderFormPartial
 
-        onSetName={(name)=>{
-          this.setState({newSiteName:name});
-        }}
+          onSetName={(name)=>{
+            this.setState({newSiteName:name});
+          }}
 
-        onValidationDone={(newState)=>{
-          this.checkFreeSiteName(this.state.newSiteName);
-          this.setState(newState);
-        }}
-      />
+          onSetVersion={(hugover)=>{
+
+            let stateUpdate = {};
+            if(hugover){
+              stateUpdate = {
+                generateQuiqrModel: false,
+                hugoExtendedEnabled: false,
+                hugoVersionSelectDisable: true,
+              }
+
+              if(hugover.startsWith("extended_")){
+                stateUpdate.hugoVersion = "v"+hugover.replace("extended_", '');
+                stateUpdate.hugoExtended = true;
+              }
+              else{
+                stateUpdate.hugoVersion = "v"+hugover;
+                stateUpdate.hugoExtended= false;
+              }
+            }
+            else{
+              stateUpdate = {
+                generateQuiqrModel: true,
+                hugoVersion: null,
+                hugoExtended: false,
+                hugoExtendedEnabled: true,
+                hugoVersionSelectDisable: false,
+              }
+            }
+
+            this.setState(stateUpdate);
+          }}
+
+          onValidationDone={(newState)=>{
+            this.checkFreeSiteName(this.state.newSiteName);
+            this.setState(newState);
+          }}
+        />
       )
 
     }
@@ -226,7 +262,7 @@ class NewSiteDialog extends React.Component{
             id="standard-full-width"
             label="Name"
             value={this.state.newSiteName}
-            disabled={(this.state.newReadyForNaming?false:true)}
+            disabled={(this.state.newReadyForNaming ? false : true)}
             variant="outlined"
             error={(this.state.newNameErrorText === '' ? false : true)}
             helperText={this.state.newNameErrorText}
@@ -235,7 +271,7 @@ class NewSiteDialog extends React.Component{
               this.checkFreeSiteName(e.target.value);
             }}
           />
-          {(this.state.newTypeHugoThemeNewingBusy ? <CircularProgress size={20} /> : null)}
+          {(this.state.newLastStepBusy ? <CircularProgress size={20} /> : null)}
         </Box>
 
         <Box my={2}>
@@ -244,6 +280,7 @@ class NewSiteDialog extends React.Component{
             <Select
               labelId="demo-simple-select-outlined-label"
               id="demo-simple-select-outlined"
+              disabled={this.state.hugoVersionSelectDisable}
               value={this.state.hugoVersion}
               onChange={(e)=>{
                 const featureVersion = Number(e.target.value.split(".")[1])
@@ -289,32 +326,48 @@ class NewSiteDialog extends React.Component{
 
           disabled={(
             this.state.hugoVersion !== ''
-              && this.state.newTypeHugoThemeReadyForNew
-              && !this.state.newTypeHugoThemeNewingBusy
-                ? false : true
+            && this.state.newTypeHugoThemeReadyForNew
+            && !this.state.newLastStepBusy
+              ? false : true
           )}
 
           onClick={()=>{
-            if(this.state.newType)
-
-            this.setState({
-              newTypeHugoThemeNewingBusy: true
-            });
 
             const hugoVersion = (this.state.hugoExtended ? "extended_" : "") + this.state.hugoVersion.replace("v",'')
+            this.setState({
+              newLastStepBusy: true
+            });
 
-            service.api.newSiteFromPublicHugoThemeUrl(this.state.newSiteName, this.state.newTypeHugoThemeLastValidatedUrl, this.state.newHugoThemeInfoDict, hugoVersion)
-              .then((siteKey)=>{
-                this.setState({
-                  newTypeHugoThemeNewingBusy: false,
-                  newSiteKey: siteKey,
+            if(this.state.newType === 'hugotheme') {
+
+              service.api.newSiteFromPublicHugoThemeUrl(this.state.newSiteName, this.state.newTypeHugoThemeLastValidatedUrl, this.state.newHugoThemeInfoDict, hugoVersion)
+                .then((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                    newSiteKey: siteKey,
+                  });
+                })
+                .catch((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                  });
                 });
-              })
-              .catch((siteKey)=>{
-                this.setState({
-                  newTypeHugoThemeNewingBusy: false,
+            }
+            if(this.state.newType === 'folder') {
+
+              service.api.newSiteFromLocalDirectory(this.state.newSiteName, this.state.newTypeFolderLastValidatedPath, this.state.generateQuiqrModel, hugoVersion)
+                .then((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                    newSiteKey: siteKey,
+                  });
+                })
+                .catch((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                  });
                 });
-              });
+            }
 
 
           }} color="primary">New Site</Button>

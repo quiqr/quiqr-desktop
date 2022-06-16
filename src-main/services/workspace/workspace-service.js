@@ -30,7 +30,7 @@ class WorkspaceService{
 
   //Get the workspace configurations data to be used by the client
   getConfigurationsData(){
-    return workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
+    return workspaceConfigProvider.readOrCreateMinimalModelConfig(this.workspacePath, this.workspaceKey);
   }
 
   clearConfigurationsDataCache(){
@@ -59,7 +59,7 @@ class WorkspaceService{
   }
 
   async getModelParseInfo(){
-    await workspaceConfigProvider.getConfig(this.workspacePath, this.workspaceKey);
+    await workspaceConfigProvider.readOrCreateMinimalModelConfig(this.workspacePath, this.workspaceKey);
     return workspaceConfigProvider.getModelParseInfo();
   }
 

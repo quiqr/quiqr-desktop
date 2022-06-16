@@ -59,7 +59,7 @@ class LibraryService{
   }
 
 
-  createConfUnmanaged(siteKey, siteName, pathSource){
+  createMountConfUnmanaged(siteKey, siteName, pathSource){
     let newConf = {};
     newConf.key = siteKey;
     newConf.name = siteName;
@@ -79,7 +79,7 @@ class LibraryService{
     await fs.ensureDir(pathSite);
     await fs.moveSync(tempDir, pathSource);
 
-    let newConf = this.createConfUnmanaged(siteKey, siteKey, pathSource);
+    let newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
     await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 

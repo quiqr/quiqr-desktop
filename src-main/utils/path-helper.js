@@ -145,7 +145,6 @@ class PathHelper{
     else{
       return this.getHugoBinDirForVer(version) + 'hugo';
     }
-
   }
 
   /* PATH STRING CREATORS */
@@ -157,6 +156,29 @@ class PathHelper{
   isLinuxAppImage(){
     return electron.app.getAppPath().indexOf("/tmp/.mount_") === 0
   }
+
+  hugoConfigFilePath(hugoRootDir){
+    let configExt;
+    const configBase = path.join(hugoRootDir, "config");
+    if(fs.existsSync(configBase+".toml")){
+      configExt = '.toml';
+    }
+    else if(fs.existsSync(configBase+".json")){
+      configExt = '.json';
+    }
+    else if(fs.existsSync(configBase+".yaml")){
+      configExt = '.yaml';
+    }
+    else if(fs.existsSync(configBase+".yml")){
+      configExt = '.yml';
+    }
+    else{
+      return null;
+    }
+
+    return configBase + configExt;
+  }
+
 
 }
 

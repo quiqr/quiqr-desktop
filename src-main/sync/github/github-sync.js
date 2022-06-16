@@ -125,7 +125,7 @@ class GithubSync {
 
   async _github_action_workflow_source(fullDestinationPath){
 
-    const hugoversion = '0.81.0';
+    const hugoVersion = '0.81.0';
     const yaml = `
 name: github pages
 
@@ -146,7 +146,7 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: '${hugoversion}'
+          hugo-version: '${hugoVersion}'
           extended: true
 
       - name: Build

@@ -9,6 +9,7 @@ const InitialWorkspaceConfigBuilder = require('../services/workspace/initial-wor
 
 class GitImporter {
 
+  //USED BY IMPORT FROM GIT URL DIALOG
   importSiteFromPublicGitUrl(url, siteName){
     return new Promise( async (resolve, reject)=>{
       try{
@@ -26,8 +27,8 @@ class GitImporter {
     });
   }
 
+  //USED BY NEW FROM HUGO THEME DIALOG
   newSiteFromPublicHugoThemeUrl(url, siteName, themeInfo, hugoVersion){
-    console.log(hugoVersion);
     return new Promise( async (resolve, reject)=>{
 
       if(!themeInfo.Name) reject("no theme name");
@@ -47,37 +48,24 @@ class GitImporter {
           await fs.copySync(tempCloneThemeDir+"/exampleSite", tempDir);
         }
 
-        const configBase = path.join(tempDir, "config");
-        let configExt;
-        if(fs.existsSync(configBase+".toml")){
-          configExt = '.toml';
-        }
-        else if(fs.existsSync(configBase+".json")){
-          configExt = '.json';
-        }
-        else if(fs.existsSync(configBase+".yaml")){
-          configExt = '.yaml';
-        }
-        else if(fs.existsSync(configBase+".yml")){
-          configExt = '.yml';
+        let formatProvider, hconfig = null;
+        let hugoConfigFilePath = pathHelper.hugoConfigFilePath(tempDir)
+        if(hugoConfigFilePath){
+          const strData = fs.readFileSync(hugoConfigFilePath, {encoding: 'utf-8'});
+          formatProvider = formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
+          hconfig = formatProvider.parse(strData);
         }
 
-        const strData = fs.readFileSync(configBase + configExt, {encoding: 'utf-8'});
-        let formatProvider = formatProviderResolver.resolveForFilePath(configBase + configExt);
-        let hconfig = formatProvider.parse(strData);
         if(!hconfig) hconfig = {};
         hconfig.theme = themeInfo.Name;
         hconfig.baseURL = "/"
         await fs.writeFileSync(
-          configBase + configExt,
+          hugoConfigFilePath,
           formatProvider.dump(hconfig)
         );
 
-
         let configBuilder = new InitialWorkspaceConfigBuilder(tempDir);
-        let filePath = configBuilder.buildAll(hugoVersion);
-        console.log(filePath)
-
+        configBuilder.buildAll(hugoVersion);
 
         await libraryService.createNewSiteWithTempDirAndKey(siteKey, tempDir);
         resolve(siteKey);

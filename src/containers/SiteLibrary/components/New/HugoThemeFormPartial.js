@@ -58,7 +58,6 @@ class HugoThemeFormPartial extends React.Component{
       newTypeHugoThemeReadyForValidation: false,
       newTypeHugoThemeLastValidatedUrl: '',
       newTypeHugoThemeReadyForNew: false,
-      newTypeHugoThemeNewingBusy: false,
       newTypeHugoThemeProvider: '',
       newTypeHugoThemeErrorText: '',
       newTypeHugoThemeScreenshot: null,
@@ -75,7 +74,6 @@ class HugoThemeFormPartial extends React.Component{
       newTypeHugoThemeLastValidatedUrl: '',
       newTypeHugoThemeReadyForValidation: false,
       newTypeHugoThemeReadyForNew: false,
-      newTypeHugoThemeNewingBusy: false,
       newTypeHugoThemeScreenshot: null,
 
       newHugoThemeMinVersion: null,
@@ -164,7 +162,6 @@ class HugoThemeFormPartial extends React.Component{
         });
       });
   }
-
 
   render(){
 

@@ -411,7 +411,7 @@ class PogoPublisher {
     await fs.ensureDir(pathSite);
     await fs.ensureDir(pathSiteSources);
     await fs.moveSync(full_gh_dest, pathSource);
-    let newConf = libraryService.createConfUnmanaged(siteKey,siteKey, pathSource);
+    let newConf = libraryService.createMountConfUnmanaged(siteKey,siteKey, pathSource);
     await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
   }
 

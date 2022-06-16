@@ -3,29 +3,48 @@ const fs       = require('fs-extra');
 const fssimple = require('fs');
 
 class FileDirUtils{
-  async recurForceRemove(path){
 
-    if(fs.existsSync(path)){
-      let lstat = fs.lstatSync(path);
+  //TODO use everywhere in code
+  filenameFromPath(fullPath){
+    return fullPath.replace(/^.*[\\/]/, '');
+  }
+
+  async recurForceRemove(dirPath){
+
+    if(fs.existsSync(dirPath)){
+      let lstat = fs.lstatSync(dirPath);
       if(lstat.isDirectory()){
-        await rimraf.sync(path);
+        await rimraf.sync(dirPath);
       }
       else if(lstat.isFile()){
-        fs.unlinkSync(path)
+        fs.unlinkSync(dirPath)
       }
     }
   }
 
-  async fileRegexRemove(path, regex){
-    fssimple.readdirSync(path)
+  async fileRegexRemove(dirPath, regex){
+    fssimple.readdirSync(dirPath)
       .filter(f => regex.test(f))
-      .map(f => fs.unlinkSync(path +"/"+ f))
+      .map(f => fs.unlinkSync(dirPath +"/"+ f))
   }
 
-  async ensureEmptyDir(destination_path){
-    await fs.ensureDir(destination_path);
-    await fs.emptyDir(destination_path);
-    await fs.ensureDir(destination_path);
+  async ensureEmptyDir(destination_dirPath){
+    await fs.ensureDir(destination_dirPath);
+    await fs.emptyDir(destination_dirPath);
+    await fs.ensureDir(destination_dirPath);
+  }
+
+  pathIsDirectory(dirPath){
+
+    if(fs.existsSync(dirPath)){
+      const lstat = fs.lstatSync(dirPath);
+      if(lstat.isDirectory()){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
   }
 }
 

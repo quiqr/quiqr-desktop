@@ -73,7 +73,7 @@ class CloudGitManager {
           newConf = this.createConfManaged(siteKey, siteName, pathSiteSource, cloudPath);
         }
         else{
-          newConf = libraryService.createConfUnmanaged(siteKey, siteName, pathSiteSource);
+          newConf = libraryService.createMountConfUnmanaged(siteKey, siteName, pathSiteSource);
         }
         await libraryService.writeSiteConf(newConf,siteKey);
         resolve(newConf);

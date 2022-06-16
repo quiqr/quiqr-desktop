@@ -44,6 +44,7 @@ class FolderFormPartial extends React.Component{
     this.state = {
       newType: '',
       newTypeFolderBusy: false,
+      newFolderInfoDict: {},
       newTypeFolderScreenshot: null,
     }
   }
@@ -51,11 +52,15 @@ class FolderFormPartial extends React.Component{
   resetNewTypeFolderState(){
     this.setState({
       newTypeFolderBusy: false,
+      newTypeFolderInfoDict: {},
       newTypeFolderScreenshot: null,
     })
   }
 
   validateDir(path){
+
+    this.props.onSetVersion();
+    if(!path) return;
 
     this.resetNewTypeFolderState();
     this.setState({newTypeFolderBusy: true});
@@ -63,18 +68,25 @@ class FolderFormPartial extends React.Component{
     service.api.hugosite_dir_show(path)
       .then((response)=>{
         if(response){
+          //service.api.logToConsole(response)
+
           this.setState({
             newTypeFolderScreenshot: (response.Screenshot ? response.Screenshot:null),
             newTypeFolderBusy: false,
-            newFolderSiteTitle: response.siteTitle,
+            newTypeFolderTheme: (response.hugoConfigExists ? response.hugoConfigParsed.theme : ""),
+            newFolderSiteTitle: (response.hugoConfigExists ? response.hugoConfigParsed.title : ""),
+            newFolderInfoDict: response,
           })
+          if(response.quiqrModelParsed){
+            this.props.onSetVersion(response.quiqrModelParsed.hugover);
+          }
 
+          this.props.onSetName(response.dirName);
           this.props.onValidationDone({
-            newTypeFolderReadyForNaming:true,
+            newReadyForNaming:true,
             newTypeFolderLastValidatedPath: path,
             newFolderInfoDict: response,
           })
-
         }
       })
       .catch((e)=>{
@@ -136,10 +148,10 @@ class FolderFormPartial extends React.Component{
                       <TableRow>
                         <TableCell align="right">
                           <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                           Theme
+                           Hugo Directories
                           </Typography>
                         </TableCell>
-                        <TableCell align="left">{(this.state.newFolderThemeDir ? "Present" : "")}</TableCell>
+                        <TableCell align="left">{(this.state.newFolderInfoDict.hugoThemesDirExists ? "Present" : "")}</TableCell>
                       </TableRow>
 
                       <TableRow>
@@ -148,7 +160,7 @@ class FolderFormPartial extends React.Component{
                             Content
                           </Typography>
                         </TableCell>
-                        <TableCell align="left">{(this.state.newFolderContentDir ? "Present" : "")}</TableCell>
+                        <TableCell align="left">{(this.state.newFolderInfoDict.hugoContentDirExists ? "Present" : "")}</TableCell>
                       </TableRow>
 
                       <TableRow>
@@ -157,9 +169,17 @@ class FolderFormPartial extends React.Component{
                             Data
                           </Typography>
                         </TableCell>
-                        <TableCell align="left">{(this.state.newFolderDataDir ? "Present" : "")}</TableCell>
+                        <TableCell align="left">{(this.state.newFolderInfoDict.hugoDataDirExists ? "Present" : "")}</TableCell>
                       </TableRow>
 
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                           Quiqr Model
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{(this.state.newFolderInfoDict.quiqrModelParsed ? "Present" : "")}</TableCell>
+                      </TableRow>
 
                     </TableBody>
                   </Table>

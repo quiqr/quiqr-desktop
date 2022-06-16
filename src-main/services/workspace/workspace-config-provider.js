@@ -23,9 +23,9 @@ class WorkspaceConfigProvider{
     this.parseInfo.partialFiles = [];
   }
 
-  async getConfig(workspacePath, workspaceKey){
+  async readOrCreateMinimalModelConfig(workspacePath, workspaceKey){
 
-    let filePath = this._getFilePath(workspacePath);
+    let filePath = this.getQuiqrModelBasePath(workspacePath);
 
     this.parseInfo.baseFile = filePath;
 
@@ -61,7 +61,7 @@ class WorkspaceConfigProvider{
   }
 
   //get path of quiqr/base.yml|yaml|toml|json
-  _getFilePath(workspacePath){
+  getQuiqrModelBasePath(workspacePath){
 
     let fileExpPrimary = path.join(workspacePath,'quiqr','model','base.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
 
@@ -72,9 +72,6 @@ class WorkspaceConfigProvider{
     let fileExpFallback = path.join(workspacePath,'sukoh.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     return glob.sync(fileExpFallback)[0];
   }
-
-  //_buildDefaultConfig(workspacePath){
-  //}
 
   async _loadConfigurationsData(filePath, workspaceKey, workspacePath){
 
