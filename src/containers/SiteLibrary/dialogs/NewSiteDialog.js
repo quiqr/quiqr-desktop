@@ -1,30 +1,31 @@
-import * as React           from 'react';
-import service              from '../../../../services/service';
-//import LogosGitServices      from '../../../../svg-assets/LogosGitServices';
-import IconHugo             from '../../../../svg-assets/IconHugo';
-import HugoThemeFormPartial from './HugoThemeFormPartial';
-import FolderFormPartial    from './FolderFormPartial';
-import { withStyles }       from '@material-ui/core/styles';
-import TextField            from '@material-ui/core/TextField';
-import Button               from '@material-ui/core/Button';
-import Typography           from '@material-ui/core/Typography';
-import FolderIcon           from '@material-ui/icons/Folder';
-//import BuildIcon             from '@material-ui/icons/Build';
-import Box                  from '@material-ui/core/Box';
-import Grid                 from '@material-ui/core/Grid';
-import Paper                from '@material-ui/core/Paper';
-import CircularProgress     from '@material-ui/core/CircularProgress';
-import Dialog               from '@material-ui/core/Dialog';
-import DialogActions        from '@material-ui/core/DialogActions';
-import DialogContent        from '@material-ui/core/DialogContent';
-import DialogContentText    from '@material-ui/core/DialogContentText';
-import DialogTitle          from '@material-ui/core/DialogTitle';
-import Select               from '@material-ui/core/Select';
-import Switch               from '@material-ui/core/Switch';
-import FormControlLabel     from '@material-ui/core/FormControlLabel';
-import FormControl          from '@material-ui/core/FormControl';
-import MenuItem             from '@material-ui/core/MenuItem';
-import InputLabel           from '@material-ui/core/InputLabel';
+import * as React                   from 'react';
+import service                      from '../../../services/service';
+//import LogosGitServices      from '../../../svg-assets/LogosGitServices';
+import IconHugo                     from '../../../svg-assets/IconHugo';
+import FormPartialNewFromHugoTheme  from './partials/FormPartialNewFromHugoTheme';
+import FormPartialNewFromScratch    from './partials/FormPartialNewFromScratch';
+import FormPartialNewFromFolder     from './partials/FormPartialNewFromFolder';
+import { withStyles }               from '@material-ui/core/styles';
+import TextField                    from '@material-ui/core/TextField';
+import Button                       from '@material-ui/core/Button';
+import Typography                   from '@material-ui/core/Typography';
+import FolderIcon                   from '@material-ui/icons/Folder';
+import BuildIcon                    from '@material-ui/icons/Build';
+import Box                          from '@material-ui/core/Box';
+import Grid                         from '@material-ui/core/Grid';
+import Paper                        from '@material-ui/core/Paper';
+import CircularProgress             from '@material-ui/core/CircularProgress';
+import Dialog                       from '@material-ui/core/Dialog';
+import DialogActions                from '@material-ui/core/DialogActions';
+import DialogContent                from '@material-ui/core/DialogContent';
+import DialogContentText            from '@material-ui/core/DialogContentText';
+import DialogTitle                  from '@material-ui/core/DialogTitle';
+import Select                       from '@material-ui/core/Select';
+import Switch                       from '@material-ui/core/Switch';
+import FormControlLabel             from '@material-ui/core/FormControlLabel';
+import FormControl                  from '@material-ui/core/FormControl';
+import MenuItem                     from '@material-ui/core/MenuItem';
+import InputLabel                   from '@material-ui/core/InputLabel';
 
 const useStyles = theme => ({
 
@@ -54,23 +55,24 @@ class NewSiteDialog extends React.Component{
     super(props);
 
     this.state = {
+
       title: "New Quiqr Site",
+
       filteredHugoVersions: [],
-      newNameErrorText: '',
 
       newType: '',
-      newTypeHugoThemeBusy: false,
-      newTypeHugoThemeLastValidatedUrl: '',
-      newTypeHugoThemeReadyForNew: false,
+
+      newReadyForNew: false,
       newReadyForNaming: false,
       newLastStepBusy: false,
 
       hugoVersionSelectDisable: false,
-
       hugoExtended: '',
       hugoVersion: '',
 
       generateQuiqrModel: false,
+
+      newSiteNameErrorText: '',
       newSiteName: '',
     }
   }
@@ -86,14 +88,14 @@ class NewSiteDialog extends React.Component{
       .then((res)=>{
         if(res.nameFree){
           this.setState({
-            newTypeHugoThemeReadyForNew: true,
-            newNameErrorText: "",
+            newReadyForNew: true,
+            newSiteNameErrorText: "",
           })
         }
         else{
           this.setState({
-            newTypeHugoThemeReadyForNew: false,
-            newNameErrorText: "Site name is already in use. Please choose another name.",
+            newReadyForNew: false,
+            newSiteNameErrorText: "Site name is already in use. Please choose another name.",
           })
         }
       })
@@ -106,7 +108,6 @@ class NewSiteDialog extends React.Component{
       <Box y={2}>
         <p>Choose the source you want to new from...</p>
         <Grid container  spacing={2}>
-          {/*
           <Grid item xs={6}>
             <Paper
               onClick={()=>{
@@ -114,6 +115,8 @@ class NewSiteDialog extends React.Component{
                   newType: 'scratch',
                   title: "New Quiqr Site from scratch",
                   dialogSize: "md",
+                  newReadyForNew: true,
+                  newReadyForNaming: true,
                 })
               }}
               className={classes.paper}
@@ -127,7 +130,6 @@ class NewSiteDialog extends React.Component{
               </Box>
             </Paper>
           </Grid>
-          */}
 
           <Grid item xs={6}>
             <Paper
@@ -188,7 +190,7 @@ class NewSiteDialog extends React.Component{
 
     if(this.state.newType==="hugotheme"){
       fromForm = (
-        <HugoThemeFormPartial
+        <FormPartialNewFromHugoTheme
 
           onSetName={(name)=>{
             this.setState({newSiteName:name});
@@ -201,10 +203,22 @@ class NewSiteDialog extends React.Component{
         />
       )
     }
+    else if(this.state.newType==="scratch"){
+
+      fromForm = (
+        <FormPartialNewFromScratch
+          onChange={(newState)=>{
+            this.setState(newState);
+          }}
+        />
+      )
+
+    }
+
     else if(this.state.newType==="folder"){
 
       fromForm = (
-        <FolderFormPartial
+        <FormPartialNewFromFolder
 
           onSetName={(name)=>{
             this.setState({newSiteName:name});
@@ -264,8 +278,8 @@ class NewSiteDialog extends React.Component{
             value={this.state.newSiteName}
             disabled={(this.state.newReadyForNaming ? false : true)}
             variant="outlined"
-            error={(this.state.newNameErrorText === '' ? false : true)}
-            helperText={this.state.newNameErrorText}
+            error={(this.state.newSiteNameErrorText === '' ? false : true)}
+            helperText={this.state.newSiteNameErrorText}
             onChange={(e)=>{
               this.setState({newSiteName: e.target.value})
               this.checkFreeSiteName(e.target.value);
@@ -326,7 +340,7 @@ class NewSiteDialog extends React.Component{
 
           disabled={(
             this.state.hugoVersion !== ''
-            && this.state.newTypeHugoThemeReadyForNew
+            && this.state.newReadyForNew
             && !this.state.newLastStepBusy
               ? false : true
           )}
@@ -353,6 +367,23 @@ class NewSiteDialog extends React.Component{
                   });
                 });
             }
+
+            if(this.state.newType === 'scratch') {
+
+              service.api.newSiteFromScratch(this.state.newSiteName, hugoVersion, this.state.newTypeScratchConfigFormat)
+                .then((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                    newSiteKey: siteKey,
+                  });
+                })
+                .catch((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                  });
+                });
+            }
+
             if(this.state.newType === 'folder') {
 
               service.api.newSiteFromLocalDirectory(this.state.newSiteName, this.state.newTypeFolderLastValidatedPath, this.state.generateQuiqrModel, hugoVersion)
@@ -369,9 +400,7 @@ class NewSiteDialog extends React.Component{
                 });
             }
 
-
           }} color="primary">New Site</Button>
-
 
       </React.Fragment>
     );
@@ -414,7 +443,6 @@ class NewSiteDialog extends React.Component{
       <Button
         key={"actionNewDialog1"}
         color="primary" onClick={()=>{
-          this.setState({newTypeHugoThemeBusy: false })
           this.props.onClose();
         }}>
         {closeText}

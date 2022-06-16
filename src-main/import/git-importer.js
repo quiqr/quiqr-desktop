@@ -56,6 +56,7 @@ class GitImporter {
           hconfig = formatProvider.parse(strData);
         }
 
+        //TODO TEST WITHOUT CONFIG (SHOULD FAIL)
         if(!hconfig) hconfig = {};
         hconfig.theme = themeInfo.Name;
         hconfig.baseURL = "/"

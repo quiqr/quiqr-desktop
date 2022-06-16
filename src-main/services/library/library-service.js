@@ -3,6 +3,8 @@ const fssimple                  = require('fs');
 const path                      = require('path');
 const pathHelper                = require('../../utils/path-helper');
 const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
+const InitialWorkspaceConfigBuilder = require('../workspace/initial-workspace-config-builder');
+const hugoUtils                 = require('./../../hugo/hugo-utils');
 
 /*
 
@@ -37,22 +39,48 @@ class LibraryService{
     });
   }
 
+  async createNewHugoQuiqrSite(siteName, hugoVersion, configFormat){
+    return new Promise(async (resolve, reject) => {
+
+      try{
+        const siteKey = await this.createSiteKeyFromName(siteName);
+
+        const pathSite = path.join(pathHelper.getRoot(), "sites", siteKey);
+        await fs.ensureDir(pathSite);
+
+        const pathSource = path.join(pathHelper.getRoot(), "sites", siteKey, "main");
+        hugoUtils.createSiteDir(pathSource, siteName, configFormat);
+
+        let configBuilder = new InitialWorkspaceConfigBuilder(pathSource);
+        configBuilder.buildAll(hugoVersion);
+
+        let newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
+        await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+        resolve(siteKey);
+      }
+      catch(err){
+        reject(err)
+      }
+
+    });
+  }
+
   async createSiteKeyFromName(name){
     return new Promise((resolve, reject) => {
 
-    var newKey = name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
-    console.log(newKey)
+      let newKey = name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+      console.log(newKey)
 
-    this.checkDuplicateSiteConfAttrStringValue('key', newKey)
-      .then((duplicate)=>{
-        if(duplicate){
-          newKey = newKey + '-' + pathHelper.randomPathSafeString(4);
-        }
-        resolve(newKey);
-      })
-      .catch((err)=>{
-        reject(err);
-      })
+      this.checkDuplicateSiteConfAttrStringValue('key', newKey)
+        .then((duplicate)=>{
+          if(duplicate){
+            newKey = newKey + '-' + pathHelper.randomPathSafeString(4);
+          }
+          resolve(newKey);
+        })
+        .catch((err)=>{
+          reject(err);
+        })
 
 
     });
@@ -73,8 +101,8 @@ class LibraryService{
 
   async createNewSiteWithTempDirAndKey(siteKey, tempDir){
 
-    var pathSite = path.join(pathHelper.getRoot(), "sites", siteKey);
-    var pathSource = path.join(pathHelper.getRoot(), "sites", siteKey, "main");
+    const pathSite = path.join(pathHelper.getRoot(), "sites", siteKey);
+    const pathSource = path.join(pathHelper.getRoot(), "sites", siteKey, "main");
 
     await fs.ensureDir(pathSite);
     await fs.moveSync(tempDir, pathSource);

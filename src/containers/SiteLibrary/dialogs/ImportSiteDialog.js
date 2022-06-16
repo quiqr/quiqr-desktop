@@ -1,8 +1,8 @@
 import * as React            from 'react';
-import service               from '../../../../services/service';
-import LogosGitServices      from '../../../../svg-assets/LogosGitServices';
-//import IconQuiqr             from '../../../../svg-assets/IconQuiqr';
-import ScreenShotPlaceholder from '../../../../img-assets/screenshot-placeholder.png';
+import service               from '../../../services/service';
+import LogosGitServices      from '../../../svg-assets/LogosGitServices';
+//import IconQuiqr             from '../../../svg-assets/IconQuiqr';
+import ScreenShotPlaceholder from '../../../img-assets/screenshot-placeholder.png';
 import { withStyles }        from '@material-ui/core/styles';
 import TextField             from '@material-ui/core/TextField';
 import Button                from '@material-ui/core/Button';

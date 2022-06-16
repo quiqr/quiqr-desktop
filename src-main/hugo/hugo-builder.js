@@ -8,6 +8,7 @@ class HugoBuilder{
     this.config = config;
   }
 
+  /*
   async create(name, directory) {
 
     let hugoArgs = ['new', 'site' , name];
@@ -37,6 +38,7 @@ class HugoBuilder{
       );
     })
   }
+  */
 
   async build() {
 
@@ -49,12 +51,10 @@ class HugoBuilder{
       hugoArgs.push('--baseURL');
       hugoArgs.push(this.config.baseUrl);
     }
-    console.log(this.config)
-    console.log(hugoArgs)
 
     const exec = pathHelper.getHugoBinForVer(this.config.hugover);
     if(!fs.existsSync(exec)){
-      Promise.reject(new Error(`Could not find hugo.exe for version ${this.config.hugover}.`));
+      Promise.reject(new Error(`Could not find hugo executable for version ${this.config.hugover}.`));
       return;
     }
 

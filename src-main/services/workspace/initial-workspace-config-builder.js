@@ -125,6 +125,7 @@ class InitialWorkspaceConfigBuilder{
   }
 
   buildBase(hugoVersion){
+
     let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     let hugoConfigPath = glob.sync(hugoConfigExp)[0];
     let formatProvider;

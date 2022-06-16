@@ -52,6 +52,11 @@ export class API {
     return mainProcessBridge.request('newSiteFromLocalDirectory', {siteName, directory, generateQuiqrModel, hugoVersion});
   }
 
+  newSiteFromScratch(siteName: string, hugoVersion, configFormat){
+    return mainProcessBridge.request('newSiteFromScratch', {siteName, hugoVersion, configFormat});
+  }
+
+
   getCurrentSiteKey(){
     return mainProcessBridge.request('getCurrentSiteKey');
   }

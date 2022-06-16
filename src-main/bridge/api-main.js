@@ -542,6 +542,15 @@ api.newSiteFromLocalDirectory = function({siteName, directory, generateQuiqrMode
       context.reject(err);
     });
 }
+api.newSiteFromScratch = function({siteName, hugoVersion, configFormat}, context){
+  libraryService.createNewHugoQuiqrSite(siteName, hugoVersion, configFormat)
+    .then((siteKey)=>{
+      context.resolve(siteKey);
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
 api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
 
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){

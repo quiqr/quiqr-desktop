@@ -44,7 +44,7 @@ const useStyles = theme => ({
 
 const regexpHttp      = new RegExp('^http(s?)://', 'i')
 
-class HugoThemeFormPartial extends React.Component{
+class FormPartialNewFromHugoTheme extends React.Component{
 
   constructor(props){
     super(props);
@@ -329,5 +329,5 @@ class HugoThemeFormPartial extends React.Component{
 
 }
 
-export default withStyles(useStyles)(HugoThemeFormPartial);
+export default withStyles(useStyles)(FormPartialNewFromHugoTheme);
 

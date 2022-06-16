@@ -56,10 +56,8 @@ class HugoServer{
       }
     }
     catch(e){
-
       console.log('No mainWindow.');
       console.log(e.message);
-
     }
 
     this.stopIfRunning();

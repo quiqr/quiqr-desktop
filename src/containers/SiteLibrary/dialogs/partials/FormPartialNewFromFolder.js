@@ -36,7 +36,7 @@ const useStyles = theme => ({
 });
 
 
-class FolderFormPartial extends React.Component{
+class FormPartialNewFromFolder extends React.Component{
 
   constructor(props){
     super(props);
@@ -198,5 +198,5 @@ class FolderFormPartial extends React.Component{
 
 }
 
-export default withStyles(useStyles)(FolderFormPartial);
+export default withStyles(useStyles)(FormPartialNewFromFolder);
 
