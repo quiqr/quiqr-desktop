@@ -52,6 +52,9 @@ export class API {
     return mainProcessBridge.request('newSiteFromLocalDirectory', {siteName, directory, generateQuiqrModel, hugoVersion});
   }
 
+  deleteSite(siteKey: string){
+    return mainProcessBridge.request('deleteSite', {siteKey});
+  }
   newSiteFromScratch(siteName: string, hugoVersion, configFormat){
     return mainProcessBridge.request('newSiteFromScratch', {siteName, hugoVersion, configFormat});
   }

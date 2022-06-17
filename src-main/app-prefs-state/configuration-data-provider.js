@@ -12,9 +12,9 @@ const pogoconf = QuiqrAppConfig();
 let configurationCache = undefined;
 
 const supportedFormats = formatProviderResolver.allFormatsExt().join(',');
-const defaultPathSearchPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
-const namespacedPathSearchPattern = (pathHelper.getRoot() + 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
-const globalConfigPattern = (pathHelper.getRoot() + 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
+const defaultPathSearchPattern = path.join(pathHelper.getRoot(), 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
+const namespacedPathSearchPattern = path.join(pathHelper.getRoot(), 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
+const globalConfigPattern = path.join(pathHelper.getRoot(), 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
 
 let pogoboardConn, pogostripeConn;
 

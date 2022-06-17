@@ -112,12 +112,12 @@ class PogoPublisher {
     progressDialogConfObj.percent = 15;
     mainWindow.webContents.send("setProgressDialogConfHome", progressDialogConfObj);
 
-    var pogokeypath = pathHelper.getRoot()+'id_rsa_pogo';
+    var pogokeypath = path.join(pathHelper.getRoot(),'id_rsa_pogo');
 
     var repository = this._config.path;
     var group = (this._config.group?this._config.group:"sites");
 
-    var resolvedDest = pathHelper.getRoot()+'sites/' + context.siteKey + '/gitlabrepo/';
+    var resolvedDest = path.join(pathHelper.getRoot(), 'sites', context.siteKey, 'gitlabrepo');
     var full_gh_url = 'git@gl.quiqr.org:' + group + '/' + repository +'.git';
     var full_gh_dest = resolvedDest + '' + repository;
 

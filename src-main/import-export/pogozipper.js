@@ -42,16 +42,16 @@ class Pogozipper{
         }
 
         let path = dirs[0];
-        let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
+        let tmppath = path.join(pathHelper.getRoot() , 'sites', global.currentSiteKey , 'exportTmp');
 
         await fileDirUtils.recurForceRemove(tmppath);
 
         fs.copySync(global.currentSitePath, tmppath);
         console.log("copied to temp dir");
 
-        await fileDirUtils.recurForceRemove(tmppath + '/.git');
-        await fileDirUtils.recurForceRemove(tmppath + '/public');
-        await fileDirUtils.recurForceRemove(tmppath + '/resources');
+        await fileDirUtils.recurForceRemove(path.join(tmppath , '.git'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'public'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'resources'));
         await fileDirUtils.fileRegexRemove(tmppath, /sitekey$/);
         await fileDirUtils.fileRegexRemove(tmppath, /config.*.json/);
         await fileDirUtils.fileRegexRemove(tmppath, /.gitignore/);
@@ -146,9 +146,9 @@ class Pogozipper{
         }
 
         var todayDate = new Date().toISOString().replace(':','-').replace(':','-').slice(0,-5);
-        var pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
-        var pathSiteSources = (pathHelper.getRoot()+"sites/"+siteKey+"/sources");
-        var pathSource = (pathSiteSources+"/"+siteKey+"-"+todayDate);
+        var pathSite = path.join(pathHelper.getRoot(),"sites",siteKey);
+        var pathSiteSources = path.join(pathHelper.getRoot(), "sites", siteKey, "sources");
+        var pathSource = path.join(pathSiteSources, siteKey+"-"+todayDate);
         await fs.ensureDir(pathSite);
         await fs.ensureDir(pathSiteSources);
         await fs.ensureDir(pathSource);
@@ -276,21 +276,21 @@ class Pogozipper{
         }
 
         let path = dirs[0];
-        let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
+        let tmppath = path.join(pathHelper.getRoot() , 'sites', global.currentSiteKey, 'exportTmp');
 
         await fileDirUtils.recurForceRemove(tmppath);
 
         fs.copySync(global.currentSitePath, tmppath);
         console.log("copied to temp dir");
 
-        await fileDirUtils.recurForceRemove(tmppath + '/.git');
-        await fileDirUtils.recurForceRemove(tmppath + '/public');
-        await fileDirUtils.recurForceRemove(tmppath + '/content');
-        await fileDirUtils.recurForceRemove(tmppath + '/static');
-        await fileDirUtils.recurForceRemove(tmppath + '/archetypes');
-        await fileDirUtils.recurForceRemove(tmppath + '/resources');
-        await fileDirUtils.recurForceRemove(tmppath + '/layouts');
-        await fileDirUtils.recurForceRemove(tmppath + '/data');
+        await fileDirUtils.recurForceRemove(path.join(tmppath , '.git'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'public'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'content'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'static'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'archetypes'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'resources'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'layouts'));
+        await fileDirUtils.recurForceRemove(path.join(tmppath , 'data'));
         await fileDirUtils.fileRegexRemove(tmppath, /sitekey$/);
         await fileDirUtils.fileRegexRemove(tmppath, /config.*.json/);
         await fileDirUtils.fileRegexRemove(tmppath, /.gitignore/);
@@ -328,7 +328,7 @@ class Pogozipper{
         }
 
         let path = dirs[0];
-        let tmppath = pathHelper.getRoot() + 'sites/'+global.currentSiteKey + '/exportTmp';
+        let tmppath = path.join(pathHelper.getRoot() , 'sites', global.currentSiteKey , 'exportTmp');
 
         await fileDirUtils.recurForceRemove(tmppath);
 

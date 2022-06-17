@@ -542,6 +542,17 @@ api.newSiteFromLocalDirectory = function({siteName, directory, generateQuiqrMode
       context.reject(err);
     });
 }
+
+api.deleteSite = function({siteKey}, context){
+  libraryService.deleteSite(siteKey)
+    .then(()=>{
+      context.resolve(true);
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
+
 api.newSiteFromScratch = function({siteName, hugoVersion, configFormat}, context){
   libraryService.createNewHugoQuiqrSite(siteName, hugoVersion, configFormat)
     .then((siteKey)=>{

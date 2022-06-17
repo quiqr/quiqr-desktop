@@ -18,7 +18,7 @@ class PathHelper{
     let prefs = pogoconf.prefs;
 
     if(prefs.dataFolder && fs.existsSync(prefs.dataFolder)){
-      thedir = prefs.dataFolder+'/';
+      thedir = prefs.dataFolder;
     }
     else {
       thedir =  path.join(electron.app.getPath('home'), 'Quiqr Data');
@@ -31,49 +31,56 @@ class PathHelper{
   }
 
   getTempDir(){
-    const dir = this.getRoot()+ 'temp/';
+    const dir = path.join(this.getRoot(), 'temp');
     fs.ensureDirSync(dir);
     return dir;
   }
 
   getSiteRoot(siteKey){
-    return this.getRoot()+ `sites/${siteKey}/`;
+    if(siteKey.trim() === "") return null;
+    return path.join(this.getRoot(), 'sites', siteKey);
   }
 
   getSiteWorkspacesRoot(siteKey){
-    return this.getSiteRoot(siteKey) + 'workspaces/';
+    if(siteKey.trim() === "") return null;
+    return path.join(this.getSiteRoot(siteKey), 'workspaces');
   }
 
   getSiteWorkspaceRoot(siteKey, workspaceKey){
-    return this.getSiteWorkspacesRoot(siteKey) + workspaceKey + '/';
+    if(siteKey.trim() === "") return null;
+    return path.join(this.getSiteWorkspacesRoot(siteKey) , workspaceKey);
   }
 
   getSiteDefaultPublishDir(siteKey, publishKey){
-    return this.getSiteRoot(siteKey) + `publish/${publishKey}/`;
+    if(siteKey.trim() === "") return null;
+    return path.join(this.getSiteRoot(siteKey) , 'publish', publishKey);
   }
 
   getHugoBinRoot(){
-    return this.getRoot() + 'tools/hugobin/';
+    return path.join(this.getRoot() , 'tools','hugobin');
   }
+
   getPublishReposRoot(){
-    return this.getRoot() + 'sitesRepos/';
+    return path.join(this.getRoot() , 'sitesRepos');
   }
 
   getHugoBinDirForVer(version){
-    return this.getHugoBinRoot() + version + '/';
+    return path.join(this.getHugoBinRoot(), version);
   }
+
+
 
   getLastBuildDir() {
     return this._lastBuildDir;
   }
 
-  getBuildDir(path){
-    this._lastBuildDir = path + "/";
+  getBuildDir(dir){
+    this._lastBuildDir = dir;
     return this._lastBuildDir;
   }
 
   getThemesDir(){
-    return this.getRoot() + 'tools/hugothemes/';
+    return path.join(this.getRoot() , 'tools', 'hugothemes');
   }
 
   getApplicationResourcesDir(){
@@ -99,12 +106,12 @@ class PathHelper{
 
   /* FILES */
   ownersLookupCacheFilePath(){
-    return this.getTempDir() + 'cache-ownerslookup.json';
+    return path.join(this.getTempDir() , 'cache-ownerslookup.json');
   }
 
   userCacheFilePath(profileUserName){
     if(profileUserName){
-      return this.getTempDir() + 'cache-user.'+profileUserName + '.json';
+      return path.join(this.getTempDir() , 'cache-user.'+profileUserName + '.json');
     }
     else{
       return '';
@@ -112,23 +119,23 @@ class PathHelper{
   }
 
   siteCacheFilePath(siteKey){
-    return this.getTempDir() + 'cache-site.'+siteKey+'.json';
+    return path.join(this.getTempDir(), 'cache-site.'+siteKey+'.json');
   }
 
   sitesCacheFilePath(){
-    return this.getTempDir() + 'cache-sites.json';
+    return path.join(this.getTempDir() , 'cache-sites.json');
   }
 
   getKnownHosts(){
-    return userHome +'/.ssh/known_hosts';
+    return path.join(userHome ,'/.ssh/known_hosts');
   }
 
   getSiteMountConfigPath(siteKey){
-    return this.getRoot()+'config.'+siteKey+'.json';
+    return path.join(this.getRoot(), 'config.'+siteKey+'.json');
   }
 
   getPogoPrivateKeyPath(username){
-    return this.getRoot()+'profiles/'+username+'/id_rsa_pogo';
+    return path.join(this.getRoot(),'profiles', username, 'id_rsa_pogo');
   }
 
   getHugoBinForVer(version){
@@ -140,10 +147,10 @@ class PathHelper{
 
     let platform = process.platform.toLowerCase();
     if(platform.startsWith('win')){
-      return this.getHugoBinDirForVer(version) + 'hugo.exe';
+      return path.join(this.getHugoBinDirForVer(version) , 'hugo.exe');
     }
     else{
-      return this.getHugoBinDirForVer(version) + 'hugo';
+      return path.join(this.getHugoBinDirForVer(version) , 'hugo');
     }
   }
 

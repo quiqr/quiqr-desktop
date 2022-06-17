@@ -19,10 +19,10 @@ class CloudGitManager {
 
   async createGitManagedSiteWithSiteKeyFromTempPath(tempSourcePath, siteKey){
 
-    const pathSite = (pathHelper.getRoot()+"sites/"+siteKey);
+    const pathSite = path.join(pathHelper.getRoot(),"sites",siteKey);
     await fs.ensureDir(pathSite);
 
-    const pathSiteSource = pathHelper.getRoot()+"sites/"+siteKey+"/pogocloudrepo";
+    const pathSiteSource = path.join(pathHelper.getRoot(), "sites", siteKey, "pogocloudrepo");
 
     await fs.moveSync(tempSourcePath, pathSiteSource);
     return pathSiteSource;
@@ -58,7 +58,7 @@ class CloudGitManager {
     const siteKey = this.newSiteKeyFromPath(cloudPath);
     Embgit.setPrivateKeyPath(pathHelper.getPogoPrivateKeyPath(global.pogoconf.currentUsername))
 
-    const temp_clone_path = pathHelper.getTempDir()+'siteFromUrl/';
+    const temp_clone_path = path.join(pathHelper.getTempDir(),'siteFromUrl');
 
     let newConf;
 

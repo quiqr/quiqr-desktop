@@ -1,25 +1,26 @@
-import React                    from 'react';
-import Typography               from '@material-ui/core/Typography';
-import { Switch, Route }        from 'react-router-dom'
-import Box                      from '@material-ui/core/Box';
-import List                     from '@material-ui/core/List';
-import ListSubheader            from '@material-ui/core/ListSubheader';
-import Grid                     from '@material-ui/core/Grid';
-import Menu                     from '@material-ui/core/Menu';
-import MenuItem                 from '@material-ui/core/MenuItem';
-import IconButton               from '@material-ui/core/IconButton';
-import MoreVertIcon             from '@material-ui/icons/MoreVert';
-import RemoteSiteDialog         from './dialogs/RemoteSiteDialog';
-import NewSlashImportSiteDialog from './dialogs/NewSlashImportSiteDialog';
-import EditTagsDialogs          from './dialogs/EditTagsDialogs';
-import RenameDialog             from './dialogs/RenameDialog';
-import SiteListItem             from './components/SiteListItem';
-import CardItem                 from './components/CardItem';
-import BlockDialog              from './../../components/BlockDialog';
-import Spinner                  from './../../components/Spinner';
-import service                  from './../../services/service';
+import React                        from 'react';
+import Typography                   from '@material-ui/core/Typography';
+import { Switch, Route }            from 'react-router-dom'
+import Box                          from '@material-ui/core/Box';
+import List                         from '@material-ui/core/List';
+import ListSubheader                from '@material-ui/core/ListSubheader';
+import Grid                         from '@material-ui/core/Grid';
+import Menu                         from '@material-ui/core/Menu';
+import MenuItem                     from '@material-ui/core/MenuItem';
+import IconButton                   from '@material-ui/core/IconButton';
+import MoreVertIcon                 from '@material-ui/icons/MoreVert';
+import DownloadQuiqrCloudSiteDialog from './dialogs/DownloadQuiqrCloudSiteDialog';
+import NewSlashImportSiteDialog     from './dialogs/NewSlashImportSiteDialog';
+import EditSiteTagsDialogs          from './dialogs/EditSiteTagsDialogs';
+import RenameSiteDialog             from './dialogs/RenameSiteDialog';
+import DeleteSiteDialog             from './dialogs/DeleteSiteDialog';
+import SiteListItem                 from './components/SiteListItem';
+import CardItem                     from './components/CardItem';
+import BlockDialog                  from './../../components/BlockDialog';
+import Spinner                      from './../../components/Spinner';
+import service                      from './../../services/service';
 //import { snackMessageService } from './../../services/ui-service';
-import { withStyles }           from '@material-ui/core/styles';
+import { withStyles }               from '@material-ui/core/styles';
 
 const useStyles = theme => ({
 });
@@ -35,6 +36,7 @@ class SiteLibraryRouted extends React.Component{
       remoteSiteDialog: false,
       editTagsDialog: false,
       renameDialog: false,
+      deleteDialog: false,
       dialogSiteConf: {},
       dialogNewSlashImportSite: {
         open: false,
@@ -194,6 +196,16 @@ class SiteLibraryRouted extends React.Component{
           }>
           Edit Tags
         </MenuItem>
+
+        <MenuItem key="delete"
+          onClick={
+            ()=>{
+              this.setState({deleteDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+            }
+          }>
+          Delete
+        </MenuItem>
+
       </Menu>
     );
   }
@@ -391,7 +403,18 @@ class SiteLibraryRouted extends React.Component{
     return (
       <div>
 
-        <RenameDialog
+        <DeleteSiteDialog
+          open={this.state.deleteDialog}
+          siteconf={this.state.dialogSiteConf}
+          onCancelClick={()=>this.setState({deleteDialog:false})}
+          onDelete={(siteKey)=>{
+            this.setState({deleteDialog:false});
+            service.api.deleteSite(siteKey);
+            this.updateLocalSites();
+          }}
+        />
+
+        <RenameSiteDialog
           open={this.state.renameDialog}
           siteconf={this.state.dialogSiteConf}
           onCancelClick={()=>this.setState({renameDialog:false})}
@@ -400,7 +423,7 @@ class SiteLibraryRouted extends React.Component{
             this.updateLocalSites();
           }}
         />
-        <EditTagsDialogs
+        <EditSiteTagsDialogs
           open={this.state.editTagsDialog}
           siteconf={this.state.dialogSiteConf}
           onCancelClick={()=>this.setState({editTagsDialog:false})}
@@ -410,7 +433,7 @@ class SiteLibraryRouted extends React.Component{
           }}
         />
 
-        <RemoteSiteDialog
+        <DownloadQuiqrCloudSiteDialog
           open={this.state.remoteSiteDialog}
           configurations={this.state.configurations}
           remoteSiteName={this.state.currentRemoteSite}

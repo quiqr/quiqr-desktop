@@ -722,7 +722,7 @@ class WorkspaceService{
       }
       else buildConfig = {config:''};
 
-      let destination = pathHelper.getBuildDir(this.workspacePath) + "public/";
+      let destination = path.join(pathHelper.getBuildDir(this.workspacePath) , "public");
 
       let hugoBuilderConfig = {
         config: buildConfig.config,

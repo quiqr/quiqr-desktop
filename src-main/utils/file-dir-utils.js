@@ -22,6 +22,7 @@ class FileDirUtils{
     }
   }
 
+  //TODO TEST ON WINDOWS
   async fileRegexRemove(dirPath, regex){
     fssimple.readdirSync(dirPath)
       .filter(f => regex.test(f))

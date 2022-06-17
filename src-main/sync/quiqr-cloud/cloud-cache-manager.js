@@ -72,7 +72,7 @@ class CloudCacheManager{
   }
 
   async updateOwnersLookupCache(){
-    const namespacedPathSearchPattern = (pathHelper.getTempDir() + 'cache-user.*.json').replace(/\\/gi,'/');
+    const namespacedPathSearchPattern = (path.join(pathHelper.getTempDir() , 'cache-user.*.json')).replace(/\\/gi,'/');
 
     let ownerslookupdata = {
       usersToPaths: {},

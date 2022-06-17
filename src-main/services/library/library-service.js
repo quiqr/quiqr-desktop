@@ -1,3 +1,4 @@
+const del                           = require('del');
 const fs                        = require('fs-extra');
 const fssimple                  = require('fs');
 const path                      = require('path');
@@ -45,10 +46,10 @@ class LibraryService{
       try{
         const siteKey = await this.createSiteKeyFromName(siteName);
 
-        const pathSite = path.join(pathHelper.getRoot(), "sites", siteKey);
+        const pathSite = pathHelper.getSiteRoot(siteKey);
         await fs.ensureDir(pathSite);
 
-        const pathSource = path.join(pathHelper.getRoot(), "sites", siteKey, "main");
+        const pathSource = path.join(pathHelper.getSiteRoot(siteKey), "main");
         await hugoUtils.createSiteDir(pathSource, siteName, configFormat);
 
         let configBuilder = new InitialWorkspaceConfigBuilder(pathSource);
@@ -100,8 +101,8 @@ class LibraryService{
 
   async createNewSiteWithTempDirAndKey(siteKey, tempDir){
 
-    const pathSite = path.join(pathHelper.getRoot(), "sites", siteKey);
-    const pathSource = path.join(pathHelper.getRoot(), "sites", siteKey, "main");
+    const pathSite = pathHelper.getSiteRoot(siteKey);
+    const pathSource = path.join(pathHelper.getSiteRoot(siteKey), "main");
 
     await fs.ensureDir(pathSite);
     await fs.moveSync(tempDir, pathSource);
@@ -126,6 +127,22 @@ class LibraryService{
     await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
     return true;
   }
+
+  async deleteSite(siteKey){
+    return new Promise(async (resolve, reject) => {
+      try{
+        fs.remove(pathHelper.getSiteMountConfigPath(siteKey));
+        del.sync([pathHelper.getSiteRoot(siteKey)],{force:true});
+        resolve();
+      }
+      catch(err){
+        reject(err)
+      }
+
+    });
+  }
+
+
 
 }
 

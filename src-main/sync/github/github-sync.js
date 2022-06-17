@@ -186,7 +186,7 @@ jobs:
   }
 
   async _ensureSyncRepoDir(siteKey){
-    const resolvedDest = path.join(pathHelper.getRoot(),'sites', siteKey, '/githubSyncRepo/');
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', siteKey, 'githubSyncRepo');
     await fs.ensureDir(resolvedDest);
     await fs.emptyDir(resolvedDest);
     await fs.ensureDir(resolvedDest);
@@ -194,7 +194,7 @@ jobs:
   }
 
   async _tempCreatePrivateKey(){
-    const tmpkeypathPrivate = pathHelper.getTempDir()+'ghkey';
+    const tmpkeypathPrivate = path.join(pathHelper.getTempDir(),'ghkey');
     await fs.writeFileSync(tmpkeypathPrivate, this._config.deployPrivateKey, 'utf-8');
     await fs.chmodSync(tmpkeypathPrivate, '0600');
     return tmpkeypathPrivate;
