@@ -1,8 +1,10 @@
 const path                                      = require('path');
-const rootPath                                  = require('electron-root-path').rootPath;
+//const rootPath                                  = require('electron-root-path').rootPath;
 const spawnAw                                   = require('await-spawn')
 const pathHelper                                = require('../utils/path-helper');
 const { EnvironmentResolver, PLATFORMS }        = require('../utils/environment-resolver');
+const electron          = require('electron')
+
 
 let userconf = {
   email:   "anonymous@quiqr.org",
@@ -56,7 +58,10 @@ class Embgit{
         cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
       }
       else{
+        const rootPath = electron.app.getAppPath();
         cmd = path.join(rootPath, 'resources', platform, executable);
+        //cmd = path.join(rootPath, 'resources', platform, executable);
+
       }
     }
     return cmd;

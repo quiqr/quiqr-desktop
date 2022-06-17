@@ -6,6 +6,7 @@ env:
 extends: eslint:recommended
 parserOptions:
   ecmaVersion: 2018
-rules: {
-  "no-console": 0
-}
+rules:
+  no-console: 0
+  no-async-promise-executor: 0
+
