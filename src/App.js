@@ -1,28 +1,23 @@
-import React                                         from 'react';
-import { Switch, Route }                             from 'react-router-dom'
+import React                                                              from 'react';
+import { Switch, Route }                                                  from 'react-router-dom'
+import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from './containers/SiteLibrary'
+import {TopToolbarRight, ToolbarButton}                                   from './containers/TopToolbarRight'
+import AppsIcon                                                           from '@material-ui/icons/Apps';
+import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
+import Console                                                            from './containers/Console';
+import PreviewButtons                                                     from './containers/PreviewBrowser/PreviewButtons';
+import TopToolbarLeft                                                     from './containers/TopToolbarLeft'
+import { FormsCookbookSidebar, FormsCookbookRouted }                      from './containers/FormsCookbook';
+import { PrefsSidebar, PrefsRouted }                                      from './containers/Prefs';
+import SplashDialog                                                       from './dialogs/SplashDialog';
 
-//CONTAINERS
-import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight }     from './containers/SiteLibrary'
-import {TopToolbarRight, ToolbarButton}    from './containers/TopToolbarRight'
-import AppsIcon                            from '@material-ui/icons/Apps';
-import Workspace                                     from './containers/WorkspaceMounted/Workspace';
-import Console                                       from './containers/Console';
-import PreviewButtons                                from './containers/PreviewBrowser/PreviewButtons';
+import lightBaseTheme                                                     from 'material-ui-02/styles/baseThemes/lightBaseTheme';
+import darkBaseTheme                                                      from 'material-ui-02/styles/baseThemes/darkBaseTheme';
+import MuiThemeProvider                                                   from 'material-ui-02/styles/MuiThemeProvider';
+import getMuiTheme                                                        from 'material-ui-02/styles/getMuiTheme';
 
-import TopToolbarLeft                                from './containers/TopToolbarLeft'
-
-import Welcome                                       from './containers/Welcome';
-
-import { FormsCookbookSidebar, FormsCookbookRouted } from './containers/FormsCookbook';
-import { PrefsSidebar, PrefsRouted }                 from './containers/Prefs';
-
-import lightBaseTheme                                from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
-import MuiThemeProvider                              from 'material-ui-02/styles/MuiThemeProvider';
-import getMuiTheme                                   from 'material-ui-02/styles/getMuiTheme';
-
-import Redirect                                      from 'react-router-dom/Redirect';
-import service                                       from './services/service';
+import Redirect                                                           from 'react-router-dom/Redirect';
+import service                                                            from './services/service';
 
 const defaultApplicationRole = "contentEditor";
 const iconColor = "#000";
@@ -60,6 +55,8 @@ class App extends React.Component{
     let win = window.require('electron').remote.getCurrentWindow();
 
     this.state = {
+      splashDialogOpen: false,
+      showSplashAtStartup: false,
       applicationRole: defaultApplicationRole,
       libraryView: "list",
       maximized:win.isMaximized(),
@@ -86,8 +83,19 @@ class App extends React.Component{
       this.setState({libraryView: view });
     });
 
+    service.api.readConfPrefKey('showSplashAtStartup').then((show)=>{
+      if(typeof show == 'undefined'){
+        show=true;
+      }
+      this.setState({
+        splashDialogOpen: show,
+        showSplashAtStartup: show,
+      });
+    });
+
     window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
     window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
+    window.require('electron').ipcRenderer.on('openSplashDialog', ()=>{this.setState({splashDialogOpen: true})});
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',(event, location)=>{
 
       this.setApplicationRole();
@@ -326,10 +334,6 @@ class App extends React.Component{
         return this.renderSelectSites();
       }} />
 
-      <Route path='/welcome' exact render={ () => {
-        return <Welcome key={ 'selectSite' } />
-      }} />
-
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
         return <FormsCookbookRouted />;
       }} />
@@ -337,7 +341,6 @@ class App extends React.Component{
       <Route path="/prefs" exact={false} render={ ({match, history})=> {
         return <PrefsRouted />;
       }} />
-
 
       <Route path="*" component={(data)=>{
         return <Redirect to='/' />
@@ -480,6 +483,7 @@ class App extends React.Component{
 
             <div className="App" style={marginStyles}>
 
+
               <div className="topToolbar">
 
                 <div className="toolbarLeft">
@@ -500,6 +504,15 @@ class App extends React.Component{
                 <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
                   { this.renderContentSwitch() }
                 </div>
+
+              <SplashDialog
+                open={this.state.splashDialogOpen}
+                showSplashAtStartup={this.state.showSplashAtStartup}
+                onClose={()=>{this.setState({splashDialogOpen:false})}}
+                onChangeSplashCheck={(show)=>{
+                  service.api.saveConfPrefKey("showSplashAtStartup",show);
+                }}
+              />
 
               </div>
 

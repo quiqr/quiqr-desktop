@@ -1033,7 +1033,8 @@ class MenuManager {
             click: async () => {
               let mainWindow = global.mainWM.getCurrentInstanceOrNew();
               mainWindow.webContents.send("disableMobilePreview");
-              mainWindow.webContents.send("redirectToGivenLocation","/welcome");
+              //mainWindow.webContents.send("redirectToGivenLocation","/welcome");
+              mainWindow.webContents.send("openSplashDialog");
             }
           },
           {
