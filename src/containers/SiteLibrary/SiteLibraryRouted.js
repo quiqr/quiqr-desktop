@@ -56,6 +56,8 @@ class SiteLibraryRouted extends React.Component{
     this.updateRemoteSites(this.props.quiqrUsername);
     this.updateLocalSites();
 
+    service.api.stopHugoServer();
+
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
       this.setState({showSpinner: true});
     });

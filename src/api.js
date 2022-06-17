@@ -24,6 +24,10 @@ export class API {
     return mainProcessBridge.request('serveWorkspace', {siteKey, workspaceKey, serveKey});
   }
 
+  stopHugoServer(){
+    return mainProcessBridge.request('stopHugoServer');
+  }
+
   logToConsole( message, label){
     return mainProcessBridge.request('logToConsole', {message, label});
   }

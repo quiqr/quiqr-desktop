@@ -582,6 +582,14 @@ api.serveWorkspace = function({siteKey, workspaceKey, serveKey}, context){
   });
 }
 
+api.stopHugoServer = function(){
+  if(global.hugoServer){
+    global.hugoServer.stopIfRunning();
+  }
+}
+
+
+
 api.buildWorkspace = function({siteKey, workspaceKey, buildKey, extraConfig}, context){
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ context.reject(err); return; }

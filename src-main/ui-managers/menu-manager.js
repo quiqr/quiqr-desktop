@@ -242,39 +242,6 @@ class MenuManager {
     mainWindow.webContents.send("redirectToGivenLocation","/prefs");
   }
 
-  deleteSite() {
-    let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    mainWindow.webContents.send("disableMobilePreview");
-
-    const dialog = electron.dialog;
-
-    if(global.currentSiteKey){
-      let options  = {
-        title: "Please confirm",
-        buttons: ["Yes","Cancel"],
-        message: "Do you really want to delete " + global.currentSiteKey
-      }
-      let response = dialog.showMessageBox(options)
-      if(response === 1) return;
-
-      fs.remove(pathHelper.getSiteMountConfigPath(global.currentSiteKey));
-
-      var rimraf = require("rimraf");
-      rimraf(pathHelper.getRoot() + 'sites/'+global.currentSiteKey, ()=>{
-      });
-
-      this.selectSitesWindow();
-    }
-    else{
-      dialog.showMessageBox(mainWindow, {
-        type: 'error',
-        buttons: ["Close"],
-        title: "Warning",
-        message: "First, select a site to delete.",
-      });
-    }
-  }
-
   createLogWindow () {
     let logWindow = logWindowManager.getCurrentInstanceOrNew();
 
@@ -929,14 +896,6 @@ class MenuManager {
             enabled: this.siteSelected(),
             click: async () => {
               this.selectSitesWindow();
-            }
-          },
-          {
-            id: 'delete-site',
-            enabled: this.siteSelected(),
-            label: 'Delete Site',
-            click: async () => {
-              this.deleteSite()
             }
           },
           { type: 'separator' },
