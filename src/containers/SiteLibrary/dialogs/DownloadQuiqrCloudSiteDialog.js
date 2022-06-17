@@ -1,7 +1,5 @@
 import * as React           from 'react';
 import service              from '../../../services/service';
-import SharedMaterialStyles from '../../../shared-material-styles';
-
 import { withStyles }       from '@material-ui/core/styles';
 import TextField            from '@material-ui/core/TextField';
 import Button               from '@material-ui/core/Button';
@@ -12,9 +10,10 @@ import DialogContent        from '@material-ui/core/DialogContent';
 import DialogContentText    from '@material-ui/core/DialogContentText';
 import DialogTitle          from '@material-ui/core/DialogTitle';
 
-const localStyles = {
-}
-const styles = {...SharedMaterialStyles, ...localStyles}
+const useStyles = theme => ({
+
+});
+
 
 class RemoteSiteDialog extends React.Component{
 
@@ -181,10 +180,9 @@ class RemoteSiteDialog extends React.Component{
   }
 
   renderFinished(){
-    let { classes } = this.props;
     return (
       <div>
-        Finished downloading. <Button className={classes.primaryFlatButton} onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.newSiteName} now</Button>.
+        Finished downloading. <Button onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.newSiteName} now</Button>.
       </div>
     )
   }
@@ -211,13 +209,13 @@ class RemoteSiteDialog extends React.Component{
 
   render(){
 
-    let { open, classes } = this.props;
+    let { open } = this.props;
     let failure = this.state.failure;
 
     const actions = [
       <Button
         key={"menuAction1a"}
-    className={classes.primaryFlatButton} onClick={()=>{
+        onClick={()=>{
         this.setState({
           open: false
         },()=>{
@@ -229,13 +227,13 @@ class RemoteSiteDialog extends React.Component{
 
       <Button
         key={"menuAction2a"}
-        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadClone()} >
+        disabled={this.state.execButtonsDisabled} onClick={()=>this.handleDownloadClone()} >
         DOWNLOAD
         </Button>,
 
       <Button
         key={"menuAction3a"}
-        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.handleDownloadCopy()} >
+        disabled={this.state.execButtonsDisabled} onClick={()=>this.handleDownloadCopy()} >
         DOWNLOAD AND COPY AS NEW SITE
         </Button>,
     ];
@@ -261,4 +259,4 @@ class RemoteSiteDialog extends React.Component{
     );
   }
 }
-export default withStyles(styles)(RemoteSiteDialog)
+export default withStyles(useStyles)(RemoteSiteDialog)

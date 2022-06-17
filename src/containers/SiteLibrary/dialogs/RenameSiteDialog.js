@@ -1,6 +1,5 @@
 import * as React           from 'react';
 import service              from '../../../services/service';
-import SharedMaterialStyles from '../../../shared-material-styles';
 import TextField            from '@material-ui/core/TextField';
 import { withStyles }       from '@material-ui/core/styles';
 import Button               from '@material-ui/core/Button';
@@ -11,9 +10,10 @@ import DialogContent        from '@material-ui/core/DialogContent';
 import DialogContentText    from '@material-ui/core/DialogContentText';
 import DialogTitle          from '@material-ui/core/DialogTitle';
 
-const localStyles = {
-}
-const styles = {...SharedMaterialStyles, ...localStyles}
+const useStyles = theme => ({
+
+});
+
 
 class RenameDialog extends React.Component{
 
@@ -90,13 +90,13 @@ class RenameDialog extends React.Component{
 
   render(){
 
-    let { open, classes, siteconf } = this.props;
+    let { open, siteconf } = this.props;
     let failure = this.state.failure;
 
     const actions = [
       <Button
         key={"menuAction1"+siteconf.name}
-        className={classes.primaryFlatButton} onClick={()=>{
+        onClick={()=>{
         this.setState({
           open: false
         },()=>{
@@ -108,7 +108,7 @@ class RenameDialog extends React.Component{
 
       <Button
         key={"menuAction2"+siteconf.name}
-        disabled={this.state.execButtonsDisabled} className={classes.primaryFlatButton} onClick={()=>this.saveSiteConf()} >
+        disabled={this.state.execButtonsDisabled} onClick={()=>this.saveSiteConf()} >
         SAVE
       </Button>,
     ];
@@ -134,4 +134,4 @@ class RenameDialog extends React.Component{
     );
   }
 }
-export default withStyles(styles)(RenameDialog)
+export default withStyles(useStyles)(RenameDialog)

@@ -1,17 +1,13 @@
 import React                from 'react';
 import { Route }            from 'react-router-dom';
-import { makeStyles }       from '@material-ui/core/styles';
+import { withStyles }       from '@material-ui/core/styles';
 import Button               from '@material-ui/core/Button';
+import Box               from '@material-ui/core/Box';
 import service              from '../../services/service';
-import SharedMaterialStyles from '../../shared-material-styles';
 
-const localStyles = {
-  container:{
-    padding: '20px',
-    height: '100%'
-  },
-}
-const useStyles = makeStyles({...SharedMaterialStyles, ...localStyles})
+const useStyles = theme => ({
+});
+
 
 class Welcome extends React.Component {
 
@@ -53,9 +49,10 @@ class Welcome extends React.Component {
         this.history = history;
 
         return (
+          <Box p={5}>
           <div className={ classes.container }>
             <div style={{ border: 'solid 0px green', marginLeft: 'auto', marginTop: 13 }}>
-              <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleCloseClick}>
+              <Button  variant="contained" color="primary" onClick={this.handleCloseClick}>
                 Close and continue
               </Button>
             </div>
@@ -78,21 +75,17 @@ class Welcome extends React.Component {
               Then open your existing site folder in Quiqr to start content management and publishing right away.
             </p>
             <p>
-              <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleNewSiteClick}>
+              <Button variant="contained" color="primary" onClick={this.handleNewSiteClick}>
                 Open site
               </Button>
             </p>
             <br/>
           </div>
+          </Box>
         );
       }}/>
     );
   }
 }
 
-export default () => {
-  const classes = useStyles();
-  return (
-    <Welcome classes={classes} />
-  )
-}
+export default withStyles(useStyles)(Welcome);
