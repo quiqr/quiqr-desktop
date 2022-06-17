@@ -2,7 +2,10 @@
 
 ## **WORK IN PROGRESS**
 
-- simplified menu
+- new/import site from folder
+- remove old create site
+- new site from scratch
+- simplified text-menu
 - log to console main-api request timeouts
 - minimal windows sizes
 

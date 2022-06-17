@@ -1,16 +1,6 @@
 import * as React            from 'react';
-import service               from '../../../services/service';
-import LogosGitServices      from '../../../svg-assets/LogosGitServices';
-//import IconQuiqr             from '../../../svg-assets/IconQuiqr';
-import ScreenShotPlaceholder from '../../../img-assets/screenshot-placeholder.png';
+import service               from '../../../../services/service';
 import { withStyles }        from '@material-ui/core/styles';
-import TextField             from '@material-ui/core/TextField';
-import Button                from '@material-ui/core/Button';
-import Typography            from '@material-ui/core/Typography';
-//import FolderIcon            from '@material-ui/icons/Folder';
-import Box                   from '@material-ui/core/Box';
-import Grid                  from '@material-ui/core/Grid';
-import Paper                 from '@material-ui/core/Paper';
 import CircularProgress      from '@material-ui/core/CircularProgress';
 import Table                 from '@material-ui/core/Table';
 import TableRow              from '@material-ui/core/TableRow';
@@ -20,14 +10,14 @@ import TableContainer        from '@material-ui/core/TableContainer';
 import Card                  from '@material-ui/core/Card';
 import CardContent           from '@material-ui/core/CardContent';
 import CardMedia             from '@material-ui/core/CardMedia';
-import Dialog                from '@material-ui/core/Dialog';
-import DialogActions         from '@material-ui/core/DialogActions';
-import DialogContent         from '@material-ui/core/DialogContent';
-import DialogContentText     from '@material-ui/core/DialogContentText';
-import DialogTitle           from '@material-ui/core/DialogTitle';
+import ScreenShotPlaceholder from '../../../../img-assets/screenshot-placeholder.png';
+import TextField             from '@material-ui/core/TextField';
+import Button                from '@material-ui/core/Button';
+import Paper                from '@material-ui/core/Paper';
+import Typography            from '@material-ui/core/Typography';
+import Box                   from '@material-ui/core/Box';
 
 const useStyles = theme => ({
-
   root: {
     margin: 0,
     display: 'flex',
@@ -68,35 +58,27 @@ const useStyles = theme => ({
 });
 
 const regexpHttp      = new RegExp('^http(s?)://', 'i')
-
-class ImportSiteDialog extends React.Component{
+class FormPartialNewFromScratch extends React.Component{
 
   constructor(props){
     super(props);
 
     this.state = {
-      title: "Import Quiqr Site",
 
-      importNameErrorText: '',
 
-      importType: '',
       importTypeGitUrl: '',
       importTypeGitBusy: false,
       importTypeGitReadyForValidation: false,
       importTypeGitLastValidatedUrl: '',
-      importTypeGitReadyForImport: false,
-      importTypeGitReadyForNaming: false,
-      importTypeGitImportingBusy: false,
       importTypeGitProvider: '',
       importTypeGitErrorText: '',
       importTypeGitScreenshot: null,
 
-      importHugoVersion: '',
       importHugoTheme: '',
 
       importQuiqrModel: '',
       importQuiqrForms: '',
-      importSiteName: '',
+
     }
   }
 
@@ -112,7 +94,6 @@ class ImportSiteDialog extends React.Component{
       importTypeGitImportingBusy: false,
       importTypeGitScreenshot: null,
 
-      importHugoVersion: '',
       importHugoTheme: '',
 
       importQuiqrModel: '',
@@ -127,6 +108,7 @@ class ImportSiteDialog extends React.Component{
 
   validateURL(url){
 
+    this.props.onSetVersion();
     this.resetImportTypeGitState();
 
     const regexpGitHub    = new RegExp('^https://github.com/', 'i')
@@ -150,8 +132,9 @@ class ImportSiteDialog extends React.Component{
     var urlparts = url.split('/');
     var siteNameFromUrl = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
     if(siteNameFromUrl.includes(".")) siteNameFromUrl = siteNameFromUrl.split(".").pop();
+
     if(siteNameFromUrl !== ""){
-      this.setState({importSiteName:siteNameFromUrl});
+      this.props.onSetName(siteNameFromUrl)
     }
 
     service.api.quiqr_git_repo_show(url)
@@ -159,7 +142,6 @@ class ImportSiteDialog extends React.Component{
         if(response){
           this.setState({
             importTypeGitScreenshot: (response.Screenshot ? response.Screenshot:null),
-            importHugoVersion: (response.HugoVersion ? response.HugoVersion:null),
             importHugoTheme: (response.HugoTheme ? response.HugoTheme:null),
             importQuiqrModel: (response.QuiqrModel? response.QuiqrModel:null),
             importQuiqrForms: (response.QuiqrFormsEndPoints ? response.QuiqrFormsEndPoints:null),
@@ -167,7 +149,16 @@ class ImportSiteDialog extends React.Component{
             importTypeGitLastValidatedUrl: url,
             importTypeGitReadyForNaming: true,
           })
-          this.checkFreeSiteName(siteNameFromUrl);
+
+          if(response.HugoVersion){
+            this.props.onSetVersion(response.HugoVersion);
+          }
+
+          this.props.onValidationDone({
+            newReadyForNaming:true,
+            importTypeGitLastValidatedUrl: url,
+            importTypeGitInfoDict: response,
+          })
         }
       })
       .catch((e)=>{
@@ -178,109 +169,13 @@ class ImportSiteDialog extends React.Component{
       });
   }
 
-  checkFreeSiteName(name){
-    service.api.checkFreeSiteName(name)
-      .then((res)=>{
-        if(res.nameFree){
-          this.setState({
-            importTypeGitReadyForImport: true,
-            importNameErrorText: "",
-          })
-        }
-        else{
-          this.setState({
-            importTypeGitReadyForImport: false,
-            importNameErrorText: "Site name is already in use. Please choose another name.",
-          })
-        }
-      })
-  }
 
+  render(){
 
-  renderStep1Cards(){
     const {classes} = this.props;
+
     return (
-
-      <Box y={2}>
-        <p>Choose the source you want to import from...</p>
-        <Grid container  spacing={2}>
-          <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({
-                  importType: 'git',
-                  title: "Import Quiqr Site from GitHub, GitLab or Generic Git URL",
-                  dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <Box display="flex" alignItems="center"  justifyContent="center">
-                <LogosGitServices />
-              </Box>
-              <Box display="flex" alignItems="center"  justifyContent="center" p={1} height={70}>
-                <Typography variant="h5">GIT SERVER</Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          {/*
-          <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({importType: 'quiqr-archive',
-                  dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <Box display="flex" alignItems="center" justifyContent="center" height={70}>
-                <IconQuiqr style={{transform: 'scale(2.5)'}} />
-              </Box>
-              <Box display="flex" alignItems="center"  justifyContent="center" p={1}>
-                <Typography variant="h5">QUIQR ARCHIVE</Typography>
-              </Box>
-
-            </Paper>
-          </Grid>
-          */}
-
-          {/*
-
-          <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({importType: 'folder',
-                  dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <Box display="flex" alignItems="center"  justifyContent="center" height={70}>
-                <FolderIcon fontSize="large"  color="#ccc"/>
-              </Box>
-              <Box display="flex" alignItems="center"  justifyContent="center" p={1}>
-                <Typography variant="h5">FOLDER</Typography>
-              </Box>
-            </Paper>
-          </Grid>
-          */}
-        </Grid>
-      </Box>
-    )
-  }
-
-  renderStep2Form(){
-
-    const {classes} = this.props;
-
-
-    if(this.state.importType==="git"){
-      return (
-        <Box>
+      <React.Fragment>
           <Box my={3}>
             <p>
               Enter a public git URL with a quiqr website or template to import.
@@ -357,7 +252,7 @@ class ImportSiteDialog extends React.Component{
                               Git URL
                             </Typography>
                           </TableCell>
-                          <TableCell align="left">{this.state.importTypeGitLastValidatedUrl}</TableCell>
+                          <TableCell align="left">{(this.state.importTypeGitBusy ? <CircularProgress size={20} /> : null)} {this.state.importTypeGitLastValidatedUrl}</TableCell>
                         </TableRow>
 
                         <TableRow>
@@ -367,15 +262,6 @@ class ImportSiteDialog extends React.Component{
                             </Typography>
                           </TableCell>
                           <TableCell align="left">{this.state.importTypeGitProvider}</TableCell>
-                        </TableRow>
-
-                        <TableRow>
-                          <TableCell align="right">
-                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                              Hugo Version
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="left">{(this.state.importTypeGitBusy ? <CircularProgress size={20} /> : null)} {this.state.importHugoVersion}</TableCell>
                         </TableRow>
 
                         <TableRow>
@@ -415,127 +301,14 @@ class ImportSiteDialog extends React.Component{
             </Card>
           </Box>
 
-          <Box my={3}>
-            <TextField
-              fullWidth
-              id="standard-full-width"
-              label="Name"
-              value={this.state.importSiteName}
-              disabled={(this.state.importTypeGitReadyForNaming?false:true)}
-              variant="outlined"
-              error={(this.state.importNameErrorText === '' ? false : true)}
-              helperText={this.state.importNameErrorText}
-              onChange={(e)=>{
-                this.setState({importSiteName: e.target.value})
-                this.checkFreeSiteName(e.target.value);
 
-
-              }}
-            />
-            {(this.state.importTypeGitImportingBusy ? <CircularProgress size={20} /> : null)}
-          </Box>
-          <Button variant="contained" disabled={(this.state.importTypeGitReadyForImport && !this.state.importTypeGitImportingBusy ? false : true)} onClick={()=>{
-
-            this.setState({
-              importTypeGitImportingBusy: true
-            });
-
-            service.api.importSiteFromPublicGitUrl(this.state.importSiteName, this.state.importTypeGitLastValidatedUrl)
-              .then((siteKey)=>{
-                this.setState({
-                  importTypeGitImportingBusy: false,
-                  newSiteKey: siteKey,
-                });
-              })
-              .catch((siteKey)=>{
-                this.setState({
-                  importTypeGitImportingBusy: false,
-                });
-              });
-
-
-          }} color="primary">Import Site</Button>
-
-        </Box>
-
-      )
-
-    }
-    else{
-      return null;
-    }
-  }
-
-  async handleOpenNewSite(){
-    this.props.mountSite(this.state.newSiteKey)
-    this.props.onClose();
-  }
-
-  renderStep3ImportFinished(){
-    return (
-      <div>
-        The site has been succesfully imported. <Button onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.importSiteName} now</Button>.
-      </div>
+      </React.Fragment>
     )
+
   }
 
-  render(){
-
-    let { open } = this.props;
-    let importButtonHidden = true;
-    let closeText = "cancel";
-    let content;
-
-    if(!this.state.newSiteKey && !this.state.importType){
-      content = this.renderStep1Cards()
-
-    }
-    else if(!this.state.newSiteKey){
-      content = this.renderStep2Form();
-    }
-    else{
-      content = this.renderStep3ImportFinished();
-      importButtonHidden = false;
-      closeText = "close";
-    }
-
-    const actions = [
-      <Button
-        key={"importSiteDialogAction1"}
-        color="primary" onClick={()=>{
-          this.setState({importTypeGitBusy: false })
-          this.props.onClose();
-        }}>
-        {closeText}
-      </Button>,
-      (importButtonHidden ? null :
-        <Button
-          key={"importSiteDialogAction2"}
-          color="primary" onClick={()=>{this.handleOpenNewSite()}}>
-          {"open "+ this.state.importSiteName}
-        </Button>),
-    ];
-
-    return (
-      <Dialog
-        open={open}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth={true}
-        maxWidth={"md"}
-      >
-        <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {content}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          {actions}
-        </DialogActions>
-      </Dialog>
-    );
-  }
 }
 
-export default withStyles(useStyles)(ImportSiteDialog);
+export default withStyles(useStyles)(FormPartialNewFromScratch);
+
+

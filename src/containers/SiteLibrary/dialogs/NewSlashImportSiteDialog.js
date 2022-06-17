@@ -1,10 +1,11 @@
 import * as React                   from 'react';
 import service                      from '../../../services/service';
-//import LogosGitServices      from '../../../svg-assets/LogosGitServices';
+import LogosGitServices      from '../../../svg-assets/LogosGitServices';
 import IconHugo                     from '../../../svg-assets/IconHugo';
 import FormPartialNewFromHugoTheme  from './partials/FormPartialNewFromHugoTheme';
 import FormPartialNewFromScratch    from './partials/FormPartialNewFromScratch';
 import FormPartialNewFromFolder     from './partials/FormPartialNewFromFolder';
+import FormPartialImportFromGit     from './partials/FormPartialImportFromGit';
 import { withStyles }               from '@material-ui/core/styles';
 import TextField                    from '@material-ui/core/TextField';
 import Button                       from '@material-ui/core/Button';
@@ -54,9 +55,17 @@ class NewSiteDialog extends React.Component{
   constructor(props){
     super(props);
 
+    let title;
+    if(this.props.newOrImport === 'import'){
+      title = "Import Quiqr Site";
+    }
+    else{
+      title = "New Quiqr Site";
+    }
+
     this.state = {
 
-      title: "New Quiqr Site",
+      title: title,
 
       filteredHugoVersions: [],
 
@@ -81,6 +90,7 @@ class NewSiteDialog extends React.Component{
     service.api.getFilteredHugoVersions().then((versions)=>{
       this.setState({filteredHugoVersions: versions});
     });
+
   }
 
   checkFreeSiteName(name){
@@ -101,77 +111,127 @@ class NewSiteDialog extends React.Component{
       })
   }
 
+  handleSetVersion(hugover){
+    let stateUpdate = {};
+    if(hugover){
+      stateUpdate = {
+        generateQuiqrModel: false,
+        hugoExtendedEnabled: false,
+        hugoVersionSelectDisable: true,
+      }
+
+      if(hugover.startsWith("extended_")){
+        stateUpdate.hugoVersion = "v"+hugover.replace("extended_", '');
+        stateUpdate.hugoExtended = true;
+      }
+      else{
+        stateUpdate.hugoVersion = "v"+hugover;
+        stateUpdate.hugoExtended= false;
+      }
+    }
+    else{
+      stateUpdate = {
+        generateQuiqrModel: true,
+        hugoVersion: null,
+        hugoExtended: false,
+        hugoExtendedEnabled: true,
+        hugoVersionSelectDisable: false,
+      }
+    }
+
+    this.setState(stateUpdate);
+  }
+
   renderStep1Cards(){
     const {classes} = this.props;
-    return (
 
-      <Box y={2}>
-        <p>Choose the source you want to new from...</p>
-        <Grid container  spacing={2}>
-          <Grid item xs={6}>
+    const sourceDefsNew = [
+      {
+        type: 'scratch',
+        title: 'FROM SCRATCH',
+        icon: <BuildIcon fontSize="large"  color="#ccc"/>,
+        stateUpdate: {
+          newType: 'scratch',
+          title: "New Quiqr Site from scratch",
+          dialogSize: "md",
+          newReadyForNew: true,
+          newReadyForNaming: true,
+        }
+      },
+      {
+        type: 'hugotheme',
+        title: 'FROM A HUGO THEME',
+        icon: <IconHugo style={{transform: 'scale(1.0)'}} />,
+        stateUpdate: {
+          newType: 'hugotheme',
+          title: "New Quiqr Site from Hugo Theme",
+          dialogSize: "md",
+        }
+      },
+    ];
+    const sourceDefsImport = [
+      {
+        type: 'folder',
+        title: 'FROM FOLDER',
+        icon: <FolderIcon fontSize="large"  color="#ccc"/>,
+        stateUpdate: {
+          newType: 'folder',
+          title: "Import Site from a folder with a Hugo site",
+          dialogSize: "md",
+        }
+      },
+      {
+        type: 'git',
+        title: 'FROM GIT SERVER URL',
+        icon: <LogosGitServices />,
+        stateUpdate: {
+          newType: 'git',
+          title: "Import Quiqr Site from GitHub, GitLab or Generic Git URL",
+          dialogSize: "md",
+        }
+      },
+    ]
+
+    const sourceDefs = (
+      this.props.newOrImport==='new' ?
+      sourceDefsNew :
+      sourceDefsImport
+    );
+
+    const instructions = (
+      this.props.newOrImport==='new' ?
+      "How to create a new site..." :
+      "Choose the source you want to import from..."
+    );
+
+    const sourceCards = sourceDefs.map((source)=>{
+      return (
+          <Grid item xs={6} key={source.title}>
             <Paper
               onClick={()=>{
-                this.setState({
-                  newType: 'scratch',
-                  title: "New Quiqr Site from scratch",
-                  dialogSize: "md",
-                  newReadyForNew: true,
-                  newReadyForNaming: true,
-                })
+                this.setState(source.stateUpdate);
               }}
               className={classes.paper}
               elevation={5}
             >
               <Box display="flex" alignItems="center"  justifyContent="center">
-                <BuildIcon fontSize="large"  color="#ccc"/>
+                {source.icon}
               </Box>
               <Box display="flex" alignItems="center"  justifyContent="center" p={1} height={70}>
-                <Typography variant="h5">FROM SCRATCH</Typography>
+                <Typography variant="h5">{source.title}</Typography>
               </Box>
             </Paper>
           </Grid>
 
-          <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({
-                  newType: 'hugotheme',
-                  title: "New Quiqr Site from Hugo Theme",
-                  dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <Box display="flex" alignItems="center" justifyContent="center" height={70}>
-                <IconHugo style={{transform: 'scale(1.0)'}} />
-              </Box>
-              <Box display="flex" alignItems="center"  justifyContent="center" p={1}>
-                <Typography variant="h5">FROM HUGO THEME</Typography>
-              </Box>
+      )
+    })
 
-            </Paper>
-          </Grid>
+    return (
 
-          <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({newType: 'folder',
-                  dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <Box display="flex" alignItems="center"  justifyContent="center" height={70}>
-                <FolderIcon fontSize="large"  color="#ccc"/>
-              </Box>
-              <Box display="flex" alignItems="center"  justifyContent="center" p={1}>
-                <Typography variant="h5">FROM FOLDER</Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
+      <Box y={2}>
+        <p>{instructions}</p>
+        <Grid container spacing={2}>
+          {sourceCards}
         </Grid>
       </Box>
     )
@@ -186,7 +246,14 @@ class NewSiteDialog extends React.Component{
         <MenuItem key={"version-"+version} value={version}>{version}</MenuItem>
       )
     });
+
     let fromForm;
+
+    const finalButtonText = (
+      this.props.newOrImport==='new' ?
+      "Create Site" :
+      "Import Site"
+    );
 
     if(this.state.newType==="hugotheme"){
       fromForm = (
@@ -194,6 +261,25 @@ class NewSiteDialog extends React.Component{
 
           onSetName={(name)=>{
             this.setState({newSiteName:name});
+          }}
+
+          onValidationDone={(newState)=>{
+            this.checkFreeSiteName(this.state.newSiteName);
+            this.setState(newState);
+          }}
+        />
+      )
+    }
+    else if(this.state.newType==="git"){
+      fromForm = (
+        <FormPartialImportFromGit
+
+          onSetName={(name)=>{
+            this.setState({newSiteName:name});
+          }}
+
+          onSetVersion={(hugover)=>{
+            this.handleSetVersion(hugover)
           }}
 
           onValidationDone={(newState)=>{
@@ -225,35 +311,7 @@ class NewSiteDialog extends React.Component{
           }}
 
           onSetVersion={(hugover)=>{
-
-            let stateUpdate = {};
-            if(hugover){
-              stateUpdate = {
-                generateQuiqrModel: false,
-                hugoExtendedEnabled: false,
-                hugoVersionSelectDisable: true,
-              }
-
-              if(hugover.startsWith("extended_")){
-                stateUpdate.hugoVersion = "v"+hugover.replace("extended_", '');
-                stateUpdate.hugoExtended = true;
-              }
-              else{
-                stateUpdate.hugoVersion = "v"+hugover;
-                stateUpdate.hugoExtended= false;
-              }
-            }
-            else{
-              stateUpdate = {
-                generateQuiqrModel: true,
-                hugoVersion: null,
-                hugoExtended: false,
-                hugoExtendedEnabled: true,
-                hugoVersionSelectDisable: false,
-              }
-            }
-
-            this.setState(stateUpdate);
+            this.handleSetVersion(hugover)
           }}
 
           onValidationDone={(newState)=>{
@@ -400,7 +458,24 @@ class NewSiteDialog extends React.Component{
                 });
             }
 
-          }} color="primary">New Site</Button>
+            if(this.state.newType === 'git') {
+
+              service.api.importSiteFromPublicGitUrl(this.state.newSiteName, this.state.importTypeGitLastValidatedUrl)
+                .then((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                    newSiteKey: siteKey,
+                  });
+                })
+                .catch((siteKey)=>{
+                  this.setState({
+                    newLastStepBusy: false,
+                  });
+                });
+            }
+
+
+          }} color="primary">{finalButtonText}</Button>
 
       </React.Fragment>
     );
@@ -423,23 +498,35 @@ class NewSiteDialog extends React.Component{
 
     let { open } = this.props;
     let newButtonHidden = true;
+    let backButtonHidden = true;
     let closeText = "cancel";
     let content;
 
     if(!this.state.newSiteKey && !this.state.newType){
       content = this.renderStep1Cards()
-
+      backButtonHidden = true;
     }
     else if(!this.state.newSiteKey){
       content = this.renderStep2Form();
+      backButtonHidden = false;
     }
     else{
       content = this.renderStep3NewFinished();
       newButtonHidden = false;
+      backButtonHidden = true;
       closeText = "close";
     }
 
     const actions = [
+
+      (backButtonHidden ? null :
+        <Button
+          key={"actionNewDialog2"}
+          color="primary" onClick={()=>{ this.setState({newType:""});}} >
+          {"back"}
+        </Button>),
+
+
       <Button
         key={"actionNewDialog1"}
         color="primary" onClick={()=>{
