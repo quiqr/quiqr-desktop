@@ -49,7 +49,7 @@ class LibraryService{
         await fs.ensureDir(pathSite);
 
         const pathSource = path.join(pathHelper.getRoot(), "sites", siteKey, "main");
-        hugoUtils.createSiteDir(pathSource, siteName, configFormat);
+        await hugoUtils.createSiteDir(pathSource, siteName, configFormat);
 
         let configBuilder = new InitialWorkspaceConfigBuilder(pathSource);
         configBuilder.buildAll(hugoVersion);
@@ -69,7 +69,6 @@ class LibraryService{
     return new Promise((resolve, reject) => {
 
       let newKey = name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
-      console.log(newKey)
 
       this.checkDuplicateSiteConfAttrStringValue('key', newKey)
         .then((duplicate)=>{
