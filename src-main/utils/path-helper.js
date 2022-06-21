@@ -87,7 +87,8 @@ class PathHelper{
 
     if(process.env.NODE_ENV === 'production'){
       if(enviromnent.platform == PLATFORMS.macOS){
-        return path.join(rootPath, 'Contents','Resources');
+        //return path.join(rootPath, 'Contents','Resources');
+        return path.join(rootPath, 'Resources');
       }
       else if(this.isLinuxAppImage()){
         const appPath = electron.app.getAppPath();
