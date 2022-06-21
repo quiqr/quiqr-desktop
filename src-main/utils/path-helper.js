@@ -2,7 +2,7 @@ const electron                           = require('electron')
 const path                               = require('path');
 const userHome                           = require('user-home');
 const fs                                 = require('fs-extra');
-//const rootPath                           = require('electron-root-path').rootPath;
+const rootPath                           = require('./electron-root-path').rootPath;
 const { EnvironmentResolver, PLATFORMS } = require('./environment-resolver');
 const QuiqrAppConfig                     = require('../app-prefs-state/quiqr-app-config');
 
@@ -85,7 +85,6 @@ class PathHelper{
 
   getApplicationResourcesDir(){
 
-    const rootPath = electron.app.getAppPath();
     let enviromnent = new EnvironmentResolver().resolve();
 
     if(process.env.NODE_ENV === 'production'){
@@ -104,6 +103,7 @@ class PathHelper{
       return path.join(rootPath, 'resources');
     }
   }
+
 
   /* FILES */
   ownersLookupCacheFilePath(){

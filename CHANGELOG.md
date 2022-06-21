@@ -2,6 +2,7 @@
 
 ## **WORK IN PROGRESS**
 
+- new welcome screen
 - new/import site from folder
 - remove old create site
 - new site from scratch
