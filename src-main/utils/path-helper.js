@@ -68,8 +68,6 @@ class PathHelper{
     return path.join(this.getHugoBinRoot(), version);
   }
 
-
-
   getLastBuildDir() {
     return this._lastBuildDir;
   }
