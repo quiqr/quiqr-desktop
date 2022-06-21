@@ -342,6 +342,7 @@ class App extends React.Component{
         return <PrefsRouted />;
       }} />
 
+
       <Route path="*" component={(data)=>{
         return <Redirect to='/' />
       }} />
@@ -359,6 +360,21 @@ class App extends React.Component{
 
       }, 2000);
     }
+  }
+
+  renderWelcomeScreen(){
+
+    return (
+    <SplashDialog
+      open={this.state.splashDialogOpen}
+      showSplashAtStartup={this.state.showSplashAtStartup}
+      onClose={()=>{this.setState({splashDialogOpen:false})}}
+      onChangeSplashCheck={(show)=>{
+        service.api.saveConfPrefKey("showSplashAtStartup",show);
+      }}
+    />
+    )
+
   }
 
   render() {
@@ -380,6 +396,7 @@ class App extends React.Component{
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;
     let contentContainerStyle = this.state.style.contentContainer;
+    let welcomeScreen = this.renderWelcomeScreen();
 
     if(!this.state.menuIsLocked){
       contentContainerStyle = Object.assign({}, contentContainerStyle, {display: 'block', paddingLeft:'66px' });
@@ -404,6 +421,9 @@ class App extends React.Component{
     }
 
     return (<Switch>
+
+
+
       <Route path="/console" exact={false} render={ ({match, history})=> {
         this.history = history;
 
@@ -456,23 +476,31 @@ class App extends React.Component{
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match, history})=> {
         this.history = history;
         return (
-          <Workspace
-            applicationRole={ this.state.applicationRole }
-            siteKey={ decodeURIComponent(match.params.site) }
-            workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          <React.Fragment>
+
+            {welcomeScreen}
+            <Workspace
+              applicationRole={ this.state.applicationRole }
+              siteKey={ decodeURIComponent(match.params.site) }
+              workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          </React.Fragment>
 
         );
       }} />
       <Route path='/sites/:site/workspaces/:workspace/*' exact render={ ({match, history})=> {
         this.history = history;
         return (
-          <Workspace
-            applicationRole={ this.state.applicationRole }
-            siteKey={ decodeURIComponent(match.params.site) }
-            workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          <React.Fragment>
+            {welcomeScreen}
+            <Workspace
+              applicationRole={ this.state.applicationRole }
+              siteKey={ decodeURIComponent(match.params.site) }
+              workspaceKey={ decodeURIComponent(match.params.workspace) } />
+          </React.Fragment>
 
         );
       }} />
+
 
       <Route
       path="*"
@@ -481,8 +509,9 @@ class App extends React.Component{
         return (
           <MuiThemeProvider muiTheme={pogoTheme}>
 
-            <div className="App" style={marginStyles}>
+            {welcomeScreen}
 
+            <div className="App" style={marginStyles}>
 
               <div className="topToolbar">
 
@@ -505,14 +534,6 @@ class App extends React.Component{
                   { this.renderContentSwitch() }
                 </div>
 
-              <SplashDialog
-                open={this.state.splashDialogOpen}
-                showSplashAtStartup={this.state.showSplashAtStartup}
-                onClose={()=>{this.setState({splashDialogOpen:false})}}
-                onChangeSplashCheck={(show)=>{
-                  service.api.saveConfPrefKey("showSplashAtStartup",show);
-                }}
-              />
 
               </div>
 
