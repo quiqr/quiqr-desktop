@@ -120,15 +120,14 @@ app.on('second-instance', function(event, argv){
 async function handleQuiqrUrl(event, schemeData){
 
   const remoteFileURL = schemeData.substr(10);
-  if(remoteFileURL === "continue"){
-    // do nothing just get focus back
-  }
-  else{
+  if(remoteFileURL.trim() !== "continue"){
     const remoteFileName = remoteFileURL.split('/').pop();
     await fs.ensureDir(pathHelper.getTempDir());
     const tmppath = pathHelper.getTempDir() + remoteFileName;
     console.log(remoteFileURL)
     console.log(tmppath)
+    const newURL='/sites/import-site/x-'+Math.random();
+    mainWindow.webContents.send("redirectToGivenLocation", newURL);
   }
 }
 
