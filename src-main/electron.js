@@ -1,7 +1,6 @@
 const electron          = require('electron')
 const fs                = require('fs-extra');
 const unhandled         = require('electron-unhandled');
-const contextMenu       = require('electron-context-menu');
 const ipcMainBinder     = require('./bridge/ipc-main-binder');
 const mainWindowManager = require('./ui-managers/main-window-manager');
 const menuManager       = require('./ui-managers/menu-manager');
@@ -53,8 +52,6 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null
   })
-
-  contextMenu(mainWindow);
 }
 
 // This method will be called when Electron has finished
