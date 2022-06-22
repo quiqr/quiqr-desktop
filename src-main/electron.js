@@ -1,5 +1,4 @@
 const electron          = require('electron')
-const fs                = require('fs-extra');
 const unhandled         = require('electron-unhandled');
 const contextMenu       = require('electron-context-menu');
 const ipcMainBinder     = require('./bridge/ipc-main-binder');
@@ -8,7 +7,6 @@ const menuManager       = require('./ui-managers/menu-manager');
 const QuiqrAppConfig    = require('./app-prefs-state/quiqr-app-config');
 const outputConsole     = require('./logger/output-console');
 const apiMain           = require('./bridge/api-main');
-const pathHelper        = require('./utils/path-helper');
 
 unhandled();
 
@@ -85,7 +83,6 @@ app.on('activate', function () {
 })
 
 app.on('open-url', function(event, schemeData){
-
   if(app.isReady()){
     handleQuiqrUrl(event, schemeData);
   }
@@ -100,7 +97,7 @@ app.on('open-url', function(event, schemeData){
 function openUrlFromArgv(argv) {
   for (let i = 1; i < argv.length; i++) {
     let arg = argv[i]
-    if (!arg.startsWith('quiqr:') && !arg.startsWith('quiqr:')) {
+    if (!arg.startsWith('quiqr:')) {
       console.log("open-url: URI doesn't start with quiqr:", arg)
       continue
     }
@@ -119,14 +116,10 @@ app.on('second-instance', function(event, argv){
 
 async function handleQuiqrUrl(event, schemeData){
 
-  const remoteFileURL = schemeData.substr(10);
+  const remoteFileURL = schemeData.substr(8);
   if(remoteFileURL.trim() !== "continue"){
-    const remoteFileName = remoteFileURL.split('/').pop();
-    await fs.ensureDir(pathHelper.getTempDir());
-    const tmppath = pathHelper.getTempDir() + remoteFileName;
-    console.log(remoteFileURL)
-    console.log(tmppath)
-    const newURL='/sites/import-site/x-'+Math.random();
+    const newURL='/sites/import-site-url/' + encodeURIComponent(remoteFileURL.replace(',',"://"));
+    //mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
     mainWindow.webContents.send("redirectToGivenLocation", newURL);
   }
 }

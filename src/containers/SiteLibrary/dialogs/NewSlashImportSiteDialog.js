@@ -86,11 +86,21 @@ class NewSiteDialog extends React.Component{
     }
   }
 
+  componentWillUpdate(nextProps, nextState) {
+
+    if(nextProps.importSiteURL && this.props.importSiteURL !== nextProps.importSiteURL){
+      this.setState({
+        importTypeGitUrl: nextProps.importSiteURL,
+        newType: 'git',
+      });
+    }
+  }
+
+
   componentDidMount(){
     service.api.getFilteredHugoVersions().then((versions)=>{
       this.setState({filteredHugoVersions: versions});
     });
-
   }
 
   checkFreeSiteName(name){
@@ -274,6 +284,7 @@ class NewSiteDialog extends React.Component{
       fromForm = (
         <FormPartialImportFromGit
 
+          importSiteURL={this.props.importSiteURL}
           onSetName={(name)=>{
             this.setState({newSiteName:name});
           }}
