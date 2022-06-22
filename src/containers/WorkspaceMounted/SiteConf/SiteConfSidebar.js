@@ -23,30 +23,45 @@ export class SiteConfSidebar extends React.Component {
     let encodedWorkspaceKey = this.props.workspaceKey;
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
 
-    let menu = {
-      title: 'Site Configuration',
-      items: [
-        {
-          active: true,
-          label: "General",
-          selected: (this.state.selectedMenuItem==='general' ? true : false),
-          onClick: ()=>{
-            this.setState({selectedMenuItem:'general'});
-            history.push(`${basePath}/general/`)
-          }
-        },
-        {
-          active: true,
-          label: "Model",
-          selected: (this.state.selectedMenuItem==='model' ? true : false),
-          onClick: ()=>{
-            this.setState({selectedMenuItem:'model'});
-            history.push(`${basePath}/model/`)
-          }
-        },
-      ]
-    }
+    let menus = [
+      {
+        title: 'Site Information',
+        items: [
+          {
+            active: true,
+            label: "Mount Information ",
+            selected: (this.state.selectedMenuItem==='general' ? true : false),
+            onClick: ()=>{
+              this.setState({selectedMenuItem:'general'});
+              history.push(`${basePath}/general/`)
+            }
+          },
+        ]
+      },
+      {
+        title: 'CMS',
+        items: [
+          {
+            active: true,
+            label: "Model",
+            selected: (this.state.selectedMenuItem==='model' ? true : false),
+            onClick: ()=>{
+              this.setState({selectedMenuItem:'model'});
+              history.push(`${basePath}/model/`)
+            }
+          },
+          {
+            active: true,
+            label: "Examples",
+            onClick: ()=>{
+              this.setState({selectedMenuItem:''});
+              history.push('/forms-cookbook')
+            }
+          },
+        ]
+      }
+    ]
 
-    return <Sidebar {...this.props} menus={[menu]} />
+    return <Sidebar {...this.props} menus={menus} />
   }
 }

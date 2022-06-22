@@ -7,6 +7,8 @@ import IconButton      from '@material-ui/core/IconButton';
 import DescriptionIcon from '@material-ui/icons/Description';
 import Grid            from '@material-ui/core/Grid';
 import Box             from '@material-ui/core/Box';
+import FolderIcon from '@material-ui/icons/Folder';
+
 
 const useStyles = theme => ({
 
@@ -74,6 +76,19 @@ class SiteConfRouteModel extends React.Component {
     service.api.getWorkspaceModelParseInfo(siteKey, workspaceKey).then((parseInfo)=>{
       this.setState({parseInfo: parseInfo});
     });
+
+    service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
+      var stateUpdate  = {};
+      stateUpdate.siteconf = bundle.site;
+
+
+      if(bundle.site.source){
+        this.setState({source: bundle.site.source});
+      }
+
+      this.setState(stateUpdate);
+    })
+
   }
 
   handleFolderSelected(folder){
@@ -89,6 +104,9 @@ class SiteConfRouteModel extends React.Component {
         <Typography variant="h6">{title}</Typography>
 
         <div className={classes.root}>
+
+
+
           {files.map((item, index)=>{
             return (
           <Grid container  spacing={1} alignItems="flex-end">
@@ -109,9 +127,7 @@ class SiteConfRouteModel extends React.Component {
                 onClick={()=>{
                   service.api.openFileInEditor(item.filename);
                 }}>
-                <DescriptionIcon
-                  style={{ color: '#000' }}
-                />
+                {(item.icon ? item.icon : <DescriptionIcon style={{ color: '#000' }} />)}
               </IconButton>
             </Grid>
           </Grid>
@@ -138,7 +154,8 @@ class SiteConfRouteModel extends React.Component {
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">Model Configuration</Typography>
 
-        {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile}])}
+        {this.renderSection("Model Directory", [{key:'directory',filename:this.state.source.path + "/quiqr/model", icon: <FolderIcon style={{ color: '#000' }} />}])}
+        {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile }])}
         {this.renderSection("Include Files", includeFiles)}
         {this.renderSection("Partial Files", partialFiles)}
 

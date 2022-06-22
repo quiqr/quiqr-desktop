@@ -1,4 +1,3 @@
-//@flow
 import { allComponents } from './samples/all-components';
 import { lotsOfString } from './samples/lots-of-strings';
 import { blogPost } from './samples/blog-post';

@@ -13,7 +13,7 @@ import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import { SyncSidebar, SyncRouted }         from './Sync';
 import AppsIcon                            from '@material-ui/icons/Apps';
 import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
-import TuneIcon                            from '@material-ui/icons/Tune';
+import BuildIcon                            from '@material-ui/icons/Build';
 import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
 import SyncIcon                         from '@material-ui/icons/Sync';
 import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
@@ -207,8 +207,8 @@ class WorkSpace extends React.Component{
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
         }}
-        title="Config"
-        icon={<TuneIcon style={{ color: iconColor }} />}
+        title="Dev Tools"
+        icon={<BuildIcon style={{ color: iconColor }} />}
       />,
     ];
   }

@@ -207,7 +207,29 @@ class App extends React.Component{
   renderTopToolbarRightSwitch(){
 
     return (<Switch>
-      <Route path='/prefs' exact render={ () => {
+    <Route path='/prefs' exact render={ () => {
+        const rightButtons = [
+          <ToolbarButton
+            key={"toolbarbutton-library"}
+            action={()=>{
+              service.api.redirectTo("/sites/last");
+            }}
+            title="Site Library"
+            icon={<AppsIcon style={{ color: iconColor }} />}
+          />
+        ];
+
+        return <TopToolbarRight
+          itemsLeft={[]}
+          itemsCenter={[]}
+          itemsRight={rightButtons}
+        />
+
+
+
+      }} />
+
+      <Route path='/forms-cookbook' render={ () => {
         const rightButtons = [
           <ToolbarButton
             key={"toolbarbutton-library"}

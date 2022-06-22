@@ -3,7 +3,9 @@ import service        from './../../../services/service';
 import Typography     from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import TextField      from '@material-ui/core/TextField';
-//import Button         from '@material-ui/core/Button';
+import IconButton      from '@material-ui/core/IconButton';
+import Grid            from '@material-ui/core/Grid';
+import FolderIcon from '@material-ui/icons/Folder';
 
 const useStyles = theme => ({
 
@@ -23,6 +25,11 @@ const useStyles = theme => ({
     width: '50ch',
   },
 
+  iconButton: {
+    padding: 10,
+  },
+
+
 });
 
 class SiteConfRouteGeneral extends React.Component {
@@ -34,9 +41,7 @@ class SiteConfRouteGeneral extends React.Component {
     this.state = {
       siteconf : {},
       source : {},
-      publish : {},
       parseInfo : {},
-      quiqrCloud : {}
     };
   }
 
@@ -71,15 +76,6 @@ class SiteConfRouteGeneral extends React.Component {
       if(bundle.site.source){
         this.setState({source: bundle.site.source});
       }
-      if(bundle.site.publish){
-        this.setState({publish: bundle.site.publish});
-
-        if(bundle.site.publish[0]
-          && bundle.site.publish[0].config
-          && bundle.site.publish[0].config.type === "quiqr"){
-          this.setState({quiqrCloud: bundle.site.publish[0].config});
-        }
-      }
 
       this.setState(stateUpdate);
     })
@@ -96,20 +92,22 @@ class SiteConfRouteGeneral extends React.Component {
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">General Configuration</Typography>
 
-        <div className={classes.root}>
+        <Grid container  spacing={1} alignItems="flex-end">
+          <Grid item xs={12}>
+            <TextField
+              id="standard-full-width"
+              label="Site key"
+              style={{ margin: 8 }}
+              value={this.state.siteconf.key}
+              fullWidth
+              disabled
+              margin="normal"
+              InputLabelProps={{
+                shrink: true,
+              }} />
 
-          <TextField
-            id="standard-full-width"
-            label="Site key"
-            style={{ margin: 8 }}
-            value={this.state.siteconf.key}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
-
+          </Grid>
+          <Grid item xs={12}>
           <TextField
             id="standard-full-width"
             label="Site Name"
@@ -122,6 +120,10 @@ class SiteConfRouteGeneral extends React.Component {
             InputLabelProps={{
               shrink: true,
             }} />
+
+          </Grid>
+
+          <Grid item xs={11}>
 
           <TextField
             id="standard-full-width"
@@ -136,40 +138,20 @@ class SiteConfRouteGeneral extends React.Component {
               shrink: true,
             }} />
 
-          <TextField
-            id="standard-full-width"
-            label="Quiqr Cloud Path"
-            style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.quiqrCloud.path}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
+          </Grid>
 
-          <TextField
-            id="standard-full-width"
-            label="Quiqr Cloud Path"
-            style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.quiqrCloud.defaultDomain}
-            fullWidth
-            disabled
-            margin="normal"
-            InputLabelProps={{
-              shrink: true,
-            }} />
+          <Grid item xs={1}>
+            <IconButton color="primary" className={classes.iconButton} aria-label="directions"
+              onClick={()=>{
+                service.api.openFileInEditor(this.state.source.path);
+              }}>
+              <FolderIcon
+                style={{ color: '#000' }}
+              />
+            </IconButton>
+          </Grid>
 
-        </div>
-
-        {/*
-        <Button className={classes.primaryButton} variant="contained" color="primary" onClick={this.handleNewSiteClick}>
-          Save Configuration
-        </Button>
-        */}
-
+        </Grid>
 
 
       </div>
