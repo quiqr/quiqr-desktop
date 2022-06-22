@@ -449,6 +449,7 @@ class SiteLibraryRouted extends React.Component{
           open={this.state.dialogNewSlashImportSite.open}
           onClose={()=>this.setState({dialogNewSlashImportSite:{open:false}})}
           newOrImport={this.state.dialogNewSlashImportSite.newOrImport}
+          importSiteURL={this.props.importSiteURL}
           mountSite={(siteKey)=>{
             this.mountSiteByKey(siteKey);
           }}
@@ -474,6 +475,14 @@ class SiteLibraryRouted extends React.Component{
 
         <Switch>
 
+          <Route path='/sites/import-site-url/:url' exact render={ ({match, history})=> {
+            this.history = history;
+            let url = decodeURIComponent(match.params.refresh)
+            return (
+              this.renderSelectSites(url, null)
+            );
+          }}
+          />
           <Route path='/sites/import-site/:refresh' exact render={ ({match, history})=> {
             this.history = history;
             let refresh = decodeURIComponent(match.params.refresh)

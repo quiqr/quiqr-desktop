@@ -57,14 +57,13 @@ const useStyles = theme => ({
   }
 });
 
-const regexpHttp      = new RegExp('^http(s?)://', 'i')
+const regexpHttp = new RegExp('^http(s?)://', 'i')
 class FormPartialNewFromScratch extends React.Component{
 
   constructor(props){
     super(props);
 
     this.state = {
-
 
       importTypeGitUrl: '',
       importTypeGitBusy: false,
@@ -79,6 +78,18 @@ class FormPartialNewFromScratch extends React.Component{
       importQuiqrModel: '',
       importQuiqrForms: '',
 
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if(this.state.importTypeGitUrl !== nextProps.importSiteURL && nextProps.importSiteURL){
+      this.setState({importTypeGitUrl: nextProps.importSiteURL},
+        ()=>{
+          if(this.preValidateURL(nextProps.importSiteURL)){
+            this.validateURL(nextProps.importSiteURL);
+          }
+        }
+      );
     }
   }
 
@@ -106,6 +117,24 @@ class FormPartialNewFromScratch extends React.Component{
 
   }
 
+  //is this a valid public git url
+  preValidateURL(url){
+    if(!regexpHttp.test(url)){
+      this.setState({
+        importTypeGitErrorText: 'URL is invalid. Currently only http:// or https:// are supported.',
+        importTypeGitReadyForValidation: false,
+      });
+      return false;
+    }
+    else{
+      this.setState({
+        importTypeGitErrorText: '',
+        importTypeGitReadyForValidation: true,
+      });
+      return true;
+    }
+  }
+
   validateURL(url){
 
     this.props.onSetVersion();
@@ -128,6 +157,10 @@ class FormPartialNewFromScratch extends React.Component{
     else if(regexpSourceHut.test(url)){
       this.setState({importTypeGitProvider: 'SourceHut'});
     }
+    else{
+      this.setState({importTypeGitProvider: 'Unknown'});
+    }
+
 
     var urlparts = url.split('/');
     var siteNameFromUrl = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
@@ -195,19 +228,7 @@ class FormPartialNewFromScratch extends React.Component{
                 if(e.target.value && e.target.value !== ''){
                   if(this.state.importTypeGitLastValidatedUrl !== e.target.value){
 
-                    //is this a valid public git url
-                    if(!regexpHttp.test(e.target.value)){
-                      this.setState({
-                        importTypeGitErrorText: 'URL is invalid. Currently only http:// or https:// are supported.',
-                        importTypeGitReadyForValidation: false,
-                      });
-                    }
-                    else{
-                      this.setState({
-                        importTypeGitErrorText: '',
-                        importTypeGitReadyForValidation: true,
-                      });
-                    }
+                    this.preValidateURL(e.target.value);
 
                   }
                   else{

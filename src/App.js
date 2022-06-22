@@ -352,18 +352,30 @@ class App extends React.Component{
         //return this.renderImportSite();
       }} />
 
+      <Route path='/sites/import-site-url/:url' exact={false} render={ ({match, history}) => {
+
+        const importUrl = decodeURIComponent(match.params.url)
+        return (
+          <SiteLibraryRouted
+        activeLibraryView={ this.state.libraryView}
+        key={ 'selectSite' }
+        importSiteURL={ decodeURIComponent(match.params.url) }
+        importSite={ true }
+        />
+        )
+      }} />
+
       <Route path='/sites/*' render={ () => {
         return this.renderSelectSites();
       }} />
 
-      <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
+      <Route path="/forms-cookbook" exact={false} render={ () => {
         return <FormsCookbookRouted />;
       }} />
 
-      <Route path="/prefs" exact={false} render={ ({match, history})=> {
+      <Route path="/prefs" exact={false} render={ () => {
         return <PrefsRouted />;
       }} />
-
 
       <Route path="*" component={(data)=>{
         return <Redirect to='/' />
