@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.13.0 (2022-06-23)
 
 - wip: open in quiqr (quiqr://)
 - reorganized site dev tools
