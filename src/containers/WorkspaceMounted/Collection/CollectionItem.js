@@ -75,7 +75,7 @@ class CollectionItem extends React.Component{
     let CollectionPath = collection.folder.split("/")
     CollectionPath.shift();
 
-    let path = CollectionPath.join("/")+ItemPathElements.join("/");
+    let path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
     let url = 'http://localhost:13131/'+path.toLowerCase();
 
     return url;
