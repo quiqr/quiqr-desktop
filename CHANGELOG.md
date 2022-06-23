@@ -2,6 +2,8 @@
 
 ## **WORK IN PROGRESS**
 
+- wip: open in quiqr (quiqr://)
+- reorganized site dev tools
 - new welcome screen
 - new/import site from folder
 - remove old create site
