@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- lint fixes
+
 ## 0.13.0 (2022-06-23)
 
 - wip: open in quiqr (quiqr://)

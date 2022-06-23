@@ -354,7 +354,6 @@ class App extends React.Component{
 
       <Route path='/sites/import-site-url/:url' exact={false} render={ ({match, history}) => {
 
-        const importUrl = decodeURIComponent(match.params.url)
         return (
           <SiteLibraryRouted
         activeLibraryView={ this.state.libraryView}
