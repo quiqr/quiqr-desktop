@@ -1,4 +1,9 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- set cname for github pages
+
+
 ## 0.13.1 (2022-06-23)
 
 - lint fixes

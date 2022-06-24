@@ -78,6 +78,8 @@ class GitHubPagesForm extends React.Component{
         keyPairBusy: true,
         overrideBaseURLSwitch: false,
         overrideBaseURL: '',
+        CNAMESwitch: false,
+        CNAME: '',
       }
     }
   }
@@ -301,6 +303,48 @@ class GitHubPagesForm extends React.Component{
               }
               label="Configure GitHub Actions"
             />
+        </Box>
+
+        <Box my={2}>
+
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.pubData.CNAMESwitch}
+                  onChange={(e)=>{
+                    if(this.state.pubData.CNAMESwitch){
+                      this.updatePubData({
+                        CNAMESwitch: e.target.checked,
+                        CNAME: "",
+                      });
+                    }
+                    else{
+                      this.updatePubData({
+                        CNAMESwitch: e.target.checked,
+                      });
+                    }
+                  }}
+
+                  name="CNAMESwitch"
+                  color="primary"
+                />
+              }
+              label="Set CNAME"
+            />
+
+          <TextField
+            id="CNAME"
+            label="CNAME"
+            disabled={!this.state.pubData.CNAMESwitch}
+            onChange={(e)=>{
+              this.updatePubData({CNAME: e.target.value });
+            }}
+            value={this.state.pubData.CNAME}
+            helperText="Fully Qualified Domain Name, e.g. example.com"
+            variant="outlined"
+            className={classes.textfield}
+          />
+
         </Box>
 
         <Box my={2}>

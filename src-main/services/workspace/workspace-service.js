@@ -298,14 +298,27 @@ class WorkspaceService{
 
     let supportedContentExt = ['md','html','markdown'];
     if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
-      // TODO config for allowing all files
-      //let globExpression = path.join(folder, `**/?(_)index.{${supportedContentExt.join(',')}}`);
-      let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
+
 
       //WHEN WE WANT TO IGNORE _index.md front pages
-      if ('hideIndex' in collection){
-        globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
+      let subDirStars = '**';
+      if ('includeSubdirs' in collection && collection.includeSubdirs === false){
+        subDirStars = '';
       }
+
+      let globExpression = path.join(folder, `${subDirStars}.{${supportedContentExt.join(',')}}`);
+
+      globExpression = path.join(folder, `${subDirStars}/*.{${supportedContentExt.join(',')}}`);
+      //WHEN WE WANT TO IGNORE _index.md front pages
+      if ('hideIndex' in collection && collection.hideIndex === true){
+        //globExpression = path.join(folder, `${subDirStars}!(_index).{${supportedContentExt.join(',')}}`);
+        globExpression = path.join(folder, `${subDirStars}/!(_index).{${supportedContentExt.join(',')}}`);
+      }
+      /*
+      else{
+        globExpression = path.join(folder, `${subDirStars}/*.{${supportedContentExt.join(',')}}`);
+      }
+      */
 
       let files = await globJob(globExpression, {});
       let retFiles = files.map(function(item){

@@ -99,6 +99,7 @@ class WorkspaceConfigValidator {
         dataformat: joi.string().trim().error(new Error('The dataformat value is invalid.')), //is not required here
         previewUrl: joi.string().trim(),
         hideIndex: joi.boolean(),
+        includeSubdirs: joi.boolean(),
         fields: joi.array().min(1).required().error(new Error('The fields value is invalid.')),
         sortkey: joi.string().trim().min(3).error(new Error('The sortkey value is invalid.')),
       })

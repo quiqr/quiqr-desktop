@@ -88,7 +88,13 @@ class GithubSync {
 
     if(this._config.publishScope === "source"){
       await fileDirUtils.recurForceRemove(fullDestinationPath+'/public');
-      await this._github_action_workflow_source(fullDestinationPath);
+      if(this._config.setGitHubActions){
+        await this._github_action_workflow_source(fullDestinationPath);
+      }
+    }
+
+    if(this._config.CNAMESwitch && this._config.CNAME !== ''){
+      await this._github_cname(fullDestinationPath);
     }
 
     await fs.ensureDir(path.join(fullDestinationPath,"static"))
@@ -121,6 +127,10 @@ class GithubSync {
       lastPublish: publDate,
       path: this._config.repository
     }
+  }
+
+  async _github_cname(fullDestinationPath){
+    await fs.writeFileSync(path.join(fullDestinationPath, "CNAME"), this._config.CNAME ,'utf-8');
   }
 
   async _github_action_workflow_source(fullDestinationPath){
