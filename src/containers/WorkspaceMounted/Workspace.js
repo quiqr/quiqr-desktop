@@ -207,7 +207,7 @@ class WorkSpace extends React.Component{
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
         }}
-        title="Dev Tools"
+        title="Tools"
         icon={<BuildIcon style={{ color: iconColor }} />}
       />,
     ];

@@ -66,8 +66,9 @@ class WorkspaceService{
   async _smartResolveFormatProvider(filePath , fallbacks ){
     let formatProvider;
     if(contentFormats.isContentFile(filePath)){
-      if(fs.existsSync(filePath))
+      if(fs.existsSync(filePath)){
         formatProvider = await formatProviderResolver.resolveForMdFilePromise(filePath);
+      }
     }
     else
       formatProvider = formatProviderResolver.resolveForFilePath(filePath);
@@ -104,10 +105,18 @@ class WorkspaceService{
     if(str===undefined||str===null||str.length===0||!/\S$/gi){
       return {};
     }
+    if(contentFormats.isContentFile(filePath)){
+      if(formatFallbacks){
+        formatFallbacks.push('yaml');
+      }
+
+    }
     let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
-    if(formatProvider===undefined)
+    if(formatProvider===undefined){
+      console.log("formatprovider undefined");
       return {};
-      //throw new Error('Could not resolve a FormatProvider to parse.');
+    }
+
     if(contentFormats.isContentFile(filePath)){
       return formatProvider.parseFromMdFileString(str);
     }
@@ -361,6 +370,10 @@ class WorkspaceService{
       if(document.resources){
         document.resources = document.resources.filter((x) => x.__deleted==true);
         document.resources.forEach((x)=>delete x.__deleted);
+
+        if(document.resources.length === 0){
+          delete document['resources'];
+        }
       }
     }
   }
@@ -458,7 +471,7 @@ class WorkspaceService{
     if (!fs.existsSync(directory))
       fs.mkdirSync(directory);//ensure directory existence
 
-    let documentClone =  JSON.parse(JSON.stringify(document));
+    let documentClone = JSON.parse(JSON.stringify(document));
     this._stripNonDocumentData(documentClone);
     let stringData = await this._smartDump(filePath, [collection.dataformat], documentClone);
     fs.writeFileSync(filePath,stringData);
@@ -725,7 +738,6 @@ class WorkspaceService{
   }
 
   async build(buildKey, extraConfig={}) {
-    //console.log(buildKey)
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
 
