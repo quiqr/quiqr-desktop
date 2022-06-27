@@ -202,6 +202,9 @@ class WorkSpace extends React.Component{
         title="Sync"
         icon={<SyncIcon style={{ color: iconColor }} />}
       />,
+      (
+
+      this.props.applicationRole === 'siteDeveloper' ?
       <ToolbarButton
         key="buttonSiteConf"
         action={()=>{
@@ -209,7 +212,8 @@ class WorkSpace extends React.Component{
         }}
         title="Tools"
         icon={<BuildIcon style={{ color: iconColor }} />}
-      />,
+      />
+        :null)
     ];
   }
 
@@ -317,6 +321,7 @@ class WorkSpace extends React.Component{
     this.getProfile();
     return <Dashboard
       key={ match.url }
+      applicationRole={ this.props.applicationRole }
       quiqrUsername={this.state.quiqrUsername}
       quiqrFingerprint={this.state.quiqrFingerprint}
       siteKey={ decodeURIComponent(match.params.site) }

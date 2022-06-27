@@ -140,37 +140,42 @@ class Home extends React.Component{
     if(workspaceDetails.menu && workspaceDetails.menu.length > 0 ){
 
       workspaceDetails.menu.forEach((menu)=>{
-        let section = {
-          title: menu.title,
-          cards: []
-        }
 
-        menu.menuItems.forEach((item)=>{
-          let workspaceItem = workspaceDetails.collections.find(x => x.key === item.key);
-          let card = {};
+        if(typeof menu.matchRole === 'undefined' || this.props.applicationRole === menu.matchRole){
 
-          if(workspaceItem){
-            card.type = "collection";
-            card.itemTitle = workspaceItem.itemtitle;
+          let section = {
+            title: menu.title,
+            cards: []
           }
-          else{
-            workspaceItem = workspaceDetails.singles.find(x => x.key === item.key);
+
+          menu.menuItems.forEach((item)=>{
+            let workspaceItem = workspaceDetails.collections.find(x => x.key === item.key);
+            let card = {};
+
             if(workspaceItem){
-              card.type = "single";
+              card.type = "collection";
+              card.itemTitle = workspaceItem.itemtitle;
             }
-          }
+            else{
+              workspaceItem = workspaceDetails.singles.find(x => x.key === item.key);
+              if(workspaceItem){
+                card.type = "single";
+              }
+            }
 
-          if(workspaceItem){
-            card.title = workspaceItem.title;
-            card.key = workspaceItem.key;
-            card.description = workspaceItem.description;
-            section.cards.push(card);
-          }
+            if(workspaceItem){
+              card.title = workspaceItem.title;
+              card.key = workspaceItem.key;
+              card.description = workspaceItem.description;
+              section.cards.push(card);
+            }
 
 
-        });
+          });
 
-        cardsSections.push(section);
+          cardsSections.push(section);
+
+        }
 
       });
 
