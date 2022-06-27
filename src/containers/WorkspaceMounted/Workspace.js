@@ -184,34 +184,37 @@ class WorkSpace extends React.Component{
     </Switch>);
   }
 
-  toolbarItemsLeft(siteKey, workspaceKey){
+  toolbarItemsLeft(siteKey, workspaceKey, activeButton){
     return [
       <ToolbarButton
         key="buttonContent"
+        active={(activeButton === "content" ? true : false)}
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
         }}
         title="Content"
-        icon={<LibraryBooksIcon style={{ color: iconColor }} />}
+        icon={LibraryBooksIcon}
       />,
       <ToolbarButton
         key="buttonSync"
+        active={(activeButton === "sync" ? true : false)}
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`);
         }}
         title="Sync"
-        icon={<SyncIcon style={{ color: iconColor }} />}
+        icon={SyncIcon}
       />,
       (
 
       this.props.applicationRole === 'siteDeveloper' ?
       <ToolbarButton
         key="buttonSiteConf"
+        active={(activeButton === "tools" ? true : false)}
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
         }}
         title="Tools"
-        icon={<BuildIcon style={{ color: iconColor }} />}
+        icon={BuildIcon}
       />
         :null)
     ];
@@ -226,7 +229,7 @@ class WorkSpace extends React.Component{
           service.api.openSiteLibrary();
         }}
         title="Site Library"
-        icon={<AppsIcon style={{ color: iconColor }} />}
+        icon={AppsIcon}
       />,
         <ToolbarButton
         key="buttonPrefs"
@@ -234,7 +237,7 @@ class WorkSpace extends React.Component{
           service.api.redirectTo(`/prefs/`);
         }}
         title="Preferences"
-        icon={<SettingsApplicationsIcon style={{ color: iconColor }} />}
+        icon={SettingsApplicationsIcon}
       />,
   ];
   }
@@ -249,8 +252,30 @@ class WorkSpace extends React.Component{
         return <TopToolbarRight
 
           key="toolbar-right-workspace-siteconf"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "tools")}
           itemsCenter={[]}
+          itemsRight={this.toolbarItemsRight("tools")}
+        />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/sync' render={ ({match})=> {
+        const siteKey= decodeURIComponent(match.params.site);
+        const workspaceKey= decodeURIComponent(match.params.workspace);
+        const toolbarItemsCenter = [
+          <ToolbarButton
+            key="buttonPreview"
+            action={()=>{
+              window.require('electron').shell.openExternal('http://localhost:13131');
+            }}
+            title="Preview in Browser"
+            icon={OpenInBrowserIcon}
+          />
+        ];
+
+        return <TopToolbarRight
+          key="toolbar-right-workspace-dashboard"
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "sync")}
+          itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight()}
         />
       }} />
@@ -265,13 +290,13 @@ class WorkSpace extends React.Component{
               window.require('electron').shell.openExternal('http://localhost:13131');
             }}
             title="Preview in Browser"
-            icon={<OpenInBrowserIcon style={{ color: iconColor }} />}
+            icon={OpenInBrowserIcon}
           />
         ];
 
         return <TopToolbarRight
           key="toolbar-right-workspace-dashboard"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "content")}
           itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight()}
         />

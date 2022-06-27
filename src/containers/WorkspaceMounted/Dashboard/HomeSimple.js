@@ -191,24 +191,25 @@ class Home extends React.Component{
     return (
       <Card style={{ width: "250px" }} elevation={3}>
         <CardContent style={{ height: "110px" }}>
-          <Typography color="text.secondary" variant="body2" >
+          <Typography variant="body2" >
             {type}
           </Typography>
           <Typography variant="h5" component="div" gutterBottom>
             {title}
           </Typography>
-          <Typography variant="body">
+          <Typography variant="body1">
             {description}
           </Typography>
         </CardContent>
         <CardActions>
-          {(type === 'collection' ? null : <Button size="small"
+          {(type === 'collection' ? null : <Button size="small" color="primary"
             onClick={()=>{
               service.api.redirectTo(`${this.state.basePath}/singles/${encodeURIComponent(key)}`)
             }}
           >Open</Button>)}
 
-          {(type === 'collection' ? <Button size="small"
+          {(type === 'collection' ? <Button size="small" color="primary"
+
             onClick={()=>{
               service.api.redirectTo(`${this.state.basePath}/collections/${encodeURIComponent(key)}`)
             }}
@@ -224,11 +225,11 @@ class Home extends React.Component{
     let { configurations, contentItemCardsSections } = this.state;
 
     let sections;
-    sections = contentItemCardsSections.map((section)=>{
+    sections = contentItemCardsSections.map((section,index)=>{
 
       return (
 
-        <React.Fragment>
+        <React.Fragment key={"section"+index}>
           {section.cards.map((card, index)=>{
 
             return (
@@ -236,7 +237,7 @@ class Home extends React.Component{
                 key={"siteCardA"+index}
                 item
               >
-                <Typography  color="text.secondary">
+                <Typography>
                   {(index === 0 ? section.title : <span>&nbsp; </span> )}
                 </Typography>
                 {this.renderCard(card)}

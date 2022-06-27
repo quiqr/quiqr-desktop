@@ -207,7 +207,7 @@ class App extends React.Component{
   renderTopToolbarRightSwitch(){
 
     return (<Switch>
-    <Route path='/prefs' exact render={ () => {
+      <Route path='/prefs' exact render={ () => {
         const rightButtons = [
           <ToolbarButton
             key={"toolbarbutton-library"}
@@ -215,7 +215,7 @@ class App extends React.Component{
               service.api.redirectTo("/sites/last");
             }}
             title="Site Library"
-            icon={<AppsIcon style={{ color: iconColor }} />}
+            icon={AppsIcon}
           />
         ];
 
@@ -237,7 +237,7 @@ class App extends React.Component{
               service.api.redirectTo("/sites/last");
             }}
             title="Site Library"
-            icon={<AppsIcon style={{ color: iconColor }} />}
+            icon={AppsIcon}
           />
         ];
 
@@ -296,22 +296,22 @@ class App extends React.Component{
 
       <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
         return (<FormsCookbookSidebar
-        menus={[]}
-        hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-        menuIsLocked={this.state.menuIsLocked}
-        onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
-        onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
-      />);
+          menus={[]}
+          hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
+          menuIsLocked={this.state.menuIsLocked}
+          onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
+          onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
+        />);
       }} />
 
       <Route path="/prefs" exact={false} render={ ({match, history})=> {
         return (<PrefsSidebar
-        menus={[]}
-        hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-        menuIsLocked={this.state.menuIsLocked}
-        onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
-        onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
-      />);
+          menus={[]}
+          hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
+          menuIsLocked={this.state.menuIsLocked}
+          onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
+          onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
+        />);
       }} />
 
 
@@ -356,11 +356,11 @@ class App extends React.Component{
 
         return (
           <SiteLibraryRouted
-        activeLibraryView={ this.state.libraryView}
-        key={ 'selectSite' }
-        importSiteURL={ decodeURIComponent(match.params.url) }
-        importSite={ true }
-        />
+            activeLibraryView={ this.state.libraryView}
+            key={ 'selectSite' }
+            importSiteURL={ decodeURIComponent(match.params.url) }
+            importSite={ true }
+          />
         )
       }} />
 
@@ -398,14 +398,14 @@ class App extends React.Component{
   renderWelcomeScreen(){
 
     return (
-    <SplashDialog
-      open={this.state.splashDialogOpen}
-      showSplashAtStartup={this.state.showSplashAtStartup}
-      onClose={()=>{this.setState({splashDialogOpen:false})}}
-      onChangeSplashCheck={(show)=>{
-        service.api.saveConfPrefKey("showSplashAtStartup",show);
-      }}
-    />
+      <SplashDialog
+        open={this.state.splashDialogOpen}
+        showSplashAtStartup={this.state.showSplashAtStartup}
+        onClose={()=>{this.setState({splashDialogOpen:false})}}
+        onChangeSplashCheck={(show)=>{
+          service.api.saveConfPrefKey("showSplashAtStartup",show);
+        }}
+      />
     )
 
   }
@@ -536,46 +536,48 @@ class App extends React.Component{
 
 
       <Route
-      path="*"
-      render={ ({match, history})=>{
-        this.history = history;
-        return (
-          <MuiThemeProvider muiTheme={pogoTheme}>
+        path="*"
+        render={ ({match, history})=>{
+          this.history = history;
+          return (
+            <MuiThemeProvider muiTheme={pogoTheme}>
 
-            {welcomeScreen}
+              <React.Fragment>
+                {welcomeScreen}
 
-            <div className="App" style={marginStyles}>
+                <div className="App" style={marginStyles}>
 
-              <div className="topToolbar">
+                  <div className="topToolbar">
 
-                <div className="toolbarLeft">
-                  { this.renderTopToolbarLeftSwitch() }
+                    <div className="toolbarLeft">
+                      { this.renderTopToolbarLeftSwitch() }
+                    </div>
+
+                    <div className="toolbarRight">
+                      { this.renderTopToolbarRightSwitch() }
+                    </div>
+                  </div>
+
+                  <div style={containerStyle}>
+
+                    <div style={menuContainerStyle} className='hideScrollbar' >
+                      { this.renderMenuSwitch() }
+                    </div>
+
+                    <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+                      { this.renderContentSwitch() }
+                    </div>
+
+
+                  </div>
+
                 </div>
+              </React.Fragment>
+            </MuiThemeProvider>
+          );
 
-                <div className="toolbarRight">
-                  { this.renderTopToolbarRightSwitch() }
-                </div>
-              </div>
-
-              <div style={containerStyle}>
-
-                <div style={menuContainerStyle} className='hideScrollbar' >
-                  { this.renderMenuSwitch() }
-                </div>
-
-                <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
-                  { this.renderContentSwitch() }
-                </div>
-
-
-              </div>
-
-            </div>
-          </MuiThemeProvider>
-        );
-
-      }} />
-  </Switch>);
+        }} />
+    </Switch>);
   }
 }
 
