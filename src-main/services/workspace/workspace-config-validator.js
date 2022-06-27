@@ -92,7 +92,8 @@ class WorkspaceConfigValidator {
     validationError = joi.validate(collection,
       joi.object().keys({
         key: joi.string().trim().regex(/^[A-Za-z0-9\-_]+$/i).min(3).max(90).required().error(new Error('The collection key "'+collection.key+'" is invalid.')),
-        title: joi.string().trim().min(3).max(90).required().error(new Error('The title value is invalid.')),
+        title: joi.string().trim().min(3).max(30).required().error(new Error('The collection.title value is invalid.')),
+        description: joi.string().trim().max(90).error(new Error('The collection.description value is invalid.'+JSON.stringify(collection))),
         folder: joi.string().trim().regex(/^(content|data|quiqr).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The folder value is invalid.')),
         itemtitle: joi.string().trim().min(3).max(90).error(new Error('The itemtitle value is invalid.')),
         extension: joi.string().regex(validationUtils.allFormatsReg).required().error(new Error('The extension value is invalid.')),
@@ -137,7 +138,8 @@ class WorkspaceConfigValidator {
     validationError = joi.validate(single,
       joi.object().keys({
         key: joi.string().trim().regex(/^[A-Za-z0-9\-_]+$/i).min(3).max(90).required().error(new Error('The single key "'+single.key+'" is invalid.')),
-        title: joi.string().trim().min(3).max(90).required().error(new Error('The singles.title value is invalid.'+JSON.stringify(single))),
+        title: joi.string().trim().min(3).max(30).required().error(new Error('The singles.title value is invalid.'+JSON.stringify(single))),
+        description: joi.string().trim().max(90).error(new Error('The singles.description value is invalid.'+JSON.stringify(single))),
         file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.:'+JSON.stringify(single))),
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
         previewUrl: joi.string().trim(),
