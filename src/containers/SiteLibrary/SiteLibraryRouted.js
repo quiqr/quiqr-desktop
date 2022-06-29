@@ -345,7 +345,6 @@ class SiteLibraryRouted extends React.Component{
           screenshotURL = "https://quiqr.github.io/quiqr-community-templates/templates/"+template.NormalizedName+"/screenshot."+template.ScreenshotImageType;
         }
 
-        service.api.logToConsole(template)
         sites.push({
           key: "template-"+template.QuiqrEtalageName,
           name: template.QuiqrEtalageName,

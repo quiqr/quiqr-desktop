@@ -113,13 +113,8 @@ class Home extends React.Component{
         var stateUpdate  = {};
         stateUpdate.configurations = bundle.configurations;
         stateUpdate.selectedSite = bundle.site;
-
-        //stateUpdate.selectedSiteWorkspaces = bundle.siteWorkspaces;
-        //stateUpdate.selectedWorkspace = bundle.workspace;
         stateUpdate.basePath = `/sites/${bundle.site.key}/workspaces/${bundle.workspace.key}`;
         stateUpdate.contentItemCardsSections = this.prepareMenuCards(bundle.workspaceDetails);
-        //service.api.logToConsole(stateUpdate.contentItemCardsSections)
-        //this.prepareMenuCards(bundle.workspaceDetails);
 
         this.setState(stateUpdate);
       }).catch(e=>{
