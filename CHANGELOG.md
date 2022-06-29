@@ -2,6 +2,14 @@
 ## **WORK IN PROGRESS**
 
 - set cname for github pages
+- sort tags
+- Quiqr Community Templates listing
+- show active toolbar item in workspace
+- move role to edit below preferences
+- role has effect on toolbar and content dashboard
+- show content items on dashboard
+- fix #412 read and save md without frontmatter
+- add new collection propery includeSubDirs default true
 
 
 ## 0.13.1 (2022-06-23)
