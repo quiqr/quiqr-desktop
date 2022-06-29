@@ -20,7 +20,6 @@ import Redirect                                                           from '
 import service                                                            from './services/service';
 
 const defaultApplicationRole = "contentEditor";
-const iconColor = "#000";
 
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {

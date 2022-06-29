@@ -8,7 +8,6 @@ import AddIcon                                                    from '@materia
 import ViewListIcon                                               from '@material-ui/icons/ViewList';
 import ViewModuleIcon                                             from '@material-ui/icons/ViewModule';
 
-const iconColor = "#000";
 
 export class SiteLibraryToolbarRight extends React.Component {
   constructor(props){

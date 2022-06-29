@@ -23,7 +23,6 @@ import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeP
 import getMuiTheme                         from 'material-ui-02/styles/getMuiTheme';
 import service                             from '../../services/service';
 
-const iconColor = "#000";
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
     background: {
