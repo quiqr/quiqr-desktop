@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.13.2 (2022-06-29)
 
 - set cname for github pages
 - sort tags
@@ -10,7 +10,6 @@
 - show content items on dashboard
 - fix #412 read and save md without frontmatter
 - add new collection propery includeSubDirs default true
-
 
 ## 0.13.1 (2022-06-23)
 
