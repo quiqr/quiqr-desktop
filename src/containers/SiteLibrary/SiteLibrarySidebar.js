@@ -106,10 +106,10 @@ export class SiteLibrarySidebar extends React.Component {
           {
             active: true,
             label: "Quiqr Community Templates",
-            selected: (this.state.selectedMenuItem==='templates-quiqr-community' ? true : false),
+            selected: (this.state.selectedMenuItem==='quiqr-community-templates' ? true : false),
             onClick: ()=>{
-              this.saveSelectedMenuItem('templates-quiqr-community');
-              history.push(`${basePath}/templates/quiqr-community`)
+              this.saveSelectedMenuItem('quiqr-community-templates');
+              history.push(`${basePath}/quiqr-community-templates`)
             }
           },
         ]

@@ -2,7 +2,6 @@ import React                               from 'react';
 import { withRouter }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
 import Dashboard                           from './Dashboard'
-//import Sync                                from './Sync'
 import TopToolbarLeft                      from '../TopToolbarLeft'
 import {TopToolbarRight, ToolbarButton}    from '../TopToolbarRight'
 import Collection                          from './Collection';
@@ -13,12 +12,11 @@ import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import { SyncSidebar, SyncRouted }         from './Sync';
 import AppsIcon                            from '@material-ui/icons/Apps';
 import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
-import BuildIcon                            from '@material-ui/icons/Build';
+import BuildIcon                           from '@material-ui/icons/Build';
 import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
-import SyncIcon                         from '@material-ui/icons/Sync';
+import SyncIcon                            from '@material-ui/icons/Sync';
 import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
 import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-//import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme                         from 'material-ui-02/styles/getMuiTheme';
 import service                             from '../../services/service';

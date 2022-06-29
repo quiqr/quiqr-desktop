@@ -98,7 +98,7 @@ class SyncServerDialog extends React.Component{
               elevation={5}
             >
               <Box display="flex" alignItems="center"  justifyContent="center" height={63}>
-                <FolderIcon fontSize="large"  color="#ccc"/>
+                <FolderIcon fontSize="large" />
               </Box>
               <Box display="flex" alignItems="center"  justifyContent="center" >
                 <Typography variant="h5">TO FOLDER</Typography>

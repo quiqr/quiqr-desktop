@@ -22,6 +22,8 @@ import service                      from './../../services/service';
 //import { snackMessageService } from './../../services/ui-service';
 import { withStyles }               from '@material-ui/core/styles';
 
+const net = window.require('electron').remote.net;
+
 const useStyles = theme => ({
 });
 
@@ -34,6 +36,7 @@ class SiteLibraryRouted extends React.Component{
       currentSiteKey: null,
       showSpinner: false,
       remoteSiteDialog: false,
+      configurations: [],
       editTagsDialog: false,
       renameDialog: false,
       deleteDialog: false,
@@ -45,6 +48,7 @@ class SiteLibraryRouted extends React.Component{
       currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
+      quiqrCommunityTemplates: [],
       remoteSitesAsOwner: [],
       remoteSitesAsMember: [],
       sitesListingView: ''
@@ -55,6 +59,7 @@ class SiteLibraryRouted extends React.Component{
 
     this.updateRemoteSites(this.props.quiqrUsername);
     this.updateLocalSites();
+    this.updateCommunityTemplates();
 
     service.api.stopHugoServer();
 
@@ -68,6 +73,37 @@ class SiteLibraryRouted extends React.Component{
     });
 
   }
+
+  updateCommunityTemplates(){
+
+    const url = "https://quiqr.github.io/quiqr-community-templates/templates.json";
+    let request = net.request(url);
+
+    let data='';
+
+    request.on('error', (err) => {
+      this.setState({quiqrCommunityTemplatesError:"Can't download templates. Your computer might be offline."});
+    });
+
+    request.on('response', (response) => {
+      response.on('error', (error) => {
+        this.setState({quiqrCommunityTemplatesError:"Can't download templates. Server might have problems."});
+      })
+
+      response.on('end', () => {
+        this.setState({
+          quiqrCommunityTemplatesError: null,
+          quiqrCommunityTemplates:JSON.parse(data)});
+      });
+      response.on("close", () => {
+      });
+      response.on("data", chunk => {
+        data += chunk;
+      });
+    })
+    request.end()
+  }
+
 
   updateRemoteSites(username){
     if(username){
@@ -119,10 +155,17 @@ class SiteLibraryRouted extends React.Component{
       });
     }
 
+    if(nextProps.importSiteURL && this.props.importSiteURL !== nextProps.importSiteURL){
+      this.setState({
+        importSiteURL: nextProps.importSiteURL
+      });
+    }
+
     if(this.props.quiqrUsername !== nextProps.quiqrUsername){
       this.updateRemoteSites(nextProps.quiqrUsername);
     }
   }
+
   mountSiteByKey(siteKey){
     service.getConfigurations(true).then((c)=>{
       let site = c.sites.find((x)=>x.key===siteKey);
@@ -171,62 +214,44 @@ class SiteLibraryRouted extends React.Component{
 
   renderItemMenuItems(index, siteconfig){
 
-    return (
-      <Menu
-        anchorEl={this.state.anchorEl}
-        open={(this.state.menuOpen===index?true:false)}
-        keepMounted
-        onClose={()=>{
-          this.setState({menuOpen:null});
-
-        }}
-      >
-        <MenuItem key="rename"
-          onClick={
-            ()=>{
-              this.setState({renameDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
-            }
-          }>
-          Rename
-        </MenuItem>
-
-        <MenuItem key="tags"
-          onClick={
-            ()=>{
-              this.setState({editTagsDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
-            }
-          }>
-          Edit Tags
-        </MenuItem>
-
-        <MenuItem key="delete"
-          onClick={
-            ()=>{
-              this.setState({deleteDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
-            }
-          }>
-          Delete
-        </MenuItem>
-
-      </Menu>
-    );
-  }
-
-  renderItemMenu(index, siteconfig){
-
-    return (
-      <div>
-        <IconButton
-          onClick={(event)=>{
-            this.setState({anchorEl:event.currentTarget, menuOpen:index})
+    if(siteconfig.template){
+      return (
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={(this.state.menuOpen===index?true:false)}
+          keepMounted
+          onClose={()=>{
+            this.setState({menuOpen:null});
           }}
-          aria-label="more"
-          aria-controls="long-menu"
-          aria-haspopup="true"
         >
-          <MoreVertIcon />
-        </IconButton>
+          <MenuItem key="import"
+            onClick={
+              ()=>{
+                this.setState({menuOpen:null});
+                this.handleSiteClick(siteconfig);
+              }
+            }>
+            Import
+          </MenuItem>
 
+          <MenuItem key="visit"
+            onClick={
+              ()=>{
+                this.setState({menuOpen:null});
+                window.require('electron').shell.openExternal(siteconfig.homepageURL);
+              }
+            }>
+            Open Homepage
+          </MenuItem>
+
+        </Menu>
+      );
+
+    }
+    else{
+
+
+      return (
         <Menu
           anchorEl={this.state.anchorEl}
           open={(this.state.menuOpen===index?true:false)}
@@ -253,35 +278,43 @@ class SiteLibraryRouted extends React.Component{
             }>
             Edit Tags
           </MenuItem>
+
+          <MenuItem key="delete"
+            onClick={
+              ()=>{
+                this.setState({deleteDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+              }
+            }>
+            Delete
+          </MenuItem>
+
         </Menu>
-      </div>
-    );}
+      );
+    }
+  }
 
   renderSelectSites(source, sourceArgument){
-    let { configurations } = this.state;
+
+    if(this.state.showSpinner){
+      return <Spinner />
+    }
 
     let listingSource
+    let listTitle = '';
+    let sites = [];
+
     if(source === 'last'){
+
       listingSource = this.state.sitesListingView;
       if(listingSource && listingSource.includes("local-tags-")){
         sourceArgument = listingSource.split("tags-")[1];
         listingSource = "tags";
       }
+
     }
     else{
       listingSource = source;
     }
-
-    let _configurations = configurations;
-    let sites = _configurations.sites || [];
-    if(configurations==null){
-      return <Spinner />
-    }
-    if(this.state.showSpinner){
-      return <Spinner />
-    }
-
-    let listTitle = 'All Sites';
 
     if(listingSource === 'quiqr-cloud' || (listingSource ==='last' && this.state.sitesListingView === 'quiqr-cloud')){
       listTitle = `Available remote sites ${(this.props.quiqrUsername? "for " + this.props.quiqrUsername:'')}`;
@@ -302,11 +335,41 @@ class SiteLibraryRouted extends React.Component{
         })
       });
     }
+    else if(listingSource === 'quiqr-community-templates' || (listingSource ==='last' && this.state.sitesListingView === 'templates-quiqr-community')){
+      listTitle = `Quiqr Community Templates ${(this.props.quiqrUsername? "for " + this.props.quiqrUsername:'')}`;
+
+      sites = [];
+      this.state.quiqrCommunityTemplates.forEach((template)=>{
+        let screenshotURL = null;
+        if(template.ScreenshotImageType){
+          screenshotURL = "https://quiqr.github.io/quiqr-community-templates/templates/"+template.NormalizedName+"/screenshot."+template.ScreenshotImageType;
+        }
+
+        service.api.logToConsole(template)
+        sites.push({
+          key: "template-"+template.QuiqrEtalageName,
+          name: template.QuiqrEtalageName,
+          screenshotURL: screenshotURL,
+          homepageURL: template.QuiqrEtalageHomepage,
+          importSiteURL: template.SourceLink.trim(),
+          template: true,
+        })
+      });
+
+    }
     else if (listingSource === 'tags'){
       listTitle = 'Sites in tag: '+ sourceArgument;
-      sites = sites.filter((site) => {
+      sites = this.state.configurations.sites.filter((site) => {
         return (site.tags && site.tags.includes(sourceArgument))
       });
+    }
+    else{
+      listTitle = 'All sites on this computer';
+      //let _configurations = configurations;
+      sites = this.state.configurations.sites || [];
+      if(this.state.configurations==null){
+        return <Spinner />
+      }
     }
 
     sites.sort(function(a, b){
@@ -329,10 +392,11 @@ class SiteLibraryRouted extends React.Component{
     return (
 
       <Box m={3}>
-      <Box my={3}>
-        <Typography variant="h6" >{listTitle}</Typography>
-      </Box>
+        <Box my={3}>
+          <Typography variant="h6" >{listTitle}</Typography>
+        </Box>
 
+        {this.state.quiqrCommunityTemplatesError}
         <Grid container spacing={3} >
           {sites.map((site, index)=>{
 
@@ -345,22 +409,33 @@ class SiteLibraryRouted extends React.Component{
                   siteClick={()=>{
                     this.handleSiteClick(site);
                   }}
-                  site={site}
-                  itemMenuButton={this.renderItemMenuButton(index, site)}
-                  itemMenuItems={this.renderItemMenuItems(index, site)}
-                />
+            site={site}
+            itemMenuButton={this.renderItemMenuButton(index, site)}
+            itemMenuItems={this.renderItemMenuItems(index, site)}
+              />
               </Grid>
-            )
+          )
           })}
-        </Grid>
+      </Grid>
       </Box>
 
     );
-  }
+          }
   handleSiteClick(site){
-    if(site.remote){
-      this.setState({remoteSiteDialog:true});
-      this.setState({currentRemoteSite:site.name})
+    if(site.template){
+      this.setState({
+        dialogNewSlashImportSite: {
+          open: true,
+          newOrImport: 'import',
+        },
+        importSiteURL: site.importSiteURL
+      });
+
+    }
+    else if(site.remote){
+      this.setState({
+        currentRemoteSite:site.name,
+        remoteSiteDialog:true});
     }
     else{
       this.mountSite(site)
@@ -378,22 +453,22 @@ class SiteLibraryRouted extends React.Component{
           </ListSubheader>
         }>
 
-        { (sites).map((site, index)=>{
-          return (
+      { (sites).map((site, index)=>{
+        return (
 
-            <SiteListItem
-              key={"sitelistitem"+index}
+          <SiteListItem
+          key={"sitelistitem"+index}
 
-              siteClick={()=>{
-                this.handleSiteClick(site);
-              }}
-              site={site}
-              itemMenuButton={this.renderItemMenuButton(index, site)}
-              itemMenuItems={ this.renderItemMenuItems(index, site)}
-            />
+          siteClick={()=>{
+            this.handleSiteClick(site);
+          }}
+          site={site}
+          itemMenuButton={this.renderItemMenuButton(index, site)}
+            itemMenuItems={ this.renderItemMenuItems(index, site)}
+          />
 
-          );
-        })}
+        );
+      })}
 
       </List>
     )
@@ -405,15 +480,15 @@ class SiteLibraryRouted extends React.Component{
     return (
       <div>
 
-        <DeleteSiteDialog
-          open={this.state.deleteDialog}
-          siteconf={this.state.dialogSiteConf}
-          onCancelClick={()=>this.setState({deleteDialog:false})}
-          onDelete={(siteKey)=>{
-            this.setState({deleteDialog:false});
-            service.api.deleteSite(siteKey);
-            this.updateLocalSites();
-          }}
+      <DeleteSiteDialog
+      open={this.state.deleteDialog}
+            siteconf={this.state.dialogSiteConf}
+            onCancelClick={()=>this.setState({deleteDialog:false})}
+            onDelete={(siteKey)=>{
+              this.setState({deleteDialog:false});
+              service.api.deleteSite(siteKey);
+              this.updateLocalSites();
+            }}
         />
 
         <RenameSiteDialog
@@ -443,20 +518,25 @@ class SiteLibraryRouted extends React.Component{
           mountSite={(siteKey)=>{
             this.mountSiteByKey(siteKey);
           }}
-        />
+      />
 
         <NewSlashImportSiteDialog
           open={this.state.dialogNewSlashImportSite.open}
-          onClose={()=>this.setState({dialogNewSlashImportSite:{open:false}})}
+          onClose={
+            ()=>this.setState({
+              importSiteURL: null,
+              dialogNewSlashImportSite:{open:false}
+            })
+          }
           newOrImport={this.state.dialogNewSlashImportSite.newOrImport}
-          importSiteURL={this.props.importSiteURL}
+          importSiteURL={this.state.importSiteURL}
           mountSite={(siteKey)=>{
             this.mountSiteByKey(siteKey);
           }}
         />
 
         <BlockDialog open={this.state.blockingOperation!=null}>{this.state.blockingOperation}</BlockDialog>
-      </div>
+        </div>
 
     )
   }
