@@ -31,6 +31,15 @@ export class SiteLibrarySidebar extends React.Component {
           })
         }
       })
+      tags.sort(function(a, b){
+        var nameA=a.toLowerCase(), nameB=b.toLowerCase()
+        if (nameA < nameB) //sort string ascending
+          return -1
+        if (nameA > nameB)
+          return 1
+        return 0 //default return value (no sorting)
+      })
+
 
       this.setState({tags:tags});
     });
