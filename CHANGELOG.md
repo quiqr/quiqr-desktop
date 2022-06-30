@@ -1,4 +1,9 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- small bugfixes
+- add quickstart video endpoint
+- try enable linux build target
+
 ## 0.13.2 (2022-06-29)
 
 - set cname for github pages

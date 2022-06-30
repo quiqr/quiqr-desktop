@@ -1,5 +1,5 @@
 import * as React          from 'react';
-//import service             from '../../../../services/service';
+import service             from '../../../../services/service';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
 import MuiDialogTitle      from '@material-ui/core/DialogTitle';
@@ -45,11 +45,15 @@ class SyncBusyDialog extends React.Component{
     let serverFormLogo, serverTitle = null;
 
     if(this.props.serverType === 'quiqr'){
-      serverTitle = "Quiqr Cloud Server";
+      serverTitle = "Syncing with Quiqr Cloud Server";
       serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
     }
     else if (this.props.serverType === 'github'){
-      serverTitle = "GitHub Pages Server";
+      serverTitle = "Syncing with GitHub Pages Server";
+      serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
+    }
+    else if (this.props.serverType === 'folder'){
+      serverTitle = "Syncing to folder";
       serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
     }
 
@@ -62,7 +66,7 @@ class SyncBusyDialog extends React.Component{
         maxWidth="sm" >
 
         <MuiDialogTitle disableTypography className={classes.root}>
-          <Typography variant="h6">{"Syncing with " + serverTitle}</Typography>
+          <Typography variant="h6">{serverTitle || ""}</Typography>
           {serverFormLogo}
         </MuiDialogTitle>
 

@@ -13,8 +13,8 @@ jobs:
 
     strategy:
       matrix:
-        #os: [macos-latest, windows-latest, ubuntu-latest]
-        os: [macos-latest, windows-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        #os: [macos-latest, windows-latest]
         #os: [ubuntu-latest]
         #os: [ubuntu-latest, windows-latest]
         #os: [ubuntu-latest, macos-latest]

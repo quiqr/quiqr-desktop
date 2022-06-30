@@ -61,6 +61,7 @@ class SplashDialog extends React.Component{
 
           <Box sx={{ border: "green solid 0px", display: 'flex', justifyContent: 'center' }}>
             <Button style={{margin:"5px"}} color="primary" variant="contained" onClick={()=>{
+              window.require('electron').shell.openExternal("https://book.quiqr.org/docs/10-getting-started/10.quick-start-video/");
               }}>
               Quickstart Movie
             </Button>
