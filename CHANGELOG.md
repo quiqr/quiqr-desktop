@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.13.4 (2022-06-30)
 - fix unused var
 
 ## 0.13.3 (2022-06-30)
