@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.13.6 (2022-07-01)
 
 - try fix npm packages package-lock.json
 
