@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- try fix npm packages
+
 ## 0.13.4 (2022-06-30)
 - fix unused var
 
