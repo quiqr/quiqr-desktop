@@ -648,10 +648,6 @@ class MenuManager {
         }
       },
       {
-        label: "Role",
-        submenu: this.createRolesSelectionMenu()
-      },
-      {
         id: 'cacheremoteuserinfo',
         enabled: ( this.profileUserName === '' ? false:true ),
         label: 'Sync Remote User Data',
@@ -846,6 +842,10 @@ class MenuManager {
 
             }
           },
+          {
+            label: "Role",
+            submenu: this.createRolesSelectionMenu()
+          },
           { type: 'separator' },
           { role: 'services' },
           { type: 'separator' },
@@ -912,12 +912,17 @@ class MenuManager {
           { role: 'cut' },
           { role: 'copy' },
           { role: 'paste' },
+          { type: 'separator' },
           {
             label: 'Preferences',
             click: async () => {
               this.appPrefs();
             }
           },
+          {
+            label: "Role",
+            submenu: this.createRolesSelectionMenu()
+          }
         ]
       },
       {

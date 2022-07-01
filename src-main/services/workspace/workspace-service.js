@@ -66,8 +66,9 @@ class WorkspaceService{
   async _smartResolveFormatProvider(filePath , fallbacks ){
     let formatProvider;
     if(contentFormats.isContentFile(filePath)){
-      if(fs.existsSync(filePath))
+      if(fs.existsSync(filePath)){
         formatProvider = await formatProviderResolver.resolveForMdFilePromise(filePath);
+      }
     }
     else
       formatProvider = formatProviderResolver.resolveForFilePath(filePath);
@@ -104,10 +105,18 @@ class WorkspaceService{
     if(str===undefined||str===null||str.length===0||!/\S$/gi){
       return {};
     }
+    if(contentFormats.isContentFile(filePath)){
+      if(formatFallbacks){
+        formatFallbacks.push('yaml');
+      }
+
+    }
     let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
-    if(formatProvider===undefined)
+    if(formatProvider===undefined){
+      console.log("formatprovider undefined");
       return {};
-      //throw new Error('Could not resolve a FormatProvider to parse.');
+    }
+
     if(contentFormats.isContentFile(filePath)){
       return formatProvider.parseFromMdFileString(str);
     }
@@ -298,14 +307,27 @@ class WorkspaceService{
 
     let supportedContentExt = ['md','html','markdown'];
     if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
-      // TODO config for allowing all files
-      //let globExpression = path.join(folder, `**/?(_)index.{${supportedContentExt.join(',')}}`);
-      let globExpression = path.join(folder, `**/*.{${supportedContentExt.join(',')}}`);
+
 
       //WHEN WE WANT TO IGNORE _index.md front pages
-      if ('hideIndex' in collection){
-        globExpression = path.join(folder, `**/!(_index).{${supportedContentExt.join(',')}}`);
+      let subDirStars = '**';
+      if ('includeSubdirs' in collection && collection.includeSubdirs === false){
+        subDirStars = '';
       }
+
+      let globExpression = path.join(folder, `${subDirStars}.{${supportedContentExt.join(',')}}`);
+
+      globExpression = path.join(folder, `${subDirStars}/*.{${supportedContentExt.join(',')}}`);
+      //WHEN WE WANT TO IGNORE _index.md front pages
+      if ('hideIndex' in collection && collection.hideIndex === true){
+        //globExpression = path.join(folder, `${subDirStars}!(_index).{${supportedContentExt.join(',')}}`);
+        globExpression = path.join(folder, `${subDirStars}/!(_index).{${supportedContentExt.join(',')}}`);
+      }
+      /*
+      else{
+        globExpression = path.join(folder, `${subDirStars}/*.{${supportedContentExt.join(',')}}`);
+      }
+      */
 
       let files = await globJob(globExpression, {});
       let retFiles = files.map(function(item){
@@ -348,6 +370,10 @@ class WorkspaceService{
       if(document.resources){
         document.resources = document.resources.filter((x) => x.__deleted==true);
         document.resources.forEach((x)=>delete x.__deleted);
+
+        if(document.resources.length === 0){
+          delete document['resources'];
+        }
       }
     }
   }
@@ -445,7 +471,7 @@ class WorkspaceService{
     if (!fs.existsSync(directory))
       fs.mkdirSync(directory);//ensure directory existence
 
-    let documentClone =  JSON.parse(JSON.stringify(document));
+    let documentClone = JSON.parse(JSON.stringify(document));
     this._stripNonDocumentData(documentClone);
     let stringData = await this._smartDump(filePath, [collection.dataformat], documentClone);
     fs.writeFileSync(filePath,stringData);
@@ -712,7 +738,6 @@ class WorkspaceService{
   }
 
   async build(buildKey, extraConfig={}) {
-    //console.log(buildKey)
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
 

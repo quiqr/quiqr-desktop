@@ -89,7 +89,6 @@ class Embgit{
     return new Promise( async (resolve, reject)=>{
       try {
         let cmd = await spawnAw( gitBinary, [ "repo_show_quiqrsite", url ]);
-        global.outputConsole.appendLine(gitBinary + " repo_show_quiqrsite " + url );
         const response = JSON.parse(cmd.toString());
         resolve(response)
       } catch (e) {

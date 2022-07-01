@@ -60,7 +60,10 @@ class CardItem extends React.Component {
   }
 
   getScreenshot(){
-    if(this.props.site.etalage && this.props.site.etalage.screenshots && this.props.site.etalage.screenshots.length > 0){
+    if(this.props.site.screenshotURL){
+      this._ismounted && this.setState({screenshot:this.props.site.screenshotURL});
+    }
+    else if(this.props.site.etalage && this.props.site.etalage.screenshots && this.props.site.etalage.screenshots.length > 0){
       service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.screenshots[0]).then((img)=>{
         this._ismounted && this.setState({screenshot:img});
       })

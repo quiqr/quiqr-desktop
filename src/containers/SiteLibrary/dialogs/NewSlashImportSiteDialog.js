@@ -19,7 +19,7 @@ import CircularProgress             from '@material-ui/core/CircularProgress';
 import Dialog                       from '@material-ui/core/Dialog';
 import DialogActions                from '@material-ui/core/DialogActions';
 import DialogContent                from '@material-ui/core/DialogContent';
-import DialogContentText            from '@material-ui/core/DialogContentText';
+//import DialogContentText            from '@material-ui/core/DialogContentText';
 import DialogTitle                  from '@material-ui/core/DialogTitle';
 import Select                       from '@material-ui/core/Select';
 import Switch                       from '@material-ui/core/Switch';
@@ -87,15 +87,12 @@ class NewSiteDialog extends React.Component{
   }
 
   componentWillUpdate(nextProps, nextState) {
-
     if(nextProps.importSiteURL && this.props.importSiteURL !== nextProps.importSiteURL){
       this.setState({
-        importTypeGitUrl: nextProps.importSiteURL,
         newType: 'git',
       });
     }
   }
-
 
   componentDidMount(){
     service.api.getFilteredHugoVersions().then((versions)=>{
@@ -159,7 +156,7 @@ class NewSiteDialog extends React.Component{
       {
         type: 'scratch',
         title: 'FROM SCRATCH',
-        icon: <BuildIcon fontSize="large"  color="#ccc"/>,
+        icon: <BuildIcon fontSize="large" />,
         stateUpdate: {
           newType: 'scratch',
           title: "New Quiqr Site from scratch",
@@ -183,7 +180,7 @@ class NewSiteDialog extends React.Component{
       {
         type: 'folder',
         title: 'FROM FOLDER',
-        icon: <FolderIcon fontSize="large"  color="#ccc"/>,
+        icon: <FolderIcon fontSize="large" />,
         stateUpdate: {
           newType: 'folder',
           title: "Import Site from a folder with a Hugo site",
@@ -364,7 +361,7 @@ class NewSiteDialog extends React.Component{
               labelId="demo-simple-select-outlined-label"
               id="demo-simple-select-outlined"
               disabled={this.state.hugoVersionSelectDisable}
-              value={this.state.hugoVersion}
+              value={this.state.hugoVersion||""}
               onChange={(e)=>{
                 const featureVersion = Number(e.target.value.split(".")[1])
                 if(featureVersion > 42){
@@ -390,7 +387,7 @@ class NewSiteDialog extends React.Component{
           <FormControlLabel className={classes.keyButton}
             control={
               <Switch
-                checked={this.state.hugoExtended}
+                checked={this.state.hugoExtended||false}
                 disabled={!this.state.hugoExtendedEnabled}
                 onChange={(e)=>{
                   this.setState({hugoExtended: e.target.checked });
@@ -513,6 +510,7 @@ class NewSiteDialog extends React.Component{
     let closeText = "cancel";
     let content;
 
+
     if(!this.state.newSiteKey && !this.state.newType){
       content = this.renderStep1Cards()
       backButtonHidden = true;
@@ -526,6 +524,10 @@ class NewSiteDialog extends React.Component{
       newButtonHidden = false;
       backButtonHidden = true;
       closeText = "close";
+    }
+
+    if(this.props.importSiteURL){
+      backButtonHidden = true;
     }
 
     const actions = [
@@ -563,9 +565,7 @@ class NewSiteDialog extends React.Component{
       >
         <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {content}
-          </DialogContentText>
+          {content}
         </DialogContent>
         <DialogActions>
           {actions}

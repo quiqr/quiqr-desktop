@@ -2,7 +2,6 @@ import React                               from 'react';
 import { withRouter }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
 import Dashboard                           from './Dashboard'
-//import Sync                                from './Sync'
 import TopToolbarLeft                      from '../TopToolbarLeft'
 import {TopToolbarRight, ToolbarButton}    from '../TopToolbarRight'
 import Collection                          from './Collection';
@@ -13,17 +12,15 @@ import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import { SyncSidebar, SyncRouted }         from './Sync';
 import AppsIcon                            from '@material-ui/icons/Apps';
 import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
-import BuildIcon                            from '@material-ui/icons/Build';
+import BuildIcon                           from '@material-ui/icons/Build';
 import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
-import SyncIcon                         from '@material-ui/icons/Sync';
+import SyncIcon                            from '@material-ui/icons/Sync';
 import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
 import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-//import darkBaseTheme                                 from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme                         from 'material-ui-02/styles/getMuiTheme';
 import service                             from '../../services/service';
 
-const iconColor = "#000";
 const pogoTheme = getMuiTheme(lightBaseTheme, {
   palette: {
     background: {
@@ -184,32 +181,39 @@ class WorkSpace extends React.Component{
     </Switch>);
   }
 
-  toolbarItemsLeft(siteKey, workspaceKey){
+  toolbarItemsLeft(siteKey, workspaceKey, activeButton){
     return [
       <ToolbarButton
         key="buttonContent"
+        active={(activeButton === "content" ? true : false)}
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}`);
         }}
         title="Content"
-        icon={<LibraryBooksIcon style={{ color: iconColor }} />}
+        icon={LibraryBooksIcon}
       />,
       <ToolbarButton
         key="buttonSync"
+        active={(activeButton === "sync" ? true : false)}
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`);
         }}
         title="Sync"
-        icon={<SyncIcon style={{ color: iconColor }} />}
+        icon={SyncIcon}
       />,
+      (
+
+      this.props.applicationRole === 'siteDeveloper' ?
       <ToolbarButton
         key="buttonSiteConf"
+        active={(activeButton === "tools" ? true : false)}
         action={()=>{
           service.api.redirectTo(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
         }}
-        title="Dev Tools"
-        icon={<BuildIcon style={{ color: iconColor }} />}
-      />,
+        title="Tools"
+        icon={BuildIcon}
+      />
+        :null)
     ];
   }
 
@@ -222,7 +226,7 @@ class WorkSpace extends React.Component{
           service.api.openSiteLibrary();
         }}
         title="Site Library"
-        icon={<AppsIcon style={{ color: iconColor }} />}
+        icon={AppsIcon}
       />,
         <ToolbarButton
         key="buttonPrefs"
@@ -230,7 +234,7 @@ class WorkSpace extends React.Component{
           service.api.redirectTo(`/prefs/`);
         }}
         title="Preferences"
-        icon={<SettingsApplicationsIcon style={{ color: iconColor }} />}
+        icon={SettingsApplicationsIcon}
       />,
   ];
   }
@@ -245,8 +249,30 @@ class WorkSpace extends React.Component{
         return <TopToolbarRight
 
           key="toolbar-right-workspace-siteconf"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "tools")}
           itemsCenter={[]}
+          itemsRight={this.toolbarItemsRight("tools")}
+        />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/sync' render={ ({match})=> {
+        const siteKey= decodeURIComponent(match.params.site);
+        const workspaceKey= decodeURIComponent(match.params.workspace);
+        const toolbarItemsCenter = [
+          <ToolbarButton
+            key="buttonPreview"
+            action={()=>{
+              window.require('electron').shell.openExternal('http://localhost:13131');
+            }}
+            title="Preview in Browser"
+            icon={OpenInBrowserIcon}
+          />
+        ];
+
+        return <TopToolbarRight
+          key="toolbar-right-workspace-dashboard"
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "sync")}
+          itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight()}
         />
       }} />
@@ -261,13 +287,13 @@ class WorkSpace extends React.Component{
               window.require('electron').shell.openExternal('http://localhost:13131');
             }}
             title="Preview in Browser"
-            icon={<OpenInBrowserIcon style={{ color: iconColor }} />}
+            icon={OpenInBrowserIcon}
           />
         ];
 
         return <TopToolbarRight
           key="toolbar-right-workspace-dashboard"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "content")}
           itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight()}
         />
@@ -317,6 +343,7 @@ class WorkSpace extends React.Component{
     this.getProfile();
     return <Dashboard
       key={ match.url }
+      applicationRole={ this.props.applicationRole }
       quiqrUsername={this.state.quiqrUsername}
       quiqrFingerprint={this.state.quiqrFingerprint}
       siteKey={ decodeURIComponent(match.params.site) }

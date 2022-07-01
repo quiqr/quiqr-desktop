@@ -8,7 +8,6 @@ import AddIcon                                                    from '@materia
 import ViewListIcon                                               from '@material-ui/icons/ViewList';
 import ViewModuleIcon                                             from '@material-ui/icons/ViewModule';
 
-const iconColor = "#000";
 
 export class SiteLibraryToolbarRight extends React.Component {
   constructor(props){
@@ -30,7 +29,7 @@ export class SiteLibraryToolbarRight extends React.Component {
           service.api.redirectTo(`/sites/new-site/x${Math.random()}`, true);
         }}
         title="New"
-        icon={<AddIcon style={{ color: iconColor }} />}
+        icon={AddIcon}
       />,
 
 
@@ -40,7 +39,7 @@ export class SiteLibraryToolbarRight extends React.Component {
           service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);
         }}
         title="Import"
-        icon={<InputIcon style={{ color: iconColor }} />}
+        icon={InputIcon}
       />,
 
     ]
@@ -70,7 +69,7 @@ export class SiteLibraryToolbarRight extends React.Component {
           history.push('/prefs/')
         }}
         title="Preferences"
-        icon={<SettingsApplicationsIcon style={{ color: iconColor }} />}
+        icon={SettingsApplicationsIcon}
       />,
     ];
 

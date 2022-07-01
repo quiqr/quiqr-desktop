@@ -32,7 +32,6 @@ const useStyles = theme => ({
 
   progressLabel:{
     marginLeft: theme.spacing(3),
-    //marginTop: theme.spacing(1),
     backgroundColor: "white",
   },
 
@@ -78,6 +77,8 @@ class GitHubPagesForm extends React.Component{
         keyPairBusy: true,
         overrideBaseURLSwitch: false,
         overrideBaseURL: '',
+        CNAMESwitch: false,
+        CNAME: '',
       }
     }
   }
@@ -93,12 +94,11 @@ class GitHubPagesForm extends React.Component{
       this.updatePubData({deployPrivateKey: resp.keyPair[0], deployPublicKey: resp.keyPair[1] },
         ()=>{
           this.setState({ keyPairBusy: false })
-          //service.api.logToConsole(this.state.pubData, "keypair2")
         }
       );
 
     }, (e)=>{
-          service.api.logToConsole(e, "ERRR")
+      service.api.logToConsole(e, "ERRR")
       this.setState({
         keyPairBusy: false
       });
@@ -206,45 +206,44 @@ class GitHubPagesForm extends React.Component{
             </FormControl>
             :
 
-          <React.Fragment>
-          <FormControl className={clsx(classes.margin, classes.keyField)} variant="outlined">
-            <InputLabel htmlFor="outlined-adornment-password">Deploy Public Key</InputLabel>
+            <React.Fragment>
+              <FormControl className={clsx(classes.margin, classes.keyField)} variant="outlined">
+                <InputLabel htmlFor="outlined-adornment-password">Deploy Public Key</InputLabel>
 
-            <OutlinedInput
-              id="outlined-adornment-password"
-              type={this.state.showPassword ? 'text' : 'password'}
-              value={this.state.pubData.deployPublicKey}
-              onChange={(e)=>{
-                //this.updatePubData({deployPublicKey: e.target.value });
-              }}
+                <OutlinedInput
+                  id="outlined-adornment-password"
+                  type={this.state.showPassword ? 'text' : 'password'}
+                  value={this.state.pubData.deployPublicKey}
+                  onChange={(e)=>{
+                    //this.updatePubData({deployPublicKey: e.target.value });
+                  }}
 
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle deploy key visibility"
-                    onClick={()=>{
-                      this.setState({ showPassword: !this.state.showPassword });
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle deploy key visibility"
+                        onClick={()=>{
+                          this.setState({ showPassword: !this.state.showPassword });
 
-                    }}
-                    onMouseDown={(event)=>{
-                      event.preventDefault();
-                    }}
-                    edge="end"
-                  >
-                    {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              }
-              labelWidth={140}
-            />
-          </FormControl>
-          </React.Fragment>
+                        }}
+                        onMouseDown={(event)=>{
+                          event.preventDefault();
+                        }}
+                        edge="end"
+                      >
+                        {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  labelWidth={140}
+                />
+              </FormControl>
+            </React.Fragment>
           )}
           <Button className={classes.keyButton} disabled={this.state.keyPairBusy} onClick={()=>{
 
             const {clipboard} = window.require('electron')
             clipboard.writeText(this.state.pubData.deployPublicKey)
-            //service.api.logToConsole(this.state.pubData.deployPublicKey);
 
           }} variant="contained">Copy</Button>
           <Button className={classes.keyButton} onClick={()=>{this.getKeyPair()}} disabled={this.state.keyPairBusy} color="secondary" variant="contained">Re-generate</Button>
@@ -252,83 +251,125 @@ class GitHubPagesForm extends React.Component{
         </Box>
 
         <Box my={2}>
-                      <FormControl variant="outlined" className={classes.formControl}>
-              <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
-              <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                value={this.state.pubData.publishScope}
-                onChange={(e)=>{
-                  if(e.target.value === "build"){
-                    this.updatePubData({
-                      publishScope: e.target.value,
-                      setGitHubActions: false,
-                    });
-                    this.setState({
-                      setGitHubActionsSwitchEnable: false
-                    });
-                  }
-                  else{
-                    this.updatePubData({
-                      publishScope: e.target.value,
-                    });
-                    this.setState({
-                      setGitHubActionsSwitchEnable:true
-                    });
-                  }
-                }}
-                label="Publish Source and Build"
-              >
-                <MenuItem value="build">Publish only build files</MenuItem>
-                <MenuItem value="source">Publish only source files</MenuItem>
-                <MenuItem value="build_and_source">Publish source and build files</MenuItem>
-              </Select>
-            </FormControl>
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              value={this.state.pubData.publishScope}
+              onChange={(e)=>{
+                if(e.target.value === "build"){
+                  this.updatePubData({
+                    publishScope: e.target.value,
+                    setGitHubActions: false,
+                  });
+                  this.setState({
+                    setGitHubActionsSwitchEnable: false
+                  });
+                }
+                else{
+                  this.updatePubData({
+                    publishScope: e.target.value,
+                  });
+                  this.setState({
+                    setGitHubActionsSwitchEnable:true
+                  });
+                }
+              }}
+              label="Publish Source and Build"
+            >
+              <MenuItem value="build">Publish only build files</MenuItem>
+              <MenuItem value="source">Publish only source files</MenuItem>
+              <MenuItem value="build_and_source">Publish source and build files</MenuItem>
+            </Select>
+          </FormControl>
 
 
           <FormControlLabel className={classes.keyButton}
-              control={
-                <Switch
-                  checked={this.state.pubData.setGitHubActions}
-                  disabled={!this.state.setGitHubActionsSwitchEnable}
-                  onChange={(e)=>{
-                    this.updatePubData({setGitHubActions: e.target.checked });
-                  }}
+            control={
+              <Switch
+                checked={this.state.pubData.setGitHubActions}
+                disabled={!this.state.setGitHubActionsSwitchEnable}
+                onChange={(e)=>{
+                  this.updatePubData({setGitHubActions: e.target.checked });
+                }}
 
-                  name="configureActions"
-                  color="primary"
-                />
-              }
-              label="Configure GitHub Actions"
-            />
+                name="configureActions"
+                color="primary"
+              />
+            }
+            label="Configure GitHub Actions"
+          />
         </Box>
 
         <Box my={2}>
 
-            <FormControlLabel className={classes.keyButton}
-              control={
-                <Switch
-                  checked={this.state.pubData.overrideBaseURLSwitch}
-                  onChange={(e)=>{
-                    if(this.state.pubData.overrideBaseURLSwitch){
-                      this.updatePubData({
-                        overrideBaseURLSwitch: e.target.checked,
-                        overrideBaseURL: "",
-                      });
-                    }
-                    else{
-                      this.updatePubData({
-                        overrideBaseURLSwitch: e.target.checked,
-                      });
-                    }
-                  }}
+          <FormControlLabel className={classes.keyButton}
+            control={
+              <Switch
+                checked={this.state.pubData.CNAMESwitch}
+                onChange={(e)=>{
+                  if(this.state.pubData.CNAMESwitch){
+                    this.updatePubData({
+                      CNAMESwitch: e.target.checked,
+                      CNAME: "",
+                    });
+                  }
+                  else{
+                    this.updatePubData({
+                      CNAMESwitch: e.target.checked,
+                    });
+                  }
+                }}
 
-                  name="overrideBaseURLSwitch"
-                  color="primary"
-                />
-              }
-              label="Override BaseURL"
-            />
+                name="CNAMESwitch"
+                color="primary"
+              />
+            }
+            label="Set CNAME"
+          />
+
+          <TextField
+            id="CNAME"
+            label="CNAME"
+            disabled={!this.state.pubData.CNAMESwitch}
+            onChange={(e)=>{
+              this.updatePubData({CNAME: e.target.value });
+            }}
+            value={this.state.pubData.CNAME}
+            helperText="Fully Qualified Domain Name, e.g. example.com"
+            variant="outlined"
+            className={classes.textfield}
+          />
+
+        </Box>
+
+        <Box my={2}>
+
+          <FormControlLabel className={classes.keyButton}
+            control={
+              <Switch
+                checked={this.state.pubData.overrideBaseURLSwitch}
+                onChange={(e)=>{
+                  if(this.state.pubData.overrideBaseURLSwitch){
+                    this.updatePubData({
+                      overrideBaseURLSwitch: e.target.checked,
+                      overrideBaseURL: "",
+                    });
+                  }
+                  else{
+                    this.updatePubData({
+                      overrideBaseURLSwitch: e.target.checked,
+                    });
+                  }
+                }}
+
+                name="overrideBaseURLSwitch"
+                color="primary"
+              />
+            }
+            label="Override BaseURL"
+          />
 
           <TextField
             id="baseUrl"

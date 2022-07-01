@@ -180,9 +180,10 @@ function createWindow () {
   // and restore the maximized or full screen state
   mainWindowState.manage(mainWindow);
 
-  //start with devtool enabled
   if(process.env.DEVTOOLS){
-    mainWindow.webContents.openDevTools();
+    let devtools = new BrowserWindow()
+    mainWindow.webContents.setDevToolsWebContents(devtools.webContents)
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
   }
 
   mobilePreviewView = new BrowserView();

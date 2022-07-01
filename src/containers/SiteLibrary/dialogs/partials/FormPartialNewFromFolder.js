@@ -68,7 +68,6 @@ class FormPartialNewFromFolder extends React.Component{
     service.api.hugosite_dir_show(path)
       .then((response)=>{
         if(response){
-          //service.api.logToConsole(response)
 
           this.setState({
             newTypeFolderScreenshot: (response.Screenshot ? response.Screenshot:null),

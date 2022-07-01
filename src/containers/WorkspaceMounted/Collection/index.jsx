@@ -414,10 +414,7 @@ class Collection extends React.Component{
           <div>
             <RaisedButton
             label={'New '+ collection.itemtitle }
-            onClick={ this.setCreateItemView.bind(this)
-            /* function(){ history.push('/collections/'+encodeURIComponent(collectionKey)+'/new') */ } />
-
-            {/* <RaisedButton label='New Section' onClick={ this.setCreateSectionView.bind(this) } /> */}
+            onClick={ this.setCreateItemView.bind(this) } />
           </div>
           <br />
 

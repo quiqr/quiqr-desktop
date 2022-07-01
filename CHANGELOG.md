@@ -1,4 +1,24 @@
 # Quiqr App CHANGELOG
+## 0.13.4 (2022-06-30)
+- fix unused var
+
+## 0.13.3 (2022-06-30)
+- small bugfixes
+- add quickstart video endpoint
+- try enable linux build target
+
+## 0.13.2 (2022-06-29)
+
+- set cname for github pages
+- sort tags
+- Quiqr Community Templates listing
+- show active toolbar item in workspace
+- move role to edit below preferences
+- role has effect on toolbar and content dashboard
+- show content items on dashboard
+- fix #412 read and save md without frontmatter
+- add new collection propery includeSubDirs default true
+
 ## 0.13.1 (2022-06-23)
 
 - lint fixes

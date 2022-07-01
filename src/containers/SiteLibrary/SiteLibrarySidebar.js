@@ -31,6 +31,15 @@ export class SiteLibrarySidebar extends React.Component {
           })
         }
       })
+      tags.sort(function(a, b){
+        var nameA=a.toLowerCase(), nameB=b.toLowerCase()
+        if (nameA < nameB) //sort string ascending
+          return -1
+        if (nameA > nameB)
+          return 1
+        return 0 //default return value (no sorting)
+      })
+
 
       this.setState({tags:tags});
     });
@@ -106,10 +115,10 @@ export class SiteLibrarySidebar extends React.Component {
           {
             active: true,
             label: "Quiqr Community Templates",
-            selected: (this.state.selectedMenuItem==='templates-quiqr-community' ? true : false),
+            selected: (this.state.selectedMenuItem==='quiqr-community-templates' ? true : false),
             onClick: ()=>{
-              this.saveSelectedMenuItem('templates-quiqr-community');
-              history.push(`${basePath}/templates/quiqr-community`)
+              this.saveSelectedMenuItem('quiqr-community-templates');
+              history.push(`${basePath}/quiqr-community-templates`)
             }
           },
         ]

@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/core/styles';
 const useStyles = theme => ({
   root: {
     margin: 20,
-    maxWidth: 345,
+    maxWidth: 545,
   },
   logo:{
     alignItems: 'center',

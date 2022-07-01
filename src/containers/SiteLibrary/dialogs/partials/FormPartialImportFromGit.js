@@ -81,8 +81,21 @@ class FormPartialNewFromScratch extends React.Component{
     }
   }
 
+  componentDidMount(){
+    if(this.props.importSiteURL && this.state.importTypeGitUrl !== this.props.importSiteURL){
+      this.setState({importTypeGitUrl: this.props.importSiteURL},
+        ()=>{
+          if(this.preValidateURL(this.props.importSiteURL)){
+            this.validateURL(this.props.importSiteURL);
+          }
+        }
+      );
+    }
+
+  }
+
   componentWillUpdate(nextProps, nextState) {
-    if(this.state.importTypeGitUrl !== nextProps.importSiteURL && nextProps.importSiteURL){
+    if(this.state.importTypeGitUrl !== nextProps.importSiteURL && nextProps.importSiteURL ){
       this.setState({importTypeGitUrl: nextProps.importSiteURL},
         ()=>{
           if(this.preValidateURL(nextProps.importSiteURL)){
@@ -209,118 +222,116 @@ class FormPartialNewFromScratch extends React.Component{
 
     return (
       <React.Fragment>
-          <Box my={3}>
-            <p>
-              Enter a public git URL with a quiqr website or template to import.
-            </p>
-          </Box>
-          <Box my={3} sx={{display:'flex'}}>
-            <TextField
-              fullWidth
-              id="standard-full-width"
-              autoFocus
-              label="Git URL"
-              value={this.state.importTypeGitUrl}
-              variant="outlined"
-              onChange={(e)=>{
-                this.setState({importTypeGitUrl: e.target.value});
+        <Box my={3}>
+          Enter a public git URL with a quiqr website or template to import.
+        </Box>
+        <Box my={3} sx={{display:'flex'}}>
+          <TextField
+            fullWidth
+            id="standard-full-width"
+            autoFocus
+            label="Git URL"
+            value={this.state.importTypeGitUrl}
+            variant="outlined"
+            onChange={(e)=>{
+              this.setState({importTypeGitUrl: e.target.value});
 
-                if(e.target.value && e.target.value !== ''){
-                  if(this.state.importTypeGitLastValidatedUrl !== e.target.value){
+              if(e.target.value && e.target.value !== ''){
+                if(this.state.importTypeGitLastValidatedUrl !== e.target.value){
 
-                    this.preValidateURL(e.target.value);
-
-                  }
-                  else{
-                    this.setState({
-                      importTypeGitErrorText: '',
-                      importTypeGitReadyForValidation: false,
-                    });
-                  }
+                  this.preValidateURL(e.target.value);
 
                 }
+                else{
+                  this.setState({
+                    importTypeGitErrorText: '',
+                    importTypeGitReadyForValidation: false,
+                  });
+                }
+
+              }
 
 
-              }}
-              error={(this.state.importTypeGitErrorText === '' ? false : true)}
-              helperText={this.state.importTypeGitErrorText}
+            }}
+            error={(this.state.importTypeGitErrorText === '' ? false : true)}
+            helperText={this.state.importTypeGitErrorText}
+          />
+          <Button variant="contained" disabled={(this.state.importTypeGitBusy || !this.state.importTypeGitReadyForValidation ? true : false)} className={classes.rightButton} color="primary" onClick={()=>{
+            this.validateURL(this.state.importTypeGitUrl);
+          }}>Validate Remote Repository</Button>
+
+        </Box>
+
+
+        <Box my={3}>
+          <Card className={classes.root} variant="outlined" style={{backgroundColor:'#eee'}}>
+            <CardMedia
+              className={classes.cover}
+              image={(this.state.importTypeGitScreenshot?this.state.importTypeGitScreenshot:ScreenShotPlaceholder)}
+              title="site screenshot"
             />
-            <Button variant="contained" disabled={(this.state.importTypeGitBusy || !this.state.importTypeGitReadyForValidation ? true : false)} className={classes.rightButton} color="primary" onClick={()=>{
-              this.validateURL(this.state.importTypeGitUrl);
-            }}>Validate Remote Repository</Button>
-
-          </Box>
+            <div className={classes.details}>
+              <CardContent className={classes.content}>
 
 
-          <Box my={3}>
-            <Card className={classes.root} variant="outlined" style={{backgroundColor:'#eee'}}>
-              <CardMedia
-                className={classes.cover}
-                image={(this.state.importTypeGitScreenshot?this.state.importTypeGitScreenshot:ScreenShotPlaceholder)}
-                title="site screenshot"
-              />
-              <div className={classes.details}>
-                <CardContent className={classes.content}>
+                <TableContainer xcomponent={Paper}>
+                  <Table className={classes.table} size="small" aria-label="a dense table">
+                    <TableBody>
 
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Git URL
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{(this.state.importTypeGitBusy ? <CircularProgress size={20} /> : null)} {this.state.importTypeGitLastValidatedUrl}</TableCell>
+                      </TableRow>
 
-                  <TableContainer xcomponent={Paper}>
-                    <Table className={classes.table} size="small" aria-label="a dense table">
-                      <TableBody>
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Git Provider
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{this.state.importTypeGitProvider}</TableCell>
+                      </TableRow>
 
-                        <TableRow>
-                          <TableCell align="right">
-                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                              Git URL
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="left">{(this.state.importTypeGitBusy ? <CircularProgress size={20} /> : null)} {this.state.importTypeGitLastValidatedUrl}</TableCell>
-                        </TableRow>
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Hugo Theme
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{this.state.importHugoTheme}</TableCell>
+                      </TableRow>
 
-                        <TableRow>
-                          <TableCell align="right">
-                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                              Git Provider
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="left">{this.state.importTypeGitProvider}</TableCell>
-                        </TableRow>
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Quiqr Model
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{this.state.importQuiqrModel}</TableCell>
+                      </TableRow>
 
-                        <TableRow>
-                          <TableCell align="right">
-                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                              Hugo Theme
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="left">{this.state.importHugoTheme}</TableCell>
-                        </TableRow>
+                      <TableRow>
+                        <TableCell align="right">
+                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
+                            Quiqr Forms
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="left">{this.state.importQuiqrForms}</TableCell>
+                      </TableRow>
 
-                        <TableRow>
-                          <TableCell align="right">
-                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                              Quiqr Model
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="left">{this.state.importQuiqrModel}</TableCell>
-                        </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
 
-                        <TableRow>
-                          <TableCell align="right">
-                            <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                              Quiqr Forms
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="left">{this.state.importQuiqrForms}</TableCell>
-                        </TableRow>
+              </CardContent>
+            </div>
 
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-
-                </CardContent>
-              </div>
-
-            </Card>
-          </Box>
+          </Card>
+        </Box>
 
 
       </React.Fragment>

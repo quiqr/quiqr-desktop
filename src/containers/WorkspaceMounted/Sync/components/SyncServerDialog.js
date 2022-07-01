@@ -57,7 +57,6 @@ class SyncServerDialog extends React.Component{
 
   componentDidUpdate(preProps){
     if(this.props.publishConf && preProps.publishConf !== this.props.publishConf) {
-      //service.api.logToConsole(this.props.publishConf);
       this.setState({
         serverType: this.props.publishConf.config.type,
         publishKey: this.props.publishConf.key,
@@ -98,7 +97,7 @@ class SyncServerDialog extends React.Component{
               elevation={5}
             >
               <Box display="flex" alignItems="center"  justifyContent="center" height={63}>
-                <FolderIcon fontSize="large"  color="#ccc"/>
+                <FolderIcon fontSize="large" />
               </Box>
               <Box display="flex" alignItems="center"  justifyContent="center" >
                 <Typography variant="h5">TO FOLDER</Typography>
