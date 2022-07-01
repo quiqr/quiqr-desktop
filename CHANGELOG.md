@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.13.5 (2022-07-01)
 - try fix npm packages
 
 ## 0.13.4 (2022-06-30)
