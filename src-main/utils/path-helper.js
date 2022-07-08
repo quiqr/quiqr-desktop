@@ -90,6 +90,9 @@ class PathHelper{
         //return path.join(rootPath, 'Contents','Resources');
         return path.join(rootPath, 'Resources');
       }
+      else if(enviromnent.platform == PLATFORMS.windows){
+        return path.join(rootPath);
+      }
       else if(this.isLinuxAppImage()){
         const appPath = electron.app.getAppPath();
         return path.join(appPath.substring(0, appPath.lastIndexOf('/')));

@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- try fix Windows embgit
 
 ## 0.13.6 (2022-07-01)
 
