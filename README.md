@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://https://quiqr.org">Website</a>
+  <a href="https://quiqr.org">Website</a>
   ·
   <a href="https://book.quiqr.org/docs/10-getting-started/01.installation/">Install</a>
   ·
