@@ -1,51 +1,75 @@
-# Quiqr Electron Desktop App
+<p align="center">
+    <a href="https://quiqr.org">
+    <img width="600" alt="horz - dark" src="https://open.quiqr.org/images/logo-nav.svg">
+    </a>
+</p>
 
-Quiqr App is a CMS and Publishing tool for Hugo to run on your computer.
+<p align="center">
+  <a href="https://https://quiqr.org">Website</a>
+  ·
+  <a href="https://book.quiqr.org/docs/10-getting-started/01.installation/">Install</a>
+  ·
+  <a href="https://book.quiqr.org">Documentation</a>
+</p>
 
-## Features
+## About
 
-Take a look at our features and understand why Quiqr is a great tool for your
-Hugo websites:
 
-* **Made for Hugo.** Quiqr is a desktop CMS for Hugo websites.
-* **Embedded git.** Quiqr comes with embedded git functionality for
-  publishing and version management.
-* **Runs on your computer.** Supported Platforms: Windows, Linux and macOS.
-* **Free for commercial use.** Download our binaries today and use it for your
-  own commercial purposes.
-* **One click installer.** It's a breeze to install on your PC.
-* **Dozen of ready to use UI components.** Crafted to handle many use cases and
-  complex data hierarchy.
-* **Clean UI.** Clearly see what you are doing without any clutter or
-  confusion.
-* **Open Source.** MIT license. Copy, edit, share, redistribute.
-* **Build User Interfaces Easily.** Just create a small configuration file
-  (JSON, TOML and YAML are supported).
+## Supported Platforms
 
-## Getting Started
+Quiqr runs on Windows, macOS and Linux
 
-* Download
-* Open the application.
-* Follow the instuctions on the welcome screen.
+## Installation
 
-Quiqr targets Hugo Website Developers and Hugo Website Content Managers.
+You can download Warp from our [website](<https://quiqr.org>).
 
-### Hugo Website Content Managers
+## Changelog and Releases
 
-When you are a content manager you can download existing theme's and site
-templates. A Hugo Site Developer can give you access to a custom made site.
+We try to release an often. See our [changelog (release notes).](https://github.com/quiqr/quiqr-desktop/blob/main/CHANGELOG.md)
 
-TODO READ/WATCH the quick start for content managers.
+## Issues, Bugs, and Feature Requests
 
-### Hugo Website Developers
+File issue requests [in this repo!](https://github.com/quiqr/quiqr-desktop/issues/new/choose)
 
-You'll have to learn some concepts before diving deep into Quiqr site
-development.
+<!--We kindly ask that you please use our issue templates to make the issues easier to track for our team.-->
 
-TODO READ/WATCH the quick start for site developers.
+## Open Source & Contributing
 
-Read the [Quiqr Book](https://book.quiqr.org)
-for full reference of the Quiqr App and the Quiqr Platform.
+Quiqr is open source and we appreciate contributions and positive feedback.
+
+## Support and Questions
+
+<!--
+
+1. See our [docs](https://docs.warp.dev/help/known-issues) for a walkthrough of the features within our app.
+2. Join our [Discord](https://discord.gg/warpdotdev) to chat with other users and get immediate help with members of the Warp team.
+
+-->
+
+Please don't hesitate to reach out via email at info at quiqr dot org.
+
+## Community Guidelines
+
+At a high level, we ask everyone be respectful and empathetic. We follow the
+[Github Community
+Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
+
+* Be welcoming and open-minded
+* Respect each other
+* Communicate with empathy
+* Be clear and stay on topic
+
+## Open Source Dependencies
+
+We'd like to call out a few of the [open source
+dependencies](https://github.com/quiqr/quiqr-desktop/blob/main/ThirdPartyNotices.txt)
+that have helped Quiqr to get off the ground:
+
+* [Hugo](https://gohugo.io/)
+* [ElectronJS](https://www.electronjs.org/)
+* [React](https://reactjs.org/)
+* [MUI](https://mui.com/)
+
 
 ## Building
 
