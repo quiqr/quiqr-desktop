@@ -11,7 +11,7 @@
     "url": "https://github.com/quiqr/quiqr-desktop.git"
   },
   "description": "CMS with a Hugo Engine",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.3",
