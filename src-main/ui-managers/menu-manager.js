@@ -12,8 +12,6 @@ const cloudApiManager             = require('../sync/quiqr-cloud/cloud-api-manag
 const cloudGitManager             = require('../sync/quiqr-cloud/cloud-git-manager');
 const PogoPublisher               = require('../publishers/pogo-publisher');
 const pathHelper                  = require('../utils/path-helper');
-//const SiteService                 = require('../services/site/site-service')
-//const libraryService              = require('../services/library/library-service')
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
 
@@ -1001,12 +999,6 @@ class MenuManager {
               this.toggleDisablePartialCache()
             }
           },
-          {
-            label: 'Model Configuration Examples',
-            click: async () => {
-              this.openCookbooks()
-            }
-          },
           { type: 'separator' },
           {
             label: 'Enable Experimental',
@@ -1045,12 +1037,19 @@ class MenuManager {
           {
             label: 'Getting Started',
             click: async () => {
-              await shell.openExternal("https://book.quiqr.org/docs/01-getting-started/");
+              await shell.openExternal("https://book.quiqr.org/docs/10-getting-started/");
             }
           },
           { type: 'separator' },
           {
-            label: 'Show Quiqr Version',
+            label: 'Model Configuration Examples',
+            click: async () => {
+              this.openCookbooks()
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Quiqr Version',
             click: async () => {
               this.showVersion();
             }
@@ -1058,7 +1057,7 @@ class MenuManager {
           {
             label: 'Release Notes',
             click: async () => {
-              await shell.openExternal("https://book.quiqr.org/docs/10-release-notes/01-quiqr-desktop/");
+              await shell.openExternal("https://book.quiqr.org/docs/80-release-notes/01-quiqr-desktop/");
             }
           }
         ]

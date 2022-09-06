@@ -67,7 +67,7 @@ class SplashDialog extends React.Component{
             </Button>
 
             <Button style={{margin:"5px"}} color="primary" variant="contained" onClick={()=>{ this.props.onClose();
-              window.require('electron').shell.openExternal("https://book.quiqr.org/docs/01-getting-started/");
+              window.require('electron').shell.openExternal("https://book.quiqr.org/docs/10-getting-started/");
             }}>
               Quickstart Guide
             </Button>
