@@ -219,6 +219,9 @@ export class API {
   hugosite_dir_show(folder: string){
     return mainProcessBridge.request('hugosite_dir_show', {folder}, {timeout: 30000});
   }
+  openCustomCommand(command: string){
+    return mainProcessBridge.request('openCustomCommand', {command});
+  }
 
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 40000});

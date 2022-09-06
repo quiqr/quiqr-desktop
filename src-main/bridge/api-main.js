@@ -22,6 +22,7 @@ const cloudGitManager           = require('../sync/quiqr-cloud/cloud-git-manager
 const GithubKeyManager          = require('../sync/github/github-key-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 const chokidar                  = require('chokidar');
+const spawnAw                   = require('await-spawn')
 
 let api = {};
 
@@ -807,6 +808,22 @@ api.hugotheme_git_repo_show = function({url}, promise){
     })
 }
 
+api.openCustomCommand = function({command}, promise){
+
+  var exec = require('child_process').exec;
+
+  exec(command,
+    function (error, stdout, stderr) {
+      console.log('stdout: ' + stdout);
+      console.log('stderr: ' + stderr);
+      if (error !== null) {
+        console.log('exec error: ' + error);
+      }
+    });
+
+  console.log(command)
+  promise.resolve();
+}
 api.hugosite_dir_show = function({folder}, promise){
 
   folderImporter.siteDirectoryInspect(folder)

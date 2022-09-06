@@ -25,7 +25,7 @@ const useStyles = theme => ({
 
 });
 
-class Prefs extends React.Component {
+class PrefsGeneral extends React.Component {
 
   history: any;
 
@@ -89,4 +89,4 @@ class Prefs extends React.Component {
 
 }
 
-export default withStyles(useStyles)(Prefs);
+export default withStyles(useStyles)(PrefsGeneral);

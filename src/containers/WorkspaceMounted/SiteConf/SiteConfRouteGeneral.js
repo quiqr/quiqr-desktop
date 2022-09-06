@@ -3,9 +3,10 @@ import service        from './../../../services/service';
 import Typography     from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import TextField      from '@material-ui/core/TextField';
-import IconButton      from '@material-ui/core/IconButton';
-import Grid            from '@material-ui/core/Grid';
-import FolderIcon from '@material-ui/icons/Folder';
+import IconButton     from '@material-ui/core/IconButton';
+import Grid           from '@material-ui/core/Grid';
+import FolderIcon     from '@material-ui/icons/Folder';
+import LaunchIcon   from '@material-ui/icons/Launch';
 
 const useStyles = theme => ({
 
@@ -68,6 +69,19 @@ class SiteConfRouteGeneral extends React.Component {
       siteKey: this.props.siteKey
     })
 
+    service.api.readConfKey('prefs').then((value)=>{
+      this.setState({prefs: value });
+
+      if(value.customOpenInCommand){
+        this.setState({customOpenInCommand: value.customOpenInCommand });
+      }
+      else{
+        this.setState({customOpenInCommand: "" });
+      }
+
+    });
+
+
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
       var stateUpdate  = {};
       stateUpdate.siteconf = bundle.site;
@@ -123,7 +137,7 @@ class SiteConfRouteGeneral extends React.Component {
 
           </Grid>
 
-          <Grid item xs={11}>
+          <Grid item xs={10}>
 
           <TextField
             id="standard-full-width"
@@ -140,15 +154,22 @@ class SiteConfRouteGeneral extends React.Component {
 
           </Grid>
 
-          <Grid item xs={1}>
+          <Grid item xs={2}>
             <IconButton color="primary" className={classes.iconButton} aria-label="directions"
               onClick={()=>{
                 service.api.openFileInEditor(this.state.source.path);
               }}>
-              <FolderIcon
-                style={{ color: '#000' }}
-              />
+              <FolderIcon style={{ color: '#000' }} />
             </IconButton>
+            { this.state.customOpenInCommand && this.state.customOpenInCommand !== "" && this.state.customOpenInCommand.trim() &&
+
+            <IconButton color="primary" className={classes.iconButton} aria-label="directions"
+              onClick={()=>{
+                service.api.openCustomCommand(this.state.customOpenInCommand.replace('%s', this.state.source.path))
+              }}>
+              <LaunchIcon style={{ color: '#000' }} />
+            </IconButton>
+            }
           </Grid>
 
         </Grid>

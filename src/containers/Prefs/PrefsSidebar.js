@@ -12,13 +12,22 @@ export class PrefsSidebar extends React.Component {
 
     let menu = {
       title: 'Preferences',
-      items: [{
+      items: [
+      {
         active: true,
         label: "General",
         onClick: ()=>{
           history.push('/prefs/general');
         }
-      }]
+      },
+      {
+        active: true,
+        label: "Advanced",
+        onClick: ()=>{
+          history.push('/prefs/advanced');
+        }
+      }
+      ]
     }
 
     return <Sidebar {...this.props} menus={[menu]} />

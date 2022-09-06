@@ -50,14 +50,6 @@ export class SiteConfSidebar extends React.Component {
               history.push(`${basePath}/model/`)
             }
           },
-          {
-            active: true,
-            label: "Examples",
-            onClick: ()=>{
-              this.setState({selectedMenuItem:''});
-              history.push('/forms-cookbook')
-            }
-          },
         ]
       }
     ]
