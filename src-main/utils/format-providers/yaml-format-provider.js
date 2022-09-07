@@ -30,7 +30,8 @@ class YamlFormatProvider {
     }
     else{
       let header = this.dump(obj);
-      header = header.split(/\r?\n/).filter(line => line.trim() !== "").join("\n");
+      //TODO WHY??? This causes https://github.com/quiqr/quiqr-desktop/issues/421
+      //header = header.split(/\r?\n/).filter(line => line.trim() !== "").join("\n");
       return `---
 ${header}
 ---
