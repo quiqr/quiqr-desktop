@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- Implement Custom Open Command
+- Fix help links
+
 ## 0.13.8 (2022-07-08)
 - try fix Windows embgit
 

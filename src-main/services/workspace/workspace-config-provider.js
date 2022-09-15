@@ -245,13 +245,16 @@ class WorkspaceConfigProvider{
           let newData = deepmerge(mergeData, mergeKey);
 
           //REMOVE DUPLICATES PREFER FIELDS FROM BASE.JSON OVER PARTIALS FIELDS
-          newData.fields = newData.fields.reverse().filter((field, index, self) =>
-            index === self.findIndex((t) => (
-              t.key === field.key
-            ))
-          )
-          //RESTORE ORDER AGAIN
-          newData.fields = newData.fields.reverse();
+          if(newData.fields){
+
+            newData.fields = newData.fields.reverse().filter((field, index, self) =>
+              index === self.findIndex((t) => (
+                t.key === field.key
+              ))
+            )
+            //RESTORE ORDER AGAIN
+            newData.fields = newData.fields.reverse();
+          }
 
           mergeKey = newData;
 

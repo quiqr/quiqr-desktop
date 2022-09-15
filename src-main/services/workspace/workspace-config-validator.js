@@ -101,7 +101,7 @@ class WorkspaceConfigValidator {
         previewUrl: joi.string().trim(),
         hideIndex: joi.boolean(),
         includeSubdirs: joi.boolean(),
-        fields: joi.array().min(1).required().error(new Error('The fields value is invalid.')),
+        fields: joi.array().min(1).required().error(new Error("The fields value is invalid.\n"+JSON.stringify(collection))),
         sortkey: joi.string().trim().min(3).error(new Error('The sortkey value is invalid.')),
       })
     ).error;
