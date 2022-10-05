@@ -270,6 +270,12 @@ export class API {
   openSiteLibrary(){
     return mainProcessBridge.request('openSiteLibrary');
   }
+  showMenuBar(){
+    return mainProcessBridge.request('showMenuBar');
+  }
+  hideMenuBar(){
+    return mainProcessBridge.request('hideMenuBar');
+  }
 
   mountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('mountWorkspace', {siteKey, workspaceKey});

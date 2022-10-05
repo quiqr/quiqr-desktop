@@ -410,6 +410,16 @@ api.openSiteLibrary = async function(){
   global.mainWM.closeSiteAndShowSelectSites();
 }
 
+api.showMenuBar = async function(){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  mainWindow.setMenuBarVisibility(true)
+}
+
+api.hideMenuBar = async function(){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  mainWindow.setMenuBarVisibility(false)
+}
+
 api.mountWorkspace = async function({siteKey, workspaceKey}, context){
   let siteService = await getSiteServicePromise(siteKey);
   bindResponseToContext(

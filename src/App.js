@@ -206,7 +206,7 @@ class App extends React.Component{
   renderTopToolbarRightSwitch(){
 
     return (<Switch>
-      <Route path='/prefs' exact render={ () => {
+      <Route path='/prefs' exact={false} render={ () => {
         const rightButtons = [
           <ToolbarButton
             key={"toolbarbutton-library"}

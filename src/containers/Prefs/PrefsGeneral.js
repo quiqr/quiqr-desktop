@@ -2,6 +2,9 @@ import React from 'react';
 import service from './../../services/service';
 import Typography from '@material-ui/core/Typography';
 
+import FormControlLabel  from '@material-ui/core/FormControlLabel';
+import Checkbox          from '@material-ui/core/Checkbox';
+
 import { withStyles } from '@material-ui/core/styles';
 import FolderPicker from '../../components/FolderPicker';
 
@@ -82,7 +85,34 @@ class PrefsGeneral extends React.Component {
             onFolderSelected={(e)=>{this.handleFolderSelected(e)}} />
           </div>
 
+
+
         </div>
+
+          <div style={{marginTop:"20px"}}>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={this.state.showSplashAtStartup}
+                onChange={(e)=>{
+                  //TODO Save settings
+                  if(e.target.checked){
+                    service.api.showMenuBar();
+                  }
+                  else{
+                    service.api.hideMenuBar();
+                  }
+                }}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+            }
+            label="Show Menu Bar"
+            labelPlacement="end"
+          />
+          </div>
+
+
       </div>
     );
   }
