@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.13.12 (2022-10-19)
 - fix build
 
 ## 0.13.11 (2022-10-19)
