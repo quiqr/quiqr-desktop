@@ -2,8 +2,8 @@ import React from 'react';
 import service from './../../services/service';
 import Typography from '@material-ui/core/Typography';
 
-import FormControlLabel  from '@material-ui/core/FormControlLabel';
-import Checkbox          from '@material-ui/core/Checkbox';
+//import FormControlLabel  from '@material-ui/core/FormControlLabel';
+//import Checkbox          from '@material-ui/core/Checkbox';
 
 import { withStyles } from '@material-ui/core/styles';
 import FolderPicker from '../../components/FolderPicker';

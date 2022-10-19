@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix build
+
 ## 0.13.11 (2022-10-19)
 - update to node 16 in github action
 
