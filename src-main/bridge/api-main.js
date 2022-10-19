@@ -11,6 +11,7 @@ const libraryService            = require('../services/library/library-service')
 const Embgit                    = require('../embgit/embgit')
 const WorkspaceService          = require('../services/workspace/workspace-service')
 const hugoDownloader            = require('../hugo/hugo-downloader')
+
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
 const gitImporter               = require('../import/git-importer');
@@ -386,6 +387,11 @@ api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
 }
 
+api.getCurrentBaseUrl = async function(_,context){
+  console.log(global.currentBaseUrl)
+  context.resolve(global.currentBaseUrl);
+}
+
 api.createPogoDomainConf = async function({path,domain},context){
   let pogopubl = new PogoPublisher({});
   await pogopubl.writeDomainInfo(path,domain)
@@ -413,6 +419,7 @@ api.openSiteLibrary = async function(){
 api.showMenuBar = async function(){
   let mainWindow = global.mainWM.getCurrentInstanceOrNew();
   mainWindow.setMenuBarVisibility(true)
+
 }
 
 api.hideMenuBar = async function(){
@@ -426,6 +433,9 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
     siteService.mountWorkspace(workspaceKey),
     context
   );
+
+
+
 
   let siteConfig = siteService.getSiteConfig();
   global.currentSiteKey = siteKey;

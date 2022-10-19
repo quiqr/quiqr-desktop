@@ -29,6 +29,7 @@ global.pogoconf = pogoconf;
 global.outputConsole = outputConsole;
 global.currentSiteKey = pogoconf.lastOpenedSite.siteKey;
 global.currentSitePath = pogoconf.lastOpenedSite.sitePath;
+global.currentBaseUrl = "";
 
 global.currentFormShouldReload = undefined;
 global.currentFormNodePath = undefined;
@@ -58,6 +59,7 @@ function createWindow () {
 app.on('ready', function () {
   createWindow();
   menuManager.createMainMenu();
+  mainWindow.setMenuBarVisibility(true)
 })
 
 app.on('before-quit', function () {

@@ -1083,12 +1083,10 @@ class MenuManager {
         this.profileUserName = profile.username
       }
     });
-      console.log("uneejaja");
 
     Promise.all([readProfileAction]).then( () => {
       menuObject = Menu.buildFromTemplate(this.mainMenuArray());
       Menu.setApplicationMenu(menuObject)
-      console.log("ujaja");
       return true;
     });
   }

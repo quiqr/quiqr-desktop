@@ -34,7 +34,7 @@ function createScreenshotAndFavicon(host, port, targetPath) {
 
   screenshotWindow.setMenuBarVisibility(false);
 
-  let url = `http://${host}:${port}`;
+  let url = `http://${host}:${port}`+global.currentBaseUrl;
 
   const net = require('net');
   const client = new net.Socket();

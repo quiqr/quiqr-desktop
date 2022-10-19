@@ -13,6 +13,7 @@ const pathHelper                      = require('./../../utils/path-helper');
 const { createThumbnailJob, globJob } = require('./../../jobs');
 const HugoBuilder                     = require('./../../hugo/hugo-builder');
 const HugoServer                      = require('./../../hugo/hugo-server');
+const HugoConfig                      = require('./../../hugo/hugo-config');
 const screenshotWindow                = require('./../../ui-managers/screenshot-window-manager');
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
@@ -700,6 +701,43 @@ class WorkspaceService{
     }
   }
 
+  setCurrentBaseUrl(hugoServerConfig){
+
+    global.currentBaseUrl = ""; //reset
+
+    let hugoConfService = new HugoConfig(JSON.parse(JSON.stringify(hugoServerConfig)));
+    hugoConfService.configLines().then((lines)=>{
+      const key = "baseurl";
+      const item = lines.find(element => {
+        return element.startsWith(key);
+      });
+
+      if(item){
+        //TOML
+        let currentBaseUrl;
+        if(item.includes('=')){
+          currentBaseUrl = item.split("=")[1].replace(/"/g, '').trim();
+        }
+        //YAML
+        else{
+          currentBaseUrl = item.replace('baseurl:','').replace(/"/g, '').trim();
+        }
+        //TODO JSON
+        if(currentBaseUrl && currentBaseUrl !== '/'){
+          try{
+            let url = new URL(currentBaseUrl)
+            global.currentBaseUrl = url.pathname;
+          }
+          catch(e){
+            console.log(e);
+          }
+        }
+
+      }
+    });
+
+  }
+
   async serve(){
     let workspaceDetails = await this.getConfigurationsData();
     return new Promise((resolve,reject)=>{
@@ -715,6 +753,8 @@ class WorkspaceService{
         workspacePath: this.workspacePath,
         hugover: workspaceDetails.hugover,
       }
+
+      this.setCurrentBaseUrl(hugoServerConfig);
 
       global.hugoServer = new HugoServer(JSON.parse(JSON.stringify(hugoServerConfig)));
 
