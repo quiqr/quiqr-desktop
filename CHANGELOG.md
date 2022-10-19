@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.14.1 (2022-10-19)
 - macos build
 
 ## 0.14.0 (2022-10-19)
