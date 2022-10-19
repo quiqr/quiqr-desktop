@@ -108,6 +108,36 @@ class SyncRouteGeneral extends React.Component {
 
   }
 
+  mergeAction(publishConf){
+    this.setState({
+      serverBusyDialog: {
+        open:true,
+        serverType: publishConf.config.type,
+      }
+    })
+
+    service.api.mergeSiteWithRemote(this.props.siteKey, publishConf).then(()=>{
+      this.setState({
+        serverBusyDialog: {
+          open:false,
+          serverType: null,
+        }
+      })
+      snackMessageService.addSnackMessage('Sync from finished.');
+
+    }).catch((e)=>{
+      service.api.logToConsole(e ,"mergefail");
+      snackMessageService.addSnackMessage('Sync from failed.');
+      this.setState({
+        serverBusyDialog: {
+          open:false,
+          serverType: null,
+        }
+      })
+    });
+
+  }
+
   publishAction(publishConf){
     const build=null;
 
@@ -128,8 +158,9 @@ class SyncRouteGeneral extends React.Component {
           }
         })
 
+        snackMessageService.addSnackMessage('Sync to finished.');
       }).catch(()=>{
-        snackMessageService.addSnackMessage('Publish failed.');
+        snackMessageService.addSnackMessage('Sync to failed.');
         this.setState({
           serverBusyDialog: {
             open:false,
@@ -176,15 +207,20 @@ class SyncRouteGeneral extends React.Component {
   renderMainCard(publishConf){
 
     let serviceLogo, title, liveUrl;
+    let enableSyncFrom = false;
+
+    if(publishConf.config.publishScope === 'source' ||publishConf.config.publishScope === 'build_and_source' ){
+      enableSyncFrom = true;
+    }
 
     if(publishConf.config.type === 'quiqr'){
       serviceLogo = <FormLogoQuiqrCloud />
-        title = publishConf.config.path;
+      title = publishConf.config.path;
       liveUrl="https://"+publishConf.config.defaultDomain;
     }
     else if(publishConf.config.type === 'github'){
       serviceLogo = <FormLogoGitHubPages />
-        title = publishConf.config.username +"/" + publishConf.config.repository;
+      title = publishConf.config.username +"/" + publishConf.config.repository;
       liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
     }
     else if(publishConf.config.type === 'folder'){
@@ -199,6 +235,10 @@ class SyncRouteGeneral extends React.Component {
       title={title}
       liveURL={liveUrl}
       serviceLogo={serviceLogo}
+      enableSyncFrom={enableSyncFrom}
+      onMerge={()=>{
+        this.mergeAction(publishConf);
+      }}
       onPublish={()=>{
         this.publishAction(publishConf);
       }}

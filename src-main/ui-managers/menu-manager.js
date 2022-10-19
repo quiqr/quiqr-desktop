@@ -613,126 +613,12 @@ class MenuManager {
   createExperimentalMenu(){
     let expMenu = [
       {
-        id: 'pulllastgitchanges',
-        label: 'Merge Last Changes From Cloud',
-        enabled: this.siteIsPogoCloudManaged(),
-        click: async () => {
-
-          configurationDataProvider.get(async (err, configurations)=>{
-            let siteData = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-            cloudGitManager.pullFastForwardMerge(siteData)
-              .then((status)=>{
-                if(status === "non_fast_forward"){
-                  const dialog = electron.dialog;
-                  const options = {
-                    type: 'warning',
-                    buttons: [ 'CLOSE'],
-                    defaultId: 1,
-                    title: 'Merge failed',
-                    message: 'Could not merge remote code.',
-                    detail: 'Nothing changed locally. When you publish, remote changes will be overwritten.',
-                  };
-
-                  dialog.showMessageBox(null, options)
-                }
-
-              })
-              .catch((err)=>{
-                console.log("ERR pullFastForwardMerge")
-                console.log(err)
-              });
-          });
-
-        }
-      },
-      {
-        id: 'cacheremoteuserinfo',
-        enabled: ( this.profileUserName === '' ? false:true ),
-        label: 'Sync Remote User Data',
-        click: async () => {
-          cloudCacheManager.updateUserRemoteCaches()
-        }
-      },
-      {
         label: 'Enable Preview Window',
         type: "checkbox",
         checked: global.pogoconf.expPreviewWindow,
         click: async () => {
           this.togglePreviewWindow()
         }
-      },
-      { type: 'separator' },
-      {
-        label: 'Import',
-        submenu: [
-          {
-            label: 'Import Site',
-            click: async () => {
-              pogozipper.importSite()
-            }
-          },
-          {
-            id: 'import-theme',
-            enabled: this.siteSelected(),
-            label: 'Import Theme',
-            click: async () => {
-              pogozipper.importTheme()
-            }
-          },
-          {
-            id: 'import-content',
-            enabled: this.siteSelected(),
-            label: 'Import Content',
-            click: async () => {
-              pogozipper.importContent()
-            }
-          },
-        ]
-      },
-      {
-        label: 'Export',
-        submenu: [
-          {
-            id: 'export-site',
-            label: 'Export Site',
-            enabled: this.siteSelected(),
-            click: async () => {
-              pogozipper.exportSite()
-            }
-          },
-          {
-            id: 'export-theme',
-            enabled: this.siteSelected(),
-            label: 'Export Theme',
-            click: async () => {
-              pogozipper.exportTheme()
-            }
-          },
-          {
-            id: 'export-content',
-            enabled: this.siteSelected(),
-            label: 'Export Content',
-            click: async () => {
-              pogozipper.exportContent()
-            }
-          },
-        ]
-      },
-      { type: 'separator' },
-      {
-        id: 'connect-user',
-        label: 'Connect User',
-        submenu: this.connectProfilesMenu()
-      },
-      {
-        id: 'invite',
-        label: 'Invite',
-        submenu: this.inviteMenu()
-      },
-      {
-        id: 'switch-profile',
-        label: 'Switch User',
-        submenu: this.createProfilesMenu()
       },
 
 
@@ -746,14 +632,6 @@ class MenuManager {
       { role: 'forcereload' },
       { role: 'toggledevtools' },
       {
-        label: 'Show Current User',
-        type: "checkbox",
-        checked: global.pogoconf.devShowCurrentUser,
-        click: async () => {
-          this.toggleDevShowCurrentUser()
-        }
-      },
-      {
         id: 'open-site-conf',
         label: 'Open Site Config',
         enabled: this.siteSelected(),
@@ -762,44 +640,11 @@ class MenuManager {
         }
       },
       {
-        label: 'Use Local API Servers',
-        type: "checkbox",
-        checked: global.pogoconf.devLocalApi,
-        click: async () => {
-          this.toggleLocalApiServers()
-        }
-      },
-      {
         label: 'Disable Auto Hugo Serve',
         type: "checkbox",
         checked: global.pogoconf.devDisableAutoHugoServe,
         click: async () => {
           this.toggleDevDisableAutoHugoServe()
-        }
-      },
-
-      {
-        label: 'Stripe Customer Portal',
-        click: async () => {
-
-          configurationDataProvider.get(async (err, configurations) => {
-
-            if(this.profileUserName!=""){
-
-              let fingerprint = await cloudGitManager.getKeyFingerprint();
-
-              let userVars = {
-                username: this.profileUserName,
-                fingerprint: fingerprint,
-              };
-
-              let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
-              let url = configurations.global.pogostripeConn.protocol+"//"+
-                configurations.global.pogostripeConn.host+":"+
-                configurations.global.pogostripeConn.port+"/myaccount/"+requestVars;
-              await shell.openExternal(url);
-            }
-          });
         }
       },
       {
@@ -813,8 +658,132 @@ class MenuManager {
               this.unlinkSiteDomain()
             }
           },
+          {
+            id: 'cacheremoteuserinfo',
+            enabled: ( this.profileUserName === '' ? false:true ),
+            label: 'Sync Remote User Data',
+            click: async () => {
+              cloudCacheManager.updateUserRemoteCaches()
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Import',
+            submenu: [
+              {
+                label: 'Import Site',
+                click: async () => {
+                  pogozipper.importSite()
+                }
+              },
+              {
+                id: 'import-theme',
+                enabled: this.siteSelected(),
+                label: 'Import Theme',
+                click: async () => {
+                  pogozipper.importTheme()
+                }
+              },
+              {
+                id: 'import-content',
+                enabled: this.siteSelected(),
+                label: 'Import Content',
+                click: async () => {
+                  pogozipper.importContent()
+                }
+              },
+            ]
+          },
+          {
+            label: 'Export',
+            submenu: [
+              {
+                id: 'export-site',
+                label: 'Export Site',
+                enabled: this.siteSelected(),
+                click: async () => {
+                  pogozipper.exportSite()
+                }
+              },
+              {
+                id: 'export-theme',
+                enabled: this.siteSelected(),
+                label: 'Export Theme',
+                click: async () => {
+                  pogozipper.exportTheme()
+                }
+              },
+              {
+                id: 'export-content',
+                enabled: this.siteSelected(),
+                label: 'Export Content',
+                click: async () => {
+                  pogozipper.exportContent()
+                }
+              },
+            ]
+          },
+          { type: 'separator' },
+          {
+            id: 'connect-user',
+            label: 'Connect User',
+            submenu: this.connectProfilesMenu()
+          },
+          {
+            id: 'invite',
+            label: 'Invite',
+            submenu: this.inviteMenu()
+          },
+          {
+            id: 'switch-profile',
+            label: 'Switch User',
+            submenu: this.createProfilesMenu()
+          },
+          {
+            label: 'Show Current User',
+            type: "checkbox",
+            checked: global.pogoconf.devShowCurrentUser,
+            click: async () => {
+              this.toggleDevShowCurrentUser()
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Use Local API Servers',
+            type: "checkbox",
+            checked: global.pogoconf.devLocalApi,
+            click: async () => {
+              this.toggleLocalApiServers()
+            }
+          },
+          {
+            label: 'Stripe Customer Portal',
+            click: async () => {
+
+              configurationDataProvider.get(async (err, configurations) => {
+
+                if(this.profileUserName!=""){
+
+                  let fingerprint = await cloudGitManager.getKeyFingerprint();
+
+                  let userVars = {
+                    username: this.profileUserName,
+                    fingerprint: fingerprint,
+                  };
+
+                  let requestVars = Buffer.from(JSON.stringify(userVars)).toString('base64');
+                  let url = configurations.global.pogostripeConn.protocol+"//"+
+                    configurations.global.pogostripeConn.host+":"+
+                    configurations.global.pogostripeConn.port+"/myaccount/"+requestVars;
+                  await shell.openExternal(url);
+                }
+              });
+            }
+          },
+
+
         ]
-      }
+      },
 
     ];
 

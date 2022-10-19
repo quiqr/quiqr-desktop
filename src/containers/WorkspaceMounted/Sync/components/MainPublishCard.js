@@ -59,8 +59,14 @@ class MainPublishCard extends React.Component {
         </CardContent>
         <CardActions>
           <Button variant="contained" color="primary" onClick={()=>{this.props.onPublish()}}>
-            Publish
+            Sync to
           </Button>
+          { this.props.enableSyncFrom === true ?
+          <Button variant="contained" color="secondary" onClick={()=>{this.props.onMerge()}}>
+            Sync from
+          </Button>
+          : null
+          }
         </CardActions>
       </Card>
     );

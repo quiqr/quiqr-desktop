@@ -1,17 +1,35 @@
 const path                    = require('path');
+const pathHelper                = require('../../utils/path-helper');
 const fs                      = require('fs-extra');
 const outputConsole           = require('../../logger/output-console');
 const fileDirUtils            = require('../../utils/file-dir-utils');
+const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 
 class FolderSync {
   constructor(config){
     this._config = config;
   }
 
+  async pullFastForwardMerge(context){
+
+    const fullDestinationPath = path.join(pathHelper.getRoot(),'sites', context.siteKey, 'folderSyncRepo');
+    return new Promise( (resolve, reject)=>{
+      try {
+        configurationDataProvider.get(async (err, configurations)=>{
+          let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+          await this._syncSourceToDestination(fullDestinationPath, site.source.path);
+          resolve("reset-and-pulled-from-remote");
+        });
+      } catch (err) {
+        console.log(err.stdout.toString())
+        reject(err)
+      }
+    });
+  }
+
   async publish(context){
 
-    const fullDestinationPath = this._config.path
-    await this._ensureSyncDir(fullDestinationPath);
+    const fullDestinationPath = await this._ensureSyncRepoDir(context.siteKey);
     let mainWindow = global.mainWM.getCurrentInstance();
 
     outputConsole.appendLine('START FOLDER SYNC');
@@ -82,6 +100,15 @@ class FolderSync {
     outputConsole.appendLine('synced source to destination ...');
     return true;
   }
+
+  async _ensureSyncRepoDir(siteKey){
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', siteKey, 'folderSyncRepo');
+    await fs.ensureDir(resolvedDest);
+    await fs.emptyDir(resolvedDest);
+    await fs.ensureDir(resolvedDest);
+    return resolvedDest;
+  }
+
 
   async _ensureSyncDir(dir){
     await fs.ensureDir(dir);

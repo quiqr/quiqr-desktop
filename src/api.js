@@ -245,6 +245,10 @@ export class API {
     return mainProcessBridge.request('saveSiteConf', {siteKey, newConf});
   }
 
+  mergeSiteWithRemote(siteKey: string, publishConf: any){
+    return mainProcessBridge.request('mergeSiteWithRemote', {siteKey, publishConf}, {timeout: 30000});
+  }
+
   publishSite(siteKey: string, publishConf: any){
     return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 30000});
   }

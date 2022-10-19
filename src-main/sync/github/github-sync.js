@@ -1,11 +1,12 @@
-const path                    = require('path');
-const fs                      = require('fs-extra');
-const spawnAw                 = require('await-spawn')
-const outputConsole           = require('../../logger/output-console');
-const Embgit                  = require('../../embgit/embgit');
-const pathHelper              = require('../../utils/path-helper');
-const fileDirUtils            = require('../../utils/file-dir-utils');
-const { EnvironmentResolver } = require('../../utils/environment-resolver');
+const path                      = require('path');
+const fs                        = require('fs-extra');
+const spawnAw                   = require('await-spawn')
+const outputConsole             = require('../../logger/output-console');
+const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
+const Embgit                    = require('../../embgit/embgit');
+const pathHelper                = require('../../utils/path-helper');
+const fileDirUtils              = require('../../utils/file-dir-utils');
+const { EnvironmentResolver }   = require('../../utils/environment-resolver');
 
 const gitBin = Embgit.getGitBin();
 const environmentResolver = new EnvironmentResolver();
@@ -14,6 +15,56 @@ const UQIS = environmentResolver.getUQIS();
 class GithubSync {
   constructor(config){
     this._config = config;
+  }
+
+  async pullFastForwardMerge(context){
+
+    const tmpkeypathPrivate = await this._tempCreatePrivateKey();
+    Embgit.setPrivateKeyPath(tmpkeypathPrivate)
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', context.siteKey, 'githubSyncRepo');
+    const fullDestinationPath = path.join(resolvedDest , this._config.repository);
+
+    return new Promise( (resolve, reject)=>{
+      try {
+        Embgit.reset_hard(fullDestinationPath).then(async ()=>{
+          Embgit.pull(fullDestinationPath)
+            .then(()=>{
+              configurationDataProvider.get(async (err, configurations)=>{
+                let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+                await this._syncSourceToDestination(fullDestinationPath, site.source.path);
+                resolve("reset-and-pulled-from-remote");
+              });
+
+            })
+            .catch((err)=>{
+              if(err.stdout.toString().includes("already up-to-date")) {
+                configurationDataProvider.get(async (err, configurations)=>{
+                  let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
+                  await this._syncSourceToDestination(fullDestinationPath, site.source.path);
+                  console.log("not fail")
+                  resolve("reset-and-synced-with-remote");
+                });
+              }
+                  console.log("yes fail")
+
+              reject(err);
+            })
+        });
+      } catch (err) {
+        console.log("Pull Error:"+context.siteKey);
+        if(err.stdout.toString().includes("already up-to-date")) {
+          resolve("no_changes")
+        }
+        else if(err.stdout.toString().includes("non-fast-forward update")){
+          resolve("non_fast_forward");
+        }
+        else{
+          reject(err)
+        }
+      }
+    });
+
+
   }
 
   async publish(context){
