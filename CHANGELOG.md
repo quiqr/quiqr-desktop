@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- update to node 16 in github action
 
 ## 0.13.9 (2022-10-19)
 - Implement Custom Open Command (e.g. tmux send-keys 'cd "%s"' Enter)
