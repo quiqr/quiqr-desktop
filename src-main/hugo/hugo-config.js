@@ -19,16 +19,15 @@ class HugoConfig {
     return new Promise( async (resolve, reject)=>{
       try {
         if(!fs.existsSync(exec)){
-          callback(new Error('Could not find hugo.exe for version '+ hugover));
-          return;
+          resolve([])
         }
 
         const output = await spawnAw( exec, [ "config" ], { cwd: workspacePath });
         const lines = output.toString().split('\n')
         resolve(lines);
+
       } catch (e) {
-        console.log(e)
-        reject(e);
+        resolve([])
       }
     });
 

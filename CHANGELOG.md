@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix undefined callback function
+
 ## 0.13.12 (2022-10-19)
 - fix build
 
