@@ -228,7 +228,7 @@ class WorkSpace extends React.Component{
         title="Site Library"
         icon={AppsIcon}
       />,
-        <ToolbarButton
+      <ToolbarButton
         key="buttonPrefs"
         action={()=>{
           service.api.redirectTo(`/prefs/`);
@@ -236,7 +236,17 @@ class WorkSpace extends React.Component{
         title="Preferences"
         icon={SettingsApplicationsIcon}
       />,
-  ];
+    ];
+  }
+
+  openPreviewInBrowser(){
+
+    let currentBaseUrlPath = '';
+    service.api.getCurrentBaseUrl().then((path)=>{
+      currentBaseUrlPath = path;
+      window.require('electron').shell.openExternal('http://localhost:13131'+currentBaseUrlPath);
+    });
+    //service.api.logToConsole(currentBaseUrl);
   }
 
   renderTopToolbarRightSwitch(){
@@ -262,7 +272,7 @@ class WorkSpace extends React.Component{
           <ToolbarButton
             key="buttonPreview"
             action={()=>{
-              window.require('electron').shell.openExternal('http://localhost:13131');
+              this.openPreviewInBrowser();
             }}
             title="Preview in Browser"
             icon={OpenInBrowserIcon}
@@ -284,7 +294,7 @@ class WorkSpace extends React.Component{
           <ToolbarButton
             key="buttonPreview"
             action={()=>{
-              window.require('electron').shell.openExternal('http://localhost:13131');
+              this.openPreviewInBrowser();
             }}
             title="Preview in Browser"
             icon={OpenInBrowserIcon}

@@ -89,6 +89,7 @@ class PrefsGeneral extends React.Component {
 
         </div>
 
+        {/*
           <div style={{marginTop:"20px"}}>
 
           <FormControlLabel
@@ -111,6 +112,7 @@ class PrefsGeneral extends React.Component {
             labelPlacement="end"
           />
           </div>
+        */}
 
 
       </div>

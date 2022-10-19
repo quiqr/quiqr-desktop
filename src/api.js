@@ -63,6 +63,9 @@ export class API {
     return mainProcessBridge.request('newSiteFromScratch', {siteName, hugoVersion, configFormat});
   }
 
+  getCurrentBaseUrl(){
+    return mainProcessBridge.request('getCurrentBaseUrl');
+  }
 
   getCurrentSiteKey(){
     return mainProcessBridge.request('getCurrentSiteKey');

@@ -1,7 +1,10 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-- Implement Custom Open Command
+- Implement Custom Open Command (e.g. tmux send-keys 'cd "%s"' Enter)
 - Fix help links
+- Fix toolbar in Preference Window
+- Add concept of option to show/hide menu bar
+- Support subdir as baseURL for preview
 
 ## 0.13.8 (2022-07-08)
 - try fix Windows embgit
