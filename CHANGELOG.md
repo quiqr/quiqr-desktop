@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.14.0 (2022-10-19)
 - fix undefined callback function
 - implement rough sync from functionality for folder targets
 - implement rough sync from functionality for git targets
