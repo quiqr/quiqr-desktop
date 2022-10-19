@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- macos build
+
 ## 0.14.0 (2022-10-19)
 - fix undefined callback function
 - implement rough sync from functionality for folder targets
