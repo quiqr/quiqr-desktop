@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- enable all matrix platform builds with fail-fast=false
+
 ## 0.14.1 (2022-10-19)
 - macos build
 
