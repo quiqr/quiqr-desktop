@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.14.2 (2022-10-20)
 - enable all matrix platform builds with fail-fast=false
 
 ## 0.14.1 (2022-10-19)
