@@ -69,7 +69,7 @@ class HugoServer{
       return;
     }
 
-    let hugoArgs = [ 'server', '--port', '13131' ];
+    let hugoArgs = [ 'server', '--port', '13131' , '--disableFastRender'];
 
     if(config){
       hugoArgs.push('--config');

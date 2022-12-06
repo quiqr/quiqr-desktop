@@ -1,4 +1,9 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- fix bug in pull sync when repo does not exist
+- always use --disableFastRender
+
 ## 0.14.4 (2022-12-06)
 
 - removed hugo versions from git workflow to make it succeed more often

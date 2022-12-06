@@ -26,13 +26,13 @@ class GithubSync {
     const fullGitHubUrl = 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
     let syncSelection = "all";
 
-    return new Promise( (resolve, reject)=>{
+    return new Promise( async (resolve, reject)=>{
       try {
 
-        if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
-          this.publish_step1_initial_clone(tmpkeypathPrivate, fullGitHubUrl, fullDestinationPath).then(()=>{
-            console.log("initial clone")
-          });
+        if(!fs.existsSync(path.join(fullDestinationPath , '.git'))){
+          console.log("start initial clone")
+          await this.publish_step1_initial_clone(tmpkeypathPrivate, fullGitHubUrl, fullDestinationPath);
+          console.log("finish initial clone")
         }
 
         Embgit.reset_hard(fullDestinationPath).then(async ()=>{
