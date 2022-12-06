@@ -9,6 +9,61 @@ const InitialWorkspaceConfigBuilder = require('../services/workspace/initial-wor
 
 class GitImporter {
 
+  importSiteFromPrivateGitRepo(gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget, siteName){
+    return new Promise( async (resolve, reject)=>{
+
+      //TODO currently only GITHUB
+      const url = "git@github.com:"+gitOrg+"/"+gitRepo+".git"
+      console.log(url);
+
+      try{
+        const siteKey = await libraryService.createSiteKeyFromName(siteName);
+        const tempCloneDir = path.join(pathHelper.getTempDir(), 'siteFromGit');
+        del.sync([tempCloneDir],{force:true});
+
+        Embgit.clonePrivateWithKey( url, tempCloneDir, privKey).then(()=>{
+          libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir).then(()=>{
+            if(saveSyncTarget){
+              libraryService.getSiteConf(siteKey).then((newConf)=>{
+                const inkey = `publ-${Math.random()}`;
+
+                const publConf = {
+                  type: "github",
+                  username: gitOrg,
+                  email: gitEmail,
+                  repository: gitRepo,
+                  branch: "main",
+                  deployPrivateKey: privKey,
+                  deployPublicKey: "SET BUT UNKNOWN",
+                  publishScope: "source",
+                  setGitHubActions: false,
+                  keyPairBusy: false,
+                  overrideBaseURLSwitch: false,
+                  overrideBaseURL: ""
+                }
+
+                newConf.publish.push({key:inkey, config: publConf});
+                libraryService.writeSiteConf(newConf, siteKey).then(()=>{
+                  console.log("write config");
+                })
+
+              });
+            }
+
+            resolve(siteKey);
+          })
+        }).catch((err)=>{
+          reject(err);
+        });
+
+      }
+      catch(err){
+        reject(err);
+      }
+
+    });
+  }
+
   //USED BY IMPORT FROM GIT URL DIALOG
   importSiteFromPublicGitUrl(url, siteName){
     return new Promise( async (resolve, reject)=>{

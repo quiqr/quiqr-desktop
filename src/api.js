@@ -44,6 +44,10 @@ export class API {
     return mainProcessBridge.request('getFilteredHugoVersions');
   }
 
+  importSiteFromPrivateGitRepo(gitOrg: string, gitRepo: string, privKey: string, gitEmail: string, saveSyncTarget: bool, siteName: string){
+    return mainProcessBridge.request('importSiteFromPrivateGitRepo', {gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget,siteName}, {timeout: 1000000});
+  }
+
   importSiteFromPublicGitUrl(siteName: string, url: string){
     return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url});
   }

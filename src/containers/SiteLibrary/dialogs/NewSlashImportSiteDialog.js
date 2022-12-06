@@ -1,6 +1,8 @@
 import * as React                   from 'react';
-import service                      from '../../../services/service';
-import LogosGitServices      from '../../../svg-assets/LogosGitServices';
+import service                      from './../../../services/service';
+import { snackMessageService }      from './../../../services/ui-service';
+import SnackbarManager              from './../../../components/SnackbarManager';
+import LogosGitServices             from '../../../svg-assets/LogosGitServices';
 import IconHugo                     from '../../../svg-assets/IconHugo';
 import FormPartialNewFromHugoTheme  from './partials/FormPartialNewFromHugoTheme';
 import FormPartialNewFromScratch    from './partials/FormPartialNewFromScratch';
@@ -336,7 +338,7 @@ class NewSiteDialog extends React.Component{
 
         {fromForm}
 
-        <Box my={3}>
+        <Box my={2}>
           <TextField
             fullWidth
             id="standard-full-width"
@@ -468,18 +470,40 @@ class NewSiteDialog extends React.Component{
 
             if(this.state.newType === 'git') {
 
-              service.api.importSiteFromPublicGitUrl(this.state.newSiteName, this.state.importTypeGitLastValidatedUrl)
-                .then((siteKey)=>{
-                  this.setState({
-                    newLastStepBusy: false,
-                    newSiteKey: siteKey,
+              if(this.state.gitPrivateRepo){
+
+                const prvdata= this.state.privData;
+                service.api.importSiteFromPrivateGitRepo(prvdata.username, prvdata.repository, prvdata.deployPrivateKey, prvdata.email, true, this.state.newSiteName)
+                  .then((siteKey)=>{
+                    this.setState({
+                      newLastStepBusy: false,
+                      newSiteKey: siteKey,
+                    });
+                  })
+                  .catch((siteKey)=>{
+
+                    snackMessageService.addSnackMessage('Import Failed');
+                    this.setState({
+                      newLastStepBusy: false,
+                    });
                   });
-                })
-                .catch((siteKey)=>{
-                  this.setState({
-                    newLastStepBusy: false,
+              }
+              else{
+                service.api.importSiteFromPublicGitUrl(this.state.newSiteName, this.state.importTypeGitLastValidatedUrl)
+                  .then((siteKey)=>{
+                    this.setState({
+                      newLastStepBusy: false,
+                      newSiteKey: siteKey,
+                    });
+                  })
+                  .catch((siteKey)=>{
+                    this.setState({
+                      newLastStepBusy: false,
+                    });
                   });
-                });
+
+              }
+
             }
 
 
@@ -563,6 +587,8 @@ class NewSiteDialog extends React.Component{
         fullWidth={true}
         maxWidth={"md"}
       >
+        <SnackbarManager />
+
         <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
         <DialogContent>
           {content}

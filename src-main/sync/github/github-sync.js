@@ -230,7 +230,8 @@ jobs:
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, 'themes'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.quiqr-cache'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.gitlab-ci.yml'));
-    await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.gitignore'));
+    console.log("skip gitignore");
+    //await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.gitignore'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.sukoh'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.hugo_build.lock'));
     return true;

@@ -15,6 +15,28 @@ This service class containes utility functions for creating and manipulating unm
 
 class LibraryService{
 
+
+  async getSiteConf(siteKey){
+    return new Promise((resolve, reject) => {
+
+      configurationDataProvider.get(function(err, data){
+        if(err){
+          reject(err);
+        }
+        else {
+          let site = data.sites.find((x)=>x.key===siteKey);
+
+          if(site){
+            resolve(site);
+          }
+          else{
+            reject(new Error(`Could not find siteconf with sitekey ${siteKey}`));
+          }
+        }
+      }, {invalidateCache: true});
+    });
+  }
+
   async checkDuplicateSiteConfAttrStringValue(attr, value){
     return new Promise((resolve, reject) => {
 

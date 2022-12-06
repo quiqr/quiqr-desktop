@@ -1,4 +1,5 @@
 const path                                      = require('path');
+const fs                   = require('fs-extra');
 //const rootPath                                  = require('electron-root-path').rootPath;
 const rootPath                                  = require('../utils/electron-root-path').rootPath;
 const spawnAw                                   = require('await-spawn')
@@ -23,6 +24,13 @@ class Embgit{
 
   setPrivateKeyPath(keyPath){
     userconf.privateKey = keyPath;
+  }
+
+  async createTemporaryPrivateKey(keyContents){
+    const tmpkeypathPrivate = path.join(pathHelper.getTempDir(),'ghkey');
+    await fs.writeFileSync(tmpkeypathPrivate, keyContents, 'utf-8');
+    await fs.chmodSync(tmpkeypathPrivate, '0600');
+    return tmpkeypathPrivate;
   }
 
   getGitBin(){
@@ -141,6 +149,28 @@ class Embgit{
         resolve(true)
       } catch (e) {
         global.outputConsole.appendLine(gitBinary + " clone -s " + url + " " + destination_path );
+        global.outputConsole.appendLine('Clone error ...:' + e);
+        console.log(e.stderr.toString())
+        reject(e);
+      }
+    });
+
+  }
+
+  async clonePrivateWithKey(url, destination_path, privateKey){
+
+    const privateKeyPath = await this.createTemporaryPrivateKey(privateKey);
+
+    const gitBinary = this.getGitBin();
+
+    return new Promise( async (resolve, reject)=>{
+      try {
+        await spawnAw( gitBinary, [ "clone", "-s" ,"-i", privateKeyPath, url , destination_path ]);
+        global.outputConsole.appendLine(gitBinary + " clone -s -i " + privateKeyPath + " " + url + " " + destination_path );
+        global.outputConsole.appendLine('Clone success ...');
+        resolve(true)
+      } catch (e) {
+        global.outputConsole.appendLine(gitBinary + " clone -s -i " + privateKeyPath + " " + url + " " + destination_path );
         global.outputConsole.appendLine('Clone error ...:' + e);
         console.log(e.stderr.toString())
         reject(e);

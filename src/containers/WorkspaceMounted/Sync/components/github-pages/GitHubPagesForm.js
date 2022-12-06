@@ -156,7 +156,7 @@ class GitHubPagesForm extends React.Component{
           <TextField
             id="email"
             label="E-mail"
-            helperText="E-mail address to use for commit messsages"
+            helperText="E-mail address to use for commit messages"
             variant="outlined"
             className={classes.textfield}
             value={this.state.pubData.email}

@@ -535,6 +535,17 @@ api.importSiteAction = function(){
   pogozipper.importSite()
 }
 
+api.importSiteFromPrivateGitRepo = function({gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget, siteName }, context){
+  gitImporter.importSiteFromPrivateGitRepo(gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget, siteName)
+    .then((siteKey)=>{
+      context.resolve(siteKey);
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
+
+
 api.importSiteFromPublicGitUrl = function({siteName, url}, context){
   gitImporter.importSiteFromPublicGitUrl(url, siteName)
     .then((siteKey)=>{
