@@ -157,6 +157,19 @@ npm run _electron-dev
 npm run _react-dev
 ```
 
+### Release
+
+```
+npm run _hugo_versions
+```
+
+update and commit last changes
+
+```
+npm run release
+```
+
+
 
 ### Development Environment on Nix / NixOS
 

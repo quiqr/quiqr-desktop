@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- removed hugo versions from git workflow to make it succeed more often
+
 ## 0.14.3 (2022-12-06)
 
 - private github repos can be imported using private key
