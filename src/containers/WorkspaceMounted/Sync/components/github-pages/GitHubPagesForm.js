@@ -463,7 +463,6 @@ class GitHubPagesForm extends React.Component{
               label="Sync Selection"
             >
               <MenuItem value="all">Sync All</MenuItem>
-              <MenuItem value="contentOnly">Sync only Content</MenuItem>
               <MenuItem value="themeandquiqr">Sync only Design and Model</MenuItem>
             </Select>
           </FormControl>

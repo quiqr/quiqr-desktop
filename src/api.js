@@ -250,7 +250,7 @@ export class API {
   }
 
   mergeSiteWithRemote(siteKey: string, publishConf: any){
-    return mainProcessBridge.request('mergeSiteWithRemote', {siteKey, publishConf}, {timeout: 30000});
+    return mainProcessBridge.request('mergeSiteWithRemote', {siteKey, publishConf}, {timeout: 130000});
   }
 
   publishSite(siteKey: string, publishConf: any){

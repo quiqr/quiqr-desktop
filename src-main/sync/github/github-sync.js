@@ -23,15 +23,30 @@ class GithubSync {
     Embgit.setPrivateKeyPath(tmpkeypathPrivate)
     const resolvedDest = path.join(pathHelper.getRoot(),'sites', context.siteKey, 'githubSyncRepo');
     const fullDestinationPath = path.join(resolvedDest , this._config.repository);
+    const fullGitHubUrl = 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
+    let syncSelection = "all";
 
     return new Promise( (resolve, reject)=>{
       try {
+
+        if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
+          this.publish_step1_initial_clone(tmpkeypathPrivate, fullGitHubUrl, fullDestinationPath).then(()=>{
+            console.log("initial clone")
+          });
+        }
+
         Embgit.reset_hard(fullDestinationPath).then(async ()=>{
+
           Embgit.pull(fullDestinationPath)
             .then(()=>{
               configurationDataProvider.get(async (err, configurations)=>{
                 let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-                await this._syncSourceToDestination(fullDestinationPath, site.source.path);
+
+                if(this._config.syncSelection && this._config.syncSelection !== "" && this._config.syncSelection !== "all"){
+                  syncSelection = this._config.syncSelection;
+                }
+
+                await this._syncSourceToDestination(fullDestinationPath, site.source.path, syncSelection);
                 resolve("reset-and-pulled-from-remote");
               });
 
@@ -40,14 +55,18 @@ class GithubSync {
               if(err.stdout.toString().includes("already up-to-date")) {
                 configurationDataProvider.get(async (err, configurations)=>{
                   let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-                  await this._syncSourceToDestination(fullDestinationPath, site.source.path);
+
+                  if(this._config.syncSelection && this._config.syncSelection !== "" && this._config.syncSelection !== "all"){
+                    syncSelection = this._config.syncSelection;
+                  }
+
+                  await this._syncSourceToDestination(fullDestinationPath, site.source.path, syncSelection);
                   console.log("not fail")
                   resolve("reset-and-synced-with-remote");
                 });
               }
-                  console.log("yes fail")
 
-              reject(err);
+              //reject(err);
             })
         });
       } catch (err) {
@@ -111,7 +130,7 @@ class GithubSync {
 
   async publish_step1_initial_clone(tmpkeypathPrivate, fullGitHubUrl, fullDestinationPath){
     try {
-      outputConsole.appendLine(gitBin+ " clone -s -s -i " + tmpkeypathPrivate + " " + fullGitHubUrl + " " + fullDestinationPath );
+      outputConsole.appendLine(gitBin+ " clone -s -i " + tmpkeypathPrivate + " " + fullGitHubUrl + " " + fullDestinationPath );
       //-s insecure (ignore hostkey)
       //-i use private file
       await spawnAw( gitBin, [ "clone", "-s", "-i", tmpkeypathPrivate, fullGitHubUrl , fullDestinationPath ]);
@@ -126,7 +145,7 @@ class GithubSync {
   async publish_step2_preprare_dircontents_build(context, fullDestinationPath){
 
     await this._removeUnwanted(fullDestinationPath);
-    await this._syncSourceToDestination(path.join(context.from,'public'), fullDestinationPath);
+    await this._syncSourceToDestination(path.join(context.from,'public'), fullDestinationPath, "all");
     await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
@@ -135,7 +154,7 @@ class GithubSync {
   async publish_step2_preprare_dircontents_source(context, fullDestinationPath){
 
     await this._removeUnwanted(fullDestinationPath);
-    await this._syncSourceToDestination(context.from, fullDestinationPath);
+    await this._syncSourceToDestination(context.from, fullDestinationPath, "all");
 
     if(this._config.publishScope === "source"){
       await fileDirUtils.recurForceRemove(fullDestinationPath+'/public');
@@ -237,13 +256,24 @@ jobs:
     return true;
   }
 
-  //move .git, copy all, remove .git, restore .git (no beauty prize)
-  async _syncSourceToDestination(sourcePath, fullDestinationPath){
-    await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
-    await fs.copySync(sourcePath, fullDestinationPath);
-    await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
-    await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
-    outputConsole.appendLine('synced source to destination ...');
+  async _syncSourceToDestination(sourcePath, fullDestinationPath, syncSelection){
+
+    if(syncSelection === "themeandquiqr"){
+      await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, 'themes'));
+      await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, 'quiqr'));
+      await fs.copySync(path.join(sourcePath,'themes'), path.join(fullDestinationPath, 'themes'));
+      await fs.copySync(path.join(sourcePath,'quiqr'), path.join(fullDestinationPath, 'quiqr'));
+      outputConsole.appendLine('synced THEME AND QUIQR sources to destination ...');
+    }
+    else {
+      //move .git, copy all, remove .git, restore .git (no beauty prize)
+      //if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
+      await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
+      await fs.copySync(sourcePath, fullDestinationPath);
+      await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
+      await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
+      outputConsole.appendLine('synced ALL source to destination ...');
+    }
     return true;
   }
 
