@@ -48,7 +48,14 @@ class MainPublishCard extends React.Component {
           }
           title={<div >{this.props.title}<br/><Button color="primary" onClick={()=>{
             window.require('electron').shell.openExternal(this.props.liveURL);
-          }}>{this.props.liveURL}</Button></div>}
+          }}>{this.props.liveURL}</Button>{
+            (this.props.repoAdminUrl!=='' ?
+              <React.Fragment><br/><Button color="primary" onClick={()=>{
+                window.require('electron').shell.openExternal(this.props.repoAdminUrl);
+              }}>{this.props.repoAdminUrl}</Button></React.Fragment>
+              : null)
+
+          }</div>}
           subheader=""
         />
 
@@ -58,12 +65,15 @@ class MainPublishCard extends React.Component {
         <CardContent>
         </CardContent>
         <CardActions>
+          { this.props.enableSyncTo === true ?
           <Button variant="contained" color="primary" onClick={()=>{this.props.onPublish()}}>
-            Sync to
+            Push
           </Button>
+          : null
+          }
           { this.props.enableSyncFrom === true ?
           <Button variant="contained" color="secondary" onClick={()=>{this.props.onMerge()}}>
-            Sync from
+            Pull
           </Button>
           : null
           }

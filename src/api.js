@@ -254,7 +254,7 @@ export class API {
   }
 
   publishSite(siteKey: string, publishConf: any){
-    return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 30000});
+    return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 130000});
   }
 
   setPublishStatus(status){

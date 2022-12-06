@@ -207,10 +207,15 @@ class SyncRouteGeneral extends React.Component {
   renderMainCard(publishConf){
 
     let serviceLogo, title, liveUrl;
+    let repoAdminUrl = '';
     let enableSyncFrom = false;
+    let enableSyncTo = true;
 
     if(publishConf.config.publishScope === 'source' ||publishConf.config.publishScope === 'build_and_source' ){
       enableSyncFrom = true;
+    }
+    if(publishConf.config.pullOnly === true){
+      enableSyncTo = false;
     }
 
     if(publishConf.config.type === 'quiqr'){
@@ -221,12 +226,26 @@ class SyncRouteGeneral extends React.Component {
     else if(publishConf.config.type === 'github'){
       serviceLogo = <FormLogoGitHubPages />
       title = publishConf.config.username +"/" + publishConf.config.repository;
-      liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
+
+      repoAdminUrl= `https://github.com/${publishConf.config.username}/${publishConf.config.repository}`
+      if(publishConf.config.CNAME){
+        liveUrl= `https://${publishConf.config.CNAME}`
+      }
+      else if(publishConf.config.setGitHubActions){
+        liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
+      }
+      else{
+        liveUrl= ''
+      }
     }
     else if(publishConf.config.type === 'folder'){
       serviceLogo = <FolderIcon />
-        title = publishConf.config.path;
+      title = publishConf.config.path;
       liveUrl= ''
+    }
+
+    if(publishConf.config.title && publishConf.config.title !== ''){
+      title = publishConf.config.title;
     }
 
     title = (title.length >  20 ? `${title.substring(0, 20)}...` : title);
@@ -234,8 +253,10 @@ class SyncRouteGeneral extends React.Component {
     return <MainPublishCard
       title={title}
       liveURL={liveUrl}
+      repoAdminUrl={repoAdminUrl}
       serviceLogo={serviceLogo}
       enableSyncFrom={enableSyncFrom}
+      enableSyncTo={enableSyncTo}
       onMerge={()=>{
         this.mergeAction(publishConf);
       }}

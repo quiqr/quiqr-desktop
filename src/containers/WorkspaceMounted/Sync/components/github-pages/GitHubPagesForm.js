@@ -46,6 +46,11 @@ const useStyles = theme => ({
     width: '60ch',
   },
 
+  smallField: {
+    margin: theme.spacing(1),
+    width: '20ch',
+  },
+
 
   formControl: {
     margin: theme.spacing(1),
@@ -64,8 +69,10 @@ class GitHubPagesForm extends React.Component{
     this.state = {
       showPassword: false,
       setGitHubActionsSwitchEnable: false,
+      syncSelectionSwitchEnable: true,
       pubData:{
         type: 'github',
+        title: '',
         username:'',
         email:'',
         repository:'',
@@ -77,6 +84,9 @@ class GitHubPagesForm extends React.Component{
         keyPairBusy: true,
         overrideBaseURLSwitch: false,
         overrideBaseURL: '',
+        pullOnly: false,
+        backupAtPull: false,
+        syncSelection: "", // "" = all, "contentOnly", "themes and quiqr only"
         CNAMESwitch: false,
         CNAME: '',
       }
@@ -136,12 +146,176 @@ class GitHubPagesForm extends React.Component{
 
   }
 
+  renderGitHubActionsForm(){
+    let { classes } = this.props;
+
+    if(this.state.pubData.pullOnly===true){
+      return null
+    }
+    else{
+
+      return (
+        <React.Fragment>
+
+          <Box my={1}>
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel id="demo-simple-select-outlined-label">Publish Source or Build</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                value={this.state.pubData.publishScope}
+                onChange={(e)=>{
+                  if(e.target.value === "build"){
+                    this.updatePubData({
+                      publishScope: e.target.value,
+                      setGitHubActions: false,
+                      syncSelection: ""
+                    });
+                    this.setState({
+                      setGitHubActionsSwitchEnable: false,
+                      syncSelectionSwitchEnable: false,
+                    });
+                  }
+                  else{
+                    this.updatePubData({
+                      publishScope: e.target.value,
+                    });
+                    this.setState({
+                      setGitHubActionsSwitchEnable:true,
+                      syncSelectionSwitchEnable: true
+                    });
+                  }
+                }}
+                label="Publish Source and Build"
+              >
+                <MenuItem value="build">Publish only build files</MenuItem>
+                <MenuItem value="source">Publish only source files</MenuItem>
+              </Select>
+            </FormControl>
+
+
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.pubData.setGitHubActions}
+                  disabled={!this.state.setGitHubActionsSwitchEnable}
+                  onChange={(e)=>{
+                    this.updatePubData({setGitHubActions: e.target.checked });
+                  }}
+
+                  name="configureActions"
+                  color="primary"
+                />
+              }
+              label="Configure GitHub Actions"
+            />
+          </Box>
+
+          <Box my={1}>
+
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.pubData.CNAMESwitch}
+                  onChange={(e)=>{
+                    if(this.state.pubData.CNAMESwitch){
+                      this.updatePubData({
+                        CNAMESwitch: e.target.checked,
+                        CNAME: "",
+                      });
+                    }
+                    else{
+                      this.updatePubData({
+                        CNAMESwitch: e.target.checked,
+                      });
+                    }
+                  }}
+
+                  name="CNAMESwitch"
+                  color="primary"
+                />
+              }
+              label="Set CNAME"
+            />
+
+            <TextField
+              id="CNAME"
+              label="CNAME"
+              disabled={!this.state.pubData.CNAMESwitch}
+              onChange={(e)=>{
+                this.updatePubData({CNAME: e.target.value });
+              }}
+              value={this.state.pubData.CNAME}
+              helperText="Fully Qualified Domain Name, e.g. example.com"
+              variant="outlined"
+              className={classes.smallField}
+            />
+
+            <FormControlLabel className={classes.keyButton}
+              control={
+                <Switch
+                  checked={this.state.pubData.overrideBaseURLSwitch}
+                  onChange={(e)=>{
+                    if(this.state.pubData.overrideBaseURLSwitch){
+                      this.updatePubData({
+                        overrideBaseURLSwitch: e.target.checked,
+                        overrideBaseURL: "",
+                      });
+                    }
+                    else{
+                      this.updatePubData({
+                        overrideBaseURLSwitch: e.target.checked,
+                      });
+                    }
+                  }}
+
+                  name="overrideBaseURLSwitch"
+                  color="primary"
+                />
+              }
+              label="Override BaseURL"
+            />
+
+            <TextField
+              id="baseUrl"
+              label="BaseURL"
+              disabled={!this.state.pubData.overrideBaseURLSwitch}
+              onChange={(e)=>{
+                this.updatePubData({overrideBaseURL: e.target.value });
+              }}
+              value={this.state.pubData.overrideBaseURL}
+              helperText="Override Hugo Configuration with new baseURL"
+              variant="outlined"
+              className={classes.smallField}
+            />
+
+          </Box>
+
+        </React.Fragment>
+      )
+    }
+
+  }
+
   render(){
     let { classes } = this.props;
 
     return (
       <React.Fragment>
-        <Box my={2}>
+        <Box my={1} sx={{display:'flex'}}>
+          <TextField
+            id="target name"
+            label="Sync name"
+            helperText="This helps identifying the correct Synchronization target"
+            variant="outlined"
+            className={classes.textfield}
+            value={this.state.pubData.title}
+            onChange={(e)=>{
+              this.updatePubData({title: e.target.value });
+            }}
+          />
+        </Box>
+        <Box my={1} sx={{display:'flex'}}>
           <TextField
             id="username-organization"
             label="Username / Organization"
@@ -151,6 +325,17 @@ class GitHubPagesForm extends React.Component{
             value={this.state.pubData.username}
             onChange={(e)=>{
               this.updatePubData({username: e.target.value });
+            }}
+          />
+          <TextField
+            id="repository"
+            label="Repository"
+            helperText="Target Repository"
+            variant="outlined"
+            className={classes.textfield}
+            value={this.state.pubData.repository}
+            onChange={(e)=>{
+              this.updatePubData({repository: e.target.value });
             }}
           />
           <TextField
@@ -164,19 +349,9 @@ class GitHubPagesForm extends React.Component{
               this.updatePubData({email: e.target.value });
             }}
           />
+
         </Box>
-        <Box my={2}>
-          <TextField
-            id="repository"
-            label="Repository"
-            helperText="Target Repository"
-            variant="outlined"
-            className={classes.textfield}
-            value={this.state.pubData.repository}
-            onChange={(e)=>{
-              this.updatePubData({repository: e.target.value });
-            }}
-          />
+        <Box my={1}>
 
           {/*
           <TextField
@@ -193,7 +368,7 @@ class GitHubPagesForm extends React.Component{
           */}
         </Box>
 
-        <Box my={2}>
+        <Box my={1}>
 
           {(this.state.keyPairBusy ?
             <FormControl className={classes.margin}>
@@ -250,143 +425,54 @@ class GitHubPagesForm extends React.Component{
 
         </Box>
 
-        <Box my={2}>
+        <Box my={1}>
+          <FormControlLabel className={classes.keyButton}
+            control={
+              <Switch
+                checked={this.state.pubData.pullOnly}
+                onChange={(e)=>{
+                  this.updatePubData({
+                    pullOnly: e.target.checked,
+                    publishScope: 'source'
+                  });
+                  this.setState({
+                    syncSelectionSwitchEnable: true,
+                  });
+
+                }}
+
+                name="pullOnly"
+                color="primary"
+              />
+            }
+            label="Pull Only"
+          />
+
           <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-outlined-label">Publish Source and Build</InputLabel>
+            <InputLabel id="demo-simple-select-outlined-label">Selective Synchronization</InputLabel>
             <Select
               labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              value={this.state.pubData.publishScope}
+              disabled={!this.state.syncSelectionSwitchEnable}
+              id="select-sync-selection"
+              value={this.state.pubData.syncSelection}
               onChange={(e)=>{
-                if(e.target.value === "build"){
-                  this.updatePubData({
-                    publishScope: e.target.value,
-                    setGitHubActions: false,
-                  });
-                  this.setState({
-                    setGitHubActionsSwitchEnable: false
-                  });
-                }
-                else{
-                  this.updatePubData({
-                    publishScope: e.target.value,
-                  });
-                  this.setState({
-                    setGitHubActionsSwitchEnable:true
-                  });
-                }
+                this.updatePubData({
+                  syncSelection: e.target.value,
+                });
               }}
-              label="Publish Source and Build"
+              label="Sync Selection"
             >
-              <MenuItem value="build">Publish only build files</MenuItem>
-              <MenuItem value="source">Publish only source files</MenuItem>
-              <MenuItem value="build_and_source">Publish source and build files</MenuItem>
+              <MenuItem value="all">Sync All</MenuItem>
+              <MenuItem value="contentOnly">Sync only Content</MenuItem>
+              <MenuItem value="themeandquiqr">Sync only Design and Model</MenuItem>
             </Select>
           </FormControl>
 
-
-          <FormControlLabel className={classes.keyButton}
-            control={
-              <Switch
-                checked={this.state.pubData.setGitHubActions}
-                disabled={!this.state.setGitHubActionsSwitchEnable}
-                onChange={(e)=>{
-                  this.updatePubData({setGitHubActions: e.target.checked });
-                }}
-
-                name="configureActions"
-                color="primary"
-              />
-            }
-            label="Configure GitHub Actions"
-          />
         </Box>
 
-        <Box my={2}>
-
-          <FormControlLabel className={classes.keyButton}
-            control={
-              <Switch
-                checked={this.state.pubData.CNAMESwitch}
-                onChange={(e)=>{
-                  if(this.state.pubData.CNAMESwitch){
-                    this.updatePubData({
-                      CNAMESwitch: e.target.checked,
-                      CNAME: "",
-                    });
-                  }
-                  else{
-                    this.updatePubData({
-                      CNAMESwitch: e.target.checked,
-                    });
-                  }
-                }}
-
-                name="CNAMESwitch"
-                color="primary"
-              />
-            }
-            label="Set CNAME"
-          />
-
-          <TextField
-            id="CNAME"
-            label="CNAME"
-            disabled={!this.state.pubData.CNAMESwitch}
-            onChange={(e)=>{
-              this.updatePubData({CNAME: e.target.value });
-            }}
-            value={this.state.pubData.CNAME}
-            helperText="Fully Qualified Domain Name, e.g. example.com"
-            variant="outlined"
-            className={classes.textfield}
-          />
-
-        </Box>
-
-        <Box my={2}>
-
-          <FormControlLabel className={classes.keyButton}
-            control={
-              <Switch
-                checked={this.state.pubData.overrideBaseURLSwitch}
-                onChange={(e)=>{
-                  if(this.state.pubData.overrideBaseURLSwitch){
-                    this.updatePubData({
-                      overrideBaseURLSwitch: e.target.checked,
-                      overrideBaseURL: "",
-                    });
-                  }
-                  else{
-                    this.updatePubData({
-                      overrideBaseURLSwitch: e.target.checked,
-                    });
-                  }
-                }}
-
-                name="overrideBaseURLSwitch"
-                color="primary"
-              />
-            }
-            label="Override BaseURL"
-          />
-
-          <TextField
-            id="baseUrl"
-            label="BaseURL"
-            disabled={!this.state.pubData.overrideBaseURLSwitch}
-            onChange={(e)=>{
-              this.updatePubData({overrideBaseURL: e.target.value });
-            }}
-            value={this.state.pubData.overrideBaseURL}
-            helperText="Override Hugo Configuration with new baseURL"
-            variant="outlined"
-            className={classes.textfield}
-          />
-
-        </Box>
-
+        {this.renderGitHubActionsForm()}
       </React.Fragment>
+
     )
   }
 }

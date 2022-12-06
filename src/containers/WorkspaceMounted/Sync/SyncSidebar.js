@@ -58,7 +58,13 @@ export class SyncSidebar extends React.Component {
         icon = <IconQuiqr/>
       }
       else if(publ.config && publ.config.type === "github" ){
-        label = publ.config.username+"/"+publ.config.repository;
+        if(publ.config.title && publ.config.title !== ''){
+          label = publ.config.title;
+        }
+        else{
+          label = publ.config.username+"/"+publ.config.repository;
+        }
+
         icon = <IconGitHub/>
       }
       else if(publ.config && publ.config.type === "folder" ){
