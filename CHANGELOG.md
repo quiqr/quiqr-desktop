@@ -2,6 +2,7 @@
 ## **WORK IN PROGRESS**
 
 - private github repos can be imported using private key
+- selective sync
 
 ## 0.14.2 (2022-10-20)
 - enable all matrix platform builds with fail-fast=false
