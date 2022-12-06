@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.14.4 (2022-12-06)
 
 - removed hugo versions from git workflow to make it succeed more often
 
