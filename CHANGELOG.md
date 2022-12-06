@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.14.5 (2022-12-06)
 
 - fix bug in pull sync when repo does not exist
 - always use --disableFastRender
