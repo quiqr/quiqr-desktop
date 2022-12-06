@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.14.3 (2022-12-06)
 
 - private github repos can be imported using private key
 - selective sync
