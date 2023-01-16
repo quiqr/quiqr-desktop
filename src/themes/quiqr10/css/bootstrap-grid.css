@@ -51,6 +51,23 @@ html {
   }
 }
 
+/* IMPROVE MENU */
+.MuiListSubheader-sticky {
+  margin-top: 1rem;
+  text-transform: uppercase;
+  font-size: smaller;
+}
+
+.MuiListSubheader-root {
+  line-height: 18px;
+}
+
+.MuiListItem-root {
+  padding-top:4px;
+  padding-bottom:4px;
+}
+
+
 .container-fluid {
   width: 100%;
   padding-right: 15px;
