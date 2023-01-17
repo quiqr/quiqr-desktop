@@ -13,6 +13,7 @@ import DownloadQuiqrCloudSiteDialog from './dialogs/DownloadQuiqrCloudSiteDialog
 import NewSlashImportSiteDialog     from './dialogs/NewSlashImportSiteDialog';
 import EditSiteTagsDialogs          from './dialogs/EditSiteTagsDialogs';
 import RenameSiteDialog             from './dialogs/RenameSiteDialog';
+import CopySiteDialog               from './dialogs/CopySiteDialog';
 import DeleteSiteDialog             from './dialogs/DeleteSiteDialog';
 import SiteListItem                 from './components/SiteListItem';
 import CardItem                     from './components/CardItem';
@@ -39,6 +40,7 @@ class SiteLibraryRouted extends React.Component{
       configurations: [],
       editTagsDialog: false,
       renameDialog: false,
+      copyDialog: false,
       deleteDialog: false,
       dialogSiteConf: {},
       dialogNewSlashImportSite: {
@@ -126,9 +128,20 @@ class SiteLibraryRouted extends React.Component{
   }
 
   updateLocalSites(){
+    let localsites = [];
     service.getConfigurations(true).then((c)=>{
+
+      c.sites.forEach((site) =>{
+        localsites.push(site.name);
+      });
+
+      this.setState({
+        localsites :localsites
+      });
+
       var stateUpdate  = {};
       stateUpdate.configurations = c;
+
 
       this.setState(stateUpdate);
     });
@@ -268,6 +281,15 @@ class SiteLibraryRouted extends React.Component{
               }
             }>
             Rename
+          </MenuItem>
+
+          <MenuItem key="copy"
+            onClick={
+              ()=>{
+                this.setState({copyDialog: true, menuOpen:null, dialogSiteConf: siteconfig})
+              }
+            }>
+            Copy
           </MenuItem>
 
           <MenuItem key="tags"
@@ -492,10 +514,22 @@ class SiteLibraryRouted extends React.Component{
 
         <RenameSiteDialog
           open={this.state.renameDialog}
+          localsites={this.state.localsites}
           siteconf={this.state.dialogSiteConf}
           onCancelClick={()=>this.setState({renameDialog:false})}
           onSavedClick={()=>{
             this.setState({renameDialog:false});
+            this.updateLocalSites();
+          }}
+        />
+
+        <CopySiteDialog
+          open={this.state.copyDialog}
+          localsites={this.state.localsites}
+          siteconf={this.state.dialogSiteConf}
+          onCancelClick={()=>this.setState({copyDialog:false})}
+          onSavedClick={()=>{
+            this.setState({copyDialog:false});
             this.updateLocalSites();
           }}
         />
@@ -512,6 +546,7 @@ class SiteLibraryRouted extends React.Component{
         <DownloadQuiqrCloudSiteDialog
           open={this.state.remoteSiteDialog}
           configurations={this.state.configurations}
+          localsites={this.state.localsites}
           remoteSiteName={this.state.currentRemoteSite}
           onCancelClick={()=>this.setState({remoteSiteDialog:false})}
           mountSite={(siteKey)=>{

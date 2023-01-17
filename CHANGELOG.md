@@ -3,6 +3,8 @@
 - experimental setting: new improved sync method
   This prevents stale copies of files which are removed on the other side
 - improve side menu layout
+- improve site name validations in library
+- Feature: Copy site from Library
 
 ## 0.14.5 (2022-12-06)
 

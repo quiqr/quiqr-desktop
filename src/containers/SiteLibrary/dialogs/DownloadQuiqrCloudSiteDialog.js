@@ -32,20 +32,6 @@ class RemoteSiteDialog extends React.Component{
     }
   }
 
-  componentDidMount(){
-    let localsites = [];
-    service.getConfigurations(true).then((c)=>{
-
-      c.sites.forEach((site) =>{
-        localsites.push(site.name);
-      });
-
-      this.setState({
-        localsites :localsites
-      });
-    });
-  }
-
   componentDidUpdate(){
 
     if(this.props.open !== this.state.open && this.props.remoteSiteName){
@@ -70,7 +56,7 @@ class RemoteSiteDialog extends React.Component{
     let errorTextSiteName = "";
     let execButtonsDisabled = false;
 
-    if(this.state.localsites && this.state.localsites.includes(newName)){
+    if(this.props.localsites && this.props.localsites.includes(newName)){
       errorTextSiteName = "Name is already used locally."
       execButtonsDisabled = true;
     }

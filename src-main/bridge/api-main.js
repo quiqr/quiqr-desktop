@@ -434,9 +434,6 @@ api.mountWorkspace = async function({siteKey, workspaceKey}, context){
     context
   );
 
-
-
-
   let siteConfig = siteService.getSiteConfig();
   global.currentSiteKey = siteKey;
   global.currentWorkspaceKey = workspaceKey;
@@ -568,6 +565,7 @@ api.newSiteFromPublicHugoThemeUrl = function({siteName, url, themeInfo, hugoVers
 api.newSiteFromLocalDirectory = function({siteName, directory, generateQuiqrModel, hugoVersion}, context){
   folderImporter.newSiteFromLocalDirectory(directory, siteName, generateQuiqrModel, hugoVersion)
     .then((siteKey)=>{
+
       context.resolve(siteKey);
     })
     .catch((err)=>{
@@ -925,6 +923,37 @@ api.saveSiteConf = function({siteKey, newConf}, context){
   libraryService.writeSiteConf(newConf, siteKey)
     .then(()=>{
       context.resolve();
+    })
+    .catch((err)=>{
+      context.reject(err);
+    });
+}
+api.copySite = function({siteKey, newConf}, context){
+
+  let directory = newConf.source.path;
+  let siteName = newConf.name;
+  let siteConf = Object.assign({}, newConf);
+
+  folderImporter.newSiteFromLocalDirectory(directory, siteName, false, 0)
+    .then((siteKey2)=>{
+
+      configurationDataProvider.invalidateCache();
+      configurationDataProvider.get(function(err, configurations){
+        if(configurations.empty===true) throw new Error('Configurations is empty.');
+        if(err) { reject(err); return; }
+        let newConf2 = configurations.sites.find((x)=>x.key===siteKey2);
+        newConf2.name = siteConf.name;
+        newConf2.tags = siteConf.tags;
+        libraryService.writeSiteConf(newConf2, siteKey2)
+          .then(()=>{
+            context.resolve();
+          })
+          .catch((err)=>{
+            context.reject(err);
+          });
+      });
+
+      context.resolve(siteKey);
     })
     .catch((err)=>{
       context.reject(err);

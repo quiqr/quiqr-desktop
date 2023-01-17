@@ -15,7 +15,7 @@ const useStyles = theme => ({
 });
 
 
-class RenameDialog extends React.Component{
+class CopyDialog extends React.Component{
 
   constructor(props){
     super(props);
@@ -31,8 +31,8 @@ class RenameDialog extends React.Component{
   componentWillUpdate(nextProps, nextState) {
     if(this.props.siteconf.key !== nextProps.siteconf.key){
       let siteconf = Object.assign({}, nextProps.siteconf);
-      //this.validateSiteName(siteconf.name);
-      this.setState({siteconf: siteconf, execButtonsDisabled: true});
+      siteconf.name = siteconf.name + " (copy)";
+      this.setState({siteconf: siteconf, execButtonsDisabled: false});
     }
   }
 
@@ -67,7 +67,7 @@ class RenameDialog extends React.Component{
   }
 
   saveSiteConf(){
-    service.api.saveSiteConf(this.state.siteconf.key, this.state.siteconf).then(()=>{
+    service.api.copySite(this.state.siteconf.key, this.state.siteconf).then(()=>{
       this.props.onSavedClick();
     });
   }
@@ -122,7 +122,7 @@ class RenameDialog extends React.Component{
         fullWidth={true}
         maxWidth={"sm"} >
 
-        <DialogTitle id="alert-dialog-title">{"Edit site name: "+siteconf.name}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"New site name: "+siteconf.name}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             { failure? this.renderFailure() : this.renderBody() }
@@ -135,4 +135,4 @@ class RenameDialog extends React.Component{
     );
   }
 }
-export default withStyles(useStyles)(RenameDialog)
+export default withStyles(useStyles)(CopyDialog)
