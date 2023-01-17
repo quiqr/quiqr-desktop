@@ -1,4 +1,9 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- experimental setting: new improved sync method
+  This prevents stale copies of files which are removed on the other side
+- improve side menu layout
+
 ## 0.14.5 (2022-12-06)
 
 - fix bug in pull sync when repo does not exist

@@ -503,6 +503,20 @@ class MenuManager {
   }
 
 
+  toggleNewSyncMethod(){
+
+    if(global.pogoconf.expNewSyncMethod){
+      global.pogoconf.setExpNewSyncMethod(false);
+    }
+    else{
+      global.pogoconf.setExpNewSyncMethod(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      this.createMainMenu();
+    });
+  }
+
   togglePreviewWindow(){
 
     if(global.pogoconf.expPreviewWindow){
@@ -618,6 +632,14 @@ class MenuManager {
         checked: global.pogoconf.expPreviewWindow,
         click: async () => {
           this.togglePreviewWindow()
+        }
+      },
+      {
+        label: 'Enable new Sync Method',
+        type: "checkbox",
+        checked: global.pogoconf.expNewSyncMethod,
+        click: async () => {
+          this.toggleNewSyncMethod()
         }
       },
 

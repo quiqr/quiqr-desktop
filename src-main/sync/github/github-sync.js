@@ -266,13 +266,44 @@ jobs:
       outputConsole.appendLine('synced THEME AND QUIQR sources to destination ...');
     }
     else {
-      //move .git, copy all, remove .git, restore .git (no beauty prize)
-      //if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
-      await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
-      await fs.copySync(sourcePath, fullDestinationPath);
-      await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
-      await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
-      outputConsole.appendLine('synced ALL source to destination ...');
+
+      //TESTING DANGEROUS
+      if(global.pogoconf.expNewSyncMethod === true){
+        console.log("expNewSyncMethod")
+
+        let gitDirExist = false;
+        if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
+          outputConsole.appendLine('.git dir exists');
+          gitDirExist = true;
+        }
+
+        if(gitDirExist){
+          await fs.moveSync(path.join(fullDestinationPath , '.git'), fullDestinationPath + '.gitmove');
+        }
+
+        await fs.emptyDir(fullDestinationPath);
+
+        await fs.copySync(sourcePath, fullDestinationPath);
+
+        if(gitDirExist){
+          await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
+          await fs.moveSync(fullDestinationPath + '.gitmove'), path.join(fullDestinationPath , '.git');
+        }
+
+        outputConsole.appendLine('synced ALL source to destination ...');
+      }
+      else{
+        //move .git, copy all, remove .git, restore .git (no beauty prize)
+        //if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
+        await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
+
+        await fs.copySync(sourcePath, fullDestinationPath);
+        await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
+        await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
+        outputConsole.appendLine('synced ALL source to destination ...');
+      }
+
+
     }
     return true;
   }

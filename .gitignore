@@ -30,3 +30,5 @@ yarn-error.log*
 resources/linux/embgit
 resources/mac/embgit
 resources/win/embgit.exe
+.temp.html
+.temp.seed

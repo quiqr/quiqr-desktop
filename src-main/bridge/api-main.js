@@ -935,7 +935,6 @@ api.mergeSiteWithRemote = function({siteKey, publishConf}, context){
   getSiteService(siteKey, function(err, siteService){
     if(err){ context.reject(err); return; }
 
-
     siteService.mergeSiteWithRemote(publishConf).then(()=>{
       context.resolve();
     }, ()=>{

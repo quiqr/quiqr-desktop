@@ -55,9 +55,15 @@ module.exports = function (options) {
   function setDisablePartialCache(toggle){
     state.disablePartialCache = toggle;
   }
+
   function setExpPreviewWindow(toggle){
     state.expPreviewWindow = toggle;
   }
+
+  function setExpNewSyncMethod(toggle){
+    state.expNewSyncMethod = toggle;
+  }
+
   function setDevLocalApi (toggle){
     state.devLocalApi = toggle;
   }
@@ -112,6 +118,7 @@ module.exports = function (options) {
     experimentalFeatures: false,
     disablePartialCache: false,
     expPreviewWindow: false,
+    expNewSyncMethod: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
     devShowCurrentUser: false,
@@ -128,6 +135,7 @@ module.exports = function (options) {
     get experimentalFeatures() { return state.experimentalFeatures; },
     get disablePartialCache() { return state.disablePartialCache; },
     get expPreviewWindow() { return state.expPreviewWindow; },
+    get expNewSyncMethod() { return state.expNewSyncMethod; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
     get devShowCurrentUser() { return state.devShowCurrentUser; },
@@ -142,6 +150,7 @@ module.exports = function (options) {
     setExperimentalFeatures,
     setDisablePartialCache,
     setExpPreviewWindow,
+    setExpNewSyncMethod,
     setDevLocalApi,
     setDevDisableAutoHugoServe,
     setDevShowCurrentUser,
