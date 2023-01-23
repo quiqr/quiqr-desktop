@@ -4,6 +4,7 @@ import { Route } from 'react-router-dom';
 import service from './../../../services/service'
 import DeleteItemKeyDialog from './DeleteItemKeyDialog'
 import EditItemKeyDialog from './EditItemKeyDialog'
+import CopyItemKeyDialog from './CopyItemKeyDialog'
 import Spinner from './../../../components/Spinner'
 import MoreVertIcon from 'material-ui-02/svg-icons/navigation/more-vert';
 import { Toggle, Chip, Divider, Dialog, FlatButton, IconButton, IconMenu, List, ListItem, MenuItem, Paper, RaisedButton, TextField } from 'material-ui-02';
@@ -58,7 +59,7 @@ class MakePageBundleItemKeyDialog extends React.Component{
 
 class CollectionListItems extends React.PureComponent {
   render(){
-    let { filteredItems, onItemClick, onRenameItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
+    let { filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
 
     filteredItems.sort(function(a, b){
       let keyA = a.sortval;
@@ -91,6 +92,7 @@ class CollectionListItems extends React.PureComponent {
         >
 
           <MenuItem onClick={()=> onRenameItemClick(item) }>Rename</MenuItem>
+          <MenuItem onClick={()=> onCopyItemClick(item) }>Copy</MenuItem>
           <MenuItem onClick={()=> onDeleteItemClick(item) }>Delete</MenuItem>
           <MenuItem onClick={()=> onMakePageBundleItemClick(item) }>Make Page Bundle</MenuItem>
         </IconMenu>
@@ -142,6 +144,10 @@ class Collection extends React.Component{
   setRenameItemView(item: any){
     service.api.parentTempHideMobilePreview();
     this.setState({view:{key:'renameItem', item}, modalBusy:false});
+  }
+  setCopyItemView(item: any){
+    service.api.parentTempHideMobilePreview();
+    this.setState({view:{key:'copyItem', item}, modalBusy:false});
   }
 
   setMakePageBundleItemView(item: any){
@@ -258,6 +264,30 @@ class Collection extends React.Component{
     service.api.parentTempUnHideMobilePreview();
   }
 
+  copyCollectionItem(itemKey : string, itemOldKey: string){
+    let { siteKey, workspaceKey, collectionKey } = this.props;
+
+    if(this.state.view==null) return;
+
+    service.api.copyCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
+      .then((result)=>{
+        if(result.copied){
+          let itemsCopy : Array<any> = (this.state.items||[]).slice(0);
+          itemsCopy.push(result.item);
+          this.setState({items:itemsCopy, modalBusy:false, view: undefined, ...(this.resolveFilteredItems(itemsCopy))});
+        }
+        else{
+          //TODO: warn someone!
+          this.setState({modalBusy:false, view: undefined});
+        }
+      },()=>{
+        //TODO: warn someone!
+        this.setState({modalBusy:false, view: undefined});
+      });
+
+    service.api.parentTempUnHideMobilePreview();
+  }
+
   createCollectionItemKey(itemKey : string, itemTitle : string){
     this.setState({modalBusy:true});
     let { siteKey, workspaceKey, collectionKey } = this.props;
@@ -318,6 +348,9 @@ class Collection extends React.Component{
 
   handleRenameItemClick = (item: any)=>{
     this.setRenameItemView(item)
+  }
+  handleCopyItemClick = (item: any)=>{
+    this.setCopyItemView(item)
   }
   handleMakePageBundleItemClick = (item: any)=>{
     this.setMakePageBundleItemView(item)
@@ -380,6 +413,18 @@ class Collection extends React.Component{
         handleClose={this.setRootView.bind(this)}
         handleConfirm={this.renameCollectionItem.bind(this)}
         confirmLabel="Rename"
+      />);
+      }
+      else if(view.key==='copyItem'){
+        dialog = (<CopyItemKeyDialog
+        title="Copy Item"
+        viewKey={view.key}
+        textfieldlabel="item key"
+        value={this.state.view.item.label}
+        busy={this.state.modalBusy}
+        handleClose={this.setRootView.bind(this)}
+        handleConfirm={this.copyCollectionItem.bind(this)}
+        confirmLabel="Copy"
       />);
       }
       else if(view.key==="deleteItem"){
@@ -466,6 +511,7 @@ class Collection extends React.Component{
                 filteredItems={filteredItems}
                 onItemClick={this.handleItemClick}
                 onRenameItemClick={this.handleRenameItemClick}
+                onCopyItemClick={this.handleCopyItemClick}
                 onDeleteItemClick={this.handleDeleteItemClick}
                 onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
                 sortDescending={this.state.sortDescending}

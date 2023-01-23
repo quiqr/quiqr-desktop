@@ -1,10 +1,13 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-- experimental setting: new improved sync method
+- fix: improve side menu layout
+- fix: improve site name validations in library
+- feature: make site menus collapsable/expandable
+- feature: copy site from Library
+- feature: copy collection item
+- fix: improve rename collection backend function
+- feature: experimental setting: new improved sync method
   This prevents stale copies of files which are removed on the other side
-- improve side menu layout
-- improve site name validations in library
-- Feature: Copy site from Library
 
 ## 0.14.5 (2022-12-06)
 

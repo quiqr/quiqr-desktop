@@ -387,25 +387,62 @@ class WorkspaceService{
     let filePath;
     let newFilePath;
     let newFileKey;
-    if(collection.folder.startsWith('content')){
+
+    if(collectionItemKey.includes("."+collection.extension)){
+      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + "." + collection.extension);
+      newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
+    }
+    else{
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
       newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey);
       newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
     }
-    else{
-      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey + collection.extension);
-      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + collection.extension);
-      newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
-    }
 
     if (!fs.existsSync(filePath)){
-      return { renamed: false };
+      console.log("orig does not exist"+ filePath)
     }
     if (fs.existsSync(newFilePath)){
+      console.log("new already  exist"+ newFilePath)
       return { renamed: false };
     }
     fs.renameSync(filePath, newFilePath);
     return { renamed: true, item: { key:newFileKey.replace(/\\/g,'/'), label:collectionItemNewKey }};
+  }
+
+
+  async copyCollectionItem(collectionKey, collectionItemKey , collectionItemNewKey ){
+    let config = await this.getConfigurationsData();
+    let collection = config.collections.find(x => x.key === collectionKey);
+    if(collection==null)
+      throw new Error('Could not find collection.');
+
+    let filePath;
+    let newFilePath;
+    let newFileKey;
+
+    if(collectionItemKey.includes("."+collection.extension)){
+      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + "." + collection.extension);
+      newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
+    }
+    else{
+      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey);
+      newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
+    }
+
+    if (!fs.existsSync(filePath)){
+      console.log("orig does not exist"+ filePath)
+      return { coped: false };
+    }
+    if (fs.existsSync(newFilePath)){
+      console.log("new already  exist"+ newFilePath)
+      return { copied: false };
+    }
+
+    fs.copySync(filePath, newFilePath);
+    return { copied: true, item: { key:newFileKey.replace(/\\/g,'/'), label:collectionItemNewKey }};
   }
 
   async deleteCollectionItem(collectionKey, collectionItemKey){

@@ -15,40 +15,6 @@ import CardActions from '@material-ui/core/CardActions';
 const md = new MarkdownIt({html:true});
 
 const styles = {
-
-  /*
-
-  container:{
-    display:'flex',
-    height: '100%'
-  },
-
-
-  sitesCol: {
-    flex: '0 0 280px',
-    overflowY:'auto',
-    overflowX:'hidden',
-    userSelect:'none',
-    borderRight: 'solid 1px #e0e0e0',
-    background:'#fafafa'
-  },
-  selectedSiteCol: {
-    flex: 'auto',
-    overflow: 'auto'
-  },
-  siteActiveStyle: {
-    fontWeight: 'bold',
-    backgroundColor: 'white',
-    borderBottom: 'solid 1px #e0e0e0',
-    borderTop: 'solid 1px #e0e0e0',
-    position: 'relative'
-  },
-  siteInactiveStyle: {
-    borderBottom: 'solid 1px transparent',
-    borderTop: 'solid 1px transparent'
-  },
-  */
-
   creatorMessage: {
     borderBottom: 'solid 1px transparent',
     padding: '0 20px ',
@@ -109,12 +75,13 @@ class Home extends React.Component{
         this.setState({siteCreatorMessage:siteCreatorMessage});
       });
 
+      /* FIXME TODO Temp disable content cards */ /* make this optional */
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
         var stateUpdate  = {};
         stateUpdate.configurations = bundle.configurations;
         stateUpdate.selectedSite = bundle.site;
         stateUpdate.basePath = `/sites/${bundle.site.key}/workspaces/${bundle.workspace.key}`;
-        stateUpdate.contentItemCardsSections = this.prepareMenuCards(bundle.workspaceDetails);
+        //stateUpdate.contentItemCardsSections = this.prepareMenuCards(bundle.workspaceDetails);
 
         this.setState(stateUpdate);
       }).catch(e=>{
@@ -260,7 +227,6 @@ class Home extends React.Component{
           <div style={ styles.container }>
 
             <Box m={3}>
-
               <Grid container spacing={3} >
                 {sections}
               </Grid>

@@ -161,6 +161,9 @@ export class API {
   renameCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, collectionItemNewKey: string){
     return mainProcessBridge.request('renameCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
   }
+  copyCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, collectionItemNewKey: string){
+    return mainProcessBridge.request('copyCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
+  }
 
   openFileInEditor(path: string){
     mainProcessBridge.requestVoid('openFileInEditor', {path});

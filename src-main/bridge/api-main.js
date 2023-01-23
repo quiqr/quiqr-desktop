@@ -800,6 +800,18 @@ api.renameCollectionItem = function({siteKey, workspaceKey, collectionKey, colle
       });
   });
 }
+api.copyCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey}, context) {
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+    if(err){ context.reject(err); return; }
+    workspaceService.copyCollectionItem(collectionKey, collectionItemKey, collectionItemNewKey)
+      .then((result)=>{
+        context.resolve(result);
+      })
+      .catch((error)=>{
+        context.reject(error);
+      });
+  });
+}
 
 api.getFilesFromAbsolutePath = function({path},promise){
 
