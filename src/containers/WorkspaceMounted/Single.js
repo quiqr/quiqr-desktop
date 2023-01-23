@@ -72,13 +72,18 @@ class Single extends React.Component{
     if(single==null) return null;
 
     let previewUrl = null;
-    if(single.previewUrl){
-      previewUrl = 'http://localhost:13131'+single.previewUrl;
-      service.api.updateMobilePreviewUrl(previewUrl)
+    if(single.hidePreviewIcon){
+      previewUrl = '';
     }
     else{
-      previewUrl = 'http://localhost:13131';
-      service.api.updateMobilePreviewUrl(previewUrl)
+      if(single.previewUrl){
+        previewUrl = 'http://localhost:13131'+single.previewUrl;
+        service.api.updateMobilePreviewUrl(previewUrl)
+      }
+      else{
+        previewUrl = 'http://localhost:13131';
+        service.api.updateMobilePreviewUrl(previewUrl)
+      }
     }
 
     var { siteKey, workspaceKey, singleKey } = this.props;
@@ -92,6 +97,8 @@ class Single extends React.Component{
     pageUrl={previewUrl}
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
+    hideExternalEditIcon={single.hideExternalEditIcon}
+    hideSaveButton={single.hideSaveButton}
     plugins={{
 
       openBundleFileDialog: function({title, extensions, targetPath, forceFileName}, onFilesReady){

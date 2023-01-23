@@ -126,24 +126,27 @@ export class SukohForm extends React.Component{
           rootName={this.props.rootName}
           saveFormHandler={()=>this.saveContent()}
           pageUrl={this.props.pageUrl}
+          hideExternalEditIcon={this.props.hideExternalEditIcon}
           values={this.props.values}
           onChange={this.handleFormChange.bind(this)}
           onOpenInEditor={this.props.onOpenInEditor}
         />
-        <FloatingActionButton
-          style={{
-            position:'fixed',
-            right:this.state.actionButtonRightPos,
-            bottom:'20px',
-            zIndex:3
-          }}
-          className={floatingActionButtonClass}
-          disabled={!this.state.changed}
-          primary={'true'}
-          onClick={()=> this.saveContent()}
-        >
-          <IconCheck />
-        </FloatingActionButton>
+        { this.props.hideSaveButton ? null :
+          <FloatingActionButton
+            style={{
+              position:'fixed',
+              right:this.state.actionButtonRightPos,
+              bottom:'20px',
+              zIndex:3
+            }}
+            className={floatingActionButtonClass}
+            disabled={!this.state.changed}
+            primary={'true'}
+            onClick={()=> this.saveContent()}
+          >
+            <IconCheck />
+          </FloatingActionButton>
+        }
         <div style={{height:'70px'}}></div>
       </React.Fragment>
     );

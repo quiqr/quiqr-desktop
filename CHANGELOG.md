@@ -2,6 +2,10 @@
 ## **WORK IN PROGRESS**
 - fix: improve side menu layout
 - fix: improve site name validations in library
+- feature: hidePreviewIcon for singles and collections
+- feature: hideExternalEditIcon for singles and collections
+- feature: hideSaveButton for singles
+- feature: previewUrlBase for collections
 - feature: make site menus collapsable/expandable
 - feature: copy site from Library
 - feature: copy collection item

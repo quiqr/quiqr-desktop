@@ -66,16 +66,27 @@ class CollectionItem extends React.Component{
 
   generatePageUrl(collection){
 
+    if(collection.hidePreviewIcon){
+
+      return '';
+    }
+
     let ItemPathElements = this.props.collectionItemKey.split("/");
     let pageItem = ItemPathElements.pop();
+    let path;
     if(pageItem !=='index.md'){
       ItemPathElements.push(pageItem.split('.').slice(0, -1).join('.'));
     }
 
-    let CollectionPath = collection.folder.split("/")
-    CollectionPath.shift();
+    if(collection.previewUrlBase){
+      path = collection.previewUrlBase + "/" + ItemPathElements.join("/");
+    }
+    else{
+      let CollectionPath = collection.folder.split("/")
+      CollectionPath.shift();
+      path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
+    }
 
-    let path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
     let url = 'http://localhost:13131/'+path.toLowerCase();
 
     return url;
@@ -106,6 +117,7 @@ class CollectionItem extends React.Component{
     debug={false}
     rootName={collection.title}
     pageUrl={pageUrl}
+    hideExternalEditIcon={collection.hideExternalEditIcon}
     fields={fields}
     siteKey={siteKey}
     workspaceKey={workspaceKey}
@@ -127,6 +139,7 @@ class CollectionItem extends React.Component{
     }}
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
+
   />);
   }
 }

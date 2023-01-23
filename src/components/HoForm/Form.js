@@ -175,11 +175,13 @@ class Form extends React.Component {
     }
   }
 
+  /*
   handleOpenFileInEditor() {
     if(this.props.pageUrl){
       window.require('electron').shell.openExternal(this.props.pageUrl);
     }
   }
+  */
 
   handleOpenPageInBrowser() {
     if(this.props.pageUrl){
@@ -316,21 +318,19 @@ class Form extends React.Component {
           <div style={Object.assign({flexGrow:1})}>
             {breadcumb}
           </div>
-          <IconButton touch={true} onClick={()=>{this.props.onOpenInEditor();}}>
-            <IconOpenEditor color="" style={{}} />
-          </IconButton>
+
+          { this.props.hideExternalEditIcon ? null
+          :
+            <IconButton touch={true} onClick={()=>{this.props.onOpenInEditor();}}>
+              <IconOpenEditor color="" style={{}} />
+            </IconButton>
+          }
 
           { this.props.pageUrl ?
               <IconButton touch={true} onClick={()=>{this.handleOpenPageInBrowser();}}>
                 <IconOpenBrowser color="" style={{}} />
               </IconButton>
               : undefined}
-
-              {/* this.props.pageUrl ?
-                        <IconButton touch={true} onClick={()=>{this.handleAlignMobilePreview();}}>
-                    <IconView color="" style={{}} />
-                </IconButton>
-                : undefined*/}
 
               </div>
 

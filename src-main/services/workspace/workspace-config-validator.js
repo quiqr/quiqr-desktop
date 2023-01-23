@@ -98,7 +98,9 @@ class WorkspaceConfigValidator {
         itemtitle: joi.string().trim().min(3).max(90).error(new Error('The itemtitle value is invalid.')),
         extension: joi.string().regex(validationUtils.allFormatsReg).required().error(new Error('The extension value is invalid.')),
         dataformat: joi.string().trim().error(new Error('The dataformat value is invalid.')), //is not required here
-        previewUrl: joi.string().trim(),
+        previewUrlBase: joi.string().trim(),
+        hidePreviewIcon: joi.boolean(),
+        hideExternalEditIcon: joi.boolean(),
         hideIndex: joi.boolean(),
         includeSubdirs: joi.boolean(),
         fields: joi.array().min(1).required().error(new Error("The fields value is invalid.\n"+JSON.stringify(collection))),
@@ -143,6 +145,9 @@ class WorkspaceConfigValidator {
         file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.:'+JSON.stringify(single))),
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
         previewUrl: joi.string().trim(),
+        hidePreviewIcon: joi.boolean(),
+        hideExternalEditIcon: joi.boolean(),
+        hideSaveButton: joi.boolean(),
         fields: joi.array().min(1).required().error(new Error('The singles.fields value is invalid.')),
         _mergePartial: joi.any().forbidden().error(new Error('The singles.mergePartial value could not be parsed. Check file paths'))
       })
