@@ -1031,6 +1031,12 @@ class MenuManager {
               await shell.openExternal("https://book.quiqr.org/docs/10-getting-started/");
             }
           },
+          {
+            label: 'Quiqr Book',
+            click: async () => {
+              await shell.openExternal("https://book.quiqr.org/docs/");
+            }
+          },
           { type: 'separator' },
           {
             label: 'Model Configuration Examples',
