@@ -7,7 +7,6 @@ import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
 import Sidebar                              from '../Sidebar';
 
-
 class WorkspaceWidget extends React.Component {
 
   constructor(props){
@@ -18,6 +17,7 @@ class WorkspaceWidget extends React.Component {
       devLocalApi: false,
       hugoRunning: false,
       selectedMenuItem: '',
+      menusCollapsed: [],
       error: null
     };
   }
@@ -314,6 +314,7 @@ class WorkspaceSidebar extends React.Component{
           if(typeof menuslot.matchRole === 'undefined' || this.props.applicationRole === menuslot.matchRole){
             menus.push({
               title: menuslot.title,
+              expandable: true,
               items: menuslot.menuItems.map((menuitem, iindex) => {
                 let item = null;
                 let itemType = null;
@@ -398,6 +399,24 @@ class WorkspaceSidebar extends React.Component{
         hideItems={this.props.hideItems}
         menuIsLocked={this.props.menuIsLocked}
         menus={menus}
+        menusCollapsed={this.state.menusCollapsed}
+        onMenuExpandToggle={(menuKey)=>{
+
+          let collapseList = this.state.menusCollapsed || [];
+          if(collapseList.includes(menuKey)){
+            let index = collapseList.indexOf(menuKey);
+            if (index !== -1) {
+              collapseList.splice(index, 1);
+            }
+          }
+          else{
+            collapseList.push(menuKey);
+          }
+          this.setState({menusCollapsed: collapseList});
+
+          //service.api.logToConsole(collapseList);
+
+        }}
         onLockMenuClicked={this.props.onLockMenuClicked}
         onToggleItemVisibility={this.props.onToggleItemVisibility}
       />

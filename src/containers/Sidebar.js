@@ -1,16 +1,18 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
-import Divider          from '@material-ui/core/Divider';
-import List          from '@material-ui/core/List';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem      from '@material-ui/core/ListItem';
-import ListItemIcon  from '@material-ui/core/ListItemIcon';
-import ListItemText  from '@material-ui/core/ListItemText';
-import Box           from '@material-ui/core/Box';
-import Collapse      from '@material-ui/core/Collapse';
-import ExpandLess    from '@material-ui/icons/ExpandLess';
-import ExpandMore    from '@material-ui/icons/ExpandMore';
+import Divider                  from '@material-ui/core/Divider';
+import List                     from '@material-ui/core/List';
+import ListSubheader            from '@material-ui/core/ListSubheader';
+import ListItem                 from '@material-ui/core/ListItem';
+import ListItemIcon             from '@material-ui/core/ListItemIcon';
+import ListItemText             from '@material-ui/core/ListItemText';
+import Box                      from '@material-ui/core/Box';
+import Collapse                 from '@material-ui/core/Collapse';
+import ExpandLess               from '@material-ui/icons/ExpandLess';
+import ExpandMore               from '@material-ui/icons/ExpandMore';
+import IconButton               from '@material-ui/core/IconButton';
+//import service                  from './../services/service'
 
 const useStyles = theme => ({
   nested: {
@@ -101,22 +103,46 @@ class Sidebar extends React.Component{
     )
   }
 
+  toggleMenuExpand(menuKey){
+    this.props.onMenuExpandToggle(menuKey);
+  }
+
   render(){
 
-    let { hideItems, menus } = this.props;
+    let { hideItems, menus, menusCollapsed } = this.props;
+    if(!menusCollapsed){
+      menusCollapsed = [];
+    }
     let menusNodes = menus.map((menu,i)=>{
       return (
         <React.Fragment key={i+menu.key||i+menu.title}>
           { menu.widget ? (menu.widget) : (null) }
           { menu.items ? (
             <List
-              style={{padding: 0}}
               subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
+
+                <ListSubheader component="div" id="nested-list-subheader" disableSticky={true}>
                   { menu.title }
+
+                  { (menu.expandable ?
+                  <IconButton edge="end" style={{position:'absolute',top:'6px', right: '12px'}}
+                    onClick={()=>{
+                      this.toggleMenuExpand(menu.title);
+                    }}
+                  >
+                    { menusCollapsed.includes(menu.title) ? <ExpandMore/> : <ExpandLess/>}
+                  </IconButton>
+                  : null )
+                  }
+
                 </ListSubheader>
               }>
-              { menu.items.map((item, index)=>{
+
+              { menusCollapsed.includes(menu.title) ?
+              null
+              :
+
+              menu.items.map((item, index)=>{
                 if(item.spacer){
                   return <Box py={3}/>
                 }
@@ -130,6 +156,8 @@ class Sidebar extends React.Component{
                   return this.renderFlatItem(item, index)
                 }
               }) }
+
+
             </List >
           ) : (null) }
         </React.Fragment>

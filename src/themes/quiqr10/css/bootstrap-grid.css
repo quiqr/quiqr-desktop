@@ -52,8 +52,9 @@ html {
 }
 
 /* IMPROVE MENU */
+.MuiListSubheader-gutters,
 .MuiListSubheader-sticky {
-  margin-top: 1rem;
+  padding-top: 1.5rem;
   text-transform: uppercase;
   font-size: smaller;
 }
