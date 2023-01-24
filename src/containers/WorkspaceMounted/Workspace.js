@@ -79,7 +79,6 @@ class WorkSpace extends React.Component{
 
       this.setState(stateUpdate);
     })
-    this.getProfile();
   }
 
   componentDidUpdate(preProps: compProps){
@@ -117,24 +116,6 @@ class WorkSpace extends React.Component{
     this._ismounted = false;
   }
 
-  getProfile(){
-    let getProfile = service.api.getQuiqrProfile();
-
-    getProfile.then((profileAndFingerprint)=>{
-      if(profileAndFingerprint){
-        if(this.state.quiqrUsername !== profileAndFingerprint.profile.username){
-          this.setState({quiqrUsername: profileAndFingerprint.profile.username, quiqrFingerprint:profileAndFingerprint.fingerprint});
-        }
-      }
-      else{
-        //CAUSES LOOP
-        //this.setState({quiqrUsername: '', quiqrFingerprint: ''});
-      }
-    }, (e)=>{
-    })
-
-    return true;
-  }
 
   toggleMenuIsLocked(){
     let menuIsLocked = !this.state.menuIsLocked;
@@ -350,7 +331,6 @@ class WorkSpace extends React.Component{
   }
 
   renderDashboard(match){
-    this.getProfile();
     return <Dashboard
       key={ match.url }
       applicationRole={ this.props.applicationRole }
@@ -361,7 +341,6 @@ class WorkSpace extends React.Component{
   }
 
   renderSync(match){
-    this.getProfile();
     return <SyncRouted
       key={ match.url }
       site={ this.state.site }

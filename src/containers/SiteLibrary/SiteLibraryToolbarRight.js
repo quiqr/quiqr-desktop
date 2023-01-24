@@ -2,6 +2,7 @@ import * as React                                                 from 'react';
 import { Route }                                                  from 'react-router-dom';
 import service                                                    from './../../services/service';
 import {TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup} from '../TopToolbarRight'
+import AppsIcon                                                   from '@material-ui/icons/Apps';
 import SettingsApplicationsIcon                                   from '@material-ui/icons/SettingsApplications';
 import InputIcon                                                  from '@material-ui/icons/Input';
 import AddIcon                                                    from '@material-ui/icons/Add';
@@ -63,6 +64,15 @@ export class SiteLibraryToolbarRight extends React.Component {
     ]
 
     const rightButtons = [
+      <ToolbarButton
+        key={"toolbarbutton-library"}
+        active={true}
+        action={()=>{
+          service.api.redirectTo("/sites/last");
+        }}
+        title="Site Library"
+        icon={AppsIcon}
+      />,
       <ToolbarButton
         key="buttonPrefs"
         action={()=>{
