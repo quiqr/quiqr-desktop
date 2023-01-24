@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.15.2 (2023-01-24)
 - fix: application did not start
 
 ## 0.15.1 (2023-01-24)
