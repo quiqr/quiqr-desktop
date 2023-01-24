@@ -2,395 +2,104 @@ import * as React from "react"
 
 const SvgComponent = (props) => (
   <svg
-    width={356.536}
-    height={120.873}
+    width={582.709}
+    height={213.895}
+    viewBox="0 0 154.175 56.593"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
-    <g transform="matrix(3.77953 0 0 3.77953 -213.18 -176.738)">
-      <g
-        style={{
-          fill: "#ffbe58",
-          fillOpacity: 1,
-        }}
-      >
-        <text
-          xmlSpace="preserve"
-          style={{
-            fontStyle: "normal",
-            fontVariant: "normal",
-            fontWeight: 400,
-            fontStretch: "normal",
-            fontSize: "40.2705px",
-            lineHeight: 1.25,
-            fontFamily: "'Fugaz One'",
-            InkscapeFontSpecification: "'Fugaz One, Normal'",
-            fontVariantLigatures: "normal",
-            fontVariantCaps: "normal",
-            fontVariantNumeric: "normal",
-            fontVariantEastAsian: "normal",
-            letterSpacing: 0,
-            wordSpacing: 0,
-            fill: "#ffbe58",
-            fillOpacity: 1,
-            strokeWidth: 1.00677,
-          }}
-          x={302.364}
-          y={458.161}
-          transform="matrix(.61186 0 0 .61186 -99.28 -208.06)"
-        >
-          <tspan
-            style={{
-              fontStyle: "normal",
-              fontVariant: "normal",
-              fontWeight: 400,
-              fontStretch: "normal",
-              fontSize: "40.2705px",
-              fontFamily: "'Fugaz One'",
-              InkscapeFontSpecification: "'Fugaz One, Normal'",
-              fontVariantLigatures: "normal",
-              fontVariantCaps: "normal",
-              fontVariantNumeric: "normal",
-              fontVariantEastAsian: "normal",
-              fill: "#ffbe58",
-              fillOpacity: 1,
-              strokeWidth: 1.00677,
-            }}
-            x={302.364}
-            y={458.161}
-          >
-            {"U"}
-          </tspan>
-        </text>
-      </g>
-      <text
-        xmlSpace="preserve"
-        style={{
-          fontStyle: "normal",
-          fontVariant: "normal",
-          fontWeight: 400,
-          fontStretch: "normal",
-          fontSize: "27.9811px",
-          lineHeight: 1.25,
-          fontFamily: "'Fugaz One'",
-          InkscapeFontSpecification: "'Fugaz One, Normal'",
-          fontVariantLigatures: "normal",
-          fontVariantCaps: "normal",
-          fontVariantNumeric: "normal",
-          fontVariantEastAsian: "normal",
-          letterSpacing: 0,
-          wordSpacing: 0,
-          fill: "#ff5758",
-          fillOpacity: 1,
-          strokeWidth: 0.699533,
-        }}
-        x={67.569}
-        y={72.279}
-      >
-        <tspan
-          style={{
-            fontStyle: "normal",
-            fontVariant: "normal",
-            fontWeight: 400,
-            fontStretch: "normal",
-            fontSize: "27.9811px",
-            fontFamily: "'Fugaz One'",
-            InkscapeFontSpecification: "'Fugaz One, Normal'",
-            fontVariantLigatures: "normal",
-            fontVariantCaps: "normal",
-            fontVariantNumeric: "normal",
-            fontVariantEastAsian: "normal",
-            fill: "#ff5758",
-            fillOpacity: 1,
-            strokeWidth: 0.699533,
-          }}
-          x={67.569}
-          y={72.279}
-        >
-          {"Q"}
-        </tspan>
-      </text>
-      <rect
-        style={{
-          fill: "#ff5758",
-          fillOpacity: 1,
-          stroke: "none",
-          strokeWidth: 0.0419314,
-          strokeLinejoin: "round",
-        }}
-        width={17.183}
-        height={3.13}
-        x={62.889}
-        y={51.927}
-        ry={1.565}
-      />
-      <rect
-        style={{
-          fill: "#ff5758",
-          fillOpacity: 1,
-          stroke: "none",
-          strokeWidth: 0.0403924,
-          strokeLinejoin: "round",
-        }}
-        width={15.945}
-        height={3.13}
-        x={57.899}
-        y={57.542}
-        ry={1.565}
-      />
-      <rect
-        style={{
-          fill: "#ff5758",
-          fillOpacity: 1,
-          stroke: "none",
-          strokeWidth: 0.0356908,
-          strokeLinejoin: "round",
-        }}
-        width={12.449}
-        height={3.13}
-        x={61.121}
-        y={63.723}
-        ry={1.565}
-      />
-      <rect
-        style={{
-          fill: "#ff5758",
-          fillOpacity: 1,
-          stroke: "none",
-          strokeWidth: 0.0419314,
-          strokeLinejoin: "round",
-        }}
-        width={17.183}
-        height={3.13}
-        x={56.404}
-        y={69.337}
-        ry={1.565}
-      />
-      <g
-        style={{
-          fill: "#ffde59",
-          fillOpacity: 1,
-        }}
-      >
-        <text
-          xmlSpace="preserve"
-          style={{
-            fontStyle: "normal",
-            fontVariant: "normal",
-            fontWeight: 400,
-            fontStretch: "normal",
-            fontSize: "40.2705px",
-            lineHeight: 1.25,
-            fontFamily: "'Fugaz One'",
-            InkscapeFontSpecification: "'Fugaz One, Normal'",
-            fontVariantLigatures: "normal",
-            fontVariantCaps: "normal",
-            fontVariantNumeric: "normal",
-            fontVariantEastAsian: "normal",
-            letterSpacing: 0,
-            wordSpacing: 0,
-            fill: "#ffde59",
-            fillOpacity: 1,
-            strokeWidth: 1.00677,
-          }}
-          x={302.271}
-          y={559.991}
-          transform="matrix(.61186 0 0 .61186 -83.033 -270.366)"
-        >
-          <tspan
-            style={{
-              fontStyle: "normal",
-              fontVariant: "normal",
-              fontWeight: 400,
-              fontStretch: "normal",
-              fontSize: "40.2705px",
-              fontFamily: "'Fugaz One'",
-              InkscapeFontSpecification: "'Fugaz One, Normal'",
-              fontVariantLigatures: "normal",
-              fontVariantCaps: "normal",
-              fontVariantNumeric: "normal",
-              fontVariantEastAsian: "normal",
-              fill: "#ffde59",
-              fillOpacity: 1,
-              strokeWidth: 1.00677,
-            }}
-            x={302.271}
-            y={559.991}
-          >
-            {"I"}
-          </tspan>
-        </text>
-        <text
-          xmlSpace="preserve"
-          style={{
-            fontStyle: "normal",
-            fontVariant: "normal",
-            fontWeight: 400,
-            fontStretch: "normal",
-            fontSize: "40.2705px",
-            lineHeight: 1.25,
-            fontFamily: "'Fugaz One'",
-            InkscapeFontSpecification: "'Fugaz One, Normal'",
-            fontVariantLigatures: "normal",
-            fontVariantCaps: "normal",
-            fontVariantNumeric: "normal",
-            fontVariantEastAsian: "normal",
-            letterSpacing: 0,
-            wordSpacing: 0,
-            fill: "#ffde59",
-            fillOpacity: 1,
-            strokeWidth: 1.00677,
-          }}
-          x={302.271}
-          y={559.991}
-          transform="matrix(.61186 0 0 .61186 -83.033 -270.366)"
-        >
-          <tspan
-            style={{
-              fontStyle: "normal",
-              fontVariant: "normal",
-              fontWeight: 400,
-              fontStretch: "normal",
-              fontSize: "40.2705px",
-              fontFamily: "'Fugaz One'",
-              InkscapeFontSpecification: "'Fugaz One, Normal'",
-              fontVariantLigatures: "normal",
-              fontVariantCaps: "normal",
-              fontVariantNumeric: "normal",
-              fontVariantEastAsian: "normal",
-              fill: "#ffde59",
-              fillOpacity: 1,
-              strokeWidth: 1.00677,
-            }}
-            x={302.271}
-            y={559.991}
-          >
-            {"I"}
-          </tspan>
-        </text>
-      </g>
-      <g
-        style={{
-          fill: "#7ed758",
-          fillOpacity: 1,
-        }}
-      >
-        <text
-          xmlSpace="preserve"
-          style={{
-            fontStyle: "normal",
-            fontVariant: "normal",
-            fontWeight: 400,
-            fontStretch: "normal",
-            fontSize: "40.2705px",
-            lineHeight: 1.25,
-            fontFamily: "'Fugaz One'",
-            InkscapeFontSpecification: "'Fugaz One, Normal'",
-            fontVariantLigatures: "normal",
-            fontVariantCaps: "normal",
-            fontVariantNumeric: "normal",
-            fontVariantEastAsian: "normal",
-            letterSpacing: 0,
-            wordSpacing: 0,
-            fill: "#7ed758",
-            fillOpacity: 1,
-            strokeWidth: 1.00677,
-          }}
-          x={302.271}
-          y={559.991}
-          transform="matrix(.61186 0 0 .61186 -74.615 -270.366)"
-        >
-          <tspan
-            style={{
-              fontStyle: "normal",
-              fontVariant: "normal",
-              fontWeight: 400,
-              fontStretch: "normal",
-              fontSize: "40.2705px",
-              fontFamily: "'Fugaz One'",
-              InkscapeFontSpecification: "'Fugaz One, Normal'",
-              fontVariantLigatures: "normal",
-              fontVariantCaps: "normal",
-              fontVariantNumeric: "normal",
-              fontVariantEastAsian: "normal",
-              fill: "#7ed758",
-              fillOpacity: 1,
-              strokeWidth: 1.00677,
-            }}
-            x={302.271}
-            y={559.991}
-          >
-            {"Q"}
-          </tspan>
-        </text>
-      </g>
-      <g
-        style={{
-          fill: "#37b6ff",
-          fillOpacity: 1,
-        }}
-      >
-        <text
-          xmlSpace="preserve"
-          style={{
-            fontStyle: "normal",
-            fontVariant: "normal",
-            fontWeight: 400,
-            fontStretch: "normal",
-            fontSize: "40.2705px",
-            lineHeight: 1.25,
-            fontFamily: "'Fugaz One'",
-            InkscapeFontSpecification: "'Fugaz One, Normal'",
-            fontVariantLigatures: "normal",
-            fontVariantCaps: "normal",
-            fontVariantNumeric: "normal",
-            fontVariantEastAsian: "normal",
-            letterSpacing: 0,
-            wordSpacing: 0,
-            fill: "#37b6ff",
-            fillOpacity: 1,
-            strokeWidth: 1.00677,
-          }}
-          x={302.271}
-          y={559.991}
-          transform="matrix(.61186 0 0 .61186 -57.779 -270.366)"
-        >
-          <tspan
-            style={{
-              fontStyle: "normal",
-              fontVariant: "normal",
-              fontWeight: 400,
-              fontStretch: "normal",
-              fontSize: "40.2705px",
-              fontFamily: "'Fugaz One'",
-              InkscapeFontSpecification: "'Fugaz One, Normal'",
-              fontVariantLigatures: "normal",
-              fontVariantCaps: "normal",
-              fontVariantNumeric: "normal",
-              fontVariantEastAsian: "normal",
-              fill: "#37b6ff",
-              fillOpacity: 1,
-              strokeWidth: 1.00677,
-            }}
-            x={302.271}
-            y={559.991}
-          >
-            {"R"}
-          </tspan>
-        </text>
-      </g>
-      <path
-        style={{
-          fill: "#9d98f1",
-          fillOpacity: 1,
-          stroke: "none",
-          strokeWidth: 0.509994,
-          strokeLinejoin: "round",
-        }}
-        d="m1358.611 4736.124-6.353 21.13-8.06-20.54-22.059.488 17.044-14.013-7.28-20.829 18.593 11.88 17.56-13.36-5.553 21.354 18.133 12.572z"
-        transform="matrix(.16189 0 0 .16189 -72.77 -714.253)"
-      />
-    </g>
+    <path
+      d="M280.676 557.896q-3.181 2.658-9.02 2.658-5.84 0-8.095-2.698-1.61-1.852-1.61-5.114 0-1.45.321-3.182l3.262-18.564h7.249l-3.262 18.403q-.161 1.007-.161 2.094 0 2.82 3.383 2.82 2.013 0 3.221-1.048 1.208-1.047 1.692-3.866l3.262-18.403h7.248l-3.262 18.564q-1.006 5.638-4.228 8.336z"
+      transform="translate(-212.015 -513.801)"
+      aria-label="U"
+      style={{
+        fill: "#ffbe58",
+        fillOpacity: 1,
+      }}
+    />
+    <path
+      d="M236.544 1227.724q11.067 0 11.067 8.597 0 1.372-.275 2.973l-1.875 10.518q-.914 5.305-3.795 8.186-2.836 2.835-7.958 3.43.504 1.646 2.424 2.607 1.967 1.006 5.076 1.006l-.228 6.493q-3.476 0-6.128-.777-2.607-.777-4.07-1.92-1.418-1.098-2.333-2.607-1.372-2.333-1.463-4.894-7.546-1.143-7.546-8.277 0-1.51.32-3.247l1.875-10.518q2.058-11.57 14.909-11.57zm-4.756 26.798q2.286 0 3.658-1.143 1.372-1.143 1.921-4.207l1.646-9.238q.137-.869.137-1.555 0-3.567-3.84-3.567-4.711.091-5.58 5.122l-1.6 9.238q-.184 1.097-.184 2.286 0 3.064 3.842 3.064z"
+      style={{
+        fill: "#ff5758",
+      }}
+      transform="translate(-199.592 -1214.941)"
+    />
+    <path
+      style={{
+        fill: "#ff5758",
+        strokeLinejoin: "round",
+      }}
+      d="M212.749 1227.707h22.967a2.552 2.552 0 0 1 2.558 2.558 2.552 2.552 0 0 1-2.558 2.557H212.75a2.552 2.552 0 0 1-2.558-2.557 2.552 2.552 0 0 1 2.558-2.558z"
+      transform="translate(-199.592 -1214.941)"
+    />
+    <path
+      style={{
+        fill: "#ff5758",
+        strokeLinejoin: "round",
+      }}
+      d="M204.593 1236.883h20.944a2.552 2.552 0 0 1 2.557 2.558 2.552 2.552 0 0 1-2.557 2.558h-20.944a2.552 2.552 0 0 1-2.558-2.558 2.552 2.552 0 0 1 2.558-2.558z"
+      transform="translate(-199.592 -1214.941)"
+    />
+    <path
+      style={{
+        fill: "#ff5758",
+        strokeLinejoin: "round",
+      }}
+      d="M209.859 1246.986h15.23a2.552 2.552 0 0 1 2.558 2.558 2.552 2.552 0 0 1-2.558 2.558h-15.23a2.552 2.552 0 0 1-2.558-2.558 2.552 2.552 0 0 1 2.558-2.558z"
+      transform="translate(-199.592 -1214.941)"
+    />
+    <path
+      style={{
+        fill: "#ff5758",
+        strokeLinejoin: "round",
+      }}
+      d="M202.15 1256.161h22.967a2.552 2.552 0 0 1 2.558 2.558 2.552 2.552 0 0 1-2.558 2.558H202.15a2.552 2.552 0 0 1-2.558-2.558 2.552 2.552 0 0 1 2.558-2.558z"
+      transform="translate(-199.592 -1214.941)"
+    />
+    <path
+      d="m315.399 530.996-5.074 28.995h-7.29l5.115-28.995z"
+      transform="translate(-227.89 -513.801)"
+      aria-label="I"
+      style={{
+        fill: "#ffde59",
+        fillOpacity: 1,
+      }}
+    />
+    <path
+      d="m315.399 530.996-5.074 28.995h-7.29l5.115-28.995z"
+      transform="translate(-227.89 -513.801)"
+      aria-label="I"
+      style={{
+        fill: "#ffde59",
+        fillOpacity: 1,
+      }}
+    />
+    <path
+      d="M318.741 530.714q9.746 0 9.746 7.57 0 1.209-.242 2.618l-1.65 9.263q-.806 4.67-3.343 7.208-2.497 2.497-7.007 3.02.443 1.45 2.134 2.296 1.732.886 4.47.886l-.201 5.718q-3.061 0-5.397-.685-2.295-.684-3.584-1.69-1.248-.967-2.054-2.296-1.208-2.054-1.288-4.31-6.645-1.006-6.645-7.288 0-1.33.282-2.86l1.651-9.262q1.812-10.188 13.128-10.188zm-4.188 23.598q2.014 0 3.222-1.006 1.208-1.007 1.691-3.705l1.45-8.135q.12-.765.12-1.37 0-3.14-3.382-3.14-4.148.08-4.913 4.51l-1.41 8.135q-.16.966-.16 2.013 0 2.698 3.382 2.698z"
+      transform="translate(-214.132 -513.801)"
+      aria-label="Q"
+      style={{
+        fill: "#7ed758",
+        fillOpacity: 1,
+      }}
+    />
+    <path
+      d="M319.829 530.996q4.59 0 6.523 2.013 1.45 1.53 1.45 3.866 0 .806-.16 1.692l-.565 3.14q-.483 2.618-1.691 4.23-1.168 1.61-2.618 2.295l3.665 11.759h-8.135l-3.382-10.833h-2.497l-1.651 10.833h-7.732l5.114-28.995zm-2.537 6.282h-3.02l-1.048 7.007h2.82q2.134 0 3.06-1.007.926-1.047.926-2.738 0-3.262-2.738-3.262z"
+      transform="translate(-186.615 -513.801)"
+      aria-label="R"
+      style={{
+        fill: "#37b6ff",
+        fillOpacity: 1,
+      }}
+    />
+    <path
+      style={{
+        fill: "#9d98f1",
+        strokeLinejoin: "round",
+      }}
+      d="m347.94 1228.766-1.681 5.591-2.132-5.435-5.837.13 4.51-3.708-1.927-5.51 4.92 3.142 4.646-3.535-1.47 5.65 4.798 3.327z"
+      transform="translate(-199.592 -1214.941)"
+    />
   </svg>
 )
 

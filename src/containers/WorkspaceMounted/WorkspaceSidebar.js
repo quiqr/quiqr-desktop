@@ -1,8 +1,5 @@
 import React                                from 'react';
 import { Route }                            from 'react-router-dom'
-import { List, ListItem }                   from 'material-ui-02/List';
-import { Divider, Toggle }                  from 'material-ui-02';
-import IconPhone                            from 'material-ui-02/svg-icons/hardware/smartphone';
 import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
 import Sidebar                              from '../Sidebar';
@@ -128,11 +125,11 @@ class WorkspaceWidget extends React.Component {
   }
   */
 
+  /*
   renderSiteMounted(){
 
     //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
-    /*
     let mobilePreviewToggle = <Toggle toggled={this.state.mobilePreviewActive} onToggle={(e,value)=>{ this.toggleMobilePreview() }} style={{marginRight: 24}} labelPosition='right' />
 
     let previewWindowItem = "";
@@ -145,7 +142,6 @@ class WorkspaceWidget extends React.Component {
         rightIcon={mobilePreviewToggle}
         leftIcon={<IconPhone xcolor="white"  />} />
     }
-    */
 
     return (
       <div style={{paddingLeft:'0px'}}>
@@ -162,6 +158,7 @@ class WorkspaceWidget extends React.Component {
       </List>
     )
   }
+  */
 
   renderPartialDevInfo(){
 
@@ -197,27 +194,11 @@ class WorkspaceWidget extends React.Component {
   }
 
   render(){
-    let {
-      siteConfig,
-      workspaceConfig,
-    } = this.props;
-
-    if(siteConfig!=null && workspaceConfig!=null){
-      return (
-        <React.Fragment>
-          {this.renderPartialDevInfo()}
-          { this.renderSiteMounted()}
-        </React.Fragment>
-      )
-    }
-    else{
-      return (
-        <React.Fragment>
-          {this.renderPartialDevInfo()}
-          {this.renderEmpty()}
-        </React.Fragment>
-      )
-    }
+    return (
+      <React.Fragment>
+        {this.renderPartialDevInfo()}
+      </React.Fragment>
+    )
   }
 }
 
@@ -297,7 +278,6 @@ class WorkspaceSidebar extends React.Component{
     let menus: Array = [];
 
     //append workspace widget
-    /*
     menus.push({
       widget: (
         <WorkspaceWidget
@@ -316,7 +296,6 @@ class WorkspaceSidebar extends React.Component{
           }} />
       )
     });
-    */
 
     if(this.state.workspace){
 

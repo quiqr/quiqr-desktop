@@ -12,8 +12,13 @@
 - feature: copy site from Library
 - feature: copy collection item
 - fix: improve rename collection backend function
+- fix: image welcomescreen
 - feature: experimental setting: new improved sync method
   This prevents stale copies of files which are removed on the other side
+
+- 96 material-02 components import left
+- 27 stars
+
 
 ## 0.14.5 (2022-12-06)
 

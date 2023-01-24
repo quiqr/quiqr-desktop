@@ -33,8 +33,6 @@ class SplashDialog extends React.Component{
     }
   }
 
-
-
   render(){
 
     let { open } = this.props;

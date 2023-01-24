@@ -5,17 +5,13 @@ import {TopToolbarRight, ToolbarButton}                                   from '
 import AppsIcon                                                           from '@material-ui/icons/Apps';
 import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
 import Console                                                            from './containers/Console';
-//import PreviewButtons                                                     from './containers/PreviewBrowser/PreviewButtons';
 import TopToolbarLeft                                                     from './containers/TopToolbarLeft'
 import { FormsCookbookSidebar, FormsCookbookRouted }                      from './containers/FormsCookbook';
 import { PrefsSidebar, PrefsRouted }                                      from './containers/Prefs';
 import SplashDialog                                                       from './dialogs/SplashDialog';
-
 import lightBaseTheme                                                     from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import darkBaseTheme                                                      from 'material-ui-02/styles/baseThemes/darkBaseTheme';
 import MuiThemeProvider                                                   from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme                                                        from 'material-ui-02/styles/getMuiTheme';
-
 import Redirect                                                           from 'react-router-dom/Redirect';
 import service                                                            from './services/service';
 
@@ -32,6 +28,7 @@ const pogoTheme = getMuiTheme(lightBaseTheme, {
   },
 });
 
+/*
 const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
   palette: {
     background: {
@@ -42,9 +39,10 @@ const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
   overrides: {
   },
 });
+*/
 
 let style = require('./themes/quiqr10/style.js');
-let trySet = false;
+//let trySet = false;
 
 class App extends React.Component{
 

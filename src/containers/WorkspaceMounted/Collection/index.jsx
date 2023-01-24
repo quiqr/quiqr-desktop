@@ -447,7 +447,7 @@ class Collection extends React.Component{
 
 
 
-    let pageUrl = this.generatePageUrl(collection);
+    //let pageUrl = this.generatePageUrl(collection);
     //service.api.updateMobilePreviewUrl(pageUrl)
 
     return(<Route render={ ({history}) => {
