@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.15.0 (2023-01-24)
 - fix: remove mobilePreviewCode
 - fix: improve side menu layout
 - fix: improve site name validations in library
@@ -18,7 +17,6 @@
 
 - 96 material-02 components import left
 - 27 stars
-
 
 ## 0.14.5 (2022-12-06)
 
