@@ -7,7 +7,6 @@ async function getRemoteReleases(username, repository, page) {
   let json = await fetch(`https://api.github.com/repos/${username}/${repository}/releases?per_page=100&page=${page}`).then(res => res.json());
   if(json.message) throw new TypeError("User or repository was not found");
 
-  console.log(json.assets)
   json = json.map(obj => obj.name);
   return json;
 }
@@ -58,8 +57,9 @@ async function run(useLocalJson){
   }
 
   try {
-    fs.writeFileSync('resources/all/filteredHugoVersions.json', JSON.stringify(filteredVersions));
-    console.log("JSON data is saved.");
+    const versionFile = 'resources/all/filteredHugoVersions.json';
+    fs.writeFileSync(versionFile, JSON.stringify(filteredVersions));
+    console.log("JSON data is saved. in " + versionFile);
   } catch (error) {
     console.error(err);
   }
