@@ -191,12 +191,14 @@ class Form extends React.Component {
   handleBackButton(){
     this.history.push(this.generateParentPath());
   }
+  /*
   handleAlignMobilePreview(){
     if(this.props.pageUrl){
       service.api.openMobilePreview();
       service.api.updateMobilePreviewUrl(this.props.pageUrl);
     }
   }
+  */
 
   /**
    * Render a level of components

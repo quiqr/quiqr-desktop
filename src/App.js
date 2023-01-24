@@ -5,7 +5,7 @@ import {TopToolbarRight, ToolbarButton}                                   from '
 import AppsIcon                                                           from '@material-ui/icons/Apps';
 import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
 import Console                                                            from './containers/Console';
-import PreviewButtons                                                     from './containers/PreviewBrowser/PreviewButtons';
+//import PreviewButtons                                                     from './containers/PreviewBrowser/PreviewButtons';
 import TopToolbarLeft                                                     from './containers/TopToolbarLeft'
 import { FormsCookbookSidebar, FormsCookbookRouted }                      from './containers/FormsCookbook';
 import { PrefsSidebar, PrefsRouted }                                      from './containers/Prefs';
@@ -381,6 +381,7 @@ class App extends React.Component{
     </Switch>);
   }
 
+  /*
   tryServer(){
 
     if(!trySet){
@@ -393,6 +394,7 @@ class App extends React.Component{
       }, 2000);
     }
   }
+  */
 
   renderWelcomeScreen(){
 
@@ -471,6 +473,7 @@ class App extends React.Component{
 
       }} />
 
+      {/*
       <Route path='/preview-empty' exact render={ ({match, history}) => {
         this.history = history;
 
@@ -504,6 +507,7 @@ class App extends React.Component{
           </MuiThemeProvider>
         )
       }} />
+      */}
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match, history})=> {
         this.history = history;

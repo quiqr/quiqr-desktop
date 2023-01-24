@@ -13,7 +13,7 @@ class WorkspaceWidget extends React.Component {
     super(props);
     this.state = {
       devDisableAutoHugoServe: false,
-      expPreviewWindow: false,
+      //expPreviewWindow: false,
       devLocalApi: false,
       hugoRunning: false,
       selectedMenuItem: '',
@@ -23,12 +23,14 @@ class WorkspaceWidget extends React.Component {
   }
 
   componentDidMount(){
+    /*
     service.api.readConfKey('expPreviewWindow').then((value)=>{
       this.setState({expPreviewWindow: value });
       if(!value){
         this.disableMobilePreview();
       }
     });
+    */
 
     this.updateBadges();
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
@@ -39,11 +41,15 @@ class WorkspaceWidget extends React.Component {
       this.updateBadges();
     });
 
+    /*
     window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
     window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
+    */
+    /*
     window.require('electron').ipcRenderer.on('disableMobilePreview', this.disableMobilePreview.bind(this));
     window.require('electron').ipcRenderer.on('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
     window.require('electron').ipcRenderer.on('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
+    */
   }
 
   updateBadges(){
@@ -59,14 +65,17 @@ class WorkspaceWidget extends React.Component {
   }
 
   componentWillUnmount(){
+    /*
     window.require('electron').ipcRenderer.removeListener('serverLive', this.activatePreview.bind(this));
     window.require('electron').ipcRenderer.removeListener('serverDown', this.disablePreview.bind(this));
     window.require('electron').ipcRenderer.removeListener('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
     window.require('electron').ipcRenderer.removeListener('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
+    */
     window.require('electron').ipcRenderer.removeAllListeners('updateBadges');
     this._ismounted = false;
   }
 
+  /*
   toggleMobilePreview(){
     if(this.state.mobilePreviewActive){
       this.disableMobilePreview();
@@ -117,14 +126,16 @@ class WorkspaceWidget extends React.Component {
       this.setState({hugoRunning: false});
     }
   }
+  */
 
   renderSiteMounted(){
 
     //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
 
+    /*
     let mobilePreviewToggle = <Toggle toggled={this.state.mobilePreviewActive} onToggle={(e,value)=>{ this.toggleMobilePreview() }} style={{marginRight: 24}} labelPosition='right' />
 
-      let previewWindowItem = "";
+    let previewWindowItem = "";
 
     if(this.state.expPreviewWindow){
       previewWindowItem = <ListItem
@@ -134,11 +145,11 @@ class WorkspaceWidget extends React.Component {
         rightIcon={mobilePreviewToggle}
         leftIcon={<IconPhone xcolor="white"  />} />
     }
+    */
 
     return (
       <div style={{paddingLeft:'0px'}}>
         <List style={{padding: 0}}>
-          { previewWindowItem}
         </List>
         <Divider/>
       </div>
@@ -286,8 +297,8 @@ class WorkspaceSidebar extends React.Component{
     let menus: Array = [];
 
     //append workspace widget
+    /*
     menus.push({
-      //title: 'Current website',
       widget: (
         <WorkspaceWidget
           siteConfig={this.state.site}
@@ -305,6 +316,7 @@ class WorkspaceSidebar extends React.Component{
           }} />
       )
     });
+    */
 
     if(this.state.workspace){
 
@@ -413,8 +425,6 @@ class WorkspaceSidebar extends React.Component{
             collapseList.push(menuKey);
           }
           this.setState({menusCollapsed: collapseList});
-
-          //service.api.logToConsole(collapseList);
 
         }}
         onLockMenuClicked={this.props.onLockMenuClicked}

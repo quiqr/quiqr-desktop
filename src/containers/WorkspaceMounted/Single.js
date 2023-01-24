@@ -78,11 +78,11 @@ class Single extends React.Component{
     else{
       if(single.previewUrl){
         previewUrl = 'http://localhost:13131'+single.previewUrl;
-        service.api.updateMobilePreviewUrl(previewUrl)
+        //service.api.updateMobilePreviewUrl(previewUrl)
       }
       else{
         previewUrl = 'http://localhost:13131';
-        service.api.updateMobilePreviewUrl(previewUrl)
+        //service.api.updateMobilePreviewUrl(previewUrl)
       }
     }
 

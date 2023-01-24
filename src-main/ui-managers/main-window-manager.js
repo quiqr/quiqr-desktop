@@ -8,10 +8,12 @@ const configurationDataProvider      = require('../app-prefs-state/configuration
 
 let mainWindow;
 let mainWindowState;
+/*
 let mobilePreviewView;
 let mobilePreviewTopBarView;
 let mobilePreviewViewUrl;
 let mobilePreviewViewActive = false;
+*/
 
 function showNotFound(mainWindow, lookups){
   let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -25,6 +27,7 @@ function showNotFound(mainWindow, lookups){
 </html>`));
 }
 
+/*
 function showPreviewWaitForServer(previewWindow){
   previewWindow.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`
     <html>
@@ -35,6 +38,7 @@ function showPreviewWaitForServer(previewWindow){
         </body>
     </html>`));
 }
+*/
 
 function showLookingForServer(mainWindow, port){
   mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
@@ -79,9 +83,11 @@ function getLocation(locPath = ''){
           mainWindow.loadURL(url);
           getFirstScreenAfterStartup();
         }
+        /*
         if(mobilePreviewTopBarView){
           mobilePreviewTopBarView.webContents.loadURL(url);
         }
+        */
       }
       );
       client.on('error', () => {
@@ -110,9 +116,11 @@ function getLocation(locPath = ''){
       mainWindow.loadURL(
         url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
       );
+      /*
       if(mobilePreviewTopBarView){
         mobilePreviewTopBarView.webContents.loadURL(url.format({ pathname: indexFile, protocol: 'file:', slashes: true }));
       }
+      */
       getFirstScreenAfterStartup();
     }
     else{
@@ -186,6 +194,7 @@ function createWindow () {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
   }
 
+  /*
   mobilePreviewView = new BrowserView();
   mobilePreviewTopBarView = new BrowserView({
     webPreferences: {
@@ -195,9 +204,11 @@ function createWindow () {
   mainWindow.addBrowserView(mobilePreviewView);
   mainWindow.addBrowserView(mobilePreviewTopBarView);
   mainWindow.show();
+  */
 
   getLocation();
 
+  /*
   mainWindow.on('resize', () => {
     //Linux hack, Win and Mac should use will-resize with newBound
     setTimeout(function(){
@@ -229,6 +240,7 @@ function createWindow () {
       setMobilePreviewBounds();
     }, 200);
   })
+  */
 
 
   mainWindow.on('closed', function () {
@@ -246,6 +258,8 @@ function createWindow () {
   mainWindow.webContents.on('new-window', handleRedirect);
 
 }
+
+/*
 
 async function setMobilePreviewBounds(){
   let mobwidth = 340;
@@ -272,6 +286,7 @@ async function setMobilePreviewBounds(){
     mobilePreviewTopBarView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
   }
 }
+*/
 
 module.exports = {
   getCurrentInstance: function(){
@@ -285,7 +300,7 @@ module.exports = {
       global.currentSiteKey = null;
       global.currentWorkspaceKey = null;
 
-      mainWindow.webContents.send("disableMobilePreview");
+      //mainWindow.webContents.send("disableMobilePreview");
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
       mainWindow.webContents.send("redirectToGivenLocation", '/sites/last');
 
@@ -302,11 +317,13 @@ module.exports = {
     mainWindow.webContents.send("redirectToGivenLocation", newURL);
   },
 
+  /*
   reloadMobilePreview: function(){
     module.exports.setMobilePreviewUrl(mobilePreviewViewUrl);
   },
+  */
 
-
+  /*
   setMobilePreviewUrl: function(url){
     mobilePreviewViewUrl = url;
     mobilePreviewView.webContents.session.clearCache(function(){return true});
@@ -383,6 +400,7 @@ module.exports = {
     mainWindow.webContents.send("setMobileBrowserClose");
     setMobilePreviewBounds();
   },
+  */
 
   getCurrentInstanceOrNew: function(){
     let instance = this.getCurrentInstance();

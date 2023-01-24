@@ -31,14 +31,14 @@ class MenuManager {
 
   openCookbooks() {
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    mainWindow.webContents.send("disableMobilePreview");
+    //mainWindow.webContents.send("disableMobilePreview");
     mainWindow.webContents.send("redirectToGivenLocation", "/forms-cookbook");
   }
   stopServer() {
     if(global.hugoServer){
       global.hugoServer.stopIfRunning();
 
-      global.mainWM.reloadMobilePreview();
+      //global.mainWM.reloadMobilePreview();
     }
 
   }
@@ -236,7 +236,7 @@ class MenuManager {
 
   appPrefs(){
     let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-    mainWindow.webContents.send("disableMobilePreview");
+    //mainWindow.webContents.send("disableMobilePreview");
     mainWindow.webContents.send("redirectToGivenLocation","/prefs");
   }
 
@@ -517,6 +517,7 @@ class MenuManager {
     });
   }
 
+  /*
   togglePreviewWindow(){
 
     if(global.pogoconf.expPreviewWindow){
@@ -530,6 +531,7 @@ class MenuManager {
       this.createMainMenu();
     });
   }
+  */
 
   toggleExperimental(){
     if(global.pogoconf.experimentalFeatures){
@@ -626,6 +628,7 @@ class MenuManager {
 
   createExperimentalMenu(){
     let expMenu = [
+      /*
       {
         label: 'Enable Preview Window',
         type: "checkbox",
@@ -634,6 +637,7 @@ class MenuManager {
           this.togglePreviewWindow()
         }
       },
+      */
       {
         label: 'Enable new Sync Method',
         type: "checkbox",
@@ -1020,7 +1024,7 @@ class MenuManager {
             label: 'Show Welcome Screen',
             click: async () => {
               let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-              mainWindow.webContents.send("disableMobilePreview");
+              //mainWindow.webContents.send("disableMobilePreview");
               //mainWindow.webContents.send("redirectToGivenLocation","/welcome");
               mainWindow.webContents.send("openSplashDialog");
             }

@@ -137,31 +137,31 @@ class Collection extends React.Component{
   }
 
   setCreateItemView(){
-    service.api.parentTempHideMobilePreview();
+    //service.api.parentTempHideMobilePreview();
     this.setState({view:{key:'createItem', item: null}, modalBusy:false});
   }
 
   setRenameItemView(item: any){
-    service.api.parentTempHideMobilePreview();
+    //service.api.parentTempHideMobilePreview();
     this.setState({view:{key:'renameItem', item}, modalBusy:false});
   }
   setCopyItemView(item: any){
-    service.api.parentTempHideMobilePreview();
+    //service.api.parentTempHideMobilePreview();
     this.setState({view:{key:'copyItem', item}, modalBusy:false});
   }
 
   setMakePageBundleItemView(item: any){
-    service.api.parentTempHideMobilePreview();
+    //service.api.parentTempHideMobilePreview();
     this.setState({view:{key:'makePageBundleItem', item}, modalBusy:false});
   }
 
   setDeleteItemView(item: any){
-    service.api.parentTempHideMobilePreview();
+    //service.api.parentTempHideMobilePreview();
     this.setState({view:{key:'deleteItem', item }, modalBusy:false});
   }
 
   setRootView(){
-    service.api.parentTempUnHideMobilePreview();
+    //service.api.parentTempUnHideMobilePreview();
     this.setState({view:undefined, modalBusy:false});
   }
 
@@ -213,7 +213,7 @@ class Collection extends React.Component{
         this.setState({modalBusy:false, view: undefined});
       });
 
-    service.api.parentTempUnHideMobilePreview();
+    //service.api.parentTempUnHideMobilePreview();
   }
 
 
@@ -237,7 +237,7 @@ class Collection extends React.Component{
         this.setState({modalBusy:false, view: undefined});
       });
 
-    service.api.parentTempUnHideMobilePreview();
+    //service.api.parentTempUnHideMobilePreview();
   }
 
   renameCollectionItem(itemKey : string, itemOldKey: string){
@@ -261,7 +261,7 @@ class Collection extends React.Component{
         this.setState({modalBusy:false, view: undefined});
       });
 
-    service.api.parentTempUnHideMobilePreview();
+    //service.api.parentTempUnHideMobilePreview();
   }
 
   copyCollectionItem(itemKey : string, itemOldKey: string){
@@ -285,7 +285,7 @@ class Collection extends React.Component{
         this.setState({modalBusy:false, view: undefined});
       });
 
-    service.api.parentTempUnHideMobilePreview();
+    //service.api.parentTempUnHideMobilePreview();
   }
 
   createCollectionItemKey(itemKey : string, itemTitle : string){
@@ -307,7 +307,7 @@ class Collection extends React.Component{
         this.history.push(path);
       });
 
-    service.api.parentTempUnHideMobilePreview();
+    //service.api.parentTempUnHideMobilePreview();
   }
 
   resolveFilteredItems = (items: Array<any>) => {
@@ -448,7 +448,7 @@ class Collection extends React.Component{
 
 
     let pageUrl = this.generatePageUrl(collection);
-    service.api.updateMobilePreviewUrl(pageUrl)
+    //service.api.updateMobilePreviewUrl(pageUrl)
 
     return(<Route render={ ({history}) => {
       this.history = history;

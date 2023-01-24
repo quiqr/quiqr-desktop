@@ -75,6 +75,8 @@ export class API {
     return mainProcessBridge.request('getCurrentSiteKey');
   }
 
+  /*
+
   openMobilePreview(){
     return mainProcessBridge.request('openMobilePreview');
   }
@@ -86,6 +88,7 @@ export class API {
   updateMobilePreviewUrl( url: string){
     return mainProcessBridge.request('updateMobilePreviewUrl', {url});
   }
+  */
 
   buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: any){
     return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey, extraConfig});
@@ -267,6 +270,7 @@ export class API {
   setPublishStatus(status){
     return mainProcessBridge.request('setPublishStatus', {status});
   }
+  /*
   parentCloseMobilePreview(){
     return mainProcessBridge.request('parentCloseMobilePreview', {})
   }
@@ -276,6 +280,7 @@ export class API {
   parentTempUnHideMobilePreview(){
     return mainProcessBridge.request('parentTempUnHideMobilePreview', {})
   }
+  */
 
   getCreatorMessage(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('getCreatorMessage', {siteKey, workspaceKey});

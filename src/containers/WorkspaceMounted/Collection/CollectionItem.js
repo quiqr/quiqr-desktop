@@ -111,7 +111,7 @@ class CollectionItem extends React.Component{
     let values =  Object.assign(this.state.collectionItemValues)
 
     let pageUrl = this.generatePageUrl(collection);
-    service.api.updateMobilePreviewUrl(pageUrl)
+    //service.api.updateMobilePreviewUrl(pageUrl)
 
     return(<SukohForm
     debug={false}

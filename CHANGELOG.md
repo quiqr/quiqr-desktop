@@ -1,5 +1,7 @@
 # Quiqr App CHANGELOG
+
 ## **WORK IN PROGRESS**
+- fix: remove mobilePreviewCode
 - fix: improve side menu layout
 - fix: improve site name validations in library
 - feature: hidePreviewIcon for singles and collections
