@@ -203,8 +203,8 @@ function createWindow () {
   });
   mainWindow.addBrowserView(mobilePreviewView);
   mainWindow.addBrowserView(mobilePreviewTopBarView);
-  mainWindow.show();
   */
+  mainWindow.show();
 
   getLocation();
 
@@ -260,7 +260,6 @@ function createWindow () {
 }
 
 /*
-
 async function setMobilePreviewBounds(){
   let mobwidth = 340;
   let topheight = 83;
