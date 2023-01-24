@@ -1038,7 +1038,7 @@ class MenuManager {
           {
             label: 'Quiqr Book',
             click: async () => {
-              await shell.openExternal("https://book.quiqr.org/docs/");
+              await shell.openExternal("https://book.quiqr.org");
             }
           },
           { type: 'separator' },
