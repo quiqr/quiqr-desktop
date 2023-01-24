@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- chore: update electron-builder to fix macos builds
+
 ## 0.15.0 (2023-01-24)
 - fix: remove mobilePreviewCode
 - fix: improve side menu layout
