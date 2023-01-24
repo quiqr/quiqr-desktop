@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.15.1 (2023-01-24)
 - chore: update electron-builder to fix macos builds
 
 ## 0.15.0 (2023-01-24)
