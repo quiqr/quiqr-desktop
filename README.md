@@ -55,8 +55,7 @@ Please don't hesitate to reach out via email at info at quiqr dot org.
 ## Community Guidelines
 
 At a high level, we ask everyone be respectful and empathetic. We follow the
-[Github Community
-Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
+[Github Community Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
 
 * Be welcoming and open-minded
 * Respect each other
@@ -157,44 +156,32 @@ npm run _electron-dev
 npm run _react-dev
 ```
 
-### Release
-
-```
-npm run _hugo_versions
-```
-
-update and commit last changes
-
-```
-npm run release
-```
-
-
-
 ### Development Environment on Nix / NixOS
 
-Clone the repository.
+Clone the repository..
 
 ```
 git clone https://github.com/quiqr/quiqr-desktop.git && cd quiqr-app
 ```
 
-Enter the nix-shell
+Enter the nix-shell..
 
 ```
 nix-shell
 [nix-shell:~/quiqr-app]$
 ```
 
-Install npm dependancies.
+Install npm dependancies..
 
 ```
 npm install
 ```
 
-Get latest embgit
+Get latest embgit..
 
-``` npm run _pack_embgit```
+```
+npm run _pack_embgit
+```
 
 Start electron with a single command.
 
@@ -204,8 +191,35 @@ npm run start
 
 ### Stack
 
-* Node JS
 * Electron
-* React
-* Material UI for React JS
+* React + MUI
 * Go
+
+### Release Runbook
+
+**1. Update Hugo version list..**
+
+```
+npm run _hugo_versions
+```
+
+**2 Gather stats for changelog..**
+
+- count templates in gallery
+- github stars
+- npm module costs
+
+```
+npx cost-of-modules --no-install
+```
+
+**3. Update and commit last changes..**
+
+**4. Release**..
+
+```
+npm run release
+```
+
+**5. Check GitHub actions..**
+
