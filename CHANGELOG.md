@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.15.2 (2023-01-24)
 - fix: application did not start
 
@@ -20,9 +22,12 @@
 - fix: image welcomescreen
 - feature: experimental setting: new improved sync method
   This prevents stale copies of files which are removed on the other side
+- 96 material-02 components import left to port to MUI 4
 
-- 96 material-02 components import left
+### Stats
+
 - 27 stars
+- 5 community templates
 
 ## 0.14.5 (2022-12-06)
 
