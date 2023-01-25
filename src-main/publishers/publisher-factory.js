@@ -20,13 +20,6 @@ class PublisherFactory{
       console.log(e);
       return;
     }
-
-    /*
-    if(type==='quiqr'){
-      let PogoPublisher = require('./pogo-publisher');
-      return new PogoPublisher(genericPublisherConfig);
-    }
-    */
   }
 }
 

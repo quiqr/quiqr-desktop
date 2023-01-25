@@ -3,15 +3,17 @@ import { Switch, Route }                                                  from '
 import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from './containers/SiteLibrary'
 import {TopToolbarRight, ToolbarButton}                                   from './containers/TopToolbarRight'
 import AppsIcon                                                           from '@material-ui/icons/Apps';
+import SettingsApplicationsIcon                                           from '@material-ui/icons/SettingsApplications';
 import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
 import Console                                                            from './containers/Console';
 import TopToolbarLeft                                                     from './containers/TopToolbarLeft'
-import { FormsCookbookSidebar, FormsCookbookRouted }                      from './containers/FormsCookbook';
 import { PrefsSidebar, PrefsRouted }                                      from './containers/Prefs';
 import SplashDialog                                                       from './dialogs/SplashDialog';
+
 import lightBaseTheme                                                     from 'material-ui-02/styles/baseThemes/lightBaseTheme';
 import MuiThemeProvider                                                   from 'material-ui-02/styles/MuiThemeProvider';
 import getMuiTheme                                                        from 'material-ui-02/styles/getMuiTheme';
+
 import Redirect                                                           from 'react-router-dom/Redirect';
 import service                                                            from './services/service';
 
@@ -28,21 +30,7 @@ const pogoTheme = getMuiTheme(lightBaseTheme, {
   },
 });
 
-/*
-const pogoDarkTheme = getMuiTheme(darkBaseTheme, {
-  palette: {
-    background: {
-    },
-  },
-  props: {
-  },
-  overrides: {
-  },
-});
-*/
-
 let style = require('./themes/quiqr10/style.js');
-//let trySet = false;
 
 class App extends React.Component{
 
@@ -60,7 +48,6 @@ class App extends React.Component{
       style: style,
       menuIsLocked: true,
       forceShowMenu: false,
-      mobileBrowserActive: false,
       skipMenuTransition: false,
       quiqrUsername: "",
       quiqrFingerprint: "",
@@ -90,8 +77,6 @@ class App extends React.Component{
       });
     });
 
-    window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
-    window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
     window.require('electron').ipcRenderer.on('openSplashDialog', ()=>{this.setState({splashDialogOpen: true})});
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',(event, location)=>{
 
@@ -112,15 +97,11 @@ class App extends React.Component{
 
       this.setState(stateUpdate);
     })
-    this.getProfile();
     this.setApplicationRole();
-
   }
 
   componentWillUnmount(){
     [
-      'setMobileBrowserOpen',
-      'setMobileBrowserClose',
       'redirectToGivenLocation',
     ].forEach((channel)=>{
       window.require('electron').ipcRenderer.removeAllListeners(channel);
@@ -133,34 +114,6 @@ class App extends React.Component{
       this.setState({applicationRole: role });
     });
   }
-
-  //TODO REMOVE
-  getProfile(){
-    let getProfile = service.api.getQuiqrProfile();
-
-    getProfile.then((profileAndFingerprint)=>{
-      if(profileAndFingerprint){
-        if(this.state.quiqrUsername !== profileAndFingerprint.profile.username){
-          this.setState({quiqrUsername: profileAndFingerprint.profile.username, quiqrFingerprint:profileAndFingerprint.fingerprint});
-        }
-      }
-      else{
-        //CAUSES LOOP
-        //this.setState({quiqrUsername: '', quiqrFingerprint: ''});
-      }
-    }, (e)=>{
-    })
-
-    return true;
-  }
-
-  setMobileBrowserOpen(){
-    this.setState({mobileBrowserActive: true});
-  }
-  setMobileBrowserClose(){
-    this.setState({mobileBrowserActive: false});
-  }
-
 
   closeWindow(){
     window.require('electron').remote.getCurrentWindow().close();
@@ -213,29 +166,16 @@ class App extends React.Component{
             }}
             title="Site Library"
             icon={AppsIcon}
-          />
-        ];
-
-        return <TopToolbarRight
-          itemsLeft={[]}
-          itemsCenter={[]}
-          itemsRight={rightButtons}
-        />
-
-
-
-      }} />
-
-      <Route path='/forms-cookbook' render={ () => {
-        const rightButtons = [
+          />,
           <ToolbarButton
-            key={"toolbarbutton-library"}
+            key="buttonPrefs"
+            active={true}
             action={()=>{
-              service.api.redirectTo("/sites/last");
+              service.api.redirectTo("/prefs");
             }}
-            title="Site Library"
-            icon={AppsIcon}
-          />
+            title="Preferences"
+            icon={SettingsApplicationsIcon}
+          />,
         ];
 
         return <TopToolbarRight
@@ -244,9 +184,8 @@ class App extends React.Component{
           itemsRight={rightButtons}
         />
 
-
-
       }} />
+
 
       <Route path="/" exact={true} render={ ({match, history})=> {
         return <SiteLibraryToolbarRight
@@ -291,16 +230,6 @@ class App extends React.Component{
         return null;
       }} />
 
-      <Route path="/forms-cookbook" exact={false} render={ ({match, history})=> {
-        return (<FormsCookbookSidebar
-          menus={[]}
-          hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-          menuIsLocked={this.state.menuIsLocked}
-          onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
-          onLockMenuClicked={()=>{this.toggleMenuIsLocked()}}
-        />);
-      }} />
-
       <Route path="/prefs" exact={false} render={ ({match, history})=> {
         return (<PrefsSidebar
           menus={[]}
@@ -322,7 +251,6 @@ class App extends React.Component{
 
   renderSelectSites(openDialog){
 
-    this.getProfile();
     return (
       <SiteLibraryRouted
         activeLibraryView={ this.state.libraryView}
@@ -346,7 +274,6 @@ class App extends React.Component{
 
       <Route path='/sites/import-site/:refresh' exact render={ () => {
         return this.renderSelectSites('importSiteDialog');
-        //return this.renderImportSite();
       }} />
 
       <Route path='/sites/import-site-url/:url' exact={false} render={ ({match, history}) => {
@@ -365,10 +292,6 @@ class App extends React.Component{
         return this.renderSelectSites();
       }} />
 
-      <Route path="/forms-cookbook" exact={false} render={ () => {
-        return <FormsCookbookRouted />;
-      }} />
-
       <Route path="/prefs" exact={false} render={ () => {
         return <PrefsRouted />;
       }} />
@@ -378,21 +301,6 @@ class App extends React.Component{
       }} />
     </Switch>);
   }
-
-  /*
-  tryServer(){
-
-    if(!trySet){
-
-      trySet = true;
-      setTimeout(function () {
-        trySet = false;
-        service.api.openMobilePreview();
-
-      }, 2000);
-    }
-  }
-  */
 
   renderWelcomeScreen(){
 
@@ -406,24 +314,14 @@ class App extends React.Component{
         }}
       />
     )
-
   }
 
   render() {
 
     let marginStyles;
-    if(this.state.mobileBrowserActive){
-      marginStyles = {
-        marginRight:'340px',
-        borderRightWidth: 1,
-        borderRightColor: '#ccc',
-        borderRightStyle: 'solid'
-      };
-    }else{
-      marginStyles = {
-        marginRight:'0px'
-      };
-    }
+    marginStyles = {
+      marginRight:'0px'
+    };
 
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;
@@ -454,8 +352,6 @@ class App extends React.Component{
 
     return (<Switch>
 
-
-
       <Route path="/console" exact={false} render={ ({match, history})=> {
         this.history = history;
 
@@ -470,42 +366,6 @@ class App extends React.Component{
         )
 
       }} />
-
-      {/*
-      <Route path='/preview-empty' exact render={ ({match, history}) => {
-        this.history = history;
-
-        return (
-          <MuiThemeProvider muiTheme={pogoDarkTheme}>
-            <div style={{backgroundColor:"#ccc", height:"83px"}}>
-            </div>
-          </MuiThemeProvider>
-        )
-      }} />
-
-      <Route path='/preview-buttons' exact render={ ({match, history}) => {
-        this.history = history;
-        return (
-          <MuiThemeProvider muiTheme={pogoDarkTheme}>
-            <div style={{backgroundColor:"#606060"}}>
-              <PreviewButtons />
-            </div>
-          </MuiThemeProvider>
-        )
-      }} />
-
-      <Route path='/preview-no-server' exact render={ ({match, history}) => {
-        this.history = history;
-
-        this.tryServer();
-        return (
-          <MuiThemeProvider muiTheme={pogoDarkTheme}>
-            <div style={{backgroundColor:"#ccc", height:"83px"}}>
-            </div>
-          </MuiThemeProvider>
-        )
-      }} />
-      */}
 
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match, history})=> {
         this.history = history;

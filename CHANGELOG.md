@@ -1,5 +1,9 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- fix #410, show active toolbar
+- cleanup text menu
+- remove quiqr cloud stuff
+- remove form cookbook
 
 ## 0.15.2 (2023-01-24)
 - fix: application did not start

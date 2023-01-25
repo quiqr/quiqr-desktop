@@ -11,14 +11,11 @@ import Dialog              from '@material-ui/core/Dialog';
 import DialogActions       from '@material-ui/core/DialogActions';
 import DialogContent       from '@material-ui/core/DialogContent';
 import DialogContentText   from '@material-ui/core/DialogContentText';
+import FolderIcon          from '@material-ui/icons/Folder';
 import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
 import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
 import GitHubPagesForm     from './github-pages/GitHubPagesForm'
 import FolderExportForm    from './folder-export/FolderExportForm'
-import QuiqrCloudForm      from './quiqr-cloud/QuiqrCloudForm'
-import FolderIcon          from '@material-ui/icons/Folder';
-//import CardLogoQuiqrCloud  from '../../../../svg-assets/CardLogoQuiqrCloud'
-import FormLogoQuiqrCloud  from '../../../../svg-assets/FormLogoQuiqrCloud'
 
 const useStyles = theme => ({
 
@@ -105,22 +102,6 @@ class SyncServerDialog extends React.Component{
             </Paper>
           </Grid>
 
-          {/*
-
-          <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({serverType: 'quiqr',
-                  dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <CardLogoQuiqrCloud />
-            </Paper>
-          </Grid>
-          */}
         </Grid>
       </React.Fragment>
     )
@@ -132,21 +113,7 @@ class SyncServerDialog extends React.Component{
     let saveButtonHidden = true;
 
     if(this.state.serverType){
-      if(this.state.serverType === 'quiqr'){
-        serverTitle = "Quiqr Cloud Server";
-        serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
-        content = <QuiqrCloudForm
-            publishConf={this.props.publishConf}
-            modAction={this.props.modAction}
-            setSaveEnabled={(enabled)=>{
-              this.setState({saveEnabled:enabled});
-            }}
-            setData={(pubData)=>{
-              this.setState({pubData:pubData});
-            }} />
-      }
-
-      else if (this.state.serverType === 'github'){
+      if (this.state.serverType === 'github'){
         serverTitle = "GitHub Pages Server";
         serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
           content = <GitHubPagesForm
