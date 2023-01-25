@@ -29,9 +29,9 @@
 - 96 material-02 components import left to port to MUI 4
 
 ### Stats
-
 - 27 stars
 - 5 community templates
+- 37 NPM modules - 35.11M
 
 ## 0.14.5 (2022-12-06)
 
