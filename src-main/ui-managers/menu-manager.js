@@ -280,6 +280,13 @@ class MenuManager {
         }
       },
       {
+        id: 'invalidate-cache',
+        label: 'Invalidate Sites Cache',
+        click: async () => {
+          global.apiMain.invalidateCache({},context);
+        }
+      },
+      {
         label: 'Import',
         submenu: [
           {

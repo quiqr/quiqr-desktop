@@ -90,6 +90,7 @@ function get(callback, {invalidateCache} = {}){
 
   let configurations = {sites:[], global: GLOBAL_DEFAULTS};
 
+  /*
   let ownerslookupHash = {};
   let lookuploaded = false;
 
@@ -101,6 +102,7 @@ function get(callback, {invalidateCache} = {}){
   catch(e){
     outputConsole.appendLine(`Could not read ownerslookup}': ${e.toString()}`);
   }
+  */
 
   for(let i = 0; i < files.length; i++){
     let file = files[i];
@@ -112,6 +114,8 @@ function get(callback, {invalidateCache} = {}){
         let site = formatProvider.parse(strData);
         validateSite(site);
         site.published = 'unknown';
+
+        /*
         if(lookuploaded){
           site.published = 'yes';
           site.owner = ''
@@ -125,6 +129,8 @@ function get(callback, {invalidateCache} = {}){
             site.published = 'no';
           }
         }
+        */
+
         site.configPath = file;
         site.etalage = getEtalage(site);
         //console.log(site);
