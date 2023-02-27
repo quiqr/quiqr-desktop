@@ -3,6 +3,7 @@ import { Switch, Route }                                                  from '
 import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from './containers/SiteLibrary'
 import {TopToolbarRight, ToolbarButton}                                   from './containers/TopToolbarRight'
 import AppsIcon                                                           from '@material-ui/icons/Apps';
+import ArrowBackIcon                                                      from '@material-ui/icons/ArrowBack';
 import SettingsApplicationsIcon                                           from '@material-ui/icons/SettingsApplications';
 import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
 import Console                                                            from './containers/Console';
@@ -158,7 +159,25 @@ class App extends React.Component{
   renderTopToolbarRightSwitch(){
 
     return (<Switch>
-      <Route path='/prefs' exact={false} render={ () => {
+
+      <Route path='/prefs' exact={false} render={ (props) => {
+
+        const sp = new URLSearchParams(props.location.search);
+        let backurl = "/sites/last";
+        if(sp.has("siteKey")){
+          let siteKey = sp.get("siteKey");
+          backurl = `/sites/${siteKey}/workspaces/source`;
+        }
+        const leftButtons = [
+          <ToolbarButton
+            key={"back"}
+            action={()=>{
+              service.api.redirectTo(backurl, true);
+            }}
+            title="Back"
+            icon={ArrowBackIcon}
+          />,
+        ]
 
         const rightButtons = [
           <ToolbarButton
@@ -181,7 +200,7 @@ class App extends React.Component{
         ];
 
         return <TopToolbarRight
-          itemsLeft={[]}
+          itemsLeft={leftButtons}
           itemsCenter={[]}
           itemsRight={rightButtons}
         />

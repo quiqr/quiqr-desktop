@@ -8,8 +8,6 @@ export class PrefsRouted extends React.Component {
   render(){
     return (
       <Switch>
-
-
         <Route
           path={'/prefs/general'}
           render={({history,match})=>{

@@ -198,7 +198,7 @@ class WorkSpace extends React.Component{
     ];
   }
 
-  toolbarItemsRight(){
+  toolbarItemsRight(siteKey){
 
     return [
       <ToolbarButton
@@ -212,7 +212,7 @@ class WorkSpace extends React.Component{
       <ToolbarButton
         key="buttonPrefs"
         action={()=>{
-          service.api.redirectTo(`/prefs/`);
+          service.api.redirectTo(`/prefs/?siteKey=${siteKey}`);
         }}
         title="Preferences"
         icon={SettingsApplicationsIcon}
@@ -242,7 +242,7 @@ class WorkSpace extends React.Component{
           key="toolbar-right-workspace-siteconf"
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "tools")}
           itemsCenter={[]}
-          itemsRight={this.toolbarItemsRight("tools")}
+          itemsRight={this.toolbarItemsRight(siteKey)}
         />
       }} />
 
@@ -264,7 +264,7 @@ class WorkSpace extends React.Component{
           key="toolbar-right-workspace-dashboard"
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "sync")}
           itemsCenter={toolbarItemsCenter}
-          itemsRight={this.toolbarItemsRight()}
+          itemsRight={this.toolbarItemsRight(siteKey)}
         />
       }} />
 
@@ -286,7 +286,7 @@ class WorkSpace extends React.Component{
           key="toolbar-right-workspace-dashboard"
           itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "content")}
           itemsCenter={toolbarItemsCenter}
-          itemsRight={this.toolbarItemsRight()}
+          itemsRight={this.toolbarItemsRight(siteKey)}
         />
       }} />
 
