@@ -75,21 +75,6 @@ export class API {
     return mainProcessBridge.request('getCurrentSiteKey');
   }
 
-  /*
-
-  openMobilePreview(){
-    return mainProcessBridge.request('openMobilePreview');
-  }
-
-  closeMobilePreview(){
-    return mainProcessBridge.request('closeMobilePreview');
-  }
-
-  updateMobilePreviewUrl( url: string){
-    return mainProcessBridge.request('updateMobilePreviewUrl', {url});
-  }
-  */
-
   buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: any){
     return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey, extraConfig});
   }

@@ -154,10 +154,12 @@ class App extends React.Component{
 
     </Switch>);
   }
+
   renderTopToolbarRightSwitch(){
 
     return (<Switch>
       <Route path='/prefs' exact={false} render={ () => {
+
         const rightButtons = [
           <ToolbarButton
             key={"toolbarbutton-library"}
@@ -185,7 +187,6 @@ class App extends React.Component{
         />
 
       }} />
-
 
       <Route path="/" exact={true} render={ ({match, history})=> {
         return <SiteLibraryToolbarRight

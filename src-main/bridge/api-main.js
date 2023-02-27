@@ -401,8 +401,6 @@ api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
 }
 
-
-
 api.getUserRemoteSites = async function({username},context){
   try{
     context.resolve(cloudCacheManager.getUserRemoteSites(username));

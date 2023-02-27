@@ -64,7 +64,7 @@ class PrefsAdvanced extends React.Component {
           <TextField
             id="openInCommand"
             label="Custom open-in-command"
-            helperText="Command to open directory in. E.g. /usr/bin/terminal -o %s"
+            helperText='Command to open directory in. E.g. alacritty --title "%site_name" --working-directory "%site_path"'
             variant="outlined"
             className={classes.textfield}
             value={this.state.customOpenInCommand}
