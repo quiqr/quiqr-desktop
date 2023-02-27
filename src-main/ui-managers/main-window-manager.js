@@ -8,12 +8,6 @@ const configurationDataProvider      = require('../app-prefs-state/configuration
 
 let mainWindow;
 let mainWindowState;
-/*
-let mobilePreviewView;
-let mobilePreviewTopBarView;
-let mobilePreviewViewUrl;
-let mobilePreviewViewActive = false;
-*/
 
 function showNotFound(mainWindow, lookups){
   let lookupsHtml = lookups.map((x)=> `<li>${x}</li>`).join('');
@@ -26,19 +20,6 @@ function showNotFound(mainWindow, lookups){
 </body>
 </html>`));
 }
-
-/*
-function showPreviewWaitForServer(previewWindow){
-  previewWindow.webContents.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`
-    <html>
-        <body style="background-color:#ccc;font-family: sans-serif; padding: 2em">
-        <h3>Starting preview..</h3>
-        <p>Quiqr is building your site. </p>
-        <p>It can take a minute or two the first time.</p>
-        </body>
-    </html>`));
-}
-*/
 
 function showLookingForServer(mainWindow, port){
   mainWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(`<html>
@@ -83,11 +64,6 @@ function getLocation(locPath = ''){
           mainWindow.loadURL(url);
           getFirstScreenAfterStartup();
         }
-        /*
-        if(mobilePreviewTopBarView){
-          mobilePreviewTopBarView.webContents.loadURL(url);
-        }
-        */
       }
       );
       client.on('error', () => {
@@ -116,11 +92,6 @@ function getLocation(locPath = ''){
       mainWindow.loadURL(
         url.format({ pathname: indexFile, protocol: 'file:', slashes: true })
       );
-      /*
-      if(mobilePreviewTopBarView){
-        mobilePreviewTopBarView.webContents.loadURL(url.format({ pathname: indexFile, protocol: 'file:', slashes: true }));
-      }
-      */
       getFirstScreenAfterStartup();
     }
     else{
@@ -194,54 +165,9 @@ function createWindow () {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
   }
 
-  /*
-  mobilePreviewView = new BrowserView();
-  mobilePreviewTopBarView = new BrowserView({
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
-  mainWindow.addBrowserView(mobilePreviewView);
-  mainWindow.addBrowserView(mobilePreviewTopBarView);
-  */
   mainWindow.show();
 
   getLocation();
-
-  /*
-  mainWindow.on('resize', () => {
-    //Linux hack, Win and Mac should use will-resize with newBound
-    setTimeout(function(){
-      setMobilePreviewBounds();
-    }, 200);
-  })
-
-  mainWindow.on('enter-full-screen', () => {
-    setTimeout(function(){
-      setMobilePreviewBounds();
-    }, 200);
-  })
-  mainWindow.on('leave-full-screen', () => {
-    setTimeout(function(){
-      setMobilePreviewBounds();
-    }, 200);
-  })
-
-  mainWindow.on('enter-html-full-screen', () => {
-    console.log('videofull');
-    setTimeout(function(){
-      mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-      mobilePreviewTopBarView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-    }, 200);
-  })
-
-  mainWindow.on('leave-html-full-screen', () => {
-    setTimeout(function(){
-      setMobilePreviewBounds();
-    }, 200);
-  })
-  */
-
 
   mainWindow.on('closed', function () {
     mainWindow = undefined; //clear reference
@@ -259,34 +185,6 @@ function createWindow () {
 
 }
 
-/*
-async function setMobilePreviewBounds(){
-  let mobwidth = 340;
-  let topheight = 83;
-
-  let view = mainWindow.getBounds();
-
-  if(mobilePreviewViewActive){
-    mobilePreviewTopBarView.setBounds({
-      x: (view.width-mobwidth),
-      y: 0,
-      width: mobwidth,
-      height:topheight
-    });
-    mobilePreviewView.setBounds({
-      x: (view.width-mobwidth),
-      y: topheight,
-      width: mobwidth,
-      height: view.height-topheight
-    });
-  }
-  else{
-    mobilePreviewView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-    mobilePreviewTopBarView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-  }
-}
-*/
-
 module.exports = {
   getCurrentInstance: function(){
     return mainWindow;
@@ -299,14 +197,12 @@ module.exports = {
       global.currentSiteKey = null;
       global.currentWorkspaceKey = null;
 
-      //mainWindow.webContents.send("disableMobilePreview");
       mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
       mainWindow.webContents.send("redirectToGivenLocation", '/sites/last');
 
       mainWindow.setTitle("Quiqr: Select site");
     });
 
-    //menuManager.updateMenu(null);
     menuManager.createMainMenu();
   },
 
@@ -315,91 +211,6 @@ module.exports = {
     var newURL='/sites/'+global.currentSiteKey+'/workspaces/'+global.currentWorkspaceKey+"?key="+Math.random();
     mainWindow.webContents.send("redirectToGivenLocation", newURL);
   },
-
-  /*
-  reloadMobilePreview: function(){
-    module.exports.setMobilePreviewUrl(mobilePreviewViewUrl);
-  },
-  */
-
-  /*
-  setMobilePreviewUrl: function(url){
-    mobilePreviewViewUrl = url;
-    mobilePreviewView.webContents.session.clearCache(function(){return true});
-    mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-empty');
-
-    if(global.currentServerProccess){
-      const net = require('net');
-      const client = new net.Socket();
-      const tryConnection = () => client.connect({port: 13131}, () => {
-
-        client.end();
-        mobilePreviewView.webContents.loadURL(url);
-        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
-        mobilePreviewTopBarView.webContents.send("previewButtonsShowingUrl", url);
-      }
-      );
-      client.on('error', () => {
-        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
-        //setTimeout(tryConnection, 1000);
-      });
-      tryConnection();
-    }
-    else{
-      mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
-      showPreviewWaitForServer(mobilePreviewView);
-    }
-
-  },
-
-  openMobilePreview: function(){
-
-    if(global.pogoconf.expPreviewWindow === false){
-      return;
-    }
-
-    mobilePreviewView.webContents.session.clearCache(function(){return true});
-
-    showPreviewWaitForServer(mobilePreviewView);
-
-    if(global.currentServerProccess){
-      const net = require('net');
-      const client = new net.Socket();
-      const tryConnection = () => client.connect({port: 13131}, () => {
-
-        client.end();
-
-        console.log('preview');
-        mobilePreviewViewUrl = 'http://localhost:13131';
-        mobilePreviewView.webContents.loadURL(mobilePreviewViewUrl);
-        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-buttons');
-      }
-      );
-      client.on('error', () => {
-        mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
-        //setTimeout(tryConnection, 1000);
-      });
-      tryConnection();
-
-    }
-    else{
-      mobilePreviewTopBarView.webContents.send("redirectToGivenLocation", '/preview-no-server');
-      console.log(global.currentSitePath);
-
-    }
-
-    mobilePreviewViewActive = true;
-    mainWindow.webContents.send("setMobileBrowserOpen");
-    setMobilePreviewBounds();
-
-  },
-
-  closeMobilePreview: function(){
-    mobilePreviewViewActive = false;
-    mainWindow.webContents.send("setMobileBrowserClose");
-    setMobilePreviewBounds();
-  },
-  */
 
   getCurrentInstanceOrNew: function(){
     let instance = this.getCurrentInstance();

@@ -10,7 +10,6 @@ class WorkspaceWidget extends React.Component {
     super(props);
     this.state = {
       devDisableAutoHugoServe: false,
-      //expPreviewWindow: false,
       devLocalApi: false,
       hugoRunning: false,
       selectedMenuItem: '',
@@ -20,14 +19,6 @@ class WorkspaceWidget extends React.Component {
   }
 
   componentDidMount(){
-    /*
-    service.api.readConfKey('expPreviewWindow').then((value)=>{
-      this.setState({expPreviewWindow: value });
-      if(!value){
-        this.disableMobilePreview();
-      }
-    });
-    */
 
     this.updateBadges();
     window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
@@ -38,15 +29,6 @@ class WorkspaceWidget extends React.Component {
       this.updateBadges();
     });
 
-    /*
-    window.require('electron').ipcRenderer.on('serverLive', this.activatePreview.bind(this));
-    window.require('electron').ipcRenderer.on('serverDown', this.disablePreview.bind(this));
-    */
-    /*
-    window.require('electron').ipcRenderer.on('disableMobilePreview', this.disableMobilePreview.bind(this));
-    window.require('electron').ipcRenderer.on('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
-    window.require('electron').ipcRenderer.on('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
-    */
   }
 
   updateBadges(){
@@ -62,103 +44,9 @@ class WorkspaceWidget extends React.Component {
   }
 
   componentWillUnmount(){
-    /*
-    window.require('electron').ipcRenderer.removeListener('serverLive', this.activatePreview.bind(this));
-    window.require('electron').ipcRenderer.removeListener('serverDown', this.disablePreview.bind(this));
-    window.require('electron').ipcRenderer.removeListener('tempHideMobilePreview', this.tempHideMobilePreview.bind(this));
-    window.require('electron').ipcRenderer.removeListener('tempUnHideMobilePreview', this.tempUnHideMobilePreview.bind(this));
-    */
     window.require('electron').ipcRenderer.removeAllListeners('updateBadges');
     this._ismounted = false;
   }
-
-  /*
-  toggleMobilePreview(){
-    if(this.state.mobilePreviewActive){
-      this.disableMobilePreview();
-    } else{
-      this.activateMobilePreview();
-    }
-  }
-
-  activateMobilePreview(){
-    service.api.openMobilePreview();
-    if(this._ismounted){
-      this.setState({mobilePreviewActive: true});
-    }
-  }
-
-  tempHideMobilePreview(){
-    if(this._ismounted){
-      if(this.state.mobilePreviewActive){
-        service.api.closeMobilePreview();
-        this.setState({mobilePreviewTempHidden: true});
-      }
-    }
-  }
-  tempUnHideMobilePreview(){
-    if(this._ismounted){
-      if(this.state.mobilePreviewActive){
-        service.api.openMobilePreview();
-        this.setState({mobilePreviewTempHidden: false});
-      }
-    }
-  }
-
-  disableMobilePreview(){
-    service.api.closeMobilePreview();
-    if(this._ismounted){
-      this.setState({mobilePreviewActive: false});
-    }
-  }
-
-  activatePreview(){
-    if(this._ismounted){
-      this.setState({hugoRunning: true});
-    }
-  }
-
-  disablePreview(){
-    if(this._ismounted){
-      this.setState({hugoRunning: false});
-    }
-  }
-  */
-
-  /*
-  renderSiteMounted(){
-
-    //let serverOptions = workspaceConfig != null && workspaceConfig.serve != null ? workspaceConfig.serve.map(x => x.key||'default') : [];
-
-    let mobilePreviewToggle = <Toggle toggled={this.state.mobilePreviewActive} onToggle={(e,value)=>{ this.toggleMobilePreview() }} style={{marginRight: 24}} labelPosition='right' />
-
-    let previewWindowItem = "";
-
-    if(this.state.expPreviewWindow){
-      previewWindowItem = <ListItem
-        primaryText="Preview on the side"
-        onClick={(e,value)=>{ this.toggleMobilePreview() }}
-        secondaryText=""
-        rightIcon={mobilePreviewToggle}
-        leftIcon={<IconPhone xcolor="white"  />} />
-    }
-
-    return (
-      <div style={{paddingLeft:'0px'}}>
-        <List style={{padding: 0}}>
-        </List>
-        <Divider/>
-      </div>
-    );
-  }
-  renderEmpty(){
-
-    return (
-      <List>
-      </List>
-    )
-  }
-  */
 
   renderPartialDevInfo(){
 

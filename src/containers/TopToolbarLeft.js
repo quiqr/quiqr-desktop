@@ -1,8 +1,6 @@
 import React from 'react';
-
 import Box from '@material-ui/core/Box';
 import { withStyles } from '@material-ui/core/styles';
-//import Avatar from '@material-ui/core/Avatar';
 
 const useStyles = theme => ({
 
@@ -19,11 +17,9 @@ const useStyles = theme => ({
   }
 });
 
-//<Avatar variant="square" className={classes.siteAvatar}>{this.props.title.charAt(0)}</Avatar>
 
 class TopToolbarLeft extends React.Component {
   render(){
-
 
     return (
       <Box textOverflow="ellipsis" overflow="hidden" fontWeight="fontWeightMedium" border={0} component="div" fontSize="h6.fontSize" m={2} whiteSpace="nowrap">
