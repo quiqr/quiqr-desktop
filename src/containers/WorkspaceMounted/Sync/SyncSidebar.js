@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route }  from 'react-router-dom';
 import Sidebar    from './../../Sidebar';
-//import service    from './../../../services/service';
+import service    from './../../../services/service';
 import AddIcon    from '@material-ui/icons/Add';
 import IconQuiqr  from '../../../svg-assets/IconQuiqr';
 import IconGitHub from '../../../svg-assets/IconGitHub';
@@ -23,11 +23,23 @@ export class SyncSidebar extends React.Component {
   componentDidUpdate(preProps){
     if(preProps.site !== this.props.site){
       this.initState();
+      this.checkLastOpenedPublishConf();
     }
   }
 
   componentDidMount(){
     this.initState();
+    this.checkLastOpenedPublishConf();
+  }
+
+  checkLastOpenedPublishConf(){
+    service.api.readConfKey('lastOpenedPublishTargetForSite').then((value)=>{
+      if(value){
+        if(this.props.siteKey in value){
+          this.setState({selectedMenuItem: value[this.props.siteKey]});
+        }
+      }
+    });
   }
 
   initState(){

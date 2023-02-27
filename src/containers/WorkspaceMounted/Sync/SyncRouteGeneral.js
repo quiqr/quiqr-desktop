@@ -82,7 +82,6 @@ class SyncRouteGeneral extends React.Component {
           this.setState({lastOpenedPublishedKey: value[this.props.siteKey]});
         }
       }
-
     });
   }
 
@@ -99,13 +98,11 @@ class SyncRouteGeneral extends React.Component {
   }
 
   initState(){
-
     if(this.props.site){
       this.setState({
         site: this.props.site
       });
     }
-
   }
 
   mergeAction(publishConf){
