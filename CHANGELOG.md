@@ -5,8 +5,10 @@
 - remove quiqr cloud stuff
 - remove form cookbook
 - breaking changes changes vars in custom open-in command (%site_name, %site_path)
-- add back button in prefs toolbar
+- feature: add back button in prefs toolbar
 - fix missing active publish conf in sidebar
+- feature: new field-type: select-from-query
+- feature: first proof of concept of the new Quiqr Query Language
 
 ## 0.15.2 (2023-01-24)
 - fix: application did not start

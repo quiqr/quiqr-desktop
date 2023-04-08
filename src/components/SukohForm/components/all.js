@@ -20,6 +20,7 @@ import ReadonlyDynamic from './ReadonlyDynamic';
 import BundleManagerDynamic from './BundleManagerDynamic';
 import SectionDynamic from './SectionDynamic';
 import SelectDynamic from './SelectDynamic';
+import SelectFromQueryDynamic from './SelectFromQueryDynamic';
 import FontPickerDynamic from './FontPickerDynamic';
 import SliderDynamic from './SliderDynamic';
 import BundleImgThumbDynamic from './BundleImgThumbDynamic';
@@ -46,6 +47,7 @@ export default [
     BundleManagerDynamic,
     SectionDynamic,
     SelectDynamic,
+    SelectFromQueryDynamic,
     SliderDynamic,
     TextFieldDynamic,
     TextFieldNumberDynamic,

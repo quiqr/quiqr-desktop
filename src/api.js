@@ -75,6 +75,10 @@ export class API {
     return mainProcessBridge.request('getCurrentSiteKey');
   }
 
+  globSync(pattern, options){
+    return mainProcessBridge.request('globSync', {pattern, options});
+  }
+
   buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: any){
     return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey, extraConfig});
   }

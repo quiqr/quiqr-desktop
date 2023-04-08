@@ -1,3 +1,4 @@
+const glob                      = require('glob');
 const fs                        = require('fs-extra');
 const fssimple                  = require('fs');
 const {dirname}                 = require('path');
@@ -61,14 +62,14 @@ function getSiteServicePromise(siteKey){
   });
 }
 
-function getWorkspaceService(siteKey,
-  workspaceKey,
-  callback){
+function getWorkspaceService(siteKey, workspaceKey, callback){
+
   return getWorkspaceServicePromise(siteKey, workspaceKey).then((data)=>{
     callback(null, data);
   },(e)=>{
     callback(e, (null));
   })
+
 }
 
 async function getWorkspaceServicePromise(siteKey, workspaceKey){
@@ -386,6 +387,12 @@ api.connectPogoDomain = async function({postData},context){
 api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
 }
+
+api.globSync = async function({pattern,options},context){
+  let files = glob.sync(path.join(global.currentSitePath,pattern),options);
+  context.resolve(files);
+}
+
 
 api.getCurrentBaseUrl = async function(_,context){
   console.log(global.currentBaseUrl)
