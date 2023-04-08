@@ -52,7 +52,7 @@ in
 #    ];
 
     nativeBuildInputs = [
-      pkgs.nodejs
+      pkgs.nodejs-16_x
       pkgs.hugo
       pkgs.electron_9
       myPackages.embgit
