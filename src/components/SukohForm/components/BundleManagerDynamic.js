@@ -192,6 +192,15 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         <strong>{field.title?field.title:"Page files"}</strong>
       </div>
 
+      { showAddButton && field.addButtonLocationTop ?
+        <RaisedButton
+          primary={true}
+          label="Add file"
+          style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
+          onClick={this.onButtonClick.bind(this)}
+          icon={<IconUpload />} />:null
+      }
+
       <BundleManager forceActive={true}>
 
         { (itemsStates).map((state,childIndex)=>{
@@ -236,13 +245,14 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         }) }
           </BundleManager>
 
-          { showAddButton?
-          <RaisedButton
+      { showAddButton && !field.addButtonLocationTop ?
+        <RaisedButton
           primary={true}
           label="Add file"
           style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
           onClick={this.onButtonClick.bind(this)}
-          icon={<IconUpload />} />:null}
+          icon={<IconUpload />} />:null
+      }
 
         </React.Fragment>);
   }

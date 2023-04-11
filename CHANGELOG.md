@@ -1,14 +1,15 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-- fix #410, show active toolbar
-- cleanup text menu
-- remove quiqr cloud stuff
-- remove form cookbook
-- breaking changes changes vars in custom open-in command (%site_name, %site_path)
 - feature: add back button in prefs toolbar
-- fix missing active publish conf in sidebar
 - feature: new field-type: select-from-query
 - feature: first proof of concept of the new Quiqr Query Language
+- feature: bundle-manager, show add-button on top of the widget
+- cleanup: text menu
+- cleanup: remove quiqr cloud stuff
+- cleanup: remove form cookbook
+- breaking changes: new vars format in custom open-in command (%site_name, %site_path)
+- fix: #410, show active toolbar
+- fix: missing active publish conf in sidebar
 
 ## 0.15.2 (2023-01-24)
 - fix: application did not start
@@ -39,16 +40,13 @@
 - 37 NPM modules - 35.11M
 
 ## 0.14.5 (2022-12-06)
-
 - fix bug in pull sync when repo does not exist
 - always use --disableFastRender
 
 ## 0.14.4 (2022-12-06)
-
 - removed hugo versions from git workflow to make it succeed more often
 
 ## 0.14.3 (2022-12-06)
-
 - private github repos can be imported using private key
 - selective sync
 
@@ -86,7 +84,6 @@
 - try fix Windows embgit
 
 ## 0.13.6 (2022-07-01)
-
 - try fix npm packages package-lock.json
 
 ## 0.13.5 (2022-07-01)
@@ -101,7 +98,6 @@
 - try enable linux build target
 
 ## 0.13.2 (2022-06-29)
-
 - set cname for github pages
 - sort tags
 - Quiqr Community Templates listing
@@ -113,11 +109,9 @@
 - add new collection propery includeSubDirs default true
 
 ## 0.13.1 (2022-06-23)
-
 - lint fixes
 
 ## 0.13.0 (2022-06-23)
-
 - wip: open in quiqr (quiqr://)
 - reorganized site dev tools
 - new welcome screen
@@ -129,18 +123,15 @@
 - minimal windows sizes
 
 ## 0.12.0 (2022-06-14)
-
 - add Hugo Version select in new site
 - show last used publish conf
 - add timeout on embgit show repo
 - add sync-to-folder target
 
 ## 0.11.4 (2022-06-14)
-
 - fix problem in react-scripts
 
 ## 0.11.3 (2022-06-14)
-
 - show mousefeedback when clicking card in Library
 - fix react errors and depreciations
 - fix problem preventing starting on a mac
@@ -151,11 +142,9 @@
 - fix production
 
 ## 0.11.1 (2022-06-13)
-
 - fix missing resources/all dir for buildinfo.js
 
 ## 0.11.0 (2022-06-13)
-
 - add disable model cache option
 - dynamics can now be defined in model/includes/
 - implement mergePartials in dynamics, refactor initial config provider
@@ -227,7 +216,6 @@
 - code cleanup
 
 ## 0.10.0 (2022-03-31)
-
 - implement preferences with choosable Data Folder
 - many fixes in bundle-manager
 - new bundle-manager attribute: forceFileName
@@ -284,25 +272,21 @@
 - fix accordion
 
 ## v0.7.2
-
 - detect if hugo server is running or not
 - show not running server in preview window
 - improve restart of hugo server
 - autoimport by clicking link in browser for Windows & Linux (quiqr://)
 
 ## v0.7.1
-
 - auto generate menu
 - experimental menu
 
 ## v0.7.0
-
 - become a Quiqr member
 - claim a Quiqr domain
 - new authentication flow for publishing sites
 
 ## v0.6.6
-
 - fix image previews in Singles
 - improve bundle-manager and image thumb layout
 - open single item in editor
@@ -368,7 +352,6 @@
 - [site-source]/quiqr/home/index.md is displayed on the site dashboard
 
 ## v0.5.0
-
 - fix progress windows not closing bug
 - fix double click pogofile error when quiqr not running
 - first working version of the poppy:// handler
@@ -377,14 +360,12 @@
 - fix scss bug
 
 ## v0.4.4
-
 - refactored pogopublish, impl.commit -a
 - disable gitlab-ci
 - remove resources add export
 
 ## v0.4.2 [05.06.20 03.03]
 - Fix unknown host problem ssh/git
-
 - Upgrade to from electron 3.x to 5.x
 - Fix strange browserview HTML behaviour
 - Stop server is not defined
@@ -441,7 +422,6 @@
 - pas site key aan
 
 ## versie de sukoh 0.2.2 - Andreas
-
 - code signature
 - git publisher gebaseerd op key
 - meer feedback na publiceren
@@ -462,7 +442,7 @@
   - when theme found copy to css
   - else copy default
   - voorkeuren voor kleuren (ik word gek van paars en blauw)
-- onfig.json
+- config.json
   - niet gemaximaliseerd starten
   - hide extra menu
 - meer stylen als een native programma
