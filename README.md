@@ -25,7 +25,7 @@ Quiqr runs on Windows, macOS and Linux
 
 ## Installation
 
-You can download Warp from our [website](<https://quiqr.org>).
+You can download Quiqr Desktop from our [website](<https://quiqr.org>).
 
 ## Changelog and Releases
 
