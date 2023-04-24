@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
 - feature: new field-type: select-from-query
 - feature: first proof of concept of the new Quiqr Query Language
