@@ -11,6 +11,11 @@
 - fix: #410, show active toolbar
 - fix: missing active publish conf in sidebar
 
+### Stats
+- 34 stars
+- 5 community templates
+- 37 NPM modules - 35.11M
+
 ## 0.15.2 (2023-01-24)
 - fix: application did not start
 

@@ -207,7 +207,7 @@ npm run _hugo_versions
 
 - count templates in gallery
 - github stars
-- npm module costs
+- npm module costs (see here below)
 
 ```
 npx cost-of-modules --no-install
