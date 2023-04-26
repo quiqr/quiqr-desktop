@@ -1,5 +1,4 @@
-const { spawn }  = require('child_process');
-const spawnAw                                   = require('await-spawn')
+const spawnAw    = require('await-spawn')
 const fs         = require('fs-extra');
 const pathHelper = require('./../utils/path-helper');
 

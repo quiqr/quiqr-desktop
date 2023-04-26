@@ -528,12 +528,6 @@ class MenuManager {
             }
           },
           */
-          {
-            label: 'Open Server Logs',
-            click: async () => {
-              this.createLogWindow()
-            }
-          },
         ]
       },
       {
@@ -558,6 +552,24 @@ class MenuManager {
             click: async () => {
               await shell.openExternal("https://book.quiqr.org");
             }
+          },
+          { type: 'separator' },
+          {
+            label: 'Troubleshooting',
+            submenu: [
+              {
+                label: 'Open Logs Window',
+                click: async () => {
+                  this.createLogWindow()
+                }
+              },
+              {
+                label: 'Report Issue',
+                click: async () => {
+                  await shell.openExternal("https://github.com/quiqr/quiqr-desktop/issues/new");
+                }
+              }
+            ]
           },
           { type: 'separator' },
           {

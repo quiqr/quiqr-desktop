@@ -24,7 +24,6 @@ const cloudGitManager           = require('../sync/quiqr-cloud/cloud-git-manager
 const GithubKeyManager          = require('../sync/github/github-key-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 const chokidar                  = require('chokidar');
-const spawnAw                   = require('await-spawn')
 
 let api = {};
 

@@ -1,4 +1,9 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- feature: improve git debugging
+- feature: add troubleshooting menu item
+- cleanup: refactored cli execute
+
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
 - feature: new field-type: select-from-query

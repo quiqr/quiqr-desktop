@@ -1,10 +1,10 @@
 const path                      = require('path');
 const fs                        = require('fs-extra');
-const spawnAw                   = require('await-spawn')
 const outputConsole             = require('../../logger/output-console');
 const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 const Embgit                    = require('../../embgit/embgit');
 const pathHelper                = require('../../utils/path-helper');
+const cliExecuteHelper          = require('../../utils/cli-execute-helper');
 const fileDirUtils              = require('../../utils/file-dir-utils');
 const { EnvironmentResolver }   = require('../../utils/environment-resolver');
 
@@ -129,16 +129,10 @@ class GithubSync {
   }
 
   async publish_step1_initial_clone(tmpkeypathPrivate, fullGitHubUrl, fullDestinationPath){
-    try {
-      outputConsole.appendLine(gitBin+ " clone -s -i " + tmpkeypathPrivate + " " + fullGitHubUrl + " " + fullDestinationPath );
-      //-s insecure (ignore hostkey)
-      //-i use private file
-      await spawnAw( gitBin, [ "clone", "-s", "-i", tmpkeypathPrivate, fullGitHubUrl , fullDestinationPath ]);
-      outputConsole.appendLine('1st Clone success ...');
-    } catch (e) {
-      outputConsole.appendLine('1st Clone error ...:' + e);
-      //IF FAIL KEY CORRECT?
-    }
+
+    await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, fullGitHubUrl , fullDestinationPath ]);
+    //-s insecure (ignore hostkey)
+    //-i use private file
     return true;
   }
 
@@ -176,17 +170,14 @@ class GithubSync {
 
   async publish_step3_add_commit_push(tmpkeypathPrivate, fullDestinationPath){
 
+    await cliExecuteHelper.try_execute("git-add", gitBin, [ "add_all", fullDestinationPath ]);
 
-    await spawnAw( gitBin, [ "add_all" , fullDestinationPath]);
-    outputConsole.appendLine('git-add finished ...');
+    await cliExecuteHelper.try_execute("git-commit", gitBin, [
+      "commit", '-a' , '-n', this._config.username,
+      '-e', this._config.email,
+      '-m', "'publication from " + UQIS +"'", fullDestinationPath]);
 
-    await spawnAw( gitBin, [ "commit", '-a' , '-n', this._config.username, '-e', this._config.email, '-m', "'publication from " + UQIS +"'", fullDestinationPath]);
-    outputConsole.appendLine(gitBin+" commit -a -n "+ this._config.username + " -e " + this._config.email + " -m 'publication from "+ UQIS +"' " + fullDestinationPath);
-    outputConsole.appendLine('git-commit finished ...');
-
-    await spawnAw( gitBin, [ "push","-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
-    outputConsole.appendLine(gitBin+" push -i "+ tmpkeypathPrivate +" "+ fullDestinationPath);
-    outputConsole.appendLine('git-commit push finished ...');
+    await cliExecuteHelper.try_execute("git-push", gitBin, [ "push", "-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
 
     return true;
   }

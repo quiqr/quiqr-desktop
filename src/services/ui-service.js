@@ -71,7 +71,11 @@ class ConsoleService extends BaseService {
     }
 
     _onConsole({line}){
-        //throttle this?
+
+        // This removes console escape codes.
+        // eslint-disable-next-line
+        line = line.replace(/\u001b[^m]*?m/g,"")
+
         this._consoleBuffer.push({id:this.consoleMessageLastId++, line});
         if(this._consoleTimeout)
             clearTimeout(this._consoleTimeout);

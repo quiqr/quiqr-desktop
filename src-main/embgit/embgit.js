@@ -1,12 +1,9 @@
-const path                                      = require('path');
-const fs                   = require('fs-extra');
-//const rootPath                                  = require('electron-root-path').rootPath;
-const rootPath                                  = require('../utils/electron-root-path').rootPath;
-const spawnAw                                   = require('await-spawn')
-const pathHelper                                = require('../utils/path-helper');
-const { EnvironmentResolver, PLATFORMS }        = require('../utils/environment-resolver');
-//const electron          = require('electron')
-
+const path                                  = require('path');
+const fs                                    = require('fs-extra');
+const rootPath                              = require('../utils/electron-root-path').rootPath;
+const spawnAw                               = require('await-spawn')
+const pathHelper                            = require('../utils/path-helper');
+const { EnvironmentResolver, PLATFORMS }    = require('../utils/environment-resolver');
 
 let userconf = {
   email:   "anonymous@quiqr.org",
