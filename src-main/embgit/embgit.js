@@ -2,6 +2,7 @@ const path                                  = require('path');
 const fs                                    = require('fs-extra');
 const rootPath                              = require('../utils/electron-root-path').rootPath;
 const spawnAw                               = require('await-spawn')
+const cliExecuteHelper                      = require('../utils/cli-execute-helper');
 const pathHelper                            = require('../utils/path-helper');
 const { EnvironmentResolver, PLATFORMS }    = require('../utils/environment-resolver');
 
@@ -76,6 +77,7 @@ class Embgit{
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve )=>{
       try {
+        //TODO REPLACE with cliExecuteHelper
         let cmd = await spawnAw( gitBinary, [ "reset_hard", destination_path ]);
         global.outputConsole.appendLine('Reset success ...');
         console.log(cmd.toString());
@@ -93,6 +95,7 @@ class Embgit{
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
+        //TODO REPLACE with cliExecuteHelper
         let cmd = await spawnAw( gitBinary, [ "repo_show_quiqrsite", url ]);
         const response = JSON.parse(cmd.toString());
         resolve(response)
@@ -107,6 +110,7 @@ class Embgit{
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
+        //TODO REPLACE with cliExecuteHelper
         let cmd = await spawnAw( gitBinary, [ "repo_show_hugotheme", url ]);
         global.outputConsole.appendLine(gitBinary + " repo_show_hugotheme " + url );
         const response = JSON.parse(cmd.toString());
@@ -122,17 +126,12 @@ class Embgit{
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
-        const cmd = await spawnAw( gitBinary, [ "pull", "-s" ,"-i", userconf.privateKey, destination_path ]);
-        global.outputConsole.appendLine(gitBinary + " pull -s -i " + userconf.privateKey + " " + destination_path );
-        global.outputConsole.appendLine('Pull success ...');
-        console.log(cmd.toString());
+        await cliExecuteHelper.try_execute("git-pull", gitBinary, ["pull", "-s" ,"-i", userconf.privateKey, destination_path]);
         resolve(true)
       } catch (e) {
-        global.outputConsole.appendLine(gitBinary + " pull -s -i " + userconf.privateKey + " " + destination_path );
         reject(e);
       }
     });
-
   }
 
   async cloneFromPublicUrl(url, destination_path){
@@ -140,6 +139,7 @@ class Embgit{
 
     return new Promise( async (resolve, reject)=>{
       try {
+        //TODO REPLACE with cliExecuteHelper
         await spawnAw( gitBinary, [ "clone", "-s" , url , destination_path ]);
         global.outputConsole.appendLine(gitBinary + " clone -s " + url + " " + destination_path );
         global.outputConsole.appendLine('Clone success ...');
@@ -162,6 +162,7 @@ class Embgit{
 
     return new Promise( async (resolve, reject)=>{
       try {
+        //TODO REPLACE with cliExecuteHelper
         await spawnAw( gitBinary, [ "clone", "-s" ,"-i", privateKeyPath, url , destination_path ]);
         global.outputConsole.appendLine(gitBinary + " clone -s -i " + privateKeyPath + " " + url + " " + destination_path );
         global.outputConsole.appendLine('Clone success ...');
@@ -180,6 +181,7 @@ class Embgit{
     const gitBinary = this.getGitBin();
     return new Promise( async (resolve, reject)=>{
       try {
+        //TODO REPLACE with cliExecuteHelper
         await spawnAw( gitBinary, [ "clone", "-s" ,"-i", userconf.privateKey, url , destination_path ]);
         global.outputConsole.appendLine(gitBinary + " clone -s -i " + userconf.privateKey + " " + url + " " + destination_path );
         global.outputConsole.appendLine('Clone success ...');

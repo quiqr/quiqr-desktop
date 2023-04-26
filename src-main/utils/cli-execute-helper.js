@@ -10,7 +10,8 @@ class CliExecuteHelper {
     } catch (e) {
       outputConsole.appendLine(`Executing: ${executable} ${args.join(" ")}`);
       outputConsole.appendLine('ERROR: ' + e.stdout.toString());
-      throw new Error('Error at execution.');
+      throw e;
+      //new Error('Error at execution.');
     }
   }
 }

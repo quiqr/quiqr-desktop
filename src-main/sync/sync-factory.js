@@ -1,15 +1,15 @@
-const outputConsole = require('./../logger/output-console');
+const outputConsole = require('../logger/output-console');
 const path = require('path')
 
 //Not a real factory, yet!
-class PublisherFactory{
+class SyncFactory{
   getPublisher(publisherConfig) {
     let type = publisherConfig.type;
     let genericPublisherConfig = (publisherConfig);
 
     outputConsole.appendLine(' about to start publisher with type: ' + type )
 
-    const typePath = path.join('..', 'sync', type, type+'-sync')
+    const typePath = path.join('../sync', type, type+'-sync')
     try{
       let SyncService = require(typePath);
       return new SyncService(genericPublisherConfig);
@@ -23,4 +23,4 @@ class PublisherFactory{
   }
 }
 
-module.exports = new PublisherFactory();
+module.exports = new SyncFactory();

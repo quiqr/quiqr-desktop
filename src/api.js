@@ -256,21 +256,6 @@ export class API {
     return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 130000});
   }
 
-  setPublishStatus(status){
-    return mainProcessBridge.request('setPublishStatus', {status});
-  }
-  /*
-  parentCloseMobilePreview(){
-    return mainProcessBridge.request('parentCloseMobilePreview', {})
-  }
-  parentTempHideMobilePreview(){
-    return mainProcessBridge.request('parentTempHideMobilePreview', {})
-  }
-  parentTempUnHideMobilePreview(){
-    return mainProcessBridge.request('parentTempUnHideMobilePreview', {})
-  }
-  */
-
   getCreatorMessage(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('getCreatorMessage', {siteKey, workspaceKey});
   }
@@ -328,57 +313,6 @@ export class API {
     return mainProcessBridge.request('createKeyPairGithub',{}, {timeout:90000});
   }
 
-  createKeyPairQC(){
-    return mainProcessBridge.request('createKeyPairQC',{}, {timeout:90000});
-  }
-
-  createPogoProfile(obj: any){
-    return mainProcessBridge.request('createPogoProfile',{obj});
-  }
-
-  registerPogoUser(postData){
-    return mainProcessBridge.request('registerPogoUser',{postData});
-  }
-
-  resendConfirmationLinkPogoUser(postData){
-    return mainProcessBridge.request('resendConfirmationLinkPogoUser',{postData});
-  }
-
-  registerPogoDomain(postData){
-    return mainProcessBridge.request('registerPogoDomain',{postData});
-  }
-
-  connectPogoDomain(postData){
-    return mainProcessBridge.request('connectPogoDomain',{postData});
-  }
-
-  deleteSiteFromCloud(postData){
-    return mainProcessBridge.request('deleteSiteFromCloud',{postData});
-  }
-
-  disconnectPogoDomain(postData){
-    return mainProcessBridge.request('disconnectPogoDomain',{postData});
-  }
-
-  createPogoDomainConf(path: string, domain: string){
-    return mainProcessBridge.request('createPogoDomainConf',{path, domain});
-  }
-
-  getQuiqrProfile(){
-    return mainProcessBridge.request('getQuiqrProfile');
-  }
-
-  cloneRemoteAsManagedSite(cloudPath: string, siteName: string){
-    return mainProcessBridge.request('cloneRemoteAsManagedSite',{cloudPath, siteName}, {timeout: 1000000});
-  }
-
-  cloneRemoteAsUnmanagedSite(cloudPath: string, siteName: string){
-    return mainProcessBridge.request('cloneRemoteAsUnmanagedSite',{cloudPath, siteName}, {timeout: 1000000});
-  }
-
-  getUserRemoteSites(username){
-    return mainProcessBridge.request('getUserRemoteSites',{username});
-  }
   invalidateCache(){
     return mainProcessBridge.request('invalidateCache');
   }

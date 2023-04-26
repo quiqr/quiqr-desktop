@@ -12,15 +12,10 @@ const libraryService            = require('../services/library/library-service')
 const Embgit                    = require('../embgit/embgit')
 const WorkspaceService          = require('../services/workspace/workspace-service')
 const hugoDownloader            = require('../hugo/hugo-downloader')
-
 const menuManager               = require('../ui-managers/menu-manager');
 const pogozipper                = require('../import-export/pogozipper');
 const gitImporter               = require('../import/git-importer');
 const folderImporter            = require('../import/folder-importer');
-const PogoPublisher             = require('../publishers/pogo-publisher');
-const cloudCacheManager         = require('../sync/quiqr-cloud/cloud-cache-manager');
-const cloudApiManager           = require('../sync/quiqr-cloud/cloud-api-manager');
-const cloudGitManager           = require('../sync/quiqr-cloud/cloud-git-manager');
 const GithubKeyManager          = require('../sync/github/github-key-manager');
 const { EnvironmentResolver }   = require('../utils/environment-resolver');
 const chokidar                  = require('chokidar');
@@ -295,94 +290,6 @@ api.createKeyPairGithub = async function(_, context){
   context.resolve({keyPair});
 }
 
-api.createKeyPairQC = async function(_, context){
-  let pubkey = await cloudGitManager.keygen();
-  let environmentResolver = new EnvironmentResolver();
-  let pubkey_title = environmentResolver.getUQIS()
-  context.resolve({pubkey, pubkey_title});
-}
-
-api.createPogoProfile = async function(profile,context){
-  let pogopubl = new PogoPublisher({});
-  await pogopubl.writeProfile(profile.obj)
-  context.resolve(true);
-}
-
-api.getQuiqrProfile = async function(_, context){
-  let pogopubl = new PogoPublisher({});
-  let profile = await pogopubl.readProfile();
-
-  let fingerprint = await cloudGitManager.getKeyFingerprint();
-
-  if(profile && fingerprint){
-    context.resolve({profile,fingerprint});
-  }
-  else{
-    context.resolve(false);
-  }
-}
-
-api.registerPogoUser = async function({postData},context){
-  try{
-    let userObj = await cloudApiManager.registerPogoUser(postData);
-    context.resolve(userObj);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-api.deleteSiteFromCloud = async function({postData},context){
-  try{
-    let result = await cloudApiManager.deleteSiteFromCloud(postData);
-    context.resolve(result);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-api.disconnectPogoDomain = async function({postData},context){
-  try{
-    let result = await cloudApiManager.disconnectPogoDomain(postData);
-    context.resolve(result);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-api.resendConfirmationLinkPogoUser = async function({postData},context){
-  try{
-    let result = await cloudApiManager.resendConfirmationLinkPogoUser(postData);
-    context.resolve(result);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-api.registerPogoDomain = async function({postData},context){
-  try{
-    let path = await cloudApiManager.registerPogoDomain(postData);
-    context.resolve(path);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-api.connectPogoDomain = async function({postData},context){
-  try{
-    let domain = await cloudApiManager.connectPogoDomain(postData);
-    context.resolve(domain);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-
 api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
 }
@@ -398,22 +305,8 @@ api.getCurrentBaseUrl = async function(_,context){
   context.resolve(global.currentBaseUrl);
 }
 
-api.createPogoDomainConf = async function({path,domain},context){
-  let pogopubl = new PogoPublisher({});
-  await pogopubl.writeDomainInfo(path,domain)
-  context.resolve(path);
-}
 api.getCurrentSiteKey = async function(){
   return await global.currentSiteKey;
-}
-
-api.getUserRemoteSites = async function({username},context){
-  try{
-    context.resolve(cloudCacheManager.getUserRemoteSites(username));
-  }
-  catch(err){
-    context.reject(err);
-  }
 }
 
 api.openSiteLibrary = async function(){
@@ -923,12 +816,6 @@ api.invalidateCache = function(){
   configurationDataProvider.invalidateCache();
 }
 
-api.setPublishStatus = async function({status}, context){
-  let pogopubl = new PogoPublisher({});
-  await pogopubl.writePublishStatus(status)
-  context.resolve(true);
-}
-
 api.genereateEtalageImages = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   workspaceService.genereateEtalageImages();
@@ -1001,28 +888,6 @@ api.publishSite = function({siteKey, publishConf}, context){
       context.reject(err);
     });
   });
-}
-
-
-api.cloneRemoteAsManagedSite = async function({cloudPath, siteName}, context){
-  try{
-    let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName, true);
-    cloudCacheManager.updateRemoteSiteCache(newConf, global.pogoconf.currentUsername);
-    context.resolve(newConf);
-  }
-  catch(err){
-    context.reject(err);
-  }
-}
-
-api.cloneRemoteAsUnmanagedSite = async function({cloudPath, siteName}, context){
-  try{
-    let newConf = await cloudGitManager.clonePogoCloudSite(cloudPath, siteName, false);
-    context.resolve(newConf);
-  }
-  catch(err){
-    context.reject(err);
-  }
 }
 
 module.exports = api;

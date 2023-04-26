@@ -93,22 +93,6 @@ export class SiteLibrarySidebar extends React.Component {
           }
         ]
       },
-      /*
-      {
-        title: 'In my cloud',
-        items: [
-          {
-            active: true,
-            label: "Quiqr Cloud",
-            selected: (this.state.selectedMenuItem==='quiqr-cloud' ? true : false),
-            onClick: ()=>{
-              this.saveSelectedMenuItem('quiqr-cloud');
-              history.push(`${basePath}/quiqr-cloud`)
-            }
-          },
-        ]
-      },
-      */
       {
         title: 'Quiqr Templates',
         items: [

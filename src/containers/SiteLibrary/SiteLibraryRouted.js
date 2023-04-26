@@ -9,7 +9,6 @@ import Menu                         from '@material-ui/core/Menu';
 import MenuItem                     from '@material-ui/core/MenuItem';
 import IconButton                   from '@material-ui/core/IconButton';
 import MoreVertIcon                 from '@material-ui/icons/MoreVert';
-import DownloadQuiqrCloudSiteDialog from './dialogs/DownloadQuiqrCloudSiteDialog';
 import NewSlashImportSiteDialog     from './dialogs/NewSlashImportSiteDialog';
 import EditSiteTagsDialogs          from './dialogs/EditSiteTagsDialogs';
 import RenameSiteDialog             from './dialogs/RenameSiteDialog';
@@ -36,7 +35,6 @@ class SiteLibraryRouted extends React.Component{
       blockingOperation: null,
       currentSiteKey: null,
       showSpinner: false,
-      remoteSiteDialog: false,
       configurations: [],
       editTagsDialog: false,
       renameDialog: false,
@@ -47,19 +45,15 @@ class SiteLibraryRouted extends React.Component{
         open: false,
         newOrImport: 'new'
       },
-      currentRemoteSite: '',
       publishSiteDialog: undefined,
       siteCreatorMessage: null,
       quiqrCommunityTemplates: [],
-      remoteSitesAsOwner: [],
-      remoteSitesAsMember: [],
       sitesListingView: ''
     };
   }
 
   componentDidMount(){
 
-    this.updateRemoteSites(this.props.quiqrUsername);
     this.updateLocalSites();
     this.updateCommunityTemplates();
 
@@ -104,27 +98,6 @@ class SiteLibraryRouted extends React.Component{
       });
     })
     request.end()
-  }
-
-
-  updateRemoteSites(username){
-    if(username){
-      service.api.getUserRemoteSites(username).then((remote_sites)=>{
-
-        if(remote_sites.sites && remote_sites.sites_with_member_access){
-          this.setState({
-            remoteSitesAsOwner: remote_sites.sites,
-            remoteSitesAsMember: remote_sites.sites_with_member_access
-          });
-        }
-      });
-    }
-    else{
-      this.setState({
-        remoteSitesAsOwner: [],
-        remoteSitesAsMember: []
-      });
-    }
   }
 
   updateLocalSites(){
@@ -174,9 +147,6 @@ class SiteLibraryRouted extends React.Component{
       });
     }
 
-    if(this.props.quiqrUsername !== nextProps.quiqrUsername){
-      this.updateRemoteSites(nextProps.quiqrUsername);
-    }
   }
 
   mountSiteByKey(siteKey){
@@ -338,26 +308,7 @@ class SiteLibraryRouted extends React.Component{
       listingSource = source;
     }
 
-    if(listingSource === 'quiqr-cloud' || (listingSource ==='last' && this.state.sitesListingView === 'quiqr-cloud')){
-      listTitle = `Available remote sites ${(this.props.quiqrUsername? "for " + this.props.quiqrUsername:'')}`;
-
-      sites = [];
-      this.state.remoteSitesAsOwner.forEach((remotesite)=>{
-        sites.push({
-          name: remotesite,
-          owner: this.props.quiqrUsername,
-          remote: true
-        })
-      });
-      this.state.remoteSitesAsMember.forEach((remotesite)=>{
-        sites.push({
-          name: remotesite,
-          owner: "?",
-          remote: true
-        })
-      });
-    }
-    else if(listingSource === 'quiqr-community-templates' || (listingSource ==='last' && this.state.sitesListingView === 'templates-quiqr-community')){
+    if(listingSource === 'quiqr-community-templates' || (listingSource ==='last' && this.state.sitesListingView === 'templates-quiqr-community')){
       listTitle = `Quiqr Community Templates ${(this.props.quiqrUsername? "for " + this.props.quiqrUsername:'')}`;
 
       sites = [];
@@ -453,11 +404,6 @@ class SiteLibraryRouted extends React.Component{
       });
 
     }
-    else if(site.remote){
-      this.setState({
-        currentRemoteSite:site.name,
-        remoteSiteDialog:true});
-    }
     else{
       this.mountSite(site)
     }
@@ -542,17 +488,6 @@ class SiteLibraryRouted extends React.Component{
             service.api.redirectTo("/sites/last", true);
           }}
         />
-
-        <DownloadQuiqrCloudSiteDialog
-          open={this.state.remoteSiteDialog}
-          configurations={this.state.configurations}
-          localsites={this.state.localsites}
-          remoteSiteName={this.state.currentRemoteSite}
-          onCancelClick={()=>this.setState({remoteSiteDialog:false})}
-          mountSite={(siteKey)=>{
-            this.mountSiteByKey(siteKey);
-          }}
-      />
 
         <NewSlashImportSiteDialog
           open={this.state.dialogNewSlashImportSite.open}

@@ -7,10 +7,6 @@ const fs                          = require('fs-extra');
 const { shell }                   = require('electron')
 const logWindowManager            = require('./log-window-manager');
 const pogozipper                  = require('../import-export/pogozipper');
-//const cloudCacheManager           = require('../sync/quiqr-cloud/cloud-cache-manager');
-//const cloudApiManager             = require('../sync/quiqr-cloud/cloud-api-manager');
-//const cloudGitManager             = require('../sync/quiqr-cloud/cloud-git-manager');
-//const PogoPublisher               = require('../publishers/pogo-publisher');
 const pathHelper                  = require('../utils/path-helper');
 const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
 const { EnvironmentResolver }     = require('../utils/environment-resolver');
@@ -589,35 +585,11 @@ class MenuManager {
     ]
 
     return template;
-
   }
 
   createMainMenu(){
-
     menuObject = Menu.buildFromTemplate(this.mainMenuArray());
     Menu.setApplicationMenu(menuObject)
-
-    /* THIS IS A GREAT EXÅMPLE HOW TO USE PROMISES
-     *
-     * Before executing the main action get all needed promise data and run from within Promise.all
-     *
-     * */
-    /*
-    this.profileUserName = "";
-    let pogopubl = new PogoPublisher({});
-    let readProfileAction = pogopubl.readProfile();
-    readProfileAction.then((profile)=>{
-      if(profile){
-        this.profileUserName = profile.username
-      }
-    });
-
-    Promise.all([readProfileAction]).then( () => {
-      menuObject = Menu.buildFromTemplate(this.mainMenuArray());
-      Menu.setApplicationMenu(menuObject)
-      return true;
-    });
-    */
   }
 }
 

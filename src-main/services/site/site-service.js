@@ -1,4 +1,4 @@
-const publisherFactory  = require('./../../publishers/publisher-factory');
+const syncFactory       = require('./../../sync/sync-factory');
 const siteSourceFactory = require('./../../site-sources/site-source-factory');
 const pathHelper        = require('./../../utils/path-helper');
 
@@ -56,12 +56,12 @@ class SiteService{
     if(from==null)
       throw new Error('Could not resolve the last build directory.');
 
-    let publisher = publisherFactory.getPublisher(publishConfig.config);
+    let publisher = syncFactory.getPublisher(publishConfig.config);
     return await publisher.publish({siteKey: this._config.key, publishKey: publishConfig.key, from });
   }
 
   async mergeSiteWithRemote(publishConfig){
-    let publisher = publisherFactory.getPublisher(publishConfig.config);
+    let publisher = syncFactory.getPublisher(publishConfig.config);
     return await publisher.pullFastForwardMerge({siteKey: this._config.key, publishKey: publishConfig.key });
   }
 }
