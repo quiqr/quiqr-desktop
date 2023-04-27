@@ -15,14 +15,6 @@ const componentMarginTop = '16px';
 
 class Form extends React.Component {
 
-  /*
-  currentNode : DynamicFormNode<FieldBase>;
-  root : DynamicFormNode<FieldBase>;
-  cache: any = {};
-  stateBuilder: FormStateBuilder;
-  forceUpdateThis: ()=>void;
-  */
-
   constructor(props : FormProps) {
 
     super(props);
@@ -175,14 +167,6 @@ class Form extends React.Component {
     }
   }
 
-  /*
-  handleOpenFileInEditor() {
-    if(this.props.pageUrl){
-      window.require('electron').shell.openExternal(this.props.pageUrl);
-    }
-  }
-  */
-
   handleOpenPageInBrowser() {
     if(this.props.pageUrl){
       window.require('electron').shell.openExternal(this.props.pageUrl);
@@ -191,14 +175,6 @@ class Form extends React.Component {
   handleBackButton(){
     this.history.push(this.generateParentPath());
   }
-  /*
-  handleAlignMobilePreview(){
-    if(this.props.pageUrl){
-      service.api.openMobilePreview();
-      service.api.updateMobilePreviewUrl(this.props.pageUrl);
-    }
-  }
-  */
 
   /**
    * Render a level of components

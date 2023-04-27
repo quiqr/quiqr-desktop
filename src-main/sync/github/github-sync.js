@@ -284,12 +284,12 @@ jobs:
         outputConsole.appendLine('synced ALL source to destination ...');
       }
       else{
-        //move .git, copy all, remove .git, restore .git (no beauty prize)
-        //if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
         await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
 
         await fs.copySync(sourcePath, fullDestinationPath);
+
         await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
+
         await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
         outputConsole.appendLine('synced ALL source to destination ...');
       }

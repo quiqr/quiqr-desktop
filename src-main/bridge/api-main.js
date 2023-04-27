@@ -390,32 +390,6 @@ api.parentMountWorkspace = async function({siteKey, workspaceKey}){
   mainWindow.webContents.send("redirectToGivenLocation",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
-api.parentCloseMobilePreview = function(){
-  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  mainWindow.webContents.send("disableMobilePreview")
-}
-
-api.parentTempHideMobilePreview = function(){
-  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  mainWindow.webContents.send("tempHideMobilePreview")
-}
-
-api.parentTempUnHideMobilePreview = function(){
-  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-  mainWindow.webContents.send("tempUnHideMobilePreview")
-}
-
-api.openMobilePreview = function(){
-  global.mainWM.openMobilePreview();
-}
-api.closeMobilePreview = function(){
-  global.mainWM.closeMobilePreview();
-}
-
-api.updateMobilePreviewUrl = function({url}){
-  global.mainWM.setMobilePreviewUrl(url);
-}
-
 api.logToConsole = function({message, label}){
 
   if(label){

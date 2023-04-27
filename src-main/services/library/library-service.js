@@ -1,4 +1,4 @@
-const del                           = require('del');
+const del                       = require('del');
 const fs                        = require('fs-extra');
 const fssimple                  = require('fs');
 const path                      = require('path');

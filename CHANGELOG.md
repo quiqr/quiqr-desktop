@@ -4,6 +4,7 @@
 - feature: add troubleshooting menu item
 - cleanup: refactored cli execute
 - cleanup: remove death quiqr-cloud code
+- cleanup: remove rimraf
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar

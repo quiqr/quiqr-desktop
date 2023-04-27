@@ -3,13 +3,13 @@ const glob                            = require('glob');
 const { shell }                       = require('electron');
 const fs                              = require('fs-extra');
 const fssimple                        = require('fs');
-const rimraf                          = require("rimraf");
 const fm                              = require('front-matter')
 const { promisify }                   = require('util');
-const formatProviderResolver          = require('./../../utils/format-provider-resolver');
 const { WorkspaceConfigProvider }     = require('./workspace-config-provider');
+const formatProviderResolver          = require('./../../utils/format-provider-resolver');
 const contentFormats                  = require('./../../utils/content-formats');
 const pathHelper                      = require('./../../utils/path-helper');
+const fileDirUtils                    = require('./../../utils/file-dir-utils');
 const { createThumbnailJob, globJob } = require('./../../jobs');
 const HugoBuilder                     = require('./../../hugo/hugo-builder');
 const HugoServer                      = require('./../../hugo/hugo-server');
@@ -460,12 +460,19 @@ class WorkspaceService{
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
     }
 
+    await fileDirUtils.recurForceRemove(filePath);
+
+    return true;
+
+    /*
     if (fs.existsSync(filePath)){
       //TODO: use async await with a promise to test if deletion succeded
-      await rimraf.sync(filePath);
+      await rim raf.sync(filePath);
       return true;
     }
-    return false;
+    */
+
+    //return false;
   }
 
   async makePageBundleCollectionItem(collectionKey , collectionItemKey ){
@@ -845,24 +852,37 @@ class WorkspaceService{
     });
   }
 
+  /*
   async removeThumbCache(relativePath){
     let thumbSrc = path.join(this.workspacePath, '.quiqr-cache/thumbs', relativePath);
+
     let thumbSrcExists = await this.existsPromise(thumbSrc);
     if(thumbSrcExists){
+
       let lstat = fs.lstatSync(thumbSrc);
       if(lstat.isDirectory()){
-        await rimraf.sync(thumbSrc);
+        await rim raf.sync(thumbSrc);
       }
       else{
         fs.remove(thumbSrc);
       }
     }
   }
+  */
 
   async genereateEtalageImages(){
 
-    this.removeThumbCache(path.join('quiqr', 'etalage', 'screenshots'));
-    this.removeThumbCache(path.join('quiqr', 'etalage', 'favicon'));
+    await fileDirUtils.recurForceRemove( pathHelper.workspaceCacheThumbsPath(this.workspacePath,
+      path.join('quiqr', 'etalage', 'screenshots')
+    ));
+    await fileDirUtils.recurForceRemove( pathHelper.workspaceCacheThumbsPath(this.workspacePath,
+      path.join('quiqr', 'etalage', 'favicon')
+    ));
+
+    //this.removeThumbCache(path.join('quiqr', 'etalage', 'screenshots'));
+    //this.removeThumbCache(path.join('quiqr', 'etalage', 'favicon'));
+
+
 
     let etalageDir = path.join(this.workspacePath, 'quiqr', 'etalage' );
     screenshotWindow.createScreenshotAndFavicon('localhost', 13131, path.join(etalageDir) )

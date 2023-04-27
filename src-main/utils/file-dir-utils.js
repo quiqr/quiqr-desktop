@@ -1,4 +1,4 @@
-const rimraf   = require("rimraf");
+const del   = require("del");
 const fs       = require('fs-extra');
 const fssimple = require('fs');
 
@@ -13,8 +13,11 @@ class FileDirUtils{
 
     if(fs.existsSync(dirPath)){
       let lstat = fs.lstatSync(dirPath);
+
       if(lstat.isDirectory()){
-        await rimraf.sync(dirPath);
+
+        await del.sync( [ dirPath ] , {force:true});
+        //await rim raf.sync(dirPath);
       }
       else if(lstat.isFile()){
         fs.unlinkSync(dirPath)

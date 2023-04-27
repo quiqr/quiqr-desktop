@@ -98,7 +98,6 @@ class CollectionItem extends React.Component{
       return <Spinner />;
     }
 
-    // let { selectedWorkspaceDetails, collectionItemValues } = this.state;
     let { selectedWorkspaceDetails} = this.state;
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
@@ -106,12 +105,9 @@ class CollectionItem extends React.Component{
     if(collection==null)return null;
 
     let fields = collection.fields.slice(0);
-    //fields.unshift({key:'__item', type:'readonly', title:'Item'});
-    //let values =  Object.assign({__item: collectionItemKey}, this.state.collectionItemValues)
     let values =  Object.assign(this.state.collectionItemValues)
 
     let pageUrl = this.generatePageUrl(collection);
-    //service.api.updateMobilePreviewUrl(pageUrl)
 
     return(<SukohForm
     debug={false}

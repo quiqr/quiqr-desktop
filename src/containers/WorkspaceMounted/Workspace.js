@@ -49,7 +49,6 @@ class WorkSpace extends React.Component{
       style: style,
       menuIsLocked: true,
       forceShowMenu: false,
-      mobileBrowserActive: false,
       skipMenuTransition: false,
       quiqrUsername: "",
       quiqrFingerprint: "",
@@ -424,19 +423,9 @@ class WorkSpace extends React.Component{
 
   render() {
 
-    let marginStyles;
-    if(this.state.mobileBrowserActive){
-      marginStyles = {
-        marginRight:'340px',
-        borderRightWidth: 1,
-        borderRightColor: '#ccc',
-        borderRightStyle: 'solid'
-      };
-    }else{
-      marginStyles = {
-        marginRight:'0px'
-      };
-    }
+    let marginStyles = {
+      marginRight:'0px'
+    };
 
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;

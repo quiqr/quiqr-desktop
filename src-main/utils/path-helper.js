@@ -87,7 +87,6 @@ class PathHelper{
 
     if(process.env.NODE_ENV === 'production'){
       if(enviromnent.platform == PLATFORMS.macOS){
-        //return path.join(rootPath, 'Contents','Resources');
         return path.join(rootPath, 'Resources');
       }
       else if(enviromnent.platform == PLATFORMS.windows){
@@ -106,27 +105,8 @@ class PathHelper{
     }
   }
 
-
-  /* FILES */
-  ownersLookupCacheFilePath(){
-    return path.join(this.getTempDir() , 'cache-ownerslookup.json');
-  }
-
-  userCacheFilePath(profileUserName){
-    if(profileUserName){
-      return path.join(this.getTempDir() , 'cache-user.'+profileUserName + '.json');
-    }
-    else{
-      return '';
-    }
-  }
-
-  siteCacheFilePath(siteKey){
-    return path.join(this.getTempDir(), 'cache-site.'+siteKey+'.json');
-  }
-
-  sitesCacheFilePath(){
-    return path.join(this.getTempDir() , 'cache-sites.json');
+  workspaceCacheThumbsPath(workspacePath, relativePath){
+    return path.join(workspacePath, '.quiqr-cache/thumbs', relativePath);
   }
 
   getKnownHosts(){
@@ -135,10 +115,6 @@ class PathHelper{
 
   getSiteMountConfigPath(siteKey){
     return path.join(this.getRoot(), 'config.'+siteKey+'.json');
-  }
-
-  getPogoPrivateKeyPath(username){
-    return path.join(this.getRoot(),'profiles', username, 'id_rsa_pogo');
   }
 
   getHugoBinForVer(version){

@@ -44,7 +44,6 @@ module.exports = function (options) {
     state.lastOpenedSite = {siteKey: siteKey, workspaceKey: workspaceKey, sitePath: sitePath};
   }
 
-
   function setSkipWelcomeScreen(skip){
     state.skipWelcomeScreen = skip;
   }
@@ -55,12 +54,6 @@ module.exports = function (options) {
   function setDisablePartialCache(toggle){
     state.disablePartialCache = toggle;
   }
-
-  /*
-  function setExpPreviewWindow(toggle){
-    state.expPreviewWindow = toggle;
-  }
-  */
 
   function setExpNewSyncMethod(toggle){
     state.expNewSyncMethod = toggle;
@@ -119,7 +112,6 @@ module.exports = function (options) {
     skipWelcomeScreen: false,
     experimentalFeatures: false,
     disablePartialCache: false,
-    //expPreviewWindow: false,
     expNewSyncMethod: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
@@ -136,7 +128,6 @@ module.exports = function (options) {
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
     get experimentalFeatures() { return state.experimentalFeatures; },
     get disablePartialCache() { return state.disablePartialCache; },
-    //get expPreviewWindow() { return state.expPreviewWindow; },
     get expNewSyncMethod() { return state.expNewSyncMethod; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
@@ -151,7 +142,6 @@ module.exports = function (options) {
     setSkipWelcomeScreen,
     setExperimentalFeatures,
     setDisablePartialCache,
-    //setExpPreviewWindow,
     setExpNewSyncMethod,
     setDevLocalApi,
     setDevDisableAutoHugoServe,

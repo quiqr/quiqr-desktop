@@ -32,29 +32,14 @@ export class SukohForm extends React.Component{
     }
   }
 
-  setMobileBrowserOpen(){
-    if(this._ismounted){
-      this.setState({actionButtonRightPos:380});
-    }
-  }
-  setMobileBrowserClose(){
-    if(this._ismounted){
-      this.setState({actionButtonRightPos:40});
-    }
-  }
-
   componentDidMount(){
     this._ismounted=true;
     service.api.shouldReloadForm(null);
     document.addEventListener('keydown', this.keydownHandler.bind(this));
-    window.require('electron').ipcRenderer.on('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
-    window.require('electron').ipcRenderer.on('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
   }
 
   componentWillUnmount(){
     document.removeEventListener('keydown', this.keydownHandler);
-    window.require('electron').ipcRenderer.removeListener('setMobileBrowserOpen', this.setMobileBrowserOpen.bind(this));
-    window.require('electron').ipcRenderer.removeListener('setMobileBrowserClose', this.setMobileBrowserClose.bind(this));
     this._ismounted=false;
   }
 

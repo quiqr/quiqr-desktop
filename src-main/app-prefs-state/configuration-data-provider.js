@@ -90,20 +90,6 @@ function get(callback, {invalidateCache} = {}){
 
   let configurations = {sites:[], global: GLOBAL_DEFAULTS};
 
-  /*
-  let ownerslookupHash = {};
-  let lookuploaded = false;
-
-  try{
-    let ownerslookUpData = fs.readFileSync(pathHelper.ownersLookupCacheFilePath(), {encoding: 'utf-8'});
-    ownerslookupHash = JSON.parse(ownerslookUpData);
-    lookuploaded = true;
-  }
-  catch(e){
-    outputConsole.appendLine(`Could not read ownerslookup}': ${e.toString()}`);
-  }
-  */
-
   for(let i = 0; i < files.length; i++){
     let file = files[i];
     if(fs.existsSync(file)){
@@ -115,25 +101,8 @@ function get(callback, {invalidateCache} = {}){
         validateSite(site);
         site.published = 'unknown';
 
-        /*
-        if(lookuploaded){
-          site.published = 'yes';
-          site.owner = ''
-          if(site.key in ownerslookupHash.sitesToUsers){
-            site.owner = ownerslookupHash.sitesToUsers[site.key];
-          }
-          if(site.key in ownerslookupHash.sitesToUsers){
-            site.publishKey = ownerslookupHash.sitesToPaths[site.key];
-          }
-          if(Array.isArray(ownerslookupHash.sitesUnpublished) && ownerslookupHash.sitesUnpublished.includes(site.key)){
-            site.published = 'no';
-          }
-        }
-        */
-
         site.configPath = file;
         site.etalage = getEtalage(site);
-        //console.log(site);
         configurations.sites.push(site);
       }
       catch(e){
