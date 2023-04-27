@@ -31,7 +31,7 @@ const pogoTheme = getMuiTheme(lightBaseTheme, {
   },
 });
 
-let style = require('./themes/quiqr10/style.js');
+let style = require('./app-ui-styles/quiqr10/style.js');
 
 class App extends React.Component{
 
@@ -64,6 +64,12 @@ class App extends React.Component{
 
     this._ismounted = true;
 
+    service.api.readConfKey('prefs').then((value)=>{
+      if(value.interfaceStyle){
+        this.setState({style: require('./app-ui-styles/'+value.interfaceStyle+'/style.js') });
+      }
+    });
+
     service.api.readConfPrefKey('libraryView').then((view)=>{
       this.setState({libraryView: view });
     });
@@ -90,14 +96,6 @@ class App extends React.Component{
       }
     });
 
-
-    service.getConfigurations().then((c)=>{
-      var stateUpdate  = {};
-      stateUpdate.configurations = c;
-      stateUpdate.style = require('./themes/' + c.global.appTheme + '/style.js');
-
-      this.setState(stateUpdate);
-    })
     this.setApplicationRole();
   }
 

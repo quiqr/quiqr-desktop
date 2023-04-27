@@ -105,7 +105,8 @@ module.exports = function (options) {
   state = Object.assign({
     lastOpenedSite: {siteKey: null, workspaceKey: null, sitePath: null},
     prefs: {
-      dataFolder: "~/QuiqrData"
+      dataFolder: "~/Quiqr",
+      interfaceStyle: "quiqr10"
     },
     lastOpenedPublishTargetForSite: {
     },

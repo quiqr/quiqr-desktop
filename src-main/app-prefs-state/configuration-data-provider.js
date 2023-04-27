@@ -5,18 +5,11 @@ const Joi                    = require('joi');
 const pathHelper             = require('../utils/path-helper');
 const formatProviderResolver = require('../utils/format-provider-resolver');
 const outputConsole          = require('../logger/output-console');
-const QuiqrAppConfig         = require('./quiqr-app-config');
-
-const pogoconf = QuiqrAppConfig();
 
 let configurationCache = undefined;
 
 const sitePathSearchPattern    = path.join(pathHelper.getRoot(), 'sites', '*/config.json').replace(/\\/gi,'/');
 const oldSitePathSearchPattern = path.join(pathHelper.getRoot(), 'config.*.json').replace(/\\/gi,'/');
-
-const GLOBAL_DEFAULTS = {
-  appTheme: "quiqr10", // default / quiqr10 / simple
-}
 
 function validateSite(site) {
   if(site==null){
@@ -73,7 +66,7 @@ function get(callback, {invalidateCache} = {}){
     .concat(glob.sync(oldSitePathSearchPattern))
     .map(x=>path.normalize(x));
 
-  let configurations = {sites:[], global: GLOBAL_DEFAULTS};
+  let configurations = {sites:[]};
 
   for(let i = 0; i < files.length; i++){
     let file = files[i];

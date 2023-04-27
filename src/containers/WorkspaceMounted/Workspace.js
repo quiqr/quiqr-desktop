@@ -32,7 +32,7 @@ const pogoTheme = getMuiTheme(lightBaseTheme, {
   },
 });
 
-let style = require('../../themes/default/style.js');
+let style = require('../../app-ui-styles/quiqr10/style.js');
 
 class WorkSpace extends React.Component{
 
@@ -71,13 +71,11 @@ class WorkSpace extends React.Component{
 
     this.refresh();
 
-    service.getConfigurations().then((c)=>{
-      var stateUpdate  = {};
-      stateUpdate.configurations = c;
-      stateUpdate.style = require('../../themes/' + c.global.appTheme + '/style.js');
-
-      this.setState(stateUpdate);
-    })
+    service.api.readConfKey('prefs').then((value)=>{
+      if(value.interfaceStyle){
+        this.setState({style: require('../../app-ui-styles/'+value.interfaceStyle+'/style.js') });
+      }
+    });
   }
 
   componentDidUpdate(preProps: compProps){

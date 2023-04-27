@@ -1,8 +1,13 @@
 import React from 'react';
 import service from './../../services/service';
 import Typography from '@material-ui/core/Typography';
+import Select                       from '@material-ui/core/Select';
 
-//import FormControlLabel  from '@material-ui/core/FormControlLabel';
+import Box                          from '@material-ui/core/Box';
+import InputLabel                   from '@material-ui/core/InputLabel';
+import MenuItem                     from '@material-ui/core/MenuItem';
+import FormControl                  from '@material-ui/core/FormControl';
+
 //import Checkbox          from '@material-ui/core/Checkbox';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -20,6 +25,11 @@ const useStyles = theme => ({
     flexWrap: 'wrap',
   },
 
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 300,
+  },
+
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
@@ -34,8 +44,11 @@ class PrefsGeneral extends React.Component {
 
   constructor(props){
     super(props);
+
     this.state = {
-      prefs : {}
+      prefs: {},
+      prefsDataFolder: '',
+      prefsInterfaceStyle: ''
     };
   }
 
@@ -44,6 +57,13 @@ class PrefsGeneral extends React.Component {
     service.registerListener(this);
     service.api.readConfKey('prefs').then((value)=>{
       this.setState({prefs: value });
+
+      if(value.interfaceStyle){
+        this.setState({prefsInterfaceStyle: value.interfaceStyle });
+      }
+      else{
+        this.setState({prefsInterfaceStyle: "quiqr10" });
+      }
 
       if(value.dataFolder){
         this.setState({prefsDataFolder: value.dataFolder });
@@ -70,18 +90,32 @@ class PrefsGeneral extends React.Component {
       <div className={ this.props.classes.container }>
         <Typography variant="h4">General Preferences</Typography>
 
-        <div className={classes.root}>
-
-          <div style={{marginTop:"20px"}}>
-            <FolderPicker
+        <Box my={2} mx={1}>
+          <FolderPicker
             label="Quiqr Data Folder"
             selectedFolder={this.state.prefsDataFolder}
             onFolderSelected={(e)=>{this.handleFolderSelected(e)}} />
-          </div>
+        </Box>
 
+        <Box my={2}>
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel>Interface Style</InputLabel>
+            <Select
+              value={this.state.prefsInterfaceStyle}
+              onChange={(e)=>{
 
+                service.api.saveConfPrefKey("interfaceStyle", e.target.value);
+                this.setState({prefsInterfaceStyle: e.target.value });
 
-        </div>
+              }}
+              label="Interface Style"
+            >
+              <MenuItem key={"quiqr10"} value={"quiqr10"}>Light (default)</MenuItem>
+              <MenuItem key={"quiqr10-dark"} value={"quiqr10-dark"}>Dark (WIP)</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+
 
         {/*
           <div style={{marginTop:"20px"}}>
@@ -106,7 +140,7 @@ class PrefsGeneral extends React.Component {
             labelPlacement="end"
           />
           </div>
-        */}
+          */}
 
 
       </div>

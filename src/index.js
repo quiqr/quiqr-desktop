@@ -4,10 +4,15 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App';
 import service from './services/service';
 
-service.getConfigurations().then((c) => {
-  require('./themes/' + c.global.appTheme + '/css/index.css');
-  require('./themes/' + c.global.appTheme + '/css/bootstrap-grid.css');
-})
+service.api.readConfKey('prefs').then((value)=>{
+  let appUiStyle = 'quiqr10';
+  if(value.interfaceStyle){
+    appUiStyle = value.interfaceStyle
+  }
+
+  require('./app-ui-styles/' + appUiStyle + '/css/index.css');
+  require('./app-ui-styles/' + appUiStyle + '/css/bootstrap-grid.css');
+});
 
 ReactDOM.render(
   <BrowserRouter>
