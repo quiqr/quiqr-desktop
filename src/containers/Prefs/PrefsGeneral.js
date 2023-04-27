@@ -49,7 +49,7 @@ class PrefsGeneral extends React.Component {
         this.setState({prefsDataFolder: value.dataFolder });
       }
       else{
-        this.setState({prefsDataFolder: "~/Quiqr Data" });
+        this.setState({prefsDataFolder: "~/Quiqr" });
       }
 
     });
@@ -66,12 +66,6 @@ class PrefsGeneral extends React.Component {
 
   render(){
     const { classes } = this.props;
-    /*
-    const model = {
-      folderPath: "~/QuiqrData",
-      theme: ""
-    };
-    */
     return (
       <div className={ this.props.classes.container }>
         <Typography variant="h4">General Preferences</Typography>

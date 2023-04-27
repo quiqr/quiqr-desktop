@@ -81,11 +81,9 @@ class SiteConfRouteGeneral extends React.Component {
 
     });
 
-
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
       var stateUpdate  = {};
       stateUpdate.siteconf = bundle.site;
-
 
       if(bundle.site.source){
         this.setState({source: bundle.site.source});

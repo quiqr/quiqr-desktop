@@ -6,6 +6,8 @@
 - cleanup: remove death quiqr-cloud code
 - cleanup: remove rimraf
 - cleanup: remove death modules
+- feature: move all config to site folder
+- feature: new default data folder `Quiqr`
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar

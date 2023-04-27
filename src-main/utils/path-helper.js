@@ -21,7 +21,7 @@ class PathHelper{
       thedir = prefs.dataFolder;
     }
     else {
-      thedir =  path.join(electron.app.getPath('home'), 'Quiqr Data');
+      thedir =  path.join(electron.app.getPath('home'), 'Quiqr');
       fs.ensureDirSync(thedir);
       pogoconf.setPrefkey("dataFolder", thedir);
       pogoconf.saveState();
@@ -114,7 +114,14 @@ class PathHelper{
   }
 
   getSiteMountConfigPath(siteKey){
-    return path.join(this.getRoot(), 'config.'+siteKey+'.json');
+    const oldfile = path.join(this.getRoot(), 'config.'+siteKey+'.json');
+    if(fs.existsSync(oldfile)){
+      return oldfile;
+    }
+    else{
+      //oldfile
+      return path.join(this.getRoot(), 'sites', siteKey, 'config.json');
+    }
   }
 
   getHugoBinForVer(version){

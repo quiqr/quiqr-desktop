@@ -11,26 +11,11 @@ const pogoconf = QuiqrAppConfig();
 
 let configurationCache = undefined;
 
-const supportedFormats = formatProviderResolver.allFormatsExt().join(',');
-const defaultPathSearchPattern = path.join(pathHelper.getRoot(), 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
-const namespacedPathSearchPattern = path.join(pathHelper.getRoot(), 'config.*.{'+supportedFormats+'}').replace(/\\/gi,'/');
-const globalConfigPattern = path.join(pathHelper.getRoot(), 'config.{'+supportedFormats+'}').replace(/\\/gi,'/');
-
-let pogoboardConn, pogostripeConn;
-
-if(pogoconf.devLocalApi){
-  pogoboardConn = {host:"localhost",port:9999, protocol: "http:"};
-  pogostripeConn = {host:"localhost",port:4242, protocol: "http:"};
-}
-else{
-  pogoboardConn = {host:"board.quiqr.app",port:443, protocol: "https:"};
-  pogostripeConn = {host:"pay.quiqr.app",port:443, protocol: "https:"};
-}
+const sitePathSearchPattern    = path.join(pathHelper.getRoot(), 'sites', '*/config.json').replace(/\\/gi,'/');
+const oldSitePathSearchPattern = path.join(pathHelper.getRoot(), 'config.*.json').replace(/\\/gi,'/');
 
 const GLOBAL_DEFAULTS = {
   appTheme: "quiqr10", // default / quiqr10 / simple
-  pogostripeConn: pogostripeConn,
-  pogoboardConn: pogoboardConn
 }
 
 function validateSite(site) {
@@ -84,8 +69,8 @@ function get(callback, {invalidateCache} = {}){
     return;
   }
 
-  let files = glob.sync(defaultPathSearchPattern)
-    .concat(glob.sync(namespacedPathSearchPattern))
+  let files = glob.sync(sitePathSearchPattern)
+    .concat(glob.sync(oldSitePathSearchPattern))
     .map(x=>path.normalize(x));
 
   let configurations = {sites:[], global: GLOBAL_DEFAULTS};
@@ -108,24 +93,6 @@ function get(callback, {invalidateCache} = {}){
       catch(e){
         outputConsole.appendLine(`Configuration file is invalid '${file}': ${e.toString()}`);
       }
-    }
-  }
-
-  let globalConfigFile = (glob.sync(globalConfigPattern)||[])[0];
-  if(globalConfigFile){
-    try{
-      let strData = fs.readFileSync(globalConfigFile, {encoding: 'utf-8'});
-      let formatProvider = formatProviderResolver.resolveForFilePath(globalConfigFile);
-      if(formatProvider==null) throw new Error(`Could not resolve a format provider for "${globalConfigFile}".`)
-      let global = formatProvider.parse(strData);
-      global = {
-        appTheme: global.appTheme == null ? GLOBAL_DEFAULTS.appTheme : global.appTheme,
-      }
-
-      configurations.global = global;
-    }
-    catch(e){
-      outputConsole.appendLine(`Global configuration file is invalid '${globalConfigFile}': ${e.toString()}`);
     }
   }
 
