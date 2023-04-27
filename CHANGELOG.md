@@ -5,6 +5,7 @@
 - cleanup: refactored cli execute
 - cleanup: remove death quiqr-cloud code
 - cleanup: remove rimraf
+- cleanup: remove death modules
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar

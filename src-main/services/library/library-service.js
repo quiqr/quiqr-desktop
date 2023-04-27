@@ -1,11 +1,11 @@
-const del                       = require('del');
-const fs                        = require('fs-extra');
-const fssimple                  = require('fs');
-const path                      = require('path');
-const pathHelper                = require('../../utils/path-helper');
-const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
+const del                           = require('del');
+const fs                            = require('fs-extra');
+const fssimple                      = require('fs');
+const path                          = require('path');
+const pathHelper                    = require('../../utils/path-helper');
+const configurationDataProvider     = require('../../app-prefs-state/configuration-data-provider')
 const InitialWorkspaceConfigBuilder = require('../workspace/initial-workspace-config-builder');
-const hugoUtils                 = require('./../../hugo/hugo-utils');
+const hugoUtils                     = require('./../../hugo/hugo-utils');
 
 /*
 
