@@ -8,6 +8,7 @@
 - cleanup: remove death modules
 - feature: move all config to site folder
 - feature: new default data folder `Quiqr`
+- feature: app-ui-style is now a preference
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
