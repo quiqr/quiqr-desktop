@@ -81,8 +81,14 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
   }
 
   parseFileContentDataQuery(query_string, files){
+    let options = [];
+    files.forEach((filepath)=>{
+      service.api.parseFileToObject(filepath).then((parsedFileObject)=>{
+        service.api.logToConsole(parsedFileObject);
+      });
+    });
     this.setState({error_msg: "File Content Quert not yet implemented."});
-    return []
+    return options;
   }
 
   runQuery(){
@@ -98,8 +104,8 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
       if(field.query_string.startsWith("#")){
         options = this.parseFileMetaDataQuery(field.query_string,files);
       }
-      else if(field.query_string.startsWith("#")){
-        options = this.parseFileMetaDataQuery(field.query_string,files);
+      else if(field.query_string.startsWith(".")){
+        options = this.parseFileContentDataQuery(field.query_string,files);
       }
       else{
         this.setState({error_msg: "Query did not start with '.' or '#'"});

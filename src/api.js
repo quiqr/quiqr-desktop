@@ -79,6 +79,10 @@ export class API {
     return mainProcessBridge.request('globSync', {pattern, options});
   }
 
+  parseFileToObject(file){
+    return mainProcessBridge.request('parseFileToObject', {file});
+  }
+
   buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: any){
     return mainProcessBridge.request('buildWorkspace', {siteKey, workspaceKey, buildKey, extraConfig});
   }

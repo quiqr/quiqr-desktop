@@ -6,6 +6,7 @@ const path                      = require('path');
 const {shell}                   = require('electron');
 const util                      = require('util')
 const pathHelper                = require('../utils/path-helper');
+const formatProviderResolver    = require('../utils/format-provider-resolver');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
 const SiteService               = require('../services/site/site-service')
 const libraryService            = require('../services/library/library-service')
@@ -298,6 +299,25 @@ api.globSync = async function({pattern,options},context){
   let files = glob.sync(path.join(global.currentSitePath,pattern),options);
   context.resolve(files);
 }
+api.parseFileToObject = async function({file},context){
+
+  let obj = null;
+  // TODO support markdown
+  if(fs.existsSync(file)){
+    try{
+      let strData = fs.readFileSync(file, {encoding: 'utf-8'});
+      let formatProvider = formatProviderResolver.resolveForFilePath(file);
+      if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)
+      obj = formatProvider.parse(strData);
+    }
+    catch(e){
+      outputConsole.appendLine(`file is invalid '${file}': ${e.toString()}`);
+    }
+  }
+
+  context.resolve(obj);
+}
+
 
 
 api.getCurrentBaseUrl = async function(_,context){

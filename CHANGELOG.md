@@ -9,6 +9,8 @@
 - feature: move all config to site folder
 - feature: new default data folder `Quiqr`
 - feature: app-ui-style is now a preference
+- fix: select-image broke with non-image files
+- feature WIP: queryselect with keys on files
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
