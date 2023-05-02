@@ -156,6 +156,12 @@ npm run _electron-dev
 npm run _react-dev
 ```
 
+### Development with devtools window
+
+```
+DEVTOOLS=1 npm run _electron-dev
+```
+
 ### Development Environment on Nix / NixOS
 
 Clone the repository..
