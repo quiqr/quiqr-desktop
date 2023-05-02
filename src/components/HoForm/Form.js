@@ -90,18 +90,12 @@ class Form extends React.Component {
     return newPath;
   }
 
-
   setPath(node){
-    if(this.props.collectionItemKey && node.field.compositeKey === 'root'){
-      this.history.push(this.generateParentPath());
-    }
-    else{
-      window.scrollTo(0,0);
-      this.currentNode = node;
-      this.setState({path: this.buildPath(node)},()=>{
-        service.api.setCurrentFormNodePath(this.state.path);
-      });
-    }
+    window.scrollTo(0,0);
+    this.currentNode = node;
+    this.setState({path: this.buildPath(node)},()=>{
+      service.api.setCurrentFormNodePath(this.state.path);
+    });
   }
 
   buildPath(currentNode){
@@ -221,7 +215,6 @@ class Form extends React.Component {
   renderBreadcumb(){
 
     let currentNode = this.currentNode;
-    //let nodeLevel = 0;
 
     let items = [];
     let nodes = [];
@@ -229,16 +222,21 @@ class Form extends React.Component {
     try{
       do{
         nodes.push(currentNode);
+
         if(currentNode===this.root){
           if(this.props.collectionItemKey){
-
-            items.push({label: this.props.rootName||'ROOT', node:currentNode});
+            let label = this.props.collectionItemKey;
+            if(this.props.collectionItemKey.split("/").length > 0){
+              label = this.props.collectionItemKey.split("/")[0];
+            }
+            items.push({label: label, node:currentNode});
           }
           else{
             items.push({label: this.props.rootName||'ROOT', node:currentNode});
           }
         }
         else{
+
           let componentPropslessInstace = this.props.componentRegistry.getProplessInstance(currentNode.field.type);
           if(componentPropslessInstace && componentPropslessInstace.buildBreadcumbFragment){
             componentPropslessInstace.buildBreadcumbFragment(currentNode, items);
@@ -255,11 +253,6 @@ class Form extends React.Component {
     }
 
     items.reverse();
-
-    if(this.props.collectionItemKey){
-      items.push({label: this.props.collectionItemKey, node:null});
-    }
-
 
     let Breadcumb = this.props.breadcumbComponentType;
     return <Breadcumb items={items} onNodeSelected={this.setPath.bind(this)} />;

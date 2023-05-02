@@ -9,8 +9,9 @@
 - feature: move all config to site folder
 - feature: new default data folder `Quiqr`
 - feature: app-ui-style is now a preference
+- feature: WIP: queryselect with keys on files
 - fix: select-image broke with non-image files
-- feature WIP: queryselect with keys on files
+- fix: #314 & #181 breadcrumb in collections  cannot go back to root document
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
