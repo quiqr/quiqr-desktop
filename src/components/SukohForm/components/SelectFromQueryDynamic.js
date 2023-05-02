@@ -3,10 +3,11 @@ import type {FormStateBuilder } from '../../HoForm';
 import { BaseDynamic }          from '../../HoForm';
 import Typography               from '@material-ui/core/Typography';
 import FormItemWrapper          from './shared/FormItemWrapper';
-import MenuItem                 from 'material-ui-02/MenuItem';
-import SelectField              from 'material-ui-02/SelectField';
 import Tip                      from '../../Tip';
 import service                  from '../../../services/service';
+
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 type SelectFromQueryDynamicField = {
   key: string,
@@ -17,13 +18,11 @@ type SelectFromQueryDynamicField = {
   title: ?string,
   query_glob: string,
   query_string: string,
-//  multiple: ?bool
 }
 
 type SelectFromQueryDynamicState = {
 
 }
-
 class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,SelectFromQueryDynamicState> {
   constructor(props){
 
@@ -39,8 +38,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
   normalizeState({state, field} : { state: any, field: SelectFromQueryDynamicField, stateBuilder: FormStateBuilder }){
     //TODO: clear if value is not a valid option
     let key = field.key;
-    let isArrayType = field.multiple===true;
-    //let isArrayType = false;
+    let isArrayType = field.multiple === true;
     if(state[key]===undefined){
       state[key] = field.default || isArrayType?[]:'';
     }
@@ -81,37 +79,45 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
   }
 
   parseFileContentDataQuery(query_string, files){
-    let options = [];
-    files.forEach((filepath)=>{
-      service.api.parseFileToObject(filepath).then((parsedFileObject)=>{
-        service.api.logToConsole(parsedFileObject);
+
+    if(files.length > 1){
+      this.setState({error_msg: "Object queries are currently only possible in max. 1 one file."});
+      return;
+    }
+
+    if((query_string.match(/\./g) || []).length === 1 && query_string.slice(-2)==="[]" ){
+      files.forEach((filepath)=>{
+        service.api.parseFileToObject(filepath).then((parsedFileObject)=>{
+          let options = parsedFileObject[query_string.slice(1,-2)];
+          this.setState({options: options});
+        });
       });
-    });
-    this.setState({error_msg: "File Content Quert not yet implemented."});
-    return options;
+    }
+    else{
+      this.setState({error_msg: "Other queries then '.key[]' are currently not supported."});
+      return;
+    }
+
   }
 
   runQuery(){
     let {node} = this.props.context;
     let {field } = node;
 
-    //service.api.logToConsole(field.query_glob);
-    //service.api.logToConsole(field.query_string);
-
     service.api.globSync(field.query_glob,{}).then((files)=>{
 
       let options = [];
       if(field.query_string.startsWith("#")){
         options = this.parseFileMetaDataQuery(field.query_string,files);
+        this.setState({options: options});
       }
       else if(field.query_string.startsWith(".")){
-        options = this.parseFileContentDataQuery(field.query_string,files);
+        this.parseFileContentDataQuery(field.query_string,files);
       }
       else{
         this.setState({error_msg: "Query did not start with '.' or '#'"});
       }
 
-      this.setState({options: options});
     }).catch(()=>{
       this.setState({
         options: [],
@@ -125,34 +131,32 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
     this.runQuery();
   }
 
-  handleChange = (e: any, index: number, payload: Array<string>)=>{
-    let {context} = this.props;
-    let field = context.node.field;
+  renderAutoComplete(field, context){
 
-    let val;
+    const options = this.state.options;
 
-    if(field.multiple===true){
-      context.setValue(payload)
-    }
-    else{
+    return (
+      <Autocomplete
+        id="auto-complete"
+        options={options}
 
-      if(typeof this.state.options[index] === "string"){
-        val = this.state.options[index]
-      }
-      else{
-        val = this.state.options[index].value
-      }
+        onChange={ (event, newValue) => {
+            context.setValue(newValue)
+        }}
 
-
-      if(val !== context.value){
-        context.setValue(val)
-      }
-    }
-
-    if(field.autoSave === true){
-      context.saveFormHandler();
-    }
-
+        value={context.value}
+        getOptionLabel={(option) => {
+          if(typeof option === "string"){
+            return option;
+          }
+          else{
+            return option.text;
+          }
+        }}
+        style={{ width: 300 }}
+        renderInput={(params) => <TextField {...params} label={field.title} variant="outlined" />}
+      />
+    )
   }
 
   renderComponent(){
@@ -177,30 +181,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
         :
         <FormItemWrapper
           control={
-            <SelectField
-              underlineShow={true}
-              floatingLabelText={field.title}
-              floatingLabelFixed={true}
-              value={context.value}
-              multiple={field.multiple===true}
-              onChange={this.handleChange}
-              fullWidth={true}
-            >
-              {this.state.options.map((option, i)=>{
-                let val, text;
-                if(typeof option === "string"){
-                  val = option
-                  text = option
-                }
-                else{
-                  val = option.value
-                  text = option.text
-                }
-                return (
-                  <MenuItem key={i} value={val} primaryText={text} />
-                )
-              })}
-            </SelectField>
+            this.renderAutoComplete(field,context)
           }
           iconButtons={iconButtons} />
         )}
