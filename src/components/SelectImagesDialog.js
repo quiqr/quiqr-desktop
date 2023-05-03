@@ -1,5 +1,7 @@
 import * as React        from 'react';
 import IconBroken        from 'material-ui-02/svg-icons/image/broken-image';
+import IconUpload                                            from 'material-ui-02/svg-icons/file/folder-open';
+import RaisedButton      from 'material-ui-02/RaisedButton';
 import Spinner           from './Spinner';
 import Button            from '@material-ui/core/Button';
 import Dialog            from '@material-ui/core/Dialog';
@@ -66,6 +68,10 @@ export default class SelectImagesDialog extends React.Component{
     return false;
   }
 
+  onButtonClick(e: any){
+
+  }
+
   render(){
 
     return (
@@ -78,6 +84,14 @@ export default class SelectImagesDialog extends React.Component{
     >
         <DialogTitle id="alert-dialog-title">{this.props.conf.title}</DialogTitle>
         <DialogContent>
+
+        {/*
+        <RaisedButton
+          primary={true}
+          label="Add file"
+          onClick={this.onButtonClick.bind(this)}
+          icon={<IconUpload />} />
+          */}
 
             <div className="BundleManager row" style={this.props.style}>
               {
