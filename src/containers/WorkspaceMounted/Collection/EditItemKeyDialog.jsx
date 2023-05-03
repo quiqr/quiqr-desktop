@@ -6,8 +6,11 @@ class EditItemKeyDialog extends React.Component{
 
   constructor(props ){
     super(props);
+
+    let valueBase = props.value.slice(0,(props.value.lastIndexOf(".") ));
+
     this.state = {
-      value:props.value||'',
+      value:valueBase||'',
       initialValue:props.value||'',
       valid: null
     };

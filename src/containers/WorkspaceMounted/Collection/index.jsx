@@ -60,7 +60,7 @@ class MakePageBundleItemKeyDialog extends React.Component{
 
 class CollectionListItems extends React.PureComponent {
   render(){
-    let { filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
+    let { collectionExtension, filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
 
     filteredItems.sort(function(a, b){
       let keyA = a.sortval;
@@ -95,7 +95,10 @@ class CollectionListItems extends React.PureComponent {
           <MenuItem onClick={()=> onRenameItemClick(item) }>Rename</MenuItem>
           <MenuItem onClick={()=> onCopyItemClick(item) }>Copy</MenuItem>
           <MenuItem onClick={()=> onDeleteItemClick(item) }>Delete</MenuItem>
-          <MenuItem onClick={()=> onMakePageBundleItemClick(item) }>Make Page Bundle</MenuItem>
+            { collectionExtension === 'md' ?
+              <MenuItem onClick={()=> onMakePageBundleItemClick(item) }>Make Page Bundle</MenuItem>
+              : null
+            }
         </IconMenu>
         );
 
@@ -207,9 +210,7 @@ class Collection extends React.Component{
       },()=>{
         this.setState({modalBusy:false, view: undefined});
       });
-
   }
-
 
   deleteCollectionItem(){
     let { siteKey, workspaceKey, collectionKey } = this.props;
@@ -377,6 +378,7 @@ class Collection extends React.Component{
       return null;
 
 
+
     if(this.state.view){
       let view = this.state.view;
       if(view.key==='createItem'){
@@ -440,8 +442,6 @@ class Collection extends React.Component{
           <Breadcumb items={[<BreadcumbItem disabled={true} label={collection.title} />]} />
           <br />
           <div>
-
-
             <Button variant="contained" onClick={ this.setCreateItemView.bind(this) }>
               {'New '+ collection.itemtitle }
             </Button>
@@ -493,15 +493,16 @@ class Collection extends React.Component{
             <Paper>
               <List>
                 <CollectionListItems
-                filteredItems={filteredItems}
-                onItemClick={this.handleItemClick}
-                onRenameItemClick={this.handleRenameItemClick}
-                onCopyItemClick={this.handleCopyItemClick}
-                onDeleteItemClick={this.handleDeleteItemClick}
-                onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
-                sortDescending={this.state.sortDescending}
-                showSortValue={this.state.showSortValue}
-              />
+                  collectionExtension={collection.extension}
+                  filteredItems={filteredItems}
+                  onItemClick={this.handleItemClick}
+                  onRenameItemClick={this.handleRenameItemClick}
+                  onCopyItemClick={this.handleCopyItemClick}
+                  onDeleteItemClick={this.handleDeleteItemClick}
+                  onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
+                  sortDescending={this.state.sortDescending}
+                  showSortValue={this.state.showSortValue}
+                />
                   { trunked ? (
                     <React.Fragment>
                       <Divider />

@@ -387,16 +387,19 @@ class WorkspaceService{
     let filePath;
     let newFilePath;
     let newFileKey;
+    let newLabel;
 
     if(collectionItemKey.includes("."+collection.extension)){
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
       newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + "." + collection.extension);
       newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
+      newLabel = collectionItemNewKey+'.'+collection.extension;
     }
     else{
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
       newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey);
       newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
+      newLabel = collectionItemNewKey;
     }
 
     if (!fs.existsSync(filePath)){
@@ -407,7 +410,7 @@ class WorkspaceService{
       return { renamed: false };
     }
     fs.renameSync(filePath, newFilePath);
-    return { renamed: true, item: { key:newFileKey.replace(/\\/g,'/'), label:collectionItemNewKey }};
+    return { renamed: true, item: { key:newFileKey.replace(/\\/g,'/'), label:newLabel }};
   }
 
 
@@ -420,16 +423,19 @@ class WorkspaceService{
     let filePath;
     let newFilePath;
     let newFileKey;
+    let newLabel;
 
     if(collectionItemKey.includes("."+collection.extension)){
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
       newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + "." + collection.extension);
       newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
+      newLabel = collectionItemNewKey+'.'+collection.extension;
     }
     else{
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
       newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey);
       newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
+      newLabel = collectionItemNewKey;
     }
 
     if (!fs.existsSync(filePath)){
@@ -442,7 +448,7 @@ class WorkspaceService{
     }
 
     fs.copySync(filePath, newFilePath);
-    return { copied: true, item: { key:newFileKey.replace(/\\/g,'/'), label:collectionItemNewKey }};
+    return { copied: true, item: { key:newFileKey.replace(/\\/g,'/'), label:newLabel }};
   }
 
   async deleteCollectionItem(collectionKey, collectionItemKey){

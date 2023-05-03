@@ -16,6 +16,8 @@
 - cleanup: removed RaisedButtons from mui-02
 - fix: select-image broke with non-image files
 - fix: #314 & #181 breadcrumb in collections  cannot go back to root document
+- fix: #422 renaming collection items do not allow extensions in new name
+- fix: no "make page bundle" for non-markdown-collections
 
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
