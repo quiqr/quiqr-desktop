@@ -1,6 +1,6 @@
 import React                                                 from 'react';
-import IconUpload                                            from 'material-ui-02/svg-icons/file/folder-open';
-import RaisedButton                                          from 'material-ui-02/RaisedButton';
+import FolderOpen                                            from '@material-ui/icons/FolderOpen';
+import Button                                                from '@material-ui/core/Button';
 import { BundleManager, BundleManagerItem }                  from '../../BundleManager';
 import DangerButton                                          from '../../DangerButton';
 import FlatButton                                            from 'material-ui-02/FlatButton';
@@ -193,12 +193,16 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       </div>
 
       { showAddButton && field.addButtonLocationTop ?
-        <RaisedButton
-          primary={true}
-          label="Add file"
-          style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
-          onClick={this.onButtonClick.bind(this)}
-          icon={<IconUpload />} />:null
+
+          <Button
+            style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
+            startIcon={<FolderOpen />} variant="contained"  onClick={()=>{
+            this.onButtonClick()
+            }}>
+            Add File
+          </Button>
+
+          :null
       }
 
       <BundleManager forceActive={true}>
@@ -246,12 +250,15 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
           </BundleManager>
 
       { showAddButton && !field.addButtonLocationTop ?
-        <RaisedButton
-          primary={true}
-          label="Add file"
-          style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
-          onClick={this.onButtonClick.bind(this)}
-          icon={<IconUpload />} />:null
+          <Button
+            style={{marginBottom:'16px', marginTop:itemsStates.length?'0px':undefined}}
+            startIcon={<FolderOpen />} variant="contained"  onClick={()=>{
+            this.onButtonClick()
+            }}>
+            Add File
+          </Button>
+
+          :null
       }
 
         </React.Fragment>);

@@ -267,8 +267,6 @@ api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
     else{
       setWatcher(workspaceService);
     }
-
-
   }
   catch(e){
     context.resolve({error: `Could not load workspace configuration (website: ${siteKey}, workspace: ${workspaceKey}). ${e.message}`});

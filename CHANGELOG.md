@@ -2,15 +2,18 @@
 ## **WORK IN PROGRESS**
 - feature: improve git debugging
 - feature: add troubleshooting menu item
-- cleanup: refactored cli execute
-- cleanup: remove death quiqr-cloud code
-- cleanup: remove rimraf
-- cleanup: remove death modules
 - feature: move all config to site folder
 - feature: new default data folder `Quiqr`
 - feature: app-ui-style is now a preference
 - feature: queryselect with keys in file (e.g. .weekdays[] in calendar.json)
 - feature: queryselect using Autosuggest
+- feature: add images directly from imageselect dialog
+- cleanup: refactored cli execute
+- cleanup: remove death quiqr-cloud code
+- cleanup: remove rimraf
+- cleanup: remove death modules
+- cleanup: remove field ArrayList
+- cleanup: removed RaisedButtons from mui-02
 - fix: select-image broke with non-image files
 - fix: #314 & #181 breadcrumb in collections  cannot go back to root document
 

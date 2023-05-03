@@ -1,10 +1,10 @@
-import React from 'react';
-import IconButton from 'material-ui-02/IconButton';
+import React           from 'react';
+import IconButton      from 'material-ui-02/IconButton';
 import IconButtonGroup from '../../IconButtonGroup';
-import RaisedButton from 'material-ui-02/RaisedButton';
-import DefaultWrapper from './shared/DefaultWrapper';
-import IconAdd from 'material-ui-02/svg-icons/content/add';
-import IconRemove from 'material-ui-02/svg-icons/content/remove';
+import DefaultWrapper  from './shared/DefaultWrapper';
+import IconRemove      from 'material-ui-02/svg-icons/content/remove';
+import AddIcon         from '@material-ui/icons/Add';
+import Button          from '@material-ui/core/Button';
 import { BaseDynamic } from '../../HoForm';
 
 class TextFieldLabelMock extends React.Component{
@@ -99,11 +99,8 @@ class LeafArrayDynamic extends BaseDynamic {
             </div>
           );
         })}
-        <RaisedButton
-          style={{marginTop:'20px'}}
-          onClick={ this.pushEmptyValue.bind(this) }
-          icon={<IconAdd />}
-        />
+
+        <Button style={{marginTop:10}} endIcon={<AddIcon />} variant="contained" onClick={()=>{this.pushEmptyValue()}}>Add</Button>
       </DefaultWrapper>);
   }
 }

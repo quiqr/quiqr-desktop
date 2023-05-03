@@ -5,8 +5,8 @@ import Tip                       from '../../Tip';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic }           from '../../HoForm';
 //import service                   from './../../../services/service'
-import IconRefresh from 'material-ui-02/svg-icons/navigation/refresh';
-import RaisedButton from 'material-ui-02/RaisedButton';
+import IconRefresh               from '@material-ui/icons/Refresh';
+import Button                    from '@material-ui/core/Button';
 
 type UniqDynamicField = {
   key: string,
@@ -80,13 +80,16 @@ class UniqDynamic extends BaseDynamic<UniqDynamicField,UniqDynamicState> {
           underlineShow={true}
           fullWidth={true}
           floatingLabelText={field.title} />
-
-        <RaisedButton
-          primary={false}
-          label="Generate new token"
+        <Button
+          startIcon={<IconRefresh />}
+          variant="contained"
           style={{marginBottom:'16px',float:'right'}}
-          onClick={this.onButtonClick.bind(this)}
-          icon={<IconRefresh />} />
+          onClick={()=>{
+            this.onButtonClick();
+          }}>
+          Generate new token
+        </Button>
+
       </div>
 
 

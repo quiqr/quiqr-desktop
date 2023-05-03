@@ -1,14 +1,15 @@
 import * as React        from 'react';
 import IconBroken        from 'material-ui-02/svg-icons/image/broken-image';
-import IconUpload                                            from 'material-ui-02/svg-icons/file/folder-open';
-import RaisedButton      from 'material-ui-02/RaisedButton';
 import Spinner           from './Spinner';
+import FolderOpen        from '@material-ui/icons/FolderOpen';
 import Button            from '@material-ui/core/Button';
 import Dialog            from '@material-ui/core/Dialog';
 import DialogActions     from '@material-ui/core/DialogActions';
 import DialogContent     from '@material-ui/core/DialogContent';
 import DialogTitle       from '@material-ui/core/DialogTitle';
-//import service from '../services/service';
+import service           from '../services/service';
+
+const extensions = [ 'gif' , 'png' , 'svg' , 'jpg' , 'jpeg' ];
 
 class ImageThumb extends React.Component{
 
@@ -54,22 +55,12 @@ export default class SelectImagesDialog extends React.Component{
 
   isImage(file){
     if(file){
-      const extname = this.getExt(file);
-      if(extname ==='gif' ||
-        extname === 'png' ||
-        extname === 'svg' ||
-        extname === 'jpg' ||
-        extname === 'jpeg'
-      ){
+      if( extensions.includes(this.getExt(file)) ){
         return true;
       }
     }
 
     return false;
-  }
-
-  onButtonClick(e: any){
-
   }
 
   render(){
@@ -85,13 +76,23 @@ export default class SelectImagesDialog extends React.Component{
         <DialogTitle id="alert-dialog-title">{this.props.conf.title}</DialogTitle>
         <DialogContent>
 
-        {/*
-        <RaisedButton
-          primary={true}
-          label="Add file"
-          onClick={this.onButtonClick.bind(this)}
-          icon={<IconUpload />} />
-          */}
+          <Button startIcon={<FolderOpen />} variant="contained"  onClick={()=>{
+
+            let {formProps} = this.props;
+
+            service.api.openFileDialogForSingleAndCollectionItem(
+              formProps.siteKey,
+              formProps.workspaceKey,
+              formProps.collectionKey,
+              formProps.collectionItemKey,
+              this.props.uploadPath,
+              { title: "Select File to add" , extensions: extensions})
+              .then(()=>{ this.props.reload();
+              });
+
+            }}>
+            Add File
+          </Button>
 
             <div className="BundleManager row" style={this.props.style}>
               {

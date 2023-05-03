@@ -1,7 +1,5 @@
 import React                        from 'react';
 import { List, ListItem }           from 'material-ui-02/List';
-import RaisedButton                 from 'material-ui-02/RaisedButton';
-import IconAdd                      from 'material-ui-02/svg-icons/content/add';
 import IconRemove                   from 'material-ui-02/svg-icons/content/clear';
 import IconSort                     from 'material-ui-02/svg-icons/editor/drag-handle';
 import IconChevronRight             from 'material-ui-02/svg-icons/navigation/chevron-right';
@@ -10,6 +8,8 @@ import { FlatButton }               from 'material-ui-02';
 import { Accordion, AccordionItem } from '../../Accordion'
 import DangerButton                 from '../../DangerButton';
 import dynamicComponentUtils        from './shared/dynamic-component-utils'
+import AddIcon                      from '@material-ui/icons/Add';
+import Button                       from '@material-ui/core/Button';
 import service                      from '../../../services/service';
 
 import type { DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
@@ -363,9 +363,11 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
               return this.renderAccordionItem(field, context, node, componentKey, item, childIndex);
             }
           })}
-              </Accordion>
-              <RaisedButton style={{marginTop:'16px'}} onClick={this.onAddClickHandler.bind(this)} icon={<IconAdd />} />
-            </Fragment>
+        </Accordion>
+
+        <Button style={{marginTop:10}} endIcon={<AddIcon />} variant="contained" onClick={()=>{this.onAddClickHandler()}}>Add</Button>
+
+      </Fragment>
     );
   }
 

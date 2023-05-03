@@ -164,6 +164,13 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
     this.setState({selectImagesDialogConf:conf})
   }
 
+  handleReload(){
+    this.setState({absFiles:[]},()=>{
+      this.checkRootPathFiles(true);
+      this.checkThumbs();
+    });
+  }
+
   renderImage(){
 
     if(this.isImage(this.props.context.value)){
@@ -201,21 +208,24 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
 
       <div>
         <SelectImagesDialog
-        conf={this.state.selectImagesDialogConf}
-        imageItems={this.state.absFiles}
-        getBundleThumbnailSrc={form.props.plugins.getBundleThumbnailSrc}
-        handleSelect={(selected)=>{
-          context.setValue(selected);
-          this.checkThumbs();
-          this.handleCloseDialog();
-          if(field.autoSave === true){
-            context.saveFormHandler();
-          }
-        }}
-        handleClose={()=>{
-          this.handleCloseDialog();
-        }}
-      />
+          conf={this.state.selectImagesDialogConf}
+          imageItems={this.state.absFiles}
+          uploadPath={field.path}
+          reload={()=>this.handleReload()}
+          formProps={form.props}
+          getBundleThumbnailSrc={form.props.plugins.getBundleThumbnailSrc}
+          handleSelect={(selected)=>{
+            context.setValue(selected);
+            this.checkThumbs();
+            this.handleCloseDialog();
+            if(field.autoSave === true){
+              context.saveFormHandler();
+            }
+          }}
+          handleClose={()=>{
+            this.handleCloseDialog();
+          }}
+        />
 
         <FormItemWrapper
         control={
@@ -238,8 +248,6 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
           {this.renderImage()}
 
           <Button style={{marginTop:'5px'}} variant="contained" color="primary" onClick={()=>{
-            //this.checkRootPathFiles(true);
-            //this.checkThumbs();
             let conf = this.state.selectImagesDialogConf;
             conf.visible = true;
 

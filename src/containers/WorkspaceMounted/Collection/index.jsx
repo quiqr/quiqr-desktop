@@ -1,14 +1,15 @@
-import * as React from 'react';
-import { Breadcumb, BreadcumbItem } from './../../../components/Breadcumb';
-import { Route } from 'react-router-dom';
-import service from './../../../services/service'
-import DeleteItemKeyDialog from './DeleteItemKeyDialog'
-import EditItemKeyDialog from './EditItemKeyDialog'
-import CopyItemKeyDialog from './CopyItemKeyDialog'
-import Spinner from './../../../components/Spinner'
-import MoreVertIcon from 'material-ui-02/svg-icons/navigation/more-vert';
-import { Toggle, Chip, Divider, Dialog, FlatButton, IconButton, IconMenu, List, ListItem, MenuItem, Paper, RaisedButton, TextField } from 'material-ui-02';
-import { Debounce } from './../../../utils/debounce';
+import * as React                                                                                                      from 'react';
+import { Breadcumb, BreadcumbItem }                                                                                    from './../../../components/Breadcumb';
+import { Route }                                                                                                       from 'react-router-dom';
+import service                                                                                                         from './../../../services/service'
+import DeleteItemKeyDialog                                                                                             from './DeleteItemKeyDialog'
+import EditItemKeyDialog                                                                                               from './EditItemKeyDialog'
+import CopyItemKeyDialog                                                                                               from './CopyItemKeyDialog'
+import Spinner                                                                                                         from './../../../components/Spinner'
+import MoreVertIcon                                                                                                    from 'material-ui-02/svg-icons/navigation/more-vert';
+import { Toggle, Chip, Divider, Dialog, FlatButton, IconButton, IconMenu, List, ListItem, MenuItem, Paper, TextField } from 'material-ui-02';
+import Button                                                                                                          from '@material-ui/core/Button';
+import { Debounce }                                                                                                    from './../../../utils/debounce';
 
 const Fragment = React.Fragment;
 
@@ -439,9 +440,11 @@ class Collection extends React.Component{
           <Breadcumb items={[<BreadcumbItem disabled={true} label={collection.title} />]} />
           <br />
           <div>
-            <RaisedButton
-            label={'New '+ collection.itemtitle }
-            onClick={ this.setCreateItemView.bind(this) } />
+
+
+            <Button variant="contained" onClick={ this.setCreateItemView.bind(this) }>
+              {'New '+ collection.itemtitle }
+            </Button>
           </div>
           <br />
 
