@@ -98,11 +98,20 @@ export default class SelectImagesDialog extends React.Component{
               {
                 this.props.imageItems.map((item, index)=>{
 
+                  let filename = item.filename;
+                  let fExtention = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+                  let fBase = filename.slice(0,(filename.lastIndexOf(".") ));
+
+                  if(fBase.length > 15){
+                    filename = fBase.substr(0,7) + "..." + fBase.substr(-5) + "." +fExtention;
+                  }
+
+
                   if(this.isImage(item.filename)){
                     return (
                       <div className="BundleManager-item col-xl-2 col-lg-4 col-6" key={"imageitem-"+index}>
-                        <Button  onClick={()=>{this.props.handleSelect(item.filename)}} color="primary">
-                          {item.filename}
+                        <Button title={fBase} onClick={()=>{this.props.handleSelect(item.filename)}} color="primary">
+                          {filename}
                         </Button>
                         <Button  onClick={()=>{this.props.handleSelect(item.filename)}}>
                           <ImageThumb
