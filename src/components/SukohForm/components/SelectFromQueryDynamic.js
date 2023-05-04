@@ -136,26 +136,25 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
     const options = this.state.options;
 
     return (
-      <Autocomplete
-        id="auto-complete"
-        options={options}
+        <Autocomplete
+          id="auto-complete"
+          options={options}
 
-        onChange={ (event, newValue) => {
+          onChange={ (event, newValue) => {
             context.setValue(newValue)
-        }}
+          }}
 
-        value={context.value}
-        getOptionLabel={(option) => {
-          if(typeof option === "string"){
-            return option;
-          }
-          else{
-            return option.text;
-          }
-        }}
-        style={{ width: 300 }}
-        renderInput={(params) => <TextField {...params} label={field.title} variant="outlined" />}
-      />
+          value={context.value}
+          getOptionLabel={(option) => {
+            if(typeof option === "string"){
+              return option;
+            }
+            else{
+              return option.text;
+            }
+          }}
+          renderInput={(params) => <TextField {...params} label={field.title} variant="outlined" />}
+        />
     )
   }
 
@@ -180,6 +179,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
           </Typography>
         :
         <FormItemWrapper
+          style={{paddingTop: "20px"}}
           control={
             this.renderAutoComplete(field,context)
           }
