@@ -189,7 +189,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         let dynSearchKeyVal = { key: searchKey, val: searchVal }
 
         await service.api.getDynFormFields( dynFormObjectRoot, dynSearchKeyVal).then((extraFields)=>{
-          if (typeof extraFields !== 'undefined') {
+          if (typeof extraFields !== 'undefined' && extraFields.fields) {
 
             service.api.shouldReloadForm(context.node.field.compositeKey);
 
