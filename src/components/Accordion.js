@@ -1,14 +1,9 @@
-import React                    from 'react';
-import FlatButton               from 'material-ui-02/FlatButton';
-import IconNavigationExpandLess from 'material-ui-02/svg-icons/navigation/expand-less';
-import IconNavigationExpandMore from 'material-ui-02/svg-icons/navigation/expand-more';
-//import service                  from '../services/service';
+import React          from 'react';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import IconButton     from '@material-ui/core/IconButton';
 
-type AccordionHeaderProps = {
-    active: bool, onClick: ()=>void, style: any, headerLeftItems: any, headerRightItems: any
-}
-
-class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
+class AccordionHeader extends React.PureComponent {
 
     render(){
         let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
@@ -23,10 +18,7 @@ class AccordionHeader extends React.PureComponent<AccordionHeaderProps,void>{
                     <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
                 )})}
                 {this.props.forceActive?undefined:
-                <FlatButton
-                    style={{minWidth: '40px'}}
-                    icon={active?<IconNavigationExpandLess />:<IconNavigationExpandMore />}
-                />
+                  <IconButton size="small" aria-label="Expand">{ active ? <ExpandLessIcon /> : <ExpandMoreIcon /> } </IconButton>
                 }
             </span>
             {label}

@@ -1,15 +1,15 @@
 import React                        from 'react';
 import { List, ListItem }           from 'material-ui-02/List';
-import IconRemove                   from 'material-ui-02/svg-icons/content/clear';
-import IconSort                     from 'material-ui-02/svg-icons/editor/drag-handle';
-import IconChevronRight             from 'material-ui-02/svg-icons/navigation/chevron-right';
-import IconFileFolder               from 'material-ui-02/svg-icons/file/folder';
-import { FlatButton }               from 'material-ui-02';
+import FolderIcon                   from '@material-ui/icons/Folder';
+import DragHandleIcon               from '@material-ui/icons/DragHandle';
+import ChevronRightIcon             from '@material-ui/icons/ChevronRight';
+import IconButton                   from '@material-ui/core/IconButton';
+import ClearIcon                    from '@material-ui/icons/Clear';
+import AddIcon                      from '@material-ui/icons/Add';
+import Button                       from '@material-ui/core/Button';
 import { Accordion, AccordionItem } from '../../Accordion'
 import DangerButton                 from '../../DangerButton';
 import dynamicComponentUtils        from './shared/dynamic-component-utils'
-import AddIcon                      from '@material-ui/icons/Add';
-import Button                       from '@material-ui/core/Button';
 import service                      from '../../../services/service';
 
 import type { DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
@@ -306,8 +306,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
         onClick={
           ()=>{ this.handleAccordionClick(context,node) }
         }
-        leftIcon={<IconFileFolder />}
-        rightIcon={<IconChevronRight />}
+        leftIcon={<FolderIcon color="disabled" />}
+        rightIcon={<ChevronRightIcon />}
         primaryText={title}
         secondaryText={context.value.length +' items'}
       /></List>
@@ -417,20 +417,23 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
           onMouseEnter: this.getOnItemMouseEnter(childIndex)
         }}
         headerRightItems={[
-          <FlatButton
+
+          <IconButton
             onClick={(e)=>{e.stopPropagation()}}
             onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
-            style={{minWidth:40, cursor: 'move'}} icon={<IconSort opacity={.3} />} />,
-            <DangerButton
-              onClick={(e, loaded)=>{
-                e.stopPropagation();
-                if(loaded){
-                  this.removeItemAtIndex(childIndex)
-                }
-              }}
-              loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
-              button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.3} />} />}
-            />
+            style={{minWidth:40, cursor: 'move'}}
+            size="small" color="disabled" aria-label="sort"><DragHandleIcon /></IconButton>,
+
+          <DangerButton
+            onClick={(e, loaded)=>{
+              e.stopPropagation();
+              if(loaded){
+                this.removeItemAtIndex(childIndex)
+              }
+            }}
+            loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
+            button={<IconButton size="small" color="disabled" aria-label="delete"> <ClearIcon /> </IconButton>}
+          />
         ]}
       />
     );

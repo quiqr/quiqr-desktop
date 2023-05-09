@@ -1,7 +1,7 @@
 import * as React                  from 'react';
 import { Form, ComponentRegistry } from '../HoForm';
-import { FloatingActionButton }    from 'material-ui-02/';
-import IconCheck                   from 'material-ui-02/svg-icons/navigation/check';
+import Fab                         from '@material-ui/core/Fab';
+import CheckIcon                   from '@material-ui/icons/Check';
 import dynamicFormComponents       from './components/all'
 import service                     from './../../services/service'
 
@@ -94,6 +94,23 @@ export class SukohForm extends React.Component{
       refreshed = true;
     }
 
+    const fabButton = (
+      <Fab
+        style={{
+          position:'fixed',
+          right:this.state.actionButtonRightPos,
+          bottom:'20px',
+          zIndex:3
+        }}
+        className={floatingActionButtonClass}
+        disabled={!this.state.changed}
+        onClick={()=> this.saveContent()}
+
+        color="primary" aria-label="add">
+        <CheckIcon />
+      </Fab>
+    )
+
     return (
       <React.Fragment>
         <Form
@@ -115,20 +132,7 @@ export class SukohForm extends React.Component{
           onOpenInEditor={this.props.onOpenInEditor}
         />
         { this.props.hideSaveButton ? null :
-          <FloatingActionButton
-            style={{
-              position:'fixed',
-              right:this.state.actionButtonRightPos,
-              bottom:'20px',
-              zIndex:3
-            }}
-            className={floatingActionButtonClass}
-            disabled={!this.state.changed}
-            primary={'true'}
-            onClick={()=> this.saveContent()}
-          >
-            <IconCheck />
-          </FloatingActionButton>
+            fabButton
         }
         <div style={{height:'70px'}}></div>
       </React.Fragment>

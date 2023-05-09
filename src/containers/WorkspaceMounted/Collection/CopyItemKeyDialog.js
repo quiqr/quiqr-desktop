@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
-import { Dialog, FlatButton, TextField } from 'material-ui-02';
+import { Dialog, TextField } from 'material-ui-02';
+import Button from '@material-ui/core/Button';
 
 class CopyItemKeyDialog extends React.Component{
 
@@ -82,8 +83,9 @@ class CopyItemKeyDialog extends React.Component{
         open={true}
         onRequestClose={this.handleClose}
         actions={[
-          <FlatButton disabled={busy} primary={true} label="Cancel" onClick={this.handleClose.bind(this)} />,
-          <FlatButton disabled={busy||!valid} primary={true} label={confirmLabel} onClick={this.handleConfirm.bind(this)}  />
+          <Button disabled={busy} onClick={this.handleClose.bind(this)} color="primary">Cancel</Button>,
+          <Button disabled={busy||!valid} onClick={this.handleConfirm.bind(this)} color="primary">{confirmLabel}</Button>
+
         ]}
       >
         <TextField

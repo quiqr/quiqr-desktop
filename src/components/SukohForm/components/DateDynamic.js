@@ -71,7 +71,6 @@ class DateDynamic extends BaseDynamic {
     if(this.getDateValue()){
       iconButtons.push(<IconButton aria-label="clear" onClick={()=>context.clearValue()}> <HighlightOffIcon /> </IconButton>);
     }
-    //iconButtons.push(<IconButton onClick={()=>context.clearValue()}><IconClear /></IconButton>);
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />)
 
     return (
