@@ -1,15 +1,17 @@
 import * as React                                                                                                      from 'react';
-import { Breadcumb, BreadcumbItem }                                                                                    from './../../../components/Breadcumb';
 import { Route }                                                                                                       from 'react-router-dom';
 import service                                                                                                         from './../../../services/service'
 import DeleteItemKeyDialog                                                                                             from './DeleteItemKeyDialog'
 import EditItemKeyDialog                                                                                               from './EditItemKeyDialog'
 import CopyItemKeyDialog                                                                                               from './CopyItemKeyDialog'
 import Spinner                                                                                                         from './../../../components/Spinner'
+
 import MoreVertIcon                                                                                                    from 'material-ui-02/svg-icons/navigation/more-vert';
 import { Toggle, Chip, Divider, Dialog, FlatButton, IconButton, IconMenu, List, ListItem, MenuItem, Paper, TextField } from 'material-ui-02';
+
 import Button                                                                                                          from '@material-ui/core/Button';
 import { Debounce }                                                                                                    from './../../../utils/debounce';
+import Typography from '@material-ui/core/Typography';
 
 const Fragment = React.Fragment;
 
@@ -439,21 +441,19 @@ class Collection extends React.Component{
       this.history = history;
       return (
         <div style={{padding:'20px'}}>
-          <Breadcumb items={[<BreadcumbItem disabled={true} label={collection.title} />]} />
-          <br />
-          <div>
-            <Button variant="contained" onClick={ this.setCreateItemView.bind(this) }>
-              {'New '+ collection.itemtitle }
-            </Button>
-          </div>
-          <br />
+
+          <Typography variant="button" display="block" gutterBottom> {collection.title} </Typography>
+
+          <Button variant="contained" onClick={ this.setCreateItemView.bind(this) }>
+            {'New '+ collection.itemtitle }
+          </Button>
 
           <TextField
-          floatingLabelText="Filter"
-          onChange={this.handleFilterChange}
-          fullWidth={true}
-          value={this.state.filter}
-          hintText="Item name" />
+            floatingLabelText="Filter"
+            onChange={this.handleFilterChange}
+            fullWidth={true}
+            value={this.state.filter}
+            hintText="Item name" />
 
           <div style={{display: 'flex', flexWrap: 'wrap', padding: '10px 0'}}>
             { this.state.dirs.map((dir)=>{

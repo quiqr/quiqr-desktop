@@ -3,25 +3,12 @@ import FormItemWrapper from './shared/FormItemWrapper';
 import DatePicker from 'material-ui-02/DatePicker';
 import Tip from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
-import IconClear from 'material-ui-02/svg-icons/content/clear';
-import IconButton from 'material-ui-02/IconButton';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import IconButton from '@material-ui/core/IconButton';
 
-type DateDynamicField = {
-  type: string,
-  key: string,
-  compositeKey: string,
-  default: ?string,
-  tip: ?string,
-  title: ?string
-}
+class DateDynamic extends BaseDynamic {
 
-type DateDynamicState = {
-
-}
-
-class DateDynamic extends BaseDynamic<DateDynamicField, DateDynamicState> {
-
-  normalizeState({state, field}: {state: any, field: DateDynamicField}){
+  normalizeState({state, field}){
     let key = field.key;
     if(state[key]===undefined){
       state[key] = field.default || undefined;
@@ -80,7 +67,11 @@ class DateDynamic extends BaseDynamic<DateDynamicField, DateDynamicState> {
     }
 
     let iconButtons = [];
-    iconButtons.push(<IconButton onClick={()=>context.clearValue()}><IconClear /></IconButton>);
+
+    if(this.getDateValue()){
+      iconButtons.push(<IconButton aria-label="clear" onClick={()=>context.clearValue()}> <HighlightOffIcon /> </IconButton>);
+    }
+    //iconButtons.push(<IconButton onClick={()=>context.clearValue()}><IconClear /></IconButton>);
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />)
 
     return (

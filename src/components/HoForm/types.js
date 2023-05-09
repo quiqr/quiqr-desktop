@@ -1,8 +1,4 @@
-//@flow
-
-import * as React from 'react';
 import type { ComponentContext } from './component-context'
-
 export type { ComponentContext } from './component-context'
 
 export interface FieldBase {
@@ -25,15 +21,3 @@ export interface DynamicFormNode<Field: FieldBase> {
 export interface ComponentProps<Field : FieldBase> {
     context: ComponentContext<Field>
 };
-
-export type BreadcumbItem = {
-    label: string,
-    node: ?DynamicFormNode<FieldBase>
-};
-
-export type BreadcumbProps = {
-    items: Array<BreadcumbItem>,
-    onNodeSelected: (node: DynamicFormNode<FieldBase>)=> void;
-};
-
-export type BreadcumbComponentType = React.ComponentType<BreadcumbProps>;

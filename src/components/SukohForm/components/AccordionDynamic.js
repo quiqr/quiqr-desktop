@@ -60,7 +60,8 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
   }
 
   buildBreadcumbFragment(currentNode: DynamicFormNode<AccordionDynamicField>, items: Array<{label: string, node:?DynamicFormNode<FieldBase>}>): void{
-    if(items.length>0){ //has a previous item
+    // has a previous item
+    if(items.length>0){
       var previousItem = items[items.length-1];
       if(previousItem.node==null||previousItem.node.uiState==null){
         throw new Error('Unexpected state');

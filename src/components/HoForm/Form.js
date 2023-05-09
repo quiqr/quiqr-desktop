@@ -1,14 +1,15 @@
-import * as React                                                                  from 'react';
-import { Route }                                                                   from 'react-router-dom'
-import IconOpenBrowser                                                             from 'material-ui-02/svg-icons/action/open-in-browser';
-import IconOpenEditor                                                              from 'material-ui-02/svg-icons/action/description';
-import IconBack                                                                    from 'material-ui-02/svg-icons/navigation/arrow-back';
-import { IconButton }                                                              from 'material-ui-02';
-import { ComponentContext }                                                        from './component-context';
-import { Debounce }                                                                from './debounce';
-import { FormStateBuilder }                                                        from './form-state-builder';
-import service                                                                     from '../../services/service';
-import { FieldsExtender }                                                          from './fields-extender';
+import * as React           from 'react';
+import { Route }            from 'react-router-dom'
+import IconButton           from '@material-ui/core/IconButton';
+import OpenInBrowserIcon    from '@material-ui/icons/OpenInBrowser';
+import DescriptionIcon      from '@material-ui/icons/Description';
+import ArrowBackIcon        from '@material-ui/icons/ArrowBack';
+import { ComponentContext } from './component-context';
+import { Debounce }         from './debounce';
+import { FormStateBuilder } from './form-state-builder';
+import service              from '../../services/service';
+import { FormBreadcumb }           from '../Breadcumb';
+import { FieldsExtender }   from './fields-extender';
 
 const Fragment = React.Fragment;
 const componentMarginTop = '16px';
@@ -254,8 +255,7 @@ class Form extends React.Component {
 
     items.reverse();
 
-    let Breadcumb = this.props.breadcumbComponentType;
-    return <Breadcumb items={items} onNodeSelected={this.setPath.bind(this)} />;
+    return <FormBreadcumb items={items} onNodeSelected={this.setPath.bind(this)} />;
   }
 
   getCurrentNodeDebugInfo(){
@@ -271,6 +271,36 @@ class Form extends React.Component {
 
   render(){
 
+    let backButton = undefined;
+    if( this.props.collectionKey){
+      backButton = (
+        <IconButton aria-label="back"
+          onClick={()=>{this.handleBackButton();}}>
+          <ArrowBackIcon />
+        </IconButton>
+      );
+    }
+
+    let openInEditorButton = undefined;
+    if(!this.props.hideExternalEditIcon){
+      openInEditorButton = (
+        <IconButton aria-label="back"
+          onClick={()=>{this.props.onOpenInEditor();}}>
+          <DescriptionIcon />
+        </IconButton>
+      );
+    }
+
+    let openInBrowserButton = undefined;
+    if(this.props.pageUrl){
+      openInBrowserButton = (
+        <IconButton aria-label="back"
+          onClick={()=>{this.handleOpenPageInBrowser();}}>
+          <OpenInBrowserIcon />
+        </IconButton>
+      );
+    }
+
     if(this.state.renderError)
       return (<p style={{color:'red', padding:'24px'}}>{this.state.renderError}</p>)
 
@@ -279,31 +309,16 @@ class Form extends React.Component {
     let form = (<div key={'dynamic-form'} style={{padding:'20px'}}>
 
       <div style={Object.assign({position : 'relative', paddingBottom: '16px', width:'100%', display:'flex'})}>
+        {backButton}
 
-        { this.props.collectionKey ?
-          <IconButton touch={true} onClick={()=>{this.handleBackButton();}}>
-            <IconBack color="" style={{}} />
-          </IconButton>
-          : undefined}
+        <div style={Object.assign({flexGrow:1})}>
+          {breadcumb}
+        </div>
 
-          <div style={Object.assign({flexGrow:1})}>
-            {breadcumb}
-          </div>
+        {openInEditorButton}
+        {openInBrowserButton}
 
-          { this.props.hideExternalEditIcon ? null
-          :
-            <IconButton touch={true} onClick={()=>{this.props.onOpenInEditor();}}>
-              <IconOpenEditor color="" style={{}} />
-            </IconButton>
-          }
-
-          { this.props.pageUrl ?
-              <IconButton touch={true} onClick={()=>{this.handleOpenPageInBrowser();}}>
-                <IconOpenBrowser color="" style={{}} />
-              </IconButton>
-              : undefined}
-
-              </div>
+      </div>
 
       {this.renderLevel({
         field: {fields: this.state.fields, key:'root', compositeKey:'root', type:'root' },

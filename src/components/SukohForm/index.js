@@ -1,7 +1,6 @@
 import * as React                  from 'react';
 import { Form, ComponentRegistry } from '../HoForm';
 import { FloatingActionButton }    from 'material-ui-02/';
-import { FormBreadcumb }           from '../Breadcumb';
 import IconCheck                   from 'material-ui-02/svg-icons/navigation/check';
 import dynamicFormComponents       from './components/all'
 import service                     from './../../services/service'
@@ -99,7 +98,6 @@ export class SukohForm extends React.Component{
       <React.Fragment>
         <Form
           debug={false}
-          breadcumbComponentType={FormBreadcumb}
           componentRegistry={componentRegistry}
           siteKey={this.props.siteKey}
           workspaceKey={this.props.workspaceKey}

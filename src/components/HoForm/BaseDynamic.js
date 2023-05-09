@@ -53,7 +53,7 @@ export class BaseDynamic extends React.Component {
         return '';
     }
 
-    // override these bellow if the component have a non default getter/setter, like the ResourceManager
+    // override these bellow if the component have a non default getter/setter, like the ResourceManager (which was deleted)
     getValue(context){
         let value = context.node.state[context.node.field.key];
         if(value && Array.isArray(value)) value = value.slice(0);
