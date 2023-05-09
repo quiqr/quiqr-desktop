@@ -1,32 +1,44 @@
-import React from 'react';
-import FlatButton from 'material-ui-02/FlatButton';
-import IconNavigationExpandLess from 'material-ui-02/svg-icons/navigation/expand-less';
-import IconNavigationExpandMore from 'material-ui-02/svg-icons/navigation/expand-more';
-//import service from '../services/service';
+import React          from 'react';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Tooltip        from '@material-ui/core/Tooltip';
+import IconButton     from '@material-ui/core/IconButton';
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
   render(){
     let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
+
+    let filename = label
+    let fExtention = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+    let fBase = filename.slice(0,(filename.lastIndexOf(".") ));
+
+    if(fBase.length > 15){
+      filename = fBase.substr(0,7) + "..." + fBase.substr(-5) + "." +fExtention;
+    }
+
+
     return (<div style={style} onClick={onClick}>
       <span style={{ display:'inline-block', margin: '-10px 0px -10px -5px'}}>
         { headerLeftItems.map((item, index) => { return  (
           <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
         )})}
+      </span>
+      <span style={{ position:'absolute', top:'0px', right: '-5px'}}>
+        { headerRightItems.map((item, index) => { return  (
+          <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
+        )})}
+        {this.props.forceActive?undefined:
+          <IconButton size="small" aria-label="Expand">{ active ? <ExpandLessIcon /> : <ExpandMoreIcon /> } </IconButton>
+        }
+      </span>
+      <Tooltip title={label}>
+
+        <span>
+          {filename}
         </span>
-        <span style={{ position:'absolute', top:'0px', right: '-5px'}}>
-          { headerRightItems.map((item, index) => { return  (
-            <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
-          )})}
-            {this.props.forceActive?undefined:
-                <FlatButton
-                style={{minWidth: '40px'}}
-                icon={active?<IconNavigationExpandLess />:<IconNavigationExpandMore />}
-              />
-            }
-              </span>
-              {label}
-              </div>);
+      </Tooltip>
+    </div>);
   }
 }
 
@@ -64,22 +76,23 @@ class BundleManagerItem extends React.Component{
       boxShadow: '1px 1px 4px RGBA(0,0,0,.2)'
     },bundleStyle);
 
+
     return <div style={_style} className="BundleManager-item col-xl-2 col-lg-4 col-6" {...wrapperProps} >
       <div style={_bundleStyle}>
         <BundleManagerHeader
-        style={_headStyle}
-        onClick={onHeadClick}
-        headerLeftItems={headerLeftItems}
-        headerRightItems={headerRightItems}
-        forceActive={this.props.forceActive}
-        active={active}
-        label={label}
-      />
-          <div  style={_bodyStyle}>
-            { active? body : ( null ) }
-          </div>
+          style={_headStyle}
+          onClick={onHeadClick}
+          headerLeftItems={headerLeftItems}
+          headerRightItems={headerRightItems}
+          forceActive={this.props.forceActive}
+          active={active}
+          label={label}
+        />
+        <div  style={_bodyStyle}>
+          { active? body : ( null ) }
         </div>
       </div>
+    </div>
   }
 }
 

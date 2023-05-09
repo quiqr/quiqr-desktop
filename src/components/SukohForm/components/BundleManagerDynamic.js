@@ -1,13 +1,12 @@
-import React                                                 from 'react';
-import FolderOpen                                            from '@material-ui/icons/FolderOpen';
-import Button                                                from '@material-ui/core/Button';
-import { BundleManager, BundleManagerItem }                  from '../../BundleManager';
-import DangerButton                                          from '../../DangerButton';
-import FlatButton                                            from 'material-ui-02/FlatButton';
-import IconRemove                                            from 'material-ui-02/svg-icons/action/delete';
-import type { ComponentContext, DynamicFormNode, FieldBase } from '../../HoForm';
-import { BaseDynamic }                                       from '../../HoForm';
-import path                                                  from 'path';
+import React                                from 'react';
+import FolderOpen                           from '@material-ui/icons/FolderOpen';
+import Button                               from '@material-ui/core/Button';
+import { BundleManager, BundleManagerItem } from '../../BundleManager';
+import DangerButton                         from '../../DangerButton';
+import IconButton                           from '@material-ui/core/IconButton';
+import DeleteIcon                           from '@material-ui/icons/Delete';
+import { BaseDynamic }                      from '../../HoForm';
+import path                                 from 'path';
 
 import service from '../../../services/service';
 
@@ -16,21 +15,9 @@ const extractExt = (file) => {
   return file.replace(regExtractExt,'$1');
 }
 
-type BundleManagerDynamicField= {
-  key: string,
-  compositeKey: string,
-  type: string,
-  src: string,
-  fields: Array<any>,
-  path: string,
-  extensions: Array<string>,
-  title: string
-}
+class BundleManagerDynamic extends BaseDynamic {
 
-
-class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
-
-  constructor(props: ComponentProps<BundleManagerDynamicField>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -38,14 +25,14 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     };
   }
 
-  extendField(field: BundleManagerDynamicField, fieldExtender : any){
+  extendField(field, fieldExtender){
     if(field.fields===undefined){
       field.fields = [];
     }
     fieldExtender.extendFields(field.fields);
   }
 
-  buildPathFragment(node: DynamicFormNode<BundleManagerDynamicField>, nodeLevel: number, nodes: Array<DynamicFormNode<FieldBase>>): ?string {
+  buildPathFragment(node, nodeLevel, nodes) {
     return undefined;
   }
 
@@ -93,7 +80,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     }
   }
 
-  normalizeState({state, field, stateBuilder} : {state:any, field:BundleManagerDynamicField, stateBuilder: any}){
+  normalizeState({state, field, stateBuilder}){
 
     if(!Array.isArray(state['resources'])){
       state['resources'] = [];
@@ -114,11 +101,11 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
     return 'bundle-manager';
   }
 
-  allocateStateLevel(field: BundleManagerDynamicField, parentState: any, rootState: any){
+  allocateStateLevel(field, parentState, rootState){
     return rootState;
  }
 
-  onButtonClick(e: any){
+  onButtonClick(e){
 
     let {context} = this.props;
     let {field} = context.node;
@@ -147,7 +134,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
       });
   }
 
-  removeItemWithValue(state: any){
+  removeItemWithValue(state){
     state.__deleted = true;
     let { context } = this.props;
     context.setValue(context.value);
@@ -216,14 +203,7 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
             parent: node
           };
 
-
           let filename = state.name||state.src;
-          let _farr = filename.split('.');
-          let fName = _farr[0];
-          let fExtention = _farr[1];
-          if(fName.length > 25){
-            filename = fName.substr(0,10) + "..." + fName.substr(-5) + "." +fExtention;
-          }
 
           return (<BundleManagerItem
             style={{marginTop:childIndex?'0px':undefined}}
@@ -241,8 +221,9 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
                   this.removeItemWithValue(state)
                 }
               }}
-              loadedButton={<FlatButton secondary={true} style={{minWidth:40}} icon={<IconRemove />} />}
-              button={<FlatButton style={{minWidth:40}} icon={<IconRemove opacity={.5} />} />}
+
+              loadedButton={<IconButton  size="small" color="secondary" aria-label="delete"> <DeleteIcon /> </IconButton>}
+              button={<IconButton  size="small" aria-label="delete"> <DeleteIcon /> </IconButton>} 
             />
             ]}
             />)
@@ -264,13 +245,13 @@ class BundleManagerDynamic extends BaseDynamic<BundleManagerDynamicField,void> {
         </React.Fragment>);
   }
 
-  getValue(context: ComponentContext<BundleManagerDynamicField>){
+  getValue(context){
     return context.node.state['resources'].slice(0);
   }
-  setValue(context: ComponentContext<BundleManagerDynamicField>, value: any){
+  setValue(context, value){
     context.node.state['resources'] = value;
   }
-  clearValue(context: ComponentContext<BundleManagerDynamicField>){
+  clearValue(context){
     delete context.node.state['resources'];
   }
 }
