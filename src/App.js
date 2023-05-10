@@ -50,8 +50,6 @@ class App extends React.Component{
       menuIsLocked: true,
       forceShowMenu: false,
       skipMenuTransition: false,
-      quiqrUsername: "",
-      quiqrFingerprint: "",
       quiqrDomain: "",
     };
 
@@ -273,7 +271,6 @@ class App extends React.Component{
       <SiteLibraryRouted
         activeLibraryView={ this.state.libraryView}
         key={ 'selectSite' }
-        quiqrUsername={this.state.quiqrUsername}
         newSite={ (openDialog === 'newSiteDialog' ? true : false ) }
         importSite={ (openDialog === 'importSiteDialog' ? true : false ) }
       />
