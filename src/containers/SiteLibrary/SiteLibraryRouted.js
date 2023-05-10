@@ -309,7 +309,7 @@ class SiteLibraryRouted extends React.Component{
     }
 
     if(listingSource === 'quiqr-community-templates' || (listingSource ==='last' && this.state.sitesListingView === 'templates-quiqr-community')){
-      listTitle = `Quiqr Community Templates ${(this.props.quiqrUsername? "for " + this.props.quiqrUsername:'')}`;
+      listTitle = 'Quiqr Community Templates';
 
       sites = [];
       this.state.quiqrCommunityTemplates.forEach((template)=>{

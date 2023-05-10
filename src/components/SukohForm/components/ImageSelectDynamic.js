@@ -1,33 +1,20 @@
-import React           from 'react';
-import FormItemWrapper from './shared/FormItemWrapper';
-import Tip             from '../../Tip';
-import { BaseDynamic } from '../../HoForm';
-import IconBroken      from 'material-ui-02/svg-icons/image/broken-image';
-import Spinner         from '../../Spinner';
-import service         from '../../../services/service';
-import path            from 'path';
-import Button          from '@material-ui/core/Button';
+import React              from 'react';
+import path               from 'path';
+import IconBroken         from '@material-ui/icons/BrokenImage';
+import Button             from '@material-ui/core/Button';
+import FormItemWrapper    from './shared/FormItemWrapper';
+import Spinner            from '../../Spinner';
+import Tip                from '../../Tip';
+import { BaseDynamic }    from '../../HoForm';
 import SelectImagesDialog from '../../SelectImagesDialog'
+import service            from '../../../services/service';
 
 const regExtractExt = /[.]([^.]+)$/
 const extractExt = (file) => {
   return file.replace(regExtractExt,'$1');
 }
 
-type ImageSelectDynamicField = {
-  type: string,
-  key: string,
-  compositeKey: string,
-  default: ?string,
-  tip: ?string,
-  title: ?string
-}
-
-type ImageSelectDynamicState = {
-
-}
-
-class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelectDynamicState> {
+class ImageSelectDynamic extends BaseDynamic {
 
   constructor(props){
     super(props);
@@ -42,9 +29,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
       },
       srcFile: undefined,
       src: undefined };
-
   }
-
 
   componentDidMount(){
     this.checkRootPathFiles();
@@ -87,7 +72,7 @@ class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicField, ImageSelec
 
   }
 
-  normalizeState({state, field, stateBuilder} : {state:any, field:ImageSelectDynamicField, stateBuilder: any}){
+  normalizeState({state, field, stateBuilder}){
     let key = field.key;
     if(state[key]===undefined){
       state[key] = field.default || undefined;

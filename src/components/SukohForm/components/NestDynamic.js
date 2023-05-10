@@ -1,21 +1,12 @@
-import React from 'react';
+import React              from 'react';
 import { List, ListItem } from 'material-ui-02/List';
-import IconChevronRight from 'material-ui-02/svg-icons/navigation/chevron-right';
-import IconFileFolder from 'material-ui-02/svg-icons/file/folder';
-import { BaseDynamic } from '../../HoForm';
+import IconChevronRight   from '@material-ui/icons/ChevronRight';
+import IconFileFolder     from '@material-ui/icons/Folder';
+import { BaseDynamic }    from '../../HoForm';
 
-type NestDynamicField  = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  title:string,
-  fields:Array<any>,
-  groupdata: ?bool
-};
+class NestDynamic extends BaseDynamic {
 
-class NestDynamic extends BaseDynamic<NestDynamicField, void> {
-
-  allocateStateLevel(field : NestDynamicField, parentState : any, rootState : any){
+  allocateStateLevel(field, parentState, rootState){
     if(field.groupdata==null||field.groupdata===true){
       if(parentState[field.key]===undefined)
         parentState[field.key]={};
@@ -24,12 +15,12 @@ class NestDynamic extends BaseDynamic<NestDynamicField, void> {
     return parentState;
   }
 
-  normalizeState({state, field, stateBuilder} : { state: any, field: NestDynamicField, stateBuilder: any }){
+  normalizeState({state, field, stateBuilder}){
     stateBuilder.setLevelState(state, field.fields);
   }
 
 
-  extendField(field : NestDynamicField, fieldExtender : any){
+  extendField(field, fieldExtender){
     fieldExtender.extendFields(field.fields);
   }
 
@@ -37,7 +28,7 @@ class NestDynamic extends BaseDynamic<NestDynamicField, void> {
     return 'nest';
   }
 
-  buildBreadcumbFragment(node : any, buttons : Array<{label:string, node:any}>){
+  buildBreadcumbFragment(node, buttons){
     buttons.push({label: node.field.title, node});
   }
 
@@ -57,7 +48,7 @@ class NestDynamic extends BaseDynamic<NestDynamicField, void> {
       return (<List style={{marginBottom:16, padding: 0}}><ListItem
       style={{ border: 'solid 1px #e8e8e8', borderRadius:'7px'}}
       onClick={function(){ context.setPath(node) } }
-      leftIcon={<IconFileFolder />}
+      leftIcon={<IconFileFolder color="disabled"/>}
       rightIcon={<IconChevronRight />}
       primaryText={field.title}
       secondaryText={childLabels}

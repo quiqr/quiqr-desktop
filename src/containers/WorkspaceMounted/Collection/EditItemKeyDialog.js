@@ -8,7 +8,11 @@ class EditItemKeyDialog extends React.Component{
   constructor(props ){
     super(props);
 
-    let valueBase = props.value.slice(0,(props.value.lastIndexOf(".") ));
+    let valueBase = props.value
+    if (valueBase.indexOf('.') > -1)
+    {
+      valueBase = props.value.slice(0,(props.value.lastIndexOf(".") ));
+    }
 
     this.state = {
       value:valueBase||'',

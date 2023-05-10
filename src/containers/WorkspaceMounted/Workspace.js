@@ -50,9 +50,6 @@ class WorkSpace extends React.Component{
       menuIsLocked: true,
       forceShowMenu: false,
       skipMenuTransition: false,
-      quiqrUsername: "",
-      quiqrFingerprint: "",
-      quiqrDomain: "",
     };
 
     win.on('maximize', () => { this.setState({maximized: true}); });
@@ -133,7 +130,6 @@ class WorkSpace extends React.Component{
       siteKey={ site ? decodeURIComponent(site) : null }
       site={this.state.site}
       workspaceKey={ workspace ? decodeURIComponent(workspace) : null }
-      quiqrUsername={this.state.quiqrUsername}
       history={history}
       hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
       menuIsLocked={this.state.menuIsLocked}
@@ -331,8 +327,6 @@ class WorkSpace extends React.Component{
     return <Dashboard
       key={ match.url }
       applicationRole={ this.props.applicationRole }
-      quiqrUsername={this.state.quiqrUsername}
-      quiqrFingerprint={this.state.quiqrFingerprint}
       siteKey={ decodeURIComponent(match.params.site) }
       workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }
@@ -342,8 +336,6 @@ class WorkSpace extends React.Component{
       key={ match.url }
       site={ this.state.site }
       workspace={ this.state.workspace }
-      quiqrUsername={this.state.quiqrUsername}
-      quiqrFingerprint={this.state.quiqrFingerprint}
       siteKey={ decodeURIComponent(match.params.site) }
       workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }

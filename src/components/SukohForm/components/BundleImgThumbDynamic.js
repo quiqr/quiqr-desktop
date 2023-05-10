@@ -1,27 +1,14 @@
-import React from 'react';
-import type {ComponentProps} from '../../HoForm';
-import { BaseDynamic } from '../../HoForm';
-import IconBroken from 'material-ui-02/svg-icons/image/broken-image';
-import Spinner from '../../Spinner';
-import MovieIcon from '@material-ui/icons/Movie';
-import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-//import service from '../../../services/service';
+import React                 from 'react';
+import IconBroken            from '@material-ui/icons/BrokenImage';
+import MovieIcon             from '@material-ui/icons/Movie';
+import PictureAsPdfIcon      from '@material-ui/icons/PictureAsPdf';
+import InsertDriveFileIcon   from '@material-ui/icons/InsertDriveFile';
+import { BaseDynamic }       from '../../HoForm';
+import Spinner               from '../../Spinner';
 
-type BundleImgThumbDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  src: ?string
-}
+class BundleImgThumbDynamic extends BaseDynamic {
 
-type BundleImgThumbDynamicState = {
-  src: ?string
-}
-
-class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicField, BundleImgThumbDynamicState> {
-
-  constructor(props: ComponentProps<BundleImgThumbDynamicField>){
+  constructor(props){
     super(props);
     if(props){
       this.state = {

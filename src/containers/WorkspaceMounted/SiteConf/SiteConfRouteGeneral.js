@@ -99,6 +99,13 @@ class SiteConfRouteGeneral extends React.Component {
 
   render(){
     const { classes } = this.props;
+    let sitekey='';
+
+    if(this.state.siteconf.key){
+      sitekey=this.state.siteconf.key;
+    }
+
+
     return (
       <div className={ this.props.classes.container }>
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
@@ -110,7 +117,7 @@ class SiteConfRouteGeneral extends React.Component {
               id="standard-full-width"
               label="Site key"
               style={{ margin: 8 }}
-              value={this.state.siteconf.key}
+              value={sitekey}
               fullWidth
               disabled
               margin="normal"
@@ -124,8 +131,7 @@ class SiteConfRouteGeneral extends React.Component {
             id="standard-full-width"
             label="Site Name"
             style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
-            value={this.state.siteconf.name}
+            value={sitekey}
             fullWidth
             disabled
             margin="normal"
@@ -141,7 +147,6 @@ class SiteConfRouteGeneral extends React.Component {
             id="standard-full-width"
             label="Source Directory"
             style={{ margin: 8 }}
-            onChange={ this.handleChangeSiteKey }
             value={this.state.source.path}
             fullWidth
             disabled

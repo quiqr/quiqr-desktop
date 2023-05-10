@@ -8,7 +8,7 @@ class IconButtonGroup extends React.Component{
             return null;
 
         let iconButtonsClones = iconButtons.map((b, key)=>{
-            let element = React.cloneElement(b, { key, iconStyle:{ width: 18, height: 18 }});
+            let element = React.cloneElement(b, { key, fontSize:"small"});
             if(this.props.vertical===true)
                 return <div key={key}>{element}</div>;
             return element;

@@ -1,16 +1,32 @@
-import * as React                                                                              from 'react';
-import { Route }                                                                               from 'react-router-dom';
-import service                                                                                 from './../../../services/service'
-import DeleteItemKeyDialog                                                                     from './DeleteItemKeyDialog'
-import EditItemKeyDialog                                                                       from './EditItemKeyDialog'
-import CopyItemKeyDialog                                                                       from './CopyItemKeyDialog'
-import Spinner                                                                                 from './../../../components/Spinner'
-import { Toggle, Chip, Divider, Dialog, IconMenu, List, ListItem, MenuItem, Paper, TextField } from 'material-ui-02';
-import IconButton                                                                              from '@material-ui/core/IconButton';
-import MoreVertIcon                                                                            from '@material-ui/icons/MoreVert';
-import Button                                                                                  from '@material-ui/core/Button';
-import { Debounce }                                                                            from './../../../utils/debounce';
-import Typography                                                                              from '@material-ui/core/Typography';
+import * as React              from 'react';
+import { Route }               from 'react-router-dom';
+import DialogTitle             from '@material-ui/core/DialogTitle';
+import Dialog                  from '@material-ui/core/Dialog';
+import DialogActions           from '@material-ui/core/DialogActions';
+import DialogContent           from '@material-ui/core/DialogContent';
+import DialogContentText       from '@material-ui/core/DialogContentText';
+import Switch                  from '@material-ui/core/Switch';
+import FormControlLabel        from '@material-ui/core/FormControlLabel';
+import Divider                 from '@material-ui/core/Divider';
+import List                    from '@material-ui/core/List';
+import ListItem                from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText            from '@material-ui/core/ListItemText';
+import TextField               from '@material-ui/core/TextField';
+import Paper                   from '@material-ui/core/Paper';
+import Chip                    from '@material-ui/core/Chip';
+import MenuItem                from '@material-ui/core/MenuItem';
+import Menu                    from '@material-ui/core/Menu';
+import IconButton              from '@material-ui/core/IconButton';
+import MoreVertIcon            from '@material-ui/icons/MoreVert';
+import Button                  from '@material-ui/core/Button';
+import Typography              from '@material-ui/core/Typography';
+import DeleteItemKeyDialog     from './DeleteItemKeyDialog'
+import EditItemKeyDialog       from './EditItemKeyDialog'
+import CopyItemKeyDialog       from './CopyItemKeyDialog'
+import Spinner                 from './../../../components/Spinner'
+import { Debounce }            from './../../../utils/debounce';
+import service                 from './../../../services/service'
 
 const Fragment = React.Fragment;
 
@@ -35,32 +51,55 @@ class MakePageBundleItemKeyDialog extends React.Component{
       this.props.handleConfirm(this.state.value);
   }
 
-
   render(){
     let { busy, itemLabel } = this.props;
 
     return (
-      <Dialog
-      title={"Convert as Page Bundle"}
-      modal={true}
-      open={true}
-      onRequestClose={this.handleClose}
-      actions={[
-        <Button disabled={busy} onClick={this.handleClose.bind(this)} color="primary">Cancel</Button>,
-        <Button disabled={busy} onClick={this.handleConfirm.bind(this)} color="primary">Convert as Page Bundle</Button>
+      <Dialog modal={true} open={true}>
 
-      ]}
-      >
-          {this.state.valid? undefined : <p>Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?</p>}
+        <DialogTitle id="simple-dialog-title">Convert as Page Bundle</DialogTitle>
 
-          { busy? <Spinner /> : undefined }
+        <DialogContent>
+          <DialogContentText>
+            {this.state.valid? undefined : <p>Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?</p>}
+            { busy? <Spinner /> : undefined }
+          </DialogContentText>
+        </DialogContent>
 
-        </Dialog>
+        <DialogActions>
+          <Button disabled={busy} onClick={this.handleClose.bind(this)} color="primary">Cancel</Button>
+          <Button disabled={busy} onClick={this.handleConfirm.bind(this)} color="primary">Convert as Page Bundle</Button>
+        </DialogActions>
+
+      </Dialog>
     );
   }
 }
 
 class CollectionListItems extends React.PureComponent {
+
+  constructor(props){
+
+    super(props);
+    this.state = {
+      anchorEl: null,
+      item: null
+    }
+
+  }
+  handleClick(event, item)  {
+    console.log(item)
+    this.setState({
+      anchorEl:event.currentTarget,
+      currentItem: item
+    });
+  }
+
+  handleClose() {
+    this.setState({anchorEl:null});
+  }
+
+
   render(){
     let { collectionExtension, filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
 
@@ -79,46 +118,64 @@ class CollectionListItems extends React.PureComponent {
       return 0;
     });
 
-    return (<React.Fragment>
-      { filteredItems.map((item, index) => {
-
-        let iconButtonElement = (
-          <IconButton size="small">
-            <MoreVertIcon/>
-          </IconButton>
-        );
-
-        let rightIconMenu = (
-          <IconMenu iconButtonElement={iconButtonElement}
-          anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-          targetOrigin={{horizontal: 'right', vertical: 'top'}}
+    return (
+      <React.Fragment>
+        <Menu
+          id="simple-menu"
+          anchorEl={this.state.anchorEl}
+          keepMounted
+          open={Boolean(this.state.anchorEl)}
+          onClose={()=>this.handleClose()}
         >
 
-          <MenuItem onClick={()=> onRenameItemClick(item) }>Rename</MenuItem>
-          <MenuItem onClick={()=> onCopyItemClick(item) }>Copy</MenuItem>
-          <MenuItem onClick={()=> onDeleteItemClick(item) }>Delete</MenuItem>
-            { collectionExtension === 'md' ?
-              <MenuItem onClick={()=> onMakePageBundleItemClick(item) }>Make Page Bundle</MenuItem>
-              : null
-            }
-        </IconMenu>
-        );
+          <MenuItem onClick={()=> {
+            this.handleClose();
+            onRenameItemClick(this.state.currentItem);
+          }}>Rename</MenuItem>
 
-        let text = item.label||item.key;
-        if(this.props.showSortValue){
-          text = text + " ("+item.sortval+ ")"
-        }
+          <MenuItem onClick={()=> {
+            this.handleClose();
+            onCopyItemClick(this.state.currentItem);
+          }}>Copy</MenuItem>
 
-        return (<Fragment key={item.key}>
-          {index!==0?<Divider />:undefined}
-          <ListItem
-          primaryText={text}
-          onClick={ ()=>{ onItemClick(item) }}
-          rightIconButton={rightIconMenu}
-        />
-            </Fragment>)
-      }) }
-          </React.Fragment>
+          <MenuItem onClick={()=> {
+            this.handleClose();
+            onDeleteItemClick(this.state.currentItem);
+          }}>Delete</MenuItem>
+
+          { collectionExtension === 'md' ?
+            <MenuItem onClick={()=> {
+              this.handleClose();
+              onMakePageBundleItemClick(this.state.currentItem);
+            }}>Make Page Bundle</MenuItem>
+            : null
+          }
+
+        </Menu>
+
+        { filteredItems.map((item, index) => {
+          let text = item.label||item.key;
+          if(this.props.showSortValue){
+            text = text + " ("+item.sortval+ ")"
+          }
+
+          return (
+            <Fragment key={item.key}>
+              {index!==0?<Divider />:undefined}
+
+              <ListItem role={undefined}  button onClick={()=> {onItemClick(item)}}>
+                <ListItemText id={text} primary={`${text}`} />
+
+                <ListItemSecondaryAction>
+                  <IconButton edge="end" aria-label="comments" onClick={(e)=>this.handleClick(e, item)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </Fragment>
+          )
+        }) }
+      </React.Fragment>
     )
   }
 }
@@ -302,7 +359,7 @@ class Collection extends React.Component{
 
   }
 
-  resolveFilteredItems = (items: Array<any>) => {
+  resolveFilteredItems = (items) => {
     let trunked = false;
     let dirs = {'':true};
     let filteredItems: Array<any> = (items||[]).filter((item)=> {
@@ -311,7 +368,7 @@ class Collection extends React.Component{
       let c = '';
       for(let i = 0; i < parts.length-1; i++){ c = c+parts[i] + '/'; dirs[c] = true; }
 
-      return item.key.startsWith(this.state.filter);
+      return item.key.includes(this.state.filter);
     });
     if(filteredItems.length > MAX_RECORDS){
       filteredItems = filteredItems.slice(0,MAX_RECORDS);
@@ -321,8 +378,9 @@ class Collection extends React.Component{
     return { filteredItems, trunked, dirs: dirsArr };
   }
 
-  handleFilterChange = (e: any, value: string)=>{
-    this.setState({filter:value});
+  handleFilterChange(e){
+    this.setState({filter:e.target.value});
+
     this.filterDebounce.run(()=>{
       this.setState(this.resolveFilteredItems(this.state.items||[]));
     });
@@ -385,55 +443,55 @@ class Collection extends React.Component{
       let view = this.state.view;
       if(view.key==='createItem'){
         dialog = (<EditItemKeyDialog
-        value=""
-        viewKey={view.key}
-        title= {"New " + collection.itemtitle }
-        textfieldlabel="Title"
-        busy={this.state.modalBusy}
-        handleClose={this.setRootView.bind(this)}
-        handleConfirm={this.createCollectionItemKey.bind(this)}
-        confirmLabel="Create"
-      />);
+          value=""
+          viewKey={view.key}
+          title= {"New " + collection.itemtitle }
+          textfieldlabel="Title"
+          busy={this.state.modalBusy}
+          handleClose={this.setRootView.bind(this)}
+          handleConfirm={this.createCollectionItemKey.bind(this)}
+          confirmLabel="Create"
+        />);
       }
       else if(view.key==='renameItem'){
         dialog = (<EditItemKeyDialog
-        title="Rename Item key"
-        viewKey={view.key}
-        textfieldlabel="item key"
-        value={this.state.view.item.label}
-        busy={this.state.modalBusy}
-        handleClose={this.setRootView.bind(this)}
-        handleConfirm={this.renameCollectionItem.bind(this)}
-        confirmLabel="Rename"
-      />);
+          title="Rename Item key"
+          viewKey={view.key}
+          textfieldlabel="item key"
+          value={this.state.view.item.label}
+          busy={this.state.modalBusy}
+          handleClose={this.setRootView.bind(this)}
+          handleConfirm={this.renameCollectionItem.bind(this)}
+          confirmLabel="Rename"
+        />);
       }
       else if(view.key==='copyItem'){
         dialog = (<CopyItemKeyDialog
-        title="Copy Item"
-        viewKey={view.key}
-        textfieldlabel="item key"
-        value={this.state.view.item.label}
-        busy={this.state.modalBusy}
-        handleClose={this.setRootView.bind(this)}
-        handleConfirm={this.copyCollectionItem.bind(this)}
-        confirmLabel="Copy"
-      />);
+          title="Copy Item"
+          viewKey={view.key}
+          textfieldlabel="item key"
+          value={this.state.view.item.label}
+          busy={this.state.modalBusy}
+          handleClose={this.setRootView.bind(this)}
+          handleConfirm={this.copyCollectionItem.bind(this)}
+          confirmLabel="Copy"
+        />);
       }
       else if(view.key==="deleteItem"){
         dialog = <DeleteItemKeyDialog
-        busy={this.state.modalBusy}
-        handleClose={this.setRootView.bind(this)}
-        handleConfirm={this.deleteCollectionItem.bind(this)}
-        itemLabel={view.item.label}
-      />
+          busy={this.state.modalBusy}
+          handleClose={this.setRootView.bind(this)}
+          handleConfirm={this.deleteCollectionItem.bind(this)}
+          itemLabel={view.item.label}
+        />
       }
       else if(view.key==="makePageBundleItem"){
         dialog = <MakePageBundleItemKeyDialog
-        busy={this.state.modalBusy}
-        handleClose={this.setRootView.bind(this)}
-        handleConfirm={this.makePageBundleCollectionItem.bind(this)}
-        itemLabel={view.item.label}
-      />
+          busy={this.state.modalBusy}
+          handleClose={this.setRootView.bind(this)}
+          handleConfirm={this.makePageBundleCollectionItem.bind(this)}
+          itemLabel={view.item.label}
+        />
       }
     }
 
@@ -449,71 +507,81 @@ class Collection extends React.Component{
           </Button>
 
           <TextField
-            floatingLabelText="Filter"
-            onChange={this.handleFilterChange}
+            style={{margin:'10px 0'}}
+            label="Filter"
+            onChange={ (e) => this.handleFilterChange(e)}
             fullWidth={true}
             value={this.state.filter}
-            hintText="Item name" />
+            helperText="Item name" />
 
           <div style={{display: 'flex', flexWrap: 'wrap', padding: '10px 0'}}>
             { this.state.dirs.map((dir)=>{
-              return (<Chip key={dir} style={{marginRight:'5px'}} onClick={this.handleDirClick} data-dir={dir}>/{dir}</Chip>);
+              return (<Chip key={dir} style={{marginRight:'5px'}} onClick={this.handleDirClick} data-dir={dir} label={"/"+dir} />);
             }) }
+          </div>
+
+          <Paper>
+            <div style={{backgroundColor: "#eee",display: 'flex',justifyContent: "flex-end", flexWrap: 'no-wrap', padding: '10px 10px'}}>
+
+
+              <FormControlLabel
+                label="Sort descending"
+                control={
+
+                  <Switch
+                    checked={this.state.sortDescending}
+                    onChange={function(e,value){
+                      if(this.state.sortDescending){
+                        this.setState({sortDescending: false});
+                      }
+                      else{
+                        this.setState({sortDescending: true});
+                      }
+                    }.bind(this)}
+                    labelPosition='right' />
+                }
+              />
+
+              <FormControlLabel
+                label="Show sorting value"
+                control={
+                  <Switch
+                    checked={this.state.showSortValue}
+                    onChange={function(e,value){
+                      if(this.state.showSortValue){
+                        this.setState({showSortValue: false});
+                      }
+                      else{
+                        this.setState({showSortValue: true});
+                      }
+                    }.bind(this)}
+                    labelPosition='right' />
+                }/>
             </div>
 
-            <div style={{backgroundColor: "#eee",display: 'flex',justifyContent: "flex-start", flexWrap: 'no-wrap', padding: '10px 10px'}}>
+            <List>
+              <CollectionListItems
+                collectionExtension={collection.extension}
+                filteredItems={filteredItems}
+                onItemClick={this.handleItemClick}
+                onRenameItemClick={this.handleRenameItemClick}
+                onCopyItemClick={this.handleCopyItemClick}
+                onDeleteItemClick={this.handleDeleteItemClick}
+                onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
+                sortDescending={this.state.sortDescending}
+                showSortValue={this.state.showSortValue}
+              />
+              { trunked ? (
+                <React.Fragment>
+                  <Divider />
+                  <ListItem disabled primaryText={`Max records limit reached (${MAX_RECORDS})`} style={{color:'rgba(0,0,0,.3)'}} />
+                </React.Fragment>
+              ) : (null) }
+            </List>
+          </Paper>
 
-              <Toggle
-              label="Sort descending"
-              toggled={this.state.sortDescending}
-              onToggle={function(e,value){
-                if(this.state.sortDescending){
-                  this.setState({sortDescending: false});
-                }
-                else{
-                  this.setState({sortDescending: true});
-                }
-              }.bind(this)}
-              labelPosition='right' />
-
-              <Toggle
-              label="Show sorting value"
-              toggled={this.state.showSortValue}
-              onToggle={function(e,value){
-                if(this.state.showSortValue){
-                  this.setState({showSortValue: false});
-                }
-                else{
-                  this.setState({showSortValue: true});
-                }
-              }.bind(this)}
-              labelPosition='right' />
-            </div>
-
-            <Paper>
-              <List>
-                <CollectionListItems
-                  collectionExtension={collection.extension}
-                  filteredItems={filteredItems}
-                  onItemClick={this.handleItemClick}
-                  onRenameItemClick={this.handleRenameItemClick}
-                  onCopyItemClick={this.handleCopyItemClick}
-                  onDeleteItemClick={this.handleDeleteItemClick}
-                  onMakePageBundleItemClick={this.handleMakePageBundleItemClick}
-                  sortDescending={this.state.sortDescending}
-                  showSortValue={this.state.showSortValue}
-                />
-                  { trunked ? (
-                    <React.Fragment>
-                      <Divider />
-                      <ListItem disabled primaryText={`Max records limit reached (${MAX_RECORDS})`} style={{color:'rgba(0,0,0,.3)'}} />
-                    </React.Fragment>
-                  ) : (null) }
-                  </List>
-                </Paper>
-
-                { dialog }
-              </div>
+          { dialog }
+        </div>
       );
     }} />);
   }

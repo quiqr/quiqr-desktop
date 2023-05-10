@@ -13,9 +13,9 @@ export class FormBreadcumb extends React.Component{
 
     }}>
       {
-        this.props.items.map((item)=>{
+        this.props.items.map((item,index)=>{
           if(item.node!=null){
-            return <Link color="inherit" onClick={()=>this.props.onNodeSelected(item.node)} >{item.label||'Untitled'}</Link>
+            return <Link color="inherit" key={"link"+index} onClick={()=>this.props.onNodeSelected(item.node)} >{item.label||'Untitled'}</Link>
           }
           else{
             return <Typography color="textPrimary">{item.label||'Untitled'}</Typography>

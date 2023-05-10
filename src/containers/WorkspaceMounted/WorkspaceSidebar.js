@@ -1,94 +1,7 @@
 import React                                from 'react';
 import { Route }                            from 'react-router-dom'
-import Chip                                 from '@material-ui/core/Chip';
 import service                              from './../../services/service'
 import Sidebar                              from '../Sidebar';
-
-class WorkspaceWidget extends React.Component {
-
-  constructor(props){
-    super(props);
-    this.state = {
-      devDisableAutoHugoServe: false,
-      devLocalApi: false,
-      hugoRunning: false,
-      selectedMenuItem: '',
-      menusCollapsed: [],
-      error: null
-    };
-  }
-
-  componentDidMount(){
-
-    this.updateBadges();
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showEmpty: true});
-    });
-
-    window.require('electron').ipcRenderer.on('updateBadges', ()=>{
-      this.updateBadges();
-    });
-
-  }
-
-  updateBadges(){
-    service.api.readConfKey('devLocalApi').then((devLocalApi)=>{
-      this.setState({devLocalApi: devLocalApi });
-    });
-    service.api.readConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe)=>{
-      this.setState({devDisableAutoHugoServe: devDisableAutoHugoServe });
-    });
-    service.api.readConfKey('devShowCurrentUser').then((value)=>{
-      this.setState({devShowCurrentUser: value });
-    });
-  }
-
-  componentWillUnmount(){
-    window.require('electron').ipcRenderer.removeAllListeners('updateBadges');
-    this._ismounted = false;
-  }
-
-  renderPartialDevInfo(){
-
-    let devSets = [];
-
-    if(this.state.devShowCurrentUser){
-      let username=this.props.quiqrUsername;
-      devSets.push(
-        <Chip label={username} key="chipUsername" color="secondary" size="small" />
-      )
-    }
-
-    if(this.state.devLocalApi){
-      devSets.push(
-        <Chip label="Local API" key="localApi" color="secondary" size="small" />
-      )
-    }
-    if(this.state.devDisableAutoHugoServe){
-      devSets.push(
-        <Chip label="Disable Hugo Serve" key="disableHugo" color="secondary" size="small" />
-      )
-    }
-
-    if(devSets.length > 0){
-      return (
-        <div>
-          {devSets}
-        </div>
-      )
-    }
-
-    return (null)
-  }
-
-  render(){
-    return (
-      <React.Fragment>
-        {this.renderPartialDevInfo()}
-      </React.Fragment>
-    )
-  }
-}
 
 class WorkspaceSidebar extends React.Component{
 
@@ -164,26 +77,6 @@ class WorkspaceSidebar extends React.Component{
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
 
     let menus: Array = [];
-
-    //append workspace widget
-    menus.push({
-      widget: (
-        <WorkspaceWidget
-          siteConfig={this.state.site}
-          workspaceConfig={this.state.workspace}
-          quiqrUsername={this.props.quiqrUsername}
-          onClick={()=>{
-            if(this.state.error!=null){
-              history.push('/');
-              this.refresh();
-            }
-            else if(this.state.site!=null){
-              history.push(basePath);
-              this.refresh();
-            }
-          }} />
-      )
-    });
 
     if(this.state.workspace){
 

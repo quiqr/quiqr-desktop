@@ -100,37 +100,35 @@ class SiteConfRouteModel extends React.Component {
     if(files.length === 0) return null;
 
     return (
-        <Box m={2}>
+      <Box m={2}>
         <Typography variant="h6">{title}</Typography>
 
         <div className={classes.root}>
 
-
-
           {files.map((item, index)=>{
             return (
-          <Grid container  spacing={1} alignItems="flex-end">
-            <Grid item xs={11}>
-              <TextField
-                id="standard-full-width"
-                label={item.key}
-                style={{ margin: 8 }}
-                value={item.filename}
-                fullWidth
-                margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }} />
-            </Grid>
-            <Grid item xs={1}>
-              <IconButton color="primary" className={classes.iconButton} aria-label="directions"
-                onClick={()=>{
-                  service.api.openFileInEditor(item.filename);
-                }}>
-                {(item.icon ? item.icon : <DescriptionIcon style={{ color: '#000' }} />)}
-              </IconButton>
-            </Grid>
-          </Grid>
+              <Grid container key={"grid"+index} spacing={1} alignItems="flex-end">
+                <Grid item xs={11}>
+                  <TextField
+                    id="standard-full-width"
+                    label={item.key}
+                    style={{ margin: 8 }}
+                    value={item.filename}
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }} />
+                </Grid>
+                <Grid item xs={1}>
+                  <IconButton color="primary" className={classes.iconButton} aria-label="directions"
+                    onClick={()=>{
+                      service.api.openFileInEditor(item.filename);
+                    }}>
+                    {(item.icon ? item.icon : <DescriptionIcon style={{ color: '#000' }} />)}
+                  </IconButton>
+                </Grid>
+              </Grid>
             )
           })}
         </div>

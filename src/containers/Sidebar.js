@@ -116,7 +116,6 @@ class Sidebar extends React.Component{
     let menusNodes = menus.map((menu,i)=>{
       return (
         <React.Fragment key={i+menu.key||i+menu.title}>
-          { menu.widget ? (menu.widget) : (null) }
           { menu.items ? (
             <List
               subheader={
