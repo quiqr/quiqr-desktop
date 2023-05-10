@@ -1,10 +1,9 @@
 import React                     from 'react';
 import FormItemWrapper           from './shared/FormItemWrapper';
-import TextField                 from 'material-ui-02/TextField';
+import TextField from '@material-ui/core/TextField';
 import Tip                       from '../../Tip';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic }           from '../../HoForm';
-//import service                   from './../../../services/service'
 import IconRefresh               from '@material-ui/icons/Refresh';
 import Button                    from '@material-ui/core/Button';
 
@@ -71,15 +70,13 @@ class UniqDynamic extends BaseDynamic<UniqDynamicField,UniqDynamicState> {
     control={
       <div>
         <TextField
-          underlineFocusStyle={{ borderColor: "#bbb" }}
-          textareaStyle={{ color:"#999" }}
-          inputStyle={{ color:"#999" }}
           value={context.value}
           floatingLabelFixed={true}
           multiLine={field.multiLine===true}
           underlineShow={true}
           fullWidth={true}
-          floatingLabelText={field.title} />
+          label={field.title} />
+
         <Button
           startIcon={<IconRefresh />}
           variant="contained"

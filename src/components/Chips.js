@@ -1,6 +1,6 @@
-import React from 'react';
-import Chip from 'material-ui-02/Chip';
-import TextField from 'material-ui-02/TextField';
+import React     from 'react';
+import TextField from '@material-ui/core/TextField';
+import Chip      from '@material-ui/core/Chip';
 
 const Fragment = React.Fragment;
 
@@ -15,7 +15,7 @@ class Chips extends React.Component{
   }
 
   onChangeHandler(e, newVal){
-    this.setState(Object.assign({}, this.state, {value:newVal}));
+    this.setState(Object.assign({}, this.state, {value:e.target.value}));
   }
 
   onKeyPressHandler(e){
@@ -75,9 +75,10 @@ class Chips extends React.Component{
     return <Chip
       key={'chip-'+index}
       style={{opacity:opacity, margin:'2px'}}
-      onRequestDelete={ this.getOnRequestDelete(index) }
+      onDelete={ this.getOnRequestDelete(index) }
       onMouseDown={this.getOnItemMouseDown(index)}
       onMouseEnter={this.getOnItemMouseEnter(index)}
+      label={label}
     >
       {label}
     </Chip>;
@@ -87,7 +88,9 @@ class Chips extends React.Component{
     return <Chip
       key={'decoy-chip-'+index}
       style={{opacity:opacity, margin:'2px'}}
-      onRequestDelete={function(){}}>
+      onDelete={function(){}}
+      label={label}
+    >
       {label}
     </Chip>;
   }
@@ -99,14 +102,14 @@ class Chips extends React.Component{
     return (
       <Fragment>
         <TextField
-          floatingLabelFixed={true}
           multiLine={false}
           value={this.state.value}
           onChange = {this.onChangeHandler.bind(this)}
           underlineShow={this.props.underlineShow}
           fullWidth={this.props.fullWidth}
-          floatingLabelText={this.props.field.title}
+          label={this.props.field.title}
           onKeyPress={ this.onKeyPressHandler.bind(this) }
+          placeholder="enter chip text and confirm with enter key"
         />
         <div style={{display: 'flex',flexWrap: 'wrap'}}>
           {this.props.items.map((item, index)=>{

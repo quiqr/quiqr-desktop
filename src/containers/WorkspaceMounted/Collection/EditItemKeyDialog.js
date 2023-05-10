@@ -1,7 +1,8 @@
 import * as React from 'react';
-import Spinner from './../../../components/Spinner'
-import { Dialog, TextField } from 'material-ui-02';
-import Button from '@material-ui/core/Button';
+import Spinner    from './../../../components/Spinner'
+import { Dialog } from 'material-ui-02';
+import TextField  from '@material-ui/core/TextField';
+import Button     from '@material-ui/core/Button';
 
 class EditItemKeyDialog extends React.Component{
 
@@ -69,11 +70,10 @@ class EditItemKeyDialog extends React.Component{
       errorText = '';
       keyField = (
         <TextField
-          floatingLabelFixed={true}
-          floatingLabelText="item key"
+          helperText="item key"
           value={this.state.titleToKey}
-          disabled={true}
           fullWidth={true}
+          disabled={true}
         />
       )
     }
@@ -93,15 +93,16 @@ class EditItemKeyDialog extends React.Component{
         ]}
       >
         <TextField
-          floatingLabelText={this.props.textfieldlabel}
+          label={this.props.textfieldlabel}
           value={this.state.value}
           errorText={valid? undefined : errorText}
           disabled={busy}
           onChange={this.handleChange.bind(this)}
-          floatingLabelFixed={true}
           underlineShow={true}
           fullWidth={true}
         />
+        <br/>
+        <br/>
         {keyField}
 
         { busy? <Spinner /> : undefined }

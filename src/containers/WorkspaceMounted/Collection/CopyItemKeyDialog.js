@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Spinner from './../../../components/Spinner'
-import { Dialog, TextField } from 'material-ui-02';
+import { Dialog } from 'material-ui-02';
+import TextField  from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 class CopyItemKeyDialog extends React.Component{
@@ -63,22 +64,6 @@ class CopyItemKeyDialog extends React.Component{
     let { busy, confirmLabel } = this.props;
     let valid = this.validate();
     let errorText;
-    let keyField = undefined;
-    if(this.props.viewKey === 'createItem'){
-      errorText = '';
-      keyField = (
-        <TextField
-          floatingLabelFixed={true}
-          floatingLabelText="item key"
-          value={this.state.titleToKey}
-          disabled={true}
-          fullWidth={true}
-        />
-      )
-    }
-    else{
-      errorText = 'Allowed characters: alphanumeric, dash, underline and slash.';
-    }
 
     return (
       <Dialog
@@ -93,16 +78,14 @@ class CopyItemKeyDialog extends React.Component{
         ]}
       >
         <TextField
-          floatingLabelText={this.props.textfieldlabel}
+          label={this.props.textfieldlabel}
           value={this.state.value}
           errorText={valid? undefined : errorText}
           disabled={busy}
           onChange={this.handleChange.bind(this)}
-          floatingLabelFixed={true}
           underlineShow={true}
           fullWidth={true}
         />
-        {keyField}
 
         { busy? <Spinner /> : undefined }
 

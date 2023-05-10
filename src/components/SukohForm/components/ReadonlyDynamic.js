@@ -1,6 +1,6 @@
 import React from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
-import TextField from 'material-ui-02/TextField';
+import TextField from '@material-ui/core/TextField';
 import Tip from '../../Tip';
 import type { FormStateBuilder } from '../../HoForm';
 import { BaseDynamic } from '../../HoForm';
@@ -51,11 +51,11 @@ class ReadonlyDynamic extends BaseDynamic<ReadonlyDynamicField,ReadonlyDynamicSt
     textareaStyle={{ color:"#999" }}
     inputStyle={{ color:"#999" }}
     value={context.value||''}
-    floatingLabelFixed={true}
+    disabled={true}
     multiLine={field.multiLine===true}
     underlineShow={true}
     fullWidth={true}
-    floatingLabelText={field.title} />
+    label={field.title} />
     }
     iconButtons={iconButtons}
   />);
