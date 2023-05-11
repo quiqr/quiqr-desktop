@@ -8,9 +8,9 @@ class FormItemWrapper extends React.Component{
 
     let { control, iconButtons } = this.props;
 
-    let controlClone= React.cloneElement(control, { style:{transition:'none', boxSizing:'border-box', flex:1}});
+    let controlClone = React.cloneElement(control, { style:{transition:'none', boxSizing:'border-box', flex:1}});
 
-    return (<DefaultWrapper style={Object.assign({display:'flex'}, this.props.style)}>
+    return (<DefaultWrapper style={Object.assign({margin:'16px 0', display:'flex'}, this.props.style)}>
       { controlClone }
       {<IconButtonGroup iconButtons={iconButtons} style={{flex: '0 0 auto', alignSelf: 'flex-end', position:'relative', top:'-4px'}} />}
       </DefaultWrapper>);

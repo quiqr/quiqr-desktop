@@ -1,26 +1,12 @@
-import React from 'react';
-import FormItemWrapper from './shared/FormItemWrapper';
-import TextField from 'material-ui-02/TextField';
-import Tip from '../../Tip';
-import type { FormStateBuilder } from '../../HoForm';
-import { BaseDynamic } from '../../HoForm';
+import React                     from 'react';
+import FormItemWrapper           from './shared/FormItemWrapper';
+import TextField                 from '@material-ui/core/TextField';
+import Tip                       from '../../Tip';
+import { BaseDynamic }           from '../../HoForm';
 
-type TextFieldNumberDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  tip: string,
-  title: string,
-  default: ?number
-}
+class TextFieldNumberDynamic extends BaseDynamic {
 
-type TextFieldNumberDynamicState = {
-
-}
-
-class TextFieldNumberDynamic extends BaseDynamic<TextFieldNumberDynamicField,TextFieldNumberDynamicState>  {
-
-  normalizeState({state, field} : { state: any, field: TextFieldNumberDynamicField, stateBuilder: FormStateBuilder }){
+  normalizeState({state, field}){
     let key = field.key;
     if(state[key]===undefined){
       state[key] = field.default||0;
@@ -41,16 +27,7 @@ class TextFieldNumberDynamic extends BaseDynamic<TextFieldNumberDynamicField,Tex
       return (null);
     }
 
-    let setNumberValue = (e,value) => {
-      if(value===undefined||value.length===0){
-        context.clearValue();
-        return;
-      }
-      this.forceUpdate();
-      context.setValue(parseFloat(value),250);
-    };
-
-    let getNumberValue = function(){
+    let getNumberValue = function(e){
       return (context.value||'').toString();
     };
 
@@ -59,18 +36,25 @@ class TextFieldNumberDynamic extends BaseDynamic<TextFieldNumberDynamicField,Tex
 
     return (
       <FormItemWrapper
-      control={<TextField
-      id={`text-field-${field.key}`}
-      onChange={ setNumberValue }
-      value={getNumberValue()}
-      type={'number'}
-      floatingLabelFixed={true}
-      underlineShow={true}
-      fullWidth={true}
-      floatingLabelText={field.title} />
-      }
-      iconButtons={iconButtons}
-    />
+        control={<TextField
+          id={`text-field-${field.key}`}
+          onChange={ (e)=>{
+            if(e.target.value===undefined||e.target.value.length===0){
+              context.clearValue();
+              return;
+            }
+            this.forceUpdate();
+            context.setValue(parseFloat(e.target.value),250);
+
+          }}
+          value={getNumberValue()}
+          type="number"
+          underlineShow={true}
+          fullWidth={true}
+          label={field.title} />
+        }
+        iconButtons={iconButtons}
+      />
     );
   }
 }

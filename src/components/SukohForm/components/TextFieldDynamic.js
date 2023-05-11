@@ -1,26 +1,12 @@
-import * as React from 'react';
+import * as React      from 'react';
+import TextField       from '@material-ui/core/TextField';
 import FormItemWrapper from './shared/FormItemWrapper';
-import TextField from 'material-ui-02/TextField';
-import Tip from '../../Tip';
+import Tip             from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
 
-type TextFieldDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  default: ?string,
-  multiLine: ?bool,
-  tip: ?string,
-  title: ?string
-}
+class TextFieldDynamic extends BaseDynamic {
 
-type TextFieldDynamicState = {
-
-}
-
-class TextFieldDynamic extends BaseDynamic<TextFieldDynamicField,TextFieldDynamicState> {
-
-  normalizeState({state, field}: {state: any, field: TextFieldDynamicField}){
+  normalizeState({state, field}){
     let key = field.key;
     if(state[key]===undefined){
       state[key] = field.default || '';
@@ -31,9 +17,9 @@ class TextFieldDynamic extends BaseDynamic<TextFieldDynamicField,TextFieldDynami
     return 'string';
   }
 
-  handleChange = (e: Event, value: any)=>{
+  handleChange(e){
     this.forceUpdate();
-    this.props.context.setValue(value, 250);
+    this.props.context.setValue(e.target.value, 250);
   }
 
   renderComponent(){
@@ -50,18 +36,17 @@ class TextFieldDynamic extends BaseDynamic<TextFieldDynamicField,TextFieldDynami
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
     return (<FormItemWrapper
-    control={<TextField
-    id={`text-field-${field.key}`}
-    onChange={ this.handleChange }
-    value={context.value}
-    floatingLabelFixed={true}
-    multiLine={field.multiLine===true}
-    underlineShow={true}
-    fullWidth={true}
-    floatingLabelText={field.title} />
-    }
-    iconButtons={iconButtons}
-  />);
+      control={<TextField
+        id={`text-field-${field.key}`}
+        onChange={ (e)=>this.handleChange(e) }
+        value={context.value}
+        multiline={field.multiLine===true}
+        underlineShow={true}
+        fullWidth={true}
+        label={field.title} />
+      }
+      iconButtons={iconButtons}
+    />);
   }
 }
 
