@@ -2,7 +2,6 @@ import { Route }    from 'react-router-dom';
 import React        from 'react';
 import service      from './../../../services/service';
 import Spinner      from './../../../components/Spinner';
-import muiThemeable from 'material-ui-02/styles/muiThemeable';
 import MarkdownIt   from 'markdown-it'
 import Button       from '@material-ui/core/Button';
 import Typography   from '@material-ui/core/Typography';
@@ -243,4 +242,4 @@ class Home extends React.Component{
 
 }
 
-export default muiThemeable()(Home);
+export default Home;

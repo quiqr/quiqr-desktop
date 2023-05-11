@@ -1,6 +1,12 @@
 import React                               from 'react';
 import { withRouter }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
+import AppsIcon                            from '@material-ui/icons/Apps';
+import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
+import BuildIcon                           from '@material-ui/icons/Build';
+import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
+import SyncIcon                            from '@material-ui/icons/Sync';
+import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
 import Dashboard                           from './Dashboard'
 import TopToolbarLeft                      from '../TopToolbarLeft'
 import {TopToolbarRight, ToolbarButton}    from '../TopToolbarRight'
@@ -10,28 +16,9 @@ import Single                              from './Single';
 import WorkspaceSidebar                    from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import { SyncSidebar, SyncRouted }         from './Sync';
-import AppsIcon                            from '@material-ui/icons/Apps';
-import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
-import BuildIcon                           from '@material-ui/icons/Build';
-import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
-import SyncIcon                            from '@material-ui/icons/Sync';
-import OpenInBrowserIcon                   from '@material-ui/icons/OpenInBrowser';
-import lightBaseTheme                      from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import MuiThemeProvider                    from 'material-ui-02/styles/MuiThemeProvider';
-import getMuiTheme                         from 'material-ui-02/styles/getMuiTheme';
 import service                             from '../../services/service';
 
-const pogoTheme = getMuiTheme(lightBaseTheme, {
-  palette: {
-    background: {
-    },
-  },
-  props: {
-  },
-  overrides: {
-  },
-});
-
+//TODO use global
 let style = require('../../app-ui-styles/quiqr10/style.js');
 
 class WorkSpace extends React.Component{
@@ -220,7 +207,6 @@ class WorkSpace extends React.Component{
       currentBaseUrlPath = path;
       window.require('electron').shell.openExternal('http://localhost:13131'+currentBaseUrlPath);
     });
-    //service.api.logToConsole(currentBaseUrl);
   }
 
   renderTopToolbarRightSwitch(){
@@ -449,7 +435,6 @@ class WorkSpace extends React.Component{
       render={ ({match})=>{
 
         return (
-          <MuiThemeProvider muiTheme={pogoTheme}>
 
             <div className="App" style={marginStyles}>
 
@@ -483,7 +468,6 @@ class WorkSpace extends React.Component{
               </div>
 
             </div>
-          </MuiThemeProvider>
         );
 
       }} />
@@ -491,6 +475,5 @@ class WorkSpace extends React.Component{
   }
 }
 
-//export default WorkSpace;
 export default withRouter(WorkSpace);
 

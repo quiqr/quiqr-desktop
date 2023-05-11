@@ -1,33 +1,27 @@
 import React                                                              from 'react';
 import { Switch, Route }                                                  from 'react-router-dom'
-import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from './containers/SiteLibrary'
-import {TopToolbarRight, ToolbarButton}                                   from './containers/TopToolbarRight'
+import Redirect                                                           from 'react-router-dom/Redirect';
 import AppsIcon                                                           from '@material-ui/icons/Apps';
 import ArrowBackIcon                                                      from '@material-ui/icons/ArrowBack';
 import SettingsApplicationsIcon                                           from '@material-ui/icons/SettingsApplications';
+import { createTheme, ThemeProvider }                                     from '@material-ui/core/styles';
+import { blue }                                                           from '@material-ui/core/colors';
 import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
 import Console                                                            from './containers/Console';
 import TopToolbarLeft                                                     from './containers/TopToolbarLeft'
 import { PrefsSidebar, PrefsRouted }                                      from './containers/Prefs';
 import SplashDialog                                                       from './dialogs/SplashDialog';
-
-import lightBaseTheme                                                     from 'material-ui-02/styles/baseThemes/lightBaseTheme';
-import MuiThemeProvider                                                   from 'material-ui-02/styles/MuiThemeProvider';
-import getMuiTheme                                                        from 'material-ui-02/styles/getMuiTheme';
-
-import Redirect                                                           from 'react-router-dom/Redirect';
+import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from './containers/SiteLibrary'
+import {TopToolbarRight, ToolbarButton}                                   from './containers/TopToolbarRight'
 import service                                                            from './services/service';
 
 const defaultApplicationRole = "contentEditor";
 
-const pogoTheme = getMuiTheme(lightBaseTheme, {
+const theme = createTheme({
   palette: {
-    background: {
+    primary: {
+      main: blue[500],
     },
-  },
-  props: {
-  },
-  overrides: {
   },
 });
 
@@ -371,13 +365,13 @@ class App extends React.Component{
         this.history = history;
 
         return (
-          <MuiThemeProvider muiTheme={pogoTheme}>
+          <ThemeProvider theme={theme}>
             <div className="App">
               <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
                 <Console />
               </div>
             </div>
-          </MuiThemeProvider>
+          </ThemeProvider>
         )
 
       }} />
@@ -385,27 +379,27 @@ class App extends React.Component{
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match, history})=> {
         this.history = history;
         return (
-          <React.Fragment>
-
+          <ThemeProvider theme={theme}>
             {welcomeScreen}
             <Workspace
               applicationRole={ this.state.applicationRole }
               siteKey={ decodeURIComponent(match.params.site) }
               workspaceKey={ decodeURIComponent(match.params.workspace) } />
-          </React.Fragment>
+          </ThemeProvider>
 
         );
       }} />
       <Route path='/sites/:site/workspaces/:workspace/*' exact render={ ({match, history})=> {
         this.history = history;
         return (
-          <React.Fragment>
+
+          <ThemeProvider theme={theme}>
             {welcomeScreen}
             <Workspace
               applicationRole={ this.state.applicationRole }
               siteKey={ decodeURIComponent(match.params.site) }
               workspaceKey={ decodeURIComponent(match.params.workspace) } />
-          </React.Fragment>
+          </ThemeProvider>
 
         );
       }} />
@@ -416,7 +410,7 @@ class App extends React.Component{
         render={ ({match, history})=>{
           this.history = history;
           return (
-            <MuiThemeProvider muiTheme={pogoTheme}>
+            <ThemeProvider theme={theme}>
 
               <React.Fragment>
                 {welcomeScreen}
@@ -449,7 +443,7 @@ class App extends React.Component{
 
                 </div>
               </React.Fragment>
-            </MuiThemeProvider>
+            </ThemeProvider>
           );
 
         }} />
