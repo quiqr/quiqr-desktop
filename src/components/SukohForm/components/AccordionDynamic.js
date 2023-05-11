@@ -1,5 +1,8 @@
 import React                        from 'react';
-import { List, ListItem }           from 'material-ui-02/List';
+import List                         from '@material-ui/core/List';
+import ListItem                     from '@material-ui/core/ListItem';
+import ListItemIcon                 from '@material-ui/core/ListItemIcon';
+import ListItemText                 from '@material-ui/core/ListItemText';
 import FolderIcon                   from '@material-ui/icons/Folder';
 import DragHandleIcon               from '@material-ui/icons/DragHandle';
 import ChevronRightIcon             from '@material-ui/icons/ChevronRight';
@@ -7,33 +10,19 @@ import IconButton                   from '@material-ui/core/IconButton';
 import ClearIcon                    from '@material-ui/icons/Clear';
 import AddIcon                      from '@material-ui/icons/Add';
 import Button                       from '@material-ui/core/Button';
+import dynamicComponentUtils        from './shared/dynamic-component-utils'
 import { Accordion, AccordionItem } from '../../Accordion'
 import DangerButton                 from '../../DangerButton';
-import dynamicComponentUtils        from './shared/dynamic-component-utils'
+import { BaseDynamic }              from '../../HoForm';
 import service                      from '../../../services/service';
-
-import type { DynamicFormNode, ComponentProps, FieldBase } from '../../HoForm';
-
-import { BaseDynamic, FieldsExtender, FormStateBuilder } from '../../HoForm';
 
 const Fragment = React.Fragment;
 
-type AccordionDynamicField = {
-  title:string,
-  fields:Array<any>
-} & FieldBase;
-
-type AccordionDynamicState = {
-  index: ?number,
-  dragFromIndex: ?number,
-  dragToIndex: ?number
-}
-
-class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynamicState> {
+class AccordionDynamic extends BaseDynamic {
 
   documentMouseUpListener: ()=>void;
 
-  constructor(props: ComponentProps<AccordionDynamicField>){
+  constructor(props){
     super(props);
 
     this.orgNode = null;
@@ -47,7 +36,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     };
   }
 
-  extendField(field: AccordionDynamicField, fieldExtender: FieldsExtender){
+  extendField(field, fieldExtender){
     fieldExtender.extendFields(field.fields);
   }
 
@@ -55,11 +44,11 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     return 'accordion';
   }
 
-  normalizeState({state, field, stateBuilder} : { state: any, field: AccordionDynamicField, stateBuilder: FormStateBuilder }){
+  normalizeState({state, field, stateBuilder}){
     dynamicComponentUtils.normalizeStateForArrayOfObject(state, field, stateBuilder);
   }
 
-  buildBreadcumbFragment(currentNode: DynamicFormNode<AccordionDynamicField>, items: Array<{label: string, node:?DynamicFormNode<FieldBase>}>): void{
+  buildBreadcumbFragment(currentNode, items) {
     // has a previous item
     if(items.length>0){
       var previousItem = items[items.length-1];
@@ -71,7 +60,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     items.push({label: currentNode.field.title, node:(currentNode/*: any*/)});
   }
 
-  buildPathFragment(node: any, nodeLevel: any, nodes: any){
+  buildPathFragment(node, nodeLevel, nodes){
     if(nodeLevel > 0)
       return node.field.key + '/' + nodes[nodeLevel-1].uiState.childIndex;
     return node.field.key;
@@ -86,14 +75,14 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     context.setValue(copy);
   };
 
-  removeItemAtIndex(i: number){
+  removeItemAtIndex(i){
     let context = this.props.context;
     let copy = context.value.slice(0);
     copy.splice(i, 1);
     context.setValue(copy);
   }
 
-  swapItems({index, otherIndex}: {index: number, otherIndex: number}){
+  swapItems({index, otherIndex}){
     if(index===otherIndex){
       return;
     }
@@ -127,7 +116,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     return this.documentMouseUpListener;
   }
 
-  getOnItemDragHandleMouseDown(index: number){
+  getOnItemDragHandleMouseDown(index){
     return function(e: any){
       if(true){
         this.setState({ dragFromIndex: index, dragToIndex: index, index:-1 });
@@ -136,7 +125,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     }.bind(this)
   }
 
-  getOnItemMouseEnter(index: number){
+  getOnItemMouseEnter(index){
     return function(e: any){
       if(this.state.dragFromIndex!=null){
         this.setState({dragToIndex: index});
@@ -301,16 +290,24 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
 
   renderUnOpened(title, context, node){
     return (
-      <List style={{marginBottom:16, padding: 0}}><ListItem
-        style={{ border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
-        onClick={
-          ()=>{ this.handleAccordionClick(context,node) }
-        }
-        leftIcon={<FolderIcon color="disabled" />}
-        rightIcon={<ChevronRightIcon />}
-        primaryText={title}
-        secondaryText={context.value.length +' items'}
-      /></List>
+      <List
+        style={{marginBottom:16, padding: 0}}>
+
+        <ListItem
+          style={{ padding: '20px 16px', border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
+          role={undefined}  button onClick={()=> {
+            this.handleAccordionClick(context,node)
+          }}>
+
+          <ListItemIcon>
+            <FolderIcon />
+          </ListItemIcon>
+
+          <ListItemText id={title} primary={`${title}`} />
+          <ChevronRightIcon />
+        </ListItem>
+
+      </List>
     );
   }
 
@@ -372,7 +369,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
     );
   }
 
-  renderAccordionItem(field, context, node, componentKey: string, item: any, childIndex: number, isDragging: bool = false){
+  renderAccordionItem(field, context, node, componentKey, item, childIndex, isDragging = false){
 
     if(this.state.dynFieldsEmpty.length > 0){
       if(componentKey in this.state.dynFields){
@@ -424,22 +421,20 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicField, AccordionDynam
             style={{minWidth:40, cursor: 'move'}}
             size="small" color="disabled" aria-label="sort"><DragHandleIcon /></IconButton>,
 
-          <DangerButton
-            onClick={(e, loaded)=>{
-              e.stopPropagation();
-              if(loaded){
-                this.removeItemAtIndex(childIndex)
-              }
-            }}
-            loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
-            button={<IconButton size="small" color="disabled" aria-label="delete"> <ClearIcon /> </IconButton>}
-          />
+            <DangerButton
+              onClick={(e, loaded)=>{
+                e.stopPropagation();
+                if(loaded){
+                  this.removeItemAtIndex(childIndex)
+                }
+              }}
+              loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
+              button={<IconButton size="small" color="disabled" aria-label="delete"> <ClearIcon /> </IconButton>}
+            />
         ]}
       />
     );
   };
-
-
 }
 
 export default AccordionDynamic;
