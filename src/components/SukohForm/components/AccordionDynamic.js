@@ -303,7 +303,9 @@ class AccordionDynamic extends BaseDynamic {
             <FolderIcon />
           </ListItemIcon>
 
-          <ListItemText id={title} primary={`${title}`} />
+          <ListItemText id={title} primary={`${title}`}
+            secondary={`${context.value.length  +' items'}`}
+          />
           <ChevronRightIcon />
         </ListItem>
 
@@ -419,7 +421,8 @@ class AccordionDynamic extends BaseDynamic {
             onClick={(e)=>{e.stopPropagation()}}
             onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
             style={{minWidth:40, cursor: 'move'}}
-            size="small" color="disabled" aria-label="sort"><DragHandleIcon /></IconButton>,
+            size="small" 
+            aria-label="sort"><DragHandleIcon /></IconButton>,
 
             <DangerButton
               onClick={(e, loaded)=>{
@@ -429,7 +432,7 @@ class AccordionDynamic extends BaseDynamic {
                 }
               }}
               loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
-              button={<IconButton size="small" color="disabled" aria-label="delete"> <ClearIcon /> </IconButton>}
+              button={<IconButton size="small" aria-label="delete"> <ClearIcon /> </IconButton>}
             />
         ]}
       />

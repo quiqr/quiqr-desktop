@@ -1,10 +1,22 @@
 import React              from 'react';
-import { List, ListItem } from 'material-ui-02/List';
-import IconChevronRight   from '@material-ui/icons/ChevronRight';
-import IconFileFolder     from '@material-ui/icons/Folder';
+//import { List, ListItem } from 'material-ui-02/List';
+
+import List                         from '@material-ui/core/List';
+import ListItem                     from '@material-ui/core/ListItem';
+import ListItemIcon                 from '@material-ui/core/ListItemIcon';
+import ListItemText                 from '@material-ui/core/ListItemText';
+
+import ChevronRightIcon   from '@material-ui/icons/ChevronRight';
+import FolderIcon     from '@material-ui/icons/Folder';
 import { BaseDynamic }    from '../../HoForm';
 
 class NestDynamic extends BaseDynamic {
+  constructor(props){
+    super(props);
+    this.state = {
+      childLabels: ''
+    };
+  }
 
   allocateStateLevel(field, parentState, rootState){
     if(field.groupdata==null||field.groupdata===true){
@@ -36,6 +48,18 @@ class NestDynamic extends BaseDynamic {
     return node.field.key;
   }
 
+  componentDidMount(){
+    let {context} = this.props;
+    let {node, currentPath, parentPath} = context;
+    let {field} = node;
+    if(currentPath===parentPath){
+      let childLabels = field.fields.map((x) => {
+        return x.title || x.key
+      }).join(', ');
+      this.setState({childLabels: `(${childLabels})` })
+    }
+  }
+
   renderComponent(){
 
     let {context} = this.props;
@@ -43,16 +67,27 @@ class NestDynamic extends BaseDynamic {
     let {field} = node;
 
     if(currentPath===parentPath){
-      let childLabels = field.fields.map((x) => x.title).join(', ');
-      childLabels = `(${childLabels})`;
-      return (<List style={{marginBottom:16, padding: 0}}><ListItem
-      style={{ border: 'solid 1px #e8e8e8', borderRadius:'7px'}}
-      onClick={function(){ context.setPath(node) } }
-      leftIcon={<IconFileFolder color="disabled"/>}
-      rightIcon={<IconChevronRight />}
-      primaryText={field.title}
-      secondaryText={childLabels}
-    /></List>
+      return (
+        <List style={{marginBottom:16, padding: 0}}>
+
+          <ListItem
+            style={{ padding: '20px 16px', border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
+            role={undefined}  button
+            onClick={function(){ context.setPath(node) } }
+          >
+            <ListItemIcon>
+              <FolderIcon />
+            </ListItemIcon>
+
+            <ListItemText
+              id={field.title}
+              primary={`${field.title}`}
+              secondary={this.state.childLabels}
+            />
+            <ChevronRightIcon />
+          </ListItem>
+
+        </List>
       );
     }
 
