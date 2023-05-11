@@ -39,8 +39,6 @@
     "joi": "13.4.0",
     "js-yaml": ">=3.13.1",
     "jsonfile": "^6.1.0",
-    "material-ui-02": "npm:material-ui@^0.20.2",
-    "material-ui-color": "^1.2.0",
     "mkdirp": "0.5.1",
     "npm": "^8.13.2",
     "react-datepicker": "^4.11.0",

@@ -14,9 +14,7 @@
 - cleanup: remove rimraf
 - cleanup: remove death modules
 - cleanup: remove field ArrayList
-- cleanup: replaced all button components from mui-02
-- cleanup: replaced all icon components from mui-02
-- cleanup: replaced all mui-02 in collection index
+- cleanup: replaced all mui-02 components with mui-4
 - cleanup: improve selectquery layout
 - fix: select-image broke with non-image files
 - fix: #314 & #181 breadcrumb in collections  cannot go back to root document
