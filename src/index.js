@@ -12,6 +12,9 @@ service.api.readConfKey('prefs').then((value)=>{
 
   require('./app-ui-styles/' + appUiStyle + '/css/index.css');
   require('./app-ui-styles/' + appUiStyle + '/css/bootstrap-grid.css');
+
+  //styles for other then mui components
+  require('./app-ui-styles/components.css');
 });
 
 ReactDOM.render(

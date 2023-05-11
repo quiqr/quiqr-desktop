@@ -1,12 +1,20 @@
-import React from 'react';
-import FormItemWrapper from './shared/FormItemWrapper';
-import DatePicker from 'material-ui-02/DatePicker';
-import Tip from '../../Tip';
-import { BaseDynamic } from '../../HoForm';
+import React            from 'react';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import IconButton from '@material-ui/core/IconButton';
+import IconButton       from '@material-ui/core/IconButton';
+import FormItemWrapper  from './shared/FormItemWrapper';
+import InputLabel       from '@material-ui/core/InputLabel';
+import FormControl      from '@material-ui/core/FormControl';
+import DatePicker       from "react-datepicker";
+import                       "react-datepicker/dist/react-datepicker.css";
+import Tip              from '../../Tip';
+import { BaseDynamic }  from '../../HoForm';
+
 
 class DateDynamic extends BaseDynamic {
+
+  state = {
+    startDate: new Date(),
+  };
 
   normalizeState({state, field}){
     let key = field.key;
@@ -40,7 +48,7 @@ class DateDynamic extends BaseDynamic {
     return undefined;
   }
 
-  setDateValue(value: Date){
+  setDateValue(value){
 
     function toStringWithZeros(value, length){
       let str = value.toString();
@@ -56,11 +64,20 @@ class DateDynamic extends BaseDynamic {
     this.props.context.setValue(dateStr);
   }
 
+  getDate(){
+    return this.state.startDate;
+  }
+
   renderComponent(){
 
     let {context} = this.props;
     let {node, currentPath} = context;
     let {field} = node;
+
+    let dateFormat = "dd/MM/yyyy";
+    if(field.dateFormat){
+      dateFormat = field.dateFormat;
+    }
 
     if(currentPath!==context.parentPath){
       return (null);
@@ -75,16 +92,21 @@ class DateDynamic extends BaseDynamic {
 
     return (
       <FormItemWrapper
-      control={<DatePicker
-      value={this.getDateValue()}
-      onChange={function(e,value){ this.setDateValue(value) }.bind(this)}
-      floatingLabelFixed={true}
-      autoOk={true}
-      fullWidth={true}
-      floatingLabelText={field.title} />
-      }
-      iconButtons={iconButtons}
-    />
+        control={
+          <FormControl >
+            <InputLabel id="demo-controlled-open-select-label" style={{
+              marginTop:"-40px",
+              fontSize: "12px"
+
+            }}>{field.title}</InputLabel>
+            <DatePicker
+              className="datepicker"
+              dateFormat={dateFormat}
+              selected={this.getDateValue()} onChange={(e)=>this.setDateValue(e)} />
+          </FormControl >
+        }
+        iconButtons={iconButtons}
+      />
     );
   }
 }

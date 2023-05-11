@@ -30,10 +30,12 @@ class SnackbarManager extends React.Component{
         action={ snackMessage.action }
         onActionClick={ snackMessage.onActionClick }
         message={ snackMessage.message }
+        /*
         ContentProps={{
           "aria-describedby": "message-id",
           className: styles.snackbarStyleViaContentProps
-      }}
+        }}
+        */
         autoHideDuration={ snackMessage.autoHideDuration }
         onRequestClose={ function(){
           snackMessageService.reportSnackDismiss()

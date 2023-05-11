@@ -1,29 +1,15 @@
-import React from 'react';
-import type {FormStateBuilder } from '../../HoForm';
-import { BaseDynamic } from '../../HoForm';
+import React           from 'react';
+import InputLabel      from '@material-ui/core/InputLabel';
+import MenuItem        from '@material-ui/core/MenuItem';
+import FormControl     from '@material-ui/core/FormControl';
+import Select          from '@material-ui/core/Select';
 import FormItemWrapper from './shared/FormItemWrapper';
-import MenuItem from 'material-ui-02/MenuItem';
-import SelectField from 'material-ui-02/SelectField';
-import Tip from '../../Tip';
+import { BaseDynamic } from '../../HoForm';
+import Tip             from '../../Tip';
 
-type SelectDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  default: ?string,
-  tip: ?string,
-  title: ?string,
-  options: Array<{value:string, text:string}>,
-  multiple: ?bool
-}
+class SelectDynamic extends BaseDynamic {
 
-type SelectDynamicState = {
-
-}
-
-class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
-
-  normalizeState({state, field} : { state: any, field: SelectDynamicField, stateBuilder: FormStateBuilder }){
+  normalizeState({state, field}){
     //TODO: clear if value is not a valid option
     let key = field.key;
     let isArrayType = field.multiple===true;
@@ -44,23 +30,22 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
     return 'select';
   }
 
-  handleChange = (e: any, index: number, payload: Array<string>)=>{
+  handleChange(e){
     let {context} = this.props;
     let field = context.node.field;
     let val;
 
-    if(field.multiple===true){
-      context.setValue(payload)
+    if(e.target.options && field.multiple===true){
+      const { options } = e.target;
+      const value = [];
+      for (let i = 0, l = options.length; i < l; i += 1) {
+        if (options[i].selected) {
+          value.push(options[i].value);
+        }
+      }
+      context.setValue(val)
     }
     else{
-
-      if(typeof field.options[index] === "string"){
-        val = field.options[index]
-      }
-      else{
-        val = field.options[index].value
-      }
-
       if(val !== context.value){
         context.setValue(val)
       }
@@ -69,7 +54,6 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
     if(field.autoSave === true){
       context.saveFormHandler();
     }
-
   }
 
   renderComponent(){
@@ -87,29 +71,34 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
 
     return (
       <FormItemWrapper
-    control={<SelectField
-    floatingLabelText={field.title}
-    floatingLabelFixed={true}
-    value={context.value}
-    multiple={field.multiple===true}
-    onChange={this.handleChange}
-    fullWidth={true}
-  >
-      {field.options.map((option, i)=>{
-        let val, text;
-        if(typeof option === "string"){
-          val = option
-          text = option
+        control={
+
+          <FormControl >
+            <InputLabel id="demo-controlled-open-select-label">{field.title}</InputLabel>
+            <Select
+              labelId="demo-controlled-open-select-label"
+              id="demo-controlled-open-select"
+              multiple={field.multiple===true}
+              value={context.value}
+              onChange={(e)=>this.handleChange(e)}
+            >
+              {field.options.map((option, i)=>{
+                let val, text;
+                if(typeof option === "string"){
+                  val = option
+                  text = option
+                }
+                else{
+                  val = option.value
+                  text = option.text
+                }
+                return (
+                  <MenuItem key={i} value={val}>{text}</MenuItem>
+                )
+              })}
+            </Select>
+          </FormControl>
         }
-        else{
-          val = option.value
-          text = option.text
-        }
-        return (
-          <MenuItem key={i} value={val} primaryText={text} />
-        )
-      })}
-        </SelectField>}
         iconButtons={iconButtons}
       />);
   }

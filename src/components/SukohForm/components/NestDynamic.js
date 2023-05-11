@@ -1,14 +1,11 @@
-import React              from 'react';
-//import { List, ListItem } from 'material-ui-02/List';
-
-import List                         from '@material-ui/core/List';
-import ListItem                     from '@material-ui/core/ListItem';
-import ListItemIcon                 from '@material-ui/core/ListItemIcon';
-import ListItemText                 from '@material-ui/core/ListItemText';
-
-import ChevronRightIcon   from '@material-ui/icons/ChevronRight';
-import FolderIcon     from '@material-ui/icons/Folder';
-import { BaseDynamic }    from '../../HoForm';
+import React            from 'react';
+import List             from '@material-ui/core/List';
+import ListItem         from '@material-ui/core/ListItem';
+import ListItemIcon     from '@material-ui/core/ListItemIcon';
+import ListItemText     from '@material-ui/core/ListItemText';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import FolderIcon       from '@material-ui/icons/Folder';
+import { BaseDynamic }  from '../../HoForm';
 
 class NestDynamic extends BaseDynamic {
   constructor(props){
@@ -30,7 +27,6 @@ class NestDynamic extends BaseDynamic {
   normalizeState({state, field, stateBuilder}){
     stateBuilder.setLevelState(state, field.fields);
   }
-
 
   extendField(field, fieldExtender){
     fieldExtender.extendFields(field.fields);

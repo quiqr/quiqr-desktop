@@ -1,36 +1,16 @@
-import React from 'react';
-import type {FormStateBuilder } from '../../HoForm';
+import React           from 'react';
 import { BaseDynamic } from '../../HoForm';
 import FormItemWrapper from './shared/FormItemWrapper';
-import FontPicker from "font-picker-react";
-import Tip from '../../Tip';
+import FontPicker      from "font-picker-react";
+import Tip             from '../../Tip';
 
-type FontPickerDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-
-  default: ?string,
-  tip: ?string,
-  title: ?string,
-
-  families: ?Array<string>,
-  variants: ?Array<string>,
-  categories: ?Array<string>,
-  limit: ?number,
-}
-
-type FontPickerDynamicState = {
-
-}
-
-class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDynamicState> {
+class FontPickerDynamic extends BaseDynamic {
 
   getType(){
     return 'font-picker';
   }
 
-  normalizeState({state, field} : { state: any, field: FontPickerDynamicField, stateBuilder: FormStateBuilder }){
+  normalizeState({state, field}){
 
     let key = field.key;
     if(state[key]===undefined){
@@ -54,7 +34,6 @@ class FontPickerDynamic extends BaseDynamic<FontPickerDynamicField,FontPickerDyn
     field.pickerId = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 
   }
-
 
   renderComponent(){
 
