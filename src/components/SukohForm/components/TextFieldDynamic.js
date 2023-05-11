@@ -41,7 +41,6 @@ class TextFieldDynamic extends BaseDynamic {
         onChange={ (e)=>this.handleChange(e) }
         value={context.value}
         multiline={field.multiLine===true}
-        underlineShow={true}
         fullWidth={true}
         label={field.title} />
       }

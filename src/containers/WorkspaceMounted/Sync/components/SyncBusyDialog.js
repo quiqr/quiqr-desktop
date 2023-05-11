@@ -1,5 +1,4 @@
 import * as React          from 'react';
-//import service             from '../../../../services/service';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
 import MuiDialogTitle      from '@material-ui/core/DialogTitle';
@@ -8,9 +7,9 @@ import Dialog              from '@material-ui/core/Dialog';
 import DialogActions       from '@material-ui/core/DialogActions';
 import DialogContent       from '@material-ui/core/DialogContent';
 import DialogContentText   from '@material-ui/core/DialogContentText';
+import LinearProgress      from '@material-ui/core/LinearProgress';
 import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
 import FormLogoQuiqrCloud  from '../../../../svg-assets/FormLogoQuiqrCloud'
-import LinearProgress      from '@material-ui/core/LinearProgress';
 
 const useStyles = theme => ({
 
@@ -59,7 +58,7 @@ class SyncBusyDialog extends React.Component{
 
     return (
       <Dialog
-        open={open}
+        open={open||false}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}

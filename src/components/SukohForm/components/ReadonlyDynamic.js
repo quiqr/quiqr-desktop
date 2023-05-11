@@ -47,13 +47,9 @@ class ReadonlyDynamic extends BaseDynamic<ReadonlyDynamicField,ReadonlyDynamicSt
 
     return (<FormItemWrapper
     control={<TextField
-    underlineFocusStyle={{ borderColor: "#bbb" }}
-    textareaStyle={{ color:"#999" }}
-    inputStyle={{ color:"#999" }}
     value={context.value||''}
     disabled={true}
-    multiLine={field.multiLine===true}
-    underlineShow={true}
+    multiline={field.multiLine===true}
     fullWidth={true}
     label={field.title} />
     }

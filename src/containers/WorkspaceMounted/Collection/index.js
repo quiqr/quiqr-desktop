@@ -538,7 +538,7 @@ class Collection extends React.Component{
                         this.setState({sortDescending: true});
                       }
                     }.bind(this)}
-                    labelPosition='right' />
+                     />
                 }
               />
 
@@ -555,7 +555,7 @@ class Collection extends React.Component{
                         this.setState({showSortValue: true});
                       }
                     }.bind(this)}
-                    labelPosition='right' />
+                    />
                 }/>
             </div>
 

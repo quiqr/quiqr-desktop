@@ -71,9 +71,7 @@ class UniqDynamic extends BaseDynamic<UniqDynamicField,UniqDynamicState> {
       <div>
         <TextField
           value={context.value}
-          floatingLabelFixed={true}
-          multiLine={field.multiLine===true}
-          underlineShow={true}
+          multiline={field.multiLine===true}
           fullWidth={true}
           label={field.title} />
 

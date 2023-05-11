@@ -85,7 +85,6 @@ class EditTagsDialogs extends React.Component{
         <Chips
           items={this.state.siteconf.tags}
           sortable={true}
-          underlineShow={true}
           fullWidth={true}
           field={field}
           onRequestDelete={this.handleRequestDelete.bind(this)}

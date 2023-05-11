@@ -400,7 +400,7 @@ class SyncRouteGeneral extends React.Component {
             />
 
             <Dialog
-              open={this.state.deleteDialogOpen}
+              open={this.state.deleteDialogOpen||false}
               onClose={()=>{this.setState({deleteDialogOpen:false})}}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"

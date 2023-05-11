@@ -88,7 +88,6 @@ class SelectDynamic extends BaseDynamic<SelectDynamicField,SelectDynamicState> {
     return (
       <FormItemWrapper
     control={<SelectField
-    underlineShow={true}
     floatingLabelText={field.title}
     floatingLabelFixed={true}
     value={context.value}

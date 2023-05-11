@@ -1,27 +1,13 @@
-import React from 'react';
-import FormItemWrapper from './shared/FormItemWrapper';
-import Tip from '../../Tip';
-import Toggle from 'material-ui-02/Toggle';
-import type { FormStateBuilder } from '../../HoForm';
-
+import React            from 'react';
+import Switch           from '@material-ui/core/Switch';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormItemWrapper  from './shared/FormItemWrapper';
+import Tip              from '../../Tip';
 import { BaseDynamic } from '../../HoForm';
 
-type ToggleDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  tip: string,
-  title: string,
-  default: ?bool
-}
+class ToggleDynamic extends BaseDynamic {
 
-type ToggleDynamicFieldState = {
-
-}
-
-class ToggleDynamic extends BaseDynamic<ToggleDynamicField,ToggleDynamicFieldState> {
-
-  normalizeState({state, field, stateBuilder} : { state: any, field: ToggleDynamicField, stateBuilder: FormStateBuilder }){
+  normalizeState({state, field, stateBuilder}){
     let key = field.key;
     if(state[key]===undefined){
       state[key] = field.default!==undefined?field.default:false;
@@ -47,15 +33,19 @@ class ToggleDynamic extends BaseDynamic<ToggleDynamicField,ToggleDynamicFieldSta
 
     return (
       <FormItemWrapper
-      control={<Toggle
-      label={field.title}
-      toggled={context.value===true}
-      onToggle={function(e,value){
-        context.setValue(value)
-      }}
-      labelPosition='right' />}
-      iconButtons={iconButtons}
-    />);
+        control={
+          <FormControlLabel
+            label={field.title}
+            control={
+              <Switch
+                checked={context.value===true}
+                onChange={function(e,value){
+                  context.setValue(value)
+                }}
+              />}
+          />}
+        iconButtons={iconButtons}
+      />);
   }
 }
 

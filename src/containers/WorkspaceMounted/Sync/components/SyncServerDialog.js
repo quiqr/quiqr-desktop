@@ -1,5 +1,4 @@
 import * as React          from 'react';
-//import service             from '../../../../services/service';
 import { withStyles }      from '@material-ui/core/styles';
 import Button              from '@material-ui/core/Button';
 import MuiDialogTitle      from '@material-ui/core/DialogTitle';
@@ -12,10 +11,10 @@ import DialogActions       from '@material-ui/core/DialogActions';
 import DialogContent       from '@material-ui/core/DialogContent';
 import DialogContentText   from '@material-ui/core/DialogContentText';
 import FolderIcon          from '@material-ui/icons/Folder';
-import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
-import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
 import GitHubPagesForm     from './github-pages/GitHubPagesForm'
 import FolderExportForm    from './folder-export/FolderExportForm'
+import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
+import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
 
 const useStyles = theme => ({
 
@@ -149,20 +148,20 @@ class SyncServerDialog extends React.Component{
     }
 
     const actions = [
-      <Button color="primary" onClick={this.props.onClose}>
+      <Button key="action1" color="primary" onClick={this.props.onClose}>
         {closeText}
       </Button>,
       (saveButtonHidden?null:
-        <Button color="primary" hidden={saveButtonHidden} disabled={!this.state.saveEnabled} onClick={()=>{
+        <Button  key="action2" color="primary" hidden={saveButtonHidden} disabled={!this.state.saveEnabled} onClick={()=>{
           this.props.onSave(this.state.publishKey, this.state.pubData);
-          }}>
+        }}>
           {"save"}
         </Button>),
     ];
 
     return (
       <Dialog
-        open={open}
+        open={open||false}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}

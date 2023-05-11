@@ -143,10 +143,10 @@ class Sidebar extends React.Component{
 
               menu.items.map((item, index)=>{
                 if(item.spacer){
-                  return <Box py={3}/>
+                  return <Box key={"menu"+index} py={3}/>
                 }
                 if(item.divider){
-                  return <Divider />
+                  return <Divider key={"menu"+index} />
                 }
                 else if(item.childItems){
                   return this.renderNetstedItems(item, index)

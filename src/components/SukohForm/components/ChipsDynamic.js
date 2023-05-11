@@ -70,7 +70,6 @@ class ChipsDynamic extends BaseDynamic {
         <Chips
           items={context.value}
           sortable={true}
-          underlineShow={true}
           fullWidth={true}
           field={field}
           onRequestDelete={this.handleRequestDelete.bind(this)}

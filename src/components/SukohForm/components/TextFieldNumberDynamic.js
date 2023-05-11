@@ -49,7 +49,6 @@ class TextFieldNumberDynamic extends BaseDynamic {
           }}
           value={getNumberValue()}
           type="number"
-          underlineShow={true}
           fullWidth={true}
           label={field.title} />
         }

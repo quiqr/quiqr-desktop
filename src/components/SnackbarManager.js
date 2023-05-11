@@ -42,7 +42,7 @@ class SnackbarManager extends React.Component{
     }
     else{
       snackbar = <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        //anchorOrigin={{ vertical: "top", horizontal: "center" }}
         key="snack-message"
         open={ false }
         action={ previousSnackMessage?previousSnackMessage.action:'' }

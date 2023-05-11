@@ -72,27 +72,25 @@ class Chips extends React.Component{
   }
 
   renderChip(index, label, opacity){
-    return <Chip
+    return (<Chip
       key={'chip-'+index}
       style={{opacity:opacity, margin:'2px'}}
       onDelete={ this.getOnRequestDelete(index) }
       onMouseDown={this.getOnItemMouseDown(index)}
       onMouseEnter={this.getOnItemMouseEnter(index)}
       label={label}
-    >
-      {label}
-    </Chip>;
+    />
+    );
   }
 
   renderDecoyChip(index,label, opacity){
-    return <Chip
+    return (<Chip
       key={'decoy-chip-'+index}
       style={{opacity:opacity, margin:'2px'}}
       onDelete={function(){}}
       label={label}
-    >
-      {label}
-    </Chip>;
+    />
+    );
   }
 
   render(){
@@ -102,10 +100,8 @@ class Chips extends React.Component{
     return (
       <Fragment>
         <TextField
-          multiLine={false}
           value={this.state.value}
           onChange = {this.onChangeHandler.bind(this)}
-          underlineShow={this.props.underlineShow}
           fullWidth={this.props.fullWidth}
           label={this.props.field.title}
           onKeyPress={ this.onKeyPressHandler.bind(this) }

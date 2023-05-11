@@ -83,7 +83,6 @@ class CopyItemKeyDialog extends React.Component{
           errorText={valid? undefined : errorText}
           disabled={busy}
           onChange={this.handleChange.bind(this)}
-          underlineShow={true}
           fullWidth={true}
         />
 

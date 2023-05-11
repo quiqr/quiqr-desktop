@@ -81,7 +81,6 @@ class DateDynamic extends BaseDynamic {
       floatingLabelFixed={true}
       autoOk={true}
       fullWidth={true}
-      underlineShow={true}
       floatingLabelText={field.title} />
       }
       iconButtons={iconButtons}
