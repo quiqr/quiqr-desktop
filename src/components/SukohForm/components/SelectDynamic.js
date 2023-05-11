@@ -33,7 +33,6 @@ class SelectDynamic extends BaseDynamic {
   handleChange(e){
     let {context} = this.props;
     let field = context.node.field;
-    let val;
 
     if(e.target.options && field.multiple===true){
       const { options } = e.target;
@@ -43,11 +42,11 @@ class SelectDynamic extends BaseDynamic {
           value.push(options[i].value);
         }
       }
-      context.setValue(val)
+      context.setValue(e.target.value)
     }
     else{
-      if(val !== context.value){
-        context.setValue(val)
+      if(e.target.value !== context.value){
+        context.setValue(e.target.value)
       }
     }
 
