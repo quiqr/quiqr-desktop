@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- feature: sync screen new layout, ready for advanged sync
 - feature: improve git debugging
 - feature: add troubleshooting menu item
 - feature: move all config to site folder

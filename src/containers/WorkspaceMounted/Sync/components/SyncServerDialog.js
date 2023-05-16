@@ -15,6 +15,7 @@ import GitHubPagesForm     from './github-pages/GitHubPagesForm'
 import FolderExportForm    from './folder-export/FolderExportForm'
 import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
 import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
+import service                 from './../../../../services/service';
 
 const useStyles = theme => ({
 
@@ -50,6 +51,27 @@ class SyncServerDialog extends React.Component{
       dialogSize: "sm",
     }
   }
+
+  savePublishData(inkey,data){
+    let site= this.props.site;
+
+    if(!inkey){
+      inkey = `publ-${Math.random()}`;
+    }
+
+    const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
+    if(publConfIndex !== -1){
+      site.publish[publConfIndex] = {key:inkey, config: data};
+    }
+    else{
+      site.publish.push({key:inkey, config: data});
+    }
+
+    service.api.saveSiteConf(site.key, site).then(()=>{
+      this.props.onSave(inkey);
+    });
+  }
+
 
   componentDidUpdate(preProps){
     if(this.props.publishConf && preProps.publishConf !== this.props.publishConf) {
@@ -153,7 +175,8 @@ class SyncServerDialog extends React.Component{
       </Button>,
       (saveButtonHidden?null:
         <Button  key="action2" color="primary" hidden={saveButtonHidden} disabled={!this.state.saveEnabled} onClick={()=>{
-          this.props.onSave(this.state.publishKey, this.state.pubData);
+          this.savePublishData(this.state.publishKey, this.state.pubData);
+          //this.props.onSave(this.state.publishKey, this.state.pubData);
         }}>
           {"save"}
         </Button>),

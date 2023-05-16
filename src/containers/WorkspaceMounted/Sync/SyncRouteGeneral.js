@@ -1,30 +1,23 @@
 import React                   from 'react';
 import { Route }               from 'react-router-dom';
 import service                 from './../../../services/service';
-import Typography              from '@material-ui/core/Typography';
 import { withStyles }          from '@material-ui/core/styles';
 import MainPublishCard         from './components/MainPublishCard';
 import SyncServerDialog        from './components/SyncServerDialog';
 import SyncBusyDialog          from './components/SyncBusyDialog';
-import FormLogoQuiqrCloud      from '../../../svg-assets/FormLogoQuiqrCloud';
-import FormLogoGitHubPages     from '../../../svg-assets/FormLogoGitHubPages';
 import IconButton              from '@material-ui/core/IconButton';
 import MoreVertIcon            from '@material-ui/icons/MoreVert';
 import Menu                    from '@material-ui/core/Menu';
 import MenuItem                from '@material-ui/core/MenuItem';
 import Button                  from '@material-ui/core/Button';
-import Dialog                  from '@material-ui/core/Dialog';
-import DialogActions           from '@material-ui/core/DialogActions';
-import DialogTitle             from '@material-ui/core/DialogTitle';
-import DialogContent           from '@material-ui/core/DialogContent';
 import { snackMessageService } from './../../../services/ui-service';
 import SnackbarManager         from './../../../components/SnackbarManager';
 import FolderIcon              from '@material-ui/icons/Folder';
+import GitHubIcon              from '@material-ui/icons/GitHub';
 
 const useStyles = theme => ({
 
   container:{
-    padding: '20px',
     height: '100%'
   },
 
@@ -93,6 +86,18 @@ class SyncRouteGeneral extends React.Component {
         modAction: "Add",
         serverTitle: "Sync Target",
         closeText: "Cancel"
+      }
+    })
+  }
+
+  onConfigure(publishConf){
+    this.setState({
+      menuOpen:null,
+      serverDialog: {
+        open:true,
+        modAction: "Edit",
+        closeText: "Cancel",
+        publishConf: publishConf
       }
     })
   }
@@ -188,22 +193,9 @@ class SyncRouteGeneral extends React.Component {
     });
   }
 
-  deletePublishConfiguration(inkey){
-    let site= this.state.site;
-
-    const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
-    if(publConfIndex > -1){
-      site.publish.splice(publConfIndex, 1);
-
-      service.api.saveSiteConf(this.state.site.key, this.state.site).then(()=>{
-        this.history.push(`${this.basePath}/`)
-      });
-    }
-  }
-
   renderMainCard(publishConf){
 
-    let serviceLogo, title, liveUrl;
+    let serviceLogo, title, liveUrl, syncToText, syncFromText;
     let repoAdminUrl = '';
     let enableSyncFrom = false;
     let enableSyncTo = true;
@@ -215,16 +207,16 @@ class SyncRouteGeneral extends React.Component {
       enableSyncTo = false;
     }
 
-    if(publishConf.config.type === 'quiqr'){
-      serviceLogo = <FormLogoQuiqrCloud />
-      title = publishConf.config.path;
-      liveUrl="https://"+publishConf.config.defaultDomain;
-    }
-    else if(publishConf.config.type === 'github'){
-      serviceLogo = <FormLogoGitHubPages />
-      title = publishConf.config.username +"/" + publishConf.config.repository;
+    if(publishConf.config.type === 'github'){
 
+      serviceLogo = <GitHubIcon fontSize="large"  style={{margin:'6px'}}/>
+      title = publishConf.config.username +"/" + publishConf.config.repository;
       repoAdminUrl= `https://github.com/${publishConf.config.username}/${publishConf.config.repository}`
+
+      syncToText = 'Push to remote';
+      syncFromText = 'Push from remote';
+
+
       if(publishConf.config.CNAME){
         liveUrl= `https://${publishConf.config.CNAME}`
       }
@@ -236,16 +228,11 @@ class SyncRouteGeneral extends React.Component {
       }
     }
     else if(publishConf.config.type === 'folder'){
-      serviceLogo = <FolderIcon />
+      serviceLogo = <FolderIcon fontSize="medium" style={{marginRight:'6px'}}/>
       title = publishConf.config.path;
-      liveUrl= ''
+      liveUrl= '';
+      syncToText = 'Publish to folder';
     }
-
-    if(publishConf.config.title && publishConf.config.title !== ''){
-      title = publishConf.config.title;
-    }
-
-    title = (title.length >  20 ? `${title.substring(0, 20)}...` : title);
 
     return <MainPublishCard
       title={title}
@@ -254,6 +241,13 @@ class SyncRouteGeneral extends React.Component {
       serviceLogo={serviceLogo}
       enableSyncFrom={enableSyncFrom}
       enableSyncTo={enableSyncTo}
+      syncToText={syncToText}
+      syncFromText={syncFromText}
+
+      onConfigure={()=>{
+        this.onConfigure(publishConf);
+      }}
+
       onMerge={()=>{
         this.mergeAction(publishConf);
       }}
@@ -325,7 +319,6 @@ class SyncRouteGeneral extends React.Component {
     let content = null;
 
     if(site.publish.length < 1){
-      //no target setup yet
       content = (
 
         <div><p>No sync server is configured. Add one first.</p>
@@ -366,7 +359,6 @@ class SyncRouteGeneral extends React.Component {
             <SnackbarManager />
 
             <div className={ this.props.classes.container }>
-              <Typography variant="h5">Sync Website - {this.state.site.name}</Typography>
 
               {content}
 
@@ -381,11 +373,15 @@ class SyncRouteGeneral extends React.Component {
               }}
             />
 
-
             <SyncServerDialog
               {...serverDialog}
-              onSave={(publishKey, publishConfig)=>{
-                this.savePublishData(publishKey, publishConfig);
+              site={this.state.site}
+              onSave={(publishKey)=>{
+
+                //this.savePublishData(publishKey, publishConfig);
+
+                this.history.push(`${this.basePath}/list/${publishKey}`)
+
                 this.setState({serverDialog: {
                   open:false
                 }})
@@ -399,27 +395,6 @@ class SyncRouteGeneral extends React.Component {
 
             />
 
-            <Dialog
-              open={this.state.deleteDialogOpen||false}
-              onClose={()=>{this.setState({deleteDialogOpen:false})}}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-            >
-              <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete this configuration?"}</DialogTitle>
-              <DialogContent>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={()=>{this.setState({deleteDialogOpen:false})}} color="primary">
-                  Cancel
-                </Button>
-                <Button onClick={()=>{
-                  this.setState({deleteDialogOpen:false})
-                  this.deletePublishConfiguration(this.state.keyForDeletion);
-                }} color="primary">
-                  Delete
-                </Button>
-              </DialogActions>
-            </Dialog>
 
           </React.Fragment>
         )

@@ -88,7 +88,6 @@ class CollectionListItems extends React.PureComponent {
 
   }
   handleClick(event, item)  {
-    console.log(item)
     this.setState({
       anchorEl:event.currentTarget,
       currentItem: item
@@ -98,7 +97,6 @@ class CollectionListItems extends React.PureComponent {
   handleClose() {
     this.setState({anchorEl:null});
   }
-
 
   render(){
     let { collectionExtension, filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
@@ -127,7 +125,6 @@ class CollectionListItems extends React.PureComponent {
           open={Boolean(this.state.anchorEl)}
           onClose={()=>this.handleClose()}
         >
-
           <MenuItem onClick={()=> {
             this.handleClose();
             onRenameItemClick(this.state.currentItem);

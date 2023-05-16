@@ -1,11 +1,13 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
+import Divider from '@material-ui/core/Divider';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Link from '@material-ui/core/Link';
 import { withStyles } from '@material-ui/core/styles';
-
+import SettingsIcon from '@material-ui/icons/Settings';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 
 const useStyles = theme => ({
   root: {
@@ -35,50 +37,79 @@ class MainPublishCard extends React.Component {
   }
 
   render(){
-    const { classes } = this.props;
 
     return (
-      <Card className={classes.root}
-      elevation={5}
-      >
-        <CardHeader
-          avatar={ null }
-          action={
-            this.props.itemMenu
-          }
-          title={<div >{this.props.title}<br/><Button color="primary" onClick={()=>{
-            window.require('electron').shell.openExternal(this.props.liveURL);
-          }}>{this.props.liveURL}</Button>{
-            (this.props.repoAdminUrl!=='' ?
-              <React.Fragment><br/><Button color="primary" onClick={()=>{
+      <React.Fragment>
+        <Box component="div" style={{
+          display:'flex',
+          alignItems: 'flex-start'
+          }} m={2}>
+
+          <Box component="span">
+            {this.props.serviceLogo}
+          </Box>
+          <Box component="span" style={{flexGrow:1}}>
+            <Typography>{this.props.title}</Typography>
+            <Link component="button" variant="body2"
+              onClick={()=>{
                 window.require('electron').shell.openExternal(this.props.repoAdminUrl);
-              }}>{this.props.repoAdminUrl}</Button></React.Fragment>
-              : null)
+              }}
+            >
+              {this.props.repoAdminUrl}
+            </Link>
 
-          }</div>}
-          subheader=""
-        />
+          </Box>
+          <Box component="span" xstyle={{padding:'6px'}}>
+            <Button
+              onClick={()=>{this.props.onConfigure()}}
+              size="small"
+              variant="contained"
+              color="default"
+              startIcon={<SettingsIcon />}
+            >
+              Configure
+            </Button>
+          </Box>
 
-        <div className={classes.logo}>
-          {this.props.serviceLogo}
-        </div>
-        <CardContent>
-        </CardContent>
-        <CardActions>
-          { this.props.enableSyncTo === true ?
-          <Button variant="contained" color="primary" onClick={()=>{this.props.onPublish()}}>
-            Push
-          </Button>
-          : null
+        </Box>
+
+        <Box component="div" style={{
+          display:'flex',
+          alignItems: 'flex-start'
+          }} m={2}>
+
+          { this.props.enableSyncTo ?
+            <Button
+              onClick={()=>{this.props.onPublish()}}
+              style={{marginRight:'5px'}}
+              size="small"
+              variant="contained"
+              color="primary"
+              startIcon={<ArrowUpwardIcon />}
+            >
+              {this.props.syncToText}
+            </Button>
+            :null
           }
-          { this.props.enableSyncFrom === true ?
-          <Button variant="contained" color="secondary" onClick={()=>{this.props.onMerge()}}>
-            Pull
-          </Button>
-          : null
+
+          { this.props.enableSyncFrom ?
+            <Button
+              onClick={()=>{this.props.onMerge()}}
+              size="small"
+              variant="contained"
+              color="primary"
+              startIcon={<ArrowDownwardIcon />}
+            >
+              {this.props.syncFromText}
+            </Button>
+            :null
           }
-        </CardActions>
-      </Card>
+
+        </Box>
+
+        <Divider/>
+
+      </React.Fragment>
     );
   }
 }
