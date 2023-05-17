@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.17.0 (2023-05-17)
 - feature: sync screen new layout, ready for advanged sync
 - feature: improve git debugging
