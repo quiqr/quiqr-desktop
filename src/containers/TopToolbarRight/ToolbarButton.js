@@ -6,14 +6,23 @@ import { withStyles } from '@material-ui/core/styles';
 
 const useStyles = theme => ({
   button: {
+    '& .MuiButton-label': {
+      flexDirection: 'column',
+    },
+
+    textTransform: 'none',
     margin: theme.spacing(0),
     padding: theme.spacing(0),
     color: '#212121',
   },
   buttonActive: {
+    '& .MuiButton-label': {
+      flexDirection: 'column',
+    },
     margin: theme.spacing(0),
     padding: theme.spacing(0),
     color: '#757575',
+    textTransform: 'none',
   },
 
   icon: {
@@ -30,12 +39,17 @@ class ToolbarButton extends React.Component {
     const { classes, title, action, icon, active } = this.props;
     let UseIcon = icon;
 
+
     return (
-      <Box onClick={action} display="flex" justifyContent="center" flexDirection="column" border={0} my={0} m={0.5} px={1}>
-        <IconButton size="small" aria-label="directions">
-          <UseIcon className={(active ? classes.iconActive : classes.icon)} />
-        </IconButton>
-        <Button size="small" className={(active ? classes.buttonActive : classes.button)} >{title}</Button>
+      <Box p={0.5}>
+        <Button
+          onClick={action}
+          color="default"
+          className={(active ? classes.buttonActive : classes.button)}
+          startIcon={<UseIcon />}
+        >
+          {title}
+        </Button>
       </Box>
     )
   }
