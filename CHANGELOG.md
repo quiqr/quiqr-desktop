@@ -23,6 +23,11 @@
 - fix: no "make page bundle" for non-markdown-collections
 - fix: make dynform more stable
 
+### Stats
+- 37 stars
+- 5 community templates
+- 60 modules - 47.03M
+
 ## 0.16.0 (2023-04-24)
 - feature: add back button in prefs toolbar
 - feature: new field-type: select-from-query
