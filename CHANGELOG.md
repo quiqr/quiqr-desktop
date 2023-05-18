@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- cleanup: improved toolbar buttons
 
 ## 0.17.0 (2023-05-17)
 - feature: sync screen new layout, ready for advanged sync
