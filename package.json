@@ -161,7 +161,6 @@
       "icon": "public/icon",
       "target": [
         "AppImage",
-        "snap",
         "deb",
         "rpm"
       ],

@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: disable snap builds
+
 ## 0.17.1 (2023-05-25)
 - cleanup: improved toolbar buttons 😎
 - fix missing npm caused by cleanup
