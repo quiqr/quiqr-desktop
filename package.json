@@ -18,6 +18,7 @@
     "@material-ui/icons": "^4",
     "@material-ui/lab": "^4.0.0-alpha.61",
     "7zip-bin": "3.1.0",
+    "material-ui-color": "^1.2.0",
     "adm-zip": "0.4.13",
     "await-spawn": "4.0.1",
     "chokidar": "^3.5.3",
