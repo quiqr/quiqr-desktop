@@ -1,24 +1,30 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-- cleanup: improved toolbar buttons
+- cleanup: improved toolbar buttons 😎
+- fix missing npm caused by cleanup
+
+### Stats
+- 37 stars
+- 5 community templates
+- 35 modules 39.39M 🤘
 
 ## 0.17.0 (2023-05-17)
-- feature: sync screen new layout, ready for advanged sync
+- feature: sync screen new layout, ready for advanged sync 💐
 - feature: improve git debugging
 - feature: add troubleshooting menu item
-- feature: move all config to site folder
+- feature: move all config to site folder 🐞
 - feature: new default data folder `Quiqr`
 - feature: app-ui-style is now a preference
 - feature: queryselect with keys in file (e.g. .weekdays[] in calendar.json)
 - feature: queryselect using Autosuggest
-- feature: add images directly from imageselect dialog
-- feature: more fuzzy filter in collection listing
+- feature: add images directly from imageselect dialog 💐
+- feature: more fuzzy filter in collection listing 💐
 - cleanup: refactored cli execute
 - cleanup: remove death quiqr-cloud code
 - cleanup: remove rimraf
 - cleanup: remove death modules
 - cleanup: remove field ArrayList
-- cleanup: replaced all mui-02 components with mui-4
+- cleanup: replaced all mui-02 components with mui-4 🥳
 - cleanup: improve selectquery layout
 - fix: select-image broke with non-image files
 - fix: #314 & #181 breadcrumb in collections  cannot go back to root document
