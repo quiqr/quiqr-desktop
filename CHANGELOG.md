@@ -6,7 +6,7 @@
 ### Stats
 - 37 stars
 - 5 community templates
-- 35 modules 39.39M 🤘
+- 36 modules 39.86M 🤘
 
 ## 0.17.0 (2023-05-17)
 - feature: sync screen new layout, ready for advanged sync 💐
