@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: typo in sync
+
 ## 0.17.2 (2023-05-25)
 - fix: disable snap builds
 

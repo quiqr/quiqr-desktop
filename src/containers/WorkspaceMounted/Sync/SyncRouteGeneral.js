@@ -214,7 +214,7 @@ class SyncRouteGeneral extends React.Component {
       repoAdminUrl= `https://github.com/${publishConf.config.username}/${publishConf.config.repository}`
 
       syncToText = 'Push to remote';
-      syncFromText = 'Push from remote';
+      syncFromText = 'Pull from remote';
 
 
       if(publishConf.config.CNAME){
