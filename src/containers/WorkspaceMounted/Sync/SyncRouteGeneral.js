@@ -1,19 +1,20 @@
-import React                   from 'react';
-import { Route }               from 'react-router-dom';
-import service                 from './../../../services/service';
-import { withStyles }          from '@material-ui/core/styles';
-import MainPublishCard         from './components/MainPublishCard';
-import SyncServerDialog        from './components/SyncServerDialog';
-import SyncBusyDialog          from './components/SyncBusyDialog';
-import IconButton              from '@material-ui/core/IconButton';
-import MoreVertIcon            from '@material-ui/icons/MoreVert';
-import Menu                    from '@material-ui/core/Menu';
-import MenuItem                from '@material-ui/core/MenuItem';
-import Button                  from '@material-ui/core/Button';
-import { snackMessageService } from './../../../services/ui-service';
-import SnackbarManager         from './../../../components/SnackbarManager';
-import FolderIcon              from '@material-ui/icons/Folder';
-import GitHubIcon              from '@material-ui/icons/GitHub';
+import React                      from 'react';
+import { Route }                  from 'react-router-dom';
+import service                    from './../../../services/service';
+import { withStyles }             from '@material-ui/core/styles';
+import MainPublishPage            from './components/MainPublishPage';
+import SyncConfigDialog           from './components/SyncConfigDialog';
+import SyncBusyDialog             from './components/SyncBusyDialog';
+import IconButton                 from '@material-ui/core/IconButton';
+import MoreVertIcon               from '@material-ui/icons/MoreVert';
+import Menu                       from '@material-ui/core/Menu';
+import MenuItem                   from '@material-ui/core/MenuItem';
+import Button                     from '@material-ui/core/Button';
+import { snackMessageService }    from './../../../services/ui-service';
+import SnackbarManager            from './../../../components/SnackbarManager';
+import {Meta as GitHubMeta}       from './syncTypes/github'
+import {History as GitHubHistory} from './syncTypes/github'
+import {Meta as FolderMeta}       from './syncTypes/folder'
 
 const useStyles = theme => ({
 
@@ -195,10 +196,22 @@ class SyncRouteGeneral extends React.Component {
 
   renderMainCard(publishConf){
 
-    let serviceLogo, title, liveUrl, syncToText, syncFromText;
-    let repoAdminUrl = '';
+    let publishCardObj = {
+      serviceLogo: '',
+      title: '',
+      liveUrl: '',
+      syncToText: '',
+      syncFromText: '',
+      repoAdminUrl: '',
+      enableSyncFrom: false,
+      enableSyncTo: true
+    };
+
+    //let serviceLogo, title, liveUrl, syncToText, syncFromText;
+    //let repoAdminUrl = '';
     let enableSyncFrom = false;
     let enableSyncTo = true;
+    let history;
 
     if(publishConf.config.publishScope === 'source' ||publishConf.config.publishScope === 'build_and_source' ){
       enableSyncFrom = true;
@@ -208,41 +221,30 @@ class SyncRouteGeneral extends React.Component {
     }
 
     if(publishConf.config.type === 'github'){
-
-      serviceLogo = <GitHubIcon fontSize="large"  style={{margin:'6px'}}/>
-      title = publishConf.config.username +"/" + publishConf.config.repository;
-      repoAdminUrl= `https://github.com/${publishConf.config.username}/${publishConf.config.repository}`
-
-      syncToText = 'Push to remote';
-      syncFromText = 'Pull from remote';
-
-
-      if(publishConf.config.CNAME){
-        liveUrl= `https://${publishConf.config.CNAME}`
-      }
-      else if(publishConf.config.setGitHubActions){
-        liveUrl= `https://${publishConf.config.username}.github.io/${publishConf.config.repository}`
-      }
-      else{
-        liveUrl= ''
-      }
+      publishCardObj = GitHubMeta.publishCardObj(publishConf.config)
+      history = (
+        <GitHubHistory
+          publishConfig={publishCardObj}
+        />
+      )
     }
     else if(publishConf.config.type === 'folder'){
-      serviceLogo = <FolderIcon fontSize="medium" style={{marginRight:'6px'}}/>
-      title = publishConf.config.path;
-      liveUrl= '';
-      syncToText = 'Publish to folder';
+      publishCardObj = FolderMeta.publishCardObj(publishConf.config)
     }
 
-    return <MainPublishCard
-      title={title}
-      liveURL={liveUrl}
-      repoAdminUrl={repoAdminUrl}
-      serviceLogo={serviceLogo}
+    return <MainPublishPage
+
+      title={publishCardObj.title}
+      liveURL={publishCardObj.liveUrl}
+      repoAdminUrl={publishCardObj.repoAdminUrl}
+      serviceLogo={publishCardObj.serviceLogo}
+      syncToText={publishCardObj.syncToText}
+      syncFromText={publishCardObj.syncFromText}
+
       enableSyncFrom={enableSyncFrom}
       enableSyncTo={enableSyncTo}
-      syncToText={syncToText}
-      syncFromText={syncFromText}
+
+      history={history}
 
       onConfigure={()=>{
         this.onConfigure(publishConf);
@@ -373,12 +375,10 @@ class SyncRouteGeneral extends React.Component {
               }}
             />
 
-            <SyncServerDialog
+            <SyncConfigDialog
               {...serverDialog}
               site={this.state.site}
               onSave={(publishKey)=>{
-
-                //this.savePublishData(publishKey, publishConfig);
 
                 this.history.push(`${this.basePath}/list/${publishKey}`)
 
@@ -394,7 +394,6 @@ class SyncRouteGeneral extends React.Component {
               }}
 
             />
-
 
           </React.Fragment>
         )

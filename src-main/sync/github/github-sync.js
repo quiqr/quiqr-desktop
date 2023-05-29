@@ -175,7 +175,7 @@ class GithubSync {
     await cliExecuteHelper.try_execute("git-commit", gitBin, [
       "commit", '-a' , '-n', this._config.username,
       '-e', this._config.email,
-      '-m', "'publication from " + UQIS +"'", fullDestinationPath]);
+      '-m', "'publication by " + UQIS +"'", fullDestinationPath]);
 
     await cliExecuteHelper.try_execute("git-push", gitBin, [ "push", "-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
 

@@ -61,7 +61,7 @@ const useStyles = theme => ({
   },
 });
 
-class GitHubPagesForm extends React.Component{
+class FormConfig extends React.Component{
 
   constructor(props){
     super(props);
@@ -476,5 +476,5 @@ class GitHubPagesForm extends React.Component{
   }
 }
 
-export default withStyles(useStyles)(GitHubPagesForm);
+export default withStyles(useStyles)(FormConfig);
 

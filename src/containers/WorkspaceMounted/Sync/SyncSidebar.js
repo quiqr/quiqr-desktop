@@ -3,18 +3,19 @@ import { Route }        from 'react-router-dom';
 import Sidebar          from './../../Sidebar';
 import service          from './../../../services/service';
 import AddIcon          from '@material-ui/icons/Add';
-import FolderIcon       from '@material-ui/icons/Folder';
-import GitHubIcon       from '@material-ui/icons/GitHub';
 import IconButton       from '@material-ui/core/IconButton';
 import MoreVertIcon     from '@material-ui/icons/MoreVert';
 import Menu             from '@material-ui/core/Menu';
 import MenuItem         from '@material-ui/core/MenuItem';
-import SyncServerDialog from './components/SyncServerDialog';
+import SyncConfigDialog from './components/SyncConfigDialog';
 import Button           from '@material-ui/core/Button';
 import Dialog           from '@material-ui/core/Dialog';
 import DialogActions    from '@material-ui/core/DialogActions';
 import DialogTitle      from '@material-ui/core/DialogTitle';
 import DialogContent    from '@material-ui/core/DialogContent';
+
+import {Meta as GitHubMeta}   from './syncTypes/github'
+import {Meta as FolderMeta}   from './syncTypes/folder'
 
 export class SyncSidebar extends React.Component {
 
@@ -152,24 +153,18 @@ export class SyncSidebar extends React.Component {
 
     let targets = [];
     let index = 0;
-    site.publish.forEach((publ)=>{
 
+    site.publish.forEach((publ)=>{
 
       let label, icon
 
       if(publ.config && publ.config.type === "github" ){
-        if(publ.config.title && publ.config.title !== ''){
-          label = publ.config.title;
-        }
-        else{
-          label = publ.config.username+"/"+publ.config.repository;
-        }
-
-        icon = <GitHubIcon/>
+        label = GitHubMeta.sidebarLabel(publ.config);
+        icon = GitHubMeta.icon();
       }
       else if(publ.config && publ.config.type === "folder" ){
-        label = publ.config.path;
-        icon = <FolderIcon/>
+        label = FolderMeta.sidebarLabel(publ.config);
+        icon = FolderMeta.icon();
       }
 
       label = (label.length >  17 ? `${label.substring(0, 17)}..` : label);
@@ -217,7 +212,7 @@ export class SyncSidebar extends React.Component {
     return (
 
       <React.Fragment>
-        <SyncServerDialog
+        <SyncConfigDialog
           {...this.state.serverDialog}
           site={this.props.site}
           onSave={(publishKey)=>{

@@ -47,7 +47,7 @@ const useStyles = theme => ({
   },
 });
 
-class FolderExportForm extends React.Component{
+class FormConfig extends React.Component{
 
   constructor(props){
     super(props);
@@ -82,7 +82,6 @@ class FolderExportForm extends React.Component{
       }
       typeof callback === 'function' && callback();
     });
-
   }
 
   render(){
@@ -177,5 +176,4 @@ class FolderExportForm extends React.Component{
   }
 }
 
-export default withStyles(useStyles)(FolderExportForm);
-
+export default withStyles(useStyles)(FormConfig);

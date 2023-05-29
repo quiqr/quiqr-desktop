@@ -1,21 +1,23 @@
-import * as React          from 'react';
-import { withStyles }      from '@material-ui/core/styles';
-import Button              from '@material-ui/core/Button';
-import MuiDialogTitle      from '@material-ui/core/DialogTitle';
-import Grid                from '@material-ui/core/Grid';
-import Paper               from '@material-ui/core/Paper';
-import Box                 from '@material-ui/core/Box';
-import Typography          from '@material-ui/core/Typography';
-import Dialog              from '@material-ui/core/Dialog';
-import DialogActions       from '@material-ui/core/DialogActions';
-import DialogContent       from '@material-ui/core/DialogContent';
-import DialogContentText   from '@material-ui/core/DialogContentText';
-import FolderIcon          from '@material-ui/icons/Folder';
-import GitHubPagesForm     from './github-pages/GitHubPagesForm'
-import FolderExportForm    from './folder-export/FolderExportForm'
-import CardLogoGitHubPages from '../../../../svg-assets/CardLogoGitHubPages'
-import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
-import service                 from './../../../../services/service';
+import * as React                       from 'react';
+import { withStyles }                   from '@material-ui/core/styles';
+import Button                           from '@material-ui/core/Button';
+import MuiDialogTitle                   from '@material-ui/core/DialogTitle';
+import Grid                             from '@material-ui/core/Grid';
+import Box                              from '@material-ui/core/Box';
+import Typography                       from '@material-ui/core/Typography';
+import Dialog                           from '@material-ui/core/Dialog';
+import DialogActions                    from '@material-ui/core/DialogActions';
+import DialogContent                    from '@material-ui/core/DialogContent';
+import DialogContentText                from '@material-ui/core/DialogContentText';
+import service                          from './../../../../services/service';
+//GitHub Target
+import {FormConfig as GitHubPagesForm}  from '../syncTypes/github'
+import {Meta as GitHubMeta}             from '../syncTypes/github'
+import {CardNew as CardNewGitHub}       from '../syncTypes/github'
+//Folder Target
+import {Meta as FolderMeta}             from '../syncTypes/folder'
+import {FormConfig as FolderExportForm} from '../syncTypes/folder'
+import {CardNew as CardNewFolder}       from '../syncTypes/folder'
 
 const useStyles = theme => ({
 
@@ -23,6 +25,7 @@ const useStyles = theme => ({
     margin: 0,
     padding: theme.spacing(2),
   },
+
   serverFormLogo: {
     position: 'absolute',
     right: theme.spacing(3),
@@ -39,7 +42,7 @@ const useStyles = theme => ({
   }
 });
 
-class SyncServerDialog extends React.Component{
+class SyncConfigDialog extends React.Component{
 
   constructor(props){
     super(props);
@@ -90,37 +93,26 @@ class SyncServerDialog extends React.Component{
       <React.Fragment>
         <Grid container  spacing={2}>
           <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
-                this.setState({
-                  serverType: 'github',
+
+            <CardNewGitHub
+              classes={classes}
+              handleClick={()=>{
+                this.setState({serverType: 'github',
                   dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <CardLogoGitHubPages />
-            </Paper>
+                });
+              }} />
+
           </Grid>
 
           <Grid item xs={6}>
-            <Paper
-              onClick={()=>{
+            <CardNewFolder
+              classes={classes}
+              handleClick={()=>{
                 this.setState({serverType: 'folder',
                   dialogSize: "md",
-                })
-              }}
-              className={classes.paper}
-              elevation={5}
-            >
-              <Box display="flex" alignItems="center"  justifyContent="center" height={63}>
-                <FolderIcon fontSize="large" />
-              </Box>
-              <Box display="flex" alignItems="center"  justifyContent="center" >
-                <Typography variant="h5">TO FOLDER</Typography>
-              </Box>
-            </Paper>
+                });
+              }} />
+
           </Grid>
 
         </Grid>
@@ -129,15 +121,17 @@ class SyncServerDialog extends React.Component{
   }
 
   render(){
-    let { open, classes, modAction, serverTitle, closeText } = this.props;
+    let { open, classes, modAction, closeText } = this.props;
     let content, serverFormLogo = null;
     let saveButtonHidden = true;
+    let configDialogTitle = '';
 
     if(this.state.serverType){
       if (this.state.serverType === 'github'){
-        serverTitle = "GitHub Pages Server";
-        serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
-          content = <GitHubPagesForm
+
+        configDialogTitle = GitHubMeta.configDialogTitle;
+        serverFormLogo = GitHubMeta.icon();
+        content = <GitHubPagesForm
             publishConf={this.props.publishConf}
             modAction={this.props.modAction}
             setSaveEnabled={(enabled)=>{
@@ -146,13 +140,15 @@ class SyncServerDialog extends React.Component{
             setData={(pubData)=>{
               this.setState({pubData:pubData});
           }} />
+
         saveButtonHidden = false;
       }
 
       else if (this.state.serverType === 'folder'){
-        serverTitle = "Folder Export Target";
-        serverFormLogo = <FolderIcon />
-          content = <FolderExportForm
+
+        configDialogTitle = FolderMeta.configDialogTitle;
+        serverFormLogo = FolderMeta.icon();
+        content = <FolderExportForm
             publishConf={this.props.publishConf}
             modAction={this.props.modAction}
             setSaveEnabled={(enabled)=>{
@@ -161,6 +157,7 @@ class SyncServerDialog extends React.Component{
             setData={(pubData)=>{
               this.setState({pubData:pubData});
           }} />
+
         saveButtonHidden = false;
       }
 
@@ -191,8 +188,10 @@ class SyncServerDialog extends React.Component{
         maxWidth={this.state.dialogSize} >
 
         <MuiDialogTitle disableTypography className={classes.root}>
-          <Typography variant="h6">{modAction + " " + serverTitle}</Typography>
+          <Box className={classes.serverFormLogo}>
           {serverFormLogo}
+          </Box>
+          <Typography variant="h6">{modAction + " " + configDialogTitle}</Typography>
         </MuiDialogTitle>
 
         <DialogContent>
@@ -208,4 +207,4 @@ class SyncServerDialog extends React.Component{
   }
 }
 
-export default withStyles(useStyles)(SyncServerDialog);
+export default withStyles(useStyles)(SyncConfigDialog);

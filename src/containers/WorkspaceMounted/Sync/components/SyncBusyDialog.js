@@ -1,15 +1,16 @@
-import * as React          from 'react';
-import { withStyles }      from '@material-ui/core/styles';
-import Button              from '@material-ui/core/Button';
-import MuiDialogTitle      from '@material-ui/core/DialogTitle';
-import Typography          from '@material-ui/core/Typography';
-import Dialog              from '@material-ui/core/Dialog';
-import DialogActions       from '@material-ui/core/DialogActions';
-import DialogContent       from '@material-ui/core/DialogContent';
-import DialogContentText   from '@material-ui/core/DialogContentText';
-import LinearProgress      from '@material-ui/core/LinearProgress';
-import FormLogoGitHubPages from '../../../../svg-assets/FormLogoGitHubPages'
-import FormLogoQuiqrCloud  from '../../../../svg-assets/FormLogoQuiqrCloud'
+import * as React           from 'react';
+import { withStyles }       from '@material-ui/core/styles';
+import Button               from '@material-ui/core/Button';
+import Box                  from '@material-ui/core/Box';
+import MuiDialogTitle       from '@material-ui/core/DialogTitle';
+import Typography           from '@material-ui/core/Typography';
+import Dialog               from '@material-ui/core/Dialog';
+import DialogActions        from '@material-ui/core/DialogActions';
+import DialogContent        from '@material-ui/core/DialogContent';
+import DialogContentText    from '@material-ui/core/DialogContentText';
+import LinearProgress       from '@material-ui/core/LinearProgress';
+import {Meta as FolderMeta} from '../syncTypes/folder'
+import {Meta as GitHubMeta} from '../syncTypes/github'
 
 const useStyles = theme => ({
 
@@ -43,17 +44,13 @@ class SyncBusyDialog extends React.Component{
     let { open, classes } = this.props;
     let serverFormLogo, serverTitle = null;
 
-    if(this.props.serverType === 'quiqr'){
-      serverTitle = "Syncing with Quiqr Cloud Server";
-      serverFormLogo = <FormLogoQuiqrCloud className={classes.serverFormLogo} />
-    }
-    else if (this.props.serverType === 'github'){
-      serverTitle = "Syncing with GitHub Pages Server";
-      serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
+    if (this.props.serverType === 'github'){
+      serverTitle = GitHubMeta.syncingText;
+      serverFormLogo = GitHubMeta.icon()
     }
     else if (this.props.serverType === 'folder'){
-      serverTitle = "Syncing to folder";
-      serverFormLogo = <FormLogoGitHubPages className={classes.serverFormLogo} />
+      serverTitle = FolderMeta.syncingText;
+      serverFormLogo = FolderMeta.icon()
     }
 
     return (
@@ -65,8 +62,11 @@ class SyncBusyDialog extends React.Component{
         maxWidth="sm" >
 
         <MuiDialogTitle disableTypography className={classes.root}>
-          <Typography variant="h6">{serverTitle || ""}</Typography>
+          <Box className={classes.serverFormLogo}>
           {serverFormLogo}
+          </Box>
+
+          <Typography variant="h6">{serverTitle || ""}</Typography>
         </MuiDialogTitle>
 
         <DialogContent>
