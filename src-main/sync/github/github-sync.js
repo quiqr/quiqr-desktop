@@ -17,6 +17,7 @@ class GithubSync {
   constructor(config, siteKey){
     this._config = config;
     this.siteKey = siteKey;
+    this.from = pathHelper.getLastBuildDir();
   }
 
   _fullGitHubUrl(){
@@ -52,7 +53,7 @@ class GithubSync {
     }
   }
 
-  async actionDispatcher(context, action, parameters){
+  async actionDispatcher(action, parameters){
 
     //console.log(parameters);
 
@@ -77,15 +78,23 @@ class GithubSync {
         return historyLocalArr;
         break;
       }
+      case 'pullFromRemote': {
+        return this.pullFastForwardMerge()
+        break;
+      }
+      case 'pushToRemote': {
+        return this.publish()
+        break;
+      }
       default:{ throw new Error('Not implemented.') }
     }
   }
 
-  async pullFastForwardMerge(context){
+  async pullFastForwardMerge(){
 
     const tmpkeypathPrivate = await this._tempCreatePrivateKey();
     Embgit.setPrivateKeyPath(tmpkeypathPrivate)
-    const resolvedDest = path.join(pathHelper.getRoot(),'sites', context.siteKey, 'githubSyncRepo');
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
     const fullDestinationPath = path.join(resolvedDest , this._config.repository);
     const fullGitHubUrl = 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
     let syncSelection = "all";
@@ -134,7 +143,7 @@ class GithubSync {
             })
         });
       } catch (err) {
-        console.log("Pull Error:"+context.siteKey);
+        console.log("Pull Error:"+this.siteKey);
         if(err.stdout.toString().includes("already up-to-date")) {
           resolve("no_changes")
         }
@@ -150,10 +159,10 @@ class GithubSync {
 
   }
 
-  async publish(context){
+  async publish(){
 
     const tmpkeypathPrivate = await this._tempCreatePrivateKey();
-    const resolvedDest = await this._ensureSyncRepoDir(context.siteKey);
+    const resolvedDest = await this._ensureSyncRepoDir(this.siteKey);
     const fullGitHubUrl = 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
     const fullDestinationPath = path.join(resolvedDest , this._config.repository);
     let mainWindow = global.mainWM.getCurrentInstance();
@@ -164,7 +173,7 @@ class GithubSync {
     outputConsole.appendLine('  git url:             ' + fullGitHubUrl);
     outputConsole.appendLine('  private key path:    ' + tmpkeypathPrivate);
     outputConsole.appendLine('  destination path:    ' + fullDestinationPath);
-    outputConsole.appendLine('  context.from is:     ' + context.from);
+    outputConsole.appendLine('  from is:             ' + this.from);
     outputConsole.appendLine('');
     outputConsole.appendLine('  github username:     ' + this._config.username);
     outputConsole.appendLine('  github repository:   ' + this._config.repository);
@@ -181,10 +190,10 @@ class GithubSync {
 
     mainWindow.webContents.send("updateProgress", 'Prepare files before uploading..', 30);
     if(this._config.publishScope === "build"){
-      await this.publish_step2_preprare_dircontents_build(context, fullDestinationPath)
+      await this.publish_step2_preprare_dircontents_build(fullDestinationPath)
     }
     else{
-      await this.publish_step2_preprare_dircontents_source(context, fullDestinationPath)
+      await this.publish_step2_preprare_dircontents_source(fullDestinationPath)
     }
     mainWindow.webContents.send("updateProgress", 'Upload files to remote server..', 70);
     await this.publish_step3_add_commit_push(tmpkeypathPrivate, fullDestinationPath)
@@ -200,19 +209,19 @@ class GithubSync {
     return true;
   }
 
-  async publish_step2_preprare_dircontents_build(context, fullDestinationPath){
+  async publish_step2_preprare_dircontents_build(fullDestinationPath){
 
     await this._removeUnwanted(fullDestinationPath);
-    await this._syncSourceToDestination(path.join(context.from,'public'), fullDestinationPath, "all");
+    await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath, "all");
     await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
 
-  async publish_step2_preprare_dircontents_source(context, fullDestinationPath){
+  async publish_step2_preprare_dircontents_source(fullDestinationPath){
 
     await this._removeUnwanted(fullDestinationPath);
-    await this._syncSourceToDestination(context.from, fullDestinationPath, "all");
+    await this._syncSourceToDestination(this.from, fullDestinationPath, "all");
 
     if(this._config.publishScope === "source"){
       await fileDirUtils.recurForceRemove(fullDestinationPath+'/public');

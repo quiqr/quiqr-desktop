@@ -1,13 +1,13 @@
 import React from 'react';
-import Divider from '@material-ui/core/Divider';
+//import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
 import { withStyles } from '@material-ui/core/styles';
 import SettingsIcon from '@material-ui/icons/Settings';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+//import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+//import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 
 const useStyles = theme => ({
   root: {
@@ -74,40 +74,6 @@ class MainPublishPage extends React.Component {
 
         </Box>
 
-        <Box component="div" style={{
-          display:'flex',
-          alignItems: 'flex-start'
-          }} m={2}>
-
-          { this.props.enableSyncTo ?
-            <Button
-              onClick={()=>{this.props.onPublish()}}
-              style={{marginRight:'5px'}}
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<ArrowUpwardIcon />}
-            >
-              {this.props.syncToText}
-            </Button>
-            :null
-          }
-
-          { this.props.enableSyncFrom ?
-            <Button
-              onClick={()=>{this.props.onMerge()}}
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<ArrowDownwardIcon />}
-            >
-              {this.props.syncFromText}
-            </Button>
-            :null
-          }
-        </Box>
-
-        <Divider/>
 
         {this.props.history}
 

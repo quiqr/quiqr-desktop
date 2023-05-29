@@ -230,6 +230,7 @@ class SyncRouteGeneral extends React.Component {
       history = (
         <GitHubHistory
           siteKey={this.props.siteKey}
+          workspaceKey={this.props.workspaceKey}
           onSyncDialogControl={(open, text, icon)=>{
             this.syncDialogControl(open,text,icon);
           }}
