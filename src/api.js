@@ -260,6 +260,14 @@ export class API {
     return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 130000});
   }
 
+  publisherDispatchAction(siteKey: string, publishConf: any, action: string, actionParameters: any, timeout: any){
+
+    if(!Number.isInteger(timeout)){
+      timeout=130000;
+    }
+    return mainProcessBridge.request('publisherDispatchAction', {siteKey, publishConf, action, actionParameters}, {timeout: timeout});
+  }
+
   getCreatorMessage(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('getCreatorMessage', {siteKey, workspaceKey});
   }

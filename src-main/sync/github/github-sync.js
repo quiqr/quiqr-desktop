@@ -17,6 +17,62 @@ class GithubSync {
     this._config = config;
   }
 
+  async actionDispatcher(context, action, parameters){
+
+    console.log(context);
+    console.log(parameters);
+
+    switch(action){
+      case 'refreshRemote': {
+        console.log("yep refreshing");
+        let historyArr = [
+          {
+            author: "pim <post@pimsnel.com>",
+            date: "thu dec 15 18:31:02 2022 +0100",
+            client: "quiqr-desktop v14.5",
+            os: "linux",
+            ref: "072ae8b6fd2cc36b1554e9ef663e83f498f7b826",
+            local: false,
+            message: "publication by pim@ojs+linux+5.15.82+quiqr-desktop-app-0.14.5",
+          },
+          {
+            author: "laura <l.van.dijk@waardenburg.eco>",
+            date: "thu dec 15 18:31:02 2022 +0100",
+            client: "quiqr-desktop v14.5",
+            os: "macos",
+            ref: "887c1b20ff9c544b91491cc98b4597d3ffcc58ad",
+            remote: false,
+            local: true,
+            message: "publication by laura@laura-van-dijk-macbook-pro+darwin+21.6.0+quiqr-desktop-app-0.14.5",
+          },
+          {
+            author: "pim <post@pimsnel.com>",
+            date: "thu dec 15 18:31:02 2022 +0100",
+            client: "quiqr-desktop v14.5",
+            os: "linux",
+            ref: "072ae8b6fd2cc36b1554e9ef663e83f498f7b826",
+            local: true,
+            message: "publication by pim@ojs+linux+5.15.82+quiqr-desktop-app-0.14.5",
+          },
+          {
+            author: "laura <l.van.dijk@waardenburg.eco>",
+            date: "thu dec 15 18:31:02 2022 +0100",
+            client: "quiqr-desktop v14.5",
+            os: "macos",
+            ref: "887c1b20ff9c544b91491cc98b4597d3ffcc58ad",
+            remote: false,
+            local: true,
+            message: "publication by laura@laura-van-dijk-macbook-pro+darwin+21.6.0+quiqr-desktop-app-0.14.5",
+          },
+        ]
+
+        return historyArr;
+        break;
+      }
+      default:{ throw new Error('Not implemented.') }
+    }
+  }
+
   async pullFastForwardMerge(context){
 
     const tmpkeypathPrivate = await this._tempCreatePrivateKey();

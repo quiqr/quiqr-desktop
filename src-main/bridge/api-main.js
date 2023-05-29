@@ -882,4 +882,19 @@ api.publishSite = function({siteKey, publishConf}, context){
   });
 }
 
+api.publisherDispatchAction = function({siteKey, publishConf, action, actionParameters}, context){
+  getSiteService(siteKey, function(err, siteService){
+    if(err){ context.reject(err); return; }
+
+    global.pogoconf.setLastOpenedPublishTargetForSite(siteKey, publishConf.key);
+    global.pogoconf.saveState();
+
+    siteService.publisherDispatchAction(publishConf, action, actionParameters).then((result)=>{
+      context.resolve(result);
+    }, ()=>{
+      context.reject(err);
+    });
+  });
+}
+
 module.exports = api;

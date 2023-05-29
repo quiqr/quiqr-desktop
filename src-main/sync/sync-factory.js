@@ -1,7 +1,6 @@
 const outputConsole = require('../logger/output-console');
 const path = require('path')
 
-//Not a real factory, yet!
 class SyncFactory{
   getPublisher(publisherConfig) {
     let type = publisherConfig.type;

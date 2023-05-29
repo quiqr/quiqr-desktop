@@ -20,23 +20,74 @@ import CloudUploadIcon         from '@material-ui/icons/CloudUpload';
 import CloudDownloadIcon       from '@material-ui/icons/CloudDownload';
 import SaveAltIcon             from '@material-ui/icons/SaveAlt';
 import RefreshIcon             from '@material-ui/icons/Refresh';
+import Meta                    from './Meta'
+import {snackMessageService}   from '../../../../../services/ui-service';
+import service                 from '../../../../../services/service';
 
 const useStyles = theme => ({
 });
 
 class History extends React.Component{
 
+  moreAmount = 2;
+
+  constructor(props){
+    super(props);
+    this.state = {
+      historyArr: [],
+      resultsShowing: 0,
+    };
+  }
+
   refreshRemoteStatus(){
 
+    this.props.onSyncDialogControl(
+      true,
+      Meta.syncingText,
+      Meta.icon()
+    );
+
+    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'refreshRemote',{},10000).then((results)=>{
+      this.setState({
+        historyArr: results,
+        resultsShowing: this.moreAmount
+      });
+      this.props.onSyncDialogControl(
+        false,
+        Meta.syncingText,
+        Meta.icon()
+      );
+
+      snackMessageService.addSnackMessage('Sync: Refreshing remote status finished.', {severity: 'success'});
+    }).catch(()=>{
+
+      snackMessageService.addSnackMessage('Sync: Refreshing remote status failed.', {severity: 'warning'});
+
+      this.props.onSyncDialogControl(
+        false,
+        Meta.syncingText,
+        Meta.icon()
+      );
+
+    });
   }
+
+  showMore(){
+    this.setState({
+      resultsShowing: (this.state.resultsShowing + this.moreAmount)
+    });
+  }
+
+
 
   render(){
 
     let lastStatusCheck = "10 minutes ago";
     let unpushedChanges = true;
     let remoteDiffers = true;
+    let historyArr = this.state.historyArr.slice(0,this.state.resultsShowing);
 
-    let historyArr = [
+    let historyArr2 = [
       {
         author: "pim <post@pimsnel.com>",
         date: "thu dec 15 18:31:02 2022 +0100",
@@ -173,38 +224,38 @@ class History extends React.Component{
                   <Typography>Date: {item.date}</Typography>
                   <Typography>Ref: {item.ref.substr(0,7)}</Typography>
                   { this.props.enableSyncFrom ?
-                  <Box py={1}>
-                    {
-                      item.local ? null :
-                        <Button
-                          onClick={()=>{
+                    <Box py={1}>
+                      {
+                        item.local ? null :
+                          <Button
+                            onClick={()=>{
 
-                          }}
-                          style={{marginRight:'5px'}}
-                          size="small"
-                          variant="contained"
-                          color="primary"
-                          startIcon={<ArrowDownwardIcon />}
-                        >
-                          Try merge
-                        </Button>
+                            }}
+                            style={{marginRight:'5px'}}
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            startIcon={<ArrowDownwardIcon />}
+                          >
+                            Try merge
+                          </Button>
 
-                    }
-                    <Button
-                      onClick={()=>{
+                      }
+                      <Button
+                        onClick={()=>{
 
-                      }}
-                      style={{marginRight:'5px'}}
-                      size="small"
-                      variant="contained"
-                      color="secondary"
-                      startIcon={<ArrowDownwardIcon />}
-                    >
-                      Checkout this version
-                    </Button>
+                        }}
+                        style={{marginRight:'5px'}}
+                        size="small"
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<ArrowDownwardIcon />}
+                      >
+                        Checkout this version
+                      </Button>
 
-                  </Box>
-                  :null}
+                    </Box>
+                    :null}
                 </Box>
               </Paper>
 
@@ -233,6 +284,7 @@ class History extends React.Component{
 
 
         </Timeline>
+        { this.state.historyArr.length > this.state.resultsShowing ?
         <Box py={1} variant="div"
           style={{
             display:'flex',
@@ -241,7 +293,7 @@ class History extends React.Component{
 
           <Button
             onClick={()=>{
-
+              this.showMore();
             }}
             style={{marginRight:'5px'}}
             size="small"
@@ -252,7 +304,7 @@ class History extends React.Component{
             Load More
           </Button>
 
-        </Box>
+        </Box>:null}
 
       </React.Fragment>
     )

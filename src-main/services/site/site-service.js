@@ -60,10 +60,18 @@ class SiteService{
     return await publisher.publish({siteKey: this._config.key, publishKey: publishConfig.key, from });
   }
 
+
   async mergeSiteWithRemote(publishConfig){
     let publisher = syncFactory.getPublisher(publishConfig.config);
     return await publisher.pullFastForwardMerge({siteKey: this._config.key, publishKey: publishConfig.key });
   }
+
+  async publisherDispatchAction(publishConfig, action, actionParameters){
+
+    let publisher = syncFactory.getPublisher(publishConfig);
+    return await publisher.actionDispatcher({siteKey: this._config.key }, action, actionParameters);
+  }
+
 }
 
 module.exports = SiteService;

@@ -42,16 +42,6 @@ class SyncBusyDialog extends React.Component{
 
   render(){
     let { open, classes } = this.props;
-    let serverFormLogo, serverTitle = null;
-
-    if (this.props.serverType === 'github'){
-      serverTitle = GitHubMeta.syncingText;
-      serverFormLogo = GitHubMeta.icon()
-    }
-    else if (this.props.serverType === 'folder'){
-      serverTitle = FolderMeta.syncingText;
-      serverFormLogo = FolderMeta.icon()
-    }
 
     return (
       <Dialog
@@ -63,10 +53,10 @@ class SyncBusyDialog extends React.Component{
 
         <MuiDialogTitle disableTypography className={classes.root}>
           <Box className={classes.serverFormLogo}>
-          {serverFormLogo}
+          {this.props.syncLogo}
           </Box>
 
-          <Typography variant="h6">{serverTitle || ""}</Typography>
+          <Typography variant="h6">{this.props.serverTitle || ""}</Typography>
         </MuiDialogTitle>
 
         <DialogContent>
