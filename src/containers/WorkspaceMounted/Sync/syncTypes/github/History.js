@@ -34,21 +34,60 @@ class History extends React.Component{
     super(props);
     this.state = {
       historyArr: [],
+      lastRefresh: '',
       resultsShowing: 0,
     };
   }
+
+  componentDidMount(){
+    this.softRefreshRemoteStatus();
+  }
+
+  softRefreshRemoteStatus(){
+
+    this.props.onSyncDialogControl(
+      true,
+      'Read cached commit history',
+      Meta.icon()
+    );
+
+    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'readRemote',{},90000).then((results)=>{
+      this.setState({
+        historyArr: results.commitList,
+        lastRefresh: results.lastRefresh.toString(),
+        resultsShowing: this.moreAmount
+      });
+      this.props.onSyncDialogControl(
+        false,
+        Meta.syncingText,
+        Meta.icon()
+      );
+    }).catch(()=>{
+
+      snackMessageService.addSnackMessage('Sync: read cached remote status failed.', {severity: 'warning'});
+
+      this.props.onSyncDialogControl(
+        false,
+        Meta.syncingText,
+        Meta.icon()
+      );
+
+    });
+  }
+
 
   refreshRemoteStatus(){
 
     this.props.onSyncDialogControl(
       true,
-      Meta.syncingText,
+      'Refreshing commit history',
       Meta.icon()
     );
 
-    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'refreshRemote',{},10000).then((results)=>{
+    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'refreshRemote',{},90000).then((results)=>{
       this.setState({
-        historyArr: results,
+        historyArr: results.commitList,
+        lastRefresh: results.lastRefresh.toString(),
         resultsShowing: this.moreAmount
       });
       this.props.onSyncDialogControl(
@@ -79,7 +118,8 @@ class History extends React.Component{
 
   render(){
 
-    let lastStatusCheck = "10 minutes ago";
+    //let lastStatusCheck = "10 minutes ago";
+    let lastStatusCheck = this.state.lastRefresh;
     let unpushedChanges = false;
     let remoteDiffers = true;
     let historyArr = this.state.historyArr.slice(0,this.state.resultsShowing);

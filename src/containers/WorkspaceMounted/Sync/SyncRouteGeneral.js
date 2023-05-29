@@ -5,10 +5,6 @@ import { withStyles }             from '@material-ui/core/styles';
 import MainPublishPage            from './components/MainPublishPage';
 import SyncConfigDialog           from './components/SyncConfigDialog';
 import SyncBusyDialog             from './components/SyncBusyDialog';
-import IconButton                 from '@material-ui/core/IconButton';
-import MoreVertIcon               from '@material-ui/icons/MoreVert';
-import Menu                       from '@material-ui/core/Menu';
-import MenuItem                   from '@material-ui/core/MenuItem';
 import Button                     from '@material-ui/core/Button';
 import { snackMessageService }    from './../../../services/ui-service';
 import {Meta as GitHubMeta}       from './syncTypes/github'
@@ -120,11 +116,12 @@ class SyncRouteGeneral extends React.Component {
     })
   }
 
+  //TODO MOVE TO SERVICE
   mergeAction(publishConf){
     this.setState({
       serverBusyDialog: {
         open:true,
-        serverType: publishConf.config.type,
+        //serverType: publishConf.config.type,
       }
     })
 
@@ -149,6 +146,7 @@ class SyncRouteGeneral extends React.Component {
     });
   }
 
+  //TODO MOVE TO SERVICE
   publishAction(publishConf){
     const build=null;
 
@@ -232,8 +230,8 @@ class SyncRouteGeneral extends React.Component {
       history = (
         <GitHubHistory
           siteKey={this.props.siteKey}
-          onSyncDialogControl={(open)=>{
-            this.syncDialogControl(open,'github');
+          onSyncDialogControl={(open, text, icon)=>{
+            this.syncDialogControl(open,text,icon);
           }}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
@@ -313,8 +311,6 @@ class SyncRouteGeneral extends React.Component {
         return (
 
           <React.Fragment>
-
-            {/*<SnackbarManager />*/}
 
             <div className={ this.props.classes.container }>
 

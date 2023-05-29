@@ -13,60 +13,68 @@ const environmentResolver = new EnvironmentResolver();
 const UQIS = environmentResolver.getUQIS();
 
 class GithubSync {
-  constructor(config){
+
+  constructor(config, siteKey){
     this._config = config;
+    this.siteKey = siteKey;
+  }
+
+  _fullGitHubUrl(){
+    return 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
+  }
+
+  _fullDestinationPath(){
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
+    return path.join(resolvedDest , this._config.repository);
+  }
+
+  _remoteHistoryCacheFile(){
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey );
+    return path.join(resolvedDest , 'githubSync-'+ this._config.repository + '-cache_remote_history.json');
+  }
+
+  async _historyRemote(){
+    const historyRemoteJson = await cliExecuteHelper.try_execute("git-log-remote", gitBin, [ "log_remote", "-s", "-i", await this._tempCreatePrivateKey(), this._fullGitHubUrl() ]);
+    const historyRemoteArr = JSON.parse(historyRemoteJson);
+    await fs.writeFileSync(this._remoteHistoryCacheFile(), historyRemoteJson,'utf-8');
+    let stat = await fs.statSync(this._remoteHistoryCacheFile());
+    return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
+  }
+
+  async _historyRemoteFromCache(){
+    if(await fs.existsSync(this._remoteHistoryCacheFile())){
+      const historyRemoteJson = await fs.readFileSync(this._remoteHistoryCacheFile(), {encoding: 'utf8'});
+      let stat = await fs.statSync(this._remoteHistoryCacheFile());
+      return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
+    }
+    else{
+      return null
+    }
   }
 
   async actionDispatcher(context, action, parameters){
 
-    console.log(context);
-    console.log(parameters);
+    //console.log(parameters);
 
     switch(action){
+      case 'readRemote': {
+        let historyRemote;
+        if(historyRemote = await this._historyRemoteFromCache()){
+          return historyRemote;
+        }
+        else{
+          return await this._historyRemote();
+        }
+        break;
+      }
       case 'refreshRemote': {
-        console.log("yep refreshing");
-        let historyArr = [
-          {
-            author: "pim <post@pimsnel.com>",
-            date: "thu dec 15 18:31:02 2022 +0100",
-            client: "quiqr-desktop v14.5",
-            os: "linux",
-            ref: "072ae8b6fd2cc36b1554e9ef663e83f498f7b826",
-            local: false,
-            message: "publication by pim@ojs+linux+5.15.82+quiqr-desktop-app-0.14.5",
-          },
-          {
-            author: "laura <l.van.dijk@waardenburg.eco>",
-            date: "thu dec 15 18:31:02 2022 +0100",
-            client: "quiqr-desktop v14.5",
-            os: "macos",
-            ref: "887c1b20ff9c544b91491cc98b4597d3ffcc58ad",
-            remote: false,
-            local: true,
-            message: "publication by laura@laura-van-dijk-macbook-pro+darwin+21.6.0+quiqr-desktop-app-0.14.5",
-          },
-          {
-            author: "pim <post@pimsnel.com>",
-            date: "thu dec 15 18:31:02 2022 +0100",
-            client: "quiqr-desktop v14.5",
-            os: "linux",
-            ref: "072ae8b6fd2cc36b1554e9ef663e83f498f7b826",
-            local: true,
-            message: "publication by pim@ojs+linux+5.15.82+quiqr-desktop-app-0.14.5",
-          },
-          {
-            author: "laura <l.van.dijk@waardenburg.eco>",
-            date: "thu dec 15 18:31:02 2022 +0100",
-            client: "quiqr-desktop v14.5",
-            os: "macos",
-            ref: "887c1b20ff9c544b91491cc98b4597d3ffcc58ad",
-            remote: false,
-            local: true,
-            message: "publication by laura@laura-van-dijk-macbook-pro+darwin+21.6.0+quiqr-desktop-app-0.14.5",
-          },
-        ]
-
-        return historyArr;
+        return await this._historyRemote();
+        break;
+      }
+      case 'refreshLocal': {
+        const historyLocalJson = await cliExecuteHelper.try_execute("git-log-local", gitBin, [ "log_local", this._fullDestinationPath() ]);
+        const historyLocalArr = JSON.parse(historyLocalJson);
+        return historyLocalArr;
         break;
       }
       default:{ throw new Error('Not implemented.') }
@@ -232,6 +240,7 @@ class GithubSync {
       "commit", '-a' , '-n', this._config.username,
       '-e', this._config.email,
       '-m', "'publication by " + UQIS +"'", fullDestinationPath]);
+
 
 
     await cliExecuteHelper.try_execute("git-push", gitBin, [ "push", "-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);

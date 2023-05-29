@@ -9,8 +9,6 @@ import DialogActions        from '@material-ui/core/DialogActions';
 import DialogContent        from '@material-ui/core/DialogContent';
 import DialogContentText    from '@material-ui/core/DialogContentText';
 import LinearProgress       from '@material-ui/core/LinearProgress';
-import {Meta as FolderMeta} from '../syncTypes/folder'
-import {Meta as GitHubMeta} from '../syncTypes/github'
 
 const useStyles = theme => ({
 
@@ -53,7 +51,7 @@ class SyncBusyDialog extends React.Component{
 
         <MuiDialogTitle disableTypography className={classes.root}>
           <Box className={classes.serverFormLogo}>
-          {this.props.syncLogo}
+          {this.props.icon}
           </Box>
 
           <Typography variant="h6">{this.props.serverTitle || ""}</Typography>

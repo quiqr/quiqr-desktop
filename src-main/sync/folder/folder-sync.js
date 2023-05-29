@@ -6,8 +6,10 @@ const fileDirUtils            = require('../../utils/file-dir-utils');
 const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 
 class FolderSync {
-  constructor(config){
+
+  constructor(config, siteKey){
     this._config = config;
+    this.siteKey = siteKey;
   }
 
   async pullFastForwardMerge(context){
