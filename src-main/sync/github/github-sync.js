@@ -233,6 +233,7 @@ class GithubSync {
       '-e', this._config.email,
       '-m', "'publication by " + UQIS +"'", fullDestinationPath]);
 
+
     await cliExecuteHelper.try_execute("git-push", gitBin, [ "push", "-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
 
     return true;
