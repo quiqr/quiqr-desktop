@@ -40,13 +40,11 @@ class CollectionItem extends React.Component{
 
   }
 
-
   handleOpenInEditor(context: any){
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
     let promise = service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
     promise.then(function(updatedValues){
-      //context.accept(updatedValues);
     }, function(){
       context.reject('Something went wrong.');
     })
@@ -54,10 +52,8 @@ class CollectionItem extends React.Component{
 
   handleSave(context: any){
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-
     let promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
     promise.then(function(updatedValues){
-      snackMessageService.addSnackMessage("Document saved successfully.")
       context.accept(updatedValues);
     }, function(){
       context.reject('Something went wrong.');

@@ -11,7 +11,7 @@ import Menu                       from '@material-ui/core/Menu';
 import MenuItem                   from '@material-ui/core/MenuItem';
 import Button                     from '@material-ui/core/Button';
 import { snackMessageService }    from './../../../services/ui-service';
-import SnackbarManager            from './../../../components/SnackbarManager';
+//import SnackbarManager            from './../../../components/SnackbarManager';
 import {Meta as GitHubMeta}       from './syncTypes/github'
 import {History as GitHubHistory} from './syncTypes/github'
 import {Meta as FolderMeta}       from './syncTypes/folder'
@@ -141,8 +141,8 @@ class SyncRouteGeneral extends React.Component {
 
   }
 
-  feedbackSyncAction(message,type){
-    snackMessageService.addSnackMessage(message);
+  feedbackSyncAction(message,severity){
+    snackMessageService.addSnackMessage(message, {severity: severity});
   }
 
   publishAction(publishConf){
@@ -364,7 +364,7 @@ class SyncRouteGeneral extends React.Component {
 
           <React.Fragment>
 
-            <SnackbarManager />
+            {/*<SnackbarManager />*/}
 
             <div className={ this.props.classes.container }>
 

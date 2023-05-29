@@ -57,7 +57,6 @@ class Single extends React.Component{
 
     let promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
     promise.then(function(updatedValues){
-      snackMessageService.addSnackMessage("Document saved successfully.")
       context.accept(updatedValues);
     }, function(){
       context.reject('Something went wrong.');
