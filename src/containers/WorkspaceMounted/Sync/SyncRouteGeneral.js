@@ -215,10 +215,9 @@ class SyncRouteGeneral extends React.Component {
       enableSyncTo: true
     };
 
-    //let serviceLogo, title, liveUrl, syncToText, syncFromText;
-    //let repoAdminUrl = '';
     let enableSyncFrom = false;
     let enableSyncTo = true;
+
     let history;
 
     if(publishConf.config.publishScope === 'source' ||publishConf.config.publishScope === 'build_and_source' ){
@@ -270,63 +269,6 @@ class SyncRouteGeneral extends React.Component {
       onPublish={()=>{
         this.publishAction(publishConf);
       }}
-      itemMenu={
-        <div>
-          <IconButton
-            onClick={(event)=>{
-              this.setState({anchorEl:event.currentTarget, menuOpen:publishConf.key})
-            }}
-            aria-label="more"
-            aria-controls="long-menu"
-            aria-haspopup="true"
-          >
-            <MoreVertIcon />
-          </IconButton>
-
-          <Menu
-            anchorEl={this.state.anchorEl}
-            open={(this.state.menuOpen===publishConf.key?true:false)}
-            keepMounted
-            onClose={()=>{
-              this.setState({menuOpen:null});
-
-            }}
-          >
-            <MenuItem key="edit"
-              onClick={
-                ()=>{
-                  this.setState({
-                    menuOpen:null,
-                    serverDialog: {
-                      open:true,
-                      modAction: "Edit",
-                      serverTitle: "Quiqr Cloud Server",
-                      closeText: "Cancel",
-                      publishConf: publishConf
-                    }
-                  })
-                }
-              }
-            >
-              Edit Configuration
-            </MenuItem>
-
-            <MenuItem key="delete"
-              onClick={
-                ()=>{
-                  this.setState({
-                    menuOpen:null,
-                    deleteDialogOpen: true,
-                    keyForDeletion: publishConf.key
-                  })
-                }
-              }>
-              Delete Configuration
-            </MenuItem>
-          </Menu>
-        </div>
-      }
-
     />
   }
 

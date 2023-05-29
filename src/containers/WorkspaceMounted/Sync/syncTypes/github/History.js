@@ -13,11 +13,10 @@ import TimelineConnector       from '@material-ui/lab/TimelineConnector';
 import TimelineContent         from '@material-ui/lab/TimelineContent';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
 import TimelineDot             from '@material-ui/lab/TimelineDot';
-import LaptopMacIcon           from '@material-ui/icons/LaptopMac';
 import NewReleasesIcon         from '@material-ui/icons/NewReleases';
-import CloudIcon               from '@material-ui/icons/Cloud';
+//import CloudIcon               from '@material-ui/icons/Cloud';
 import CloudUploadIcon         from '@material-ui/icons/CloudUpload';
-import CloudDownloadIcon       from '@material-ui/icons/CloudDownload';
+//import CloudDownloadIcon       from '@material-ui/icons/CloudDownload';
 import SaveAltIcon             from '@material-ui/icons/SaveAlt';
 import RefreshIcon             from '@material-ui/icons/Refresh';
 import Meta                    from './Meta'
@@ -78,55 +77,12 @@ class History extends React.Component{
     });
   }
 
-
-
   render(){
 
     let lastStatusCheck = "10 minutes ago";
-    let unpushedChanges = true;
+    let unpushedChanges = false;
     let remoteDiffers = true;
     let historyArr = this.state.historyArr.slice(0,this.state.resultsShowing);
-
-    let historyArr2 = [
-      {
-        author: "pim <post@pimsnel.com>",
-        date: "thu dec 15 18:31:02 2022 +0100",
-        client: "quiqr-desktop v14.5",
-        os: "linux",
-        ref: "072ae8b6fd2cc36b1554e9ef663e83f498f7b826",
-        local: false,
-        message: "publication by pim@ojs+linux+5.15.82+quiqr-desktop-app-0.14.5",
-      },
-      {
-        author: "laura <l.van.dijk@waardenburg.eco>",
-        date: "thu dec 15 18:31:02 2022 +0100",
-        client: "quiqr-desktop v14.5",
-        os: "macos",
-        ref: "887c1b20ff9c544b91491cc98b4597d3ffcc58ad",
-        remote: false,
-        local: true,
-        message: "publication by laura@laura-van-dijk-macbook-pro+darwin+21.6.0+quiqr-desktop-app-0.14.5",
-      },
-      {
-        author: "pim <post@pimsnel.com>",
-        date: "thu dec 15 18:31:02 2022 +0100",
-        client: "quiqr-desktop v14.5",
-        os: "linux",
-        ref: "072ae8b6fd2cc36b1554e9ef663e83f498f7b826",
-        local: true,
-        message: "publication by pim@ojs+linux+5.15.82+quiqr-desktop-app-0.14.5",
-      },
-      {
-        author: "laura <l.van.dijk@waardenburg.eco>",
-        date: "thu dec 15 18:31:02 2022 +0100",
-        client: "quiqr-desktop v14.5",
-        os: "macos",
-        ref: "887c1b20ff9c544b91491cc98b4597d3ffcc58ad",
-        remote: false,
-        local: true,
-        message: "publication by laura@laura-van-dijk-macbook-pro+darwin+21.6.0+quiqr-desktop-app-0.14.5",
-      },
-    ]
 
     return (
       <React.Fragment>
@@ -158,6 +114,7 @@ class History extends React.Component{
 
         <Timeline xalign="alternate">
 
+          {unpushedChanges ?
           <TimelineItem>
             <TimelineOppositeContent>
               <Paper elevation={3}>
@@ -211,6 +168,7 @@ class History extends React.Component{
             <TimelineContent>
             </TimelineContent>
           </TimelineItem>
+          :null}
 
           {historyArr.map((item, index)=>{
 

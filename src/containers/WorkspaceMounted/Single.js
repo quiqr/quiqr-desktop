@@ -1,6 +1,6 @@
 import React from 'react';
 import service from './../../services/service'
-import { snackMessageService } from './../../services/ui-service'
+//import { snackMessageService } from './../../services/ui-service'
 import { SukohForm } from './../../components/SukohForm';
 import Spinner from './../../components/Spinner';
 
