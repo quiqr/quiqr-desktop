@@ -25,7 +25,7 @@ class SnackbarManager extends React.Component{
           open={ true }
           anchorOrigin={{vertical:"bottom", horizontal: "left" }}
           action={ snackMessage.action }
-          onActionClick={ snackMessage.onActionClick }
+          //onActionClick={ snackMessage.onActionClick }
           autoHideDuration={ snackMessage.autoHideDuration }
           onClose={()=>{ snackMessageService.reportSnackDismiss() }}
         >

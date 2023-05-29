@@ -59,8 +59,8 @@ class Sidebar extends React.Component{
         button>
         {icon}
         <ListItemText primary={item.label} />
-        {secondaryAction}
         {secondaryActionMenu}
+        {secondaryAction}
 
 
       </ListItem>

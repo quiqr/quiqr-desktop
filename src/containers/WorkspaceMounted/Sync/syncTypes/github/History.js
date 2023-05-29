@@ -26,6 +26,10 @@ const useStyles = theme => ({
 
 class History extends React.Component{
 
+  refreshRemoteStatus(){
+
+  }
+
   render(){
 
     let lastStatusCheck = "10 minutes ago";
@@ -90,6 +94,7 @@ class History extends React.Component{
 
           <Button
             onClick={()=>{
+              this.refreshRemoteStatus()
             }}
             size="small"
             variant="contained"

@@ -50,13 +50,14 @@ class MainPublishPage extends React.Component {
           </Box>
           <Box component="span" style={{flexGrow:1}}>
             <Typography>{this.props.title}</Typography>
+            {this.props.repoAdminUrl?
             <Link component="button" variant="body2"
               onClick={()=>{
                 window.require('electron').shell.openExternal(this.props.repoAdminUrl);
               }}
             >
               {this.props.repoAdminUrl}
-            </Link>
+            </Link>:null}
 
           </Box>
           <Box component="span" xstyle={{padding:'6px'}}>
