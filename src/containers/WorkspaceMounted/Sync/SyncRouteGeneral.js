@@ -126,11 +126,11 @@ class SyncRouteGeneral extends React.Component {
           serverType: null,
         }
       })
-      snackMessageService.addSnackMessage('Sync from finished.');
+      snackMessageService.addSnackMessage('Sync: pull from remote finished.','success');
 
     }).catch((e)=>{
       service.api.logToConsole(e ,"mergefail");
-      snackMessageService.addSnackMessage('Sync from failed.');
+      snackMessageService.addSnackMessage('Sync: pull from remote failed.', {severity: 'warning'});
       this.setState({
         serverBusyDialog: {
           open:false,
@@ -139,6 +139,10 @@ class SyncRouteGeneral extends React.Component {
       })
     });
 
+  }
+
+  feedbackSyncAction(message,type){
+    snackMessageService.addSnackMessage(message);
   }
 
   publishAction(publishConf){
@@ -161,9 +165,9 @@ class SyncRouteGeneral extends React.Component {
           }
         })
 
-        snackMessageService.addSnackMessage('Sync to finished.');
+        snackMessageService.addSnackMessage('Sync: Push to remote finished.', {severity: 'success'});
       }).catch(()=>{
-        snackMessageService.addSnackMessage('Sync to failed.');
+        snackMessageService.addSnackMessage('Sync: Push to remote failed.', {severity: 'warning'});
         this.setState({
           serverBusyDialog: {
             open:false,
@@ -224,6 +228,8 @@ class SyncRouteGeneral extends React.Component {
       publishCardObj = GitHubMeta.publishCardObj(publishConf.config)
       history = (
         <GitHubHistory
+          enableSyncFrom={enableSyncFrom}
+          enableSyncTo={enableSyncTo}
           publishConfig={publishCardObj}
         />
       )

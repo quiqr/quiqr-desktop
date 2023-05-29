@@ -110,35 +110,36 @@ class History extends React.Component{
                     There are unpublished local changes.
                   </Typography>
 
-                      <Box py={1}>
+                  { this.props.enableSyncTo ?
+                    <Box py={1}>
 
-                        <Button
-                          onClick={()=>{
+                      <Button
+                        onClick={()=>{
 
-                          }}
-                          style={{marginRight:'5px'}}
-                          size="small"
-                          variant="contained"
-                          color="primary"
-                          startIcon={<ArrowUpwardIcon />}
-                        >
-                          Push to Remote
-                        </Button>
+                        }}
+                        style={{marginRight:'5px'}}
+                        size="small"
+                        variant="contained"
+                        color={remoteDiffers ? "secondary" : "primary"}
+                        startIcon={<ArrowUpwardIcon />}
+                      >
+                        Push to Remote
+                      </Button>
 
-                        <Button
-                          onClick={()=>{
+                      <Button
+                        onClick={()=>{
 
-                          }}
-                          style={{marginRight:'5px'}}
-                          size="small"
-                          variant="contained"
-                          color="primary"
-                          startIcon={<SaveAltIcon />}
-                        >
-                          Local Commit
-                        </Button>
+                        }}
+                        style={{marginRight:'5px'}}
+                        size="small"
+                        variant="contained"
+                        color="primary"
+                        startIcon={<SaveAltIcon />}
+                      >
+                        Local Commit
+                      </Button>
 
-                      </Box>
+                    </Box>:null}
 
                 </Box>
               </Paper>
@@ -156,27 +157,20 @@ class History extends React.Component{
           </TimelineItem>
 
           {historyArr.map((item, index)=>{
-            return (
-              <TimelineItem key={"timeline"+index}>
-                <TimelineSeparator>
-                  <TimelineDot color={item.local ? "primary" : "secondary"}>
-                    {/*item.local ? <LaptopMacIcon /> : <CloudIcon/>*/}
-                    <CloudUploadIcon />
-                  </TimelineDot>
-                  <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent>
-                  <Paper elevation={3}>
-                    <Box p={2}>
-                      <Typography variant="h6" component="h1">
-                        {item.message.split("+")[0]}
-                      </Typography>
-                      <Typography>Author: {item.author}</Typography>
-                      <Typography>Date: {item.date}</Typography>
-                      <Typography>Ref: {item.ref.substr(0,7)}</Typography>
-                      <Box py={1}>
-                        {
-                          item.local ? null : 
+
+            let content = (
+              <Paper elevation={3}>
+                <Box p={2}>
+                  <Typography variant="h6" component="h1">
+                    {item.message.split("+")[0]}
+                  </Typography>
+                  <Typography>Author: {item.author}</Typography>
+                  <Typography>Date: {item.date}</Typography>
+                  <Typography>Ref: {item.ref.substr(0,7)}</Typography>
+                  { this.props.enableSyncFrom ?
+                  <Box py={1}>
+                    {
+                      item.local ? null :
                         <Button
                           onClick={()=>{
 
@@ -190,23 +184,43 @@ class History extends React.Component{
                           Try merge
                         </Button>
 
-                        }
-                        <Button
-                          onClick={()=>{
+                    }
+                    <Button
+                      onClick={()=>{
 
-                          }}
-                          style={{marginRight:'5px'}}
-                          size="small"
-                          variant="contained"
-                          color="secondary"
-                          startIcon={<ArrowDownwardIcon />}
-                        >
-                          Checkout this version
-                        </Button>
+                      }}
+                      style={{marginRight:'5px'}}
+                      size="small"
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<ArrowDownwardIcon />}
+                    >
+                      Checkout this version
+                    </Button>
 
-                      </Box>
-                    </Box>
-                  </Paper>
+                  </Box>
+                  :null}
+                </Box>
+              </Paper>
+
+            )
+
+            return (
+              <TimelineItem key={"timeline"+index}>
+                <TimelineOppositeContent>
+                  {item.local ? content : null}
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot
+                    color={item.local ? "primary" : "secondary"}
+                  >
+                    {/*item.local ? <LaptopMacIcon /> : <CloudIcon/>*/}
+                    <CloudUploadIcon />
+                  </TimelineDot>
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  {item.local ? null : content}
                 </TimelineContent>
               </TimelineItem>
             )
