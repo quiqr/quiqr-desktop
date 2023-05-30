@@ -1,5 +1,10 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- feature: show remote versions in github 🥳
+- cleanup: refactored sync frontend
+- cleanup: refactored sync api bridge
+- cleanup: refactored sync backend
+- fix: fix folder sync (synced to wrong path)
 - fix: typo in sync
 
 ## 0.17.2 (2023-05-25)
