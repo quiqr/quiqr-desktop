@@ -15,11 +15,14 @@ import TimelineContent         from '@material-ui/lab/TimelineContent';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
 import TimelineDot             from '@material-ui/lab/TimelineDot';
 import NewReleasesIcon         from '@material-ui/icons/NewReleases';
+import GitHubIcon from '@material-ui/icons/GitHub';
 //import CloudIcon               from '@material-ui/icons/Cloud';
 import CloudUploadIcon         from '@material-ui/icons/CloudUpload';
 //import CloudDownloadIcon       from '@material-ui/icons/CloudDownload';
 import SaveAltIcon             from '@material-ui/icons/SaveAlt';
 import RefreshIcon             from '@material-ui/icons/Refresh';
+import Link from '@material-ui/core/Link';
+import SettingsIcon from '@material-ui/icons/Settings';
 import Meta                    from './Meta'
 import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
@@ -27,9 +30,9 @@ import service                 from '../../../../../services/service';
 const useStyles = theme => ({
 });
 
-class History extends React.Component{
+class Dashboard extends React.Component{
 
-  moreAmount = 2;
+  moreAmount = 4;
 
   constructor(props){
     super(props);
@@ -172,6 +175,40 @@ class History extends React.Component{
         <Box component="div" style={{
           display:'flex',
           alignItems: 'flex-start'
+          }} m={2}>
+
+          <Box component="span">
+            <GitHubIcon fontSize="large"  style={{margin:'6px'}} />
+          </Box>
+
+          <Box component="span" style={{flexGrow:1}}>
+            <Typography>{Meta.sidebarLabel(this.props.publishConf)}</Typography>
+
+            <Link component="button" variant="body2"
+              onClick={()=>{
+                window.require('electron').shell.openExternal(Meta.repoAdminUrl(this.props.publishConf));
+              }}
+            >
+            {Meta.repoAdminUrl(this.props.publishConf)}
+            </Link>
+          </Box>
+
+          <Box component="span">
+            <Button
+              onClick={()=>{this.props.onConfigure()}}
+              size="small"
+              variant="contained"
+              color="default"
+              startIcon={<SettingsIcon />}
+            >
+              Configure
+            </Button>
+          </Box>
+        </Box>
+
+        <Box component="div" style={{
+          display:'flex',
+          alignItems: 'flex-start'
         }} m={2}>
 
           { this.props.enableSyncTo ?
@@ -203,6 +240,7 @@ class History extends React.Component{
         </Box>
 
         <Divider/>
+
 
         <Box component="div"
           m={1}
@@ -387,6 +425,6 @@ class History extends React.Component{
 
 }
 
-export default withStyles(useStyles)(History);
+export default withStyles(useStyles)(Dashboard);
 
 

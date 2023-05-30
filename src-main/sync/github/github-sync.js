@@ -20,39 +20,6 @@ class GithubSync {
     this.from = pathHelper.getLastBuildDir();
   }
 
-  _fullGitHubUrl(){
-    return 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
-  }
-
-  _fullDestinationPath(){
-    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
-    return path.join(resolvedDest , this._config.repository);
-  }
-
-  _remoteHistoryCacheFile(){
-    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey );
-    return path.join(resolvedDest , 'githubSync-'+ this._config.repository + '-cache_remote_history.json');
-  }
-
-  async _historyRemote(){
-    const historyRemoteJson = await cliExecuteHelper.try_execute("git-log-remote", gitBin, [ "log_remote", "-s", "-i", await this._tempCreatePrivateKey(), this._fullGitHubUrl() ]);
-    const historyRemoteArr = JSON.parse(historyRemoteJson);
-    await fs.writeFileSync(this._remoteHistoryCacheFile(), historyRemoteJson,'utf-8');
-    let stat = await fs.statSync(this._remoteHistoryCacheFile());
-    return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
-  }
-
-  async _historyRemoteFromCache(){
-    if(await fs.existsSync(this._remoteHistoryCacheFile())){
-      const historyRemoteJson = await fs.readFileSync(this._remoteHistoryCacheFile(), {encoding: 'utf8'});
-      let stat = await fs.statSync(this._remoteHistoryCacheFile());
-      return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
-    }
-    else{
-      return null
-    }
-  }
-
   async actionDispatcher(action, parameters){
 
     //console.log(parameters);
@@ -87,6 +54,39 @@ class GithubSync {
         break;
       }
       default:{ throw new Error('Not implemented.') }
+    }
+  }
+
+  _fullGitHubUrl(){
+    return 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
+  }
+
+  _fullDestinationPath(){
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
+    return path.join(resolvedDest , this._config.repository);
+  }
+
+  _remoteHistoryCacheFile(){
+    const resolvedDest = path.join(pathHelper.getRoot(),'sites', this.siteKey );
+    return path.join(resolvedDest , 'githubSync-'+ this._config.repository + '-cache_remote_history.json');
+  }
+
+  async _historyRemote(){
+    const historyRemoteJson = await cliExecuteHelper.try_execute("git-log-remote", gitBin, [ "log_remote", "-s", "-i", await this._tempCreatePrivateKey(), this._fullGitHubUrl() ]);
+    const historyRemoteArr = JSON.parse(historyRemoteJson);
+    await fs.writeFileSync(this._remoteHistoryCacheFile(), historyRemoteJson,'utf-8');
+    let stat = await fs.statSync(this._remoteHistoryCacheFile());
+    return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
+  }
+
+  async _historyRemoteFromCache(){
+    if(await fs.existsSync(this._remoteHistoryCacheFile())){
+      const historyRemoteJson = await fs.readFileSync(this._remoteHistoryCacheFile(), {encoding: 'utf8'});
+      let stat = await fs.statSync(this._remoteHistoryCacheFile());
+      return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
+    }
+    else{
+      return null
     }
   }
 

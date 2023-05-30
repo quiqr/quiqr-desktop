@@ -15,26 +15,20 @@ export default class Meta {
     }
   }
 
-  static publishCardObj(config){
+  static repoAdminUrl(config){
+    return `https://github.com/${config.username}/${config.repository}`
+  }
 
-    let publishCardObj = {};
-    publishCardObj.serviceLogo = <GitHubIcon fontSize="large"  style={{margin:'6px'}} />
-    publishCardObj.title = config.username +"/" + config.repository;
-    publishCardObj.repoAdminUrl= `https://github.com/${config.username}/${config.repository}`
-
-    publishCardObj.syncToText = 'Push to remote';
-    publishCardObj.syncFromText = 'Pull from remote';
-
+  static liveUrl(config){
     if(config.CNAME){
-      publishCardObj.liveUrl= `https://${config.CNAME}`
+      return `https://${config.CNAME}`
     }
     else if(config.setGitHubActions){
-      publishCardObj.liveUrl= `https://${config.username}.github.io/${config.repository}`
+      return `https://${config.username}.github.io/${config.repository}`
     }
     else{
-      publishCardObj.liveUrl= ''
+      return ''
     }
-    return publishCardObj;
   }
 
   static icon(){

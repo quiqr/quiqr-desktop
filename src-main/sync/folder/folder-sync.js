@@ -10,16 +10,37 @@ class FolderSync {
   constructor(config, siteKey){
     this._config = config;
     this.siteKey = siteKey;
+    this.from = pathHelper.getLastBuildDir();
   }
 
-  async pullFastForwardMerge(context){
+  _fullDestinationPath(){
+    return this._config.path;
+  }
 
-    const fullDestinationPath = path.join(pathHelper.getRoot(),'sites', context.siteKey, 'folderSyncRepo');
+  async actionDispatcher(action, parameters){
+
+    switch(action){
+      case 'pullFromRemote': {
+        return this.pullFastForwardMerge()
+        break;
+      }
+      case 'pushToRemote': {
+        return this.publish()
+        break;
+      }
+      default:{ throw new Error('Not implemented.') }
+    }
+  }
+
+  async pullFastForwardMerge(){
     return new Promise( (resolve, reject)=>{
       try {
         configurationDataProvider.get(async (err, configurations)=>{
           let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
-          await this._syncSourceToDestination(fullDestinationPath, site.source.path);
+
+          await this._ensureSyncDir(site.source.path);
+
+          await this._syncSourceToDestination(this._fullDestinationPath(), site.source.path);
           resolve("reset-and-pulled-from-remote");
         });
       } catch (err) {
@@ -29,43 +50,43 @@ class FolderSync {
     });
   }
 
-  async publish(context){
+  async publish(){
 
-    const fullDestinationPath = await this._ensureSyncRepoDir(context.siteKey);
+    await this._ensureSyncDir(this._fullDestinationPath());
     let mainWindow = global.mainWM.getCurrentInstance();
 
     outputConsole.appendLine('START FOLDER SYNC');
     outputConsole.appendLine('-----------------');
-    outputConsole.appendLine('  context.from is:     ' + context.from);
+    outputConsole.appendLine('  from is:     ' + this.from);
     outputConsole.appendLine('');
-    outputConsole.appendLine('  destination path:    ' + fullDestinationPath);
+    outputConsole.appendLine('  destination path:    ' + this._fullDestinationPath());
     outputConsole.appendLine('  override BaseURL:    ' + this._config.overrideBaseURL);
     outputConsole.appendLine('-----------------');
     outputConsole.appendLine('');
 
     mainWindow.webContents.send("updateProgress", 'Prepare files before uploading..', 30);
     if(this._config.publishScope === "build"){
-      await this.publish_step2_preprare_dircontents_build(context, fullDestinationPath)
+      await this.publish_step2_preprare_dircontents_build(fullDestinationPath)
     }
     else{
-      await this.publish_step2_preprare_dircontents_source(context, fullDestinationPath)
+      await this.publish_step2_preprare_dircontents_source(fullDestinationPath)
     }
 
     return true;
   }
 
-  async publish_step2_preprare_dircontents_build(context, fullDestinationPath){
+  async publish_step2_preprare_dircontents_build(fullDestinationPath){
 
-    await this._syncSourceToDestination(path.join(context.from,'public'), fullDestinationPath);
+    await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath);
     await this._removeUnwanted(fullDestinationPath);
     await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
 
-  async publish_step2_preprare_dircontents_source(context, fullDestinationPath){
+  async publish_step2_preprare_dircontents_source(fullDestinationPath){
 
-    await this._syncSourceToDestination(context.from, fullDestinationPath);
+    await this._syncSourceToDestination(this.from, fullDestinationPath);
     await this._removeUnwanted(fullDestinationPath);
 
     if(this._config.publishScope === "source"){
@@ -103,22 +124,12 @@ class FolderSync {
     return true;
   }
 
-  async _ensureSyncRepoDir(siteKey){
-    const resolvedDest = path.join(pathHelper.getRoot(),'sites', siteKey, 'folderSyncRepo');
-    await fs.ensureDir(resolvedDest);
-    await fs.emptyDir(resolvedDest);
-    await fs.ensureDir(resolvedDest);
-    return resolvedDest;
-  }
-
-
   async _ensureSyncDir(dir){
     await fs.ensureDir(dir);
     await fs.emptyDir(dir);
     await fs.ensureDir(dir);
     return dir;
   }
-
 }
 
 module.exports = FolderSync;

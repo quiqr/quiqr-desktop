@@ -8,18 +8,6 @@ export default class Meta {
   static sidebarLabel(config){
     return config.path;
   }
-
-  static publishCardObj(config){
-
-    let publishCardObj = {};
-    publishCardObj.serviceLogo = <FolderIcon fontSize="medium" style={{marginRight:'6px'}} />
-    publishCardObj.title = config.path;
-    publishCardObj.liveUrl= '';
-    publishCardObj.syncToText = 'Publish to folder';
-    publishCardObj.syncFromText = 'Download from folder';
-
-    return publishCardObj;
-  }
   static icon(){
     return <FolderIcon />;
   }

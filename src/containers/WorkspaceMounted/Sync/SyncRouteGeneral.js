@@ -1,15 +1,14 @@
-import React                      from 'react';
-import { Route }                  from 'react-router-dom';
-import service                    from './../../../services/service';
-import { withStyles }             from '@material-ui/core/styles';
-import MainPublishPage            from './components/MainPublishPage';
-import SyncConfigDialog           from './components/SyncConfigDialog';
-import SyncBusyDialog             from './components/SyncBusyDialog';
-import Button                     from '@material-ui/core/Button';
-import { snackMessageService }    from './../../../services/ui-service';
-import {Meta as GitHubMeta}       from './syncTypes/github'
-import {History as GitHubHistory} from './syncTypes/github'
-import {Meta as FolderMeta}       from './syncTypes/folder'
+import React                          from 'react';
+import { Route }                      from 'react-router-dom';
+import service                        from './../../../services/service';
+import { withStyles }                 from '@material-ui/core/styles';
+import SyncConfigDialog               from './components/SyncConfigDialog';
+import SyncBusyDialog                 from './components/SyncBusyDialog';
+import Button                         from '@material-ui/core/Button';
+import { snackMessageService }        from './../../../services/ui-service';
+//targets
+import {Dashboard as GitHubDashboard} from './syncTypes/github'
+import {Dashboard as FolderDashboard} from './syncTypes/folder'
 
 const useStyles = theme => ({
 
@@ -202,6 +201,7 @@ class SyncRouteGeneral extends React.Component {
 
   renderMainCard(publishConf){
 
+    /*
     let publishCardObj = {
       serviceLogo: '',
       title: '',
@@ -212,11 +212,12 @@ class SyncRouteGeneral extends React.Component {
       enableSyncFrom: false,
       enableSyncTo: true
     };
+    */
 
     let enableSyncFrom = false;
     let enableSyncTo = true;
 
-    let history;
+    let dashboard;
 
     if(publishConf.config.publishScope === 'source' ||publishConf.config.publishScope === 'build_and_source' ){
       enableSyncFrom = true;
@@ -226,9 +227,9 @@ class SyncRouteGeneral extends React.Component {
     }
 
     if(publishConf.config.type === 'github'){
-      publishCardObj = GitHubMeta.publishCardObj(publishConf.config)
-      history = (
-        <GitHubHistory
+      //publishCardObj = GitHubMeta.publishCardObj(publishConf.config)
+      dashboard = (
+        <GitHubDashboard
           siteKey={this.props.siteKey}
           workspaceKey={this.props.workspaceKey}
           onSyncDialogControl={(open, text, icon)=>{
@@ -237,38 +238,41 @@ class SyncRouteGeneral extends React.Component {
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
           publishConf={publishConf.config}
+
+          //title={publishCardObj.title}
+          //repoAdminUrl={publishCardObj.repoAdminUrl}
+          //serviceLogo={publishCardObj.serviceLogo}
+
+          onConfigure={()=>{
+            this.onConfigure(publishConf);
+          }}
+
         />
       )
     }
     else if(publishConf.config.type === 'folder'){
-      publishCardObj = FolderMeta.publishCardObj(publishConf.config)
+      //publishCardObj = FolderMeta.publishCardObj(publishConf.config)
+      dashboard = (
+        <FolderDashboard
+          siteKey={this.props.siteKey}
+          workspaceKey={this.props.workspaceKey}
+          onSyncDialogControl={(open, text, icon)=>{
+            this.syncDialogControl(open,text,icon);
+          }}
+          enableSyncFrom={enableSyncFrom}
+          enableSyncTo={enableSyncTo}
+          publishConf={publishConf.config}
+
+          onConfigure={()=>{
+            this.onConfigure(publishConf);
+          }}
+
+        />
+      )
+
     }
 
-    return <MainPublishPage
-
-      title={publishCardObj.title}
-      liveURL={publishCardObj.liveUrl}
-      repoAdminUrl={publishCardObj.repoAdminUrl}
-      serviceLogo={publishCardObj.serviceLogo}
-      syncToText={publishCardObj.syncToText}
-      syncFromText={publishCardObj.syncFromText}
-
-      enableSyncFrom={enableSyncFrom}
-      enableSyncTo={enableSyncTo}
-
-      history={history}
-
-      onConfigure={()=>{
-        this.onConfigure(publishConf);
-      }}
-
-      onMerge={()=>{
-        this.mergeAction(publishConf);
-      }}
-      onPublish={()=>{
-        this.publishAction(publishConf);
-      }}
-    />
+    return dashboard;
   }
 
   render(){
