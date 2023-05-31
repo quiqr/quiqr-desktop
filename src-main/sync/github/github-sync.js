@@ -83,7 +83,6 @@ class GithubSync {
 
     const parentPath = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
     await this._ensureSyncDirEmpty(parentPath);
-    //await this._ensureSyncDirEmpty(this._fullDestinationPath());
 
     outputConsole.appendLine('START GITHUB CHECKOUT');
     outputConsole.appendLine('-----------------');
@@ -110,7 +109,9 @@ class GithubSync {
     const filter = file => {
       return file !== '.git'
     }
-    fs.copySync(this._fullDestinationPath(), '/tmp/testsync', { filter })
+
+    await this._ensureSyncDirEmpty(global.currentSitePath);
+    fs.copySync(this._fullDestinationPath(), global.currentSitePath, { filter })
 
     return true;
 
@@ -150,7 +151,6 @@ class GithubSync {
     if(await fs.existsSync(this._remoteHistoryCacheFile())){
       const historyRemoteJson = await fs.readFileSync(this._remoteHistoryCacheFile(), {encoding: 'utf8'});
       let stat = await fs.statSync(this._remoteHistoryCacheFile());
-      console.log("hallo");
       return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
     }
     else{
@@ -180,6 +180,8 @@ class GithubSync {
 
           Embgit.pull(fullDestinationPath)
             .then(()=>{
+
+              //TODO use global.currentSitePath
               configurationDataProvider.get(async (err, configurations)=>{
                 let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
 
@@ -195,6 +197,7 @@ class GithubSync {
             .catch((err)=>{
               if(err.stdout.toString().includes("already up-to-date")) {
                 configurationDataProvider.get(async (err, configurations)=>{
+                  //TODO use global.currentSitePath
                   let site = configurations.sites.find((x)=>x.key===global.currentSiteKey);
 
                   if(this._config.syncSelection && this._config.syncSelection !== "" && this._config.syncSelection !== "all"){

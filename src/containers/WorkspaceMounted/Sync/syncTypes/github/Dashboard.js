@@ -56,7 +56,7 @@ class Dashboard extends React.Component{
     );
 
     service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'readRemote',{},90000).then((results)=>{
-      service.api.logToConsole(results)
+      //service.api.logToConsole(results.commitList)
       this.setState({
         historyArr: results.commitList,
         lastRefresh: results.lastRefresh.toString(),
@@ -145,7 +145,6 @@ class Dashboard extends React.Component{
 
     });
   }
-
 
   showMore(){
     this.setState({
@@ -373,9 +372,8 @@ class Dashboard extends React.Component{
                   <Typography>Date: {item.date}</Typography>
                   <Typography>Ref: {item.ref.substr(0,7)}</Typography>
                     <Box py={1}>
-                      {
+                      {/*
                         item.local ? null :
-                  {/* this.props.enableSyncFrom ?
                           <Button
                             onClick={()=>{
 
@@ -388,8 +386,8 @@ class Dashboard extends React.Component{
                           >
                             Try merge
                           </Button>
-                    :null*/}
 
+*/
                       }
                       <Button
                         onClick={()=>{

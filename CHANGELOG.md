@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- feature: checkout any version in complete history 😎
 - feature: show remote versions in github 🥳
 - cleanup: refactored sync frontend
 - cleanup: refactored sync api bridge

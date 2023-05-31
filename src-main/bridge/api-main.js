@@ -881,7 +881,17 @@ api.publishSite = function({siteKey, publishConf}, context){
     });
   });
 }
+api.getSiteConfig = function({siteKey}, context){
+  getSiteService(siteKey, function(err, siteService){
+    if(err){ context.reject(err); return; }
 
+    siteService.getSiteConfig().then((result)=>{
+      context.resolve(result);
+    }, ()=>{
+      context.reject(err);
+    });
+  });
+}
 api.publisherDispatchAction = function({siteKey, publishConf, action, actionParameters}, context){
   getSiteService(siteKey, function(err, siteService){
     if(err){ context.reject(err); return; }

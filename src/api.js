@@ -263,6 +263,10 @@ export class API {
   }
   */
 
+  getSiteConfig(siteKey: string){
+    return mainProcessBridge.request('getSiteConfig', {siteKey});
+  }
+
   publisherDispatchAction(siteKey: string, publishConf: any, action: string, actionParameters: any, timeout: any){
     if(!Number.isInteger(timeout)){
       timeout=130000;
