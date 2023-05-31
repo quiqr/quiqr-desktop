@@ -56,6 +56,7 @@ class Dashboard extends React.Component{
     );
 
     service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'readRemote',{},90000).then((results)=>{
+      service.api.logToConsole(results)
       this.setState({
         historyArr: results.commitList,
         lastRefresh: results.lastRefresh.toString(),
@@ -79,7 +80,7 @@ class Dashboard extends React.Component{
     });
   }
 
-  refreshRemoteStatus(){
+  refreshRemoteStatus(showSnack){
     this.props.onSyncDialogControl(
       true,
       'Refreshing commit history',
@@ -98,7 +99,10 @@ class Dashboard extends React.Component{
         Meta.icon()
       );
 
-      snackMessageService.addSnackMessage('Sync: Refreshing remote status finished.', {severity: 'success'});
+      if(showSnack){
+        snackMessageService.addSnackMessage('Sync: Refreshing remote status finished.', {severity: 'success'});
+      }
+
     }).catch(()=>{
 
       snackMessageService.addSnackMessage('Sync: Refreshing remote status failed.', {severity: 'warning'});
@@ -111,6 +115,37 @@ class Dashboard extends React.Component{
 
     });
   }
+
+  checkoutRef(refHash){
+    this.props.onSyncDialogControl(
+      true,
+      'Refreshing commit history',
+      Meta.icon()
+    );
+
+    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'checkoutRef',{ref: refHash},90000).then((results)=>{
+
+      this.props.onSyncDialogControl(
+        false,
+        Meta.syncingText,
+        Meta.icon()
+      );
+      this.refreshRemoteStatus(false);
+
+      snackMessageService.addSnackMessage(`Sync: commit with ref ${refHash} has been checkout succesfully.`, {severity: 'success'});
+    }).catch(()=>{
+
+      snackMessageService.addSnackMessage(`Sync: Failed checking out ref: ${refHash}.`, {severity: 'warning'});
+
+      this.props.onSyncDialogControl(
+        false,
+        Meta.syncingText,
+        Meta.icon()
+      );
+
+    });
+  }
+
 
   showMore(){
     this.setState({
@@ -151,7 +186,7 @@ class Dashboard extends React.Component{
         this.props.onSyncDialogControl(
           false,
           Meta.syncingText, Meta.icon());
-        this.refreshRemoteStatus();
+        this.refreshRemoteStatus(false);
 
         snackMessageService.addSnackMessage('Sync: Push to remote finished.', {severity: 'success'});
       }).catch(()=>{
@@ -167,7 +202,8 @@ class Dashboard extends React.Component{
     let lastStatusCheck = this.state.lastRefresh;
     let unpushedChanges = false;
     let remoteDiffers = true;
-    let historyArr = this.state.historyArr.slice(0,this.state.resultsShowing);
+    //let historyArr = this.state.historyArr.slice(0,this.state.resultsShowing);
+    let historyArr = this.state.historyArr;
 
     return (
       <React.Fragment>
@@ -256,7 +292,7 @@ class Dashboard extends React.Component{
 
           <Button
             onClick={()=>{
-              this.refreshRemoteStatus()
+              this.refreshRemoteStatus(true)
             }}
             size="small"
             variant="contained"
@@ -328,7 +364,7 @@ class Dashboard extends React.Component{
           {historyArr.map((item, index)=>{
 
             let content = (
-              <Paper elevation={3}>
+              <Paper elevation={3} key={"commit-"+index}>
                 <Box p={2}>
                   <Typography variant="h6" component="h1">
                     {item.message.split("+")[0]}
@@ -336,10 +372,10 @@ class Dashboard extends React.Component{
                   <Typography>Author: {item.author}</Typography>
                   <Typography>Date: {item.date}</Typography>
                   <Typography>Ref: {item.ref.substr(0,7)}</Typography>
-                  {/* this.props.enableSyncFrom ?
                     <Box py={1}>
                       {
                         item.local ? null :
+                  {/* this.props.enableSyncFrom ?
                           <Button
                             onClick={()=>{
 
@@ -352,11 +388,12 @@ class Dashboard extends React.Component{
                           >
                             Try merge
                           </Button>
+                    :null*/}
 
                       }
                       <Button
                         onClick={()=>{
-
+                          this.checkoutRef(item.ref);
                         }}
                         style={{marginRight:'5px'}}
                         size="small"
@@ -364,11 +401,10 @@ class Dashboard extends React.Component{
                         color="secondary"
                         startIcon={<ArrowDownwardIcon />}
                       >
-                        Checkout this version
+                        Checkout this Version
                       </Button>
 
                     </Box>
-                    :null*/}
                 </Box>
               </Paper>
 

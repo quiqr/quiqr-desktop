@@ -11,7 +11,6 @@ class SiteService{
     return siteSourceFactory.get(this._config.key, this._config.source);
   }
 
-  //List all workspaces
   async listWorkspaces(){
     return this._getSiteSource().listWorkspaces();
   }
@@ -51,6 +50,7 @@ class SiteService{
     }
   }
 
+  /*
   async publish(publishConfig){
     let from = pathHelper.getLastBuildDir();
     if(from==null)
@@ -64,6 +64,7 @@ class SiteService{
     let publisher = syncFactory.getPublisher(publishConfig.config, this._config.key);
     return await publisher.pullFastForwardMerge({siteKey: this._config.key, publishKey: publishConfig.key });
   }
+  */
 
   async publisherDispatchAction(publishConfig, action, actionParameters){
     let publisher = syncFactory.getPublisher(publishConfig, this._config.key);

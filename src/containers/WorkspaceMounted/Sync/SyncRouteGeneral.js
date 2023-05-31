@@ -5,7 +5,6 @@ import { withStyles }                 from '@material-ui/core/styles';
 import SyncConfigDialog               from './components/SyncConfigDialog';
 import SyncBusyDialog                 from './components/SyncBusyDialog';
 import Button                         from '@material-ui/core/Button';
-import { snackMessageService }        from './../../../services/ui-service';
 //targets
 import {Dashboard as GitHubDashboard} from './syncTypes/github'
 import {Dashboard as FolderDashboard} from './syncTypes/folder'
@@ -115,70 +114,6 @@ class SyncRouteGeneral extends React.Component {
     })
   }
 
-  //TODO MOVE TO SERVICE
-  mergeAction(publishConf){
-    this.setState({
-      serverBusyDialog: {
-        open:true,
-        //serverType: publishConf.config.type,
-      }
-    })
-
-    service.api.mergeSiteWithRemote(this.props.siteKey, publishConf).then(()=>{
-      this.setState({
-        serverBusyDialog: {
-          open:false,
-          serverType: null,
-        }
-      })
-      snackMessageService.addSnackMessage('Sync: pull from remote finished.','success');
-
-    }).catch((e)=>{
-      service.api.logToConsole(e ,"mergefail");
-      snackMessageService.addSnackMessage('Sync: pull from remote failed.', {severity: 'warning'});
-      this.setState({
-        serverBusyDialog: {
-          open:false,
-          serverType: null,
-        }
-      })
-    });
-  }
-
-  //TODO MOVE TO SERVICE
-  publishAction(publishConf){
-    const build=null;
-
-    this.setState({
-      serverBusyDialog: {
-        open:true,
-        serverType: publishConf.config.type,
-      }
-    })
-
-    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, build, publishConf.config).then(()=>{
-
-      service.api.publishSite(this.props.siteKey, publishConf).then(()=>{
-        this.setState({
-          serverBusyDialog: {
-            open:false,
-            serverType: null,
-          }
-        })
-
-        snackMessageService.addSnackMessage('Sync: Push to remote finished.', {severity: 'success'});
-      }).catch(()=>{
-        snackMessageService.addSnackMessage('Sync: Push to remote failed.', {severity: 'warning'});
-        this.setState({
-          serverBusyDialog: {
-            open:false,
-            serverType: null,
-          }
-        })
-      });
-    });
-  }
-
   savePublishData(inkey,data){
     let site= this.state.site;
 
@@ -201,19 +136,6 @@ class SyncRouteGeneral extends React.Component {
 
   renderMainCard(publishConf){
 
-    /*
-    let publishCardObj = {
-      serviceLogo: '',
-      title: '',
-      liveUrl: '',
-      syncToText: '',
-      syncFromText: '',
-      repoAdminUrl: '',
-      enableSyncFrom: false,
-      enableSyncTo: true
-    };
-    */
-
     let enableSyncFrom = false;
     let enableSyncTo = true;
 
@@ -227,21 +149,17 @@ class SyncRouteGeneral extends React.Component {
     }
 
     if(publishConf.config.type === 'github'){
-      //publishCardObj = GitHubMeta.publishCardObj(publishConf.config)
       dashboard = (
         <GitHubDashboard
           siteKey={this.props.siteKey}
           workspaceKey={this.props.workspaceKey}
-          onSyncDialogControl={(open, text, icon)=>{
-            this.syncDialogControl(open,text,icon);
-          }}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
           publishConf={publishConf.config}
 
-          //title={publishCardObj.title}
-          //repoAdminUrl={publishCardObj.repoAdminUrl}
-          //serviceLogo={publishCardObj.serviceLogo}
+          onSyncDialogControl={(open, text, icon)=>{
+            this.syncDialogControl(open,text,icon);
+          }}
 
           onConfigure={()=>{
             this.onConfigure(publishConf);
@@ -251,17 +169,17 @@ class SyncRouteGeneral extends React.Component {
       )
     }
     else if(publishConf.config.type === 'folder'){
-      //publishCardObj = FolderMeta.publishCardObj(publishConf.config)
       dashboard = (
         <FolderDashboard
           siteKey={this.props.siteKey}
           workspaceKey={this.props.workspaceKey}
-          onSyncDialogControl={(open, text, icon)=>{
-            this.syncDialogControl(open,text,icon);
-          }}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
           publishConf={publishConf.config}
+
+          onSyncDialogControl={(open, text, icon)=>{
+            this.syncDialogControl(open,text,icon);
+          }}
 
           onConfigure={()=>{
             this.onConfigure(publishConf);

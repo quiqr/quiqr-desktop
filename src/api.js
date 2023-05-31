@@ -232,6 +232,7 @@ export class API {
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 40000});
   }
+
   getThumbnailForCollectionOrSingleItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){
     return mainProcessBridge.request('getThumbnailForCollectionOrSingleItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
   }
@@ -252,6 +253,7 @@ export class API {
     return mainProcessBridge.request('copySite', {siteKey, newConf});
   }
 
+  /*
   mergeSiteWithRemote(siteKey: string, publishConf: any){
     return mainProcessBridge.request('mergeSiteWithRemote', {siteKey, publishConf}, {timeout: 130000});
   }
@@ -259,9 +261,9 @@ export class API {
   publishSite(siteKey: string, publishConf: any){
     return mainProcessBridge.request('publishSite', {siteKey, publishConf}, {timeout: 130000});
   }
+  */
 
   publisherDispatchAction(siteKey: string, publishConf: any, action: string, actionParameters: any, timeout: any){
-
     if(!Number.isInteger(timeout)){
       timeout=130000;
     }

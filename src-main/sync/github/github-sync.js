@@ -12,6 +12,8 @@ const gitBin = Embgit.getGitBin();
 const environmentResolver = new EnvironmentResolver();
 const UQIS = environmentResolver.getUQIS();
 
+let mainWindow = global.mainWM.getCurrentInstance();
+
 class GithubSync {
 
   constructor(config, siteKey){
@@ -21,8 +23,6 @@ class GithubSync {
   }
 
   async actionDispatcher(action, parameters){
-
-    //console.log(parameters);
 
     switch(action){
       case 'readRemote': {
@@ -45,6 +45,12 @@ class GithubSync {
         return historyLocalArr;
         break;
       }
+
+      case 'checkoutRef': {
+        return this._checkoutRef(parameters)
+        break;
+      }
+
       case 'pullFromRemote': {
         return this.pullFastForwardMerge()
         break;
@@ -71,18 +77,80 @@ class GithubSync {
     return path.join(resolvedDest , 'githubSync-'+ this._config.repository + '-cache_remote_history.json');
   }
 
+  async _checkoutRef(parameters){
+
+    const tmpkeypathPrivate = await this._tempCreatePrivateKey();
+
+    const parentPath = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
+    await this._ensureSyncDirEmpty(parentPath);
+    //await this._ensureSyncDirEmpty(this._fullDestinationPath());
+
+    outputConsole.appendLine('START GITHUB CHECKOUT');
+    outputConsole.appendLine('-----------------');
+    outputConsole.appendLine('  git binary:          ' + gitBin);
+    outputConsole.appendLine('  git url:             ' + this._fullGitHubUrl());
+    outputConsole.appendLine('  private key path:    ' + tmpkeypathPrivate);
+    outputConsole.appendLine('  destination path:    ' + this._fullDestinationPath());
+    outputConsole.appendLine('');
+    outputConsole.appendLine('  github username:     ' + this._config.username);
+    outputConsole.appendLine('  github repository:   ' + this._config.repository);
+    outputConsole.appendLine('  github email:        ' + this._config.email);
+    outputConsole.appendLine('');
+    outputConsole.appendLine('  git ref:             ' + parameters.ref);
+    outputConsole.appendLine('-----------------');
+    outputConsole.appendLine('');
+
+    mainWindow.webContents.send("updateProgress", 'Making a fresh clone of the repository..', 20);
+    await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, this._fullGitHubUrl() , this._fullDestinationPath() ]);
+
+    mainWindow.webContents.send("updateProgress", 'Checking out ref:'+parameters.ref, 70);
+    await cliExecuteHelper.try_execute("git-checkout", gitBin, ["checkout", '-r', parameters.ref, this._fullDestinationPath() ]);
+
+    mainWindow.webContents.send("updateProgress", 'Copying to main site directory', 90);
+    const filter = file => {
+      return file !== '.git'
+    }
+    fs.copySync(this._fullDestinationPath(), '/tmp/testsync', { filter })
+
+    return true;
+
+  }
+
   async _historyRemote(){
+
+    //historySize=20;
+
+    mainWindow.webContents.send("updateProgress", 'Getting remote commits.', 20);
     const historyRemoteJson = await cliExecuteHelper.try_execute("git-log-remote", gitBin, [ "log_remote", "-s", "-i", await this._tempCreatePrivateKey(), this._fullGitHubUrl() ]);
     const historyRemoteArr = JSON.parse(historyRemoteJson);
-    await fs.writeFileSync(this._remoteHistoryCacheFile(), historyRemoteJson,'utf-8');
+
+    mainWindow.webContents.send("updateProgress", 'Comparing with local commit history', 80);
+    const historyLocalJson = await cliExecuteHelper.try_execute("git-log-local", gitBin, [ "log_local", this._fullDestinationPath() ]);
+    const historyLocalArr = JSON.parse(historyLocalJson);
+
+    let historyMergedArr = [];
+    historyRemoteArr.forEach((commit)=>{
+
+      if (historyLocalArr.filter(e => e.ref === commit.ref).length > 0) {
+        commit.local = true;
+      }
+      historyMergedArr.push(commit);
+    })
+
+    let historyMergedJson = JSON.stringify(historyMergedArr);
+
+    mainWindow.webContents.send("updateProgress", 'Writing commit history cache', 100);
+    await fs.writeFileSync(this._remoteHistoryCacheFile(), historyMergedJson,'utf-8');
     let stat = await fs.statSync(this._remoteHistoryCacheFile());
-    return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
+
+    return {lastRefresh: stat['mtime'], commitList: historyMergedArr};
   }
 
   async _historyRemoteFromCache(){
     if(await fs.existsSync(this._remoteHistoryCacheFile())){
       const historyRemoteJson = await fs.readFileSync(this._remoteHistoryCacheFile(), {encoding: 'utf8'});
       let stat = await fs.statSync(this._remoteHistoryCacheFile());
+      console.log("hallo");
       return {lastRefresh: stat['mtime'], commitList: JSON.parse(historyRemoteJson)};
     }
     else{
@@ -165,7 +233,6 @@ class GithubSync {
     const resolvedDest = await this._ensureSyncRepoDir(this.siteKey);
     const fullGitHubUrl = 'git@github.com:' + this._config.username + '/' + this._config.repository +'.git';
     const fullDestinationPath = path.join(resolvedDest , this._config.repository);
-    let mainWindow = global.mainWM.getCurrentInstance();
 
     outputConsole.appendLine('START GITHUB SYNC');
     outputConsole.appendLine('-----------------');
@@ -372,6 +439,12 @@ jobs:
 
     }
     return true;
+  }
+  async _ensureSyncDirEmpty(dir){
+    await fs.ensureDir(dir);
+    await fs.emptyDir(dir);
+    await fs.ensureDir(dir);
+    return dir;
   }
 
   async _ensureSyncRepoDir(siteKey){

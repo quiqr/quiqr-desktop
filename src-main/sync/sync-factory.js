@@ -6,7 +6,7 @@ class SyncFactory{
     let type = publisherConfig.type;
     let genericPublisherConfig = (publisherConfig);
 
-    outputConsole.appendLine(' about to start publisher with type: ' + type )
+    //outputConsole.appendLine(' about to start publisher with type: ' + type )
 
     const typePath = path.join('../sync', type, type+'-sync')
     try{
