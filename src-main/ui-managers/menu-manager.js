@@ -1,15 +1,16 @@
-const electron                    = require('electron');
-const Menu                        = electron.Menu;
-const path                        = require("path");
-const { lstatSync }               = require('fs')
-const fssimple                    = require('fs');
-const fs                          = require('fs-extra');
-const { shell }                   = require('electron')
-const logWindowManager            = require('./log-window-manager');
-const pogozipper                  = require('../import-export/pogozipper');
-const pathHelper                  = require('../utils/path-helper');
-const configurationDataProvider   = require('../app-prefs-state/configuration-data-provider')
-const { EnvironmentResolver }     = require('../utils/environment-resolver');
+const electron                                  = require('electron');
+const Menu                                      = electron.Menu;
+const path                                      = require("path");
+const { lstatSync }                             = require('fs')
+const fssimple                                  = require('fs');
+const fs                                        = require('fs-extra');
+const { shell }                                 = require('electron')
+const logWindowManager                          = require('./log-window-manager');
+const pogozipper                                = require('../import-export/pogozipper');
+const pathHelper                                = require('../utils/path-helper');
+const configurationDataProvider                 = require('../app-prefs-state/configuration-data-provider')
+const hugoDownloader                            = require('../hugo/hugo-downloader')
+const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../utils/environment-resolver');
 
 const app = electron.app
 let menuObject = null;
@@ -196,7 +197,8 @@ class MenuManager {
       });
     });
 
-    return rolesMenu;
+    return [];
+    //return rolesMenu;
   }
 
 
@@ -257,6 +259,43 @@ class MenuManager {
     });
   }
 
+
+
+
+  getHugoVersionsSubMenu(platform, extended){
+
+    const jsonFile = path.join(pathHelper.getApplicationResourcesDir(),"all","filteredHugoVersions.json");
+    let filteredVersions = ["v0.100.2"];
+
+    if(fs.existsSync(jsonFile)){
+      const jsonContent = fssimple.readFileSync(jsonFile, {encoding:'utf8', flag:'r'})
+      filteredVersions = JSON.parse(jsonContent);
+    }
+
+    let expMenu = []
+    filteredVersions.forEach((version)=>{
+
+      let versionStr = version;
+      if(extended){
+        versionStr = 'extended_'+version.replace("v",'');
+      }
+
+
+      let versionItem = {
+        id: `${versionStr}_${platform}`,
+        label: versionStr,
+        click: async () => {
+          hugoDownloader.downloader.download(versionStr, {platform: platform, arch: ARCHS.x64 }, true);
+        }
+      };
+      expMenu.push(versionItem);
+    })
+
+    return expMenu;
+  }
+
+
+
   createExperimentalMenu(){
     let expMenu = [
       {
@@ -281,6 +320,45 @@ class MenuManager {
         click: async () => {
           global.apiMain.invalidateCache({},context);
         }
+      },
+      {
+        label: 'Hugo Download',
+        submenu: [
+          {
+            label: 'Minimal',
+            submenu: [
+              {
+                label: 'Windows',
+                submenu: this.getHugoVersionsSubMenu(PLATFORMS.windows, false),
+              },
+              {
+                label: 'macOS',
+                submenu: this.getHugoVersionsSubMenu(PLATFORMS.macOS, false),
+              },
+              {
+                label: 'Linux',
+                submenu: this.getHugoVersionsSubMenu(PLATFORMS.linux, false),
+              },
+            ]
+          },
+          {
+            label: 'Extended',
+            submenu: [
+              {
+                label: 'Windows',
+                submenu: this.getHugoVersionsSubMenu(PLATFORMS.windows, true),
+              },
+              {
+                label: 'macOS',
+                submenu: this.getHugoVersionsSubMenu(PLATFORMS.macOS, true),
+              },
+              {
+                label: 'Linux',
+                submenu: this.getHugoVersionsSubMenu(PLATFORMS.linux, true),
+              },
+            ]
+          },
+        ]
       },
       {
         label: 'Import',

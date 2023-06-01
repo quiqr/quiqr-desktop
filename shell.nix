@@ -54,6 +54,7 @@ in
     nativeBuildInputs = [
       pkgs.nodejs-16_x
       pkgs.hugo
+      pkgs.p7zip
       pkgs.electron_9
       myPackages.embgit
       pkgs.xdg-utils
@@ -63,4 +64,5 @@ in
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
     #EMBGIT_PATH="${myPackages.embgit}/bin/src"; #STUPID HACK
     HUGO_PATH="${pkgs.hugo}/bin/hugo";
+    P7ZIP_PATH="${pkgs.p7zip}/bin/7za";
   }

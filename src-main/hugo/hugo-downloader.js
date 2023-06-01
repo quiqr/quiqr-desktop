@@ -5,42 +5,86 @@ const fs                                        = require('fs-extra');
 const mkdirp                                    = require("mkdirp");
 const path                                      = require("path");
 const glob                                      = require("glob");
-const {path7za}                                 = require("7zip-bin");
 const request                                   = require('request');
 
 const pathHelper                                = require('./../utils/path-helper');
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../utils/environment-resolver');
 const outputConsole                             = require('./../logger/output-console');
 
-
 class OfficialHugoSourceUrlBuilder{
-  build(enviromnent, version){
+
+  build(environment, version){
+
+    version = version.replace(/^v/i,'');
+    let versionMain = parseInt(version.split(".")[1]);
+
+    let arch;
+    switch(environment.arch){
+      case ARCHS.x32: { arch = '32bit'; break; }
+      case ARCHS.x64: {
+        if(versionMain >= 103){
+          arch = 'amd64';
+        }
+        else{
+          arch = '64bit';
+        }
+        break; }
+      default:{ throw new Error('Not implemented.') }
+    }
+
     let platform;
     let format;
-    switch(enviromnent.platform){
-      case PLATFORMS.linux: { platform = 'Linux'; format = 'tar.gz'; break; }
-      case PLATFORMS.windows: { platform = 'Windows'; format = 'zip'; break; }
-      case PLATFORMS.macOS: { platform = 'macOS'; format = 'tar.gz'; break; }
+    switch(environment.platform){
+      case PLATFORMS.linux: {
+        if(versionMain >= 103){
+          platform = 'linux';
+        }
+        else{
+          platform = 'Linux';
+        }
+        format = 'tar.gz';
+        break;
+      }
+      case PLATFORMS.windows: {
+        if(versionMain >= 103){
+          platform = 'windows';
+        }
+        else{
+          platform = 'Windows';
+        }
+        format = 'zip';
+        break;
+      }
+      case PLATFORMS.macOS: {
+        if(versionMain >= 103){
+          platform = 'darwin';
+        }
+        else{
+          platform = 'macOS';
+        }
+
+        if(versionMain >= 102){
+          arch = 'universal';
+        }
+        format = 'tar.gz';
+        break;
+      }
       default:{ throw new Error('Not implemented.') }
     }
-    let arch;
-    switch(enviromnent.arch){
-      case ARCHS.x32: { arch = '32bit'; break; }
-      case ARCHS.x64: { arch = '64bit'; break; }
-      default:{ throw new Error('Not implemented.') }
-    }
-    version = version.replace(/^v/i,'');
+
     return `https://github.com/gohugoio/hugo/releases/download/v${version.replace('extended_','')}/hugo_${version}_${platform}-${arch}.${format}`;
   }
 }
 
 class OfficialHugoUnpacker{
 
+
   _unpackLinux(packagePath){
+
     packagePath = path.normalize(packagePath);
     let output = path.dirname(packagePath);
     return new Promise((resolve,reject)=>{
-      execFile(path7za, ['e', packagePath, '-o'+output, '*', '-r', '-y' ], (error)=>{
+      execFile(pathHelper.get7zaBin(), ['e', packagePath, '-o'+output, '*', '-r', '-y' ], (error)=>{
         if(error) reject(error);
         else resolve();
       });
@@ -55,7 +99,7 @@ class OfficialHugoUnpacker{
       });
     }).then((tarFile)=>{
       return new Promise((resolve, reject)=>{
-        execFile(path7za, ['e', tarFile, '-o'+output, 'hugo*', '-r', '-y' ], (error)=>{
+        execFile(pathHelper.get7zaBin(), ['e', tarFile, '-o'+output, 'hugo*', '-r', '-y' ], (error)=>{
           if(error){ reject(error); return; }
           fs.chmodSync(packagePath.replace('download.partial','hugo'),722);
           resolve();
@@ -68,7 +112,7 @@ class OfficialHugoUnpacker{
     packagePath = path.normalize(packagePath);
     let output = path.dirname(packagePath);
     return new Promise((resolve,reject)=>{
-      execFile(path7za, ['e', packagePath, '-o'+output, '*.exe', '-r', '-y' ], (error)=>{
+      execFile(pathHelper.get7zaBin(), ['e', packagePath, '-o'+output, '*.exe', '-r', '-y' ], (error)=>{
         if(error)
           reject(error);
         else
@@ -77,8 +121,8 @@ class OfficialHugoUnpacker{
     });
   }
 
-  unpack(packagePath, enviromnent){
-    switch(enviromnent.platform){
+  unpack(packagePath, environment){
+    switch(environment.platform){
       case PLATFORMS.linux:
       case PLATFORMS.macOS: //don't know if this will work
         return this._unpackLinux(packagePath);
@@ -110,7 +154,10 @@ class HugoDownloader{
         resolve();
       });
 
-      request.get(url)
+      request.get({
+          uri: url,
+          method: 'GET'
+        })
         .on('error', function(err) {
           reject(err);
         })
@@ -118,29 +165,34 @@ class HugoDownloader{
     });
   }
 
-  async download(version){
+  async download(version, environment = null, skipExistCheck=false){
+
 
     if(this._isRunning){ return; }
 
     let bin = pathHelper.getHugoBinForVer(version);
-    if(fs.existsSync(bin)){
+    if(!skipExistCheck && fs.existsSync(bin)){
       return;
     }
 
     this._isRunning = true;
 
     try{
-      let enviromnent = new EnvironmentResolver().resolve();
-      let url = new OfficialHugoSourceUrlBuilder().build(enviromnent,version);
+
+      if(!environment){
+        environment = new EnvironmentResolver().resolve();
+      }
+
+      let url = new OfficialHugoSourceUrlBuilder().build(environment,version);
       let unpacker = new OfficialHugoUnpacker();
       let tempDest = path.join(pathHelper.getHugoBinDirForVer(version) , 'download.partial');
-
 
       if(fs.existsSync(tempDest)){
         await fs.unlink(tempDest)
       }
 
       let mainWindow = global.mainWM.getCurrentInstance();
+
       var progressBar = new ProgressBar({
         indeterminate: false,
         text: 'Downloading Quiqr Components, ..',
@@ -165,7 +217,6 @@ class HugoDownloader{
           console.info(`aborted... ${value}`);
         })
 
-
       outputConsole.appendLine(`Hugo installation started. Downloading package from ${url}...`);
       progressBar.value += 30;
       progressBar.detail = `Getting Hugo version...`
@@ -175,7 +226,7 @@ class HugoDownloader{
       outputConsole.appendLine(`Unpacking....`);
       progressBar.value += 30;
       progressBar.detail = `Unpacking Hugo-component`
-      await unpacker.unpack(tempDest, enviromnent);
+      await unpacker.unpack(tempDest, environment);
       await fs.unlink(tempDest);
 
       progressBar.value = 100;
@@ -186,6 +237,7 @@ class HugoDownloader{
       this._isRunning = false;
     }
     catch(e){
+      console.log(e.toString())
       outputConsole.appendLine(`Hugo installation failed.`);
       const dialog = electron.dialog;
       let mainWindow = global.mainWM.getCurrentInstance();

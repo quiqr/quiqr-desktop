@@ -5,6 +5,7 @@ const fs                                 = require('fs-extra');
 const rootPath                           = require('./electron-root-path').rootPath;
 const { EnvironmentResolver, PLATFORMS } = require('./environment-resolver');
 const QuiqrAppConfig                     = require('../app-prefs-state/quiqr-app-config');
+const {path7za}                          = require("7zip-bin");
 
 const pogoconf = QuiqrAppConfig();
 
@@ -121,6 +122,15 @@ class PathHelper{
     else{
       //oldfile
       return path.join(this.getRoot(), 'sites', siteKey, 'config.json');
+    }
+  }
+
+  get7zaBin(){
+    if(process.env.P7ZIP_PATH) {
+      return process.env.P7ZIP_PATH;
+    }
+    else {
+      return path7za;
     }
   }
 
