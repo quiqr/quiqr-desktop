@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.17.3 (2023-06-01)
 - feature: checkout any version in complete history 😎
 - feature: show remote versions in github 🥳
 - feature: hugo download tester for all platforms
