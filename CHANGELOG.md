@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: typo #443
+
 ## 0.17.3 (2023-06-01)
 - feature: checkout any version in complete history 😎
 - feature: show remote versions in github 🥳
@@ -6,7 +9,7 @@
 - cleanup: refactored sync frontend
 - cleanup: refactored sync api bridge
 - cleanup: refactored sync backend
-- fix: fix hugo downloads after v0.102.x (wrong url's)
+- fix: fix hugo downloads after v0.102.x (wrong url's) #444 #443
 - fix: fix folder sync (synced to wrong path)
 - fix: typo in sync
 

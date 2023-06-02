@@ -521,7 +521,7 @@ class NewSiteDialog extends React.Component{
   renderStep3NewFinished(){
     return (
       <div>
-        The site has been succesfully newed. <Button onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.newSiteName} now</Button>.
+        The site has been succesfully created. <Button onClick={()=>{this.handleOpenNewSite()}}>Open {this.state.newSiteName} now</Button>.
       </div>
     )
   }
