@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.17.4 (2023-06-02)
 - fix: typo #443
 
 ## 0.17.3 (2023-06-01)
