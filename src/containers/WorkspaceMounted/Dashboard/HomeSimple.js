@@ -17,7 +17,7 @@ const styles = {
   creatorMessage: {
     borderBottom: 'solid 1px transparent',
     padding: '0 20px ',
-    fontSize: '80%'
+    fontSize: '90%'
   }
 }
 

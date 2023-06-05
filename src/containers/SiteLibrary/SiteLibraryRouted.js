@@ -313,6 +313,7 @@ class SiteLibraryRouted extends React.Component{
 
       sites = [];
       this.state.quiqrCommunityTemplates.forEach((template)=>{
+
         let screenshotURL = null;
         if(template.ScreenshotImageType){
           screenshotURL = "https://quiqr.github.io/quiqr-community-templates/templates/"+template.NormalizedName+"/screenshot."+template.ScreenshotImageType;

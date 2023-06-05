@@ -10,11 +10,11 @@ const apiMain           = require('./bridge/api-main');
 unhandled();
 
 const app = electron.app
+const session = electron.session
 
 if(app.isPackaged) {
   process.env.NODE_ENV = 'production';
 }
-
 
 
 // FIXME TODO this is to solve the 2021q3 Lets Encrypt problems
@@ -57,6 +57,7 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
+  session.defaultSession.clearStorageData();
   createWindow();
   menuManager.createMainMenu();
   mainWindow.setMenuBarVisibility(true)
