@@ -91,7 +91,7 @@ class FontIconPickerDynamic extends BaseDynamic {
 
           <FormControl >
             <InputLabel id="demo-controlled-open-select-label">{field.title}</InputLabel>
-            <IconPicker value={this.props.context.value} buttonStyles={{marginTop:"40px", width:"130px"}} buttonIconStyles={{fontSize:'100px', color: '#aaa'}} containerStyles={{marginLeft:'230px', height:'300px', width:"500px"}}  size={48} onChange={(v) => this.props.context.setValue(v)} />
+            <IconPicker value={this.props.context.value} buttonStyles={{marginTop:"40px", width:"130px"}} buttonIconStyles={{fontSize:'100px', color: '#666'}} containerStyles={{marginLeft:'230px', height:'300px', width:"500px"}}  size={48} onChange={(v) => this.props.context.setValue(v)} />
             <TextField
               value={this.props.context.value||''}
               disabled={true}
