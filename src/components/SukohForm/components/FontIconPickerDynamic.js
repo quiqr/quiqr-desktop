@@ -6,6 +6,7 @@ import FormItemWrapper from './shared/FormItemWrapper';
 import { BaseDynamic } from '../../HoForm';
 import Tip             from '../../Tip';
 import { IconPicker }  from 'react-fa-icon-picker'
+//import service         from '../../../services/service';
 
 class FontIconPickerDynamic extends BaseDynamic {
 
@@ -64,13 +65,22 @@ class FontIconPickerDynamic extends BaseDynamic {
 
   renderComponent(){
 
+
     let {context} = this.props;
+
     let {node, currentPath, parentPath} = context;
     let {field} = node;
+
+    /*
+    service.api.getValueByConfigPath("singles", field.if).then((val)=>{
+      service.api.logToConsole(val);
+    });
+    */
 
     if(currentPath!==parentPath){
       return (null);
     }
+
 
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
@@ -87,9 +97,7 @@ class FontIconPickerDynamic extends BaseDynamic {
               disabled={true}
               fullWidth={true}
             />
-
-
-              </FormControl>
+          </FormControl>
         }
         iconButtons={iconButtons}
       />);

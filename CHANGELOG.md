@@ -3,6 +3,7 @@
 
 ## 0.17.4 (2023-06-02)
 - fix: typo #443
+- feature: new form field type: fontIconSelect
 
 ## 0.17.3 (2023-06-01)
 - feature: checkout any version in complete history 😎

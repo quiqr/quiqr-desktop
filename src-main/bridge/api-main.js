@@ -535,6 +535,29 @@ api.getSingle = function({siteKey, workspaceKey, singleKey}, context) {
   });
 }
 
+
+//WIP
+api.getValueByConfigPath = async function({searchRootNode, path }, context){
+  const { workspaceService } = await getWorkspaceServicePromise(global.currentSiteKey, global.currentWorkspaceKey);
+  let configuration;
+  try{
+    configuration = await workspaceService.getConfigurationsData();
+
+    if(searchRootNode in configuration){
+
+      let confObj = configuration[searchRootNode].find(x => x['key'] === 'mainConfig');
+      let value = confObj.fields.find(x => x['key'] === 'use_font_icons');
+      console.log("JIOEJOEE")
+      //let value = confObj['use_font_icons'];
+      context.resolve(value);
+    }
+  }
+  catch(e){
+    console.log("could not get configuration for dynformfields")
+  }
+}
+
+
 api.getDynFormFields = async function({searchRootNode, searchLevelKeyVal }, context){
   const { workspaceService } = await getWorkspaceServicePromise(global.currentSiteKey, global.currentWorkspaceKey);
   let configuration;
