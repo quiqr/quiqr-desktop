@@ -69,7 +69,7 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha",
     "clean": "rm -Rf dist && rm -Rf build",
-    "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4001 electron .",
+    "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4001 electron --no-sandbox .",
     "_react-dev": "cross-env APP_ENV=development BROWSERSLIST_IGNORE_OLD_DATA=true BROWSER=none PORT=4001 react-scripts start",
     "_react-build": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true react-scripts build",
     "_copy-electron-code": "copyfiles -u 1 \"./src-main/**/*\" \"./build/electron/\"",
