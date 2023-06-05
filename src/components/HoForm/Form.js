@@ -136,6 +136,10 @@ class Form extends React.Component {
       node.field.title = node.field.key
     }
 
+    if(node.field.disabled === true){
+      return null;
+    }
+
     var {field} = node;
     let component = this.props.componentRegistry.get(field.type);
     try{
@@ -147,7 +151,6 @@ class Form extends React.Component {
 
       let nodePath = this.buildPath(node);
       let parentPath = this.buildPath(node.parent);
-
 
       let context = new ComponentContext(this, node, this.state.path, parentPath, nodePath,component.proplessInstance, onValueChanged);
 
