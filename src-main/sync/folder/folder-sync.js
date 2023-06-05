@@ -79,7 +79,7 @@ class FolderSync {
 
     await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath);
     await this._removeUnwanted(fullDestinationPath);
-    await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
+    //await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
@@ -94,12 +94,13 @@ class FolderSync {
     }
 
     await fs.ensureDir(path.join(fullDestinationPath,"static"))
-    await fs.writeFileSync(path.join(fullDestinationPath, "static", ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
+    //await fs.writeFileSync(path.join(fullDestinationPath, "static", ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
 
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
 
+  /*
   _quiqr_with_me_json(){
     let publDate = Date.now();
     return {
@@ -107,6 +108,7 @@ class FolderSync {
       path: this._config.repository
     }
   }
+  */
 
   async _removeUnwanted(fullDestinationPath){
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.quiqr-cache'));

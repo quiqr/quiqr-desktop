@@ -283,7 +283,7 @@ class GithubSync {
 
     await this._removeUnwanted(fullDestinationPath);
     await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath, "all");
-    await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
+    //await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
@@ -305,7 +305,7 @@ class GithubSync {
     }
 
     await fs.ensureDir(path.join(fullDestinationPath,"static"))
-    await fs.writeFileSync(path.join(fullDestinationPath, "static", ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
+    //await fs.writeFileSync(path.join(fullDestinationPath, "static", ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
 
     outputConsole.appendLine('prepare and sync finished');
     return true;
@@ -327,6 +327,7 @@ class GithubSync {
     return true;
   }
 
+  /*
   _quiqr_with_me_json(){
     let publDate = Date.now();
     return {
@@ -334,6 +335,7 @@ class GithubSync {
       path: this._config.repository
     }
   }
+  */
 
   async _github_cname(fullDestinationPath){
     await fs.writeFileSync(path.join(fullDestinationPath, "CNAME"), this._config.CNAME ,'utf-8');
