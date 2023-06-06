@@ -1,8 +1,7 @@
-import React from 'react';
-import service from './../../services/service'
-//import { snackMessageService } from './../../services/ui-service'
+import React         from 'react';
+import service       from './../../services/service'
 import { SukohForm } from './../../components/SukohForm';
-import Spinner from './../../components/Spinner';
+import Spinner       from './../../components/Spinner';
 
 class Single extends React.Component{
   constructor(props){

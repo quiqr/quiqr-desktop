@@ -19,7 +19,6 @@ import CardItem                     from './components/CardItem';
 import BlockDialog                  from './../../components/BlockDialog';
 import Spinner                      from './../../components/Spinner';
 import service                      from './../../services/service';
-//import { snackMessageService } from './../../services/ui-service';
 import { withStyles }               from '@material-ui/core/styles';
 
 const net = window.require('electron').remote.net;

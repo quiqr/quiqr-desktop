@@ -36,9 +36,12 @@ const useStyles = theme => ({
     height: "160px",
     padding:"40px",
     cursor: "pointer",
+    /*
     backgroundColor:"#eee",
+    */
     '&:hover': {
-      backgroundColor:"#ccc"
+      backgroundColor:"#eee",
+      color:"#222"
     }
   },
   formControl: {

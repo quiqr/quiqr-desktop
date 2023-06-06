@@ -408,6 +408,11 @@ api.parentMountWorkspace = async function({siteKey, workspaceKey}){
   mainWindow.webContents.send("redirectToGivenLocation",`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspaceKey)}`)
 }
 
+api.reloadThemeStyle = async function(){
+  let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+  mainWindow.webContents.send("reloadThemeStyle")
+}
+
 api.logToConsole = function({message, label}){
 
   if(label){

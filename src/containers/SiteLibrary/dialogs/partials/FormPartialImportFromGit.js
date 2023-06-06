@@ -494,7 +494,7 @@ class FormPartialNewFromScratch extends React.Component{
 
 
         <Box my={2}>
-          <Card className={classes.root} variant="outlined" style={{backgroundColor:'#eee'}}>
+          <Card className={classes.root} variant="outlined">
             <CardMedia
               className={classes.cover}
               image={(this.state.importTypeGitScreenshot?this.state.importTypeGitScreenshot:ScreenShotPlaceholder)}

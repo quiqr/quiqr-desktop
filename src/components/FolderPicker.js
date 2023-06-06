@@ -45,8 +45,6 @@ export default class FolderPicker extends React.Component{
           variant="outlined"
           value={selectedFolder||''}
           label={label}
-          xfloatingLabelText={label}
-          xfloatingLabelFixed
           onClick={this.handleTextFieldClick.bind(this)}
           style={{flex:'1 0 500px',  flexDirection: 'row'}} />
         <Button

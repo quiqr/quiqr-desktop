@@ -60,7 +60,7 @@ class FontPickerDynamic extends BaseDynamic {
               fontSize:12,
               pointerEvents: 'none',
               userSelect: 'none',
-              color: 'rgba(0, 0, 0, 0.3)' }}>{field.title}</label>
+              }}>{field.title}</label>
 
 
             <FontPicker

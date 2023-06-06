@@ -58,7 +58,7 @@ class BundleManagerItem extends React.Component{
       cursor:'pointer',
       position:'relative',
       fontSize: 12,
-      color: 'rgba(0, 0, 0, 0.47)'
+      //color: 'rgba(0, 0, 0, 0.47)'
     }, headStyle);
 
     let _bodyStyle = Object.assign({

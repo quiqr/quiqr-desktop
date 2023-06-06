@@ -189,9 +189,11 @@ class Dashboard extends React.Component{
 
         snackMessageService.addSnackMessage('Sync: Push to remote finished.', {severity: 'success'});
       }).catch(()=>{
+
         this.props.onSyncDialogControl(
           false,
           Meta.syncingText, Meta.icon());
+
         snackMessageService.addSnackMessage('Sync: Push to remote failed.', {severity: 'warning'});
       });
     });

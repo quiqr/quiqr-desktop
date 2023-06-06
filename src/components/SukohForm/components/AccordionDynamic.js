@@ -397,6 +397,7 @@ class AccordionDynamic extends BaseDynamic {
       label = newNode.state[arrayTitle.key];
     }
 
+    /*
     let headStyle = {
       backgroundColor: '#eee',
     }
@@ -405,11 +406,12 @@ class AccordionDynamic extends BaseDynamic {
         backgroundColor: "#e2e2e2",
       };
     }
+    */
 
     return (
       <AccordionItem key={componentKey}
         label={label}
-        headStyle={headStyle}
+        //headStyle={headStyle}
         bodyStyle={{padding:'16px 16px 0px 16px'}}
         body={ context.renderLevel(newNode) }
         wrapperProps={{

@@ -224,7 +224,7 @@ class FormPartialNewFromHugoTheme extends React.Component{
         </Box>
 
         <Box my={3}>
-          <Card className={classes.root} variant="outlined" style={{backgroundColor:'#eee'}}>
+          <Card className={classes.root} variant="outlined">
             <CardMedia
               className={classes.cover}
               image={(this.state.newTypeHugoThemeScreenshot?this.state.newTypeHugoThemeScreenshot:ScreenShotPlaceholder)}

@@ -125,7 +125,7 @@ class SiteConfRouteModel extends React.Component {
                     onClick={()=>{
                       service.api.openFileInEditor(item.filename);
                     }}>
-                    {(item.icon ? item.icon : <DescriptionIcon style={{ color: '#000' }} />)}
+                    {(item.icon ? item.icon : <DescriptionIcon />)}
                   </IconButton>
                 </Grid>
               </Grid>
@@ -152,7 +152,7 @@ class SiteConfRouteModel extends React.Component {
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">Model Configuration</Typography>
 
-        {this.renderSection("Model Directory", [{key:'directory',filename:this.state.source.path + "/quiqr/model", icon: <FolderIcon style={{ color: '#000' }} />}])}
+        {this.renderSection("Model Directory", [{key:'directory',filename:this.state.source.path + "/quiqr/model", icon: <FolderIcon />}])}
         {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile }])}
         {this.renderSection("Include Files", includeFiles)}
         {this.renderSection("Partial Files", partialFiles)}

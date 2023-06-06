@@ -32,7 +32,6 @@ class AccordionItem extends React.Component{
 
         let _headStyle = Object.assign({
             border: 'solid 1px #d8d8d8',
-            //backgroundColor: '#e2e2e2',
             padding: '16px',
             display:'block',
             cursor:'pointer',

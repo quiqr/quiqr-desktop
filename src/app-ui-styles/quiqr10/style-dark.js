@@ -1,5 +1,3 @@
-//the default locked UI style
-
 const topBarHeight = '52px';
 const sidebarWidth= '280px';
 
@@ -16,7 +14,8 @@ exports.menuContainer = {
   overflowY:'auto',
   overflowX:'hidden',
   userSelect:'none',
-  background:'linear-gradient(to bottom right, #eaebed, #eaebed)',
+  //background:'linear-gradient(to bottom right, #eaebed, #eaebed)',
+  backgroundColor: '#222'
 };
 
 exports.contentContainer = {
@@ -24,4 +23,14 @@ exports.contentContainer = {
   userSelect:'none',
   overflow: 'auto',
   overflowX: 'hidden'
+};
+
+exports.topToolbar = {
+  borderTop: 'solid 1px #c7c5c4',
+  borderBottom: 'solid 1px #c7c5c4',
+  top: 0,
+  position: 'absolute',
+  display: 'flex',
+  width: '100%',
+  backgroundColor: '#222'
 };

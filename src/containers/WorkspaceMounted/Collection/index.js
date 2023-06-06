@@ -518,7 +518,7 @@ class Collection extends React.Component{
           </div>
 
           <Paper>
-            <div style={{backgroundColor: "#eee",display: 'flex',justifyContent: "flex-end", flexWrap: 'no-wrap', padding: '10px 10px'}}>
+            <div style={{/*backgroundColor: "#eee",*/ display: 'flex',justifyContent: "flex-end", flexWrap: 'no-wrap', padding: '10px 10px'}}>
 
 
               <FormControlLabel

@@ -10,7 +10,7 @@ import { BaseDynamic } from '../../HoForm';
 class TextFieldLabelMock extends React.Component{
   render(){
     return <label style={{
-      display:'block', lineHeight: '22px', fontSize:12, pointerEvents: 'none', userSelect: 'none', color: 'rgba(0, 0, 0, 0.3)' }}>{this.props.children}</label>;
+      display:'block', lineHeight: '22px', fontSize:12, pointerEvents: 'none', userSelect: 'none',  }}>{this.props.children}</label>;
   }
 }
 

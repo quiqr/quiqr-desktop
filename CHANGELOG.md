@@ -1,4 +1,9 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix refreshing history after new clone
+- dark mode
+- live switch light and dark mode
+
 ## 0.17.6 (2023-06-06)
 - fix wrong npm's
 

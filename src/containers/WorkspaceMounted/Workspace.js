@@ -19,7 +19,7 @@ import { SyncSidebar, SyncRouted }         from './Sync';
 import service                             from '../../services/service';
 
 //TODO use global
-let style = require('../../app-ui-styles/quiqr10/style.js');
+let style = require('../../app-ui-styles/quiqr10/style-light.js');
 
 class WorkSpace extends React.Component{
 
@@ -54,13 +54,25 @@ class WorkSpace extends React.Component{
     service.registerListener(this);
 
     this.refresh();
+    this.setThemeStyleFromPrefs();
+  }
 
+  setThemeStyleFromPrefs(){
     service.api.readConfKey('prefs').then((value)=>{
       if(value.interfaceStyle){
-        this.setState({style: require('../../app-ui-styles/'+value.interfaceStyle+'/style.js') });
+
+        let themeStyle='light';
+        if(value.interfaceStyle ==='quiqr10-dark'){
+          themeStyle='dark';
+        }
+
+        this.setState({
+          style: require('../../app-ui-styles/quiqr10/style-'+themeStyle+'.js'),
+        });
       }
     });
   }
+
 
   componentDidUpdate(preProps: compProps){
 
@@ -406,6 +418,7 @@ class WorkSpace extends React.Component{
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;
     let contentContainerStyle = this.state.style.contentContainer;
+    let topToolbarStyle = this.state.style.topToolbar;
 
     if(!this.state.menuIsLocked){
       contentContainerStyle = Object.assign({}, contentContainerStyle, {display: 'block', paddingLeft:'66px' });
@@ -438,7 +451,7 @@ class WorkSpace extends React.Component{
 
             <div className="App" style={marginStyles}>
 
-              <div className="topToolbar">
+              <div style={topToolbarStyle}>
 
                 <div className="toolbarLeft">
                   { this.renderTopToolbarLeftSwitch() }

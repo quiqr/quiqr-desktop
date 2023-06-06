@@ -1,17 +1,13 @@
-import React from 'react';
-import service from './../../services/service';
-import Typography from '@material-ui/core/Typography';
-import Select                       from '@material-ui/core/Select';
-
-import Box                          from '@material-ui/core/Box';
-import InputLabel                   from '@material-ui/core/InputLabel';
-import MenuItem                     from '@material-ui/core/MenuItem';
-import FormControl                  from '@material-ui/core/FormControl';
-
-//import Checkbox          from '@material-ui/core/Checkbox';
-
-import { withStyles } from '@material-ui/core/styles';
-import FolderPicker from '../../components/FolderPicker';
+import React                 from 'react';
+import Typography            from '@material-ui/core/Typography';
+import Select                from '@material-ui/core/Select';
+import Box                   from '@material-ui/core/Box';
+import InputLabel            from '@material-ui/core/InputLabel';
+import MenuItem              from '@material-ui/core/MenuItem';
+import FormControl           from '@material-ui/core/FormControl';
+import { withStyles }        from '@material-ui/core/styles';
+import service               from './../../services/service';
+import FolderPicker          from '../../components/FolderPicker';
 
 const useStyles = theme => ({
 
@@ -103,15 +99,15 @@ class PrefsGeneral extends React.Component {
             <Select
               value={this.state.prefsInterfaceStyle}
               onChange={(e)=>{
-
+                service.api.reloadThemeStyle('reloadThemeStyle');
                 service.api.saveConfPrefKey("interfaceStyle", e.target.value);
                 this.setState({prefsInterfaceStyle: e.target.value });
 
               }}
               label="Interface Style"
             >
-              <MenuItem key={"quiqr10"} value={"quiqr10"}>Light (default)</MenuItem>
-              <MenuItem key={"quiqr10-dark"} value={"quiqr10-dark"}>Dark (WIP)</MenuItem>
+              <MenuItem key={"quiqr10"} value={"quiqr10"}>Light</MenuItem>
+              <MenuItem key={"quiqr10-dark"} value={"quiqr10-dark"}>Dark</MenuItem>
             </Select>
           </FormControl>
         </Box>

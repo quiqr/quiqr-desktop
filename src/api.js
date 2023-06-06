@@ -326,6 +326,10 @@ export class API {
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});
   }
 
+  reloadThemeStyle(){
+    return mainProcessBridge.request('reloadThemeStyle');
+  }
+
   createKeyPairGithub(){
 
     return mainProcessBridge.request('createKeyPairGithub',{}, {timeout:90000});

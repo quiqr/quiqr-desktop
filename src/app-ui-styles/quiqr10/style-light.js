@@ -25,3 +25,13 @@ exports.contentContainer = {
   overflow: 'auto',
   overflowX: 'hidden'
 };
+
+exports.topToolbar = {
+  borderTop: 'solid 1px #c7c5c4',
+  borderBottom: 'solid 1px #c7c5c4',
+  top: 0,
+  position: 'absolute',
+  display: 'flex',
+  width: '100%',
+  backgroundColor: '#eaebed'
+};

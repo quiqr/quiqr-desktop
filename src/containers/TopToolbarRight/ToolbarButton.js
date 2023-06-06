@@ -12,7 +12,7 @@ const useStyles = theme => ({
     textTransform: 'none',
     margin: theme.spacing(0),
     padding: theme.spacing(0),
-    color: '#212121',
+    //color: '#212121',
   },
   buttonActive: {
     '& .MuiButton-label': {
@@ -25,7 +25,7 @@ const useStyles = theme => ({
   },
 
   icon: {
-    color: '#212121',
+    //color: '#212121',
   },
   iconActive: {
     color: '#757575',

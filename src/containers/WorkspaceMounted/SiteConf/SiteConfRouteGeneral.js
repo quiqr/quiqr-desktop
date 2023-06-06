@@ -162,7 +162,7 @@ class SiteConfRouteGeneral extends React.Component {
               onClick={()=>{
                 service.api.openFileInEditor(this.state.source.path);
               }}>
-              <FolderIcon style={{ color: '#000' }} />
+              <FolderIcon />
             </IconButton>
             { this.state.customOpenInCommand && this.state.customOpenInCommand !== "" && this.state.customOpenInCommand.trim() &&
 
@@ -170,7 +170,7 @@ class SiteConfRouteGeneral extends React.Component {
               onClick={()=>{
                 service.api.openCustomCommand(this.state.customOpenInCommand.replace('%site_path', this.state.source.path).replace('%site_name', this.state.siteconf.name))
               }}>
-              <LaunchIcon style={{ color: '#000' }} />
+              <LaunchIcon />
             </IconButton>
             }
           </Grid>

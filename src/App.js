@@ -5,6 +5,7 @@ import AppsIcon                                                           from '
 import ArrowBackIcon                                                      from '@material-ui/icons/ArrowBack';
 import SettingsApplicationsIcon                                           from '@material-ui/icons/SettingsApplications';
 import { createTheme, ThemeProvider }                                     from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import { blue }                                                           from '@material-ui/core/colors';
 import Workspace                                                          from './containers/WorkspaceMounted/Workspace';
 import Console                                                            from './containers/Console';
@@ -15,17 +16,7 @@ import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from '
 import {TopToolbarRight, ToolbarButton}                                   from './containers/TopToolbarRight'
 import service                                                            from './services/service';
 
-const defaultApplicationRole = "contentEditor";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: blue[500],
-    },
-  },
-});
-
-let style = require('./app-ui-styles/quiqr10/style.js');
+let defaultApplicationRole = "contentEditor";
 
 class App extends React.Component{
 
@@ -33,6 +24,15 @@ class App extends React.Component{
     super(props);
 
     let win = window.require('electron').remote.getCurrentWindow();
+    let style = require('./app-ui-styles/quiqr10/style-light.js');
+    let theme = createTheme({
+      palette: {
+        type: "light",
+        primary: {
+          main: blue[500],
+        },
+      },
+    });
 
     this.state = {
       splashDialogOpen: false,
@@ -41,6 +41,7 @@ class App extends React.Component{
       libraryView: "list",
       maximized:win.isMaximized(),
       style: style,
+      theme: theme,
       menuIsLocked: true,
       forceShowMenu: false,
       skipMenuTransition: false,
@@ -52,15 +53,37 @@ class App extends React.Component{
     window.state = this.state;
   }
 
+  setThemeStyleFromPrefs(){
+    service.api.readConfKey('prefs').then((value)=>{
+      if(value.interfaceStyle){
+
+        let themeStyle='light';
+        if(value.interfaceStyle ==='quiqr10-dark'){
+          themeStyle='dark';
+        }
+
+        let theme = createTheme({
+          palette: {
+            type: themeStyle,
+            primary: {
+              main: blue[500],
+            },
+          },
+        });
+
+        this.setState({
+          style: require('./app-ui-styles/quiqr10/style-'+themeStyle+'.js'),
+          theme: theme
+        });
+      }
+    });
+  }
+
   componentDidMount(){
 
     this._ismounted = true;
 
-    service.api.readConfKey('prefs').then((value)=>{
-      if(value.interfaceStyle){
-        this.setState({style: require('./app-ui-styles/'+value.interfaceStyle+'/style.js') });
-      }
-    });
+    this.setThemeStyleFromPrefs();
 
     service.api.readConfPrefKey('libraryView').then((view)=>{
       this.setState({libraryView: view });
@@ -77,6 +100,9 @@ class App extends React.Component{
     });
 
     window.require('electron').ipcRenderer.on('openSplashDialog', ()=>{this.setState({splashDialogOpen: true})});
+    window.require('electron').ipcRenderer.on('reloadThemeStyle', ()=>{
+      this.setThemeStyleFromPrefs();
+    });
     window.require('electron').ipcRenderer.on('redirectToGivenLocation',(event, location)=>{
 
       this.setApplicationRole();
@@ -334,6 +360,7 @@ class App extends React.Component{
 
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;
+    let topToolbarStyle = this.state.style.topToolbar;
     let contentContainerStyle = this.state.style.contentContainer;
     let welcomeScreen = this.renderWelcomeScreen();
 
@@ -365,7 +392,8 @@ class App extends React.Component{
         this.history = history;
 
         return (
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={this.state.theme}>
+            <CssBaseline />
             <div className="App">
               <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
                 <Console />
@@ -379,7 +407,8 @@ class App extends React.Component{
       <Route path='/sites/:site/workspaces/:workspace' exact render={ ({match, history})=> {
         this.history = history;
         return (
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={this.state.theme}>
+            <CssBaseline />
             {welcomeScreen}
             <Workspace
               applicationRole={ this.state.applicationRole }
@@ -393,7 +422,8 @@ class App extends React.Component{
         this.history = history;
         return (
 
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={this.state.theme}>
+            <CssBaseline />
             {welcomeScreen}
             <Workspace
               applicationRole={ this.state.applicationRole }
@@ -410,14 +440,15 @@ class App extends React.Component{
         render={ ({match, history})=>{
           this.history = history;
           return (
-            <ThemeProvider theme={theme}>
+            <ThemeProvider theme={this.state.theme}>
+              <CssBaseline />
 
               <React.Fragment>
                 {welcomeScreen}
 
                 <div className="App" style={marginStyles}>
 
-                  <div className="topToolbar">
+                  <div style={topToolbarStyle} className="xxtopToolbar">
 
                     <div className="toolbarLeft">
                       { this.renderTopToolbarLeftSwitch() }

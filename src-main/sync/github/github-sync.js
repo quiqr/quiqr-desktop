@@ -39,12 +39,6 @@ class GithubSync {
         return await this._historyRemote();
         break;
       }
-      case 'refreshLocal': {
-        const historyLocalJson = await cliExecuteHelper.try_execute("git-log-local", gitBin, [ "log_local", this._fullDestinationPath() ]);
-        const historyLocalArr = JSON.parse(historyLocalJson);
-        return historyLocalArr;
-        break;
-      }
 
       case 'checkoutRef': {
         return this._checkoutRef(parameters)
@@ -125,9 +119,12 @@ class GithubSync {
     const historyRemoteJson = await cliExecuteHelper.try_execute("git-log-remote", gitBin, [ "log_remote", "-s", "-i", await this._tempCreatePrivateKey(), this._fullGitHubUrl() ]);
     const historyRemoteArr = JSON.parse(historyRemoteJson);
 
-    mainWindow.webContents.send("updateProgress", 'Comparing with local commit history', 80);
-    const historyLocalJson = await cliExecuteHelper.try_execute("git-log-local", gitBin, [ "log_local", this._fullDestinationPath() ]);
-    const historyLocalArr = JSON.parse(historyLocalJson);
+    let historyLocalArr = [];
+    if(await fs.existsSync(this._fullDestinationPath())){
+      mainWindow.webContents.send("updateProgress", 'Comparing with local commit history', 80);
+      const historyLocalJson = await cliExecuteHelper.try_execute("git-log-local", gitBin, [ "log_local", this._fullDestinationPath() ]);
+      historyLocalArr = JSON.parse(historyLocalJson);
+    }
 
     let historyMergedArr = [];
     historyRemoteArr.forEach((commit)=>{
