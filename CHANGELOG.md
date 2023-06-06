@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix wrong npm's
+
 ## 0.17.5 (2023-06-06)
 - feature: new form field type: fontIconSelect 🥳
 - feature: new global field propery: disabled
