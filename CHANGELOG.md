@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.17.6 (2023-06-06)
 - fix wrong npm's
 
 ## 0.17.5 (2023-06-06)
