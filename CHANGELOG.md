@@ -1,8 +1,5 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-
-## 0.17.4 (2023-06-02)
-- fix: typo #443
 - feature: new form field type: fontIconSelect 🥳
 - feature: new global field propery: disabled
 - feature: clear cache a startup
@@ -12,6 +9,9 @@
 - 37 stars
 - 6 community templates
 - 45 modules 48.56M
+
+## 0.17.4 (2023-06-02)
+- fix: typo #443
 
 ## 0.17.3 (2023-06-01)
 - feature: checkout any version in complete history 😎
