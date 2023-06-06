@@ -17,7 +17,6 @@ let
   myPackages = lib.fix' (self: with self;
   {
     embgit = pkgs.buildGo118Module rec {
-    #embgit = pkgs.buildGoModule rec {
       name = "embgit";
       version = "0.6.2";
 
@@ -46,11 +45,6 @@ let
   });
 in
   pkgs.mkShell {
-#    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-#      nixos05.stdenv.cc.cc
-#      nixos05.zlib
-#    ];
-
     nativeBuildInputs = [
       pkgs.nodejs-16_x
       pkgs.hugo
@@ -60,9 +54,7 @@ in
       pkgs.xdg-utils
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_9}/bin/";
-    #NIX_LD = builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
-    #EMBGIT_PATH="${myPackages.embgit}/bin/src"; #STUPID HACK
     HUGO_PATH="${pkgs.hugo}/bin/hugo";
     P7ZIP_PATH="${pkgs.p7zip}/bin/7za";
   }
