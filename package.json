@@ -96,7 +96,7 @@
   },
   "build": {
     "appId": "org.quiqr.quiqr-desktop",
-    "artifactName": "quiqr_${os}_${arch}.${ext}",
+    "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
     "productName": "Quiqr",
     "directories": {
       "buildResources": "public"
