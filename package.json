@@ -107,7 +107,7 @@
       },
       {
         "provider": "s3",
-        "bucket": "quiqr-app-releases",
+        "bucket": "quiqr-desktop-releases",
         "region": "eu-west-1"
       }
     ],
