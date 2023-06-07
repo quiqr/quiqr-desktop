@@ -3,6 +3,7 @@ import { withStyles }          from '@material-ui/core/styles';
 import Box                     from '@material-ui/core/Box';
 import Divider                 from '@material-ui/core/Divider';
 import Paper                   from '@material-ui/core/Paper';
+import Tooltip                 from '@material-ui/core/Tooltip';
 import Button                  from '@material-ui/core/Button';
 import ArrowUpwardIcon         from '@material-ui/icons/ArrowUpward';
 import ArrowDownwardIcon       from '@material-ui/icons/ArrowDownward';
@@ -173,14 +174,14 @@ class Dashboard extends React.Component{
     });
   }
 
-  pushToRemote(){
+  pushWithSoftMerge(){
     this.props.onSyncDialogControl(
       true,
       Meta.syncingText, Meta.icon());
 
     service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, null, this.props.publishConf).then(()=>{
 
-      service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'pushToRemote',{},90000).then(()=>{
+      service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'pushWithSoftMerge',{},90000).then(()=>{
 
         this.props.onSyncDialogControl(
           false,
@@ -203,7 +204,6 @@ class Dashboard extends React.Component{
     let lastStatusCheck = this.state.lastRefresh;
     let unpushedChanges = false;
     let remoteDiffers = true;
-    //let historyArr = this.state.historyArr.slice(0,this.state.resultsShowing);
     let historyArr = this.state.historyArr;
 
     return (
@@ -249,29 +249,62 @@ class Dashboard extends React.Component{
         }} m={2}>
 
           { this.props.enableSyncTo ?
-            <Button
-              onClick={()=>{this.pushToRemote()}}
-              style={{marginRight:'5px'}}
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<ArrowUpwardIcon />}
-            >
-              Push to remote
-            </Button>
+            <React.Fragment>
+              <Tooltip title="tries to merge files with remote version">
+                <Button
+                  onClick={()=>{this.pushWithSoftMerge()}}
+                  style={{marginRight:'5px'}}
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<ArrowUpwardIcon />}
+                >
+                  Soft Push
+                </Button>
+              </Tooltip>
+              <Tooltip title="overwrites remote version">
+                <Button
+                  onClick={()=>{this.pushHard()}}
+                  style={{marginRight:'5px'}}
+                  size="small"
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<ArrowUpwardIcon />}
+                >
+                  Hard Push
+                </Button>
+              </Tooltip>
+            </React.Fragment>
             :null
           }
 
           { this.props.enableSyncFrom ?
-            <Button
-              onClick={()=>{this.pullFromRemote()}}
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<ArrowDownwardIcon />}
-            >
-              Pull from remote
-            </Button>
+            <React.Fragment>
+              <Tooltip title="tries to merge remote files with local version">
+                <Button
+                  style={{marginLeft:'10px',marginRight:'5px'}}
+                  onClick={()=>{this.pullFromRemote()}}
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<ArrowDownwardIcon />}
+                >
+                  Pull latest
+                </Button>
+              </Tooltip>
+              <Tooltip title="overwrites local version">
+                <Button
+                  style={{marginRight:'5px'}}
+                  onClick={()=>{this.checkoutLatestFromRemote()}}
+                  size="small"
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<ArrowDownwardIcon />}
+                >
+                  Checkout latest
+                </Button>
+              </Tooltip>
+            </React.Fragment>
             :null
           }
         </Box>
@@ -300,7 +333,7 @@ class Dashboard extends React.Component{
             color="default"
             startIcon={<RefreshIcon />}
           >
-            Refresh
+            Refresh History
           </Button>
         </Box>
 

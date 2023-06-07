@@ -1,5 +1,11 @@
 # Quiqr App CHANGELOG
+
 ## **WORK IN PROGRESS**
+
+- improve link colors for dark mode in site home text
+
+## 0.17.8 (2023-06-07)
+- fix missing role menu
 
 ## 0.17.7 (2023-06-06)
 - fix refreshing history after new clone

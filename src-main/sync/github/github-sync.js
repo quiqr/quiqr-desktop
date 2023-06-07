@@ -49,8 +49,8 @@ class GithubSync {
         return this.pullFastForwardMerge()
         break;
       }
-      case 'pushToRemote': {
-        return this.publish()
+      case 'pushWithSoftMerge': {
+        return this.pushWithSoftMerge()
         break;
       }
       default:{ throw new Error('Not implemented.') }
@@ -227,7 +227,7 @@ class GithubSync {
 
   }
 
-  async publish(){
+  async pushWithSoftMerge(){
 
     const tmpkeypathPrivate = await this._tempCreatePrivateKey();
     const resolvedDest = await this._ensureSyncRepoDir(this.siteKey);
@@ -280,7 +280,6 @@ class GithubSync {
 
     await this._removeUnwanted(fullDestinationPath);
     await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath, "all");
-    //await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
@@ -302,7 +301,6 @@ class GithubSync {
     }
 
     await fs.ensureDir(path.join(fullDestinationPath,"static"))
-    //await fs.writeFileSync(path.join(fullDestinationPath, "static", ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
 
     outputConsole.appendLine('prepare and sync finished');
     return true;
@@ -323,16 +321,6 @@ class GithubSync {
 
     return true;
   }
-
-  /*
-  _quiqr_with_me_json(){
-    let publDate = Date.now();
-    return {
-      lastPublish: publDate,
-      path: this._config.repository
-    }
-  }
-  */
 
   async _github_cname(fullDestinationPath){
     await fs.writeFileSync(path.join(fullDestinationPath, "CNAME"), this._config.CNAME ,'utf-8');
@@ -385,7 +373,6 @@ jobs:
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.quiqr-cache'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.gitlab-ci.yml'));
     console.log("skip gitignore");
-    //await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.gitignore'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.sukoh'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.hugo_build.lock'));
     return true;

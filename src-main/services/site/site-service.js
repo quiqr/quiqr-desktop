@@ -50,22 +50,6 @@ class SiteService{
     }
   }
 
-  /*
-  async publish(publishConfig){
-    let from = pathHelper.getLastBuildDir();
-    if(from==null)
-      throw new Error('Could not resolve the last build directory.');
-
-    let publisher = syncFactory.getPublisher(publishConfig.config, this._config.key);
-    return await publisher.publish({siteKey: this._config.key, publishKey: publishConfig.key, from });
-  }
-
-  async mergeSiteWithRemote(publishConfig){
-    let publisher = syncFactory.getPublisher(publishConfig.config, this._config.key);
-    return await publisher.pullFastForwardMerge({siteKey: this._config.key, publishKey: publishConfig.key });
-  }
-  */
-
   async publisherDispatchAction(publishConfig, action, actionParameters){
     let publisher = syncFactory.getPublisher(publishConfig, this._config.key);
     return await publisher.actionDispatcher(action, actionParameters);
