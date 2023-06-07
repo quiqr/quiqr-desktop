@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.17.8 (2023-06-07)
 - fix missing role menu
 
 ## 0.17.7 (2023-06-06)
