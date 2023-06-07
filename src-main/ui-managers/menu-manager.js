@@ -197,8 +197,7 @@ class MenuManager {
       });
     });
 
-    return [];
-    //return rolesMenu;
+    return rolesMenu;
   }
 
 

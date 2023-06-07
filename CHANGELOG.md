@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+
+## NEXT RELEASE
+- fix missing role menu
+
 ## 0.17.7 (2023-06-06)
 - fix refreshing history after new clone
 - dark mode
