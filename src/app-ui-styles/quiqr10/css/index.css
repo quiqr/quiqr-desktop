@@ -6,22 +6,6 @@ body {
   /*color: #2f343c;*/
 }
 
-.actionpanel li {
-  /*color: #2f343c;*/
-}
-
-/*
-.topToolbar {
-  border-top: solid 1px #c7c5c4;
-  border-bottom: solid 1px #c7c5c4;
-  top: 0;
-  position: absolute;
-  display: flex;
-  width: 100%;
-  background-color: #eaebed;
-}
-*/
-
 .toolbarLeft {
   flex: 0 0 280px;
   border-right: solid 1px #c7c5c4;
@@ -36,13 +20,6 @@ body {
   overflow: hidden;
   overflow-x: hidden;
 }
-
-/*
-.sidebar-subheader {
-  color: #2f343c;
-  font-weight:700;
-}
-*/
 
 .hideScrollbar{
   border-right: solid 1px #c7c5c4;
@@ -98,6 +75,13 @@ outline: 1px solid slategrey;
 
 .hideScrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* ==== SITE HOME TEXT ==== */
+.site-home-text a,
+.site-home-text a:visited
+{
+  color: #2196f3;
 }
 
 /* ==== MARKDOWN CONTAINER ==== */

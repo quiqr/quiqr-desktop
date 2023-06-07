@@ -231,7 +231,7 @@ class Home extends React.Component{
               </Grid>
             </Box>
 
-            <div className="markdown" style={ styles.creatorMessage } dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}} />
+            <div className="markdown site-home-text" style={ styles.creatorMessage } dangerouslySetInnerHTML={{__html:this.state.siteCreatorMessage}} />
 
           </div>
         )
