@@ -16,14 +16,13 @@ import TimelineContent         from '@material-ui/lab/TimelineContent';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
 import TimelineDot             from '@material-ui/lab/TimelineDot';
 import NewReleasesIcon         from '@material-ui/icons/NewReleases';
-import GitHubIcon from '@material-ui/icons/GitHub';
-//import CloudIcon               from '@material-ui/icons/Cloud';
+import GitHubIcon              from '@material-ui/icons/GitHub';
 import CloudUploadIcon         from '@material-ui/icons/CloudUpload';
-//import CloudDownloadIcon       from '@material-ui/icons/CloudDownload';
 import SaveAltIcon             from '@material-ui/icons/SaveAlt';
 import RefreshIcon             from '@material-ui/icons/Refresh';
-import Link from '@material-ui/core/Link';
-import SettingsIcon from '@material-ui/icons/Settings';
+import BlockIcon               from '@material-ui/icons/Block';
+import Link                    from '@material-ui/core/Link';
+import SettingsIcon            from '@material-ui/icons/Settings';
 import Meta                    from './Meta'
 import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
@@ -38,6 +37,8 @@ class Dashboard extends React.Component{
   constructor(props){
     super(props);
     this.state = {
+      siteconf : {},
+      source : {},
       historyArr: [],
       lastRefresh: '',
       resultsShowing: 0,
@@ -45,8 +46,35 @@ class Dashboard extends React.Component{
   }
 
   componentDidMount(){
+    this.checkSiteInProps();
     this.softRefreshRemoteStatus();
   }
+
+  checkSiteInProps(){
+
+    var { siteKey, workspaceKey } = this.props;
+
+    this.setState({
+      siteKey: this.props.siteKey
+    })
+
+    service.api.getWorkspaceModelParseInfo(siteKey, workspaceKey).then((parseInfo)=>{
+      this.setState({parseInfo: parseInfo});
+    });
+
+    service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
+      var stateUpdate  = {};
+      stateUpdate.siteconf = bundle.site;
+
+      if(bundle.site.source){
+        this.setState({source: bundle.site.source});
+      }
+
+      this.setState(stateUpdate);
+    })
+
+  }
+
 
   softRefreshRemoteStatus(){
 
@@ -57,7 +85,6 @@ class Dashboard extends React.Component{
     );
 
     service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'readRemote',{},90000).then((results)=>{
-      //service.api.logToConsole(results.commitList)
       this.setState({
         historyArr: results.commitList,
         lastRefresh: results.lastRefresh.toString(),
@@ -133,7 +160,7 @@ class Dashboard extends React.Component{
       );
       this.refreshRemoteStatus(false);
 
-      snackMessageService.addSnackMessage(`Sync: commit with ref ${refHash} has been checkout succesfully.`, {severity: 'success'});
+      snackMessageService.addSnackMessage(`Sync: commit with ref ${refHash} has been checked out succesfully.`, {severity: 'success'});
     }).catch(()=>{
 
       snackMessageService.addSnackMessage(`Sync: Failed checking out ref: ${refHash}.`, {severity: 'warning'});
@@ -153,35 +180,48 @@ class Dashboard extends React.Component{
     });
   }
 
-  pullFromRemote(){
+  pullFromRemote(mode='pull'){
+
+    let dispatchCommand = 'checkoutLatest';
+    if(mode==='pull')
+    {
+      dispatchCommand = 'pullFromRemote';
+    }
+
     this.props.onSyncDialogControl(
       true,
       Meta.syncingText, Meta.icon());
 
-    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'pullFromRemote',{},90000).then(()=>{
+    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, dispatchCommand, {}, 180000).then(()=>{
 
       this.props.onSyncDialogControl(
         false,
         Meta.syncingText, Meta.icon());
 
-      snackMessageService.addSnackMessage('Sync: pull from remote finished.','success');
+      snackMessageService.addSnackMessage(`Sync: ${mode} from remote finished.`,'success');
 
     }).catch((e)=>{
-      snackMessageService.addSnackMessage('Sync: pull from remote failed.', {severity: 'warning'});
+      snackMessageService.addSnackMessage(`Sync: ${mode} from remote failed.`, {severity: 'warning'});
       this.props.onSyncDialogControl(
         false,
         Meta.syncingText, Meta.icon());
     });
   }
 
-  pushWithSoftMerge(){
+  pushToRemote(mode='soft'){
+    let dispatchCommand = 'hardPush';
+    if(mode==='soft')
+    {
+      dispatchCommand = 'pullFromRemote';
+    }
+
     this.props.onSyncDialogControl(
       true,
       Meta.syncingText, Meta.icon());
 
     service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, null, this.props.publishConf).then(()=>{
 
-      service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'pushWithSoftMerge',{},90000).then(()=>{
+      service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, dispatchCommand, {}, 180000).then(()=>{
 
         this.props.onSyncDialogControl(
           false,
@@ -233,12 +273,25 @@ class Dashboard extends React.Component{
           <Box component="span">
             <Button
               onClick={()=>{this.props.onConfigure()}}
+              style={{marginRight:'5px'}}
               size="small"
               variant="contained"
               color="default"
               startIcon={<SettingsIcon />}
             >
               Configure
+            </Button>
+            <Button
+              onClick={()=>{
+                let filename = this.state.source.path + "/quiqr/sync_ignore.txt"
+                service.api.openFileInEditor(filename, true);
+              }}
+              size="small"
+              variant="contained"
+              color="default"
+              startIcon={<BlockIcon />}
+            >
+              Edit ignore list
             </Button>
           </Box>
         </Box>
@@ -252,7 +305,7 @@ class Dashboard extends React.Component{
             <React.Fragment>
               <Tooltip title="tries to merge files with remote version">
                 <Button
-                  onClick={()=>{this.pushWithSoftMerge()}}
+                  onClick={()=>{this.pushToRemote('soft')}}
                   style={{marginRight:'5px'}}
                   size="small"
                   variant="contained"
@@ -264,7 +317,7 @@ class Dashboard extends React.Component{
               </Tooltip>
               <Tooltip title="overwrites remote version">
                 <Button
-                  onClick={()=>{this.pushHard()}}
+                  onClick={()=>{this.pushToRemote('hard')}}
                   style={{marginRight:'5px'}}
                   size="small"
                   variant="contained"
@@ -283,7 +336,7 @@ class Dashboard extends React.Component{
               <Tooltip title="tries to merge remote files with local version">
                 <Button
                   style={{marginLeft:'10px',marginRight:'5px'}}
-                  onClick={()=>{this.pullFromRemote()}}
+                  onClick={()=>{this.pullFromRemote('pull')}}
                   size="small"
                   variant="contained"
                   color="primary"
@@ -295,7 +348,7 @@ class Dashboard extends React.Component{
               <Tooltip title="overwrites local version">
                 <Button
                   style={{marginRight:'5px'}}
-                  onClick={()=>{this.checkoutLatestFromRemote()}}
+                  onClick={()=>{this.pullFromRemote('checkoutLatest')}}
                   size="small"
                   variant="contained"
                   color="secondary"

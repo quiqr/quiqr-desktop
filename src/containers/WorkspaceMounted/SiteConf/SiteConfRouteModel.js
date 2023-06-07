@@ -81,7 +81,6 @@ class SiteConfRouteModel extends React.Component {
       var stateUpdate  = {};
       stateUpdate.siteconf = bundle.site;
 
-
       if(bundle.site.source){
         this.setState({source: bundle.site.source});
       }

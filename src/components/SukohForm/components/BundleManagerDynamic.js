@@ -3,6 +3,7 @@ import FolderOpen                           from '@material-ui/icons/FolderOpen'
 import Button                               from '@material-ui/core/Button';
 import { BundleManager, BundleManagerItem } from '../../BundleManager';
 import DangerButton                         from '../../DangerButton';
+import FolderIcon     from '@material-ui/icons/Folder';
 import IconButton                           from '@material-ui/core/IconButton';
 import DeleteIcon                           from '@material-ui/icons/Delete';
 import { BaseDynamic }                      from '../../HoForm';
@@ -175,9 +176,27 @@ class BundleManagerDynamic extends BaseDynamic {
     }
 
     return (<React.Fragment>
+
+
+
       <div style={{padding:'16px 0'}}>
         <strong>{field.title?field.title:"Page files"}</strong>
+        <br/>
+      { field.path.substring(0,1) === '/' ?
+        <React.Fragment>
+        <IconButton color="primary"  aria-label="directions"
+          onClick={()=>{
+            service.api.openFileExplorer(field.path, true);
+          }}>
+          <FolderIcon />
+        </IconButton>
+          {field.path}
+        </React.Fragment>
+        :null}
+
       </div>
+
+
 
       { showAddButton && field.addButtonLocationTop ?
 

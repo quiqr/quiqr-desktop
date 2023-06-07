@@ -161,12 +161,12 @@ export class API {
     return mainProcessBridge.request('copyCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
   }
 
-  openFileInEditor(path: string){
-    mainProcessBridge.requestVoid('openFileInEditor', {path});
+  openFileInEditor(filepath: string, create: bool, relativeToRoot: bool){
+    mainProcessBridge.requestVoid('openFileInEditor', {filepath, create, relativeToRoot});
   }
 
-  openFileExplorer(path: string){
-    mainProcessBridge.requestVoid('openFileExplorer', {path});
+  openFileExplorer(filepath: string, relativeToRoot: false){
+    mainProcessBridge.requestVoid('openFileExplorer', {filepath, relativeToRoot});
   }
 
   openFileDialogForSingleAndCollectionItem(

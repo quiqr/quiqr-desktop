@@ -44,9 +44,16 @@ class GithubSync {
         return this._checkoutRef(parameters)
         break;
       }
-
       case 'pullFromRemote': {
         return this.pullFastForwardMerge()
+        break;
+      }
+      case 'hardPush': {
+        return this.hardPush()
+        break;
+      }
+      case 'checkoutLatest': {
+        return this.checkoutLatest()
         break;
       }
       case 'pushWithSoftMerge': {
@@ -55,6 +62,14 @@ class GithubSync {
       }
       default:{ throw new Error('Not implemented.') }
     }
+  }
+
+  checkoutLatest(){
+    console.log('checkoutLatest');
+  }
+
+  hardPush(){
+    console.log('hardPush');
   }
 
   _fullGitHubUrl(){
@@ -313,9 +328,7 @@ class GithubSync {
     await cliExecuteHelper.try_execute("git-commit", gitBin, [
       "commit", '-a' , '-n', this._config.username,
       '-e', this._config.email,
-      '-m', "'publication by " + UQIS +"'", fullDestinationPath]);
-
-
+      '-m', "'push by " + UQIS +"'", fullDestinationPath]);
 
     await cliExecuteHelper.try_execute("git-push", gitBin, [ "push", "-s", "-i", tmpkeypathPrivate, fullDestinationPath ]);
 

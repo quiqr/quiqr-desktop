@@ -166,14 +166,18 @@ api.getFilteredHugoVersions = async function(_,context){
 }
 
 
-api.openFileExplorer = function({path}, context){
+api.openFileExplorer = function({filepath, relativeToRoot=false}, context){
+  if(relativeToRoot){
+    filepath = path.join(pathHelper.getSiteRootMountPath(), filepath);
+    console.log(filepath)
+  }
   try{
-    let lstat = fs.lstatSync(path);
+    let lstat = fs.lstatSync(filepath);
     if(lstat.isDirectory()){
-      shell.openPath(path);
+      shell.openPath(filepath);
     }
     else{
-      shell.openPath(dirname(path));
+      shell.openPath(dirname(filepath));
     }
   }
   catch(e){
@@ -182,9 +186,17 @@ api.openFileExplorer = function({path}, context){
   }
 }
 
-api.openFileInEditor = function({path}, context){
+api.openFileInEditor = function({filepath, create=false, relativeToRoot=false}, context){
+
+  if(relativeToRoot){
+    filepath = path.join(pathHelper.getSiteRoot(global.currentSiteKey), filepath);
+  }
+
   try{
-    shell.openPath(path);
+    if(create && !fs.existsSync(filepath)){
+      const fd = fs.openSync(filepath, 'w')
+    }
+    shell.openPath(filepath);
   }
   catch(e){
     context.reject(e)
