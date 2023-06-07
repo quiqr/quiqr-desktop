@@ -64,12 +64,83 @@ class GithubSync {
     }
   }
 
+
+  _readSyncIgnoreFileToArray(){
+    const filepath = path.join(pathHelper.getSiteRootMountPath(),'quiqr','sync_ignore.txt')
+
+    if(fs.existsSync(filepath)){
+      let strData = fs.readFileSync(filepath, {encoding: 'utf-8'});
+      if(strData){
+        let arrData = strData.split("\n");
+        arrData = [...new Set(arrData)];
+        arrData = arrData.filter((item)=>{
+          if(item === '') return false;
+          if(item.trim().startsWith('#')) return false;
+          return true
+        });
+
+        console.log('read');
+        console.log(arrData);
+      }
+    }
+
+    return [];
+  }
+
   checkoutLatest(){
     console.log('checkoutLatest');
   }
 
-  hardPush(){
+  async hardPush(){
     console.log('hardPush');
+
+    const tmpDir = pathHelper.getTempDir();
+    await this._ensureSyncDirEmpty(tmpDir);
+
+    const tmpCloneDir = path.join(pathHelper.getTempDir(), 'tmpclone');
+    fs.mkdirSync(tmpCloneDir);
+
+
+    const tmpkeypathPrivate = await this._tempCreatePrivateKey();
+
+    const parentPath = path.join(pathHelper.getRoot(),'sites', this.siteKey, 'githubSyncRepo');
+    await this._ensureSyncDirEmpty(parentPath);
+
+    outputConsole.appendLine('START GITHUB CHECKOUT');
+    outputConsole.appendLine('-----------------');
+    outputConsole.appendLine('  git binary:          ' + gitBin);
+    outputConsole.appendLine('  git url:             ' + this._fullGitHubUrl());
+    outputConsole.appendLine('  private key path:    ' + tmpkeypathPrivate);
+    outputConsole.appendLine('  destination path:    ' + this._fullDestinationPath());
+    outputConsole.appendLine('');
+    outputConsole.appendLine('  github username:     ' + this._config.username);
+    outputConsole.appendLine('  github repository:   ' + this._config.repository);
+    outputConsole.appendLine('  github email:        ' + this._config.email);
+    outputConsole.appendLine('-----------------');
+    outputConsole.appendLine('');
+
+    mainWindow.webContents.send("updateProgress", 'Gettting latest remote commit history..', 20);
+    await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, this._fullGitHubUrl() , tmpCloneDir ]);
+
+    mainWindow.webContents.send("updateProgress", 'Copying to commit history to destination directory', 30);
+    fs.copySync(path.join(tmpCloneDir, '.git'), path.join(this._fullDestinationPath(), '.git'));
+
+    const ignoreList = this._readSyncIgnoreFileToArray();
+    const filter = file => {
+      console.log(file)
+      if(file === '.git') return false;
+      if(file === '.quiqr-cache') return false;
+      if(ignoreList.includes(file)) {
+        console.log('gevangen');
+        return false;
+      }
+      return true;
+    }
+
+    mainWindow.webContents.send("updateProgress", 'Copying site files to git destination directory', 40);
+    fs.copySync(global.currentSitePath, this._fullDestinationPath(), { filter })
+
+    return true;
   }
 
   _fullGitHubUrl(){
