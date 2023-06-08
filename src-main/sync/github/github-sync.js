@@ -125,20 +125,33 @@ class GithubSync {
     mainWindow.webContents.send("updateProgress", 'Copying to commit history to destination directory', 30);
     fs.copySync(path.join(tmpCloneDir, '.git'), path.join(this._fullDestinationPath(), '.git'));
 
-    const ignoreList = this._readSyncIgnoreFileToArray();
+    let ignoreList = this._readSyncIgnoreFileToArray();
+    ignoreList.push('.git')
+    ignoreList.push('quiqr-cache')
+    if(this._config.publishScope === "source"){
+      ignoreList.push('public')
+    }
+
     const filter = file => {
-      console.log(file)
-      if(file === '.git') return false;
-      if(file === '.quiqr-cache') return false;
-      if(ignoreList.includes(file)) {
-        console.log('gevangen');
-        return false;
+      let rootFile = file.substr(global.currentSitePath.length+1);
+      if(rootFile.substr(0,1)==='/'){
+        rootFile = rootFile.substr(1)
       }
-      return true;
+      if(!ignoreList.includes(rootFile)) {
+        return true;
+      }
     }
 
     mainWindow.webContents.send("updateProgress", 'Copying site files to git destination directory', 40);
     fs.copySync(global.currentSitePath, this._fullDestinationPath(), { filter })
+
+    if(this._config.publishScope === "source"){
+      if(this._config.setGitHubActions){
+        await this._github_action_workflow_source(this._fullDestinationPath());
+      }
+    }
+
+    await this.publish_step3_add_commit_push(tmpkeypathPrivate, this._fullDestinationPath())
 
     return true;
   }
@@ -420,6 +433,9 @@ on:
   push:
     branches:
     - ${this._config.branch}  # Set a branch to deploy
+
+permissions:
+    contents: write
 
 jobs:
   deploy:
