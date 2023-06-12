@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.17.9 (2023-06-12)
 
 - improve link colors for dark mode in site home text
 - deleting files now get staged and commited at git push 😎
