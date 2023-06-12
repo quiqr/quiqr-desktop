@@ -197,6 +197,7 @@ class Dashboard extends React.Component{
       this.props.onSyncDialogControl(
         false,
         Meta.syncingText, Meta.icon());
+      this.refreshRemoteStatus(false);
 
       snackMessageService.addSnackMessage(`Sync: ${mode} from remote finished.`,'success');
 

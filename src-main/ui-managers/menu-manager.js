@@ -200,21 +200,6 @@ class MenuManager {
     return rolesMenu;
   }
 
-
-  toggleNewSyncMethod(){
-
-    if(global.pogoconf.expNewSyncMethod){
-      global.pogoconf.setExpNewSyncMethod(false);
-    }
-    else{
-      global.pogoconf.setExpNewSyncMethod(true);
-    }
-
-    global.pogoconf.saveState().then(()=>{
-      this.createMainMenu();
-    });
-  }
-
   toggleExperimental(){
     if(global.pogoconf.experimentalFeatures){
       global.pogoconf.setExperimentalFeatures(false);
@@ -297,14 +282,6 @@ class MenuManager {
 
   createExperimentalMenu(){
     let expMenu = [
-      {
-        label: 'Enable new Sync Method',
-        type: "checkbox",
-        checked: global.pogoconf.expNewSyncMethod,
-        click: async () => {
-          this.toggleNewSyncMethod()
-        }
-      },
       {
         label: 'Disable CMS Partials Cache',
         type: "checkbox",

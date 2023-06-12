@@ -41,7 +41,7 @@ class GithubSync {
       }
 
       case 'checkoutRef': {
-        return this._checkoutRef(parameters)
+        return this._checkoutRef(parameters.ref)
         break;
       }
       case 'pullFromRemote': {
@@ -53,7 +53,7 @@ class GithubSync {
         break;
       }
       case 'checkoutLatest': {
-        return this.checkoutLatest()
+        return this._checkoutRef('LATEST');
         break;
       }
       case 'pushWithSoftMerge': {
@@ -70,6 +70,7 @@ class GithubSync {
 
     if(fs.existsSync(filepath)){
       let strData = fs.readFileSync(filepath, {encoding: 'utf-8'});
+      console.log(strData)
       if(strData){
         let arrData = strData.split("\n");
         arrData = [...new Set(arrData)];
@@ -78,17 +79,32 @@ class GithubSync {
           if(item.trim().startsWith('#')) return false;
           return true
         });
-
-        console.log('read');
-        console.log(arrData);
+        return arrData;
       }
     }
 
     return [];
   }
 
-  checkoutLatest(){
-    console.log('checkoutLatest');
+  _createIgnoreFilter(){
+    let ignoreList = this._readSyncIgnoreFileToArray();
+    ignoreList.push('.git')
+    ignoreList.push('.quiqr-cache')
+    if(this._config.publishScope === "source"){
+      ignoreList.push('public')
+    }
+    const filter = file => {
+      let rootFile = file.substr(global.currentSitePath.length+1);
+      if(rootFile.substr(0,1)==='/'){
+        rootFile = rootFile.substr(1)
+      }
+      if(!ignoreList.includes(rootFile)) {
+        return true;
+      }
+      console.log(rootFile)
+    }
+
+    return filter;
   }
 
   async hardPush(){
@@ -99,7 +115,6 @@ class GithubSync {
 
     const tmpCloneDir = path.join(pathHelper.getTempDir(), 'tmpclone');
     fs.mkdirSync(tmpCloneDir);
-
 
     const tmpkeypathPrivate = await this._tempCreatePrivateKey();
 
@@ -119,30 +134,15 @@ class GithubSync {
     outputConsole.appendLine('-----------------');
     outputConsole.appendLine('');
 
+
     mainWindow.webContents.send("updateProgress", 'Gettting latest remote commit history..', 20);
     await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, this._fullGitHubUrl() , tmpCloneDir ]);
 
     mainWindow.webContents.send("updateProgress", 'Copying to commit history to destination directory', 30);
     fs.copySync(path.join(tmpCloneDir, '.git'), path.join(this._fullDestinationPath(), '.git'));
 
-    let ignoreList = this._readSyncIgnoreFileToArray();
-    ignoreList.push('.git')
-    ignoreList.push('quiqr-cache')
-    if(this._config.publishScope === "source"){
-      ignoreList.push('public')
-    }
-
-    const filter = file => {
-      let rootFile = file.substr(global.currentSitePath.length+1);
-      if(rootFile.substr(0,1)==='/'){
-        rootFile = rootFile.substr(1)
-      }
-      if(!ignoreList.includes(rootFile)) {
-        return true;
-      }
-    }
-
     mainWindow.webContents.send("updateProgress", 'Copying site files to git destination directory', 40);
+    const filter = this._createIgnoreFilter();
     fs.copySync(global.currentSitePath, this._fullDestinationPath(), { filter })
 
     if(this._config.publishScope === "source"){
@@ -170,7 +170,7 @@ class GithubSync {
     return path.join(resolvedDest , 'githubSync-'+ this._config.repository + '-cache_remote_history.json');
   }
 
-  async _checkoutRef(parameters){
+  async _checkoutRef(ref="LATEST"){
 
     const tmpkeypathPrivate = await this._tempCreatePrivateKey();
 
@@ -188,15 +188,17 @@ class GithubSync {
     outputConsole.appendLine('  github repository:   ' + this._config.repository);
     outputConsole.appendLine('  github email:        ' + this._config.email);
     outputConsole.appendLine('');
-    outputConsole.appendLine('  git ref:             ' + parameters.ref);
+    outputConsole.appendLine('  git ref:             ' + ref);
     outputConsole.appendLine('-----------------');
     outputConsole.appendLine('');
 
     mainWindow.webContents.send("updateProgress", 'Making a fresh clone of the repository..', 20);
     await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, this._fullGitHubUrl() , this._fullDestinationPath() ]);
 
-    mainWindow.webContents.send("updateProgress", 'Checking out ref:'+parameters.ref, 70);
-    await cliExecuteHelper.try_execute("git-checkout", gitBin, ["checkout", '-r', parameters.ref, this._fullDestinationPath() ]);
+    if(ref!=="LATEST"){
+      mainWindow.webContents.send("updateProgress", 'Checking out ref:'+ref, 70);
+      await cliExecuteHelper.try_execute("git-checkout", gitBin, ["checkout", '-r', ref, this._fullDestinationPath() ]);
+    }
 
     mainWindow.webContents.send("updateProgress", 'Copying to main site directory', 90);
     const filter = file => {
@@ -377,7 +379,7 @@ class GithubSync {
 
   async publish_step2_preprare_dircontents_build(fullDestinationPath){
 
-    await this._removeUnwanted(fullDestinationPath);
+    //await this._removeUnwanted(fullDestinationPath);
     await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath, "all");
     outputConsole.appendLine('prepare and sync finished');
     return true;
@@ -385,11 +387,11 @@ class GithubSync {
 
   async publish_step2_preprare_dircontents_source(fullDestinationPath){
 
-    await this._removeUnwanted(fullDestinationPath);
+    //await this._removeUnwanted(fullDestinationPath);
     await this._syncSourceToDestination(this.from, fullDestinationPath, "all");
 
     if(this._config.publishScope === "source"){
-      await fileDirUtils.recurForceRemove(fullDestinationPath+'/public');
+      //await fileDirUtils.recurForceRemove(fullDestinationPath+'/public');
       if(this._config.setGitHubActions){
         await this._github_action_workflow_source(fullDestinationPath);
       }
@@ -488,44 +490,13 @@ jobs:
       outputConsole.appendLine('synced THEME AND QUIQR sources to destination ...');
     }
     else {
+      //await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
 
-      //TESTING DANGEROUS
-      if(global.pogoconf.expNewSyncMethod === true){
-        console.log("expNewSyncMethod")
-
-        let gitDirExist = false;
-        if(fs.existsSync(path.join(fullDestinationPath , '.git'))){
-          outputConsole.appendLine('.git dir exists');
-          gitDirExist = true;
-        }
-
-        if(gitDirExist){
-          await fs.moveSync(path.join(fullDestinationPath , '.git'), fullDestinationPath + '.gitmove');
-        }
-
-        await fs.emptyDir(fullDestinationPath);
-
-        await fs.copySync(sourcePath, fullDestinationPath);
-
-        if(gitDirExist){
-          await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
-          await fs.moveSync(fullDestinationPath + '.gitmove'), path.join(fullDestinationPath , '.git');
-        }
-
-        outputConsole.appendLine('synced ALL source to destination ...');
-      }
-      else{
-        await fs.moveSync(path.join(fullDestinationPath , '.git'), path.join(fullDestinationPath , '.gitmove'));
-
-        await fs.copySync(sourcePath, fullDestinationPath);
-
-        await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
-
-        await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
-        outputConsole.appendLine('synced ALL source to destination ...');
-      }
-
-
+      const filter = this._createIgnoreFilter();
+      await fs.copySync(sourcePath, fullDestinationPath, { filter });
+      //await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.git'));
+      //await fs.moveSync(path.join(fullDestinationPath , '.gitmove'), path.join(fullDestinationPath , '.git'));
+      outputConsole.appendLine('synced ALL source to destination ...');
     }
     return true;
   }

@@ -3,6 +3,11 @@
 ## **WORK IN PROGRESS**
 
 - improve link colors for dark mode in site home text
+- deleting files now get staged and commited at git push 😎
+- open in folder button in bundle manager, open sync ignore list
+- ignore list working
+- add hard push, checkout latest
+- improve soft pull
 
 ## 0.17.8 (2023-06-07)
 - fix missing role menu

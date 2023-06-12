@@ -55,10 +55,6 @@ module.exports = function (options) {
     state.disablePartialCache = toggle;
   }
 
-  function setExpNewSyncMethod(toggle){
-    state.expNewSyncMethod = toggle;
-  }
-
   function setDevLocalApi (toggle){
     state.devLocalApi = toggle;
   }
@@ -113,7 +109,6 @@ module.exports = function (options) {
     skipWelcomeScreen: false,
     experimentalFeatures: false,
     disablePartialCache: false,
-    expNewSyncMethod: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
     devShowCurrentUser: false,
@@ -129,7 +124,6 @@ module.exports = function (options) {
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
     get experimentalFeatures() { return state.experimentalFeatures; },
     get disablePartialCache() { return state.disablePartialCache; },
-    get expNewSyncMethod() { return state.expNewSyncMethod; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
     get devShowCurrentUser() { return state.devShowCurrentUser; },
@@ -143,7 +137,6 @@ module.exports = function (options) {
     setSkipWelcomeScreen,
     setExperimentalFeatures,
     setDisablePartialCache,
-    setExpNewSyncMethod,
     setDevLocalApi,
     setDevDisableAutoHugoServe,
     setDevShowCurrentUser,
