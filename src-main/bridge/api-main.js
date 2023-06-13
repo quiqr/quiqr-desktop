@@ -327,10 +327,7 @@ api.parseFileToObject = async function({file},context){
   context.resolve(obj);
 }
 
-
-
 api.getCurrentBaseUrl = async function(_,context){
-  console.log(global.currentBaseUrl)
   context.resolve(global.currentBaseUrl);
 }
 
