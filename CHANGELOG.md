@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.17.10 (2023-06-13)
 - feature: implement server draft mode
 
 ## 0.17.9 (2023-06-12)
