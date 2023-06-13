@@ -14,6 +14,7 @@ class WorkspaceSidebar extends React.Component{
       site: null,
       draftMode: false,
       workspace: null,
+      menusCollapsed: [],
       error: null
     };
 
@@ -27,6 +28,17 @@ class WorkspaceSidebar extends React.Component{
 
     this._ismounted = true;
     this.refresh();
+
+    service.api.readConfKey('prefs').then((value)=>{
+      this.setState({prefs: value });
+
+      if(value[this.props.siteKey+':collapsedMenus']){
+        this.setState({menusCollapsed: value[this.props.siteKey+':collapsedMenus'] });
+      }
+      else{
+        this.setState({menusCollapsed: []});
+      }
+    });
   }
 
   componentDidUpdate(preProps: compProps){
@@ -83,6 +95,7 @@ class WorkspaceSidebar extends React.Component{
 
     if(this.state.workspace){
 
+      //TODO only allow menu not singles and collections remove this if
       if("menu" in this.state.workspace){
         this.state.workspace.menu.map((menuslot, mindex) => {
 
@@ -225,6 +238,8 @@ class WorkspaceSidebar extends React.Component{
           else{
             collapseList.push(menuKey);
           }
+
+          service.api.saveConfPrefKey(this.props.siteKey+':collapsedMenus',collapseList);
           this.setState({menusCollapsed: collapseList});
 
         }}

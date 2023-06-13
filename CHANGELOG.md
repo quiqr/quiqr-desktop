@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- feature: save collapse state in site content
+
 ## 0.17.10 (2023-06-13)
 - feature: implement server draft mode
 
