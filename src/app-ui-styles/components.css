@@ -10,4 +10,6 @@
 }
 
 
-
+.toolbar-button .MuiButton-startIcon {
+  margin-left:4px;
+}

@@ -1,6 +1,8 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 - feature: save collapse state in site content
+- fix: preview single and collections will now respect url-prefix-path
+- feature: improve toolbar buttons, improve single and collection action buttons
 
 ## 0.17.10 (2023-06-13)
 - feature: implement server draft mode

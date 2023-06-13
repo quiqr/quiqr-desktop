@@ -70,7 +70,6 @@ class GithubSync {
 
     if(fs.existsSync(filepath)){
       let strData = fs.readFileSync(filepath, {encoding: 'utf-8'});
-      console.log(strData)
       if(strData){
         let arrData = strData.split("\n");
         arrData = [...new Set(arrData)];
@@ -101,15 +100,12 @@ class GithubSync {
       if(!ignoreList.includes(rootFile)) {
         return true;
       }
-      console.log(rootFile)
     }
 
     return filter;
   }
 
   async hardPush(){
-    console.log('hardPush');
-
     const tmpDir = pathHelper.getTempDir();
     await this._ensureSyncDirEmpty(tmpDir);
 
@@ -474,7 +470,6 @@ jobs:
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, 'themes'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.quiqr-cache'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.gitlab-ci.yml'));
-    console.log("skip gitignore");
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.sukoh'));
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.hugo_build.lock'));
     return true;

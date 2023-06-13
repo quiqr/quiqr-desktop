@@ -9,6 +9,7 @@ class Single extends React.Component{
     this.state = {
       selectedWorkspaceDetails: null,
       single: null,
+      previewUrl: null,
       singleValues: null
     };
   }
@@ -28,12 +29,17 @@ class Single extends React.Component{
       }),
       service.api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails)=>{
         stateUpdate.selectedWorkspaceDetails = workspaceDetails;
+      }),
+      service.api.getCurrentBaseUrl().then((currentBaseUrlPath)=>{
+        stateUpdate.currentBaseUrlPath = currentBaseUrlPath;
       })
+
     ]).then(()=>{
       this.setState(stateUpdate);
     }).catch((e)=>{
 
     });
+
   }
 
   componentWillUnmount(){
@@ -75,10 +81,10 @@ class Single extends React.Component{
     }
     else{
       if(single.previewUrl){
-        previewUrl = 'http://localhost:13131'+single.previewUrl;
+        previewUrl = 'http://localhost:13131'+this.state.currentBaseUrlPath + single.previewUrl;
       }
-      else{
-        previewUrl = 'http://localhost:13131';
+      else {
+        previewUrl = 'http://localhost:13131'+this.state.currentBaseUrlPath
       }
     }
 

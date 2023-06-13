@@ -4,11 +4,12 @@ import IconButton           from '@material-ui/core/IconButton';
 import OpenInBrowserIcon    from '@material-ui/icons/OpenInBrowser';
 import DescriptionIcon      from '@material-ui/icons/Description';
 import ArrowBackIcon        from '@material-ui/icons/ArrowBack';
+import Button               from '@material-ui/core/Button';
 import { ComponentContext } from './component-context';
 import { Debounce }         from './debounce';
 import { FormStateBuilder } from './form-state-builder';
 import service              from '../../services/service';
-import { FormBreadcumb }           from '../Breadcumb';
+import { FormBreadcumb }    from '../Breadcumb';
 import { FieldsExtender }   from './fields-extender';
 
 const Fragment = React.Fragment;
@@ -287,20 +288,30 @@ class Form extends React.Component {
     let openInEditorButton = undefined;
     if(!this.props.hideExternalEditIcon){
       openInEditorButton = (
-        <IconButton aria-label="back"
-          onClick={()=>{this.props.onOpenInEditor();}}>
-          <DescriptionIcon />
-        </IconButton>
+          <Button
+            onClick={()=>{this.props.onOpenInEditor();}}
+            size="small"
+            variant="contained"
+            startIcon={<DescriptionIcon />}
+          >
+           Open in Editor
+          </Button>
       );
     }
 
     let openInBrowserButton = undefined;
     if(this.props.pageUrl){
       openInBrowserButton = (
-        <IconButton aria-label="back"
-          onClick={()=>{this.handleOpenPageInBrowser();}}>
-          <OpenInBrowserIcon />
-        </IconButton>
+
+          <Button
+            onClick={()=>{this.handleOpenPageInBrowser();}}
+            style={{marginRight:'5px'}}
+            size="small"
+            variant="contained"
+            startIcon={<OpenInBrowserIcon />}
+          >
+            Preview Page
+          </Button>
       );
     }
 
@@ -318,8 +329,11 @@ class Form extends React.Component {
           {breadcumb}
         </div>
 
-        {openInEditorButton}
+        <div>
+
         {openInBrowserButton}
+        {openInEditorButton}
+        </div>
 
       </div>
 

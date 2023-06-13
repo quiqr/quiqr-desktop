@@ -44,8 +44,8 @@ class ToolbarButton extends React.Component {
         <Button
           onClick={action}
           color="default"
-          className={(active ? classes.buttonActive : classes.button)}
-          startIcon={<UseIcon />}
+          className={(active ? classes.buttonActive : classes.button) + " toolbar-button"}
+          startIcon={<UseIcon style={{padding:0}} />}
         >
           {title}
         </Button>

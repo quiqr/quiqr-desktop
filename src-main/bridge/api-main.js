@@ -169,7 +169,6 @@ api.getFilteredHugoVersions = async function(_,context){
 api.openFileExplorer = function({filepath, relativeToRoot=false}, context){
   if(relativeToRoot){
     filepath = path.join(pathHelper.getSiteRootMountPath(), filepath);
-    console.log(filepath)
   }
   try{
     let lstat = fs.lstatSync(filepath);

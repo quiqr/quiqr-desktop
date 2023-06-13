@@ -31,7 +31,11 @@ class CollectionItem extends React.Component{
       }),
       service.api.getCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey).then((collectionItemValues)=>{
         stateUpdate.collectionItemValues = collectionItemValues;
+      }),
+      service.api.getCurrentBaseUrl().then((currentBaseUrlPath)=>{
+        stateUpdate.currentBaseUrlPath = currentBaseUrlPath;
       })
+
     ]).then(()=>{
       this.setState(stateUpdate);
 
@@ -82,7 +86,7 @@ class CollectionItem extends React.Component{
       path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
     }
 
-    let url = 'http://localhost:13131/'+path.toLowerCase();
+    let url = 'http://localhost:13131'+this.state.currentBaseUrlPath+path.toLowerCase();
 
     return url;
   }

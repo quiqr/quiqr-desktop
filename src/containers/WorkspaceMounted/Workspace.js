@@ -246,7 +246,7 @@ class WorkSpace extends React.Component{
             action={()=>{
               this.openPreviewInBrowser();
             }}
-            title="Preview in Browser"
+            title="Preview Site"
             icon={OpenInBrowserIcon}
           />
         ];
@@ -268,7 +268,7 @@ class WorkSpace extends React.Component{
             action={()=>{
               this.openPreviewInBrowser();
             }}
-            title="Preview in Browser"
+            title="Preview Site"
             icon={OpenInBrowserIcon}
           />
         ];
