@@ -187,6 +187,9 @@ class Sidebar extends React.Component{
           }>
           { menusNodes }
         </Box>
+
+        {this.props.statusPanel}
+
       </React.Fragment>
     );
   }

@@ -71,6 +71,11 @@ class HugoServer{
 
     let hugoArgs = [ 'server', '--port', '13131' , '--disableFastRender'];
 
+    if(global.pogoconf.hugoServeDraftMode){
+      global.outputConsole.appendLine('Server Draft Mode Enabled...');
+       hugoArgs.push("--buildDrafts");
+    }
+
     if(config){
       hugoArgs.push('--config');
       hugoArgs.push(config);

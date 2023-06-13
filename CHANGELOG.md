@@ -1,23 +1,27 @@
 # Quiqr App CHANGELOG
+
+## **WORK IN PROGRESS**
+- feature: implement server draft mode
+
 ## 0.17.9 (2023-06-12)
 
-- improve link colors for dark mode in site home text
-- deleting files now get staged and commited at git push 😎
-- open in folder button in bundle manager, open sync ignore list
-- ignore list working
-- add hard push, checkout latest
-- improve soft pull
+- feature: improve link colors for dark mode in site home text
+- feature: open in folder button in bundle manager, open sync ignore list
+- feature: ignore list working
+- feature: add hard push, checkout latest
+- fix: deleting files now get staged and commited at git push 😎
+- fix: improve soft pull
 
 ## 0.17.8 (2023-06-07)
-- fix missing role menu
+- fix: missing role menu
 
 ## 0.17.7 (2023-06-06)
-- fix refreshing history after new clone
-- dark mode
-- live switch light and dark mode
+- fix: refreshing history after new clone
+- feature: dark mode
+- feature: live switch light and dark mode
 
 ## 0.17.6 (2023-06-06)
-- fix wrong npm's
+- fix: wrong npm's
 
 ## 0.17.5 (2023-06-06)
 - feature: new form field type: fontIconSelect 🥳

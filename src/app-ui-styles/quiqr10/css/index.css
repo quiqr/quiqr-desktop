@@ -38,6 +38,42 @@ listItem{
   color: white !important;
 }
 
+.led {
+    /*margin: 20px auto;*/
+    width: 13px;
+    height: 13px;
+    display: inline-block;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.25);
+    box-shadow: #000 0 -1px 4px 1px;
+}
+.led-red {
+    background-color: #F00;
+    box-shadow: #000 0 -1px 6px 1px, inset #600 0 -1px 8px, #F00 0 3px 11px;
+}
+.led-orange {
+    background-color: #FF7000;
+    box-shadow: #000 0 -1px 6px 1px, inset #630 0 -1px 8px, #FF7000 0 3px 11px;
+}
+
+.led-yellow {
+    background-color: #FF0;
+    box-shadow: #000 0 -1px 6px 1px, inset #660 0 -1px 8px, #FF0 0 3px 11px;
+}
+
+.led-green {
+    background-color: #ABFF00;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+    /*box-shadow: #000 0 -1px 4px 1px, inset #460 0 -1px 8px, #80FF00 0 3px 11px;*/
+}
+
+.led-blue {
+    background-color: #06F;
+    /*box-shadow: #000 0 -1px 6px 1px, inset #006 0 -1px 8px, #06F 0 3px 11px;*/
+}
+
+
 h1,h2,h3,h4,h5,p{
   font-family: 'Roboto', sans-serif;
   font-weight: 400;

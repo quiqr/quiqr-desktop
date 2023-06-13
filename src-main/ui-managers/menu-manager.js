@@ -227,6 +227,25 @@ class MenuManager {
     });
   }
 
+
+  toggleHugoServeDraftMode(){
+
+    if(global.pogoconf.hugoServeDraftMode){
+      global.pogoconf.setHugoServeDraftMode(false);
+    }
+    else{
+      global.pogoconf.setHugoServeDraftMode(true);
+    }
+
+    global.pogoconf.saveState().then(()=>{
+      let mainWindow = global.mainWM.getCurrentInstanceOrNew();
+      this.createMainMenu();
+      this.startServer()
+    });
+  }
+
+
+
   toggleDevDisableAutoHugoServe(){
 
     if(global.pogoconf.devDisableAutoHugoServe){
@@ -238,7 +257,6 @@ class MenuManager {
 
     global.pogoconf.saveState().then(()=>{
       let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-      mainWindow.webContents.send("updateBadges");
       this.createMainMenu();
     });
   }
@@ -560,6 +578,15 @@ class MenuManager {
             enabled: this.siteSelected(),
             click: async () => {
               this.startServer()
+            }
+          },
+          { type: 'separator' },
+          {
+            label: 'Server Draft Mode',
+            type: "checkbox",
+            checked: global.pogoconf.hugoServeDraftMode,
+            click: async () => {
+              this.toggleHugoServeDraftMode()
             }
           },
           {

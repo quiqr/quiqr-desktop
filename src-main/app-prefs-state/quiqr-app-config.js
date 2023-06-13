@@ -61,6 +61,9 @@ module.exports = function (options) {
   function setDevDisableAutoHugoServe(toggle){
     state.devDisableAutoHugoServe = toggle;
   }
+  function setHugoServeDraftMode(toggle){
+    state.hugoServeDraftMode = toggle;
+  }
   function setDevShowCurrentUser(toggle){
     state.devShowCurrentUser = toggle;
   }
@@ -111,6 +114,7 @@ module.exports = function (options) {
     disablePartialCache: false,
     devLocalApi: false,
     devDisableAutoHugoServe: false,
+    hugoServeDraftMode: false,
     devShowCurrentUser: false,
     sitesListingView: 'all',
     currentUsername: null,
@@ -126,6 +130,7 @@ module.exports = function (options) {
     get disablePartialCache() { return state.disablePartialCache; },
     get devLocalApi() { return state.devLocalApi; },
     get devDisableAutoHugoServe() { return state.devDisableAutoHugoServe; },
+    get hugoServeDraftMode() { return state.hugoServeDraftMode; },
     get devShowCurrentUser() { return state.devShowCurrentUser; },
     get sitesListingView() {
       return state.sitesListingView;
@@ -139,6 +144,7 @@ module.exports = function (options) {
     setDisablePartialCache,
     setDevLocalApi,
     setDevDisableAutoHugoServe,
+    setHugoServeDraftMode,
     setDevShowCurrentUser,
     setSitesListingView,
     saveState,

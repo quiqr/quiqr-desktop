@@ -1,7 +1,9 @@
-import React                                from 'react';
-import { Route }                            from 'react-router-dom'
-import service                              from './../../services/service'
-import Sidebar                              from '../Sidebar';
+import React     from 'react';
+import { Route } from 'react-router-dom'
+import service   from './../../services/service'
+import Sidebar   from '../Sidebar';
+//import Box       from '@material-ui/core/Box';
+//import Switch    from '@material-ui/core/Switch';
 
 class WorkspaceSidebar extends React.Component{
 
@@ -10,6 +12,7 @@ class WorkspaceSidebar extends React.Component{
 
     this.state = {
       site: null,
+      draftMode: false,
       workspace: null,
       error: null
     };
@@ -166,9 +169,47 @@ class WorkspaceSidebar extends React.Component{
       }
     }
 
+    let statusPanel = null;
+    /*let statusPanel = (
+
+        <Box
+          className="status-panel"
+          style={{
+            borderTop:'solid 1px #c7c5c4',
+            backgroundColor:'#d8d9da',
+            width:'280px',
+            height:'100px',
+            bottom:'0px',
+            position:'absolute'
+          }}>
+          <Box m={1}><div className="led led-green"></div>Hugo Server Running</Box>
+          <Box m={1}><div className="led led-green" ></div>Build Success</Box>
+          <Box m={1}> 
+            <Switch
+              size="small"
+              checked={this.state.draftMode}
+              onChange={(e)=>{
+                if(e.target.checked){
+                  this.setState({draftMode:true})
+                }
+                else{
+                  this.setState({draftMode:false})
+                }
+              }}
+
+              name="draftmode"
+              color="primary"
+            />
+            Draft Mode</Box>
+
+        </Box>
+    )
+    */
+
     return (<React.Fragment>
       <Sidebar
         hideItems={this.props.hideItems}
+        statusPanel={statusPanel}
         menuIsLocked={this.props.menuIsLocked}
         menus={menus}
         menusCollapsed={this.state.menusCollapsed}
