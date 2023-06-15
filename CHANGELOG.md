@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.17.12 (2023-06-15)
 - fix: bundlemanager bug causing save problems #455
 - fix: start with cards by default
 
