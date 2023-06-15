@@ -3,13 +3,12 @@ import FolderOpen                           from '@material-ui/icons/FolderOpen'
 import Button                               from '@material-ui/core/Button';
 import { BundleManager, BundleManagerItem } from '../../BundleManager';
 import DangerButton                         from '../../DangerButton';
-import FolderIcon     from '@material-ui/icons/Folder';
+import FolderIcon                           from '@material-ui/icons/Folder';
 import IconButton                           from '@material-ui/core/IconButton';
 import DeleteIcon                           from '@material-ui/icons/Delete';
 import { BaseDynamic }                      from '../../HoForm';
 import path                                 from 'path';
-
-import service from '../../../services/service';
+import service                              from '../../../services/service';
 
 const regExtractExt = /[.]([^.]+)$/
 const extractExt = (file) => {
@@ -38,10 +37,12 @@ class BundleManagerDynamic extends BaseDynamic {
   }
 
   componentDidMount(){
+
     this.checkRootPathFiles();
   }
 
   componentDidUpdate(preProps: HomeProps){
+    if(this.state.absFiles !== this.props.context.value)
     this.checkRootPathFiles();
   }
 
@@ -61,7 +62,6 @@ class BundleManagerDynamic extends BaseDynamic {
             return item;
           })
           this.setState({absFiles: files});
-          context.setValue(files);
         }
       });
     }
@@ -74,7 +74,7 @@ class BundleManagerDynamic extends BaseDynamic {
             return item;
           })
           this.setState({absFiles: files});
-          context.setValue(files);
+          //context.setValue(files);
         }
       });
 
@@ -87,14 +87,15 @@ class BundleManagerDynamic extends BaseDynamic {
       state['resources'] = [];
     }
     for(let r = 0; r < state['resources'].length; r++){
-      let resource = state['resources'][r];
+      //let resource = state['resources'][r];
 
       if(!field.extensions){
         field.extensions= [];
       }
-      if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
+      /*if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
         //stateBuilder.setLevelState(resource, field.fields);
       }
+      */
     }
   }
 
@@ -118,7 +119,7 @@ class BundleManagerDynamic extends BaseDynamic {
     context.form.props.plugins.openBundleFileDialog({title:field.title, extensions: field.extensions, targetPath: field.path, forceFileName: field.forceFileName})
       .then((files)=>{
         if(files){
-          let currentFiles = context.value.slice();
+          let currentFiles = this.state.absFiles;
           for(let f = 0; f < files.length; f++){
             let file = files[f];
             let match = currentFiles.find((x)=>x.src===file);
@@ -138,7 +139,7 @@ class BundleManagerDynamic extends BaseDynamic {
   removeItemWithValue(state){
     state.__deleted = true;
     let { context } = this.props;
-    context.setValue(context.value);
+    context.setValue(this.state.absFiles);
   }
 
   renderComponent(){
@@ -157,7 +158,7 @@ class BundleManagerDynamic extends BaseDynamic {
 
     let itemsStates = [];
 
-    itemsStates = context.value.filter(x => {
+    itemsStates = this.state.absFiles.filter(x => {
       return (
         //x.src.startsWith(field.path) && x.__deleted !== true && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )
         x.__deleted !== true && ( field.extensions || field.extensions.indexOf(extractExt(x.src))!==-1 )

@@ -38,7 +38,7 @@ class App extends React.Component{
       splashDialogOpen: false,
       showSplashAtStartup: false,
       applicationRole: defaultApplicationRole,
-      libraryView: "list",
+      libraryView: "cards",
       maximized:win.isMaximized(),
       style: style,
       theme: theme,

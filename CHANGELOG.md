@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: bundlemanager bug causing save problems #455
+- fix: start with cards by default
+
 ## 0.17.11 (2023-06-13)
 - feature: save collapse state in site content
 - fix: preview single and collections will now respect url-prefix-path
