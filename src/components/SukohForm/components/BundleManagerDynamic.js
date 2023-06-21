@@ -41,10 +41,15 @@ class BundleManagerDynamic extends BaseDynamic {
     this.checkRootPathFiles();
   }
 
+  /*
   componentDidUpdate(preProps: HomeProps){
+    service.api.logToConsole(this.state.absFiles, "state");
+    service.api.logToConsole(this.props.context.value, "context");
+    return;
     if(this.state.absFiles !== this.props.context.value)
     this.checkRootPathFiles();
   }
+  */
 
   checkRootPathFiles(){
     let {context} = this.props;
