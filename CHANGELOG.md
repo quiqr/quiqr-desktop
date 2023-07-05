@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: another fix in the bundlemanager, causing high CPU loads.
+
 ## 0.17.12 (2023-06-15)
 - fix: bundlemanager bug causing save problems #455
 - fix: start with cards by default
