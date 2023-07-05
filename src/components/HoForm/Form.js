@@ -5,6 +5,7 @@ import OpenInBrowserIcon    from '@material-ui/icons/OpenInBrowser';
 import DescriptionIcon      from '@material-ui/icons/Description';
 import ArrowBackIcon        from '@material-ui/icons/ArrowBack';
 import Button               from '@material-ui/core/Button';
+import Box                  from '@material-ui/core/Box';
 import { ComponentContext } from './component-context';
 import { Debounce }         from './debounce';
 import { FormStateBuilder } from './form-state-builder';
@@ -320,9 +321,24 @@ class Form extends React.Component {
 
     let breadcumb = this.renderBreadcumb();
 
-    let form = (<div key={'dynamic-form'} style={{padding:'20px'}}>
+    let form = (
+      <div key={'dynamic-form'} style={{padding:'0px'}}>
 
-      <div style={Object.assign({position : 'relative', paddingBottom: '16px', width:'100%', display:'flex'})}>
+        <Box
+          bgcolor='background.default'
+          sx={{
+            position : 'sticky',
+            zIndex:9999,
+            top:0,
+            paddingBottom: '16px',
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            paddingTop: '6px',
+            width:'100%',
+            display:'flex'
+          }}
+        >
+
         {backButton}
 
         <div style={Object.assign({flexGrow:1})}>
@@ -335,7 +351,8 @@ class Form extends React.Component {
         {openInEditorButton}
         </div>
 
-      </div>
+      </Box>
+      <div key={'dynamic-form2'} style={{padding:'20px'}}>
 
       {this.renderLevel({
         field: {fields: this.state.fields, key:'root', compositeKey:'root', type:'root' },
@@ -356,7 +373,9 @@ class Form extends React.Component {
           </div> : undefined }
 
 
-      </div>);
+      </div>
+      </div>
+    );
 
     return (<Route render={({history})=>{
 
