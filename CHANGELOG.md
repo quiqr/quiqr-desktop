@@ -5,6 +5,11 @@
 - copy file path as url in bundle manager to clipboard
 - github show limited commits with more button
 
+### Stats
+- 41 stars
+- 6 community templates
+- 44 modules 47.60M
+
 ## 0.17.12 (2023-06-15)
 - fix: bundlemanager bug causing save problems #455
 - fix: start with cards by default
