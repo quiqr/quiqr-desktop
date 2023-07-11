@@ -328,8 +328,8 @@ class Form extends React.Component {
           bgcolor='background.default'
           sx={{
             position : 'sticky',
-            zIndex:9999,
-            top:0,
+            zIndex: 1,
+            top: 0,
             paddingBottom: '16px',
             paddingLeft: '16px',
             paddingRight: '16px',
