@@ -96,6 +96,8 @@ class Single extends React.Component{
     refreshed={this.props.refreshed}
     fields={single.fields}
     values={this.state.singleValues}
+    siteKey={siteKey}
+    workspaceKey={workspaceKey}
     pageUrl={previewUrl}
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
@@ -104,7 +106,7 @@ class Single extends React.Component{
     plugins={{
 
       openBundleFileDialog: function({title, extensions, targetPath, forceFileName}, onFilesReady){
-        return service.api.openFileDialogForSingleAndCollectionItem(siteKey,workspaceKey,"",singleKey, targetPath, {title, extensions}, forceFileName);
+        return service.api.openFileDialogForSingleAndCollectionItem(siteKey, workspaceKey, "", singleKey, targetPath, {title, extensions}, forceFileName);
       },
 
       getFilesInBundle: function(extensions, targetPath, forceFileName){
