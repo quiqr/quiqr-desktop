@@ -449,7 +449,7 @@ class Dashboard extends React.Component{
             </TimelineItem>
             :null}
 
-          {historyArr.map((item, index)=>{
+          {historyArr.slice(0,this.state.resultsShowing).map((item, index)=>{
 
             let content = (
               <Paper elevation={3} key={"commit-"+index}>
