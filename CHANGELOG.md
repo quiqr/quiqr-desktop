@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.17.13 (2023-07-11)
 - fix: another fix in the bundlemanager, causing high CPU loads.
 - single and collection form top bar static
 - copy file path as url in bundle manager to clipboard
