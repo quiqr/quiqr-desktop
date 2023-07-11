@@ -2,6 +2,8 @@
 ## **WORK IN PROGRESS**
 - fix: another fix in the bundlemanager, causing high CPU loads.
 - single and collection form top bar static
+- copy file path as url in bundle manager to clipboard
+- github show limited commits with more button
 
 ## 0.17.12 (2023-06-15)
 - fix: bundlemanager bug causing save problems #455
