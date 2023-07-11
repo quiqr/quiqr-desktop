@@ -1,14 +1,20 @@
 import React          from 'react';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import FileCopyIcon   from '@material-ui/icons/FileCopy';
 import Tooltip        from '@material-ui/core/Tooltip';
 import IconButton     from '@material-ui/core/IconButton';
+import { snackMessageService }      from './../services/ui-service';
+//import service         from '../services/service';
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
   render(){
     let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
 
+    if(label.substr(0,7) === '/static'){
+      label = label.substr(7,(label.length-7))
+    }
     let filename = label
     let fExtention = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
     let fBase = filename.slice(0,(filename.lastIndexOf(".") ));
@@ -17,7 +23,6 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
       filename = fBase.substr(0,7) + "..." + fBase.substr(-5) + "." +fExtention;
     }
 
-
     return (<div style={style} onClick={onClick}>
       <span style={{ display:'inline-block', margin: '-10px 0px -10px -5px'}}>
         { headerLeftItems.map((item, index) => { return  (
@@ -25,6 +30,11 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
         )})}
       </span>
       <span style={{ position:'absolute', top:'0px', right: '-5px'}}>
+        <IconButton size="small" aria-label="Expand" onClick={()=>{
+          const {clipboard} = window.require('electron')
+          clipboard.writeText(encodeURI(label))
+          snackMessageService.addSnackMessage('File path copied to clipboard');
+        }}><FileCopyIcon /></IconButton>
         { headerRightItems.map((item, index) => { return  (
           <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
         )})}
@@ -33,7 +43,6 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
         }
       </span>
       <Tooltip title={label}>
-
         <span>
           {filename}
         </span>
