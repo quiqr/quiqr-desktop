@@ -229,3 +229,4 @@ npm run release
 
 **5. Check GitHub actions..**
 
+**6. Create release on github from tag**

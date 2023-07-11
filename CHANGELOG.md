@@ -1,9 +1,13 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: adding files in Single gave error
+- fix: z-index for popups
+
 ## 0.17.13 (2023-07-11)
 - fix: another fix in the bundlemanager, causing high CPU loads.
-- single and collection form top bar static
-- copy file path as url in bundle manager to clipboard
-- github show limited commits with more button
+- feature: single and collection form top bar static
+- feature: copy file path as url in bundle manager to clipboard
+- feature: github show limited commits with more button
 
 ### Stats
 - 41 stars
