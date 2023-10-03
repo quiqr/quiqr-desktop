@@ -131,7 +131,7 @@ class GithubSync {
     outputConsole.appendLine('');
 
 
-    mainWindow.webContents.send("updateProgress", 'Gettting latest remote commit history..', 20);
+    mainWindow.webContents.send("updateProgress", 'Getting latest remote commit history..', 20);
     await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, this._fullGitHubUrl() , tmpCloneDir ]);
 
     mainWindow.webContents.send("updateProgress", 'Copying to commit history to destination directory', 30);
