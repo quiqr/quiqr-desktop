@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://quiqr.org">
-    <img width="600" alt="horz - dark" src="https://open.quiqr.org/images/logo-nav.svg">
+    <img width="600" alt="horz - dark" src="https://raw.githubusercontent.com/quiqr/quiqr.org/main/static/images/logo/logo-nav.svg">
     </a>
 </p>
 
