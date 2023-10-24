@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.17.14 (2023-07-11)
 - fix: adding files in Single gave error
 - fix: z-index for popups
