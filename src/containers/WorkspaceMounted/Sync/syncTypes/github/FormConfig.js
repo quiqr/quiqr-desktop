@@ -353,7 +353,6 @@ class FormConfig extends React.Component{
         </Box>
         <Box my={1}>
 
-          {/*
           <TextField
             id="branch"
             label="Branch"
@@ -365,7 +364,6 @@ class FormConfig extends React.Component{
             variant="outlined"
             className={classes.textfield}
           />
-          */}
         </Box>
 
         <Box my={1}>

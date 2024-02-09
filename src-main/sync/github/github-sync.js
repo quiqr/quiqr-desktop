@@ -126,10 +126,10 @@ class GithubSync {
     outputConsole.appendLine('');
     outputConsole.appendLine('  github username:     ' + this._config.username);
     outputConsole.appendLine('  github repository:   ' + this._config.repository);
+    outputConsole.appendLine('  github branch:       ' + this._config.branch);
     outputConsole.appendLine('  github email:        ' + this._config.email);
     outputConsole.appendLine('-----------------');
     outputConsole.appendLine('');
-
 
     mainWindow.webContents.send("updateProgress", 'Getting latest remote commit history..', 20);
     await cliExecuteHelper.try_execute("git-clone", gitBin, ["clone", "-s", "-i", tmpkeypathPrivate, this._fullGitHubUrl() , tmpCloneDir ]);
