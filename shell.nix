@@ -1,60 +1,23 @@
-{}:
+{ pkgs, pkgs-unstable, lib, ... }:
 
 let
-  config = rec {
-    permittedInsecurePackages = [ "electron-5.0.13" "electron-9.4.4"];
-  };
-  pkgs = import <nixpkgs> { inherit config; };
-  nixos05 = import <nixos05> {
-    config = {
-      allowUnfree = true;
-      permittedInsecurePackages = [ "electron-5.0.13" "electron-9.4.4"];
-    };
-  };
-
-  inherit (pkgs) lib;
-
   myPackages = lib.fix' (self: with self;
   {
-    embgit = pkgs.buildGo118Module rec {
-      name = "embgit";
-      version = "0.6.3";
-
-      src = pkgs.fetchgit {
-        url = "https://github.com/quiqr/embgit.git";
-        rev = "${version}";
-        sha256 = "sha256-buiLjqXFLdKy4TdQmpAxELM0bjTZpm8xrTXTinpl/Jk=";
-        #sha256 = lib.fakeSha256;
-      };
-
-      vendorSha256 = "sha256-e0CXBakEXyWOPOmw1ORHUmWfHCcWkNGR0dwtdNXG9Xo=";
-      #vendorSha256 = lib.fakeSha256;
-
-      postInstall = ''
-         cp "$out/bin/src" "$out/bin/embgit"
-      '';
-
-      meta = with lib; {
-        description = ''
-          Embedded Git for electron apps
-        '';
-        homepage = "https://github.com/quiqr/embgit";
-        license = licenses.mit;
-      };
-    };
+    embgit = import ./pkg-embgit.nix { inherit pkgs; inherit lib; };
   });
 in
   pkgs.mkShell {
     nativeBuildInputs = [
       pkgs.nodejs-16_x
-      pkgs.hugo
       pkgs.p7zip
       pkgs.electron_9
-      myPackages.embgit
       pkgs.xdg-utils
+
+      pkgs-unstable.hugo
+      myPackages.embgit
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_9}/bin/";
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
-    HUGO_PATH="${pkgs.hugo}/bin/hugo";
+    HUGO_PATH="${pkgs-unstable.hugo}/bin/hugo";
     P7ZIP_PATH="${pkgs.p7zip}/bin/7za";
   }
