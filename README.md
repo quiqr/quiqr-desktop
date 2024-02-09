@@ -170,10 +170,13 @@ Clone the repository..
 git clone https://github.com/quiqr/quiqr-desktop.git && cd quiqr-app
 ```
 
+Make sure flakes are enabled.
+
 Enter the nix-shell..
 
 ```
-nix-shell
+nix develop
+
 [nix-shell:~/quiqr-app]$
 ```
 
