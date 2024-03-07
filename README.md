@@ -14,8 +14,8 @@
 
 ## About
 
-Quiqr is a hackable, open source, cross platform, Hugo specialized, offline
-desktop CMS application with build in Git functionality for deploying static
+Quiqr is a open source, cross platform, offline
+desktop CMS for Hugo with build in Git functionality for deploying static
 sites to any hosting server. Read all about it Quiqr at our [website](<https://quiqr.org>).
 
 
