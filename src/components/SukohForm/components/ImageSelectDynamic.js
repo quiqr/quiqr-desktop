@@ -9,11 +9,6 @@ import { BaseDynamic }    from '../../HoForm';
 import SelectImagesDialog from '../../SelectImagesDialog'
 import service            from '../../../services/service';
 
-const regExtractExt = /[.]([^.]+)$/
-const extractExt = (file) => {
-  return file.replace(regExtractExt,'$1');
-}
-
 class ImageSelectDynamic extends BaseDynamic {
 
   constructor(props){
@@ -40,20 +35,22 @@ class ImageSelectDynamic extends BaseDynamic {
     let {context} = this.props;
     let {field} = context.node;
 
-    // #464 resource issue
-    /*
-      * if(!Array.isArray(context.node.state['resources'])){
-      context.node.state['resources'] = [];
-    }
-    */
+    let field_path = field.path
 
     if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
-      service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
+
+      if(typeof field.real_fs_path == 'string'){
+        field_path = field.real_fs_path
+      }
+
+      service.api.getFilesFromAbsolutePath(field_path).then((_files)=>{
 
         if(this.state.absFiles.length === 0 || reload){
           let files = _files.map(item => {
             item.filename = item.src;
-            item.src = path.join(field.path, item.src);
+            item.src = path.join(field_path, item.src);
+            //service.api.logToConsole(item.src)
+
             return item;
           })
           this.setState({absFiles: files});
@@ -81,26 +78,6 @@ class ImageSelectDynamic extends BaseDynamic {
     if(state[key]===undefined){
       state[key] = field.default || undefined;
     }
-
-    /*
-    if(!Array.isArray(state['resources'])){
-      state['resources'] = [];
-    }
-    */
-
-    /*
-    for(let r = 0; r < state['resources'].length; r++){
-      let resource = state['resources'][r];
-
-      if(!field.extensions){
-        field.extensions= [];
-      }
-      if(resource.src.startsWith(field.path) && ( field.extensions || field.extensions.indexOf(extractExt(resource.src.src))!==-1)){
-        //stateBuilder.setLevelState(resource, field.fields);
-      }
-    }
-    */
-
   }
 
   getType(){
@@ -140,9 +117,19 @@ class ImageSelectDynamic extends BaseDynamic {
         let thumbPath = this.props.context.value;
         this.setState({srcFile: this.props.context.value });
 
-        if(field.path && (field.path.charAt(0) === "/" || field.path.charAt(0) === "\\")){
-          thumbPath = path.join(field.path, this.props.context.value);
+        let field_path = field.path
+        if(typeof field.real_fs_path == 'string'){
+          field_path = field.real_fs_path
+
+          let imgBaseName = this.props.context.value.split('/').reverse()[0];
+          thumbPath = path.join(field_path, imgBaseName);
         }
+        else{
+          if(field.path && (field.path.charAt(0) === "/" || field.path.charAt(0) === "\\")){
+            thumbPath = path.join(field_path, this.props.context.value);
+          }
+        }
+
 
         form.props.plugins.getBundleThumbnailSrc(thumbPath)
           .then((src)=>{
@@ -180,6 +167,24 @@ class ImageSelectDynamic extends BaseDynamic {
     }
   }
 
+  convertToRealPath(savedPath, field){
+
+    if(typeof field.real_fs_path == 'string'){
+      let imgBaseName = savedPath.split('/').reverse()[0];
+      return field.real_fs_path + "/" + imgBaseName;
+    }
+    return savedPath;
+  }
+
+  convertToPublishPath(imageName, field){
+    if(typeof field.real_fs_path == 'string'){
+      let imgBaseName = imageName.split('/').reverse()[0];
+//      service.api.logToConsole(field.path)
+      return field.path + '/' + imgBaseName;
+    }
+    return imageName;
+  }
+
   renderComponent(){
 
     let {context} = this.props;
@@ -209,7 +214,7 @@ class ImageSelectDynamic extends BaseDynamic {
           formProps={form.props}
           getBundleThumbnailSrc={form.props.plugins.getBundleThumbnailSrc}
           handleSelect={(selected)=>{
-            context.setValue(selected);
+            context.setValue(this.convertToPublishPath(selected,field));
             this.checkThumbs();
             this.handleCloseDialog();
             if(field.autoSave === true){
