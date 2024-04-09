@@ -18,6 +18,6 @@ in
     ];
     ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron_9}/bin/";
     EMBGIT_PATH="${myPackages.embgit}/bin/embgit";
-    HUGO_PATH="${pkgs-unstable.hugo}/bin/hugo";
+    HUGO_PATH="${pkgs.hugo}/bin/hugo";
     P7ZIP_PATH="${pkgs.p7zip}/bin/7za";
   }
