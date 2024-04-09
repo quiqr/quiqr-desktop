@@ -5,7 +5,7 @@ on:
   # but only for the main branch
   push:
     tags:
-      - 'v*'
+      - 'v0.17.*'
 
 jobs:
   release:
