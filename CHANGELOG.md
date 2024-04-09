@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.1 (2024-04-09)
 
 - feature: new prerelease pipeline
 
