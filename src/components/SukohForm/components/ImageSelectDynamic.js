@@ -39,9 +39,13 @@ class ImageSelectDynamic extends BaseDynamic {
   checkRootPathFiles(reload = false){
     let {context} = this.props;
     let {field} = context.node;
-    if(!Array.isArray(context.node.state['resources'])){
+
+    // #464 resource issue
+    /*
+      * if(!Array.isArray(context.node.state['resources'])){
       context.node.state['resources'] = [];
     }
+    */
 
     if(field.path.charAt(0) === "/" || field.path.charAt(0) === "\\"){
       service.api.getFilesFromAbsolutePath(field.path).then((_files)=>{
@@ -78,9 +82,13 @@ class ImageSelectDynamic extends BaseDynamic {
       state[key] = field.default || undefined;
     }
 
+    /*
     if(!Array.isArray(state['resources'])){
       state['resources'] = [];
     }
+    */
+
+    /*
     for(let r = 0; r < state['resources'].length; r++){
       let resource = state['resources'][r];
 
@@ -91,6 +99,7 @@ class ImageSelectDynamic extends BaseDynamic {
         //stateBuilder.setLevelState(resource, field.fields);
       }
     }
+    */
 
   }
 

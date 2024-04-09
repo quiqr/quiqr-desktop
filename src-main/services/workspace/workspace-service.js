@@ -137,9 +137,12 @@ class WorkspaceService{
       let data = await fs.readFileSync(filePath,'utf8');
 
       let obj = await this._smartParse(filePath, [path.extname(single.file).replace('.','')], data);
+      // FIXME #464 resource issue
+      /*
       if(contentFormats.isContentFile(filePath)){
         obj.resources = await this.getResourcesFromContent(filePath, obj.resources);
       }
+      */
       return obj;
     }
     else{
@@ -190,6 +193,8 @@ class WorkspaceService{
     fs.writeFileSync(filePath, stringData);
 
 
+    // FIXME #464 resource issue
+    /*
     if(document.resources){
       for(let r = 0; r < document.resources.length; r++){
         let resource = document.resources[r];
@@ -207,6 +212,7 @@ class WorkspaceService{
       }
       document.resources = document.resources.filter(x => x.__deleted!==true);
     }
+    */
 
     return document;
   }
@@ -259,9 +265,13 @@ class WorkspaceService{
     if(await fs.exists(filePath)){
       let data = await fs.readFile(filePath,{encoding:'utf8'});
       let obj  = await this._smartParse(filePath, [collection.extension], data);
+
+      // FIXME #464 resource issue
+      /*
       if(contentFormats.isContentFile(filePath)){
         obj.resources = await this.getResourcesFromContent(filePath, obj.resources);
       }
+      */
       return obj;
     }
     else{
@@ -368,6 +378,9 @@ class WorkspaceService{
       if(key.startsWith('__')){
         delete document[key];
       }
+
+      // FIXME #464 resource issue
+      /*
       if(document.resources){
         document.resources = document.resources.filter((x) => x.__deleted==true);
         document.resources.forEach((x)=>delete x.__deleted);
@@ -376,6 +389,7 @@ class WorkspaceService{
           delete document['resources'];
         }
       }
+      */
     }
   }
 
@@ -527,7 +541,9 @@ class WorkspaceService{
     let stringData = await this._smartDump(filePath, [collection.dataformat], documentClone);
     fs.writeFileSync(filePath,stringData);
 
+    // FIXME #464 resource issue
     //preparing return
+    /*
     if(document.resources){
       for(let r = 0; r < document.resources.length; r++){
         let resource = document.resources[r];
@@ -540,6 +556,7 @@ class WorkspaceService{
       }
       document.resources = document.resources.filter(x => x.__deleted!==true);
     }
+    */
     return document;
   }
 
