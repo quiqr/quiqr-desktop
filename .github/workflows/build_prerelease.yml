@@ -1,11 +1,11 @@
-name: Build/release
+name: Build/prerelease
 
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
     tags:
-      - '*'
+      - 'pre-v*'
 
 jobs:
   release:
@@ -41,11 +41,11 @@ jobs:
 #        run: sudo apt-get install -y flatpak flatpak-builder
 
       # Import Apple API key for app notarization on macOS
-      - name: Prepare for app notarization (macOS)
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          mkdir -p ~/private_keys/
-          echo '${{ secrets.API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.API_KEY_ID }}.p8
+      #      - name: Prepare for app notarization (macOS)
+      #        if: startsWith(matrix.os, 'macos')
+      #        run: |
+      #          mkdir -p ~/private_keys/
+      #          echo '${{ secrets.API_KEY }}' > ~/private_keys/AuthKey_${{ secrets.API_KEY_ID }}.p8
 
 
       - name: Build/release Electron app
@@ -53,23 +53,21 @@ jobs:
         with:
 
           # macOS Code Signing
-          mac_certs: ${{ secrets.MAC_CERTS }}
-          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
+          #         mac_certs: ${{ secrets.MAC_CERTS }}
+          #         mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
 
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          release: ${{ startsWith(github.ref, 'refs/tags/pre-v') }}
 
         env:
           GH_PRIV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USE_HARD_LINKS: false
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          #          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          #          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-          # macOS notarization API key
-          API_KEY_ID: ${{ secrets.API_KEY_ID }}
-          API_KEY_ISSUER_ID: ${{ secrets.API_KEY_ISSUER_ID }}
-
-
+          #          # macOS notarization API key
+          #          API_KEY_ID: ${{ secrets.API_KEY_ID }}
+          #          API_KEY_ISSUER_ID: ${{ secrets.API_KEY_ISSUER_ID }}

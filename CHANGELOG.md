@@ -2,7 +2,15 @@
 ## **WORK IN PROGRESS**
 
 - feature: convert shell.nix to flake.nix (run nix develop)
+- feature: metadata editor in tools (using eat your own dog food method)
+- feature: add prefix to select-image form-field
+- fix: sync to folder
 
+### Stats
+- 44 modules 47.60M
+- 9 community templates
+- 73 stars
+ 
 ## 0.17.14 (2023-07-11)
 - fix: adding files in Single gave error
 - fix: z-index for popups
