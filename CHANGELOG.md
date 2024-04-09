@@ -1,6 +1,8 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 
+- feature: new prerelease pipeline
+
 ## 0.18.0 (2024-04-09)
 
 - feature: convert shell.nix to flake.nix (run nix develop)
