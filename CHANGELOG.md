@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.0 (2024-04-09)
 
 - feature: convert shell.nix to flake.nix (run nix develop)
 - feature: metadata editor in tools (using eat your own dog food method)
@@ -10,7 +10,7 @@
 - 44 modules 47.60M
 - 9 community templates
 - 73 stars
- 
+
 ## 0.17.14 (2023-07-11)
 - fix: adding files in Single gave error
 - fix: z-index for popups
