@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.18.0 (2024-04-09)
 
 - feature: convert shell.nix to flake.nix (run nix develop)
