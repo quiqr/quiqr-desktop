@@ -1,8 +1,8 @@
-const path                    = require('path');
+const path                      = require('path');
 const pathHelper                = require('../../utils/path-helper');
-const fs                      = require('fs-extra');
-const outputConsole           = require('../../logger/output-console');
-const fileDirUtils            = require('../../utils/file-dir-utils');
+const fs                        = require('fs-extra');
+const outputConsole             = require('../../logger/output-console');
+const fileDirUtils              = require('../../utils/file-dir-utils');
 const configurationDataProvider = require('../../app-prefs-state/configuration-data-provider')
 
 class FolderSync {
@@ -66,20 +66,18 @@ class FolderSync {
 
     mainWindow.webContents.send("updateProgress", 'Prepare files before uploading..', 30);
     if(this._config.publishScope === "build"){
-      await this.publish_step2_preprare_dircontents_build(fullDestinationPath)
+      await this.publish_step2_preprare_dircontents_build(this._fullDestinationPath())
     }
     else{
-      await this.publish_step2_preprare_dircontents_source(fullDestinationPath)
+      await this.publish_step2_preprare_dircontents_source(this._fullDestinationPath())
     }
 
     return true;
   }
 
   async publish_step2_preprare_dircontents_build(fullDestinationPath){
-
     await this._syncSourceToDestination(path.join(this.from,'public'), fullDestinationPath);
     await this._removeUnwanted(fullDestinationPath);
-    //await fs.writeFileSync(path.join(fullDestinationPath, ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
@@ -94,21 +92,10 @@ class FolderSync {
     }
 
     await fs.ensureDir(path.join(fullDestinationPath,"static"))
-    //await fs.writeFileSync(path.join(fullDestinationPath, "static", ".quiqr_with_me"), JSON.stringify(this._quiqr_with_me_json()) ,'utf-8');
 
     outputConsole.appendLine('prepare and sync finished');
     return true;
   }
-
-  /*
-  _quiqr_with_me_json(){
-    let publDate = Date.now();
-    return {
-      lastPublish: publDate,
-      path: this._config.repository
-    }
-  }
-  */
 
   async _removeUnwanted(fullDestinationPath){
     await fileDirUtils.recurForceRemove(path.join(fullDestinationPath, '.quiqr-cache'));
