@@ -1,0 +1,11 @@
+---
+title: Developers README
+file: ./README.md
+description: README for site developers, displayed e.g. in Github
+hidePreviewIcon: true
+fields:
+
+  - key: mainContent
+    title: Main content
+    type: markdown
+

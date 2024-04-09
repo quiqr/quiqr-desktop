@@ -1,6 +1,6 @@
 import * as React           from 'react';
 import { Route }            from 'react-router-dom';
-import Sidebar           from './../../Sidebar';
+import Sidebar              from './../../Sidebar';
 //import service              from './../../services/service';
 
 export class SiteConfSidebar extends React.Component {
@@ -17,7 +17,7 @@ export class SiteConfSidebar extends React.Component {
     return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
   }
 
-  renderWithRoute(history: {push:(path: string)=>void}){
+  renderWithRoute(history){
 
     let encodedSiteKey = this.props.siteKey;
     let encodedWorkspaceKey = this.props.workspaceKey;
@@ -34,6 +34,33 @@ export class SiteConfSidebar extends React.Component {
             onClick: ()=>{
               this.setState({selectedMenuItem:'general'});
               history.push(`${basePath}/general/`)
+            }
+          },
+          {
+            active: true,
+            label: "Etalage",
+            selected: (this.state.selectedMenuItem==='etalage' ? true : false),
+            onClick: ()=>{
+              this.setState({selectedMenuItem:'etalage'});
+              history.push(`${basePath}/etalage/`)
+            }
+          },
+          {
+            active: true,
+            label: "Site Readme",
+            selected: (this.state.selectedMenuItem==='sitereadme' ? true : false),
+            onClick: ()=>{
+              this.setState({selectedMenuItem:'sitereadme'});
+              history.push(`${basePath}/sitereadme/`)
+            }
+          },
+          {
+            active: true,
+            label: "Project Readme",
+            selected: (this.state.selectedMenuItem==='projectreadme' ? true : false),
+            onClick: ()=>{
+              this.setState({selectedMenuItem:'projectreadme'});
+              history.push(`${basePath}/projectreadme/`)
             }
           },
         ]

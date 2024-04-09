@@ -1,14 +1,14 @@
 const electron                                  = require('electron');
 const Menu                                      = electron.Menu;
 const path                                      = require("path");
-const { lstatSync }                             = require('fs')
+//const { lstatSync }                             = require('fs')
 const fssimple                                  = require('fs');
 const fs                                        = require('fs-extra');
 const { shell }                                 = require('electron')
 const logWindowManager                          = require('./log-window-manager');
 const pogozipper                                = require('../import-export/pogozipper');
 const pathHelper                                = require('../utils/path-helper');
-const configurationDataProvider                 = require('../app-prefs-state/configuration-data-provider')
+//const configurationDataProvider                 = require('../app-prefs-state/configuration-data-provider')
 const hugoDownloader                            = require('../hugo/hugo-downloader')
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../utils/environment-resolver');
 

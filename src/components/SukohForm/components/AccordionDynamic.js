@@ -20,7 +20,7 @@ const Fragment = React.Fragment;
 
 class AccordionDynamic extends BaseDynamic {
 
-  documentMouseUpListener: ()=>void;
+  documentMouseUpListener;
 
   constructor(props){
     super(props);
@@ -106,7 +106,7 @@ class AccordionDynamic extends BaseDynamic {
 
   //DRAG EVENTS
   getDocumentMouseUpListener(){
-    this.documentMouseUpListener = function(e: any){
+    this.documentMouseUpListener = function(e){
       if(this.state.dragFromIndex!=null&&this.state.dragToIndex!=null){
         this.swapItems({index:this.state.dragFromIndex, otherIndex:this.state.dragToIndex});
         this.setState({ dragFromIndex: null, dragToIndex:null });
@@ -117,7 +117,7 @@ class AccordionDynamic extends BaseDynamic {
   }
 
   getOnItemDragHandleMouseDown(index){
-    return function(e: any){
+    return function(e){
       if(true){
         this.setState({ dragFromIndex: index, dragToIndex: index, index:-1 });
         document.addEventListener('mouseup', this.getDocumentMouseUpListener());
@@ -126,7 +126,7 @@ class AccordionDynamic extends BaseDynamic {
   }
 
   getOnItemMouseEnter(index){
-    return function(e: any){
+    return function(e){
       if(this.state.dragFromIndex!=null){
         this.setState({dragToIndex: index});
       }
@@ -163,7 +163,7 @@ class AccordionDynamic extends BaseDynamic {
       context.value = [];
     }
 
-    context.value.map( async (item: any, childIndex: number)=>{
+    context.value.map( async (item, childIndex)=>{
       let componentKey = `item-${childIndex}`;
 
       if("dynFormSearchKey" in field){
@@ -330,7 +330,7 @@ class AccordionDynamic extends BaseDynamic {
               }
             }}>
 
-          {context.value.map((item: any, childIndex: number)=>{
+          {context.value.map((item, childIndex)=>{
 
             let componentKey = `item-${childIndex}`;
 
@@ -423,7 +423,7 @@ class AccordionDynamic extends BaseDynamic {
             onClick={(e)=>{e.stopPropagation()}}
             onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
             style={{minWidth:40, cursor: 'move'}}
-            size="small" 
+            size="small"
             aria-label="sort"><DragHandleIcon /></IconButton>,
 
             <DangerButton

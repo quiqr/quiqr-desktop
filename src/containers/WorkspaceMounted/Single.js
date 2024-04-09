@@ -37,7 +37,7 @@ class Single extends React.Component{
     ]).then(()=>{
       this.setState(stateUpdate);
     }).catch((e)=>{
-
+        service.api.logToConsole(e, 'error')
     });
 
   }
@@ -50,7 +50,8 @@ class Single extends React.Component{
     var { siteKey, workspaceKey, singleKey } = this.props;
 
     let promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
-    promise.then(function(updatedValues){
+    promise.then(function(){
+      // TODO should watch file for changes and if so reload
     }, function(){
       context.reject('Something went wrong.');
     })

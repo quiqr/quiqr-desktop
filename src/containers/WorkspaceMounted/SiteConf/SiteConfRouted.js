@@ -1,10 +1,10 @@
-import * as React        from 'react';
-import { Switch, Route } from 'react-router-dom';
-import  SiteConfRouteGeneral  from './SiteConfRouteGeneral';
-import  SiteConfRouteModel    from './SiteConfRouteModel';
+import * as React                   from 'react';
+import { Switch, Route }            from 'react-router-dom';
+import  SiteConfRouteGeneral        from './SiteConfRouteGeneral';
+import  SiteConfRouteDogFoodSingle  from './SiteConfRouteDogFoodSingle';
+import  SiteConfRouteModel          from './SiteConfRouteModel';
 
 export class SiteConfRouted extends React.Component {
-
 
   render(){
     return (
@@ -12,6 +12,30 @@ export class SiteConfRouted extends React.Component {
 
       <Route path='/sites/:site/workspaces/:workspace/siteconf' exact render={ ({match})=> {
         return <SiteConfRouteGeneral
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/etalage' exact render={ ({match})=> {
+        return <SiteConfRouteDogFoodSingle
+        title="etalage"
+        singleKey="dogfoodEtalageTemplateJson"
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/sitereadme' exact render={ ({match})=> {
+        return <SiteConfRouteDogFoodSingle
+        title="Site Readme"
+        singleKey="dogfoodReadmeSiteMd"
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/projectreadme' exact render={ ({match})=> {
+        return <SiteConfRouteDogFoodSingle
+        title="Developers Readme"
+        singleKey="dogfoodReadmeProjectMd"
         siteKey={ decodeURIComponent(match.params.site) }
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />

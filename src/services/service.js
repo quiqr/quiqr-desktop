@@ -3,10 +3,10 @@ import * as api from './../api';
 
 class Service extends BaseService {
 
-    api : api.API;
-    _configurations : ?Configurations;
-    _configurationsPromise : ?Promise<Configurations>;
-    _siteAndWorkspaceDataPromise : ?Promise<any>;
+    api;
+    _configurations;
+    _configurationsPromise;
+    _siteAndWorkspaceDataPromise;
 
     constructor(){
         super();
@@ -17,7 +17,7 @@ class Service extends BaseService {
         this._siteAndWorkspaceDataPromise = undefined;
     }
 
-    getConfigurations(refetch?: boolean): Promise<Configurations>{
+    getConfigurations(refetch){
         if(this._configurations){
             if(refetch===true)
                 this._configurations = null;
@@ -34,7 +34,7 @@ class Service extends BaseService {
         return this._configurationsPromise;
     }
 
-    getSiteAndWorkspaceData(siteKey: string, workspaceKey: string): Promise<SiteAndWorkspaceData> {
+    getSiteAndWorkspaceData(siteKey, workspaceKey) {
 
         var bundle = {};
 
@@ -44,9 +44,7 @@ class Service extends BaseService {
             this._siteAndWorkspaceDataPromise = this.getConfigurations()
             .then((configurations)=>{
                 bundle.configurations = configurations;
-                //$FlowFixMe
                 bundle.site = configurations.sites.find(site => { return site.key === siteKey });
-                //$FlowFixMe
                 return this.api.listWorkspaces(siteKey);
             }).then((workspaces)=>{
                 bundle.siteWorkspaces = workspaces;
@@ -63,23 +61,22 @@ class Service extends BaseService {
             });
         }
 
-        //$FlowFixMe
-        return ( this._siteAndWorkspaceDataPromise: Promise<SiteAndWorkspaceData>);
+        return ( this._siteAndWorkspaceDataPromise);
     }
 
-    getWorkspaceDetails(siteKey: string, workspaceKey: string){
+    getWorkspaceDetails(siteKey, workspaceKey){
         return this.api.getWorkspaceDetails(siteKey, workspaceKey);
     }
 
-    getSiteCreatorMessage(siteKey: string, workspaceKey: string){
+    getSiteCreatorMessage(siteKey, workspaceKey){
         return this.api.getCreatorMessage(siteKey, workspaceKey);
     }
 
-    serveWorkspace(siteKey: string, workspaceKey: string, serveKey: string){
+    serveWorkspace(siteKey, workspaceKey, serveKey){
         this.api.serveWorkspace(siteKey, workspaceKey, serveKey);
     }
 
-    openWorkspaceDir(siteKey : string, workspaceKey : string){
+    openWorkspaceDir(siteKey, workspaceKey){
         this.getSiteAndWorkspaceData(siteKey, workspaceKey)
         .then((bundle)=>{
             this.api.openFileExplorer(bundle.workspace.path);

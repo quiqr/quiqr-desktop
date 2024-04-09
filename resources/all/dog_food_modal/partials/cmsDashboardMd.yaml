@@ -1,0 +1,12 @@
+---
+title: Site Readme
+description: Dashboard text for content editors
+hidePreviewIcon: true
+file: ./quiqr/home/index.md
+fields:
+  - key: mainContent
+    title: Main content
+    type: markdown
+
+
+

@@ -35,7 +35,7 @@ const useStyles = theme => ({
 
 class SiteConfRouteGeneral extends React.Component {
 
-  history: any;
+  history;
 
   constructor(props){
     super(props);
@@ -46,7 +46,7 @@ class SiteConfRouteGeneral extends React.Component {
     };
   }
 
-  componentDidUpdate(preProps: HomeProps){
+  componentDidUpdate(preProps){
     if(this._ismounted && preProps.siteKey !== this.props.siteKey){
       this.checkSiteInProps();
     }
@@ -92,10 +92,6 @@ class SiteConfRouteGeneral extends React.Component {
       this.setState(stateUpdate);
     })
   }
-
-  handleFolderSelected(folder){
-  }
-
 
   render(){
     const { classes } = this.props;

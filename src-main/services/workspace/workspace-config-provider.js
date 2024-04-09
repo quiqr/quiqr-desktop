@@ -5,9 +5,9 @@ const { FileCacheToken }            = require('./file-cache-token');
 const WorkspaceConfigValidator      = require('./workspace-config-validator');
 const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builder');
 const formatProviderResolver        = require('./../../utils/format-provider-resolver');
+const pathHelper                    = require('./../../utils/path-helper');
 const deepmerge                     = require('deepmerge');
 const request                       = require('request');
-
 
 class WorkspaceConfigProvider{
 
@@ -43,12 +43,11 @@ class WorkspaceConfigProvider{
       }
     }
     else{
-      // need to build default config and update cache
-      //CREATE quiqr/base.yaml and some other default files
+      // File is missing > need to build default config and update cache
+      // CREATE quiqr/model/base.yaml and some other default files
       let configBuilder = new InitialWorkspaceConfigBuilder(workspacePath);
       filePath = configBuilder.buildAll();
 
-      //filePath = this._buildDefaultConfig(workspacePath);
       token = await (new FileCacheToken([filePath])).build();
     }
 
@@ -108,7 +107,11 @@ class WorkspaceConfigProvider{
     configOrg = this.configObjectSkeleton(configOrg)
 
     // LOAD AND MERGE INCLUDES
-    configOrg = this._loadIncludes(configOrg, workspacePath);
+    let siteModelIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    configOrg = this._loadIncludes(configOrg, siteModelIncludes);
+
+    let dogFoodIncludes = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_modal/includes",'*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    configOrg = this._loadIncludes(configOrg, dogFoodIncludes);
 
     // MERGE PARTIALS
     let mergedDataCollections = [];
@@ -163,8 +166,8 @@ class WorkspaceConfigProvider{
     return filePartialDir;
   }
 
-  _loadIncludes(configObject, workspacePath){
-    let fileIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  _loadIncludes(configObject, fileIncludes){
+    //let fileIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     let files = glob.sync(fileIncludes);
 
     let newObject = {};
@@ -185,8 +188,6 @@ class WorkspaceConfigProvider{
         //console.log(configObject);
         //console.log(newObject)
       }
-
-
     });
 
     return {...configObject, ...newObject}
@@ -223,6 +224,14 @@ class WorkspaceConfigProvider{
             await this._getRemotePartial(mergeKey._mergePartial, filePartial);
           }
 
+        }
+        else if(mergeKey._mergePartial.startsWith("dogfood://")){
+          let filePartialPattern = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_modal","partials",mergeKey._mergePartial.slice(10)+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+          //let filePartialPattern = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+          let files = glob.sync(filePartialPattern);
+          if( files.length > 0 ){
+            filePartial = files[0];
+          }
         }
         else{
           let filePartialPattern = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');

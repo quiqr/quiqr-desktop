@@ -36,7 +36,7 @@ const useStyles = theme => ({
 
 class SiteConfRouteModel extends React.Component {
 
-  history: any;
+  history;
 
   constructor(props){
     super(props);
@@ -50,7 +50,7 @@ class SiteConfRouteModel extends React.Component {
     this._ismounted = false;
   }
 
-  componentDidUpdate(preProps: HomeProps){
+  componentDidUpdate(preProps){
     if(this._ismounted && preProps.siteKey !== this.props.siteKey){
       this.checkSiteInProps();
     }
@@ -88,9 +88,6 @@ class SiteConfRouteModel extends React.Component {
       this.setState(stateUpdate);
     })
 
-  }
-
-  handleFolderSelected(folder){
   }
 
   renderSection(title, files){

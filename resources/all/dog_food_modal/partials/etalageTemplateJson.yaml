@@ -1,0 +1,58 @@
+---
+title: Template Etalage
+description: Template etalage fields for site developers
+file: quiqr/etalage/template.json
+hidePreviewIcon: true
+fields:
+
+  - key: name
+    type: string
+
+  - key: description
+    type: string
+    multiLine: true
+
+  - key: quiqrVersionRequirement
+    title: Quiqr Version Requirement
+    type: string
+
+  - key: homepage
+    title: Template Homepage
+    type: string
+
+  - key: license
+    type: string
+
+  - key: licenseURL
+    title: License URL
+    type: string
+
+  - key: author
+    type: string
+
+  - key: authorHomepage
+    title: Author Homepage
+    type: string
+
+  - key: themeAuthor
+    title: Theme Author Homepage
+    type: string
+
+  - key: themseAuthorHomepage
+    title: Theme Author Homepage
+    type: string
+
+  - key: screenshots
+    type: bundle-manager
+    path: "/quiqr/etalage/screenshots"
+    extensions:
+      - png
+      - jpg
+      - gif
+    fields:
+      - key: thumb
+        title: Thumb
+        type: bundle-image-thumbnail
+
+
+

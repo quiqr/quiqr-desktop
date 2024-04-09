@@ -6,16 +6,6 @@ import { ColorPicker } from 'material-ui-color';
 import { BaseDynamic } from '../../HoForm';
 //import service                              from './../../../services/service'
 
-/*
-type ColorToolDynamicField = {
-  key: string,
-  compositeKey: string,
-  type: string,
-  default: ?string,
-  tip: ?string,
-  title: ?string
-}
-*/
 
 const palette = {
   red: '#ff0000',
@@ -34,20 +24,11 @@ const palette = {
 };
 class ColorToolDynamic extends BaseDynamic {
 
-  /*
-  normalizeState({state, field}: {state: any, field: ColorToolDynamicField}){
-    let key = field.key;
-    if(state[key]===undefined){
-      state[key] = field.default || '';
-    }
-  }
-  */
-
   getType(){
     return 'color';
   }
 
-  handleChange = (e: Event, value: any)=>{
+  handleChange = (e, _)=>{
     let {context} = this.props;
     let {node} = context;
     let {field} = node;

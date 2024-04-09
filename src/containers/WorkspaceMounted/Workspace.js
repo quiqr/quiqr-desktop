@@ -74,7 +74,7 @@ class WorkSpace extends React.Component{
   }
 
 
-  componentDidUpdate(preProps: compProps){
+  componentDidUpdate(preProps){
 
     if(preProps.siteKey){
 
@@ -121,7 +121,7 @@ class WorkSpace extends React.Component{
     this.setState({forceShowMenu});
   }
 
-  renderWorkspaceSidebar = (history : any, url : string, site : ?string, workspace : ?string)=>{
+  renderWorkspaceSidebar = (history, url, site, workspace)=>{
 
     return <WorkspaceSidebar
       key={ url }
