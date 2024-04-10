@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix s3 again
+
 ## 0.18.1 (2024-04-09)
 
 - feature: new prerelease pipeline
