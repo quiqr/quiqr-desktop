@@ -1,6 +1,8 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-- too long accordion titles fix #287
+- too long accordion titles #287,312
+- accordion UX improvement #224
+- show disabled state of accordion items #496
 
 ## 0.18.4 (2024-04-11)
 
