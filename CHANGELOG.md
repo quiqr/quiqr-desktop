@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.18.3 (2024-04-11)
 - fix yaml
 
 ## 0.18.2 (2024-04-10)
