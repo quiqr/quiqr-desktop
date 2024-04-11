@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+
+
+- fix yaml
+
 ## 0.18.2 (2024-04-10)
 - fix s3 again
 
