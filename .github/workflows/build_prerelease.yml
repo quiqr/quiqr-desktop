@@ -65,8 +65,8 @@ jobs:
         env:
           GH_PRIV_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USE_HARD_LINKS: false
-                    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
           #          # macOS notarization API key
           #          API_KEY_ID: ${{ secrets.API_KEY_ID }}
