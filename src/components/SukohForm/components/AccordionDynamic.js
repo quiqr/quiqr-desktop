@@ -391,10 +391,15 @@ class AccordionDynamic extends BaseDynamic {
       parent: node
     };
 
-
     let arrayTitle = field.fields.find((x)=> x.arrayTitle===true);
     if(arrayTitle && newNode.state[arrayTitle.key]){
-      label = newNode.state[arrayTitle.key];
+
+      if(newNode.state[arrayTitle.key].length > 100){
+        label = newNode.state[arrayTitle.key].substr(0,100) + "...";
+      }
+      else {
+        label = newNode.state[arrayTitle.key];
+      }
     }
 
     /*
