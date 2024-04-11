@@ -391,6 +391,13 @@ class AccordionDynamic extends BaseDynamic {
       parent: node
     };
 
+    let itemDisabled = false;
+    if(newNode.state["disabled"] !== undefined){
+      if(newNode.state["disabled"]){
+        itemDisabled = true;
+      }
+    }
+
     let arrayTitle = field.fields.find((x)=> x.arrayTitle===true);
     if(arrayTitle && newNode.state[arrayTitle.key]){
 
@@ -402,22 +409,24 @@ class AccordionDynamic extends BaseDynamic {
       }
     }
 
-    /*
     let headStyle = {
-      backgroundColor: '#eee',
+      backgroundColor: '#efefef',
     }
     if(isDragging){
       headStyle = {
         backgroundColor: "#e2e2e2",
       };
     }
-    */
+    if(itemDisabled){
+      headStyle.color = "#cccccc";
+    }
 
     return (
       <AccordionItem key={componentKey}
         label={label}
-        //headStyle={headStyle}
-        bodyStyle={{padding:'16px 16px 0px 16px'}}
+        headStyle={headStyle}
+        bodyStyle={{padding:'16px 16px 0px 16px' }}
+        //headStyle={{padding:'16px 16px 0px 16px' }}
         body={ context.renderLevel(newNode) }
         wrapperProps={{
           onMouseEnter: this.getOnItemMouseEnter(childIndex)
