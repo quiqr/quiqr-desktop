@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.4 (2024-04-11)
 
 - disable s3 for pre-release
 
