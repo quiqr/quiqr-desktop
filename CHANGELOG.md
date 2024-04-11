@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- too long accordion titles fix #287
 
 ## 0.18.4 (2024-04-11)
 
