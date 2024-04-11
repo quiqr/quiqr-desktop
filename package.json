@@ -103,11 +103,6 @@
     "publish": [
       {
         "provider": "github"
-      },
-      {
-        "provider": "s3",
-        "bucket": "quiqr-desktop-pre-releases",
-        "region": "eu-west-1"
       }
     ],
     "protocols": [

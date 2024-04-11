@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
+- disable s3 for pre-release
+
 ## 0.18.3 (2024-04-11)
 - fix yaml
 
