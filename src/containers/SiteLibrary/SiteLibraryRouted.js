@@ -492,10 +492,13 @@ class SiteLibraryRouted extends React.Component{
         <NewSlashImportSiteDialog
           open={this.state.dialogNewSlashImportSite.open}
           onClose={
-            ()=>this.setState({
-              importSiteURL: null,
-              dialogNewSlashImportSite:{open:false}
-            })
+            ()=> {
+              this.setState({
+                importSiteURL: null,
+                dialogNewSlashImportSite:{open:false}
+              });
+              this.updateLocalSites();
+            }
           }
           newOrImport={this.state.dialogNewSlashImportSite.newOrImport}
           importSiteURL={this.state.importSiteURL}

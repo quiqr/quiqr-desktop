@@ -570,6 +570,7 @@ class NewSiteDialog extends React.Component{
       <Button
         key={"actionNewDialog1"}
         color="primary" onClick={()=>{
+          this.setState({newSiteKey:null});
           this.props.onClose();
         }}>
         {closeText}
