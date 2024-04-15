@@ -7,6 +7,7 @@ import Tip                      from '../../Tip';
 import service                  from '../../../services/service';
 
 import TextField from '@material-ui/core/TextField';
+import Box from '@material-ui/core/Box';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 type SelectFromQueryDynamicField = {
@@ -75,6 +76,8 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
         this.setState({error_msg: "File meta data query could not be parsed. Syntax Error?"});
       }
     });
+
+    this.setOptionImages(options);
     return options;
   }
 
@@ -90,6 +93,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
         service.api.parseFileToObject(filepath).then((parsedFileObject)=>{
           let options = parsedFileObject[query_string.slice(1,-2)];
           this.setState({options: options});
+          this.setOptionImages(options);
         });
       });
     }
@@ -97,7 +101,26 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
       this.setState({error_msg: "Other queries then '.key[]' are currently not supported."});
       return;
     }
+  }
 
+  setOptionImages(options){
+    let {node} = this.props.context;
+    let {field } = node;
+
+    if(typeof field.option_image_path === "string"){
+    //service.api.logToConsole(field.option_image_path);
+
+      service.api.getCurrentSiteKey().then((currentSiteKey)=>{
+
+          options.forEach((option)=>{
+            service.api.getThumbnailForPath(currentSiteKey, 'source', field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension).then((img)=>{
+              this.setState({ ["optimg_"+this.getOptionValue(option)]: img });
+              //service.api.logToConsole(img);
+            })
+          });
+      })
+
+    }
   }
 
   runQuery(){
@@ -127,6 +150,24 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
     })
   }
 
+  getOptionValue(option){
+    if(typeof option === "string"){
+      return option;
+    }
+    else{
+      return option.value;
+    }
+  }
+
+  getOptionLabel(option){
+    if(typeof option === "string"){
+      return option;
+    }
+    else{
+      return option.text;
+    }
+  }
+
   componentDidMount(){
     this.runQuery();
   }
@@ -134,26 +175,67 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
   renderAutoComplete(field, context){
 
     const options = this.state.options;
+    let showImage = false;
+    let option_image_width;
+
+    if(typeof field.option_image_path === "string"){
+      showImage = true;
+      option_image_width = (typeof field.option_image_width !== "undefined" ? field.option_image_width : 20 )
+    }
 
     return (
         <Autocomplete
           id="auto-complete"
           options={options}
 
-          onChange={ (event, newValue) => {
+          onChange={ (_, newValue) => {
             context.setValue(newValue)
+          }}
+
+          renderOption={(option) => {
+            if(showImage){
+              return (
+                <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} >
+                  <img
+                    loading="lazy"
+                    width={ option_image_width }
+                    src={ this.state["optimg_" + this.getOptionValue(option)] }
+                  />&nbsp;
+                  { this.getOptionLabel(option) }
+                </Box>
+              )}
+            else{
+              return this.getOptionLabel(option)
+            }
           }}
 
           value={context.value}
           getOptionLabel={(option) => {
-            if(typeof option === "string"){
-              return option;
+            return this.getOptionLabel(option);
+          }}
+          renderInput={(params) => {
+
+            if(showImage){
+             return (
+
+                <Box component="div" sx={{ '& > img': { pb: 4, flexShrink: 0 } }} >
+                  <img
+                    loading="lazy"
+                    width={ option_image_width }
+                    src={ this.state["optimg_" + context.value] }
+                    alt=""
+                  />
+                  <div>&nbsp;</div>
+
+                  <TextField {...params} label={field.title} variant="outlined" />
+               </Box>
+             )
             }
             else{
-              return option.text;
+             return (<TextField {...params} label={field.title} variant="outlined" />)
             }
+
           }}
-          renderInput={(params) => <TextField {...params} label={field.title} variant="outlined" />}
         />
     )
   }

@@ -331,8 +331,8 @@ api.getCurrentBaseUrl = async function(_,context){
   context.resolve(global.currentBaseUrl);
 }
 
-api.getCurrentSiteKey = async function(){
-  return await global.currentSiteKey;
+api.getCurrentSiteKey = async function(_,context){
+  context.resolve(global.currentSiteKey);
 }
 
 api.openSiteLibrary = async function(){
