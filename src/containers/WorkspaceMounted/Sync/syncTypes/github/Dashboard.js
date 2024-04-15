@@ -197,6 +197,7 @@ class Dashboard extends React.Component{
       this.props.onSyncDialogControl(
         false,
         Meta.syncingText, Meta.icon());
+
       this.refreshRemoteStatus(false);
 
       snackMessageService.addSnackMessage(`Sync: ${mode} from remote finished.`,'success');
@@ -227,7 +228,8 @@ class Dashboard extends React.Component{
         this.props.onSyncDialogControl(
           false,
           Meta.syncingText, Meta.icon());
-        this.refreshRemoteStatus(false);
+
+        //this.refreshRemoteStatus(false);
 
         snackMessageService.addSnackMessage('Sync: Push to remote finished.', {severity: 'success'});
       }).catch(()=>{
@@ -304,6 +306,7 @@ class Dashboard extends React.Component{
 
           { this.props.enableSyncTo ?
             <React.Fragment>
+              {/*
               <Tooltip title="tries to merge files with remote version">
                 <Button
                   onClick={()=>{this.pushToRemote('soft')}}
@@ -316,6 +319,7 @@ class Dashboard extends React.Component{
                   Soft Push
                 </Button>
               </Tooltip>
+              */}
               <Tooltip title="overwrites remote version">
                 <Button
                   onClick={()=>{this.pushToRemote('hard')}}
@@ -325,7 +329,7 @@ class Dashboard extends React.Component{
                   color="secondary"
                   startIcon={<ArrowUpwardIcon />}
                 >
-                  Hard Push
+                  Push
                 </Button>
               </Tooltip>
             </React.Fragment>
@@ -334,6 +338,7 @@ class Dashboard extends React.Component{
 
           { this.props.enableSyncFrom ?
             <React.Fragment>
+              {/*
               <Tooltip title="tries to merge remote files with local version">
                 <Button
                   style={{marginLeft:'10px',marginRight:'5px'}}
@@ -346,6 +351,7 @@ class Dashboard extends React.Component{
                   Pull latest
                 </Button>
               </Tooltip>
+              */}
               <Tooltip title="overwrites local version">
                 <Button
                   style={{marginRight:'5px'}}
