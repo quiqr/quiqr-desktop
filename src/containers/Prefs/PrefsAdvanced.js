@@ -1,7 +1,7 @@
-import React from 'react';
-import service from './../../services/service';
-import Typography from '@material-ui/core/Typography';
-import TextField           from '@material-ui/core/TextField';
+import React          from 'react';
+import service        from './../../services/service';
+import Typography     from '@material-ui/core/Typography';
+import TextField      from '@material-ui/core/TextField';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -34,18 +34,32 @@ class PrefsAdvanced extends React.Component {
     };
   }
 
+  setStringPrefToState(prefKey, value){
+    if(value[prefKey]){
+      this.setState({[prefKey]: value[prefKey] });
+    }
+    else{
+      this.setState({[prefKey]: "" });
+    }
+  }
+
   componentDidMount(){
 
     //service.registerListener(this);
     service.api.readConfKey('prefs').then((value)=>{
       this.setState({prefs: value });
 
+      this.setStringPrefToState('systemGitBinPath',value)
+      this.setStringPrefToState('customOpenInCommand',value)
+
+      /*
       if(value.customOpenInCommand){
         this.setState({customOpenInCommand: value.customOpenInCommand });
       }
       else{
         this.setState({customOpenInCommand: "" });
       }
+      */
 
     });
   }
@@ -75,6 +89,23 @@ class PrefsAdvanced extends React.Component {
           />
 
         </div>
+
+        <div className={classes.root}>
+          <TextField
+            id="gitBinary"
+            label="Path to git binary"
+            helperText='providing a path to a installed version of git enables the real git sync target'
+            variant="outlined"
+            className={classes.textfield}
+            value={this.state.systemGitBinPath}
+            onChange={(e)=>{
+              this.setState({systemGitBinPath: e.target.value });
+              service.api.saveConfPrefKey("systemGitBinPath",e.target.value);
+            }}
+          />
+
+        </div>
+
       </div>
     );
   }

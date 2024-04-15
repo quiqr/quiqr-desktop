@@ -108,14 +108,12 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
     let {field } = node;
 
     if(typeof field.option_image_path === "string"){
-    //service.api.logToConsole(field.option_image_path);
 
       service.api.getCurrentSiteKey().then((currentSiteKey)=>{
 
           options.forEach((option)=>{
             service.api.getThumbnailForPath(currentSiteKey, 'source', field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension).then((img)=>{
               this.setState({ ["optimg_"+this.getOptionValue(option)]: img });
-              //service.api.logToConsole(img);
             })
           });
       })

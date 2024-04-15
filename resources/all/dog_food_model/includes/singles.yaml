@@ -1,0 +1,13 @@
+- key: dogfoodEtalageTemplateJson
+  _mergePartial: dogfood_site://etalageTemplateJson
+
+- key: dogfoodReadmeProjectMd
+  _mergePartial: dogfood_site://readmeProjectReadmeMd
+
+- key: dogfoodReadmeSiteMd
+  _mergePartial: dogfood_site://cmsDashboardMd
+
+- key: dogfoodReadmeSiteMd
+  _mergePartial: dogfood_site://cmsDashboardMd
+
+

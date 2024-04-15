@@ -110,7 +110,7 @@ class WorkspaceConfigProvider{
     let siteModelIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     configOrg = this._loadIncludes(configOrg, siteModelIncludes);
 
-    let dogFoodIncludes = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_modal/includes",'*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    let dogFoodIncludes = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_model/includes",'*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     configOrg = this._loadIncludes(configOrg, dogFoodIncludes);
 
     // MERGE PARTIALS
@@ -225,14 +225,14 @@ class WorkspaceConfigProvider{
           }
 
         }
-        else if(mergeKey._mergePartial.startsWith("dogfood://")){
-          let filePartialPattern = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_modal","partials",mergeKey._mergePartial.slice(10)+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-          //let filePartialPattern = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+        else if(mergeKey._mergePartial.startsWith("dogfood_site://")){
+          let filePartialPattern = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_model","partials",mergeKey._mergePartial.slice(15)+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
           let files = glob.sync(filePartialPattern);
           if( files.length > 0 ){
             filePartial = files[0];
           }
         }
+
         else{
           let filePartialPattern = path.join(workspacePath,'quiqr','model','partials',mergeKey._mergePartial+'.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
           let files = glob.sync(filePartialPattern);

@@ -13,6 +13,7 @@ module.exports = function (options) {
     path: app.getPath('userData')
   }, options);
   const fullStoreFileName = path.join(config.path, config.file);
+  console.log(fullStoreFileName);
 
   function resetStateToDefault() {
     state.lastOpenedSite = {siteKey: null, workspaceKey: null, sitePath: null};
