@@ -204,8 +204,15 @@ class GithubSync {
     await this._ensureSyncDirEmpty(global.currentSitePath);
     fs.copySync(this._fullDestinationPath(), global.currentSitePath, { filter })
 
-    return true;
+    if(global.hugoServer){
+      global.hugoServer.serve((err) => {
+        if(err){
+          console.log(err)
+        }
+      });
+    }
 
+    return true;
   }
 
   async _historyRemote(){
