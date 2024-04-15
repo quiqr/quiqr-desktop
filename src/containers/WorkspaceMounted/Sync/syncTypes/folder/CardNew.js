@@ -25,6 +25,9 @@ class CardNew extends React.Component{
         <Box display="flex" alignItems="center"  justifyContent="center" >
           <Typography variant="h5">Folder Target</Typography>
         </Box>
+        <Box display="flex" textAlign="center">
+          <Typography variant="p">Sync to folder on local filesystem</Typography>
+        </Box>
       </Paper>
     )
   }

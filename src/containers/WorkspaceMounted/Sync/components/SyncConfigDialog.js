@@ -10,10 +10,17 @@ import DialogActions                    from '@material-ui/core/DialogActions';
 import DialogContent                    from '@material-ui/core/DialogContent';
 import DialogContentText                from '@material-ui/core/DialogContentText';
 import service                          from './../../../../services/service';
+
 //GitHub Target
 import {FormConfig as GitHubPagesForm}  from '../syncTypes/github'
 import {Meta as GitHubMeta}             from '../syncTypes/github'
 import {CardNew as CardNewGitHub}       from '../syncTypes/github'
+
+//System Git Target
+import {FormConfig as SysGitForm}       from '../syncTypes/sysgit'
+import {CardNew as CardNewSysGit}       from '../syncTypes/sysgit'
+import {Meta as SysGitMeta}             from '../syncTypes/sysgit'
+
 //Folder Target
 import {Meta as FolderMeta}             from '../syncTypes/folder'
 import {FormConfig as FolderExportForm} from '../syncTypes/folder'
@@ -88,10 +95,24 @@ class SyncConfigDialog extends React.Component{
 
   renderServerCards(){
     const {classes} = this.props;
+    const sysGitBinAvailable = true;
     return (
 
       <React.Fragment>
         <Grid container  spacing={2}>
+
+          { (sysGitBinAvailable ?
+          <Grid item xs={6}>
+            <CardNewSysGit
+              classes={classes}
+              handleClick={()=>{
+                this.setState({serverType: 'sysgit',
+                  dialogSize: "md",
+                });
+              }} />
+          </Grid>
+          : null) }
+
           <Grid item xs={6}>
 
             <CardNewGitHub
@@ -144,7 +165,24 @@ class SyncConfigDialog extends React.Component{
         saveButtonHidden = false;
       }
 
+      else if (this.state.serverType === 'sysgit'){
+        configDialogTitle = SysGitMeta.configDialogTitle;
+        serverFormLogo = SysGitMeta.icon();
+        content = <SysGitForm
+            publishConf={this.props.publishConf}
+            modAction={this.props.modAction}
+            setSaveEnabled={(enabled)=>{
+              this.setState({saveEnabled:enabled});
+            }}
+            setData={(pubData)=>{
+              this.setState({pubData:pubData});
+          }} />
+
+        saveButtonHidden = false;
+      }
+
       else if (this.state.serverType === 'folder'){
+
 
         configDialogTitle = FolderMeta.configDialogTitle;
         serverFormLogo = FolderMeta.icon();

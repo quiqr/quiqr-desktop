@@ -25,6 +25,9 @@ class CardNew extends React.Component{
         <Box display="flex" alignItems="center"  justifyContent="center" >
           <Typography variant="h5">Github Target</Typography>
         </Box>
+        <Box display="flex" textAlign="center">
+          <Typography variant="">Sync with github using embedded git binary</Typography>
+        </Box>
 
 
       </Paper>

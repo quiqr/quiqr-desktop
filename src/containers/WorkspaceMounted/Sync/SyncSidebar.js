@@ -16,6 +16,7 @@ import DialogContent    from '@material-ui/core/DialogContent';
 //targets
 import {Meta as GitHubMeta}   from './syncTypes/github'
 import {Meta as FolderMeta}   from './syncTypes/folder'
+import {Meta as SysGitMeta}   from './syncTypes/sysgit'
 
 export class SyncSidebar extends React.Component {
 
@@ -162,6 +163,11 @@ export class SyncSidebar extends React.Component {
         label = GitHubMeta.sidebarLabel(publ.config);
         icon = GitHubMeta.icon();
       }
+      else if(publ.config && publ.config.type === "sysgit" ){
+        label = SysGitMeta.sidebarLabel(publ.config);
+        icon = SysGitMeta.icon();
+      }
+
       else if(publ.config && publ.config.type === "folder" ){
         label = FolderMeta.sidebarLabel(publ.config);
         icon = FolderMeta.icon();

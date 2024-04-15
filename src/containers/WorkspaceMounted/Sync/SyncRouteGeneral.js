@@ -7,6 +7,7 @@ import SyncBusyDialog                 from './components/SyncBusyDialog';
 import Button                         from '@material-ui/core/Button';
 //targets
 import {Dashboard as GitHubDashboard} from './syncTypes/github'
+import {Dashboard as SysGitDashboard} from './syncTypes/sysgit'
 import {Dashboard as FolderDashboard} from './syncTypes/folder'
 
 const useStyles = theme => ({
@@ -168,6 +169,27 @@ class SyncRouteGeneral extends React.Component {
         />
       )
     }
+    else if(publishConf.config.type === 'sysgit'){
+      dashboard = (
+        <SysGitDashboard
+          siteKey={this.props.siteKey}
+          workspaceKey={this.props.workspaceKey}
+          enableSyncFrom={enableSyncFrom}
+          enableSyncTo={enableSyncTo}
+          publishConf={publishConf.config}
+
+          onSyncDialogControl={(open, text, icon)=>{
+            this.syncDialogControl(open,text,icon);
+          }}
+
+          onConfigure={()=>{
+            this.onConfigure(publishConf);
+          }}
+
+        />
+      )
+    }
+
     else if(publishConf.config.type === 'folder'){
       dashboard = (
         <FolderDashboard
