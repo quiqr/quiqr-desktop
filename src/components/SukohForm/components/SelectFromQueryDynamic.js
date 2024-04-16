@@ -112,6 +112,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
       service.api.getCurrentSiteKey().then((currentSiteKey)=>{
 
           options.forEach((option)=>{
+            //service.api.logToConsole(field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension);
             service.api.getThumbnailForPath(currentSiteKey, 'source', field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension).then((img)=>{
               this.setState({ ["optimg_"+this.getOptionValue(option)]: img });
             })
@@ -173,6 +174,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
   renderAutoComplete(field, context){
 
     const options = this.state.options;
+
     let showImage = false;
     let option_image_width;
 
@@ -195,6 +197,7 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
               return (
                 <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} >
                   <img
+                    alt=""
                     loading="lazy"
                     width={ option_image_width }
                     src={ this.state["optimg_" + this.getOptionValue(option)] }
@@ -217,15 +220,15 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicField,Sel
              return (
 
                 <Box component="div" sx={{ '& > img': { pb: 4, flexShrink: 0 } }} >
+                  <TextField {...params} label={field.title} variant="outlined" />
+                  <div>&nbsp;</div>
                   <img
                     loading="lazy"
                     width={ option_image_width }
                     src={ this.state["optimg_" + context.value] }
                     alt=""
                   />
-                  <div>&nbsp;</div>
 
-                  <TextField {...params} label={field.title} variant="outlined" />
                </Box>
              )
             }

@@ -3,11 +3,30 @@ import InputLabel      from '@material-ui/core/InputLabel';
 import MenuItem        from '@material-ui/core/MenuItem';
 import FormControl     from '@material-ui/core/FormControl';
 import Select          from '@material-ui/core/Select';
+import Box             from '@material-ui/core/Box';
 import FormItemWrapper from './shared/FormItemWrapper';
 import { BaseDynamic } from '../../HoForm';
 import Tip             from '../../Tip';
+import service                  from '../../../services/service';
 
 class SelectDynamic extends BaseDynamic {
+
+  constructor(props){
+
+    super(props);
+
+    this.state = {
+      options: [],
+      error_msg: null,
+    }
+
+  }
+
+  componentDidMount(){
+    let {context} = this.props;
+    let field = context.node.field;
+    this.setOptionImages(field.options);
+  }
 
   normalizeState({state, field}){
     //TODO: clear if value is not a valid option
@@ -55,11 +74,57 @@ class SelectDynamic extends BaseDynamic {
     }
   }
 
+  setOptionImages(options){
+    let {node} = this.props.context;
+    let {field } = node;
+
+    if(typeof field.option_image_path === "string"){
+
+      service.api.getCurrentSiteKey().then((currentSiteKey)=>{
+
+          options.forEach((option)=>{
+            service.api.getThumbnailForPath(currentSiteKey, 'source', field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension).then((img)=>{
+              this.setState({ ["optimg_"+this.getOptionValue(option)]: img });
+            })
+          });
+      })
+
+    }
+  }
+
+
+  getOptionValue(option){
+    if(typeof option === "string"){
+      return option;
+    }
+    else{
+      return option.value;
+    }
+  }
+
+  getOptionLabel(option){
+    if(typeof option === "string"){
+      return option;
+    }
+    else{
+      return option.text;
+    }
+  }
+
   renderComponent(){
 
     let {context} = this.props;
     let {node, currentPath, parentPath} = context;
     let {field} = node;
+
+    let showImage = false;
+    let option_image_width;
+
+    if(typeof field.option_image_path === "string"){
+      showImage = true;
+      option_image_width = (typeof field.option_image_width !== "undefined" ? field.option_image_width : 20 )
+    }
+
 
     if(currentPath!==parentPath){
       return (null);
@@ -67,6 +132,7 @@ class SelectDynamic extends BaseDynamic {
 
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
+
 
     return (
       <FormItemWrapper
@@ -82,6 +148,7 @@ class SelectDynamic extends BaseDynamic {
               onChange={(e)=>this.handleChange(e)}
             >
               {field.options.map((option, i)=>{
+                /*
                 let val, text;
                 if(typeof option === "string"){
                   val = option
@@ -91,8 +158,20 @@ class SelectDynamic extends BaseDynamic {
                   val = option.value
                   text = option.text
                 }
+                */
                 return (
-                  <MenuItem key={i} value={val}>{text}</MenuItem>
+                  <MenuItem key={i} value={this.getOptionValue(option)}>
+                    {(showImage ?
+                    <Box component="div" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} >
+                      <img
+                        alt=""
+                        loading="lazy"
+                        width={ option_image_width }
+                        src={ this.state["optimg_" + this.getOptionValue(option)] }
+                      />&nbsp;{this.getOptionLabel(option)}
+                    </Box>
+                      : this.getOptionLabel(option))}
+                  </MenuItem>
                 )
               })}
             </Select>
