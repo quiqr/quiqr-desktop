@@ -1,10 +1,11 @@
 const electron          = require('electron')
 const unhandled         = require('electron-unhandled');
-const ipcMainBinder     = require('./bridge/ipc-main-binder');
 const mainWindowManager = require('./ui-managers/main-window-manager');
 const menuManager       = require('./ui-managers/menu-manager');
 const QuiqrAppConfig    = require('./app-prefs-state/quiqr-app-config');
 const outputConsole     = require('./logger/output-console');
+
+const ipcMainBinder     = require('./bridge/ipc-main-binder');
 const apiMain           = require('./bridge/api-main');
 
 unhandled();
