@@ -258,6 +258,25 @@ api.getWorkspaceModelParseInfo =  async function({siteKey, workspaceKey}, contex
 }
 
 
+api.getPreviewCheckConfiguration = async function({}, context){
+
+  let obj = null;
+  file = path.join(global.currentSitePath, 'quiqr', 'previewchecksettings.json');
+  if(fs.existsSync(file)){
+    try{
+      let strData = fs.readFileSync(file, {encoding: 'utf-8'});
+      let formatProvider = formatProviderResolver.resolveForFilePath(file);
+      if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)
+      obj = formatProvider.parse(strData);
+    }
+    catch(e){
+      outputConsole.appendLine(`file is invalid '${file}': ${e.toString()}`);
+    }
+  }
+  context.resolve(obj);
+}
+
+
 api.getWorkspaceDetails = async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   let configuration;

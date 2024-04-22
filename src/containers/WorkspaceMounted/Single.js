@@ -81,12 +81,13 @@ class Single extends React.Component{
       previewUrl = '';
     }
     else{
+      let finalpath = this.state.currentBaseUrlPath;
+
       if(single.previewUrl){
-        previewUrl = 'http://localhost:13131'+this.state.currentBaseUrlPath + single.previewUrl;
+        finalpath = this.state.currentBaseUrlPath + single.previewUrl
       }
-      else {
-        previewUrl = 'http://localhost:13131'+this.state.currentBaseUrlPath
-      }
+      finalpath = finalpath.replace("//","/").replace("//","/");
+      previewUrl = 'http://localhost:13131'+finalpath;
     }
 
     var { siteKey, workspaceKey, singleKey } = this.props;

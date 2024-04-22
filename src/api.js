@@ -20,6 +20,10 @@ export class API {
     return mainProcessBridge.request('getWorkspaceDetails', {siteKey, workspaceKey});
   }
 
+  getPreviewCheckConfiguration() {
+    return mainProcessBridge.request('getPreviewCheckConfiguration', {});
+  }
+
   serveWorkspace(siteKey: string, workspaceKey: string, serveKey: string){
     return mainProcessBridge.request('serveWorkspace', {siteKey, workspaceKey, serveKey});
   }

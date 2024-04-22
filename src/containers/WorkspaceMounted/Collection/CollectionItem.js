@@ -86,7 +86,11 @@ class CollectionItem extends React.Component{
       path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
     }
 
-    let url = 'http://localhost:13131'+this.state.currentBaseUrlPath+path.toLowerCase();
+    let finalpath = this.state.currentBaseUrlPath+path.toLowerCase();
+    //service.api.logToConsole(this.state.currentBaseUrlPath)
+    finalpath = finalpath.replace("//","/").replace("//","/");
+    //service.api.logToConsole(finalpath)
+    let url = 'http://localhost:13131'+finalpath;
 
     return url;
   }

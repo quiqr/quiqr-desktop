@@ -32,6 +32,14 @@ export class SiteConfRouted extends React.Component {
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/previewchecksettings' exact render={ ({match})=> {
+        return <SiteConfRouteDogFoodSingle
+        title="Preview Check Settings"
+        singleKey="dogfoodPreviewCheckSettings"
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) } />
+      }} />
+
       <Route path='/sites/:site/workspaces/:workspace/siteconf/projectreadme' exact render={ ({match})=> {
         return <SiteConfRouteDogFoodSingle
         title="Developers Readme"

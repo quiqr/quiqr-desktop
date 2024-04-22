@@ -66,6 +66,20 @@ export class SiteConfSidebar extends React.Component {
         ]
       },
       {
+        title: 'Preview Check Settings',
+        items: [
+          {
+            active: true,
+            label: "Preview Check Settings",
+            selected: (this.state.selectedMenuItem==='previewchecksettings' ? true : false),
+            onClick: ()=>{
+              this.setState({selectedMenuItem:'previewchecksettings'});
+              history.push(`${basePath}/previewchecksettings/`)
+            }
+          },
+        ]
+      },
+      {
         title: 'CMS',
         items: [
           {
@@ -78,7 +92,7 @@ export class SiteConfSidebar extends React.Component {
             }
           },
         ]
-      }
+      },
     ]
 
     return <Sidebar {...this.props} menus={menus} />

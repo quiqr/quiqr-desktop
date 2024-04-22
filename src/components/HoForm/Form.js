@@ -169,9 +169,24 @@ class Form extends React.Component {
 
   handleOpenPageInBrowser() {
     if(this.props.pageUrl){
-      window.require('electron').shell.openExternal(this.props.pageUrl);
+
+      service.api.getPreviewCheckConfiguration()
+        .then((conf)=>{
+          service.api.logToConsole(conf);
+          if(conf.enable && conf.enable === true){
+            window.require('electron').shell.openExternal("https://quiqr.github.io/quiqr-preview-check/?url="+this.props.pageUrl);
+          }
+          else{
+            window.require('electron').shell.openExternal(this.props.pageUrl);
+          }
+        })
+        .catch(()=>{
+          window.require('electron').shell.openExternal(this.props.pageUrl);
+        });
+
     }
   }
+
   handleBackButton(){
     this.history.push(this.generateParentPath());
   }
