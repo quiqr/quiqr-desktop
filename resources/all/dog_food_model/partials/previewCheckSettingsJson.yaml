@@ -1,0 +1,31 @@
+---
+title: Preview Check
+description: Preview Check Settings
+file: quiqr/previewchecksettings.json
+hidePreviewIcon: true
+fields:
+
+  - key: enable
+    type: boolean
+    default: false
+
+  - key: min_keywords
+    type: number
+    default: 15
+
+  - key: max_keywords
+    type: number
+    default: 20
+
+  - key: word_count
+    type: number
+    default: 1500
+
+  - key: title_character_count
+    type: number
+    default: 60
+
+  - key: description_word_count
+    type: number
+    default: 150
+
