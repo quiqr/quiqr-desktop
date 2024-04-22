@@ -25,7 +25,15 @@ fields:
     type: number
     default: 60
 
-  - key: description_word_count
+  - key: description_character_count
     type: number
     default: 150
+
+  - key: content_css_selector
+    type: string
+    default: "#content"
+
+  - key: preview_url
+    type: string
+    default: https://quiqr.github.io/quiqr-preview-check/
 

@@ -4,10 +4,10 @@
 - key: dogfoodReadmeProjectMd
   _mergePartial: dogfood_site://readmeProjectReadmeMd
 
-#- key: dogfoodReadmeSiteMd
 #  _mergePartial: dogfood_site://cmsReadMd
 
-- key: dogfoodDashboardReadmeMd
+- key: dogfoodReadmeSiteMd
+#- key: dogfoodDashboardReadmeMd
   _mergePartial: dogfood_site://cmsDashboardMd
 
 - key: dogfoodPreviewCheckSettings

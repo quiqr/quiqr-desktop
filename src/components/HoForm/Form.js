@@ -174,7 +174,23 @@ class Form extends React.Component {
         .then((conf)=>{
           service.api.logToConsole(conf);
           if(conf.enable && conf.enable === true){
-            window.require('electron').shell.openExternal("https://quiqr.github.io/quiqr-preview-check/?url="+this.props.pageUrl);
+
+            const sets = [
+            'min_keywords',
+            'max_keywords',
+            'title_character_count',
+            'description_character_count',
+            'word_count',
+            'content_css_selector',
+            ];
+
+            let qstr = ""
+            for (var i = 0; i < sets.length; i++) {
+              qstr += `&${sets[i]}=${conf[sets[i]]}`;
+            }
+
+            const previewUrl = conf.preview_url+"?url="+this.props.pageUrl+qstr;
+            window.require('electron').shell.openExternal(previewUrl);
           }
           else{
             window.require('electron').shell.openExternal(this.props.pageUrl);
