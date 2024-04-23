@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- new preview SEO check function...
 - too long accordion titles #287,312
 - accordion UX improvement #224
 - show disabled state of accordion items #496
