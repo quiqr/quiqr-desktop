@@ -1,12 +1,12 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.5 (2024-04-23)
 - new preview SEO check function...
 - too long accordion titles #287,312
 - accordion UX improvement #224
 - show disabled state of accordion items #496
 - replace 4 git sync buttons with 2 #495 
 - after checkout hugo server should be restarted #462 
-- after import sites are not reloaded #414 
+- after import sites are not reloaded #414
 
 ## 0.18.4 (2024-04-11)
 
