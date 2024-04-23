@@ -87,6 +87,11 @@ class Single extends React.Component{
         finalpath = this.state.currentBaseUrlPath + single.previewUrl
       }
       finalpath = finalpath.replace("//","/").replace("//","/");
+
+      if(Array.from('some string')[0]!=="/"){
+        finalpath = "/"+finalpath;
+      }
+
       previewUrl = 'http://localhost:13131'+finalpath;
     }
 

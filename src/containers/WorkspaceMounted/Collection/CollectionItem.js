@@ -66,7 +66,6 @@ class CollectionItem extends React.Component{
   generatePageUrl(collection){
 
     if(collection.hidePreviewIcon){
-
       return '';
     }
 
@@ -87,9 +86,10 @@ class CollectionItem extends React.Component{
     }
 
     let finalpath = this.state.currentBaseUrlPath+path.toLowerCase();
-    //service.api.logToConsole(this.state.currentBaseUrlPath)
     finalpath = finalpath.replace("//","/").replace("//","/");
-    //service.api.logToConsole(finalpath)
+    if(Array.from('some string')[0]!=="/"){
+      finalpath = "/"+finalpath;
+    }
     let url = 'http://localhost:13131'+finalpath;
 
     return url;
