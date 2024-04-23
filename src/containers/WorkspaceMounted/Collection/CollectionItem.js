@@ -87,7 +87,7 @@ class CollectionItem extends React.Component{
 
     let finalpath = this.state.currentBaseUrlPath+path.toLowerCase();
     finalpath = finalpath.replace("//","/").replace("//","/");
-    if(Array.from('some string')[0]!=="/"){
+    if(Array.from(finalpath)[0]!=="/"){
       finalpath = "/"+finalpath;
     }
     let url = 'http://localhost:13131'+finalpath;

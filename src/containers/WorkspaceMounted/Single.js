@@ -88,7 +88,7 @@ class Single extends React.Component{
       }
       finalpath = finalpath.replace("//","/").replace("//","/");
 
-      if(Array.from('some string')[0]!=="/"){
+      if(Array.from(finalpath)[0]!=="/"){
         finalpath = "/"+finalpath;
       }
 
