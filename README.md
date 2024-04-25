@@ -19,6 +19,11 @@ desktop CMS application with build in Git functionality for deploying static
 sites to any hosting server. Read all about it Quiqr at our [website](<https://quiqr.org>).
 
 
+## Feature block
+
+- CMS for Hugo
+
+
 ## Supported Platforms
 
 Quiqr runs on Windows, macOS and Linux

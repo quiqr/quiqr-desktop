@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.18.5 (2024-04-23)
 - new preview SEO check function...
 - too long accordion titles #287,312
