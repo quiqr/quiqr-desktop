@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.6 (2024-04-25)
 - update readme
 
 ## 0.18.5 (2024-04-23)
