@@ -2,12 +2,13 @@ import React          from 'react';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton     from '@material-ui/core/IconButton';
+import Box               from '@material-ui/core/Box';
 
 class AccordionHeader extends React.PureComponent {
 
     render(){
         let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
-        return (<div style={style} onClick={onClick}>
+        return (<Box style={style} onClick={onClick}>
             <span style={{ display:'inline-block', margin: '-10px 0px -10px -5px'}}>
                 { headerLeftItems.map((item, index) => { return  (
                     <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
@@ -22,7 +23,7 @@ class AccordionHeader extends React.PureComponent {
                 }
             </span>
             {label}
-        </div>);
+        </Box>);
     }
 }
 
@@ -56,9 +57,9 @@ class AccordionItem extends React.Component{
                 active={active}
                 label={label}
             />
-            <div style={_bodyStyle}>
+            <Box style={_bodyStyle}>
                 { active? body : ( null ) }
-            </div>
+            </Box>
         </div>;
     }
 }

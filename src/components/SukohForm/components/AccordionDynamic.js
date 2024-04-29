@@ -410,8 +410,11 @@ class AccordionDynamic extends BaseDynamic {
     }
 
     let headStyle = {
-      backgroundColor: '#efefef',
+      //backgroundColor: '#efefef',
+      backgroundColor: '#aaa',
     }
+    // #aaa looks kind of good on light and dark mode
+    // better to check which mode it is. and use efefef again
     if(isDragging){
       headStyle = {
         backgroundColor: "#e2e2e2",
