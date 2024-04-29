@@ -355,6 +355,27 @@ class MenuManager {
         ]
       },
       {
+        label: 'Scaffold Model',
+        submenu: [
+          {
+            label: 'Scaffold Single',
+            click: async () => {
+              console.log("Scaffold single")
+              //Select file
+              //Analyse file
+              //create single store in quiqr/model/includes/singles/
+            }
+          },
+          {
+            label: 'Scaffold Collection',
+            click: async () => {
+              console.log("Scaffold collection")
+            }
+          },
+        ]
+      },
+
+      {
         label: 'Import',
         submenu: [
           {

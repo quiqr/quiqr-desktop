@@ -145,6 +145,7 @@ class WorkspaceConfigValidator {
         file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.:'+JSON.stringify(single))),
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
         previewUrl: joi.string().trim(),
+        pullOuterRootKey: joi.string().trim(),
         hidePreviewIcon: joi.boolean(),
         hideExternalEditIcon: joi.boolean(),
         hideSaveButton: joi.boolean(),

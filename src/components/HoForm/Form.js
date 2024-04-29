@@ -175,7 +175,7 @@ class Form extends React.Component {
           //service.api.logToConsole(conf);
           if(conf && conf.enable === true){
 
-      //service.api.logToConsole('hallo');
+            //service.api.logToConsole('hallo');
             const sets = [
             'min_keywords',
             'max_keywords',
@@ -195,17 +195,13 @@ class Form extends React.Component {
           }
           else{
 
-      service.api.logToConsole(this.props.pageUrl);
-      //service.api.logToConsole('hallo1');
+            service.api.logToConsole(this.props.pageUrl);
             window.require('electron').shell.openExternal(this.props.pageUrl);
           }
         })
         .catch((e)=>{
-      service.api.logToConsole('hallo2');
-      service.api.logToConsole(e);
-      service.api.logToConsole(this.props.pageUrl);
+          service.api.logToConsole(e);
           window.require('electron').shell.openExternal(this.props.pageUrl);
-      service.api.logToConsole('hallo2');
         });
 
     }

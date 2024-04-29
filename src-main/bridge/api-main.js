@@ -555,10 +555,10 @@ api.buildWorkspace = function({siteKey, workspaceKey, buildKey, extraConfig}, co
   });
 }
 
-api.getSingle = function({siteKey, workspaceKey, singleKey}, context) {
+api.getSingle = function({siteKey, workspaceKey, singleKey, fileOverride}, context) {
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ context.reject(err); return; }
-    workspaceService.getSingle(singleKey).then(r=>{
+    workspaceService.getSingle(singleKey, fileOverride).then(r=>{
       context.resolve(r);
     })
       .catch((error)=>{

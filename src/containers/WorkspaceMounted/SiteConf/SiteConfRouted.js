@@ -60,6 +60,18 @@ export class SiteConfRouted extends React.Component {
         workspaceKey={ decodeURIComponent(match.params.workspace) } />
       }} />
 
+      <Route path='/sites/:site/workspaces/:workspace/siteconf/dogfoodIncludesMenu/:fileOverride' exact render={ ({match})=> {
+        return <SiteConfRouteDogFoodSingle
+        title="Menu Editor"
+        singleKey="dogfoodIncludesMenu"
+        siteKey={ decodeURIComponent(match.params.site) }
+        workspaceKey={ decodeURIComponent(match.params.workspace) }
+        fileOverride={ "quiqr/model/includes/" + decodeURIComponent(match.params.fileOverride) }
+        />
+      }} />
+
+
+
     </Switch>
 
     );

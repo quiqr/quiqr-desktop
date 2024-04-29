@@ -126,17 +126,30 @@ class WorkspaceService{
     }
   }
 
-  async getSingle(singleKey ){
+  async getSingle(singleKey, fileOverride ){
     let config = await this.getConfigurationsData();
 
     let single = config.singles.find(x => x.key === singleKey);
     if(single==null)throw new Error('Could not find single.');
-    let filePath = path.join(this.workspacePath, single.file);
+
+
+    let fileLastPath = single.file;
+
+    if(typeof fileOverride === 'string') fileLastPath = fileOverride;
+
+    let filePath = path.join(this.workspacePath, fileLastPath);
 
     if(fs.existsSync(filePath)){
       let data = await fs.readFileSync(filePath,'utf8');
 
       let obj = await this._smartParse(filePath, [path.extname(single.file).replace('.','')], data);
+
+      if(typeof single.pullOuterRootKey === 'string') {
+        let newObj = {}
+        newObj[single.pullOuterRootKey] = obj;
+        obj = newObj;
+      }
+
       // FIXME #464 resource issue
       /*
       if(contentFormats.isContentFile(filePath)){
@@ -187,6 +200,11 @@ class WorkspaceService{
       fs.mkdirSync(directory);//ensure directory existence
 
     let documentClone =  JSON.parse(JSON.stringify(document));
+
+    if(typeof single.pullOuterRootKey === 'string') {
+      documentClone = documentClone[single.pullOuterRootKey]
+    }
+
     this._stripNonDocumentData(documentClone);
 
     let stringData = await this._smartDump(filePath, [path.extname(single.file).replace('.','')], documentClone);

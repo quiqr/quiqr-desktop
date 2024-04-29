@@ -99,8 +99,8 @@ export class API {
     return mainProcessBridge.pendingCallbacks.length;
   }
 
-  getSingle(siteKey: string, workspaceKey: string, singleKey: string){
-    return mainProcessBridge.request('getSingle', {siteKey, workspaceKey, singleKey});
+  getSingle(siteKey: string, workspaceKey: string, singleKey: string, fileOverride: string){
+    return mainProcessBridge.request('getSingle', {siteKey, workspaceKey, singleKey, fileOverride});
   }
 
   openSingleInEditor(siteKey: string, workspaceKey: string, singleKey: string){

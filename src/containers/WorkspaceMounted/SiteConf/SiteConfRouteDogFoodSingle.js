@@ -91,12 +91,19 @@ class SiteConfRouteEtalage extends React.Component {
 
   render(){
 
+    let fileOverride = null;
+    if(typeof this.props.fileOverride === "string"){
+      fileOverride = this.props.fileOverride;
+    }
+
     let single = <Single
         key={ this.props.singleKey }
         siteKey={ this.props.siteKey }
         refreshed={ false }
         workspaceKey={ this.props.workspaceKey }
-        singleKey={ this.props.singleKey } /> ;
+        singleKey={ this.props.singleKey }
+        fileOverride={ fileOverride }
+        /> ;
 
     let complete = (
       <div className={ this.props.classes.container }>

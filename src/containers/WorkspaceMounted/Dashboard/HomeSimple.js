@@ -102,7 +102,7 @@ class Home extends React.Component{
 
       workspaceDetails.menu.forEach((menu)=>{
 
-        if(typeof menu.matchRole === 'undefined' || this.props.applicationRole === menu.matchRole){
+        if(typeof menu.matchRole === 'undefined' || menu.matchRole === 'all' || this.props.applicationRole === menu.matchRole){
 
           let section = {
             title: menu.title,

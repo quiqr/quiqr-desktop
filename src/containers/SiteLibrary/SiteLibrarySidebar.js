@@ -77,6 +77,17 @@ export class SiteLibrarySidebar extends React.Component {
       {
         title: 'On this computer',
         items: [
+          /*
+          {
+            active: true,
+            label: "Root",
+            selected: (this.state.selectedMenuItem==='local-root' ? true : false),
+            onClick: ()=>{
+              this.saveSelectedMenuItem('local-root');
+              history.push(`${basePath}/local`)
+            }
+          },
+          */
           {
             active: true,
             label: "All",

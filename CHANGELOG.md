@@ -1,4 +1,12 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- hide dogfood from cms model parseinfo
+- new method to add includes: #500
+    - quiqr/model/includes/{singles,collections, menus}/file.yaml
+-  new Single property: pullOuterRootKey: [key] #502
+  - this make files with outer arrays possible
+- dogfood edit menu.yml #501
+
 ## 0.18.6 (2024-04-25)
 - update readme
 

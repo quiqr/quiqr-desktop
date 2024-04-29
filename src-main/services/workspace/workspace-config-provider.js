@@ -20,6 +20,7 @@ class WorkspaceConfigProvider{
     this.parseInfo = {};
     this.parseInfo.baseFile = '';
     this.parseInfo.includeFiles = [];
+    this.parseInfo.includeFilesSub = [];
     this.parseInfo.partialFiles = [];
   }
 
@@ -108,10 +109,19 @@ class WorkspaceConfigProvider{
 
     // LOAD AND MERGE INCLUDES
     let siteModelIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-    configOrg = this._loadIncludes(configOrg, siteModelIncludes);
+    configOrg = this._loadIncludes(configOrg, siteModelIncludes, true);
+
+    let siteModelIncludesSingles = path.join(workspacePath,'quiqr','model','includes','singles','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    configOrg = this._loadIncludesSub('singles', configOrg, siteModelIncludesSingles, true);
+
+    let siteModelIncludesCollections = path.join(workspacePath,'quiqr','model','includes','collections','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    configOrg = this._loadIncludesSub('collections', configOrg, siteModelIncludesCollections, true);
+
+    let siteModelIncludesMenus = path.join(workspacePath,'quiqr','model','includes','menus','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    configOrg = this._loadIncludesSub('menu', configOrg, siteModelIncludesMenus, true);
 
     let dogFoodIncludes = path.join(pathHelper.getApplicationResourcesDir(),"all","dog_food_model/includes",'*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-    configOrg = this._loadIncludes(configOrg, dogFoodIncludes);
+    configOrg = this._loadIncludes(configOrg, dogFoodIncludes, false);
 
     // MERGE PARTIALS
     let mergedDataCollections = [];
@@ -166,8 +176,7 @@ class WorkspaceConfigProvider{
     return filePartialDir;
   }
 
-  _loadIncludes(configObject, fileIncludes){
-    //let fileIncludes = path.join(workspacePath,'quiqr','model','includes','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+  _loadIncludes(configObject, fileIncludes, showInParseInfo){
     let files = glob.sync(fileIncludes);
 
     let newObject = {};
@@ -181,7 +190,7 @@ class WorkspaceConfigProvider{
       }
       let mergeData = formatProvider.parse(strData);
 
-      this.parseInfo.includeFiles.push({key:path.parse(filename).name,filename: filename});
+      if(showInParseInfo) this.parseInfo.includeFiles.push({key:path.parse(filename).name,filename: filename});
 
       newObject[path.parse(filename).name] = deepmerge(mergeData, configObject[path.parse(filename).name]);
       if(path.parse(filename).name == 'dynamics' ){
@@ -192,6 +201,32 @@ class WorkspaceConfigProvider{
 
     return {...configObject, ...newObject}
   }
+
+  _loadIncludesSub(modelType, configObject, fileIncludes, showInParseInfo){
+    let files = glob.sync(fileIncludes);
+
+    let newObject = {};
+
+    files.forEach((filename)=>{
+
+      let strData = fs.readFileSync(filename,'utf8');
+      let formatProvider = formatProviderResolver.resolveForFilePath(files[0]);
+      if(formatProvider==null){
+        formatProvider = formatProviderResolver.getDefaultFormat();
+      }
+
+      let mergeDataSub = formatProvider.parse(strData);
+      let mergeData = [mergeDataSub];
+
+      if(showInParseInfo) this.parseInfo.includeFilesSub.push({key: modelType,filename: filename});
+
+      newObject[modelType] = deepmerge(mergeData, configObject[modelType]);
+    });
+
+    return {...configObject, ...newObject}
+  }
+
+
 
   getEncodedDestinationPath(filePartialDir, mergeKey){
     let encodeFilename = encodeURIComponent(mergeKey._mergePartial);
@@ -243,7 +278,7 @@ class WorkspaceConfigProvider{
 
         if(filePartial && fs.existsSync(filePartial) ){
 
-          this.parseInfo.partialFiles.push({key:mergeKey.key, filename: filePartial});
+          if(!mergeKey._mergePartial.startsWith("dogfood_site://")) this.parseInfo.partialFiles.push({key:mergeKey.key, filename: filePartial});
 
           let strData = await fs.readFileSync(filePartial,'utf8');
           let formatProvider = formatProviderResolver.resolveForFilePath(filePartial);

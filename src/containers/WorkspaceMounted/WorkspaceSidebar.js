@@ -85,6 +85,13 @@ class WorkspaceSidebar extends React.Component{
     return (<Route render={({history})=>{ return this.renderWithRoute(history) }} />);
   }
 
+  matchRole(menuslot){
+    if(typeof menuslot.matchRole === 'undefined' || menuslot.matchRole === '' || menuslot.matchRole === 'all' || this.props.applicationRole === menuslot.matchRole){
+      return true;
+    }
+    return false;
+  }
+
   renderWithRoute(history: any){
 
     let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
@@ -99,11 +106,12 @@ class WorkspaceSidebar extends React.Component{
       if("menu" in this.state.workspace){
         this.state.workspace.menu.map((menuslot, mindex) => {
 
-          if(typeof menuslot.matchRole === 'undefined' || this.props.applicationRole === menuslot.matchRole){
+          if(this.matchRole(menuslot) && menuslot.disabled !== true){
+
             menus.push({
               title: menuslot.title,
               expandable: true,
-              items: menuslot.menuItems.map((menuitem, iindex) => {
+              items: menuslot.menuItems.filter( (item)=> item.disabled !== true ).map((menuitem, iindex) => {
                 let item = null;
                 let itemType = null;
 

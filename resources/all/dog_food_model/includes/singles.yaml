@@ -4,14 +4,51 @@
 - key: dogfoodReadmeProjectMd
   _mergePartial: dogfood_site://readmeProjectReadmeMd
 
-#  _mergePartial: dogfood_site://cmsReadMd
-
 - key: dogfoodReadmeSiteMd
-#- key: dogfoodDashboardReadmeMd
   _mergePartial: dogfood_site://cmsDashboardMd
 
 - key: dogfoodPreviewCheckSettings
   title: Preview Check Settings
   _mergePartial: dogfood_site://previewCheckSettingsJson
 
+- key: dogfoodIncludesMenu
+  title: Menu Single Editor
+  description: Edit CMS Menu
+  file: quiqr/model/includes/menu.yaml
+  pullOuterRootKey: root
+  hidePreviewIcon: true
+  fields:
+  - key: root
+    type: accordion
+    groupdata: false
+    fields:
+    - key: key
+      type: string
+    - key: title
+      type: string
+      arrayTitle: true
+    - key: disabled
+      type: boolean
+    - key: matchRole
+      type: select
+      default: ''
+      options:
+      - text: all
+        value: ''
+
+      - text: Content Editor
+        value: contentEditor
+
+      - text: Site Developer
+        value: siteDeveloper
+
+    - key: menuItems
+      type: accordion
+      fields:
+      - key: key
+        type: string
+        arrayTitle: true
+
+      - key: disabled
+        type: boolean
 

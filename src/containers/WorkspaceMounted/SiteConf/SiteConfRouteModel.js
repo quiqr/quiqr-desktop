@@ -1,4 +1,5 @@
 import React           from 'react';
+import { Route }            from 'react-router-dom';
 import service         from './../../../services/service';
 import Typography      from '@material-ui/core/Typography';
 import { withStyles }  from '@material-ui/core/styles';
@@ -90,8 +91,12 @@ class SiteConfRouteModel extends React.Component {
 
   }
 
-  renderSection(title, files){
+  renderSection(title, files, history){
     const { classes } = this.props;
+    let encodedSiteKey = this.props.siteKey;
+    let encodedWorkspaceKey = this.props.workspaceKey;
+    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
+
 
     if(files.length === 0) return null;
 
@@ -119,7 +124,14 @@ class SiteConfRouteModel extends React.Component {
                 <Grid item xs={1}>
                   <IconButton color="primary" className={classes.iconButton} aria-label="directions"
                     onClick={()=>{
-                      service.api.openFileInEditor(item.filename);
+                      if(item.filename.includes("/quiqr/model/includes/menu.")){
+                        let fileBaseName = item.filename.split('/').reverse()[0];
+                        history.push(`${basePath}/dogfoodIncludesMenu/${fileBaseName}`)
+                      }
+                      else{
+                        service.api.openFileInEditor(item.filename);
+                      }
+
                     }}>
                     {(item.icon ? item.icon : <DescriptionIcon />)}
                   </IconButton>
@@ -134,11 +146,18 @@ class SiteConfRouteModel extends React.Component {
   }
 
   render(){
+    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
+  }
+
+  renderWithRoute(history){
+
 
     let includeFiles = [];
+    let includeFilesSub = [];
     let partialFiles = [];
     if(this.state.parseInfo && this.state.parseInfo.includeFiles && this.state.parseInfo.partialFiles){
       includeFiles = this.state.parseInfo.includeFiles;
+      includeFilesSub = this.state.parseInfo.includeFilesSub;
       partialFiles = this.state.parseInfo.partialFiles;
     }
 
@@ -148,10 +167,11 @@ class SiteConfRouteModel extends React.Component {
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">Model Configuration</Typography>
 
-        {this.renderSection("Model Directory", [{key:'directory',filename:this.state.source.path + "/quiqr/model", icon: <FolderIcon />}])}
-        {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile }])}
-        {this.renderSection("Include Files", includeFiles)}
-        {this.renderSection("Partial Files", partialFiles)}
+        {this.renderSection("Model Directory", [{key:'directory',filename:this.state.source.path + "/quiqr/model", icon: <FolderIcon />}],history)}
+        {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile }], history)}
+        {this.renderSection("Include Files", includeFiles, history)}
+        {this.renderSection("Include Files Subs", includeFilesSub, history)}
+        {this.renderSection("Partial Files", partialFiles, history)}
 
       </div>
     );

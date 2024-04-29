@@ -21,10 +21,12 @@ class Single extends React.Component{
     service.registerListener(this);
 
     var stateUpdate  = {};
-    var { siteKey, workspaceKey, singleKey } = this.props;
+
+    //fileOverride is used for some dynamic dogFood editors
+    var { siteKey, workspaceKey, singleKey, fileOverride } = this.props;
 
     Promise.all([
-      service.api.getSingle(siteKey, workspaceKey, singleKey).then((single)=>{
+      service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride).then((single)=>{
         stateUpdate.singleValues = single;
       }),
       service.api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails)=>{
