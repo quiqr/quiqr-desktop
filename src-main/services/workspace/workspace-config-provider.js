@@ -112,7 +112,9 @@ class WorkspaceConfigProvider{
     configOrg = this._loadIncludes(configOrg, siteModelIncludes, true);
 
     let siteModelIncludesSingles = path.join(workspacePath,'quiqr','model','includes','singles','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    console.log(configOrg)
     configOrg = this._loadIncludesSub('singles', configOrg, siteModelIncludesSingles, true);
+    console.log(configOrg)
 
     let siteModelIncludesCollections = path.join(workspacePath,'quiqr','model','includes','collections','*.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
     configOrg = this._loadIncludesSub('collections', configOrg, siteModelIncludesCollections, true);
@@ -205,7 +207,7 @@ class WorkspaceConfigProvider{
   _loadIncludesSub(modelType, configObject, fileIncludes, showInParseInfo){
     let files = glob.sync(fileIncludes);
 
-    let newObject = {};
+    let newObject = {...configObject, ...{}};
 
     files.forEach((filename)=>{
 
@@ -220,10 +222,10 @@ class WorkspaceConfigProvider{
 
       if(showInParseInfo) this.parseInfo.includeFilesSub.push({key: modelType,filename: filename});
 
-      newObject[modelType] = deepmerge(mergeData, configObject[modelType]);
+      newObject[modelType].push(mergeDataSub);//deepmerge(mergeData, configObject[modelType]);
     });
 
-    return {...configObject, ...newObject}
+    return newObject
   }
 
 
