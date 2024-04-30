@@ -32,8 +32,28 @@ class AccordionDynamic extends BaseDynamic {
       dragToIndex: null,
       dynFields: {},
       dynFieldsEmpty: [],
+      headerBackgroundColor: '#efefef',
       shouldSaveAccordionState:false
     };
+  }
+
+  componentDidMount(){
+
+    this.procDynamicFields();
+
+    let headerBackgroundColor = '#efefef';
+    service.api.readConfKey('prefs').then((value)=>{
+      if(value.interfaceStyle){
+        if(value.interfaceStyle ==='quiqr10-dark'){
+          headerBackgroundColor = '#666';
+        }
+
+        this.setState({
+          headerBackgroundColor: headerBackgroundColor
+        });
+      }
+    });
+
   }
 
   extendField(field, fieldExtender){
@@ -133,9 +153,6 @@ class AccordionDynamic extends BaseDynamic {
     }.bind(this)
   }
 
-  componentDidMount(){
-    this.procDynamicFields();
-  }
 
   getLastOpenState(){
     service.api.getCurrentFormAccordionIndex().then((pathPlusIndex)=>{
@@ -410,8 +427,7 @@ class AccordionDynamic extends BaseDynamic {
     }
 
     let headStyle = {
-      //backgroundColor: '#efefef',
-      backgroundColor: '#aaa',
+      backgroundColor: this.state.headerBackgroundColor,
     }
     // #aaa looks kind of good on light and dark mode
     // better to check which mode it is. and use efefef again
