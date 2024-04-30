@@ -9,7 +9,7 @@ const glob                          = require('glob');
 const WorkspaceService         = require('../services/workspace/workspace-service')
 const formatProviderResolver   = require('../utils/format-provider-resolver');
 
-const singleExtensions    = [
+const dataExtensions    = [
   'toml',
   'yaml',
   'yml',
@@ -54,7 +54,7 @@ class ScaffoldModel {
     }
   }
 
-  async scaffoldSingle(filePath=null) {
+  async scaffoldFromFile(dataType, filePath=null) {
 
     if(!this.checkCurrentSiteKey()) {return;}
 
@@ -62,7 +62,7 @@ class ScaffoldModel {
       let files = dialog.showOpenDialogSync(mainWindow, {
         defaultPath: global.currentSitePath,
         filters: [
-          { name: "Data files", extensions: singleExtensions }
+          { name: "Data files", extensions: dataExtensions }
         ],
         properties: ['openFile'] })
 
@@ -87,22 +87,34 @@ class ScaffoldModel {
     let data = fs.readFileSync(filePath,'utf8');
     let extension = path.extname(filePath).replace('.','');
     let fileObject = await workspaceService._smartParse(filePath, [extension], data);
-    await this.createSingleFromObject(fileObject, filePath, this.fileType(extension));
 
-    const singleOutFilePath = path.join(global.currentSitePath,"quiqr","model","includes","singles",this.singleConfObject.key+'.yaml');
-    let stringData = await workspaceService._smartDump(singleOutFilePath, ['yaml'], this.singleConfObject);
+    let stringData = null;
+    let outFilePath = null;
 
-    mkdirp.sync(path.dirname(singleOutFilePath));
-    fs.writeFileSync(singleOutFilePath, stringData);
+    if(dataType==='single'){
+      await this.createSingleFromObject(fileObject, filePath, this.fileType(extension));
+      outFilePath = path.join(global.currentSitePath,"quiqr","model","includes","singles",this.confObject.key+'.yaml');
+    }
+    else if(dataType==='collection'){
+      await this.createCollectionFromObject(fileObject, filePath, this.fileType(extension));
+      outFilePath = path.join(global.currentSitePath,"quiqr","model","includes","collections",this.confObject.key+'.yaml');
+    }
 
-    this.addNewDataKeyToMenu(this.singleConfObject.key);
+    stringData = await workspaceService._smartDump(outFilePath, ['yaml'], this.confObject);
 
-    dialog.showMessageBox(mainWindow, {
-      type: 'info',
-      buttons: ["Close"],
-      title: "Finished task",
-      message: "File has been scaffold.",
-    });
+    if(stringData){
+      mkdirp.sync(path.dirname(outFilePath));
+      fs.writeFileSync(outFilePath, stringData);
+
+      this.addNewDataKeyToMenu(this.confObject.key);
+
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        buttons: ["Close"],
+        title: "Finished task",
+        message: "File has been scaffold.",
+      });
+    }
 
   }
 
@@ -152,10 +164,11 @@ class ScaffoldModel {
   async createSingleFromObject(fileObject, filePath, fileType){
     let uniqNormalizedKeyName = path.basename(filePath,path.extname(filePath)) +"_"+pathHelper.randomPathSafeString(4);
     let relativeFilePath = path.relative(currentSitePath, filePath);
+    let title = "single: " + path.basename(filePath);
 
-    this.singleConfObject = {
+    this.confObject = {
       key: uniqNormalizedKeyName,
-      title: "single: " + path.basename(filePath),
+      title: title.substring(0,30),
       description: "scaffolded single file",
       file: relativeFilePath,
       hidePreviewIcon: true,
@@ -164,16 +177,14 @@ class ScaffoldModel {
 
     if(fileType === "md"){
       let formatProvider = await formatProviderResolver.resolveForMdFilePromise(filePath);
-      let dataformat = 'yaml';
       if(typeof formatProvider !== 'undefined'){
-        dataformat = formatProvider.defaultExt();
-        this.singleConfObject.dataformat = dataformat;
+        this.confObject.dataformat = formatProvider.defaultExt();
       }
     }
 
     let obj = {};
     if(Object.prototype.toString.call(fileObject) === '[object Array]') {
-      this.singleConfObject.pullOuterRootKey = "root"
+      this.confObject.pullOuterRootKey = "root"
       obj.root = fileObject;
     }
     else {
@@ -182,7 +193,51 @@ class ScaffoldModel {
 
     let fields = [];
     this.parseKeysToFields(obj, fields, 0);
-    this.singleConfObject.fields = fields;
+    this.confObject.fields = fields;
+  }
+
+  async createCollectionFromObject(fileObject, filePath, fileType){
+    let uniqNormalizedKeyName = path.basename(filePath,path.extname(filePath)) +"_"+pathHelper.randomPathSafeString(4);
+    let relativeFilePath = path.relative(currentSitePath, path.dirname(filePath));
+    let extension = path.extname(filePath).replace('.','');
+    let title = "collection: " + path.basename(filePath);
+
+    this.confObject = {
+      key: uniqNormalizedKeyName,
+      description: "scaffolded collection file",
+      title: title.substring(0,30),
+      extension: extension,
+      itemtitle: "Item",
+      folder: relativeFilePath,
+      hidePreviewIcon: true,
+      fields: []
+    };
+
+    if(fileType === "md"){
+      let formatProvider = await formatProviderResolver.resolveForMdFilePromise(filePath);
+      if(typeof formatProvider !== 'undefined'){
+        this.confObject.dataformat = formatProvider.defaultExt();
+      }
+    }
+    else{
+      this.confObject.dataformat = extension;
+    }
+
+    let obj = {};
+    obj = fileObject;
+    /*
+    if(Object.prototype.toString.call(fileObject) === '[object Array]') {
+      this.confObject.pullOuterRootKey = "root"
+      obj.root = fileObject;
+    }
+    else {
+      obj = fileObject;
+    }
+    */
+
+    let fields = [];
+    this.parseKeysToFields(obj, fields, 0);
+    this.confObject.fields = fields;
   }
 
   isScalar(value){

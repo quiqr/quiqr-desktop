@@ -360,17 +360,13 @@ class MenuManager {
           {
             label: 'Scaffold Single',
             click: async () => {
-              ScaffoldModel.scaffoldSingle()
-              console.log("Scaffold single")
-              //Select file
-              //Analyse file
-              //create single store in quiqr/model/includes/singles/
+              ScaffoldModel.scaffoldFromFile('single');
             }
           },
           {
             label: 'Scaffold Collection',
             click: async () => {
-              console.log("Scaffold collection")
+              ScaffoldModel.scaffoldFromFile('collection');
             }
           },
         ]
