@@ -111,7 +111,7 @@ class ScaffoldModel {
     let files = glob.sync(siteMenuIncludePath);
     let workspaceService = new WorkspaceService(global.currentSitePath, 'source', global.currentSiteKey);
 
-    let lastFileName = '';
+    let lastFileName = path.join(global.currentSitePath,'quiqr','model','includes','menu.yaml');
     let mergeData = [];
     files.forEach(async (filename)=>{
       lastFileName = filename;
@@ -168,7 +168,7 @@ class ScaffoldModel {
       if(typeof formatProvider !== 'undefined'){
         dataformat = formatProvider.defaultExt();
       }
-      this.singleConfObject.dataformat = dataformat;
+      //this.singleConfObject.dataformat = dataformat;
     }
 
     let obj = {};
