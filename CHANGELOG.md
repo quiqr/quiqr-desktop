@@ -8,6 +8,7 @@
 - dogfood edit menu.yml #501
 - accordion items look bad in darkmode #504 
 - scaffolding of singles (see experimental)
+- scaffolding of collections (see experimental)
 
 ## 0.18.6 (2024-04-25)
 - update readme
