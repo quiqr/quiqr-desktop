@@ -218,7 +218,6 @@ class WorkspaceConfigProvider{
       }
 
       let mergeDataSub = formatProvider.parse(strData);
-      let mergeData = [mergeDataSub];
 
       if(showInParseInfo) this.parseInfo.includeFilesSub.push({key: modelType,filename: filename});
 

@@ -4,6 +4,7 @@ const fs                       = require('fs-extra');
 const pathHelper               = require('../utils/path-helper');
 const path                     = require('path');
 const mkdirp                   = require('mkdirp');
+const glob                          = require('glob');
 
 const WorkspaceService         = require('../services/workspace/workspace-service')
 const formatProviderResolver   = require('../utils/format-provider-resolver');
@@ -94,6 +95,7 @@ class ScaffoldModel {
     mkdirp.sync(path.dirname(singleOutFilePath));
     fs.writeFileSync(singleOutFilePath, stringData);
 
+    this.addNewDataKeyToMenu(this.singleConfObject.key);
 
     dialog.showMessageBox(mainWindow, {
       type: 'info',
@@ -101,6 +103,34 @@ class ScaffoldModel {
       title: "Finished task",
       message: "File has been scaffold.",
     });
+
+  }
+
+  async addNewDataKeyToMenu(key){
+    let siteMenuIncludePath = path.join(global.currentSitePath,'quiqr','model','includes','menu.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    let files = glob.sync(siteMenuIncludePath);
+    let workspaceService = new WorkspaceService(global.currentSitePath, 'source', global.currentSiteKey);
+
+    let lastFileName = '';
+    let mergeData = [];
+    files.forEach(async (filename)=>{
+      lastFileName = filename;
+      let strData = fs.readFileSync(filename,'utf8');
+      let formatProvider = formatProviderResolver.resolveForFilePath(files[0]);
+      if(formatProvider==null){
+        formatProvider = formatProviderResolver.getDefaultFormat();
+      }
+      mergeData = formatProvider.parse(strData);
+    });
+    mergeData.push({
+      key: key,
+      title: "scaffolded item",
+      menuItems: [{key: key}]
+    });
+
+    let extension = path.extname(lastFileName).replace('.','');
+    let stringData = await workspaceService._smartDump(lastFileName, [extension], mergeData);
+    fs.writeFileSync(lastFileName, stringData);
 
   }
 
