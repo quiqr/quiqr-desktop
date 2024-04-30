@@ -6,6 +6,8 @@
 -  new Single property: pullOuterRootKey: [key] #502
   - this make files with outer arrays possible
 - dogfood edit menu.yml #501
+- accordion items look bad in darkmode #504 
+- scaffolding of singles (see experimental)
 
 ## 0.18.6 (2024-04-25)
 - update readme

@@ -1,12 +1,12 @@
 const electron                                  = require('electron');
 const Menu                                      = electron.Menu;
 const path                                      = require("path");
-//const { lstatSync }                             = require('fs')
 const fssimple                                  = require('fs');
 const fs                                        = require('fs-extra');
 const { shell }                                 = require('electron')
 const logWindowManager                          = require('./log-window-manager');
 const pogozipper                                = require('../import-export/pogozipper');
+const ScaffoldModel                             = require('../scaffold-model/scaffold-model');
 const pathHelper                                = require('../utils/path-helper');
 //const configurationDataProvider                 = require('../app-prefs-state/configuration-data-provider')
 const hugoDownloader                            = require('../hugo/hugo-downloader')
@@ -360,6 +360,7 @@ class MenuManager {
           {
             label: 'Scaffold Single',
             click: async () => {
+              ScaffoldModel.scaffoldSingle()
               console.log("Scaffold single")
               //Select file
               //Analyse file
