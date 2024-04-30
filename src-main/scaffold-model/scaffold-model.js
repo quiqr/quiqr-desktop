@@ -167,8 +167,8 @@ class ScaffoldModel {
       let dataformat = 'yaml';
       if(typeof formatProvider !== 'undefined'){
         dataformat = formatProvider.defaultExt();
+        this.singleConfObject.dataformat = dataformat;
       }
-      //this.singleConfObject.dataformat = dataformat;
     }
 
     let obj = {};
