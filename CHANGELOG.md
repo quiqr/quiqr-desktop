@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.8 (2024-05-01)
 - fix macos build
 
 ## 0.18.7 (2024-04-30)
