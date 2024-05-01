@@ -9,6 +9,7 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import Grid            from '@material-ui/core/Grid';
 import Box             from '@material-ui/core/Box';
 import FolderIcon from '@material-ui/icons/Folder';
+import BallotIcon from '@material-ui/icons/Ballot';
 
 
 const useStyles = theme => ({
@@ -91,6 +92,29 @@ class SiteConfRouteModel extends React.Component {
 
   }
 
+  renderDogFoodIcon(item, history){
+    const { classes } = this.props;
+    let encodedSiteKey = this.props.siteKey;
+    let encodedWorkspaceKey = this.props.workspaceKey;
+    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
+
+    //service.api.logToConsole(item.filename && item.filename.includes("/quiqr/model/includes/menu.yaml"));
+    if(item.filename && item.filename.includes("/quiqr/model/includes/menu.yaml")){
+      return (
+        <IconButton color="primary" className={classes.iconButton} aria-label="directions"
+          onClick={()=>{
+            let fileBaseName = item.filename.split('/').reverse()[0];
+            history.push(`${basePath}/dogfoodIncludesMenu/${fileBaseName}`)
+
+          }}>
+          {(item.icon ? item.icon : <BallotIcon />)}
+        </IconButton>
+      )
+    }
+    return null
+
+  }
+
   renderSection(title, files, history){
     const { classes } = this.props;
     let encodedSiteKey = this.props.siteKey;
@@ -107,6 +131,7 @@ class SiteConfRouteModel extends React.Component {
         <div className={classes.root}>
 
           {files.map((item, index)=>{
+
             return (
               <Grid container key={"grid"+index} spacing={1} alignItems="flex-end">
                 <Grid item xs={11}>
@@ -122,19 +147,15 @@ class SiteConfRouteModel extends React.Component {
                     }} />
                 </Grid>
                 <Grid item xs={1}>
+
                   <IconButton color="primary" className={classes.iconButton} aria-label="directions"
                     onClick={()=>{
-                      if(item.filename.includes("/quiqr/model/includes/menu.")){
-                        let fileBaseName = item.filename.split('/').reverse()[0];
-                        history.push(`${basePath}/dogfoodIncludesMenu/${fileBaseName}`)
-                      }
-                      else{
-                        service.api.openFileInEditor(item.filename);
-                      }
+                      service.api.openFileInEditor(item.filename);
 
                     }}>
                     {(item.icon ? item.icon : <DescriptionIcon />)}
                   </IconButton>
+                  {this.renderDogFoodIcon(item,history)}
                 </Grid>
               </Grid>
             )
