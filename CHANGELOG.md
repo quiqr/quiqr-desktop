@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- fix macos build
 
 ## 0.18.7 (2024-04-30)
 - hide dogfood from cms model parseinfo
