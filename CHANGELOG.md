@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.18.7 (2024-04-30)
 - hide dogfood from cms model parseinfo
 - new method to add includes: #500
