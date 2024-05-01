@@ -168,8 +168,16 @@ class PathHelper{
   }
 
   hugoConfigFilePath(hugoRootDir){
+
+    // TODO this could be faster and less code
+    //let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    //let hugoConfigPath = glob.sync(hugoConfigExp)[0];
+
+
     let configExt;
     const configBase = path.join(hugoRootDir, "config");
+    const configNewBase = path.join(hugoRootDir, "hugo");
+    let confVersion=1;
     if(fs.existsSync(configBase+".toml")){
       configExt = '.toml';
     }
@@ -182,11 +190,33 @@ class PathHelper{
     else if(fs.existsSync(configBase+".yml")){
       configExt = '.yml';
     }
+    else if(fs.existsSync(configNewBase+".toml")){
+      configExt = '.toml';
+      confVersion=2;
+    }
+    else if(fs.existsSync(configNewBase+".json")){
+      configExt = '.json';
+      confVersion=2;
+    }
+    else if(fs.existsSync(configNewBase+".yaml")){
+      configExt = '.yaml';
+      confVersion=2;
+    }
+    else if(fs.existsSync(configNewBase+".yml")){
+      configExt = '.yml';
+      confVersion=2;
+    }
     else{
       return null;
     }
 
-    return configBase + configExt;
+    if(confVersion===1){
+      return configBase + configExt;
+    }
+    else{
+      return configNewBase + configExt;
+    }
+
   }
 
 

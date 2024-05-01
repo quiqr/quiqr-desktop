@@ -100,7 +100,7 @@ class GitImporter {
 
         await Embgit.cloneFromPublicUrl( url, tempCloneThemeDir);
         if(themeInfo.ExampleSite){
-          await fs.copySync(tempCloneThemeDir+"/exampleSite", tempDir);
+          fs.copySync(tempCloneThemeDir+"/exampleSite", tempDir);
         }
 
         let formatProvider, hconfig = null;
@@ -115,7 +115,7 @@ class GitImporter {
         if(!hconfig) hconfig = {};
         hconfig.theme = themeInfo.Name;
         hconfig.baseURL = "/"
-        await fs.writeFileSync(
+        fs.writeFileSync(
           hugoConfigFilePath,
           formatProvider.dump(hconfig)
         );

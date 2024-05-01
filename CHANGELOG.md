@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- new hugo versions use hugo.toml in stead of config.toml #507
+
 ## 0.18.8 (2024-05-01)
 - fix macos build
 

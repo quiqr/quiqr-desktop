@@ -2,6 +2,7 @@ const path                   = require('path');
 const glob                   = require('glob');
 const fs                     = require('fs-extra');
 const formatProviderResolver = require('./../../utils/format-provider-resolver');
+const pathHelper             = require('./../../utils/path-helper');
 
 class InitialWorkspaceConfigBuilder{
 
@@ -79,7 +80,7 @@ class InitialWorkspaceConfigBuilder{
         {
           "key": "mainConfig",
           "title": "Site Configuration",
-          "file": `config.${opts.ext}`,
+          "file": `${opts.configFile}`,
           "fields":[
             { "key": getBestKey("title"), "title":"Site Title", "type":"string", "tip":"Your page title." },
             { "key": getBestKey("baseURL"), "title":"Base URL", "type":"string", "tip":"Your site URL." },
@@ -126,8 +127,10 @@ class InitialWorkspaceConfigBuilder{
 
   buildBase(hugoVersion){
 
-    let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-    let hugoConfigPath = glob.sync(hugoConfigExp)[0];
+    //let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
+    //let hugoConfigPath = glob.sync(hugoConfigExp)[0];
+
+    let hugoConfigPath = pathHelper.hugoConfigFilePath(this.workspacePath)
     let formatProvider;
 
     if(hugoConfigPath==null){
