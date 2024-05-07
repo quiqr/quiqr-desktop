@@ -90,9 +90,10 @@ class GitImporter {
 
       try{
 
+        const themeName = themeInfo.Name.replace(" ",'-').toLowerCase();
         const siteKey = await libraryService.createSiteKeyFromName(siteName);
         const tempDir = path.join(pathHelper.getTempDir(), 'siteFromTheme');
-        const tempCloneThemeDir = path.join(pathHelper.getTempDir(), 'siteFromTheme', 'themes', themeInfo.Name);
+        const tempCloneThemeDir = path.join(pathHelper.getTempDir(), 'siteFromTheme', 'themes', themeName);
 
         del.sync([tempDir],{force:true});
         await fs.ensureDir(tempDir);
@@ -113,7 +114,7 @@ class GitImporter {
 
         //TODO TEST WITHOUT CONFIG (SHOULD FAIL)
         if(!hconfig) hconfig = {};
-        hconfig.theme = themeInfo.Name;
+        hconfig.theme = themeName;
         hconfig.baseURL = "/"
         fs.writeFileSync(
           hugoConfigFilePath,

@@ -98,7 +98,6 @@ class SiteConfRouteModel extends React.Component {
     let encodedWorkspaceKey = this.props.workspaceKey;
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
 
-    //service.api.logToConsole(item.filename && item.filename.includes("/quiqr/model/includes/menu.yaml"));
     if(item.filename && item.filename.includes("/quiqr/model/includes/menu.yaml")){
       return (
         <IconButton color="primary" className={classes.iconButton} aria-label="directions"
