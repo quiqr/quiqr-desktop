@@ -50,6 +50,7 @@ class PrefsAdvanced extends React.Component {
       this.setState({prefs: value });
 
       this.setStringPrefToState('systemGitBinPath',value)
+      this.setStringPrefToState('openAiApiKey',value)
       this.setStringPrefToState('customOpenInCommand',value)
 
       /*
@@ -89,6 +90,23 @@ class PrefsAdvanced extends React.Component {
           />
 
         </div>
+
+        <div className={classes.root}>
+          <TextField
+            id="openAiApiKey"
+            label="openAiApikey"
+            helperText='Enter API key to enable AI services. Translate texts, create meta summaries, etc..'
+            variant="outlined"
+            className={classes.textfield}
+            value={this.state.openAiApiKey}
+            onChange={(e)=>{
+              this.setState({openAiApiKey: e.target.value });
+              service.api.saveConfPrefKey("openAiApiKey",e.target.value);
+            }}
+          />
+
+        </div>
+
 
         <div className={classes.root}>
           <TextField

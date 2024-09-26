@@ -116,9 +116,9 @@ class SiteConfRouteModel extends React.Component {
 
   renderSection(title, files, history){
     const { classes } = this.props;
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
+//    let encodedSiteKey = this.props.siteKey;
+//    let encodedWorkspaceKey = this.props.workspaceKey;
+//    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
 
 
     if(files.length === 0) return null;

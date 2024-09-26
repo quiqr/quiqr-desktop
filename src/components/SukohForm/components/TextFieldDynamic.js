@@ -2,6 +2,7 @@ import * as React      from 'react';
 import TextField       from '@material-ui/core/TextField';
 import FormItemWrapper from './shared/FormItemWrapper';
 import Tip             from '../../Tip';
+import AiAssist        from '../../AiAssist';
 import { BaseDynamic } from '../../HoForm';
 
 class TextFieldDynamic extends BaseDynamic {
@@ -34,6 +35,9 @@ class TextFieldDynamic extends BaseDynamic {
 
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
+
+    let enableAiAssist = true;
+    if(enableAiAssist) iconButtons.push(<AiAssist inField={field.title} inValue={context.value} />);
 
     return (<FormItemWrapper
       control={<TextField
