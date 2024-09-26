@@ -37,7 +37,7 @@ class TextFieldDynamic extends BaseDynamic {
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
     let enableAiAssist = true;
-    if(enableAiAssist) iconButtons.push(<AiAssist inField={field.title} inValue={context.value} />);
+    if(enableAiAssist) iconButtons.push(<AiAssist inField={field} inValue={context.value} />);
 
     return (<FormItemWrapper
       control={<TextField
