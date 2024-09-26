@@ -46,6 +46,7 @@
     "mkdirp": "0.5.1",
     "node-fetch": "^2.6.11",
     "npm": "^8.13.2",
+    "openai": "^4.64.0",
     "prop-types": "^15.8.1",
     "react-datepicker": "^4.11.0",
     "react-fa-icon-picker": "^1.0.3",

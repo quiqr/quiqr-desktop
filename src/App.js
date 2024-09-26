@@ -117,7 +117,7 @@ class App extends React.Component{
     this.setApplicationRole();
   }
 
-  componentWillUnmount(){
+  componenWillUnmount(){
     [
       'redirectToGivenLocation',
     ].forEach((channel)=>{

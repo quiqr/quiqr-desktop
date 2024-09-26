@@ -77,6 +77,20 @@ class Form extends React.Component {
         this.setState({path: newNode});
       });
     }
+
+    service.api.readConfKey('prefs').then((value)=>{
+      this.setState({prefs: value });
+
+      if(value.openAiApiKey){
+        this.setState({enableAiAssist: true });
+      }
+      else{
+        this.setState({enableAiAssist: false });
+      }
+
+    });
+
+
   }
 
   static getDerivedStateFromProps(props: FormProps, state: FormState){
@@ -154,7 +168,16 @@ class Form extends React.Component {
       let nodePath = this.buildPath(node);
       let parentPath = this.buildPath(node.parent);
 
-      let context = new ComponentContext(this, node, this.state.path, parentPath, nodePath,component.proplessInstance, onValueChanged);
+      let context = new ComponentContext(this,
+        node,
+        this.state.path,
+        parentPath,
+        nodePath,
+        component.proplessInstance,
+        onValueChanged,
+        this.state.enableAiAssist,
+        this.props.pageUrl
+      );
 
       let DynamicComponent = component.classType;
       return (<DynamicComponent

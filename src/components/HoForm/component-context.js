@@ -23,14 +23,14 @@ export class ComponentContext<Field: FieldBase>{
     setLevelState: any;
 
 
-    constructor(form : any, node : DynamicFormNode<Field>, currentPath : string, parentPath : string,
-        nodePath : string, proplessInstance : any, onValueChanged : ?(value: any)=>void
-    ){
+    constructor(form , node , currentPath , parentPath , nodePath , proplessInstance , onValueChanged, enableAiAssist, pageUrl){
 
         this.node = node;
 
         //paths
         this.nodePath = nodePath;
+        this.enableAiAssist = enableAiAssist;
+        this.pageUrl = pageUrl;
         this.parentPath = parentPath;
         this.currentPath = currentPath;
         this.proplessInstance = proplessInstance;
@@ -43,6 +43,7 @@ export class ComponentContext<Field: FieldBase>{
         this.form = form;
 
         this.reloadAfterSave = false;
+
 
         //functions borowed from the DynamicForm
         this.renderLevel = form.renderLevel.bind(form); //don't know why, but this solved a huge nasty bug!
