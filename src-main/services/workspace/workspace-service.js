@@ -448,9 +448,6 @@ class WorkspaceService{
 
   async copyCollectionItemToLang(collectionKey, collectionItemKey , collectionItemNewKey, destLang ){
 
-    console.log(destLang);
-    return {copied: false};
-
 
     let config = await this.getConfigurationsData();
     let collection = config.collections.find(x => x.key === collectionKey);
@@ -461,6 +458,8 @@ class WorkspaceService{
     let newFilePath;
     let newFileKey;
     let newLabel;
+
+
 
     if(collectionItemKey.includes("."+collection.extension)){
       filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
@@ -474,6 +473,13 @@ class WorkspaceService{
       newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
       newLabel = collectionItemNewKey;
     }
+
+    console.log(destLang);
+    console.log(filePath);
+    console.log(newFilePath);
+    console.log(newLabel);
+    return {copied: false};
+
 
     if (!fs.existsSync(filePath)){
       console.log("orig does not exist"+ filePath)
