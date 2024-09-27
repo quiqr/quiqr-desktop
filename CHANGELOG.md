@@ -1,7 +1,14 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
-- new hugo versions use hugo.toml in stead of config.toml #507
-- in model sep icon for dogfood items (currently only menu)
+- feature: AI Assistent for text fields. Using ChatGPT from OpenAI.
+- fix: improve theme import stability
+- fix: new hugo versions use hugo.toml in stead of config.toml #507
+- feature: in model sep icon for dogfood items (currently only menu)
+
+### Stats
+- 45 modules 52.08M
+- 9 community templates
+- 96 stars
 
 ## 0.18.8 (2024-05-01)
 - fix macos build
