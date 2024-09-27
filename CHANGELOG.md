@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.18.9 (2024-09-27)
 - feature: AI Assistent for text fields. Using ChatGPT from OpenAI.
 - fix: improve theme import stability

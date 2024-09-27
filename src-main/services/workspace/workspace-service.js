@@ -446,6 +446,50 @@ class WorkspaceService{
   }
 
 
+  async copyCollectionItemToLang(collectionKey, collectionItemKey , collectionItemNewKey, destLang ){
+
+    console.log(destLang);
+    return {copied: false};
+
+
+    let config = await this.getConfigurationsData();
+    let collection = config.collections.find(x => x.key === collectionKey);
+    if(collection==null)
+      throw new Error('Could not find collection.');
+
+    let filePath;
+    let newFilePath;
+    let newFileKey;
+    let newLabel;
+
+    if(collectionItemKey.includes("."+collection.extension)){
+      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + "." + collection.extension);
+      newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
+      newLabel = collectionItemNewKey+'.'+collection.extension;
+    }
+    else{
+      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey);
+      newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
+      newLabel = collectionItemNewKey;
+    }
+
+    if (!fs.existsSync(filePath)){
+      console.log("orig does not exist"+ filePath)
+      return { coped: false };
+    }
+    if (fs.existsSync(newFilePath)){
+      console.log("new already  exist"+ newFilePath)
+      return { copied: false };
+    }
+
+    fs.copySync(filePath, newFilePath);
+    return { copied: true, item: { key:newFileKey.replace(/\\/g,'/'), label:newLabel }};
+  }
+
+
+
   async copyCollectionItem(collectionKey, collectionItemKey , collectionItemNewKey ){
     let config = await this.getConfigurationsData();
     let collection = config.collections.find(x => x.key === collectionKey);
@@ -822,6 +866,40 @@ class WorkspaceService{
     });
 
   }
+
+  async getHugoConfigLanguages(){
+
+    let workspaceDetails = await this.getConfigurationsData();
+
+    return new Promise((resolve,reject)=>{
+
+      let serveConfig;
+      if(workspaceDetails.serve && workspaceDetails.serve.length){
+        serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
+      }
+      else serveConfig = {config:''};
+
+      let hugoServerConfig = {
+        config: serveConfig.config,
+        workspacePath: this.workspacePath,
+        hugover: workspaceDetails.hugover,
+      }
+
+      let hugoConfService = new HugoConfig(JSON.parse(JSON.stringify(hugoServerConfig)));
+      hugoConfService.configMountsAsObject().then((confObj)=>{
+        var filteredArray = confObj.mounts.filter(function(mount){
+          return "lang" in mount;
+        });
+
+        resolve(filteredArray);
+      }).
+        catch((e)=>{
+          reject(e);
+        });
+    });
+  }
+
+
 
   async serve(){
     let workspaceDetails = await this.getConfigurationsData();

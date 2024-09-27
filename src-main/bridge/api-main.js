@@ -757,6 +757,19 @@ api.copyCollectionItem = function({siteKey, workspaceKey, collectionKey, collect
   });
 }
 
+api.copyCollectionItemToLang = function({siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey, destLang}, context) {
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+    if(err){ context.reject(err); return; }
+    workspaceService.copyCollectionItemToLang(collectionKey, collectionItemKey, collectionItemNewKey, destLang)
+      .then((result)=>{
+        context.resolve(result);
+      })
+      .catch((error)=>{
+        context.reject(error);
+      });
+  });
+}
+
 api.getFilesFromAbsolutePath = function({path},promise){
 
   getWorkspaceService(global.currentSiteKey, global.currentWorkspaceKey, function(err, {workspaceService}){
@@ -947,6 +960,21 @@ api.getSiteConfig = function({siteKey}, context){
     });
   });
 }
+
+api.getLanguages = function({siteKey, workspaceKey}, context) {
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+    if(err){ context.reject(err); return; }
+    workspaceService.getHugoConfigLanguages().then(r=>{
+
+      context.resolve(r);
+    })
+      .catch((error)=>{
+    console.log(error);
+        context.reject(error);
+      });
+  });
+}
+
 api.publisherDispatchAction = function({siteKey, publishConf, action, actionParameters}, context){
   getSiteService(siteKey, function(err, siteService){
     if(err){ context.reject(err); return; }

@@ -165,6 +165,10 @@ export class API {
     return mainProcessBridge.request('copyCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey});
   }
 
+  copyCollectionItemToLang(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, collectionItemNewKey: string, destLang: string){
+    return mainProcessBridge.request('copyCollectionItemToLang', {siteKey, workspaceKey, collectionKey, collectionItemKey, collectionItemNewKey, destLang});
+  }
+
   openFileInEditor(filepath: string, create: bool, relativeToRoot: bool){
     mainProcessBridge.requestVoid('openFileInEditor', {filepath, create, relativeToRoot});
   }
@@ -269,6 +273,10 @@ export class API {
 
   getSiteConfig(siteKey: string){
     return mainProcessBridge.request('getSiteConfig', {siteKey});
+  }
+
+  getLanguages(siteKey: string, workspaceKey: string){
+    return mainProcessBridge.request('getLanguages', {siteKey, workspaceKey});
   }
 
   publisherDispatchAction(siteKey: string, publishConf: any, action: string, actionParameters: any, timeout: any){

@@ -1,32 +1,33 @@
-import * as React              from 'react';
-import { Route }               from 'react-router-dom';
-import DialogTitle             from '@material-ui/core/DialogTitle';
-import Dialog                  from '@material-ui/core/Dialog';
-import DialogActions           from '@material-ui/core/DialogActions';
-import DialogContent           from '@material-ui/core/DialogContent';
-import DialogContentText       from '@material-ui/core/DialogContentText';
-import Switch                  from '@material-ui/core/Switch';
-import FormControlLabel        from '@material-ui/core/FormControlLabel';
-import Divider                 from '@material-ui/core/Divider';
-import List                    from '@material-ui/core/List';
-import ListItem                from '@material-ui/core/ListItem';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText            from '@material-ui/core/ListItemText';
-import TextField               from '@material-ui/core/TextField';
-import Paper                   from '@material-ui/core/Paper';
-import Chip                    from '@material-ui/core/Chip';
-import MenuItem                from '@material-ui/core/MenuItem';
-import Menu                    from '@material-ui/core/Menu';
-import IconButton              from '@material-ui/core/IconButton';
-import MoreVertIcon            from '@material-ui/icons/MoreVert';
-import Button                  from '@material-ui/core/Button';
-import Typography              from '@material-ui/core/Typography';
-import DeleteItemKeyDialog     from './DeleteItemKeyDialog'
-import EditItemKeyDialog       from './EditItemKeyDialog'
-import CopyItemKeyDialog       from './CopyItemKeyDialog'
-import Spinner                 from './../../../components/Spinner'
-import { Debounce }            from './../../../utils/debounce';
-import service                 from './../../../services/service'
+import * as React                    from 'react';
+import { Route }                     from 'react-router-dom';
+import DialogTitle                   from '@material-ui/core/DialogTitle';
+import Dialog                        from '@material-ui/core/Dialog';
+import DialogActions                 from '@material-ui/core/DialogActions';
+import DialogContent                 from '@material-ui/core/DialogContent';
+import DialogContentText             from '@material-ui/core/DialogContentText';
+import Switch                        from '@material-ui/core/Switch';
+import FormControlLabel              from '@material-ui/core/FormControlLabel';
+import Divider                       from '@material-ui/core/Divider';
+import List                          from '@material-ui/core/List';
+import ListItem                      from '@material-ui/core/ListItem';
+import ListItemSecondaryAction       from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText                  from '@material-ui/core/ListItemText';
+import TextField                     from '@material-ui/core/TextField';
+import Paper                         from '@material-ui/core/Paper';
+import Chip                          from '@material-ui/core/Chip';
+import MenuItem                      from '@material-ui/core/MenuItem';
+import Menu                          from '@material-ui/core/Menu';
+import IconButton                    from '@material-ui/core/IconButton';
+import MoreVertIcon                  from '@material-ui/icons/MoreVert';
+import Button                        from '@material-ui/core/Button';
+import Typography                    from '@material-ui/core/Typography';
+import DeleteItemKeyDialog           from './DeleteItemKeyDialog'
+import EditItemKeyDialog             from './EditItemKeyDialog'
+import CopyItemKeyDialog             from './CopyItemKeyDialog'
+import CopyItemToLanguageDialog      from './CopyItemToLanguageDialog'
+import Spinner                       from './../../../components/Spinner'
+import { Debounce }                  from './../../../utils/debounce';
+import service                       from './../../../services/service'
 
 const Fragment = React.Fragment;
 
@@ -83,7 +84,7 @@ class CollectionListItems extends React.PureComponent {
     super(props);
     this.state = {
       anchorEl: null,
-      item: null
+      item: null,
     }
 
   }
@@ -99,7 +100,7 @@ class CollectionListItems extends React.PureComponent {
   }
 
   render(){
-    let { collectionExtension, filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
+    let { collectionExtension, filteredItems, onItemClick, onRenameItemClick, onCopyItemClick, onCopyToLangClick, onDeleteItemClick, onMakePageBundleItemClick, sortDescending } = this.props;
 
     filteredItems.sort(function(a, b){
       let keyA = a.sortval;
@@ -116,6 +117,7 @@ class CollectionListItems extends React.PureComponent {
       return 0;
     });
 
+
     return (
       <React.Fragment>
         <Menu
@@ -129,6 +131,16 @@ class CollectionListItems extends React.PureComponent {
             this.handleClose();
             onRenameItemClick(this.state.currentItem);
           }}>Rename</MenuItem>
+
+          {
+            ( this.props.languages.length > 0 ?
+            <MenuItem onClick={()=> {
+              this.handleClose();
+              onCopyToLangClick(this.state.currentItem);
+            }}>Copy to other language</MenuItem>
+
+            : null)
+          }
 
           <MenuItem onClick={()=> {
             this.handleClose();
@@ -187,6 +199,7 @@ class Collection extends React.Component{
     this.state = {
       selectedWorkspaceDetails: null,
       items: null,
+      languages: [],
       filter: '',
       filteredItems: [],
       view: null,
@@ -203,6 +216,11 @@ class Collection extends React.Component{
   setRenameItemView(item: any){
     this.setState({view:{key:'renameItem', item}, modalBusy:false});
   }
+
+  setCopyToLangView(item: any){
+    this.setState({view:{key:'copyToLang', item}, modalBusy:false});
+  }
+
   setCopyItemView(item: any){
     this.setState({view:{key:'copyItem', item}, modalBusy:false});
   }
@@ -224,6 +242,10 @@ class Collection extends React.Component{
       this.setState({showSpinner: true});
     });
     service.registerListener(this);
+    service.api.getLanguages(this.props.siteKey, this.props.workspaceKey).then((langs)=>{
+      this.setState({languages:langs})
+      //this.forceUpdate();
+    });
 
     this.refreshItems();
   }
@@ -312,7 +334,7 @@ class Collection extends React.Component{
 
   }
 
-  copyCollectionItem(itemKey : string, itemOldKey: string){
+  copyCollectionItem(itemKey, itemOldKey){
     let { siteKey, workspaceKey, collectionKey } = this.props;
 
     if(this.state.view==null) return;
@@ -320,16 +342,39 @@ class Collection extends React.Component{
     service.api.copyCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
       .then((result)=>{
         if(result.copied){
-          let itemsCopy : Array<any> = (this.state.items||[]).slice(0);
+          let itemsCopy = (this.state.items||[]).slice(0);
           itemsCopy.push(result.item);
           this.setState({items:itemsCopy, modalBusy:false, view: undefined, ...(this.resolveFilteredItems(itemsCopy))});
         }
         else{
-          //TODO: warn someone!
           this.setState({modalBusy:false, view: undefined});
         }
       },()=>{
-        //TODO: warn someone!
+        this.setState({modalBusy:false, view: undefined});
+      });
+
+  }
+
+  copyCollectionItemToLang(itemKey, itemOldKey, destLang){
+    console.log(destLang)
+    let { siteKey, workspaceKey, collectionKey } = this.props;
+
+    if(this.state.view==null) return;
+
+    service.api.copyCollectionItemToLang(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey, destLang)
+      .then((result)=>{
+        if(result.copied){
+          /*
+          let itemsCopy = (this.state.items||[]).slice(0);
+          itemsCopy.push(result.item);
+          this.setState({items:itemsCopy, modalBusy:false, view: undefined, ...(this.resolveFilteredItems(itemsCopy))});
+          */
+          service.api.logToConsole("copied to "+ destLang);
+        }
+        else{
+          this.setState({modalBusy:false, view: undefined});
+        }
+      },()=>{
         this.setState({modalBusy:false, view: undefined});
       });
 
@@ -395,6 +440,9 @@ class Collection extends React.Component{
 
   handleRenameItemClick = (item: any)=>{
     this.setRenameItemView(item)
+  }
+  handleCopyToLangClick = (item: any)=>{
+    this.setCopyToLangView(item)
   }
   handleCopyItemClick = (item: any)=>{
     this.setCopyItemView(item)
@@ -471,6 +519,19 @@ class Collection extends React.Component{
           busy={this.state.modalBusy}
           handleClose={this.setRootView.bind(this)}
           handleConfirm={this.copyCollectionItem.bind(this)}
+          confirmLabel="Copy"
+        />);
+      }
+      else if(view.key==='copyToLang'){
+        dialog = (<CopyItemToLanguageDialog
+          title="Copy To Language"
+          viewKey={view.key}
+          textfieldlabel="item key"
+          languages={this.state.languages}
+          value={this.state.view.item.label}
+          busy={this.state.modalBusy}
+          handleClose={this.setRootView.bind(this)}
+          handleConfirm={this.copyCollectionItemToLang.bind(this)}
           confirmLabel="Copy"
         />);
       }
@@ -558,10 +619,12 @@ class Collection extends React.Component{
 
             <List>
               <CollectionListItems
+                languages={this.state.languages}
                 collectionExtension={collection.extension}
                 filteredItems={filteredItems}
                 onItemClick={this.handleItemClick}
                 onRenameItemClick={this.handleRenameItemClick}
+                onCopyToLangClick={this.handleCopyToLangClick}
                 onCopyItemClick={this.handleCopyItemClick}
                 onDeleteItemClick={this.handleDeleteItemClick}
                 onMakePageBundleItemClick={this.handleMakePageBundleItemClick}

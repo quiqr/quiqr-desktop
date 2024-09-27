@@ -1,13 +1,16 @@
-import * as React from 'react';
-import Spinner from './../../../components/Spinner'
-import TextField  from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import * as React        from 'react';
+import Spinner           from './../../../components/Spinner'
+import TextField         from '@material-ui/core/TextField';
+import Button            from '@material-ui/core/Button';
 import DialogTitle       from '@material-ui/core/DialogTitle';
 import Dialog            from '@material-ui/core/Dialog';
 import DialogActions     from '@material-ui/core/DialogActions';
 import DialogContent     from '@material-ui/core/DialogContent';
+import Select            from '@material-ui/core/Select';
+import MenuItem          from '@material-ui/core/MenuItem';
+import Box               from '@material-ui/core/Box';
 
-class CopyItemKeyDialog extends React.Component{
+class CopyItemToLanguageDialog extends React.Component{
 
   constructor(props ){
     super(props);
@@ -20,6 +23,7 @@ class CopyItemKeyDialog extends React.Component{
     this.state = {
       value:valueBase||'',
       initialValue:props.value||'',
+      destLang: '',
       valid: null
     };
   }
@@ -30,17 +34,8 @@ class CopyItemKeyDialog extends React.Component{
   }
 
   handleConfirm(){
-
-    if(this.props.viewKey === 'createItem'){
-      if(this.validate() && this.props.handleConfirm) {
-        this.props.handleConfirm(this.state.titleToKey, this.state.value);
-      }
-    }
-    else{
-      if(this.validate() && this.props.handleConfirm) {
-        this.props.handleConfirm(this.state.value, this.state.initialValue);
-      }
-
+    if(this.validate() && this.props.handleConfirm) {
+      this.props.handleConfirm(this.state.value, this.state.initialValue, this.state.destLang);
     }
   }
 
@@ -78,20 +73,42 @@ class CopyItemKeyDialog extends React.Component{
       >
         <DialogTitle>{this.props.title}</DialogTitle>
         <DialogContent>
+        <Box my={3} sx={{display:'flex'}}>
 
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="destLang"
+              value={this.state.destLang}
+              onChange={(e)=>{
+
+                this.setState({destLang: e.target.value})
+
+              }}
+              label="Destination Language"
+            >
+              {
+                this.props.languages.map((lang)=>{
+                  return (<MenuItem key={"key"+lang.lang} value={lang.lang}>{lang.lang}</MenuItem>)
+                })
+              }
+            </Select>
+        { busy? <Spinner /> : undefined }
+
+        </Box>
+
+
+        <Box my={3} sx={{display:'flex'}}>
         <TextField
           label={this.props.textfieldlabel}
           value={this.state.value}
           error={valid ? false : true}
           helperText={valid? undefined : errorText}
           disabled={busy}
-          onChange={this.handleChange.bind(this)}
           fullWidth={true}
         />
-        <br/>
-        <br/>
+        </Box>
 
-        { busy? <Spinner /> : undefined }
+
 
         </DialogContent>
         <DialogActions>
@@ -104,4 +121,4 @@ class CopyItemKeyDialog extends React.Component{
     );
   }
 }
-export default CopyItemKeyDialog
+export default CopyItemToLanguageDialog
