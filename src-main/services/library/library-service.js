@@ -115,7 +115,7 @@ class LibraryService{
     newConf.name = siteName;
     newConf.source = {};
     newConf.source.type = 'folder';
-    newConf.source.path = pathSource;
+    newConf.source.path = path.basename(pathSource); // 30sep2024, always relative from now on
     newConf.publish = [];
     newConf.lastPublish = 0;
     return newConf;

@@ -16,19 +16,11 @@ class InitialWorkspaceConfigBuilder{
 
     let {dataBase, formatProvider} = this.buildBase(hugoVersion);
 
-    /*
-    let dataInclude = this.buildInclude();
-    let dataPartial = this.buildPartials();
-    */
 
     fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model'));
     fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model','includes'));
     fs.ensureDirSync(path.join(this.workspacePath,'quiqr','model','partials'));
 
-    /*
-    let filePathInclude = path.join(this.workspacePath,'quiqr','model','includes','collections.'+formatProvider.defaultExt());
-    let filePathPartial = path.join(this.workspacePath,'quiqr','model','partials', 'page.'+formatProvider.defaultExt());
-    */
     let filePathBase    = path.join(this.workspacePath,'quiqr','model','base.'+formatProvider.defaultExt());
 
 
@@ -36,16 +28,6 @@ class InitialWorkspaceConfigBuilder{
       filePathBase,
       formatProvider.dump(dataBase)
     );
-    /*
-    fs.writeFileSync(
-      filePathInclude,
-      formatProvider.dump(dataInclude)
-    );
-    fs.writeFileSync(
-      filePathPartial,
-      formatProvider.dump(dataPartial)
-    );
-    */
 
     return filePathBase;
   }
@@ -126,9 +108,6 @@ class InitialWorkspaceConfigBuilder{
   }
 
   buildBase(hugoVersion){
-
-    //let hugoConfigExp = path.join(this.workspacePath,'config.{'+formatProviderResolver.allFormatsExt().join(',')+'}');
-    //let hugoConfigPath = glob.sync(hugoConfigExp)[0];
 
     let hugoConfigPath = pathHelper.hugoConfigFilePath(this.workspacePath)
     let formatProvider;

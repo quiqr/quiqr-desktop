@@ -29,11 +29,16 @@ export class API {
   }
 
   stopHugoServer(){
-    return mainProcessBridge.request('stopHugoServer');
+    return mainProcessBridge.request('stopHugoServer', {}, {timeout:100000});
   }
 
+
+//openSiteLibrary
+//redirectTo
+//getThumbnailForPath
+
   logToConsole( message, label){
-    return mainProcessBridge.request('logToConsole', {message, label});
+    return mainProcessBridge.request('logToConsole', {message, label}, {timeout: 1000});
   }
 
   getDynFormFields(searchRootNode: string, searchLevelKeyVal: any){
@@ -53,7 +58,7 @@ export class API {
   }
 
   importSiteFromPublicGitUrl(siteName: string, url: string){
-    return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url});
+    return mainProcessBridge.request('importSiteFromPublicGitUrl', {siteName, url}, {timeout: 1000000});
   }
 
   newSiteFromPublicHugoThemeUrl(siteName: string, url: string, themeInfo: any, hugoVersion){
@@ -238,7 +243,7 @@ export class API {
   }
 
   getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
-    return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 40000});
+    return mainProcessBridge.request('getThumbnailForPath', {siteKey, workspaceKey, targetPath}, {timeout: 400000});
   }
 
   getThumbnailForCollectionOrSingleItemImage(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string){
@@ -295,7 +300,7 @@ export class API {
   }
 
   openSiteLibrary(){
-    return mainProcessBridge.request('openSiteLibrary');
+    return mainProcessBridge.request('openSiteLibrary', {}, {timeout: 100000 });
   }
   showMenuBar(){
     return mainProcessBridge.request('showMenuBar');
@@ -332,7 +337,7 @@ export class API {
   }
 
   redirectTo(location, forceRefresh){
-    return mainProcessBridge.request('redirectTo', {location, forceRefresh});
+    return mainProcessBridge.request('redirectTo', {location, forceRefresh}, {timeout: 10000});
   }
   parentMountWorkspace(siteKey: string, workspaceKey: string){
     return mainProcessBridge.request('parentMountWorkspace', {siteKey, workspaceKey});

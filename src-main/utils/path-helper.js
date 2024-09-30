@@ -127,7 +127,6 @@ class PathHelper{
       return oldfile;
     }
     else{
-      //oldfile
       return path.join(this.getRoot(), 'sites', siteKey, 'config.json');
     }
   }

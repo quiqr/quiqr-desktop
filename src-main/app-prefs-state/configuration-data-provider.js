@@ -69,28 +69,39 @@ function get(callback, {invalidateCache} = {}){
   let configurations = {sites:[]};
 
   for(let i = 0; i < files.length; i++){
-    let file = files[i];
-    if(fs.existsSync(file)){
+    let conffile = files[i];
+    if(fs.existsSync(conffile)){
       try{
-        let strData = fs.readFileSync(file, {encoding: 'utf-8'});
-        let formatProvider = formatProviderResolver.resolveForFilePath(file);
-        if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${file}.`)
+        let strData = fs.readFileSync(conffile, {encoding: 'utf-8'});
+        let formatProvider = formatProviderResolver.resolveForFilePath(conffile);
+        if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${conffile}.`)
         let site = formatProvider.parse(strData);
         validateSite(site);
         site.published = 'unknown';
 
-        site.configPath = file;
+        site.source.path = siteSourceRelativeToAbsolute(site, conffile);
+        site.configPath = conffile;
         site.etalage = getEtalage(site);
         configurations.sites.push(site);
       }
       catch(e){
-        outputConsole.appendLine(`Configuration file is invalid '${file}': ${e.toString()}`);
+        outputConsole.appendLine(`Configuration file is invalid '${conffile}': ${e.toString()}`);
       }
     }
   }
 
   configurationCache = configurations;
   callback(undefined, configurations);
+}
+
+function siteSourceRelativeToAbsolute(site, conffile){
+  if(site.source.path.substring(0, 1) !== "/" ){
+    siteKey = path.basename(path.dirname(conffile));
+    return path.join(pathHelper.getRoot(), 'sites', siteKey, site.source.path);
+  }
+  else{
+    return site.source.path;
+  }
 }
 
 function getEtalage(site){
