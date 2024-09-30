@@ -27,6 +27,7 @@ import CopyItemKeyDialog             from './CopyItemKeyDialog'
 import CopyItemToLanguageDialog      from './CopyItemToLanguageDialog'
 import Spinner                       from './../../../components/Spinner'
 import { Debounce }                  from './../../../utils/debounce';
+import {snackMessageService}         from './../../../services/ui-service';
 import service                       from './../../../services/service'
 
 const Fragment = React.Fragment;
@@ -364,12 +365,9 @@ class Collection extends React.Component{
     service.api.copyCollectionItemToLang(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey, destLang)
       .then((result)=>{
         if(result.copied){
-          /*
-          let itemsCopy = (this.state.items||[]).slice(0);
-          itemsCopy.push(result.item);
-          this.setState({items:itemsCopy, modalBusy:false, view: undefined, ...(this.resolveFilteredItems(itemsCopy))});
-          */
-          service.api.logToConsole("copied to "+ destLang);
+          this.setState({modalBusy:false, view: undefined });
+          //service.api.logToConsole("copied to "+ destLang);
+          snackMessageService.addSnackMessage(`Copies ${itemKey} to ${destLang}.`,'success');
         }
         else{
           this.setState({modalBusy:false, view: undefined});

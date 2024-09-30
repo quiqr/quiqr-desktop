@@ -446,40 +446,53 @@ class WorkspaceService{
   }
 
 
-  async copyCollectionItemToLang(collectionKey, collectionItemKey , collectionItemNewKey, destLang ){
-
+  async copyCollectionItemToLang(collectionKey, collectionItemKey , collectionItemNewKey, destLangCode ){
 
     let config = await this.getConfigurationsData();
     let collection = config.collections.find(x => x.key === collectionKey);
     if(collection==null)
       throw new Error('Could not find collection.');
 
-    let filePath;
+    //let filePath;
     let newFilePath;
     let newFileKey;
     let newLabel;
 
+    let langs = await this.getHugoConfigLanguages();
 
+    let sourcelang = langs.find((lang)=>{
+      return collection.folder.startsWith(lang.source);
+    });
+    let destlang = langs.find((lang)=>{
+      return lang.lang == destLangCode;
+    });
+    let pathInLang = collection.folder.slice(sourcelang.source.length);
+
+//    console.log(sourcelang, 'sourcelang')
+//    console.log(pathInLang, 'pathInLang')
+//    console.log(destlang, 'destlang')
+//
+//    console.log(langs);
+//    console.log(this.workspacePath);
+//    console.log(collection.folder);
+//    console.log(destLangCode);
+
+    let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
 
     if(collectionItemKey.includes("."+collection.extension)){
-      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
-      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey + "." + collection.extension);
+      newFilePath = path.join(this.workspacePath, destlang.source, pathInLang, collectionItemNewKey + "." + collection.extension);
       newFileKey = path.join(collectionItemNewKey+'.'+collection.extension);
       newLabel = collectionItemNewKey+'.'+collection.extension;
     }
     else{
-      filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
-      newFilePath = path.join(this.workspacePath, collection.folder, collectionItemNewKey);
+      newFilePath = path.join(this.workspacePath, destlang.source, pathInLang, collectionItemNewKey);
       newFileKey = path.join(collectionItemNewKey, 'index.'+collection.extension);
       newLabel = collectionItemNewKey;
     }
 
-    console.log(destLang);
-    console.log(filePath);
-    console.log(newFilePath);
-    console.log(newLabel);
-    return {copied: false};
-
+//    console.log(filePath);
+//    console.log(newFilePath);
+//    console.log(newLabel);
 
     if (!fs.existsSync(filePath)){
       console.log("orig does not exist"+ filePath)
