@@ -25,7 +25,7 @@ class DateDynamic extends BaseDynamic {
     if(state[key]==='now')
     {
       let date = new Date();
-      state[key] = '' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +  date.getDate();
+      state[key] = date.toISOString().split('T')[0];
     }
   }
 
