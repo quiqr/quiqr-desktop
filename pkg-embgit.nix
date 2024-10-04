@@ -2,12 +2,12 @@
 
 pkgs.buildGo118Module rec {
   name = "embgit";
-  version = "0.6.3";
+  version = "0.6.4";
 
   src = pkgs.fetchgit {
     url = "https://github.com/quiqr/embgit.git";
     rev = "${version}";
-    sha256 = "sha256-buiLjqXFLdKy4TdQmpAxELM0bjTZpm8xrTXTinpl/Jk=";
+    sha256 = "sha256-0eEBKhJIcKGoW8Nd1/L4849Ew99GAKoRh3otuVw4P3o=";
     #sha256 = lib.fakeSha256;
   };
 
