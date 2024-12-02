@@ -13,23 +13,12 @@ import {
 //  Colors,
   registerables
 } from 'chart.js';
-//import { Bar } from 'react-chartjs-2';
 
 import "chartjs-plugin-dragdata";
-//import {Chart, Colors, registerables} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-//import annotationPlugin from 'chartjs-plugin-annotation';
+import annotationPlugin from 'chartjs-plugin-annotation';
 
 import { Bubble, getDatasetAtEvent } from "react-chartjs-2";
-
-/*
-type qdtOptions = {
-  topLeft: string;
-  topRight: string;
-  bottomLeft: string;
-  bottomRight: string;
-}
-*/
 
 const quadrants = {
   id: 'quadrants',
@@ -57,17 +46,13 @@ const quadrants = {
   }
 };
 
-//Chart.register(annotationPlugin,quadrants, ChartDataLabels, ...registerables);
-
-
 ChartJS.register(
-//  CategoryScale,
-//  LinearScale,
+  //Colors,
   ChartDataLabels,
   PointElement,
-//  Title,
   Tooltip,
   quadrants,
+  annotationPlugin,
   Legend,
   ...registerables
 );
@@ -123,6 +108,7 @@ class EisenhouwerDynamic extends BaseDynamic {
     //let {context} = this.props;
   }
 
+  /*
   normalizeState({state, field}){
     //TODO: clear if value is not a valid option
     let key = field.key;
@@ -139,30 +125,14 @@ class EisenhouwerDynamic extends BaseDynamic {
       }
     }
   }
+*/
 
   getType(){
     return 'eisenhouwer';
   }
 
   handleChange(event){
-
-    //let x = getDatasetAtEvent(this.selectorRef.current, event)
-    //let x = this.selectorRef.ctx
-    //service.api.logToConsole(x);
-    //service.api.logToConsole(this.cdata);
-
-    //this.forceUpdate();
-    /*
-    let objectVal = {
-      blabl: "ljldajskld",
-      foot: [
-        "blabla",
-        "boep"
-      ],
-
-    };
-    */
-    this.props.context.setValue(this.cdata, 250);
+     this.props.context.setValue(this.cdata, 250);
   }
 
   renderComponent(){
