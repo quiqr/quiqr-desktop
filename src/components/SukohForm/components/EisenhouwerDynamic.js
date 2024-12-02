@@ -117,7 +117,7 @@ class EisenhouwerDynamic extends BaseDynamic {
                 max: 100,
                 title: {
                   display: true,
-                  text: "Cost of Solution"
+                  text: field.xScaleTitle
                 }
               },
               y: {
@@ -125,7 +125,7 @@ class EisenhouwerDynamic extends BaseDynamic {
                 max: 100,
                 title: {
                   display: true,
-                  text: "Impact of Solution"
+                  text: field.yScaleTitle
                 }
               },
             },
