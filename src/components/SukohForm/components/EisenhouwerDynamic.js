@@ -63,21 +63,11 @@ class EisenhouwerDynamic extends BaseDynamic {
   constructor(props){
 
     super(props);
-    this.selectorRef = React.createRef(null);
 
     this.cdata = {
       datasets: [{
-        label: 'First Dataset',
-        data: [{
-          x: 20,
-          y: 30,
-          r: 15
-        }, {
-            x: 40,
-            y: 10,
-            r: 10
-          }],
-        backgroundColor: 'rgb(255, 99, 132)'
+        label: '',
+        data: [],
       }]
     };
     this.state = {
@@ -105,7 +95,8 @@ class EisenhouwerDynamic extends BaseDynamic {
   }
 
   componentDidMount(){
-    //let {context} = this.props;
+    let {context} = this.props;
+    this.cdata = context.value;
   }
 
   /*
@@ -153,14 +144,7 @@ class EisenhouwerDynamic extends BaseDynamic {
       control={
 
         <Bubble
-          ref={ this.selectorRef }
           data={this.cdata}
-          /*
-          onClick={(event)=>{
-            this.handleChange(event);
-
-          }}
-          */
 
           options={{
             scales: {
@@ -275,16 +259,11 @@ class EisenhouwerDynamic extends BaseDynamic {
                 dragX: true,
                 dragY: true,
                 onDrag(event, di, index, value) {
-                  //console.log("drag", { event, di, index, value });
                 },
                 onDragEnd: (e, datasetIndex, index, value)=> {
-                  // you may use this callback to store the final datapoint value
-                  // (after dragging) in a database, or update other UI elements that
-                  // dependent on it
                   this.handleChange(e);
                 },
                          onDragStart(event, di, index, value) {
-                  //console.log("drag start", { event, di, index, value });
                 },
               },
             },
