@@ -73,50 +73,13 @@ class EisenhouwerDynamic extends BaseDynamic {
     this.state = {
       options: [],
       error_msg: null,
-
-      data: {
-        datasets: [{
-          label: 'First Dataset',
-          data: [{
-            x: 20,
-            y: 30,
-            r: 15
-          }, {
-              x: 40,
-              y: 10,
-              r: 10
-            }],
-          backgroundColor: 'rgb(255, 99, 132)'
-        }]
-      }
-
     }
-
   }
 
   componentDidMount(){
     let {context} = this.props;
     this.cdata = context.value;
   }
-
-  /*
-  normalizeState({state, field}){
-    //TODO: clear if value is not a valid option
-    let key = field.key;
-    let isArrayType = field.multiple===true;
-    if(state[key]===undefined){
-      state[key] = field.default || isArrayType?[]:'';
-    }
-    else{
-      if(isArrayType && !Array.isArray(state[key])){
-        state[key] = [state[key].toString()];
-      }
-      else if(!isArrayType && typeof(state[key])!=='string'){
-        state[key] = state[key].toString();
-      }
-    }
-  }
-*/
 
   getType(){
     return 'eisenhouwer';
@@ -232,8 +195,6 @@ class EisenhouwerDynamic extends BaseDynamic {
                   }
                 }
               },
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
               quadrants: {
                 topLeft: "#ffe3e8",
                 topRight: "#fff6e0",
@@ -249,22 +210,14 @@ class EisenhouwerDynamic extends BaseDynamic {
                   if(value.RiskCode) return value.RiskCode + " - " + value.QuestionTitle;
                 }
               },
-                  animation: {
-      onComplete: ctx => {
-        console.log(ctx.chart.data.datasets);
-        console.log(ctx.chart.options.scales.x);
-      }
-    },
               dragData: {
                 dragX: true,
                 dragY: true,
-                onDrag(event, di, index, value) {
-                },
+//                onDrag(event, di, index, value) {},
                 onDragEnd: (e, datasetIndex, index, value)=> {
                   this.handleChange(e);
                 },
-                         onDragStart(event, di, index, value) {
-                },
+ //               onDragStart(event, di, index, value) {},
               },
             },
           }}
