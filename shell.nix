@@ -8,7 +8,8 @@ let
 in
   pkgs.mkShell {
     nativeBuildInputs = [
-      pkgs.nodejs-16_x
+      #pkgs.nodejs-16_x
+      pkgs.nodejs-18_x
       pkgs.p7zip
       pkgs.electron_9
       pkgs.xdg-utils

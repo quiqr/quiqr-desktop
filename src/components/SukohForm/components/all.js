@@ -24,6 +24,7 @@ import SelectFromQueryDynamic from './SelectFromQueryDynamic';
 import FontPickerDynamic      from './FontPickerDynamic';
 import SliderDynamic          from './SliderDynamic';
 import BundleImgThumbDynamic  from './BundleImgThumbDynamic';
+import EisenhouwerDynamic  from './EisenhouwerDynamic';
 
 export default [
     AccordionDynamic,
@@ -51,5 +52,6 @@ export default [
     SliderDynamic,
     TextFieldDynamic,
     TextFieldNumberDynamic,
-    ToggleDynamic
+    ToggleDynamic,
+    EisenhouwerDynamic
 ];

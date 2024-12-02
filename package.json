@@ -55,6 +55,11 @@
     "request": "2.87.0",
     "toml": "2.3.3",
     "tomlify-j0.4": "3.0.0",
+    "chart.js": "^3.9.1",
+    "chartjs-plugin-annotation": "^3.1.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "chartjs-plugin-dragdata": "^2.3.1",
+    "react-chartjs-2": "^4.3.0",
     "user-home": "2.0.0"
   },
   "devDependencies": {
