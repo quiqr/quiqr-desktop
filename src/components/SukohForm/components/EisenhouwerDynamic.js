@@ -13,6 +13,8 @@ import service                  from '../../../services/service';
 const arrayToObject = (array, keyField) =>
   array.reduce((obj, item) => {
     obj[item[keyField]] = item
+    //delete obj[item[keyField]][keyField]
+
     return obj
   }, {})
 
@@ -75,6 +77,10 @@ class EisenhouwerDynamic extends BaseDynamic {
     }
   }
 
+  getType(){
+    return 'eisenhouwer';
+  }
+
 /*
 
 # #   dataSetsPath: .
@@ -94,7 +100,7 @@ class EisenhouwerDynamic extends BaseDynamic {
     if(field.dataSetsDataPointsKeyToItem) {
       points = Object.keys(newPData).map(key => {
         let rval = newPData[key]
-        rval.label = key
+        rval._label = key
         return rval
       })
     }
@@ -140,52 +146,68 @@ class EisenhouwerDynamic extends BaseDynamic {
     return {datasets: rdatasets};
   }
 
-  outParseDataSets(data,field){
+  outParseDataSets(incdata,field){
 
+    let cdata = incdata;
 
-    //dataSetsDataPointsKeyToItem: true
-    //
-
+    let dsets = [];
     if(field.dataSetsDataPointsKeyToItem){
+      cdata.datasets.forEach((dsitem) => {
+        let ppdata0 = {};
+        //let ppdata00 = dsitem
+        //delete ppdata00.data
+        ppdata0.data = arrayToObject(dsitem.data, "_label");
+        ppdata0.label = dsitem.label;
 
-      data.datasets.forEach((item)=> {
-        item.data = arrayToObject(item.data, "label");
-      });
+        //ppdata0 = {...ppdata00, ...ppdata01 }
 
+        dsets.push(ppdata0);
+      })
 
-      //data.datasets = newDatasets;
-      service.api.logToConsole(data)
-
+      cdata.datasets = dsets;
     }
 
+    //dsets = cdata.datasets;
+    dsets =[];
+    cdata.datasets.forEach((dsitem) => {
 
-    this.rdata = {};
+      let ppdata = {};
+      if(field.dataSetsDataPointsPath){
+        this.createNestedObject(ppdata, field.dataSetsDataPointsPath.substring(1).split('.') );
+
+        let data = dsitem.data
+        delete dsitem.data
+        ppdata = dsitem;
+
+        eval("ppdata"+field.dataSetsDataPointsPath + " = data" )
+      }
+      else{
+        //ppdata = dsitem.data
+        //ppdata.label = dsitem.label
+      }
+      dsets.push(ppdata);
+    })
+
+    cdata.datasets = dsets;
+
+    //fixme make local
+    this.rdata = {};//cdata
+
     if(field.dataSetsPath){
       this.createNestedObject(this.rdata, field.dataSetsPath.substring(1).split('.') );
-      eval("this.rdata"+field.dataSetsPath + "= data.datasets" );
+      eval("this.rdata"+field.dataSetsPath + " = cdata.datasets" );
     }
     else{
-      this.rdata = data.datasets
+      //this.rdata = {...cleancdata, ...cdata.datasets}
+      this.rdata = cdata.datasets
+      //service.api.logToConsole(this.cdata.label)
     }
-
 
     if(field.dataSetsKeyToLabel){
-
-      this.rdata = arrayToObject(this.rdata, "label");
-      /*
-
-      this.rdata = this.rdata.reduce((obj, item) => {
-        //TODO remove label
-        obj[item.label] = item
-
-        return obj
-      })
-      */
-
-      //this.rdata = this.rdata.reduce((a, v) => ({ ...a, [v]: v}), {}) 
+      let tmpdata = this.rdata;
+      //this.rdata = arrayToObject(tmpdata, "label");
     }
 
-    //service.api.logToConsole(this.rdata)
 
     return this.rdata;
   }
@@ -201,10 +223,6 @@ class EisenhouwerDynamic extends BaseDynamic {
     }
 
     this.cdata = cdata;
-  }
-
-  getType(){
-    return 'eisenhouwer';
   }
 
 
