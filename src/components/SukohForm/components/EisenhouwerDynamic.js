@@ -2,23 +2,20 @@ import React           from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
 import { BaseDynamic } from '../../HoForm';
 import Tip             from '../../Tip';
-import service                  from '../../../services/service';
-
-
-import {
-  Chart as ChartJS,
-  PointElement,
-  Tooltip,
-  Legend,
-//  Colors,
-  registerables
-} from 'chart.js';
-
+import { Chart as ChartJS, PointElement, Tooltip, Legend, registerables } from 'chart.js';
 import "chartjs-plugin-dragdata";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import { Bubble } from "react-chartjs-2";
+import service                  from '../../../services/service';
 
-import { Bubble, getDatasetAtEvent } from "react-chartjs-2";
+
+const arrayToObject = (array, keyField) =>
+  array.reduce((obj, item) => {
+    obj[item[keyField]] = item
+    return obj
+  }, {})
+
 
 const quadrants = {
   id: 'quadrants',
@@ -57,6 +54,13 @@ ChartJS.register(
   ...registerables
 );
 
+const emptyDataSet = {
+      datasets: [{
+        label: '',
+        data: [],
+      }]
+    };
+
 
 class EisenhouwerDynamic extends BaseDynamic {
 
@@ -64,29 +68,155 @@ class EisenhouwerDynamic extends BaseDynamic {
 
     super(props);
 
-    this.cdata = {
-      datasets: [{
-        label: '',
-        data: [],
-      }]
-    };
+    this.cdata = emptyDataSet;
+
     this.state = {
-      options: [],
       error_msg: null,
     }
   }
 
+/*
+
+# #   dataSetsPath: .
+# #   dataSetsKeyToLabel: true
+ #   dataSetsDataPointsPath: data
+# #   dataSetsDataPointsKeyToItem: true
+ #   dataSetsDataPointPosXPath: .REPORT.importance_number_of_100
+ #   dataSetsDataPointPosyPath: .REPORT.cost_number_of_100
+
+    dataSetsDataPointLabelTemplate: "(%s) %s - %s"
+    dataSetsDataPointLabelVars: [ ".Risk", ".RiskCode", ".QuestionTitle" ]
+  */
+
+  inParsePoints(newPData, field){
+
+    let points = [];
+    if(field.dataSetsDataPointsKeyToItem) {
+      points = Object.keys(newPData).map(key => {
+        let rval = newPData[key]
+        rval.label = key
+        return rval
+      })
+    }
+    else{
+      points = newPData;
+    }
+
+    points.map((point)=>{
+      point.x = eval("point"+(field.dataSetsDataPointPosXPath||""))
+      point.y = eval("point"+(field.dataSetsDataPointPosYPath||""))
+      return point
+    });
+    return points;
+
+  }
+
+  createNestedObject( base, names ) {
+    for( let i = 0; i < names.length; i++ ) {
+      base = base[ names[i] ] = base[ names[i] ] || {};
+    }
+  }
+
+  inParseDataSets(data, field){
+
+    let newData = eval("data"+(field.dataSetsPath||""))
+
+    let rdatasets = [];
+    if(field.dataSetsKeyToLabel){
+      rdatasets = Object.keys(newData).map(key => {
+        let newPData = eval("newData[key]"+(field.dataSetsDataPointsPath||""))
+        return { label: key, data: this.inParsePoints(newPData,field) }
+      })
+    }
+    else{
+      rdatasets = newData.map((item)=>{
+        let newPData = eval("item"+(field.dataSetsDataPointsPath||""))
+        item.data = this.inParsePoints(newPData,field);
+
+        return item;
+      });
+    }
+
+    return {datasets: rdatasets};
+  }
+
+  outParseDataSets(data,field){
+
+
+    //dataSetsDataPointsKeyToItem: true
+    //
+
+    if(field.dataSetsDataPointsKeyToItem){
+
+      data.datasets.forEach((item)=> {
+        item.data = arrayToObject(item.data, "label");
+      });
+
+
+      //data.datasets = newDatasets;
+      service.api.logToConsole(data)
+
+    }
+
+
+    this.rdata = {};
+    if(field.dataSetsPath){
+      this.createNestedObject(this.rdata, field.dataSetsPath.substring(1).split('.') );
+      eval("this.rdata"+field.dataSetsPath + "= data.datasets" );
+    }
+    else{
+      this.rdata = data.datasets
+    }
+
+
+    if(field.dataSetsKeyToLabel){
+
+      this.rdata = arrayToObject(this.rdata, "label");
+      /*
+
+      this.rdata = this.rdata.reduce((obj, item) => {
+        //TODO remove label
+        obj[item.label] = item
+
+        return obj
+      })
+      */
+
+      //this.rdata = this.rdata.reduce((a, v) => ({ ...a, [v]: v}), {}) 
+    }
+
+    //service.api.logToConsole(this.rdata)
+
+    return this.rdata;
+  }
+
   componentDidMount(){
     let {context} = this.props;
-    this.cdata = context.value;
+    let {node} = context;
+    let {field} = node;
+
+    let cdata = emptyDataSet;
+    if(context.value){
+      cdata = this.inParseDataSets(context.value, field)
+    }
+
+    this.cdata = cdata;
   }
 
   getType(){
     return 'eisenhouwer';
   }
 
-  handleChange(event){
-     this.props.context.setValue(this.cdata, 250);
+
+  handleChange(field){
+
+
+    let cdataOut = this.outParseDataSets(this.cdata, field);
+
+    //service.api.logToConsole(cdataOut)
+
+
+     //this.props.context.setValue(this.cdata, 250);
   }
 
   renderComponent(){
@@ -101,7 +231,6 @@ class EisenhouwerDynamic extends BaseDynamic {
 
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
-
 
     return (<FormItemWrapper
       control={
@@ -213,11 +342,9 @@ class EisenhouwerDynamic extends BaseDynamic {
               dragData: {
                 dragX: true,
                 dragY: true,
-//                onDrag(event, di, index, value) {},
                 onDragEnd: (e, datasetIndex, index, value)=> {
-                  this.handleChange(e);
+                  this.handleChange(field);
                 },
- //               onDragStart(event, di, index, value) {},
               },
             },
           }}
@@ -230,8 +357,6 @@ class EisenhouwerDynamic extends BaseDynamic {
       iconButtons={iconButtons}
     />);
   }
-
-
 }
 
 export default EisenhouwerDynamic;
