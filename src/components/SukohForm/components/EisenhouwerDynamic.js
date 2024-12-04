@@ -6,23 +6,17 @@ import { Chart as ChartJS, PointElement, Tooltip, Legend, registerables } from '
 import "chartjs-plugin-dragdata";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import autocolors from 'chartjs-plugin-autocolors';
 import { Bubble } from "react-chartjs-2";
 import service                  from '../../../services/service';
 
-
 const arrayToObject = (arrayIn, keyField) => {
+    return arrayIn.reduce((obj, item) => {
+      obj[item[keyField]] = item
 
-    //service.api.logToConsole(arrayIn)
-    //if(typeof arrayIn == Array){
-      return arrayIn.reduce((obj, item) => {
-        obj[item[keyField]] = item
-        //delete obj[item[keyField]][keyField]
-
-        return obj
-      }, {})
-    //}
+      return obj
+    }, {})
   }
-
 
 const quadrants = {
   id: 'quadrants',
@@ -51,7 +45,7 @@ const quadrants = {
 };
 
 ChartJS.register(
-  //Colors,
+  autocolors,
   ChartDataLabels,
   PointElement,
   Tooltip,
@@ -86,19 +80,6 @@ class EisenhouwerDynamic extends BaseDynamic {
     return 'eisenhouwer';
   }
 
-/*
-
-# #   dataSetsPath: .
-# #   dataSetsKeyToLabel: true
- #   dataSetsDataPointsPath: data
-# #   dataSetsDataPointsKeyToItem: true
- #   dataSetsDataPointPosXPath: .REPORT.importance_number_of_100
- #   dataSetsDataPointPosyPath: .REPORT.cost_number_of_100
-
-    dataSetsDataPointLabelTemplate: "(%s) %s - %s"
-    dataSetsDataPointLabelVars: [ ".Risk", ".RiskCode", ".QuestionTitle" ]
-  */
-
   inParsePoints(newPData, field){
 
     let points = [];
@@ -119,7 +100,6 @@ class EisenhouwerDynamic extends BaseDynamic {
       return point
     });
     return points;
-
   }
 
   createNestedObject( base, names ) {
@@ -151,74 +131,6 @@ class EisenhouwerDynamic extends BaseDynamic {
     return {datasets: rdatasets};
   }
 
-  outParseDataSets(incdata,field){
-
-    let cdata = incdata;
-
-    let dsets = [];
-
-    /*
-    if(field.dataSetsDataPointsKeyToItem){
-      cdata.datasets.forEach((dsitem) => {
-        let ppdata0 = {};
-        //let ppdata00 = dsitem
-        //delete ppdata00.data
-
-        ppdata0.data = arrayToObject(dsitem.data, "_label");
-        ppdata0.label = dsitem.label;
-
-        //ppdata0 = {...ppdata00, ...ppdata01 }
-
-        dsets.push(ppdata0);
-      })
-
-      cdata.datasets = dsets;
-    }
-    */
-
-    //dsets = cdata.datasets;
-    dsets =[];
-    cdata.datasets.forEach((dsitem) => {
-
-      let ppdata = {};
-      if(field.dataSetsDataPointsPath){
-        this.createNestedObject(ppdata, field.dataSetsDataPointsPath.substring(1).split('.') );
-
-        let data = dsitem.data
-        delete dsitem.data
-        ppdata = dsitem;
-
-        eval("ppdata"+field.dataSetsDataPointsPath + " = data" )
-      }
-      else{
-        //ppdata = dsitem.data
-        //ppdata.label = dsitem.label
-      }
-      dsets.push(ppdata);
-    })
-
-    cdata.datasets = dsets;
-
-    //fixme make local
-    this.rdata = {};//cdata
-
-    if(field.dataSetsPath){
-      this.createNestedObject(this.rdata, field.dataSetsPath.substring(1).split('.') );
-      eval("this.rdata"+field.dataSetsPath + " = cdata.datasets" );
-    }
-    else{
-      //this.rdata = {...cleancdata, ...cdata.datasets}
-      this.rdata = cdata.datasets
-      //service.api.logToConsole(this.cdata.label)
-    }
-
-    if(field.dataSetsKeyToLabel){
-      let tmpdata = this.rdata;
-      //this.rdata = arrayToObject(tmpdata, "label");
-    }
-    return this.rdata;
-  }
-
   componentDidMount(){
     let {context} = this.props;
     let {node} = context;
@@ -244,12 +156,9 @@ class EisenhouwerDynamic extends BaseDynamic {
       return point
     });
     return points;
-
   }
 
-
-
-  outParseDataSets2(cdata,field){
+  outParseDataSets(cdata,field){
 
     let cdataIn = { ...cdata }
     let cdataOut = {}
@@ -308,23 +217,13 @@ class EisenhouwerDynamic extends BaseDynamic {
         else{
           cdataOut = dsets;
         }
-        service.api.logToConsole(cdataOut);
     }
-
-
-
-
 
     return cdataOut;
   }
 
   handleChange(field){
-
-    //service.api.logToConsole(typeof this.cdata)
-    //let cdataOut = this.outParseDataSets2(this.cdata, field);
-
-    //service.api.logToConsole(cdataOut)
-    this.props.context.setValue(this.outParseDataSets2(this.cdata, field), 250);
+    this.props.context.setValue(this.outParseDataSets(this.cdata, field), 250);
   }
 
   renderComponent(){
@@ -367,6 +266,9 @@ class EisenhouwerDynamic extends BaseDynamic {
               },
             },
             elements: {
+              point:{
+                radius: (field.pointRadius || 5)
+              },
               line: {
                 fill: false,
                 tension: 0.4
@@ -443,8 +345,16 @@ class EisenhouwerDynamic extends BaseDynamic {
                 offset: 6,
                 anchor: 'center',
                 align: 'right',
-                xformatter: function(value, context) {
-                  if(value.RiskCode) return value.RiskCode + " - " + value.QuestionTitle;
+                formatter: (point, context) => {
+                  //service.api.logToConsole(point)
+                  let label = `${point.x}, ${point.y}`
+                  if(field.dataSetsDataPointLabelTemplate){
+                    //label=field.dataSetsDataPointLabelTemplate
+                    label=`(${point.Risk}) ${point.RiskCode} - ${point.QuestionTitle`
+                    // eval(`label=`+field.dataSetsDataPointLabelTemplate)
+                  }
+                  return label;
+                  //if(value.RiskCode) return value.RiskCode + " - " + value.QuestionTitle;
                 }
               },
               dragData: {
