@@ -10,13 +10,18 @@ import { Bubble } from "react-chartjs-2";
 import service                  from '../../../services/service';
 
 
-const arrayToObject = (array, keyField) =>
-  array.reduce((obj, item) => {
-    obj[item[keyField]] = item
-    //delete obj[item[keyField]][keyField]
+const arrayToObject = (arrayIn, keyField) => {
 
-    return obj
-  }, {})
+    //service.api.logToConsole(arrayIn)
+    //if(typeof arrayIn == Array){
+      return arrayIn.reduce((obj, item) => {
+        obj[item[keyField]] = item
+        //delete obj[item[keyField]][keyField]
+
+        return obj
+      }, {})
+    //}
+  }
 
 
 const quadrants = {
@@ -151,11 +156,14 @@ class EisenhouwerDynamic extends BaseDynamic {
     let cdata = incdata;
 
     let dsets = [];
+
+    /*
     if(field.dataSetsDataPointsKeyToItem){
       cdata.datasets.forEach((dsitem) => {
         let ppdata0 = {};
         //let ppdata00 = dsitem
         //delete ppdata00.data
+
         ppdata0.data = arrayToObject(dsitem.data, "_label");
         ppdata0.label = dsitem.label;
 
@@ -166,6 +174,7 @@ class EisenhouwerDynamic extends BaseDynamic {
 
       cdata.datasets = dsets;
     }
+    */
 
     //dsets = cdata.datasets;
     dsets =[];
@@ -207,8 +216,6 @@ class EisenhouwerDynamic extends BaseDynamic {
       let tmpdata = this.rdata;
       //this.rdata = arrayToObject(tmpdata, "label");
     }
-
-
     return this.rdata;
   }
 
@@ -225,16 +232,79 @@ class EisenhouwerDynamic extends BaseDynamic {
     this.cdata = cdata;
   }
 
+  outParsePoints(points, field){
+
+    /*
+    let points = [];
+
+    if(field.dataSetsDataPointsKeyToItem) {
+      points = Object.keys(newPData).map(key => {
+        let rval = newPData[key]
+        rval._label = key
+        return rval
+      })
+    }
+    else{
+      let points = newPData;
+    }
+    */
+    //let points = newPData;
+
+    points.map((point)=>{
+      if(field.dataSetsDataPointPosXPath){
+        eval("point"+(field.dataSetsDataPointPosXPath+"=point.x"))
+      }
+      if(field.dataSetsDataPointPosYPath){
+        eval("point"+(field.dataSetsDataPointPosYPath+"=point.y"))
+      }
+      //eval("point"+(field.dataSetsDataPointPosYPath||""))
+      return point
+    });
+    return points;
+
+  }
+
+
+
+  outParseDataSets2(cdata,field){
+
+    let cdataIn = { ...cdata }
+
+    if(field.dataSetsKeyToLabel){
+      let dsets={}
+
+      cdataIn.datasets = arrayToObject(cdataIn.datasets, "label");
+
+      if(field.dataSetsDataPointsKeyToItem){
+
+        Object.keys(cdataIn.datasets).forEach((key) => {
+          //let dset = {};
+
+          dsets[key] = {}
+
+          dsets[key].data = this.outParsePoints(cdataIn.datasets[key].data, field)
+
+          //service.api.logToConsole(cdataIn.datasets[key].data)
+
+          dsets[key].data = arrayToObject(cdataIn.datasets[key].data, "_label");
+        })
+      }
+
+
+      cdataIn.datasets = dsets
+    }
+
+    return cdataIn;
+  }
 
   handleChange(field){
 
-
-    let cdataOut = this.outParseDataSets(this.cdata, field);
+    service.api.logToConsole(typeof this.cdata)
+    service.api.logToConsole(this.cdata)
+    let cdataOut = this.outParseDataSets2(this.cdata, field);
 
     //service.api.logToConsole(cdataOut)
-
-
-     //this.props.context.setValue(this.cdata, 250);
+    //this.props.context.setValue(this.cdata, 250);
   }
 
   renderComponent(){
