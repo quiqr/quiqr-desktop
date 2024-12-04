@@ -294,9 +294,9 @@ class EisenhouwerDynamic extends BaseDynamic {
                 annotations: {
                   label1: {
                     type: 'label',
-                    xValue: 5,
+                    xValue: 10,
                     yValue: 95,
-                    content: ['DO NOW'],
+                    content: [(field.labelDoNow||"DO NOW")],
                     font: {
                       size: 16,
                       weight: "bold"
@@ -304,9 +304,9 @@ class EisenhouwerDynamic extends BaseDynamic {
                   },
                   label2: {
                     type: 'label',
-                    xValue: 95,
+                    xValue: 90,
                     yValue: 95,
-                    content: ['TO PLAN'],
+                    content: [(field.labelToPlan||"TO PLAN")],
                     font: {
                       size: 16,
                       weight: "bold"
@@ -314,9 +314,9 @@ class EisenhouwerDynamic extends BaseDynamic {
                   },
                   label3: {
                     type: 'label',
-                    xValue: 6,
+                    xValue: 10,
                     yValue: 3,
-                    content: ['DELEGATE'],
+                    content: [(field.labelDelegate||"DELEGATE")],
                     font: {
                       size: 16,
                       weight: "bold"
@@ -324,9 +324,9 @@ class EisenhouwerDynamic extends BaseDynamic {
                   },
                   label4: {
                     type: 'label',
-                    xValue: 96,
+                    xValue: 90,
                     yValue: 3,
-                    content: ['DELETE'],
+                    content: [(field.labelDelete||"DELETE")],
                     font: {
                       size: 16,
                       weight: "bold"
@@ -346,15 +346,15 @@ class EisenhouwerDynamic extends BaseDynamic {
                 anchor: 'center',
                 align: 'right',
                 formatter: (point, context) => {
-                  //service.api.logToConsole(point)
                   let label = `${point.x}, ${point.y}`
                   if(field.dataSetsDataPointLabelTemplate){
-                    //label=field.dataSetsDataPointLabelTemplate
-                    label=`(${point.Risk}) ${point.RiskCode} - ${point.QuestionTitle`
-                    // eval(`label=`+field.dataSetsDataPointLabelTemplate)
+                    eval("label=`"+field.dataSetsDataPointLabelTemplate+"`")
+                  }
+                  else{
+                    label=`x=${point.x}, y=${point.y}`
+
                   }
                   return label;
-                  //if(value.RiskCode) return value.RiskCode + " - " + value.QuestionTitle;
                 }
               },
               dragData: {
