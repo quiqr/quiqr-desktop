@@ -6,6 +6,11 @@
 - feature: site property to hide previewSite button
 - feature: allow quarto .qmd files as markdown files
 
+### Stats
+- 51 modules 72.76M
+- 9 community templates
+- 110 stars
+
 ## 0.18.9 (2024-09-27)
 - feature: AI Assistent for text fields. Using ChatGPT from OpenAI.
 - fix: improve theme import stability
