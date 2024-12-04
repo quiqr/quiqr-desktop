@@ -40,7 +40,8 @@ class WorkspaceConfigValidator {
         })),
         serve: joi.array().items(joi.object().keys({
           key:joi.string(),
-          config:joi.string().required()
+          config:joi.string().required(),
+          hugoHidePreviewSite:joi.boolean()
         }))
       }).required()
     ).error;

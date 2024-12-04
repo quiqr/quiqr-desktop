@@ -14,6 +14,8 @@ const dataExtensions    = [
   'yaml',
   'yml',
   'json',
+  'markdown',
+  'qmd',
   'md'
 ]
 

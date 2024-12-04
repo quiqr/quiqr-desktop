@@ -212,6 +212,23 @@ class WorkSpace extends React.Component{
     ];
   }
 
+  showPreviewSiteButton(){
+    if(this.state.workspace && this.state.workspace.serve && this.state.workspace.serve[0].hugoHidePreviewSite){
+      return null
+    }
+
+    return (
+      <ToolbarButton
+        key="buttonPreview"
+        action={()=>{
+          this.openPreviewInBrowser();
+        }}
+        title="Preview Site"
+        icon={OpenInBrowserIcon}
+      />
+    )
+  }
+
   openPreviewInBrowser(){
 
     let currentBaseUrlPath = '';
@@ -241,14 +258,7 @@ class WorkSpace extends React.Component{
         const siteKey= decodeURIComponent(match.params.site);
         const workspaceKey= decodeURIComponent(match.params.workspace);
         const toolbarItemsCenter = [
-          <ToolbarButton
-            key="buttonPreview"
-            action={()=>{
-              this.openPreviewInBrowser();
-            }}
-            title="Preview Site"
-            icon={OpenInBrowserIcon}
-          />
+          this.showPreviewSiteButton()
         ];
 
         return <TopToolbarRight
@@ -263,14 +273,7 @@ class WorkSpace extends React.Component{
         const siteKey= decodeURIComponent(match.params.site);
         const workspaceKey= decodeURIComponent(match.params.workspace);
         const toolbarItemsCenter = [
-          <ToolbarButton
-            key="buttonPreview"
-            action={()=>{
-              this.openPreviewInBrowser();
-            }}
-            title="Preview Site"
-            icon={OpenInBrowserIcon}
-          />
+          this.showPreviewSiteButton()
         ];
 
         return <TopToolbarRight

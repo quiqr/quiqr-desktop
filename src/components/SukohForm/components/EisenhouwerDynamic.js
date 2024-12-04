@@ -253,7 +253,12 @@ class EisenhouwerDynamic extends BaseDynamic {
                 max: 100,
                 title: {
                   display: true,
-                  text: field.xScaleTitle
+                  text: field.xScaleTitle,
+                  font: {
+                    size: 26,
+                    weight: 'bold'
+                  }
+
                 }
               },
               y: {
@@ -261,7 +266,11 @@ class EisenhouwerDynamic extends BaseDynamic {
                 max: 100,
                 title: {
                   display: true,
-                  text: field.yScaleTitle
+                  text: field.yScaleTitle,
+                  font: {
+                    size: 26,
+                    weight: 'bold'
+                  }
                 }
               },
             },
@@ -297,28 +306,31 @@ class EisenhouwerDynamic extends BaseDynamic {
                     xValue: 10,
                     yValue: 95,
                     content: [(field.labelDoNow||"DO NOW")],
+                    color: '#bcc0c0',
                     font: {
-                      size: 16,
+                      size: 26,
                       weight: "bold"
                     }
                   },
                   label2: {
                     type: 'label',
-                    xValue: 90,
+                    xValue: 89,
                     yValue: 95,
                     content: [(field.labelToPlan||"TO PLAN")],
+                    color: '#bcc0c0',
                     font: {
-                      size: 16,
+                      size: 26,
                       weight: "bold"
                     }
                   },
                   label3: {
                     type: 'label',
-                    xValue: 10,
+                    xValue: 11,
                     yValue: 3,
                     content: [(field.labelDelegate||"DELEGATE")],
+                    color: '#bcc0c0',
                     font: {
-                      size: 16,
+                      size: 26,
                       weight: "bold"
                     }
                   },
@@ -327,8 +339,9 @@ class EisenhouwerDynamic extends BaseDynamic {
                     xValue: 90,
                     yValue: 3,
                     content: [(field.labelDelete||"DELETE")],
+                    color: '#bcc0c0',
                     font: {
-                      size: 16,
+                      size: 26,
                       weight: "bold"
                     }
                   }

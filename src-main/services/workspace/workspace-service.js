@@ -334,7 +334,7 @@ class WorkspaceService{
     // TODO: make it more flexible! This should not be handled with IF ELSE.
     //  But is good enough for now.
 
-    let supportedContentExt = ['md','html','markdown'];
+    let supportedContentExt = ['md','html','markdown', 'qmd'];
     if(collection.folder.startsWith('content') || supportedContentExt.indexOf(collection.extension)!==-1){
 
 

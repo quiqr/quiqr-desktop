@@ -2,6 +2,9 @@
 ## **WORK IN PROGRESS**
 - fix: #452 make config.json source path agnostic
 - feature: copy collection item to lang
+- feature: new [Eisenhouwer Matrix form-field](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/data-field-types/eisenhouwer/)
+- feature: site property to hide previewSite button
+- feature: allow quarto .qmd files as markdown files
 
 ## 0.18.9 (2024-09-27)
 - feature: AI Assistent for text fields. Using ChatGPT from OpenAI.
