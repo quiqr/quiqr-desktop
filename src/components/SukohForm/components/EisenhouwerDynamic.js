@@ -234,22 +234,6 @@ class EisenhouwerDynamic extends BaseDynamic {
 
   outParsePoints(points, field){
 
-    /*
-    let points = [];
-
-    if(field.dataSetsDataPointsKeyToItem) {
-      points = Object.keys(newPData).map(key => {
-        let rval = newPData[key]
-        rval._label = key
-        return rval
-      })
-    }
-    else{
-      let points = newPData;
-    }
-    */
-    //let points = newPData;
-
     points.map((point)=>{
       if(field.dataSetsDataPointPosXPath){
         eval("point"+(field.dataSetsDataPointPosXPath+"=point.x"))
@@ -257,7 +241,6 @@ class EisenhouwerDynamic extends BaseDynamic {
       if(field.dataSetsDataPointPosYPath){
         eval("point"+(field.dataSetsDataPointPosYPath+"=point.y"))
       }
-      //eval("point"+(field.dataSetsDataPointPosYPath||""))
       return point
     });
     return points;
@@ -269,6 +252,7 @@ class EisenhouwerDynamic extends BaseDynamic {
   outParseDataSets2(cdata,field){
 
     let cdataIn = { ...cdata }
+    let cdataOut = {}
 
     if(field.dataSetsKeyToLabel){
       let dsets={}
@@ -278,33 +262,69 @@ class EisenhouwerDynamic extends BaseDynamic {
       if(field.dataSetsDataPointsKeyToItem){
 
         Object.keys(cdataIn.datasets).forEach((key) => {
-          //let dset = {};
+
+          let tmpData = this.outParsePoints(cdataIn.datasets[key].data, field)
+          tmpData = arrayToObject(tmpData, "_label");
 
           dsets[key] = {}
 
-          dsets[key].data = this.outParsePoints(cdataIn.datasets[key].data, field)
-
-          //service.api.logToConsole(cdataIn.datasets[key].data)
-
-          dsets[key].data = arrayToObject(cdataIn.datasets[key].data, "_label");
+          if(field.dataSetsDataPointsPath){
+            dsets[key][field.dataSetsDataPointsPath.substring(1)] = tmpData;
+          }
+          else{
+            dsets[key] = tmpData;
+          }
         })
       }
 
+      if(field.dataSetsPath){
+        cdataIn[field.dataSetsPath.substring(1)] = dsets;
+      }
+      else{
+        cdataIn = dsets
+      }
+      cdataOut = cdataIn;
+    }
+    else {
 
-      cdataIn.datasets = dsets
+        let dsets = []
+
+        cdataIn.datasets.forEach((ds) => {
+
+          let newDs = {}
+          if(field.dataSetsDataPointsPath){
+            newDs[field.dataSetsDataPointsPath.substring(1)] = ds.data
+          }
+          else{
+            newDs = ds.data
+          }
+
+          dsets.push(newDs)
+        })
+
+        if(field.dataSetsPath){
+          cdataOut[field.dataSetsPath.substring(1)] = dsets;
+        }
+        else{
+          cdataOut = dsets;
+        }
+        service.api.logToConsole(cdataOut);
     }
 
-    return cdataIn;
+
+
+
+
+    return cdataOut;
   }
 
   handleChange(field){
 
-    service.api.logToConsole(typeof this.cdata)
-    service.api.logToConsole(this.cdata)
-    let cdataOut = this.outParseDataSets2(this.cdata, field);
+    //service.api.logToConsole(typeof this.cdata)
+    //let cdataOut = this.outParseDataSets2(this.cdata, field);
 
     //service.api.logToConsole(cdataOut)
-    //this.props.context.setValue(this.cdata, 250);
+    this.props.context.setValue(this.outParseDataSets2(this.cdata, field), 250);
   }
 
   renderComponent(){
