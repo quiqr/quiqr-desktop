@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.10 (2024-12-04)
 - fix: #452 make config.json source path agnostic
 - feature: copy collection item to lang
 - feature: new [Eisenhouwer Matrix form-field](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/data-field-types/eisenhouwer/)
