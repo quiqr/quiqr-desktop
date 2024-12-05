@@ -1,5 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- fix: remove warnings in Eisenhouwer field
 
 ## 0.18.10 (2024-12-04)
 - fix: #452 make config.json source path agnostic
