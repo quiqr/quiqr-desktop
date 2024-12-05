@@ -8,7 +8,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import autocolors from 'chartjs-plugin-autocolors';
 import { Bubble } from "react-chartjs-2";
-import service                  from '../../../services/service';
+//import service                  from '../../../services/service';
 
 const arrayToObject = (arrayIn, keyField) => {
     return arrayIn.reduce((obj, item) => {
@@ -95,7 +95,9 @@ class EisenhouwerDynamic extends BaseDynamic {
     }
 
     points.map((point)=>{
+      // eslint-disable-next-line
       point.x = eval("point"+(field.dataSetsDataPointPosXPath||""))
+      // eslint-disable-next-line
       point.y = eval("point"+(field.dataSetsDataPointPosYPath||""))
       return point
     });
@@ -110,17 +112,20 @@ class EisenhouwerDynamic extends BaseDynamic {
 
   inParseDataSets(data, field){
 
+    // eslint-disable-next-line
     let newData = eval("data"+(field.dataSetsPath||""))
 
     let rdatasets = [];
     if(field.dataSetsKeyToLabel){
       rdatasets = Object.keys(newData).map(key => {
+        // eslint-disable-next-line
         let newPData = eval("newData[key]"+(field.dataSetsDataPointsPath||""))
         return { label: key, data: this.inParsePoints(newPData,field) }
       })
     }
     else{
       rdatasets = newData.map((item)=>{
+        // eslint-disable-next-line
         let newPData = eval("item"+(field.dataSetsDataPointsPath||""))
         item.data = this.inParsePoints(newPData,field);
 
@@ -148,9 +153,11 @@ class EisenhouwerDynamic extends BaseDynamic {
 
     points.map((point)=>{
       if(field.dataSetsDataPointPosXPath){
+        // eslint-disable-next-line
         eval("point"+(field.dataSetsDataPointPosXPath+"=point.x"))
       }
       if(field.dataSetsDataPointPosYPath){
+        // eslint-disable-next-line
         eval("point"+(field.dataSetsDataPointPosYPath+"=point.y"))
       }
       return point
@@ -361,6 +368,7 @@ class EisenhouwerDynamic extends BaseDynamic {
                 formatter: (point, context) => {
                   let label = `${point.x}, ${point.y}`
                   if(field.dataSetsDataPointLabelTemplate){
+                    // eslint-disable-next-line
                     eval("label=`"+field.dataSetsDataPointLabelTemplate+"`")
                   }
                   else{
