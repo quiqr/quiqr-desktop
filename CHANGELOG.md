@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.11 (2024-12-05)
 - fix: remove warnings in Eisenhouwer field
 
 ## 0.18.10 (2024-12-04)
