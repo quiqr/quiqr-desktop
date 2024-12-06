@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.18.12 (2024-12-06)
 - no changes
 
 ## 0.18.11 (2024-12-05)
