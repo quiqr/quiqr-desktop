@@ -6,6 +6,7 @@ on:
   push:
     tags:
       - 'v0.17.*'
+      - 'v0.18.*'
 
 jobs:
   release:

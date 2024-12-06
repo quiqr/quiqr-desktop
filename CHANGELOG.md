@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- no changes
+
 ## 0.18.11 (2024-12-05)
 - fix: remove warnings in Eisenhouwer field
 
@@ -6,7 +9,7 @@
 - fix: #452 make config.json source path agnostic
 - feature: copy collection item to lang
 - feature: new [Eisenhouwer Matrix form-field](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/data-field-types/eisenhouwer/)
-- feature: site property to hide previewSite button
+- feature: site property to [hide previewSite button](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/02-model-file-structure/01-root-properties/02-serve/)
 - feature: allow quarto .qmd files as markdown files
 
 ### Stats
@@ -34,26 +37,26 @@
     - quiqr/model/includes/{singles,collections, menus}/file.yaml
 -  new Single property: pullOuterRootKey: [key] #502
   - this make files with outer arrays possible
-- dogfood edit menu.yml #501
-- accordion items look bad in darkmode #504 
-- scaffolding of singles (see experimental)
-- scaffolding of collections (see experimental)
+- feature: dogfood edit menu.yml #501
+- fix: accordion items look bad in darkmode #504 
+- feature: scaffolding of singles (see experimental)
+- feature: scaffolding of collections (see experimental)
 
 ## 0.18.6 (2024-04-25)
 - update readme
 
 ## 0.18.5 (2024-04-23)
-- new preview SEO check function...
-- too long accordion titles #287,312
-- accordion UX improvement #224
-- show disabled state of accordion items #496
-- replace 4 git sync buttons with 2 #495
-- after checkout hugo server should be restarted #462
-- after import sites are not reloaded #414
+- feature: new preview SEO check function...
+- fix: too long accordion titles #287,312
+- fix: accordion UX improvement #224
+- feature: show disabled state of accordion items #496
+- fix: replace 4 git sync buttons with 2 #495
+- fix: after checkout hugo server should be restarted #462
+- fix: after import sites are not reloaded #414
 
 ## 0.18.4 (2024-04-11)
 
-- disable s3 for pre-release
+- fix: disable s3 for pre-release
 
 ## 0.18.3 (2024-04-11)
 - fix yaml
