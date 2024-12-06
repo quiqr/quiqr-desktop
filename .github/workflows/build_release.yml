@@ -15,7 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest, macos-14]
+        settings:
+          - host: macos-14-large
+            target: x86_64-apple-darwin
+        os: [macos-14-large, windows-latest, ubuntu-latest]
         #os: [windows-latest]
         #os: [ubuntu-latest]
         #os: [ubuntu-latest, windows-latest]

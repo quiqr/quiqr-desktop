@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- no changes
+- fix macos pipeline
+
 ## 0.18.12 (2024-12-06)
 - no changes
 
