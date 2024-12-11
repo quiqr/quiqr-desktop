@@ -18,6 +18,15 @@ import service                      from '../../../services/service';
 
 const Fragment = React.Fragment;
 
+const arrayToObject = (arrayIn, keyField) => {
+    return arrayIn.reduce((obj, item) => {
+      obj[item[keyField]] = item
+
+      return obj
+    }, {})
+  }
+
+
 class AccordionDynamic extends BaseDynamic {
 
   documentMouseUpListener;
@@ -65,8 +74,46 @@ class AccordionDynamic extends BaseDynamic {
   }
 
   normalizeState({state, field, stateBuilder}){
+      service.api.logToConsole( "normalizeState")
+
+    if(field.normalizeObjectWithKeyValsToArrayWithObjects===true){
+
+      let newState = Object.keys(state[field.key]).map(key => {
+        state[field.key][key].tmpQLabel = key;
+        return state[field.key][key]
+      })
+
+      state[field.key] = newState;
+    }
+
     dynamicComponentUtils.normalizeStateForArrayOfObject(state, field, stateBuilder);
   }
+
+/*
+  allocateStateLevel(field: PullDynamicField, parentState: any, rootState: any, path1, path2, path3){
+
+
+  //    service.api.logToConsole(this.state.shouldSaveAccordionState, "shouldChange in state")
+  //    service.api.logToConsole(path1, "allocateStateLevelPath1")
+  //    service.api.logToConsole(path2, "allocateStateLevelPath2")
+  //    service.api.logToConsole(path3, "allocateStateLevelPath3")
+      //    service.api.logToConsole(parentState, "allocateStateLevel:parentState")
+    if(field.normalizeObjectWithKeyValsToArrayWithObjects===true && Array.isArray(parentState[field.key])){
+
+      if(path1 && path1 === path2){
+        //service.api.logToConsole( "changePath")
+        //parentState[field.key] = arrayToObject(parentState[field.key], "tmpQLabel");
+      }
+
+      //service.api.logToConsole(parentState, "allocateStateLevel:parentStatxe")
+      //service.api.logToConsole(rootState, "allocateStateLevel:rootState")
+    }
+
+    //service.api.logToConsole(node, "allocateStateLevel: node")
+
+     return parentState;
+  }
+*/
 
   buildBreadcumbFragment(currentNode, items) {
     // has a previous item
@@ -235,6 +282,7 @@ class AccordionDynamic extends BaseDynamic {
     });
     this.setState({ dynFieldsEmpty: dynFieldsEmpty});
     this.setState({ dynFields: dynFields });
+
   }
 
   renderComponent(){
@@ -252,6 +300,7 @@ class AccordionDynamic extends BaseDynamic {
     if(!Array.isArray(context.value)){
       context.value = [];
     }
+
 
     if(currentPath === context.parentPath){
       return this.renderUnOpened(field.title, context, node);
@@ -341,6 +390,8 @@ class AccordionDynamic extends BaseDynamic {
           index={this.state.index}
           onChange={
             (index)=>{
+
+              //service.api.logToConsole('shouldChange')
               this.setState({index:this.state.index===index?-1:index});
               if(this.state.shouldSaveAccordionState){
                 service.api.setCurrentFormAccordionIndex(field.compositeKey + " " + index);
@@ -398,6 +449,9 @@ class AccordionDynamic extends BaseDynamic {
         field.fields = this.state.dynFieldsEmpty;
       }
     }
+
+    //service.api.logToConsole(context.value[childIndex], "child")
+    //service.api.logToConsole(field, "childfield")
 
     let label = 'Untitled';
 

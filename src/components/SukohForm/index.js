@@ -43,7 +43,9 @@ export class SukohForm extends React.Component{
   }
 
   saveContent(){
+
     if(this.props.onSave){
+
       var context = {
         accept: function(updatedValues){
 
@@ -66,6 +68,7 @@ export class SukohForm extends React.Component{
         }.bind(this),
         data: Object.assign({}, this._valueFactory())
       }
+
       this.props.onSave.call(this, context);
 
       service.api.reloadCurrentForm();
@@ -77,6 +80,9 @@ export class SukohForm extends React.Component{
   }
 
   handleFormChange(valueFactory){
+
+    service.api.logToConsole("handleFormChange:valueFactory");
+
     this._valueFactory = valueFactory;
     if(!this.state.changed){
       this.setState({changed:true});
