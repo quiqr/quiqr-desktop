@@ -42,6 +42,7 @@ class AccordionDynamic extends BaseDynamic {
       dynFields: {},
       dynFieldsEmpty: [],
       headerBackgroundColor: '#efefef',
+      itemCount: 0,
       shouldSaveAccordionState:false
     };
   }
@@ -73,47 +74,12 @@ class AccordionDynamic extends BaseDynamic {
     return 'accordion';
   }
 
-  normalizeState({state, field, stateBuilder}){
-      service.api.logToConsole( "normalizeState")
+  normalizeState(state, field, stateBuilder){
 
-    if(field.normalizeObjectWithKeyValsToArrayWithObjects===true){
-
-      let newState = Object.keys(state[field.key]).map(key => {
-        state[field.key][key].tmpQLabel = key;
-        return state[field.key][key]
-      })
-
-      state[field.key] = newState;
+    if(field && field.normalizeObjectWithKeyValsToArrayWithObjects!==true){
+       dynamicComponentUtils.normalizeStateForArrayOfObject(state, field, stateBuilder);
     }
-
-    dynamicComponentUtils.normalizeStateForArrayOfObject(state, field, stateBuilder);
   }
-
-/*
-  allocateStateLevel(field: PullDynamicField, parentState: any, rootState: any, path1, path2, path3){
-
-
-  //    service.api.logToConsole(this.state.shouldSaveAccordionState, "shouldChange in state")
-  //    service.api.logToConsole(path1, "allocateStateLevelPath1")
-  //    service.api.logToConsole(path2, "allocateStateLevelPath2")
-  //    service.api.logToConsole(path3, "allocateStateLevelPath3")
-      //    service.api.logToConsole(parentState, "allocateStateLevel:parentState")
-    if(field.normalizeObjectWithKeyValsToArrayWithObjects===true && Array.isArray(parentState[field.key])){
-
-      if(path1 && path1 === path2){
-        //service.api.logToConsole( "changePath")
-        //parentState[field.key] = arrayToObject(parentState[field.key], "tmpQLabel");
-      }
-
-      //service.api.logToConsole(parentState, "allocateStateLevel:parentStatxe")
-      //service.api.logToConsole(rootState, "allocateStateLevel:rootState")
-    }
-
-    //service.api.logToConsole(node, "allocateStateLevel: node")
-
-     return parentState;
-  }
-*/
 
   buildBreadcumbFragment(currentNode, items) {
     // has a previous item
@@ -133,19 +99,38 @@ class AccordionDynamic extends BaseDynamic {
     return node.field.key;
   }
 
-  onAddClickHandler(){
+  onAddClickHandler(normalizeObjectWithKeyValsToArrayWithObjects){
     let context = this.props.context;
-    let copy = context.value.slice(0);
+    let copy
+
     let newData = {};
     context.setLevelState(newData, context.node.field.fields);
-    copy.push(newData);
+    if(normalizeObjectWithKeyValsToArrayWithObjects){
+      copy = Object.assign({}, context.value);
+      let newkey = `key-${Math.random()}`;
+      copy[newkey] = newData;
+   }
+    else{
+      copy = context.value.slice(0);
+      copy.push(newData);
+    }
+
     context.setValue(copy);
   };
 
-  removeItemAtIndex(i){
+  removeItemAtIndex(i, normalizeObjectWithKeyValsToArrayWithObjects){
+
     let context = this.props.context;
-    let copy = context.value.slice(0);
-    copy.splice(i, 1);
+    let copy
+
+    if(normalizeObjectWithKeyValsToArrayWithObjects){
+      copy = Object.assign({}, context.value);
+      delete copy[i]
+    }
+    else{
+      copy = context.value.slice(0);
+      copy.splice(i, 1);
+    }
     context.setValue(copy);
   }
 
@@ -214,13 +199,16 @@ class AccordionDynamic extends BaseDynamic {
   }
 
   procDynamicFields(){
-
     let {context} = this.props;
     let {node} = context;
     let {field} = node;
 
     let dynFields = {}
     let dynFieldsEmpty = field.fields;
+
+    if(field.normalizeObjectWithKeyValsToArrayWithObjects ===true){
+      return
+    }
 
 
     if(!Array.isArray(context.value)){
@@ -297,13 +285,15 @@ class AccordionDynamic extends BaseDynamic {
       }
     });
 
-    if(!Array.isArray(context.value)){
+    if(field.normalizeObjectWithKeyValsToArrayWithObjects!==true && !Array.isArray(context.value)){
       context.value = [];
     }
 
 
+
+
     if(currentPath === context.parentPath){
-      return this.renderUnOpened(field.title, context, node);
+      return this.renderUnOpened(field.title, context, node, field);
 
     } else if(currentPath===context.nodePath){
 
@@ -353,8 +343,16 @@ class AccordionDynamic extends BaseDynamic {
     context.setPath(node)
   }
 
+  renderUnOpened(title, context, node, field){
 
-  renderUnOpened(title, context, node){
+    let count = 0;
+    if(field.normalizeObjectWithKeyValsToArrayWithObjects!==true && Array.isArray(context.value)){
+      count = context.value.length
+    }
+    else if(context.value && !Array.isArray(context.value)){
+      count = Object.keys(context.value).length
+    }
+
     return (
       <List
         style={{marginBottom:16, padding: 0}}>
@@ -370,7 +368,7 @@ class AccordionDynamic extends BaseDynamic {
           </ListItemIcon>
 
           <ListItemText id={title} primary={`${title}`}
-            secondary={`${context.value.length  +' items'}`}
+            secondary={`${count +' items'}`}
           />
           <ChevronRightIcon />
         </ListItem>
@@ -382,6 +380,53 @@ class AccordionDynamic extends BaseDynamic {
   renderAccordion(field, context, currentPath, node){
 
     let { dragToIndex, dragFromIndex } = this.state;
+      let renderItem;
+
+    if(field && field.normalizeObjectWithKeyValsToArrayWithObjects===true){
+      renderItem = Object.keys(context.value).map((key)=>{
+
+        let componentKey = `item-${key}`;
+        let item = context.value[key]
+        return this.renderAccordionItem(field, context, node, componentKey, item, key, true);
+      })
+    }
+    else{
+      renderItem = context.value.map((item, childIndex)=>{
+
+          let componentKey = `item-${childIndex}`;
+
+          if(childIndex===dragFromIndex){
+            return this.renderAccordionItem(field, context, node, componentKey, item, childIndex, false, true);
+          }
+
+          if(childIndex === dragToIndex && dragFromIndex != null && dragToIndex != null){
+
+            let movedItem = (
+              <div style={{margin:'18px 0', height:'8px', background:'#00bcd4', borderRadius:3}}></div>
+            )
+
+            let beforeItem, afterItem;
+            if(dragFromIndex < dragToIndex){
+              afterItem = movedItem;
+            }
+            else {
+              beforeItem = movedItem;
+            }
+            return (
+              <Fragment key={componentKey}>
+                {beforeItem}
+                {this.renderAccordionItem(field, context, node, componentKey, item,childIndex, false)}
+                {afterItem}
+              </Fragment>
+            )
+          }
+          else{
+            return this.renderAccordionItem(field, context, node, componentKey, item, childIndex, false);
+          }
+        })
+    }
+
+
 
     return (
       <Fragment>
@@ -390,56 +435,25 @@ class AccordionDynamic extends BaseDynamic {
           index={this.state.index}
           onChange={
             (index)=>{
-
-              //service.api.logToConsole('shouldChange')
               this.setState({index:this.state.index===index?-1:index});
               if(this.state.shouldSaveAccordionState){
                 service.api.setCurrentFormAccordionIndex(field.compositeKey + " " + index);
               }
             }}>
 
-          {context.value.map((item, childIndex)=>{
-
-            let componentKey = `item-${childIndex}`;
-
-            if(childIndex===dragFromIndex){
-              return this.renderAccordionItem(field, context, node, componentKey, item, childIndex, true);
-            }
-
-            if(childIndex === dragToIndex && dragFromIndex != null && dragToIndex != null){
-
-              let movedItem = (
-                <div style={{margin:'18px 0', height:'8px', background:'#00bcd4', borderRadius:3}}></div>
-              )
-
-              let beforeItem, afterItem;
-              if(dragFromIndex < dragToIndex){
-                afterItem = movedItem;
-              }
-              else {
-                beforeItem = movedItem;
-              }
-              return (
-                <Fragment key={componentKey}>
-                  {beforeItem}
-                  {this.renderAccordionItem(field, context, node, componentKey, item,childIndex)}
-                  {afterItem}
-                </Fragment>
-              )
-            }
-            else{
-              return this.renderAccordionItem(field, context, node, componentKey, item, childIndex);
-            }
-          })}
+          {renderItem}
         </Accordion>
 
-        <Button style={{marginTop:10}} endIcon={<AddIcon />} variant="contained" onClick={()=>{this.onAddClickHandler()}}>Add</Button>
+        {(field.disableCreate !== true?
+<Button style={{marginTop:10}} endIcon={<AddIcon />} variant="contained" onClick={()=>{this.onAddClickHandler(field.normalizeObjectWithKeyValsToArrayWithObjects)}}>Add</Button>
+        : null)}
+
 
       </Fragment>
     );
   }
 
-  renderAccordionItem(field, context, node, componentKey, item, childIndex, isDragging = false){
+  renderAccordionItem(field, context, node, componentKey, item, childIndexOrKey, normalizeObjectWithKeyValsToArrayWithObjects = false, isDragging = false){
 
     if(this.state.dynFieldsEmpty.length > 0){
       if(componentKey in this.state.dynFields){
@@ -450,15 +464,12 @@ class AccordionDynamic extends BaseDynamic {
       }
     }
 
-    //service.api.logToConsole(context.value[childIndex], "child")
-    //service.api.logToConsole(field, "childfield")
-
     let label = 'Untitled';
 
     let newNode = {
       field,
-      state: context.value[childIndex],
-      uiState:{childIndex},
+      state: context.value[childIndexOrKey],
+      uiState:{childIndexOrKey},
       parent: node
     };
 
@@ -493,7 +504,10 @@ class AccordionDynamic extends BaseDynamic {
     if(itemDisabled){
       headStyle.color = "#cccccc";
     }
-
+    let enableSort = true;
+    if (field.normalizeObjectWithKeyValsToArrayWithObjects ===true || field.disableSort === true){
+      enableSort = false;
+    }
     return (
       <AccordionItem key={componentKey}
         label={label}
@@ -502,27 +516,31 @@ class AccordionDynamic extends BaseDynamic {
         //headStyle={{padding:'16px 16px 0px 16px' }}
         body={ context.renderLevel(newNode) }
         wrapperProps={{
-          onMouseEnter: this.getOnItemMouseEnter(childIndex)
+          onMouseEnter: this.getOnItemMouseEnter(childIndexOrKey)
         }}
         headerRightItems={[
 
+          ( enableSort ?
           <IconButton
             onClick={(e)=>{e.stopPropagation()}}
-            onMouseDown={this.getOnItemDragHandleMouseDown(childIndex)}
+            onMouseDown={this.getOnItemDragHandleMouseDown(childIndexOrKey)}
             style={{minWidth:40, cursor: 'move'}}
             size="small"
-            aria-label="sort"><DragHandleIcon /></IconButton>,
+            aria-label="sort"><DragHandleIcon /></IconButton>:null),
 
+(field.disableDelete !== true?
             <DangerButton
               onClick={(e, loaded)=>{
                 e.stopPropagation();
                 if(loaded){
-                  this.removeItemAtIndex(childIndex)
+                  this.removeItemAtIndex(childIndexOrKey,normalizeObjectWithKeyValsToArrayWithObjects)
                 }
               }}
               loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
               button={<IconButton size="small" aria-label="delete"> <ClearIcon /> </IconButton>}
-            />
+            />:
+null)
+
         ]}
       />
     );

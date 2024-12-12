@@ -81,8 +81,6 @@ export class SukohForm extends React.Component{
 
   handleFormChange(valueFactory){
 
-    service.api.logToConsole("handleFormChange:valueFactory");
-
     this._valueFactory = valueFactory;
     if(!this.state.changed){
       this.setState({changed:true});
