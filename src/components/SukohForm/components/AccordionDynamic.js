@@ -18,15 +18,6 @@ import service                      from '../../../services/service';
 
 const Fragment = React.Fragment;
 
-const arrayToObject = (arrayIn, keyField) => {
-    return arrayIn.reduce((obj, item) => {
-      obj[item[keyField]] = item
-
-      return obj
-    }, {})
-  }
-
-
 class AccordionDynamic extends BaseDynamic {
 
   documentMouseUpListener;
@@ -76,7 +67,7 @@ class AccordionDynamic extends BaseDynamic {
 
   normalizeState(state, field, stateBuilder){
 
-    if(field && field.normalizeObjectWithKeyValsToArrayWithObjects!==true){
+    if(field && field.arrayIndicesAreKeys!==true){
        dynamicComponentUtils.normalizeStateForArrayOfObject(state, field, stateBuilder);
     }
   }
@@ -99,13 +90,13 @@ class AccordionDynamic extends BaseDynamic {
     return node.field.key;
   }
 
-  onAddClickHandler(normalizeObjectWithKeyValsToArrayWithObjects){
+  onAddClickHandler(arrayIndicesAreKeys){
     let context = this.props.context;
     let copy
 
     let newData = {};
     context.setLevelState(newData, context.node.field.fields);
-    if(normalizeObjectWithKeyValsToArrayWithObjects){
+    if(arrayIndicesAreKeys){
       copy = Object.assign({}, context.value);
       let newkey = `key-${Math.random()}`;
       copy[newkey] = newData;
@@ -118,12 +109,12 @@ class AccordionDynamic extends BaseDynamic {
     context.setValue(copy);
   };
 
-  removeItemAtIndex(i, normalizeObjectWithKeyValsToArrayWithObjects){
+  removeItemAtIndex(i, arrayIndicesAreKeys){
 
     let context = this.props.context;
     let copy
 
-    if(normalizeObjectWithKeyValsToArrayWithObjects){
+    if(arrayIndicesAreKeys){
       copy = Object.assign({}, context.value);
       delete copy[i]
     }
@@ -206,7 +197,7 @@ class AccordionDynamic extends BaseDynamic {
     let dynFields = {}
     let dynFieldsEmpty = field.fields;
 
-    if(field.normalizeObjectWithKeyValsToArrayWithObjects ===true){
+    if(field.arrayIndicesAreKeys ===true){
       return
     }
 
@@ -285,7 +276,7 @@ class AccordionDynamic extends BaseDynamic {
       }
     });
 
-    if(field.normalizeObjectWithKeyValsToArrayWithObjects!==true && !Array.isArray(context.value)){
+    if(field.arrayIndicesAreKeys!==true && !Array.isArray(context.value)){
       context.value = [];
     }
 
@@ -346,7 +337,7 @@ class AccordionDynamic extends BaseDynamic {
   renderUnOpened(title, context, node, field){
 
     let count = 0;
-    if(field.normalizeObjectWithKeyValsToArrayWithObjects!==true && Array.isArray(context.value)){
+    if(field.arrayIndicesAreKeys!==true && Array.isArray(context.value)){
       count = context.value.length
     }
     else if(context.value && !Array.isArray(context.value)){
@@ -382,7 +373,7 @@ class AccordionDynamic extends BaseDynamic {
     let { dragToIndex, dragFromIndex } = this.state;
       let renderItem;
 
-    if(field && field.normalizeObjectWithKeyValsToArrayWithObjects===true){
+    if(field && field.arrayIndicesAreKeys===true){
       renderItem = Object.keys(context.value).map((key)=>{
 
         let componentKey = `item-${key}`;
@@ -445,7 +436,7 @@ class AccordionDynamic extends BaseDynamic {
         </Accordion>
 
         {(field.disableCreate !== true?
-<Button style={{marginTop:10}} endIcon={<AddIcon />} variant="contained" onClick={()=>{this.onAddClickHandler(field.normalizeObjectWithKeyValsToArrayWithObjects)}}>Add</Button>
+<Button style={{marginTop:10}} endIcon={<AddIcon />} variant="contained" onClick={()=>{this.onAddClickHandler(field.arrayIndicesAreKeys)}}>Add</Button>
         : null)}
 
 
@@ -453,7 +444,7 @@ class AccordionDynamic extends BaseDynamic {
     );
   }
 
-  renderAccordionItem(field, context, node, componentKey, item, childIndexOrKey, normalizeObjectWithKeyValsToArrayWithObjects = false, isDragging = false){
+  renderAccordionItem(field, context, node, componentKey, item, childIndexOrKey, arrayIndicesAreKeys = false, isDragging = false){
 
     if(this.state.dynFieldsEmpty.length > 0){
       if(componentKey in this.state.dynFields){
@@ -505,7 +496,7 @@ class AccordionDynamic extends BaseDynamic {
       headStyle.color = "#cccccc";
     }
     let enableSort = true;
-    if (field.normalizeObjectWithKeyValsToArrayWithObjects ===true || field.disableSort === true){
+    if (field.arrayIndicesAreKeys ===true || field.disableSort === true){
       enableSort = false;
     }
     return (
@@ -528,18 +519,18 @@ class AccordionDynamic extends BaseDynamic {
             size="small"
             aria-label="sort"><DragHandleIcon /></IconButton>:null),
 
-(field.disableDelete !== true?
-            <DangerButton
-              onClick={(e, loaded)=>{
-                e.stopPropagation();
-                if(loaded){
-                  this.removeItemAtIndex(childIndexOrKey,normalizeObjectWithKeyValsToArrayWithObjects)
-                }
-              }}
-              loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
-              button={<IconButton size="small" aria-label="delete"> <ClearIcon /> </IconButton>}
-            />:
-null)
+            (field.disableDelete !== true?
+              <DangerButton
+                onClick={(e, loaded)=>{
+                  e.stopPropagation();
+                  if(loaded){
+                    this.removeItemAtIndex(childIndexOrKey,arrayIndicesAreKeys)
+                  }
+                }}
+                loadedButton={<IconButton size="small" color="secondary" aria-label="delete"> <ClearIcon /> </IconButton>}
+                button={<IconButton size="small" aria-label="delete"> <ClearIcon /> </IconButton>}
+              />:
+            null)
 
         ]}
       />

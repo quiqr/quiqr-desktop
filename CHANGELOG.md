@@ -1,5 +1,9 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- feature: Accordion has new option arrayIndicesAreKeys. Enables read/write dictionaries which are actually arrays with keys as indeces [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/container-field-types/accordion/)
+- feature: Accordion has new option disableCreate [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/container-field-types/accordion/)
+- feature: Accordion has new option disableDelete [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/container-field-types/accordion/)
+- feature: Accordion has new option disableSort [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/container-field-types/accordion/)
 
 ## 0.18.13 (2024-12-06)
 - no changes
