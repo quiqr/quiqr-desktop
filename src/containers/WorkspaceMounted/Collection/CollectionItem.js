@@ -38,19 +38,23 @@ class CollectionItem extends React.Component{
 
     ]).then(()=>{
       this.setState(stateUpdate);
-
     });
-
   }
 
-  handleOpenInEditor(context: any){
+  handleDocBuild(buildAction){
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
-    let promise = service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
-    promise.then(function(updatedValues){
+    let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
+    promise.then(function(buildResult){
+      service.api.logToConsole(buildResult, "oj year")
     }, function(){
-      context.reject('Something went wrong.');
+      service.api.logToConsole("Something when wrong")
     })
+  }
+
+  handleOpenInEditor(){
+    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+    service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
   }
 
   handleSave(context: any){
@@ -108,6 +112,7 @@ class CollectionItem extends React.Component{
     if(collection==null)return null;
 
     let fields = collection.fields.slice(0);
+    let buildActions = collection.build_actions.slice(0);
     let values =  Object.assign(this.state.collectionItemValues)
 
     let pageUrl = this.generatePageUrl(collection);
@@ -124,6 +129,7 @@ class CollectionItem extends React.Component{
     collectionItemKey={collectionItemKey}
     values={values}
     trim={false}
+    buildActions={buildActions}
     plugins={{
 
       openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
@@ -138,6 +144,7 @@ class CollectionItem extends React.Component{
     }}
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
+    onDocBuild={(build_action)=>this.handleDocBuild(build_action)}
 
   />);
   }

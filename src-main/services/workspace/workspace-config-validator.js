@@ -5,9 +5,9 @@ const formatProviderResolver = require('./../../utils/format-provider-resolver')
 const dataFormatsPiped = formatProviderResolver.allFormatsExt().join('|');
 
 let validationUtils= {
-  contentFormatReg: new RegExp('^(md|mmark)$'),
+  contentFormatReg: new RegExp('^(md|qmd|mmark)$'),
   dataFormatReg: new RegExp('^('+dataFormatsPiped+')$'),
-  allFormatsReg: new RegExp('^('+dataFormatsPiped+'|md|mmark)$')
+  allFormatsReg: new RegExp('^('+dataFormatsPiped+'|md|qmd|mmark)$')
 }
 
 class WorkspaceConfigValidator {
@@ -89,19 +89,20 @@ class WorkspaceConfigValidator {
     validationError = joi.validate(collection, joi.object().required().error(new Error('The collection configuration is required.'))).error;
     if(validationError) return validationError.message;
 
-    //validate all fields common to content or data files
+    // VALIDATE ALL FIELDS COMMON TO CONTENT OR DATA FILES
     validationError = joi.validate(collection,
       joi.object().keys({
         key: joi.string().trim().regex(/^[A-Za-z0-9\-_]+$/i).min(3).max(90).required().error(new Error('The collection key "'+collection.key+'" is invalid.')),
         title: joi.string().trim().min(3).max(30).required().error(new Error('The collection.title value is invalid.')),
         description: joi.string().trim().max(90).error(new Error('The collection.description value is invalid.'+JSON.stringify(collection))),
-        folder: joi.string().trim().regex(/^(content|data|quiqr).+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The folder value is invalid.')),
+        folder: joi.string().trim().regex(/^(?!.*[.][.]).*$/).required().error(new Error('The folder value is invalid.')),
         itemtitle: joi.string().trim().min(3).max(90).error(new Error('The itemtitle value is invalid.')),
         extension: joi.string().regex(validationUtils.allFormatsReg).required().error(new Error('The extension value is invalid.')),
         dataformat: joi.string().trim().error(new Error('The dataformat value is invalid.')), //is not required here
         previewUrlBase: joi.string().trim(),
         hidePreviewIcon: joi.boolean(),
         hideExternalEditIcon: joi.boolean(),
+        build_actions: joi.array(),
         hideIndex: joi.boolean(),
         includeSubdirs: joi.boolean(),
         fields: joi.array().min(1).required().error(new Error("The fields value is invalid.\n"+JSON.stringify(collection))),
@@ -112,7 +113,8 @@ class WorkspaceConfigValidator {
     if(validationError) return validationError.message;
 
     if(validationUtils.contentFormatReg.test(collection.extension)){
-      //content files, data format is required
+
+      // WITH CONTENT FILES, DATA FORMAT IS REQUIRED
       validationError = joi.validate(collection.dataformat,
         joi.string().regex(validationUtils.dataFormatReg).required().error(new Error('The dataformat value is invalid.'))
       ).error;
@@ -145,6 +147,7 @@ class WorkspaceConfigValidator {
         description: joi.string().trim().max(90).error(new Error('The singles.description value is invalid.'+JSON.stringify(single))),
         file: joi.string().trim().regex(/^.+$/).regex(/^(?!.*[.][.]).*$/).required().error(new Error('The singles.file value is invalid.:'+JSON.stringify(single))),
         dataformat: joi.string().trim().error(new Error('The singles.dataformat value is invalid.')),
+        build_actions: joi.array(),
         previewUrl: joi.string().trim(),
         pullOuterRootKey: joi.string().trim(),
         hidePreviewIcon: joi.boolean(),

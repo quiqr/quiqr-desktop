@@ -46,19 +46,6 @@ class PathHelper{
     return global.currentSitePath;
   }
 
-
-  /*
-  getSiteWorkspacesRoot(siteKey){
-    if(siteKey.trim() === "") return null;
-    return path.join(this.getSiteRoot(siteKey), 'workspaces');
-  }
-
-  getSiteWorkspaceRoot(siteKey, workspaceKey){
-    if(siteKey.trim() === "") return null;
-    return path.join(this.getSiteWorkspacesRoot(siteKey) , workspaceKey);
-  }
-  */
-
   getSiteDefaultPublishDir(siteKey, publishKey){
     if(siteKey.trim() === "") return null;
     return path.join(this.getSiteRoot(siteKey) , 'publish', publishKey);
@@ -217,6 +204,7 @@ class PathHelper{
     }
 
   }
+
 
 
 }

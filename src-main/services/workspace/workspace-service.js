@@ -14,6 +14,7 @@ const { createThumbnailJob, globJob } = require('./../../jobs');
 const HugoBuilder                     = require('./../../hugo/hugo-builder');
 const HugoServer                      = require('./../../hugo/hugo-server');
 const HugoConfig                      = require('./../../hugo/hugo-config');
+const DocumentBuildAction             = require('./../../build-actions/document-build-action');
 const screenshotWindow                = require('./../../ui-managers/screenshot-window-manager');
 
 const workspaceConfigProvider = new WorkspaceConfigProvider();
@@ -594,6 +595,7 @@ class WorkspaceService{
     return false;
   }
 
+  //TODO use getCollectionByKey()
   async openCollectionItemInEditor(collectionKey , collectionItemKey){
     let config = await this.getConfigurationsData();
     let collection = config.collections.find(x => x.key === collectionKey);
@@ -602,6 +604,48 @@ class WorkspaceService{
     let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
 
     shell.openPath(filePath);
+  }
+
+  async getCollectionByKey(collectionKey){
+    const config = await this.getConfigurationsData();
+    const collection = config.collections.find(x => x.key === collectionKey);
+
+    if(collection==null)
+      throw new Error('Could not find collection.');
+
+    return collection;
+
+  }
+
+  async buildCollectionItem(collectionKey , collectionItemKey, buildAction){
+
+    const collection = await this.getCollectionByKey(collectionKey)
+    let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+
+    let buildActionDict = collection.build_actions.find(x => x.key === buildAction);
+
+    DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
+      .then((result)=>{
+        console.log(result)
+        return {
+          status: "0",
+          buildAction: buildAction,
+          sourceDocument: filePath,
+          result: result
+        };
+
+      })
+      .catch((e)=>{
+        return {
+          status: "1",
+          buildAction: buildAction,
+          sourceDocument: filePath,
+          result: e
+        };
+
+      });
+
+
   }
 
   // TODO REMOVE CODE SMELL REDUNDANT CODE WITH SINGLE

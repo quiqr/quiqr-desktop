@@ -127,6 +127,10 @@ export class API {
     return mainProcessBridge.request('openFileDialogForCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey});
   }
 
+  buildCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, buildAction: string){
+    return mainProcessBridge.request('buildCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction});
+  }
+
   updateCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, document: any){
     return mainProcessBridge.request('updateCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, document});
   }

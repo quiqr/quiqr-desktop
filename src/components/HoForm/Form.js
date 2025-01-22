@@ -374,6 +374,27 @@ class Form extends React.Component {
       );
     }
 
+    let buildActionButtons = undefined;
+    if(this.props.buildActions){
+
+      buildActionButtons = this.props.buildActions.map((build_action)=>{
+        return (
+          <Button
+            onClick={()=>{this.props.onDocBuild(build_action.key);}}
+            style={{marginRight:'5px'}}
+            size="small"
+            variant="contained"
+            startIcon={<OpenInBrowserIcon />}
+          >
+            {build_action.button_text}
+          </Button>
+      );
+
+      });
+    }
+
+
+
     if(this.state.renderError)
       return (<p style={{color:'red', padding:'24px'}}>{this.state.renderError}</p>)
 
@@ -407,6 +428,7 @@ class Form extends React.Component {
 
         {openInBrowserButton}
         {openInEditorButton}
+        {buildActionButtons}
         </div>
 
       </Box>

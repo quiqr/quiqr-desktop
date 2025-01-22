@@ -3,7 +3,7 @@ const SUPPORTED_CONTENT_EXTENSIONS = ['md','markdown','html', 'qmd'];
 module.exports.SUPPORTED_CONTENT_EXTENSIONS = SUPPORTED_CONTENT_EXTENSIONS;
 
 module.exports.allValidContentFilesExt = function(filePath ){
-  return filePath && (filePath.endsWith('.md') || filePath.endsWith('.markdown') || filePath.endsWith('.markdown'));
+  return filePath && (filePath.endsWith('.md') || filePath.endsWith('.markdown') || filePath.endsWith('.markdown') || filePath.endsWith('.qmd'));
 }
 
 module.exports.isContentFile = function(filePath ){

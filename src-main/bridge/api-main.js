@@ -682,6 +682,21 @@ api.openFileDialogForCollectionItem = function({siteKey, workspaceKey, collectio
   });
 }
 
+api.buildCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction}, context) {
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+
+    if(err){ context.reject(err); return; }
+
+    workspaceService.buildCollectionItem(collectionKey, collectionItemKey, buildAction)
+      .then((result)=>{
+        context.resolve(result);
+      })
+      .catch((error)=>{
+        context.reject(error);
+      });
+  });
+}
+
 api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, document}, context) {
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
     if(err){ context.reject(err); return; }

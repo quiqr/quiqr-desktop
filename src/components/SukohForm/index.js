@@ -126,6 +126,7 @@ export class SukohForm extends React.Component{
           refreshed={refreshed}
           collectionItemKey={this.props.collectionItemKey}
           fields={this.props.fields}
+          buildActions={this.props.buildActions}
           plugins={this.props.plugins}
           rootName={this.props.rootName}
           saveFormHandler={()=>this.saveContent()}
@@ -134,6 +135,7 @@ export class SukohForm extends React.Component{
           values={this.props.values}
           onChange={this.handleFormChange.bind(this)}
           onOpenInEditor={this.props.onOpenInEditor}
+          onDocBuild={this.props.onDocBuild}
         />
         { this.props.hideSaveButton ? null :
             fabButton
