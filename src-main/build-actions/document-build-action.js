@@ -61,22 +61,20 @@ class DocumentBuildAction{
 
         child.stdout.on('end', () => {
           var stdoutContent = Buffer.concat(stdoutChunks).toString();
-          //console.log('stdout chars:', stdoutContent.length);
-          //console.log(stdoutContent);
+          global.outputConsole.appendLine(stdoutContent);
         });
 
         child.stderr.on('data', (data) => {
           stderrChunks = stderrChunks.concat(data);
           var stderrContent = Buffer.concat(stderrChunks).toString();
           global.outputConsole.appendLine(stderrContent);
-          //console.log(stderrContent);
         });
 
+        /*
         child.stderr.on('end', () => {
           var stderrContent = Buffer.concat(stderrChunks).toString();
-          //console.log('stderr chars:', stderrContent.length);
-          //console.log(stderrContent);
         });
+        */
 
       } catch (e) {
         reject(e);

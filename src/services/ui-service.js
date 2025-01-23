@@ -95,6 +95,7 @@ class ConsoleService extends BaseService {
         return this._consoleMessages;
     }
 
+    /*
     getConsoleIsHidden(){
         return this._consoleIsHiddden;
     }
@@ -103,6 +104,7 @@ class ConsoleService extends BaseService {
         this._consoleIsHiddden = !this._consoleIsHiddden;
         this._notifyChanges();
     }
+    */
 }
 
 let consoleService = new ConsoleService();

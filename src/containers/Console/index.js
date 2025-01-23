@@ -25,7 +25,9 @@ class ConsoleOutput extends React.Component{
   constructor(props){
     super(props);
     this.closeTimeout = undefined;
-
+    this.state = {
+      autoscroll: true
+    }
   }
 
   componentDidMount(){
@@ -36,20 +38,25 @@ class ConsoleOutput extends React.Component{
     consoleService.unregisterListener(this);
   }
 
+  componentDidUpdate(preProps){
+    this.refs.scroll.scrollIntoView({ behavior: "smooth" });
+  }
+
   render(){
 
     let preStyle = Object.assign({}, consoleStyle.pre);
 
     if(this.preElement){
-      this.preElement.scrollTop = 5000;
+      //this.preElement.scrollTop = 5000;
     }
 
     return <React.Fragment>
-        <pre
-          style={preStyle}
-          ref={ (pre) => this.preElement = pre }
-        >
+      <pre
+        style={preStyle}
+        ref={ (pre) => this.preElement = pre }
+      >
         { consoleService.getConsoleMessages().map(({key, line}) => line).join('\n') }
+        <div ref="scroll" />
       </pre>
     </React.Fragment>;
   }
@@ -58,10 +65,10 @@ class ConsoleOutput extends React.Component{
 class Console extends React.Component{
 
   render(){
-      return (<React.Fragment>
-        <ConsoleOutput />
-      </React.Fragment>);
-    }
+    return (<React.Fragment>
+      <ConsoleOutput />
+    </React.Fragment>);
   }
+}
 
 export default Console;
