@@ -624,26 +624,7 @@ class WorkspaceService{
 
     let buildActionDict = collection.build_actions.find(x => x.key === buildAction);
 
-    DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
-      .then((result)=>{
-        console.log(result)
-        return {
-          status: "0",
-          buildAction: buildAction,
-          sourceDocument: filePath,
-          result: result
-        };
-
-      })
-      .catch((e)=>{
-        return {
-          status: "1",
-          buildAction: buildAction,
-          sourceDocument: filePath,
-          result: e
-        };
-
-      });
+    return DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
 
 
   }

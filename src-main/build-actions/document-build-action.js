@@ -41,7 +41,14 @@ class DocumentBuildAction{
 
         child.on('exit', (code) => {
           if(code == 0){
-            resolve(true)
+
+            var stdoutContent = Buffer.concat(stdoutChunks).toString();
+            resolve(
+              {
+                stdout: stdoutContent,
+                filePath: filePath,
+              }
+            )
           }
           else{
             console.log('Process exited with code', code)
@@ -55,17 +62,20 @@ class DocumentBuildAction{
         child.stdout.on('end', () => {
           var stdoutContent = Buffer.concat(stdoutChunks).toString();
           //console.log('stdout chars:', stdoutContent.length);
-          console.log(stdoutContent);
+          //console.log(stdoutContent);
         });
 
         child.stderr.on('data', (data) => {
           stderrChunks = stderrChunks.concat(data);
+          var stderrContent = Buffer.concat(stderrChunks).toString();
+          global.outputConsole.appendLine(stderrContent);
+          //console.log(stderrContent);
         });
 
         child.stderr.on('end', () => {
           var stderrContent = Buffer.concat(stderrChunks).toString();
           //console.log('stderr chars:', stderrContent.length);
-          console.log(stderrContent);
+          //console.log(stderrContent);
         });
 
       } catch (e) {

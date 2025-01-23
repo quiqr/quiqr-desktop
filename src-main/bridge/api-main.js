@@ -689,10 +689,26 @@ api.buildCollectionItem = function({siteKey, workspaceKey, collectionKey, collec
 
     workspaceService.buildCollectionItem(collectionKey, collectionItemKey, buildAction)
       .then((result)=>{
-        context.resolve(result);
+
+        //console.log(result)
+        ret = {
+          status: "0",
+          buildAction: buildAction,
+          sourceDocument: result.filePath,
+          stdout: result.stdout,
+          result: result
+        };
+
+        context.resolve(ret);
       })
       .catch((error)=>{
-        context.reject(error);
+        let ret = {
+          status: "1",
+          buildAction: buildAction,
+          sourceDocument: filePath,
+          result: error
+        };
+        context.reject(ret);
       });
   });
 }

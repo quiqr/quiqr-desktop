@@ -351,16 +351,63 @@ class App extends React.Component{
     )
   }
 
-  render() {
+  renderBodyWithToolbars(){
 
-    let marginStyles;
-    marginStyles = {
+    let marginStyles = {
       marginRight:'0px'
     };
 
     let containerStyle = this.state.style.container;
     let menuContainerStyle = this.state.style.menuContainer;
     let topToolbarStyle = this.state.style.topToolbar;
+    let contentContainerStyle = this.state.style.contentContainer;
+    let welcomeScreen = this.renderWelcomeScreen();
+
+
+    return (
+      <ThemeProvider theme={this.state.theme}>
+        <CssBaseline />
+
+        <React.Fragment>
+          {welcomeScreen}
+
+          <div className="App" style={marginStyles}>
+
+            <div style={topToolbarStyle}>
+
+              <div className="toolbarLeft">
+                { this.renderTopToolbarLeftSwitch() }
+              </div>
+
+              <div className="toolbarRight">
+                { this.renderTopToolbarRightSwitch() }
+              </div>
+            </div>
+
+            <div style={containerStyle}>
+
+              <div style={menuContainerStyle} className='hideScrollbar' >
+                { this.renderMenuSwitch() }
+              </div>
+
+              <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+                { this.renderContentSwitch() }
+              </div>
+
+
+            </div>
+
+          </div>
+        </React.Fragment>
+      </ThemeProvider>
+    );
+
+  }
+
+
+  render() {
+
+    let menuContainerStyle = this.state.style.menuContainer;
     let contentContainerStyle = this.state.style.contentContainer;
     let welcomeScreen = this.renderWelcomeScreen();
 
@@ -434,50 +481,39 @@ class App extends React.Component{
         );
       }} />
 
-
-      <Route
-        path="*"
-        render={ ({match, history})=>{
-          this.history = history;
-          return (
-            <ThemeProvider theme={this.state.theme}>
-              <CssBaseline />
-
-              <React.Fragment>
-                {welcomeScreen}
-
-                <div className="App" style={marginStyles}>
-
-                  <div style={topToolbarStyle} className="xxtopToolbar">
-
-                    <div className="toolbarLeft">
-                      { this.renderTopToolbarLeftSwitch() }
-                    </div>
-
-                    <div className="toolbarRight">
-                      { this.renderTopToolbarRightSwitch() }
-                    </div>
-                  </div>
-
-                  <div style={containerStyle}>
-
-                    <div style={menuContainerStyle} className='hideScrollbar' >
-                      { this.renderMenuSwitch() }
-                    </div>
-
-                    <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
-                      { this.renderContentSwitch() }
-                    </div>
-
-
-                  </div>
-
-                </div>
-              </React.Fragment>
-            </ThemeProvider>
-          );
-
+      <Route path="/" exact={true} render={ ({match, history})=> {
+        this.history = history;
+        return (
+          <ThemeProvider theme={this.state.theme}>
+          </ThemeProvider>
+        )
         }} />
+
+      <Route path="/sites" exact={true} render={ ({match, history})=> {
+          this.history = history;
+          return this.renderBodyWithToolbars()
+        }} />
+
+      <Route path="/sites/*" exact={true} render={ ({match, history})=> {
+          this.history = history;
+          return this.renderBodyWithToolbars()
+        }} />
+
+      <Route path="/create-new" exact={true} render={ ({match, history})=> {
+          this.history = history;
+          return this.renderBodyWithToolbars()
+        }} />
+
+      <Route path="/welcome" exact={true} render={ ({match, history})=> {
+          this.history = history;
+          return this.renderBodyWithToolbars()
+        }} />
+
+      <Route path="/prefs" exact={false} render={ ({match, history})=> {
+          this.history = history;
+          return this.renderBodyWithToolbars()
+        }} />
+
     </Switch>);
   }
 }

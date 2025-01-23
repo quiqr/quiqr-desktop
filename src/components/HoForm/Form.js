@@ -426,9 +426,9 @@ class Form extends React.Component {
 
         <div>
 
+        {buildActionButtons}
         {openInBrowserButton}
         {openInEditorButton}
-        {buildActionButtons}
         </div>
 
       </Box>
