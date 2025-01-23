@@ -74,22 +74,10 @@ class MenuManager {
   }
 
   createLogWindow () {
-    let logWindow = logWindowManager.getCurrentInstanceOrNew();
+    global.logWindow = logWindowManager.getCurrentInstanceOrNew();
 
-    if (logWindow) {
-      logWindow.webContents.send("redirectToGivenLocation", "/console")
-    }
-
-    logWindow.once('ready-to-show', () => {
-      logWindow.webContents.send("redirectToGivenLocation", "/console")
-    })
-
-    logWindow.webContents.on('did-finish-load',() => {
-      logWindow.webContents.send("redirectToGivenLocation", "/console")
-    })
-
-    logWindow.on('closed', () => {
-      logWindow = null
+    global.logWindow.webContents.on('did-finish-load',() => {
+      global.logWindow.webContents.send("redirectToGivenLocation", "/console")
     })
   }
 

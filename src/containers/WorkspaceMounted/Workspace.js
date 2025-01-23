@@ -3,6 +3,7 @@ import { withRouter }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
 import AppsIcon                            from '@material-ui/icons/Apps';
 import SettingsApplicationsIcon            from '@material-ui/icons/SettingsApplications';
+import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import BuildIcon                           from '@material-ui/icons/Build';
 import LibraryBooksIcon                    from '@material-ui/icons/LibraryBooks';
 import SyncIcon                            from '@material-ui/icons/Sync';
@@ -194,6 +195,14 @@ class WorkSpace extends React.Component{
 
     return [
       <ToolbarButton
+        key="buttonLog"
+        action={()=>{
+          service.api.showLogWindow();
+        }}
+        title="Log"
+        icon={DeveloperModeIcon}
+      />,
+      <ToolbarButton
         key="buttonLibrary"
         action={()=>{
           service.api.openSiteLibrary();
@@ -209,6 +218,7 @@ class WorkSpace extends React.Component{
         title="Preferences"
         icon={SettingsApplicationsIcon}
       />,
+
     ];
   }
 

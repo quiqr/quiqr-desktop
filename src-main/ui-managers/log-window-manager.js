@@ -61,6 +61,7 @@ function createWindow () {
 
     //let url = process.env.REACT_DEV_URL+'/console';
     let url = process.env.REACT_DEV_URL;
+    //console.log(url)
     const urlWithPortMatch = url.match(/:([0-9]{4})/);
     if(urlWithPortMatch==null){
       showInvalidDevelopmentUrl(url);
@@ -128,10 +129,12 @@ module.exports = {
   getCurrentInstance: function(){
     return logWindow;
   },
+
   getCurrentInstanceOrNew: function(){
     let instance = this.getCurrentInstance();
 
     if(instance){
+      instance.show();
       return instance;
     }
 

@@ -41,6 +41,7 @@ global.skipWelcomeScreen = pogoconf.skipWelcomeScreen;
 global.hugoServer = undefined;
 global.currentServerProccess = undefined;
 global.mainWM = mainWindowManager;
+global.logWindow;
 global.apiMain = apiMain;
 global.modelDirWatcher = undefined;
 

@@ -32,10 +32,9 @@ export class API {
     return mainProcessBridge.request('stopHugoServer', {}, {timeout:100000});
   }
 
-
-//openSiteLibrary
-//redirectTo
-//getThumbnailForPath
+  showLogWindow(){
+    return mainProcessBridge.request('showLogWindow', {});
+  }
 
   logToConsole( message, label){
     return mainProcessBridge.request('logToConsole', {message, label}, {timeout: 1000});

@@ -104,7 +104,6 @@ function getFirstScreenAfterStartup(){
   mainWindow.webContents.once('dom-ready', async () => {
     configurationDataProvider.get((err, configurations) => {
       if(configurations.empty===true || configurations.sites.length ===0){
-        console.log("switch to welcomeScreen ");
         mainWindow.webContents.once('dom-ready', () => {
           mainWindow.webContents.send("redirectToGivenLocation", '/welcome');
         });
@@ -123,7 +122,7 @@ function getFirstScreenAfterStartup(){
       }
       else{
         mainWindow.setTitle("Quiqr: Select site");
-
+        mainWindow.webContents.send("redirectToGivenLocation",'/sites/last');
       }
     });
   });

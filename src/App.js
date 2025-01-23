@@ -1,6 +1,5 @@
 import React                                                              from 'react';
 import { Switch, Route }                                                  from 'react-router-dom'
-import Redirect                                                           from 'react-router-dom/Redirect';
 import AppsIcon                                                           from '@material-ui/icons/Apps';
 import ArrowBackIcon                                                      from '@material-ui/icons/ArrowBack';
 import SettingsApplicationsIcon                                           from '@material-ui/icons/SettingsApplications';
@@ -204,6 +203,7 @@ class App extends React.Component{
             title="Site Library"
             icon={AppsIcon}
           />,
+
           <ToolbarButton
             key="buttonPrefs"
             active={true}
@@ -213,6 +213,7 @@ class App extends React.Component{
             title="Preferences"
             icon={SettingsApplicationsIcon}
           />,
+
         ];
 
         return <TopToolbarRight
@@ -331,9 +332,6 @@ class App extends React.Component{
         return <PrefsRouted />;
       }} />
 
-      <Route path="*" component={(data)=>{
-        return <Redirect to='/' />
-      }} />
     </Switch>);
   }
 
@@ -480,6 +478,16 @@ class App extends React.Component{
 
         );
       }} />
+
+
+      <Route path="/refresh" exact={true} render={ ({match, history})=> {
+        this.history = history;
+        return (
+          <ThemeProvider theme={this.state.theme}>
+          </ThemeProvider>
+        )
+        }} />
+
 
       <Route path="/" exact={true} render={ ({match, history})=> {
         this.history = history;

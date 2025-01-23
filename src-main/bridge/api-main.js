@@ -5,6 +5,7 @@ const {dirname}                 = require('path');
 const path                      = require('path');
 const {shell}                   = require('electron');
 const util                      = require('util')
+const logWindowManager          = require('../ui-managers/log-window-manager');
 const pathHelper                = require('../utils/path-helper');
 const formatProviderResolver    = require('../utils/format-provider-resolver');
 const configurationDataProvider = require('../app-prefs-state/configuration-data-provider')
@@ -538,7 +539,14 @@ api.stopHugoServer = function(){
     global.hugoServer.stopIfRunning();
   }
 }
+api.showLogWindow = function(){
+  global.logWindow = logWindowManager.getCurrentInstanceOrNew();
 
+  global.logWindow.webContents.on('did-finish-load',() => {
+    global.logWindow.webContents.send("redirectToGivenLocation", "/console")
+  })
+
+}
 
 
 api.buildWorkspace = function({siteKey, workspaceKey, buildKey, extraConfig}, context){

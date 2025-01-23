@@ -8,11 +8,6 @@ import SnackbarManager   from './components/SnackbarManager';
 service.api.readConfKey('prefs').then((value)=>{
 
   let appUiStyle = 'quiqr10';
-  /*
-  if(value.interfaceStyle){
-    appUiStyle = value.interfaceStyle
-  }
-  */
 
   require('./app-ui-styles/' + appUiStyle + '/css/index.css');
   require('./app-ui-styles/' + appUiStyle + '/css/bootstrap-grid.css');
