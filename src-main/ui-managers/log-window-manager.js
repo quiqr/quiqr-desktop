@@ -55,6 +55,8 @@ function createWindow () {
 
   logWindow.show();
 
+  logWindow.setTitle("Quiqr Log");
+
   if(process.env.REACT_DEV_URL){
 
     //DEVELOPMENT SERVER
