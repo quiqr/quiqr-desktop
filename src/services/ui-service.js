@@ -23,9 +23,7 @@ class SnackMessageService extends BaseService {
         return false;
     }
 
-    addSnackMessage( message,
-        {severity, action, onActionClick, autoHideDuration=3000} = {}
-    ){
+    addSnackMessage( message, {severity, action, onActionClick, autoHideDuration=3000} = {} ){
         this._snackMessageQueue.push({message, severity, action, onActionClick, autoHideDuration});
         if(this._tryAssingCurrentSnack())
             this._notifyChanges();

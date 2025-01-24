@@ -1,6 +1,14 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 
+## 0.19.1 (2025-01-24)
+- fix: stabilized log window
+- fix: improve startup speed, less redirects
+- feature: auto scroll in log window
+- feature: document build actions [TODO](documentation)
+- feature: log button always visible in mounted site
+- feature: log button sets focus on log window
+
 ## 0.19.0 (2024-12-12)
 - feature: Accordion has new option arrayIndicesAreKeys. Enables read/write dictionaries which are actually arrays with keys as indeces [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/container-field-types/accordion/)
 - feature: Accordion has new option disableCreate [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/container-field-types/accordion/)

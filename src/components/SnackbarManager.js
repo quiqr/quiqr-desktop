@@ -19,24 +19,39 @@ class SnackbarManager extends React.Component{
     let snackbar = undefined;
 
     if(snackMessage){
-      snackbar = (
-        <Snackbar
-          key="snack-message"
-          open={ true }
-          anchorOrigin={{vertical:"bottom", horizontal: "left" }}
-          action={ snackMessage.action }
-          autoHideDuration={ snackMessage.autoHideDuration }
-          onClose={()=>{ snackMessageService.reportSnackDismiss() }}
-        >
-          <Alert
-            elevation={6} variant="filled"
-            onClose={ ()=>{ snackMessageService.reportSnackDismiss() }}
-            severity={snackMessage.severity}>
-            {snackMessage.message}
-        </Alert>
-        </Snackbar>
-      )
-      ;
+
+      if(snackMessage.action){
+        snackbar = (
+          <Snackbar
+            key="snack-message"
+            open={ true }
+            anchorOrigin={{vertical:"bottom", horizontal: "left" }}
+            action={ snackMessage.action }
+            autoHideDuration={ snackMessage.autoHideDuration }
+            message={snackMessage.message}
+          />
+        );
+
+      }
+      else{
+        snackbar = (
+          <Snackbar
+            key="snack-message"
+            open={ true }
+            onClose={()=>{ snackMessageService.reportSnackDismiss() }}
+            anchorOrigin={{vertical:"bottom", horizontal: "left" }}
+            autoHideDuration={ snackMessage.autoHideDuration }
+          >
+            <Alert
+              elevation={6} variant="filled"
+              onClose={ ()=>{ snackMessageService.reportSnackDismiss() }}
+              severity={snackMessage.severity}>
+              {snackMessage.message}
+            </Alert>
+          </Snackbar>
+        );
+
+      }
     }
     else{
       snackbar = (

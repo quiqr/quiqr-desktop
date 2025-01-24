@@ -1,7 +1,11 @@
-import React from 'react';
-import service from './../../../services/service'
-import { SukohForm } from './../../../components/SukohForm';
-import Spinner from './../../../components/Spinner'
+import React                         from 'react';
+import service                       from './../../../services/service'
+import {snackMessageService}         from './../../../services/ui-service';
+import { SukohForm }                 from './../../../components/SukohForm';
+import Spinner                       from './../../../components/Spinner'
+import IconButton              from '@material-ui/core/IconButton';
+import Button              from '@material-ui/core/Button';
+import CloseIcon    from '@material-ui/icons/Close';
 
 class CollectionItem extends React.Component{
   constructor(props){
@@ -46,9 +50,44 @@ class CollectionItem extends React.Component{
 
     let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
     promise.then(function(buildResult){
-      service.api.logToConsole(buildResult, "oj year")
+
+      if(buildResult.stdoutType == "message"){
+        snackMessageService.addSnackMessage(<div>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</div>,{severity: 'success'});
+      }
+      else if(buildResult.stdoutType == "ascii_message"){
+        snackMessageService.addSnackMessage(<pre>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</pre>,{severity: 'success'});
+      }
+      else if(buildResult.stdoutType == "file_path"){
+        let action = (          <React.Fragment>
+          <Button color="secondary" size="small" onClick={()=>{
+            service.api.openFileInEditor(buildResult.stdoutContent.replace("\n",""));
+          }}>
+            Open
+          </Button>
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            onClick={()=>{
+              snackMessageService.reportSnackDismiss()
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </React.Fragment>
+        )
+
+        snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success', action: action});
+      }
+      else{
+        snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success'});
+
+      }
+
+      service.api.logToConsole(buildResult)
+
     }, function(){
-      service.api.logToConsole("Something when wrong")
+
+      snackMessageService.addSnackMessage(`Build failed`,{severity: 'warning'});
     })
   }
 

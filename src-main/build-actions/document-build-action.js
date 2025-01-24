@@ -1,11 +1,5 @@
-//const path                                  = require('path');
-//const fs                                    = require('fs-extra');
-//const rootPath                              = require('../utils/electron-root-path').rootPath;
-//const spawnAw                               = require('await-spawn')
-const cliExecuteHelper                      = require('../utils/cli-execute-helper');
-//const pathHelper                            = require('../utils/path-helper');
 const { EnvironmentResolver, PLATFORMS }    = require('../utils/environment-resolver');
-const { spawn, exec } = require('child_process');
+const { spawn } = require('child_process');
 
 class DocumentBuildAction{
 
@@ -13,10 +7,10 @@ class DocumentBuildAction{
     let enviromnent = new EnvironmentResolver().resolve();
 
     if(enviromnent.platform == PLATFORMS.windows){
-      return this.runOnWindows(actionName, execution_dict['windows'], filePath, sitePath);
+      return this.runOnWindows(actionName, execution_dict['windows'], filePath, sitePath, execution_dict['stdout_type']);
     }
     else{
-      return this.runOnUnix(actionName, execution_dict['unix'], filePath, sitePath);
+      return this.runOnUnix(actionName, execution_dict['unix'], filePath, sitePath, execution_dict['stdout_type']);
     }
   }
 
@@ -26,12 +20,15 @@ class DocumentBuildAction{
       .replace('%document_path', filePath)
   }
 
-  runOnUnix(actionName, execution_dict, filePath, sitePath){
+  runOnUnix(actionName, execution_dict, filePath, sitePath, stdout_type ){
 
     let command = this.replace_path_vars(execution_dict.command, filePath, sitePath);
-    let args = execution_dict.args.map((arg) => {
-      return this.replace_path_vars(arg, filePath, sitePath);
-    });
+    let args = [];
+    if (execution_dict.args && execution_dict.args.length > 0){
+      args = execution_dict.args.map((arg) => {
+        return this.replace_path_vars(arg, filePath, sitePath);
+      });
+    }
 
     return new Promise( async (resolve, reject)=>{
       try {
@@ -45,13 +42,16 @@ class DocumentBuildAction{
             var stdoutContent = Buffer.concat(stdoutChunks).toString();
             resolve(
               {
-                stdout: stdoutContent,
+                actionName: actionName,
+                stdoutType: stdout_type,
+                stdoutContent: stdoutContent,
                 filePath: filePath,
               }
             )
           }
           else{
-            console.log('Process exited with code', code)
+            const e = new Error(`Process exited with code ${code}`);
+            reject(e);
           }
         });
 
@@ -69,12 +69,6 @@ class DocumentBuildAction{
           var stderrContent = Buffer.concat(stderrChunks).toString();
           global.outputConsole.appendLine(stderrContent);
         });
-
-        /*
-        child.stderr.on('end', () => {
-          var stderrContent = Buffer.concat(stderrChunks).toString();
-        });
-        */
 
       } catch (e) {
         reject(e);
