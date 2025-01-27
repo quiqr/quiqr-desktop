@@ -7,10 +7,10 @@ class DocumentBuildAction{
     let enviromnent = new EnvironmentResolver().resolve();
 
     if(enviromnent.platform == PLATFORMS.windows){
-      return this.runOnWindows(actionName, execution_dict['windows'], filePath, sitePath, execution_dict['stdout_type']);
+      return this.runOn(actionName, execution_dict['windows'], filePath, sitePath, execution_dict['stdout_type']);
     }
     else{
-      return this.runOnUnix(actionName, execution_dict['unix'], filePath, sitePath, execution_dict['stdout_type']);
+      return this.runOn(actionName, execution_dict['unix'], filePath, sitePath, execution_dict['stdout_type']);
     }
   }
 
@@ -20,7 +20,7 @@ class DocumentBuildAction{
       .replace('%document_path', filePath)
   }
 
-  runOnUnix(actionName, execution_dict, filePath, sitePath, stdout_type ){
+  runOn(actionName, execution_dict, filePath, sitePath, stdout_type ){
 
     let command = this.replace_path_vars(execution_dict.command, filePath, sitePath);
     let args = [];
