@@ -1,8 +1,6 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 - fix: replace redirects for import popups with setState handlers
-
-## 0.19.1 (2025-01-24)
 - fix: stabilized log window
 - fix: improve startup speed, less redirects
 - feature: auto scroll in log window
