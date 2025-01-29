@@ -51,13 +51,13 @@ class CollectionItem extends React.Component{
     let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
     promise.then(function(buildResult){
 
-      if(buildResult.stdoutType == "message"){
+      if(buildResult.stdoutType === "message"){
         snackMessageService.addSnackMessage(<div>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</div>,{severity: 'success'});
       }
-      else if(buildResult.stdoutType == "ascii_message"){
+      else if(buildResult.stdoutType === "ascii_message"){
         snackMessageService.addSnackMessage(<pre>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</pre>,{severity: 'success'});
       }
-      else if(buildResult.stdoutType == "file_path"){
+      else if(buildResult.stdoutType === "file_path"){
         let action = (          <React.Fragment>
           <Button color="secondary" size="small" onClick={()=>{
             service.api.openFileInEditor(buildResult.stdoutContent.replace("\n",""));

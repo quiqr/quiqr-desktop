@@ -490,9 +490,7 @@ class MenuManager {
             id: 'new-site',
             click: async () => {
               let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-              mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-              var newURL='/sites/new-site/x-'+Math.random();
-              mainWindow.webContents.send("redirectToGivenLocation", newURL);
+              mainWindow.webContents.send("newSiteDialogOpen");
             }
           },
           {
@@ -500,9 +498,7 @@ class MenuManager {
             id: 'import-site',
             click: async () => {
               let mainWindow = global.mainWM.getCurrentInstanceOrNew();
-              mainWindow.webContents.send("redirectToGivenLocation", '/refresh');
-              var newURL='/sites/import-site/x-'+Math.random();
-              mainWindow.webContents.send("redirectToGivenLocation", newURL);
+              mainWindow.webContents.send("importSiteDialogOpen");
             }
           },
           { type: 'separator' },

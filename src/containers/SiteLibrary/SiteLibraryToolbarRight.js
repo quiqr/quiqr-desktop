@@ -27,7 +27,8 @@ export class SiteLibraryToolbarRight extends React.Component {
       <ToolbarButton
         key="buttonNewSite"
         action={()=>{
-          service.api.redirectTo(`/sites/new-site/x${Math.random()}`, true);
+          this.props.handleLibraryDialogClick('newSiteDialog')
+          //service.api.redirectTo(`/sites/new-site/x${Math.random()}`, true);
         }}
         title="New"
         icon={AddIcon}
@@ -37,7 +38,8 @@ export class SiteLibraryToolbarRight extends React.Component {
       <ToolbarButton
         key="buttonImportSite"
         action={()=>{
-          service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);
+          this.props.handleLibraryDialogClick('importSiteDialog')
+          //service.api.redirectTo(`/sites/import-site/x${Math.random()}`, true);
         }}
         title="Import"
         icon={InputIcon}

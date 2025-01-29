@@ -99,6 +99,8 @@ class App extends React.Component{
     });
 
     window.require('electron').ipcRenderer.on('openSplashDialog', ()=>{this.setState({splashDialogOpen: true})});
+    window.require('electron').ipcRenderer.on('importSiteDialogOpen', ()=>{this.setState({importSiteDialogOpen: true})});
+    window.require('electron').ipcRenderer.on('newSiteDialogOpen', ()=>{this.setState({newSiteDialogOpen: true})});
     window.require('electron').ipcRenderer.on('reloadThemeStyle', ()=>{
       this.setThemeStyleFromPrefs();
     });
@@ -224,15 +226,18 @@ class App extends React.Component{
 
       }} />
 
+      {/*REMOVE ONE OF THESE*/}
       <Route path="/" exact={true} render={ ({match, history})=> {
         return <SiteLibraryToolbarRight
           handleChange={(v)=>this.handleLibraryViewChange(v)}
+          handleLibraryDialogClick={(v)=>this.handleLibraryDialogClick(v)}
           activeLibraryView={ this.state.libraryView} />
       }} />
 
       <Route path='/sites/*' exact render={ () => {
         return <SiteLibraryToolbarRight
           handleChange={(v)=>this.handleLibraryViewChange(v)}
+          handleLibraryDialogClick={(v)=>this.handleLibraryDialogClick(v)}
           activeLibraryView={ this.state.libraryView} />
       }} />
 
@@ -281,19 +286,35 @@ class App extends React.Component{
     </Switch>);
   }
 
+  handleLibraryDialogCloseClick(){
+    this.setState({
+      newSiteDialogOpen: false,
+      importSiteDialogOpen:false
+    })
+  }
+
+  handleLibraryDialogClick(openDialog){
+    if(openDialog === 'newSiteDialog'){
+      this.setState({newSiteDialogOpen: true })
+    }
+    else if(openDialog === 'importSiteDialog'){
+      this.setState({importSiteDialogOpen: true })
+    }
+  }
+
   handleLibraryViewChange(view){
     service.api.saveConfPrefKey("libraryView",view);
     this.setState({libraryView: view})
   }
 
-  renderSelectSites(openDialog){
-
+  renderSelectSites(){
     return (
       <SiteLibraryRouted
+        handleLibraryDialogCloseClick={()=>this.handleLibraryDialogCloseClick()}
         activeLibraryView={ this.state.libraryView}
         key={ 'selectSite' }
-        newSite={ (openDialog === 'newSiteDialog' ? true : false ) }
-        importSite={ (openDialog === 'importSiteDialog' ? true : false ) }
+        newSite={ this.state.newSiteDialogOpen }
+        importSite={ this.state.importSiteDialogOpen }
       />
     );
   }
@@ -316,6 +337,7 @@ class App extends React.Component{
 
         return (
           <SiteLibraryRouted
+            handleLibraryDialogCloseClick={()=>this.handleLibraryDialogCloseClick()}
             activeLibraryView={ this.state.libraryView}
             key={ 'selectSite' }
             importSiteURL={ decodeURIComponent(match.params.url) }
