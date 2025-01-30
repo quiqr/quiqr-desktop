@@ -1,4 +1,7 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- fix: missing build_actions cause form to crash
+
 ## 0.19.1 (2025-01-29)
 - fix: replace redirects for import popups with setState handlers
 - fix: stabilized log window
