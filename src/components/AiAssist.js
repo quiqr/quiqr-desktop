@@ -14,6 +14,7 @@ import MenuItem            from '@material-ui/core/MenuItem';
 import Select              from '@material-ui/core/Select';
 import InputLabel          from '@material-ui/core/InputLabel';
 import { withStyles }      from '@material-ui/core/styles';
+import CircularProgress           from '@material-ui/core/CircularProgress';
 
 import OpenAI from 'openai';
 
@@ -52,6 +53,7 @@ class AiAssist extends React.Component {
       commandPrompt:"",
       webpage:"",
       assistendNotReady: true,
+      aiBusy: false,
       formNotReady: true,
     }
   }
@@ -84,8 +86,6 @@ class AiAssist extends React.Component {
       return this.state.commandPrompt + "\nApply this on the following text...\n " + this.props.inValue;
     }
     else if(this.state.runOn === "previewpage"){
-      //service.api.logToConsole(this.props.pageUrl);
-
 
       return this.state.commandPrompt + "\nApply this on the following text extracted from a webpage...\n " + this.props.inValue;
 
@@ -94,6 +94,7 @@ class AiAssist extends React.Component {
   }
 
   sendToAssistent() {
+
 
     service.api.readConfKey('prefs').then(async (value)=>{
 
@@ -106,6 +107,9 @@ class AiAssist extends React.Component {
         const content = this.genPrompt();
         //service.api.logToConsole(content);
         if(content!==""){
+
+          this.setState({assistendNotReady:true, aiBusy: true});
+
           const stream = AIclient.beta.chat.completions.stream({
             model: 'gpt-4',
             messages: [{ role: 'user', content: content }],
@@ -113,6 +117,9 @@ class AiAssist extends React.Component {
           });
 
           const chatCompletion = await stream.finalChatCompletion();
+
+          this.setState({assistendNotReady:false, aiBusy: false});
+
           if(chatCompletion && chatCompletion.choices.length > 0){
             this.setState({result: chatCompletion.choices[0].message.content});
           }
@@ -223,6 +230,11 @@ class AiAssist extends React.Component {
 
         <Box my={0} sx={{display:'flex'}}>
             <Button className={classes.keyButton} onClick={()=>{this.sendToAssistent()}} disabled={this.state.assistendNotReady} color="primary" variant="contained">Send prompt to AI assistent</Button>
+            { (this.state.aiBusy ?
+              <React.Fragment>&nbsp;<CircularProgress size={24} />&nbsp;</React.Fragment>
+              :
+              null) }
+
         </Box>
 
         <Box my={3} sx={{display:'flex'}}>
@@ -233,7 +245,6 @@ class AiAssist extends React.Component {
             id="standard-full-width"
             label="Result Text"
             placeholder="result text"
-            //value={(this.state.result !=="" ? this.state.result : "empty")}
             value={this.state.result}
             onChange={(e)=>{
               this.setState({result: e.target.value});

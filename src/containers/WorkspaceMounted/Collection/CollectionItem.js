@@ -1,11 +1,7 @@
 import React                         from 'react';
 import service                       from './../../../services/service'
-import {snackMessageService}         from './../../../services/ui-service';
 import { SukohForm }                 from './../../../components/SukohForm';
 import Spinner                       from './../../../components/Spinner'
-import IconButton              from '@material-ui/core/IconButton';
-import Button              from '@material-ui/core/Button';
-import CloseIcon    from '@material-ui/icons/Close';
 
 class CollectionItem extends React.Component{
   constructor(props){
@@ -44,61 +40,6 @@ class CollectionItem extends React.Component{
       this.setState(stateUpdate);
     });
   }
-
-  /*
-  handleDocBuild(buildAction){
-
-    let buildButtonsStates = this.state.buildButtonsStates;
-    buildButtonsStates[buildAction] = "busy"
-    this.setState({buildButtonsStates:buildButtonsStates});
-    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-
-    let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
-    promise.then((buildResult)=>{
-
-      if(buildResult.stdoutType === "message"){
-        snackMessageService.addSnackMessage(<div>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</div>,{severity: 'success'});
-      }
-      else if(buildResult.stdoutType === "ascii_message"){
-        snackMessageService.addSnackMessage(<pre>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</pre>,{severity: 'success'});
-      }
-      else if(buildResult.stdoutType === "file_path"){
-        let action = (          <React.Fragment>
-          <Button color="secondary" size="small" onClick={()=>{
-            snackMessageService.reportSnackDismiss()
-          }}>
-            Open
-          </Button>
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            onClick={()=>{
-              snackMessageService.reportSnackDismiss()
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </React.Fragment>
-        )
-
-        snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success', action: action});
-      }
-      else{
-        snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success'});
-      }
-
-      buildButtonsStates[buildAction] = "ready"
-      this.setState({buildButtonsStates:buildButtonsStates});
-
-    }, function(){
-
-      snackMessageService.addSnackMessage(`Build failed`,{severity: 'warning'});
-
-      buildButtonsStates[buildAction] = "ready"
-      this.setState({buildButtonsStates:buildButtonsStates});
-    })
-  }
-  */
 
   handleOpenInEditor(){
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
@@ -193,8 +134,6 @@ class CollectionItem extends React.Component{
     }}
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
-    //onDocBuild={(build_action)=>this.handleDocBuild(build_action)}
-    //buildButtonsStates={this.state.buildButtonsStates}
 
   />);
   }

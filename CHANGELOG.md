@@ -1,6 +1,7 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 - feature: add txtInsertButtons option to string fieldtype [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/data-field-types/string/)
+- feature: add loadingCircle when actionButton is busy
 
 ## 0.19.2 (2025-01-30)
 - fix: missing build_actions cause form to crash
