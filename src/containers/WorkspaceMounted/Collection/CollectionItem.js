@@ -12,7 +12,7 @@ class CollectionItem extends React.Component{
     super(props);
     this.state = {
       selectedWorkspaceDetails: null,
-      collectionItemValues: null
+      collectionItemValues: null,
     };
   }
 
@@ -45,11 +45,16 @@ class CollectionItem extends React.Component{
     });
   }
 
+  /*
   handleDocBuild(buildAction){
+
+    let buildButtonsStates = this.state.buildButtonsStates;
+    buildButtonsStates[buildAction] = "busy"
+    this.setState({buildButtonsStates:buildButtonsStates});
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
     let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
-    promise.then(function(buildResult){
+    promise.then((buildResult)=>{
 
       if(buildResult.stdoutType === "message"){
         snackMessageService.addSnackMessage(<div>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</div>,{severity: 'success'});
@@ -60,7 +65,7 @@ class CollectionItem extends React.Component{
       else if(buildResult.stdoutType === "file_path"){
         let action = (          <React.Fragment>
           <Button color="secondary" size="small" onClick={()=>{
-            service.api.openFileInEditor(buildResult.stdoutContent.replace("\n",""));
+            snackMessageService.reportSnackDismiss()
           }}>
             Open
           </Button>
@@ -82,13 +87,18 @@ class CollectionItem extends React.Component{
         snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success'});
       }
 
-      //service.api.logToConsole(buildResult)
+      buildButtonsStates[buildAction] = "ready"
+      this.setState({buildButtonsStates:buildButtonsStates});
 
     }, function(){
 
       snackMessageService.addSnackMessage(`Build failed`,{severity: 'warning'});
+
+      buildButtonsStates[buildAction] = "ready"
+      this.setState({buildButtonsStates:buildButtonsStates});
     })
   }
+  */
 
   handleOpenInEditor(){
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
@@ -183,7 +193,8 @@ class CollectionItem extends React.Component{
     }}
     onSave={this.handleSave.bind(this)}
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
-    onDocBuild={(build_action)=>this.handleDocBuild(build_action)}
+    //onDocBuild={(build_action)=>this.handleDocBuild(build_action)}
+    //buildButtonsStates={this.state.buildButtonsStates}
 
   />);
   }

@@ -1,6 +1,7 @@
 import * as React           from 'react';
 import { Route }            from 'react-router-dom'
 import IconButton           from '@material-ui/core/IconButton';
+import CircularProgress           from '@material-ui/core/CircularProgress';
 import OpenInBrowserIcon    from '@material-ui/icons/OpenInBrowser';
 import DescriptionIcon      from '@material-ui/icons/Description';
 import ArrowBackIcon        from '@material-ui/icons/ArrowBack';
@@ -10,6 +11,8 @@ import { ComponentContext } from './component-context';
 import { Debounce }         from './debounce';
 import { FormStateBuilder } from './form-state-builder';
 import service              from '../../services/service';
+import {snackMessageService}         from '../../services/ui-service';
+import CloseIcon    from '@material-ui/icons/Close';
 import { FormBreadcumb }    from '../Breadcumb';
 import { FieldsExtender }   from './fields-extender';
 
@@ -46,7 +49,7 @@ class Form extends React.Component {
         document: formState,
         path: 'ROOT/',
         fields: fields,
-        renderError: null
+        renderError: null,
       };
 
       this.forceUpdateThis = this.forceUpdate.bind(this);
@@ -57,7 +60,9 @@ class Form extends React.Component {
         document: {},
         path: '',
         fields: [],
-        renderError: error.message
+        renderError: error.message,
+        actionButtonLoading: false
+
       }
     }
   }
@@ -269,6 +274,8 @@ class Form extends React.Component {
     }
   }
 
+
+
   saveFormHandler(){
     this.props.saveFormHandler();
   }
@@ -329,6 +336,55 @@ class Form extends React.Component {
     return { path: path };
   }
 
+  handleDocBuild(buildAction){
+
+    this.setState({actionButtonLoading: true})
+
+    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+
+    let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
+    promise.then((buildResult)=>{
+
+      if(buildResult.stdoutType === "message"){
+        snackMessageService.addSnackMessage(<div>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</div>,{severity: 'success'});
+      }
+      else if(buildResult.stdoutType === "ascii_message"){
+        snackMessageService.addSnackMessage(<pre>Build ${buildAction} was succesful<br/>{buildResult.stdoutContent}</pre>,{severity: 'success'});
+      }
+      else if(buildResult.stdoutType === "file_path"){
+        let action = (          <React.Fragment>
+          <Button color="secondary" size="small" onClick={()=>{
+            service.api.openFileInEditor(buildResult.stdoutContent.replace("\n",""));
+            snackMessageService.reportSnackDismiss()
+          }}>
+            Open
+          </Button>
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            onClick={()=>{
+              snackMessageService.reportSnackDismiss()
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </React.Fragment>
+        )
+
+        snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success', action: action});
+      }
+      else{
+        snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success'});
+      }
+    this.setState({actionButtonLoading: false})
+
+    }, () => {
+      snackMessageService.addSnackMessage(`Build failed`,{severity: 'warning'});
+    this.setState({actionButtonLoading: false})
+    })
+  }
+
+
   render(){
 
     let backButton = undefined;
@@ -375,12 +431,16 @@ class Form extends React.Component {
     if(this.props.buildActions){
 
       buildActionButtons = this.props.buildActions.map((build_action)=>{
+
+
         return (
           <Button
-            onClick={()=>{this.props.onDocBuild(build_action.key);}}
+            key={"buildButton"+build_action}
+            onClick={()=>{this.handleDocBuild(build_action.key);}}
             style={{marginRight:'5px'}}
             size="small"
             variant="contained"
+            disabled={this.state['build_action_'+build_action]}
             startIcon={<OpenInBrowserIcon />}
           >
             {build_action.button_text}
@@ -423,6 +483,10 @@ class Form extends React.Component {
 
         <div>
 
+        { (this.state.actionButtonLoading ?
+          <React.Fragment>&nbsp;<CircularProgress size={24} />&nbsp;</React.Fragment>
+          :
+          null) }
         {buildActionButtons}
         {openInBrowserButton}
         {openInEditorButton}
