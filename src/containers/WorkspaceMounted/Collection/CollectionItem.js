@@ -80,10 +80,9 @@ class CollectionItem extends React.Component{
       }
       else{
         snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success'});
-
       }
 
-      service.api.logToConsole(buildResult)
+      //service.api.logToConsole(buildResult)
 
     }, function(){
 

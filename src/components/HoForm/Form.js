@@ -195,10 +195,8 @@ class Form extends React.Component {
 
       service.api.getPreviewCheckConfiguration()
         .then((conf)=>{
-          //service.api.logToConsole(conf);
           if(conf && conf.enable === true){
 
-            //service.api.logToConsole('hallo');
             const sets = [
             'min_keywords',
             'max_keywords',
@@ -217,8 +215,7 @@ class Form extends React.Component {
             window.require('electron').shell.openExternal(previewUrl);
           }
           else{
-
-            service.api.logToConsole(this.props.pageUrl);
+            //service.api.logToConsole(this.props.pageUrl);
             window.require('electron').shell.openExternal(this.props.pageUrl);
           }
         })

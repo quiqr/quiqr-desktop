@@ -36,19 +36,41 @@ class TextFieldDynamic extends BaseDynamic {
     let iconButtons = [];
     if(field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
+    if(field.txtInsertButtons){
+      let iBtns = field.txtInsertButtons.map((b)=>{
+        return(
+          <button  onClick={()=>{
+            this.props.context.setValue(b, 250);
+          }} >{b}</button>
+        )
+      });
+      iconButtons.push(
+        <React.Fragment>
+          {iBtns}
+        </React.Fragment>
+      );
+    }
+
     if(context.enableAiAssist) iconButtons.push(<AiAssist handleSetAiText={(text)=>{ context.setValue(text)}} inField={field} inValue={context.value} pageUrl={context.pageUrl} />);
 
-    return (<FormItemWrapper
-      control={<TextField
-        id={`text-field-${field.key}`}
-        onChange={ (e)=>this.handleChange(e) }
-        value={context.value}
-        multiline={field.multiLine===true}
-        fullWidth={true}
-        label={field.title} />
-      }
-      iconButtons={iconButtons}
-    />);
+    return (
+
+      <React.Fragment>
+
+        <FormItemWrapper
+          control={
+            <TextField
+              id={`text-field-${field.key}`}
+              onChange={ (e)=>this.handleChange(e) }
+              value={context.value}
+              multiline={field.multiLine===true}
+              fullWidth={true}
+              label={field.title} />
+          }
+          iconButtons={iconButtons}
+        />
+      </React.Fragment>
+    );
   }
 }
 
