@@ -626,8 +626,18 @@ class WorkspaceService{
 
     return DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
 
-
   }
+
+  async buildSingle(singleKey, buildAction){
+    let config = await this.getConfigurationsData();
+    let single = config.singles.find(x => x.key === singleKey);
+    if(single==null)throw new Error('Could not find single.');
+    let filePath = path.join(this.workspacePath, single.file);
+
+    let buildActionDict = single.build_actions.find(x => x.key === buildAction);
+    return DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
+  }
+
 
   // TODO REMOVE CODE SMELL REDUNDANT CODE WITH SINGLE
   async updateCollectionItem(collectionKey , collectionItemKey , document ){

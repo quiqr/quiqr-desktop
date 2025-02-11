@@ -705,6 +705,20 @@ api.buildCollectionItem = function({siteKey, workspaceKey, collectionKey, collec
       });
   });
 }
+api.buildSingle = function({siteKey, workspaceKey, singleKey, buildAction}, context) {
+  getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){
+
+    if(err){ context.reject(err); return; }
+
+    workspaceService.buildSingle(singleKey, buildAction)
+      .then((result)=>{
+        context.resolve(result);
+      })
+      .catch((e)=>{
+        context.reject(e);
+      });
+  });
+}
 
 api.updateCollectionItem = function({siteKey, workspaceKey, collectionKey, collectionItemKey, document}, context) {
   getWorkspaceService(siteKey, workspaceKey, function(err, {workspaceService}){

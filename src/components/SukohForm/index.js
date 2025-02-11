@@ -123,6 +123,7 @@ export class SukohForm extends React.Component{
           siteKey={this.props.siteKey}
           workspaceKey={this.props.workspaceKey}
           collectionKey={this.props.collectionKey}
+          singleKey={this.props.singleKey}
           refreshed={refreshed}
           collectionItemKey={this.props.collectionItemKey}
           fields={this.props.fields}

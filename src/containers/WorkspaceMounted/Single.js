@@ -78,6 +78,11 @@ class Single extends React.Component{
     let single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
     if(single==null) return null;
 
+    let buildActions = []
+    if('build_actions' in single){
+      buildActions = single.build_actions.slice(0);
+    }
+
     let previewUrl = null;
     if(single.hidePreviewIcon){
       previewUrl = '';
@@ -102,6 +107,7 @@ class Single extends React.Component{
     return(<SukohForm
     debug={false}
     rootName={single.title}
+    singleKey={this.props.singleKey}
     refreshed={this.props.refreshed}
     fields={single.fields}
     values={this.state.singleValues}
@@ -112,6 +118,7 @@ class Single extends React.Component{
     onOpenInEditor={this.handleOpenInEditor.bind(this)}
     hideExternalEditIcon={single.hideExternalEditIcon}
     hideSaveButton={single.hideSaveButton}
+    buildActions={buildActions}
     plugins={{
 
       openBundleFileDialog: function({title, extensions, targetPath, forceFileName}, onFilesReady){

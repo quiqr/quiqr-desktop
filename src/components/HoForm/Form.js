@@ -220,7 +220,6 @@ class Form extends React.Component {
             window.require('electron').shell.openExternal(previewUrl);
           }
           else{
-            //service.api.logToConsole(this.props.pageUrl);
             window.require('electron').shell.openExternal(this.props.pageUrl);
           }
         })
@@ -338,11 +337,17 @@ class Form extends React.Component {
 
   handleDocBuild(buildAction){
 
+    let { siteKey, singleKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+
+    let promise;
     this.setState({actionButtonLoading: true})
+    if(collectionKey){
+      promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
+    }
+    else {
+      promise = service.api.buildSingle(siteKey, workspaceKey, singleKey, buildAction);
+    }
 
-    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-
-    let promise = service.api.buildCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction);
     promise.then((buildResult)=>{
 
       if(buildResult.stdoutType === "message"){
@@ -376,12 +381,13 @@ class Form extends React.Component {
       else{
         snackMessageService.addSnackMessage(`Build ${buildAction} was succesful`,{severity: 'success'});
       }
-    this.setState({actionButtonLoading: false})
+      this.setState({actionButtonLoading: false})
 
     }, () => {
-      snackMessageService.addSnackMessage(`Build failed`,{severity: 'warning'});
-    this.setState({actionButtonLoading: false})
-    })
+        snackMessageService.addSnackMessage(`Build failed`,{severity: 'warning'});
+        this.setState({actionButtonLoading: false})
+      })
+
   }
 
 

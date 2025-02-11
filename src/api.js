@@ -129,6 +129,9 @@ export class API {
   buildCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, buildAction: string){
     return mainProcessBridge.request('buildCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction});
   }
+  buildSingle(siteKey: string, workspaceKey: string, singleKey: string, buildAction: string){
+    return mainProcessBridge.request('buildSingle', {siteKey, workspaceKey, singleKey, buildAction});
+  }
 
   updateCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, document: any){
     return mainProcessBridge.request('updateCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, document});
