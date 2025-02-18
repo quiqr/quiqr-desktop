@@ -17,7 +17,6 @@ if(app.isPackaged) {
   process.env.NODE_ENV = 'production';
 }
 
-
 // FIXME TODO this is to solve the 2021q3 Lets Encrypt problems
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 

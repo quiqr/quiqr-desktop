@@ -127,10 +127,10 @@ export class API {
   }
 
   buildCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, buildAction: string){
-    return mainProcessBridge.request('buildCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction});
+    return mainProcessBridge.request('buildCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, buildAction}, {timeout: 400000});
   }
   buildSingle(siteKey: string, workspaceKey: string, singleKey: string, buildAction: string){
-    return mainProcessBridge.request('buildSingle', {siteKey, workspaceKey, singleKey, buildAction});
+    return mainProcessBridge.request('buildSingle', {siteKey, workspaceKey, singleKey, buildAction}, {timeout: 400000});
   }
 
   updateCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, document: any){
