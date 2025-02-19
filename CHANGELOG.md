@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.19.3 (2025-02-19)
 - feature: add txtInsertButtons option to string fieldtype [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/data-field-types/string/)
 - feature: add loadingCircle when actionButton is busy
 - feature: add loadingCircle when AI popup is busy

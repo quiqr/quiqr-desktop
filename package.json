@@ -11,7 +11,7 @@
     "url": "https://github.com/quiqr/quiqr-desktop.git"
   },
   "description": "Offline CMS with a Hugo Engine",
-  "version": "0.19.2",
+  "version": "0.19.3",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
