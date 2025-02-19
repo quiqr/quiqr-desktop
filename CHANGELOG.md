@@ -4,6 +4,13 @@
 - feature: add loadingCircle when actionButton is busy
 - feature: add loadingCircle when AI popup is busy
 - feature: add buildActions to single form
+- fix: prevent timeouts for buildActions
+
+### Stats
+- 
+- 51 modules 72.76M
+- 9 community templates
+- 128 stars
 
 ## 0.19.2 (2025-01-30)
 - fix: missing build_actions cause form to crash
