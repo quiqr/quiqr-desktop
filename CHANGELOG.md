@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.19.4 (2025-02-20)
 - fix: whitescreen in compiled version
 
