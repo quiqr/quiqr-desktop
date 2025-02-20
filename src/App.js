@@ -512,11 +512,8 @@ class App extends React.Component{
 
 
       <Route path="/" exact={true} render={ ({match, history})=> {
-        this.history = history;
-        return (
-          <ThemeProvider theme={this.state.theme}>
-          </ThemeProvider>
-        )
+          this.history = history;
+          return this.renderBodyWithToolbars()
         }} />
 
       <Route path="/sites" exact={true} render={ ({match, history})=> {
