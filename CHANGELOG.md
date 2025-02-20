@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.19.5 (2025-02-20)
 - fix: whitescreen in compiled version
 - feature: add txtInsertButtons option to string fieldtype [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/03-form-fields/data-field-types/string/)
 - feature: add loadingCircle when actionButton is busy
