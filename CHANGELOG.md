@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-**WORK IN PROGRESS**
+## **WORK IN PROGRESS**
 - fix: improve first start
 
 ## 0.19.5 (2025-02-20)
