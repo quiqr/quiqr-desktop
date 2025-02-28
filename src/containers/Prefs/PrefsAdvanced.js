@@ -25,8 +25,6 @@ const useStyles = theme => ({
 
 class PrefsAdvanced extends React.Component {
 
-  history: any;
-
   constructor(props){
     super(props);
     this.state = {
@@ -44,29 +42,13 @@ class PrefsAdvanced extends React.Component {
   }
 
   componentDidMount(){
-
-    //service.registerListener(this);
     service.api.readConfKey('prefs').then((value)=>{
       this.setState({prefs: value });
 
       this.setStringPrefToState('systemGitBinPath',value)
       this.setStringPrefToState('openAiApiKey',value)
       this.setStringPrefToState('customOpenInCommand',value)
-
-      /*
-      if(value.customOpenInCommand){
-        this.setState({customOpenInCommand: value.customOpenInCommand });
-      }
-      else{
-        this.setState({customOpenInCommand: "" });
-      }
-      */
-
     });
-  }
-
-  componentWillUnmount(){
-    //service.unregisterListener(this);
   }
 
   render(){

@@ -22,6 +22,13 @@ export class PrefsSidebar extends React.Component {
       },
       {
         active: true,
+        label: "Variables",
+        onClick: ()=>{
+          history.push('/prefs/vars');
+        }
+      },
+      {
+        active: true,
         label: "Advanced",
         onClick: ()=>{
           history.push('/prefs/advanced');

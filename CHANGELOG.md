@@ -1,6 +1,8 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 - fix: improve first start
+- feature: variables [documentation]()
+- feature: build_actions [documentation]()
 
 ## 0.19.5 (2025-02-20)
 - fix: whitescreen in compiled version

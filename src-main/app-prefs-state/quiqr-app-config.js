@@ -84,6 +84,9 @@ module.exports = function (options) {
   function setLastOpenedPublishTargetForSite(siteKey,publishKey){
     state.lastOpenedPublishTargetForSite[siteKey] = publishKey;
   }
+  function setAppVars(appVars){
+    state.appVars = appVars;
+  }
 
 
   /*
@@ -107,9 +110,9 @@ module.exports = function (options) {
       dataFolder: "~/Quiqr",
       interfaceStyle: "quiqr10"
     },
-    lastOpenedPublishTargetForSite: {
-    },
+    lastOpenedPublishTargetForSite: {},
     skipWelcomeScreen: false,
+    appVars: {},
     experimentalFeatures: false,
     disablePartialCache: false,
     devLocalApi: false,
@@ -124,6 +127,7 @@ module.exports = function (options) {
     get lastOpenedSite() { return state.lastOpenedSite; },
     get lastOpenedPublishTargetForSite() { return state.lastOpenedPublishTargetForSite; },
     get prefs() { return state.prefs; },
+    get appVars() { return state.appVars },
     get currentUsername() { return state.currentUsername; },
     get skipWelcomeScreen() { return state.skipWelcomeScreen; },
     get experimentalFeatures() { return state.experimentalFeatures; },
@@ -137,6 +141,7 @@ module.exports = function (options) {
     },
     setLastOpenedSite,
     setLastOpenedPublishTargetForSite,
+    setAppVars,
     setPrefkey,
     setCurrectUsername,
     setSkipWelcomeScreen,

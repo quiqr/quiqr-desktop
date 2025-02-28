@@ -37,7 +37,7 @@ export class API {
   }
 
   logToConsole( message, label){
-    return mainProcessBridge.request('logToConsole', {message, label}, {timeout: 1000});
+    return mainProcessBridge.request('logToConsole', {message, label}, {timeout: 100000});
   }
 
   getDynFormFields(searchRootNode: string, searchLevelKeyVal: any){
@@ -167,6 +167,10 @@ export class API {
 
   saveConfPrefKey(prefKey: string, prefValue: string){
     return mainProcessBridge.request('saveConfPrefKey', {prefKey, prefValue});
+  }
+
+  saveConfAppVars(appVars: any){
+    return mainProcessBridge.request('saveConfAppVars', {appVars});
   }
 
   renameCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, collectionItemNewKey: string){

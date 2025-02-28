@@ -50,7 +50,6 @@ class PrefsGeneral extends React.Component {
 
   componentDidMount(){
 
-    //service.registerListener(this);
     service.api.readConfKey('prefs').then((value)=>{
       this.setState({prefs: value });
 
@@ -69,10 +68,6 @@ class PrefsGeneral extends React.Component {
       }
 
     });
-  }
-
-  componentWillUnmount(){
-   // service.unregisterListener(this);
   }
 
   handleFolderSelected(folder){

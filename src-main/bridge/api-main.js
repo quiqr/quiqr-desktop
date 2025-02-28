@@ -252,6 +252,15 @@ api.saveConfPrefKey = async function({prefKey, prefValue}, context){
   context.resolve(true);
 }
 
+api.saveConfAppVars = async function({appVars}, context){
+  global.pogoconf.setAppVars(appVars);
+  console.log(appVars)
+  global.pogoconf.saveState();
+  context.resolve(true);
+}
+
+
+
 api.getWorkspaceModelParseInfo =  async function({siteKey, workspaceKey}, context){
   const { workspaceService } = await getWorkspaceServicePromise(siteKey, workspaceKey);
   let modelParseInfo;
