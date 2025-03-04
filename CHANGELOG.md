@@ -3,6 +3,8 @@
 - fix: improve first start
 - feature: variables [documentation]()
 - feature: build_actions [documentation]()
+- breaking: the variables site_path, document_path and site_name have been
+  renamed to SITE_NAME, SITE_PATH and DOCUMENT_PATH. [documentation]()
 
 ## 0.19.5 (2025-02-20)
 - fix: whitescreen in compiled version

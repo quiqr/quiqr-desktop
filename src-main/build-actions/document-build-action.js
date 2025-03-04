@@ -15,9 +15,18 @@ class DocumentBuildAction{
   }
 
   replace_path_vars(sourcePath, filePath, sitePath){
-    return sourcePath
-      .replace('%site_path', sitePath)
-      .replace('%document_path', filePath)
+
+
+    let appVars = global.pogoconf['appVars'].slice();
+    appVars.push({var_name: 'SITE_PATH', var_value: sitePath});
+    appVars.push({var_name: 'DOCUMENT_PATH', var_value: filePath});
+
+    let newSourcePath = sourcePath;
+    appVars.forEach((varItem)=>{
+      newSourcePath = newSourcePath.replace('%'+varItem.var_name, varItem.var_value);
+    });
+
+    return newSourcePath;
   }
 
   runOn(actionName, execution_dict, filePath, sitePath, stdout_type ){
