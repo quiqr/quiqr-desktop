@@ -254,7 +254,6 @@ api.saveConfPrefKey = async function({prefKey, prefValue}, context){
 
 api.saveConfAppVars = async function({appVars}, context){
   global.pogoconf.setAppVars(appVars);
-  console.log(appVars)
   global.pogoconf.saveState();
   context.resolve(true);
 }

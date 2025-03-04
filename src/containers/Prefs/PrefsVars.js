@@ -39,7 +39,6 @@ class PrefsVars extends React.Component {
   componentDidMount(){
 
     service.api.readConfKey('appVars').then((value)=>{
-      service.api.logToConsole(value)
 
       this.setState({appVariables: value });
     });
@@ -47,50 +46,52 @@ class PrefsVars extends React.Component {
 
   renderVarRows(){
     const { classes } = this.props;
-    let appVariables = this.state.appVariables;
-    console.log(appVariables)
 
-    let rows = appVariables.map((_,index)=>{
-      console.log(index)
-      return (
-        <React.Fragment
+    let rows = this.state.appVariables.map((_,index)=>{
+      if(this.state.appVariables[index] && this.state.appVariables[index].hasOwnProperty('var_name')){
+        return (
+          <React.Fragment
             key={"varEntry"+index}
-        >
-          <TextField
-            id={"varEntry"+index}
-            label="Variable Name"
-            helperText='Name for the variable to define E.g. "TERRAFORM_EXECUTABLE"'
-            variant="outlined"
-            value={this.state.appVariables[index].var_name}
-            className={classes.textfield}
-            onChange={(e)=>{
-              let appVariables= this.state.appVariables;
-              appVariables[index].var_name = e.target.value;
-              this.setState({appVariables: appVariables})
-            }}
-          />
-          <TextField
-            id={"varValue"+index}
-            label="Variable Value"
-            helperText='Replacement value for the variable to define E.g. "/usr/bin/terraform"'
-            value={this.state.appVariables[index].var_value}
-            variant="outlined"
-            className={classes.textfield}
-            onChange={(e)=>{
-              let appVariables= this.state.appVariables;
-              appVariables[index].var_value = e.target.value;
-              this.setState({appVariables: appVariables})
-            }}
-          />
-          <IconButton aria-label="clear"  onClick={()=>{
+          >
+            <TextField
+              id={"varEntry"+index}
+              label="Variable Name"
+              helperText='Name for the variable to define E.g. "TERRAFORM_EXECUTABLE"'
+              variant="outlined"
+              value={this.state.appVariables[index].var_name}
+              className={classes.textfield}
+              onChange={(e)=>{
+                let appVariables= this.state.appVariables;
+                appVariables[index].var_name = e.target.value;
+                this.setState({appVariables: appVariables})
+              }}
+            />
+            <TextField
+              id={"varValue"+index}
+              label="Variable Value"
+              helperText='Replacement value for the variable to define E.g. "/usr/bin/terraform"'
+              value={this.state.appVariables[index].var_value}
+              variant="outlined"
+              className={classes.textfield}
+              onChange={(e)=>{
+                let appVariables= this.state.appVariables;
+                appVariables[index].var_value = e.target.value;
+                this.setState({appVariables: appVariables})
+              }}
+            />
+            <IconButton aria-label="clear"  onClick={()=>{
               let appVariables= this.state.appVariables;
               delete appVariables[index]
               this.setState({appVariables: appVariables})
-            console.log('delete')
-          }}> <RemoveIcon /> </IconButton>
+            }}> <RemoveIcon /> </IconButton>
 
-        </React.Fragment>
-      )
+          </React.Fragment>
+        )
+      }
+      else{
+        return null;
+
+      }
 
     });
     return (
@@ -116,14 +117,12 @@ class PrefsVars extends React.Component {
         }}>Add variable</Button>
 
         <Button onClick={()=>{
-          //service.api.logToConsole(this.state.appVariables)
-          //
           let appVariables = this.state.appVariables
-          appVariables.filter((item)=>{
-            return typeof item === Object
+          appVariables = appVariables.filter((item)=>{
+            return item !== null;
           })
 
-          service.api.saveConfAppVars(this.state.appVariables);
+          service.api.saveConfAppVars(appVariables);
 
         }}>Save</Button>
 
