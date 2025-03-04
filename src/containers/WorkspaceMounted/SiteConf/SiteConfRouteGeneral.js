@@ -164,7 +164,7 @@ class SiteConfRouteGeneral extends React.Component {
 
             <IconButton color="primary" className={classes.iconButton} aria-label="directions"
               onClick={()=>{
-                service.api.openCustomCommand(this.state.customOpenInCommand.replace('%site_path', this.state.source.path).replace('%site_name', this.state.siteconf.name))
+                service.api.openCustomCommand(this.state.customOpenInCommand.replace('%SITE_PATH', this.state.source.path).replace('%SITE_NAME', this.state.siteconf.name))
               }}>
               <LaunchIcon />
             </IconButton>
