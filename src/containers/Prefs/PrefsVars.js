@@ -40,9 +40,6 @@ class PrefsVars extends React.Component {
 
     service.api.readConfKey('appVars').then((value)=>{
       service.api.logToConsole(value)
-      value.filter((item)=>{
-        return typeof item === Object
-      })
 
       this.setState({appVariables: value });
     });
@@ -120,6 +117,11 @@ class PrefsVars extends React.Component {
 
         <Button onClick={()=>{
           //service.api.logToConsole(this.state.appVariables)
+          //
+          let appVariables = this.state.appVariables
+          appVariables.filter((item)=>{
+            return typeof item === Object
+          })
 
           service.api.saveConfAppVars(this.state.appVariables);
 
