@@ -112,7 +112,7 @@ module.exports = function (options) {
     },
     lastOpenedPublishTargetForSite: {},
     skipWelcomeScreen: false,
-    appVars: {},
+    appVars: [],
     experimentalFeatures: false,
     disablePartialCache: false,
     devLocalApi: false,
