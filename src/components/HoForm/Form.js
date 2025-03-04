@@ -1,20 +1,20 @@
-import * as React           from 'react';
-import { Route }            from 'react-router-dom'
-import IconButton           from '@material-ui/core/IconButton';
-import CircularProgress           from '@material-ui/core/CircularProgress';
-import OpenInBrowserIcon    from '@material-ui/icons/OpenInBrowser';
-import DescriptionIcon      from '@material-ui/icons/Description';
-import ArrowBackIcon        from '@material-ui/icons/ArrowBack';
-import Button               from '@material-ui/core/Button';
-import Box                  from '@material-ui/core/Box';
-import { ComponentContext } from './component-context';
-import { Debounce }         from './debounce';
-import { FormStateBuilder } from './form-state-builder';
-import service              from '../../services/service';
-import {snackMessageService}         from '../../services/ui-service';
-import CloseIcon    from '@material-ui/icons/Close';
-import { FormBreadcumb }    from '../Breadcumb';
-import { FieldsExtender }   from './fields-extender';
+import * as React              from 'react';
+import { Route }               from 'react-router-dom'
+import IconButton              from '@material-ui/core/IconButton';
+import CircularProgress        from '@material-ui/core/CircularProgress';
+import OpenInBrowserIcon       from '@material-ui/icons/OpenInBrowser';
+import DescriptionIcon         from '@material-ui/icons/Description';
+import ArrowBackIcon           from '@material-ui/icons/ArrowBack';
+import Button                  from '@material-ui/core/Button';
+import Box                     from '@material-ui/core/Box';
+import { ComponentContext }    from './component-context';
+import { Debounce }            from './debounce';
+import { FormStateBuilder }    from './form-state-builder';
+import service                 from '../../services/service';
+import {snackMessageService}   from '../../services/ui-service';
+import CloseIcon               from '@material-ui/icons/Close';
+import { FormBreadcumb }       from '../Breadcumb';
+import { FieldsExtender }      from './fields-extender';
 
 const Fragment = React.Fragment;
 const componentMarginTop = '16px';
@@ -67,9 +67,10 @@ class Form extends React.Component {
     }
   }
 
+  /*
   static shapeDocument(updatedDoc: {}, doc: {}){
-
   }
+  */
 
   componentDidCatch(error: Error , info: string) {
     this.setState({ renderError: error.message });
@@ -94,8 +95,6 @@ class Form extends React.Component {
       }
 
     });
-
-
   }
 
   static getDerivedStateFromProps(props: FormProps, state: FormState){
@@ -438,15 +437,14 @@ class Form extends React.Component {
 
       buildActionButtons = this.props.buildActions.map((build_action)=>{
 
-
         return (
           <Button
-            key={"buildButton"+build_action}
+            key={"buildButton"+build_action.key}
             onClick={()=>{this.handleDocBuild(build_action.key);}}
             style={{marginRight:'5px'}}
             size="small"
             variant="contained"
-            disabled={this.state['build_action_'+build_action]}
+            disabled={this.state['build_action_'+build_action.key]}
             startIcon={<OpenInBrowserIcon />}
           >
             {build_action.button_text}
