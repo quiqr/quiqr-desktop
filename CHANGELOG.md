@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.19.6 (2025-03-05)
 - fix: improve first start
 - feature: buildActions [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)
 - feature: buildActions with default variables [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)
