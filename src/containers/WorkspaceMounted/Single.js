@@ -79,8 +79,8 @@ class Single extends React.Component{
     if(single==null) return null;
 
     let buildActions = []
-    if('build_actions' in single){
-      buildActions = single.build_actions.slice(0);
+    if('buildActions' in single){
+      buildActions = single.buildActions.slice(0);
     }
 
     let previewUrl = null;

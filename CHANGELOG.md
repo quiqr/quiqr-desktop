@@ -1,8 +1,10 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
 - fix: improve first start
-- feature: variables [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/30-global-preferences/20-variables/)
-- feature: build_actions [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)
+- feature: buildActions [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)
+- feature: buildActions with default variables [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)
+- feature: add search replace for return paths. This is primary implemented to remap the Windows WSL return paths.
+- feature: preference variables [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/30-global-preferences/20-variables/)
 - breaking: the variables site_path and site_name have been
   renamed to SITE_NAME, SITE_PATH. [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/30-global-preferences/30-advanced/)
 

@@ -622,7 +622,7 @@ class WorkspaceService{
     const collection = await this.getCollectionByKey(collectionKey)
     let filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
 
-    let buildActionDict = collection.build_actions.find(x => x.key === buildAction);
+    let buildActionDict = collection.buildActions.find(x => x.key === buildAction);
 
     return DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
 
@@ -634,7 +634,7 @@ class WorkspaceService{
     if(single==null)throw new Error('Could not find single.');
     let filePath = path.join(this.workspacePath, single.file);
 
-    let buildActionDict = single.build_actions.find(x => x.key === buildAction);
+    let buildActionDict = single.buildActions.find(x => x.key === buildAction);
     return DocumentBuildAction.runAction(buildAction, buildActionDict['execute'], filePath, this.workspacePath)
   }
 

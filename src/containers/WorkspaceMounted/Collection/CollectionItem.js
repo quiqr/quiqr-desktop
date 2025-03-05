@@ -101,8 +101,8 @@ class CollectionItem extends React.Component{
     if(collection==null)return null;
 
     let fields = collection.fields.slice(0);
-    if(!collection.build_actions) collection.build_actions = [];
-    let buildActions = collection.build_actions.slice(0);
+    if(!collection.buildActions) collection.buildActions = [];
+    let buildActions = collection.buildActions.slice(0);
     let values =  Object.assign(this.state.collectionItemValues)
 
     let pageUrl = this.generatePageUrl(collection);
