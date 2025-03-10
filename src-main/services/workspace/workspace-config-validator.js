@@ -102,6 +102,7 @@ class WorkspaceConfigValidator {
         previewUrlBase: joi.string().trim(),
         hidePreviewIcon: joi.boolean(),
         hideExternalEditIcon: joi.boolean(),
+        build_actions: joi.array(), //REMOVE AFTER SAMMY IS BOARDED
         buildActions: joi.array(),
         hideIndex: joi.boolean(),
         includeSubdirs: joi.boolean(),

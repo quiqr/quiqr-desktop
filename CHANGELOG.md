@@ -1,4 +1,8 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+- feature: `site_path_replace` and `document_path_replace` in buildActions definition to replace substrings before execution. [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)
+- fix: new icon for macos
+
 ## 0.19.6 (2025-03-05)
 - fix: improve first start
 - feature: buildActions [documentation](https://book.quiqr.org/docs/20-quiqr-developer-reference/03-content-model/04-build-actions/)

@@ -86,6 +86,7 @@ class WorkspaceConfigProvider{
 
     let validator = new WorkspaceConfigValidator();
     let result = validator.validate(dataPhase2Merged);
+
     if(result)
       throw new Error(result);
 

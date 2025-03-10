@@ -1,9 +1,9 @@
 const { EnvironmentResolver, PLATFORMS }    = require('../utils/environment-resolver');
 const { spawn } = require('child_process');
 
-class DocumentBuildAction{
+class DocumentBuildAction {
 
-  runAction(actionName, execution_dict, filePath, sitePath){
+  runAction(actionName, execution_dict, docPath, sitePath){
     let enviromnent = new EnvironmentResolver().resolve();
 
     let def_variables = execution_dict.variables || [];
@@ -13,17 +13,17 @@ class DocumentBuildAction{
     });
 
     if(enviromnent.platform == PLATFORMS.windows){
-      return this.runOn(actionName, execution_dict['windows'], filePath, sitePath, execution_dict['stdout_type'], def_vars);
+      return this.runOn(actionName, execution_dict['windows'], docPath, sitePath, execution_dict['stdout_type'], def_vars);
     }
     else{
-      return this.runOn(actionName, execution_dict['unix'], filePath, sitePath, execution_dict['stdout_type'], def_vars);
+      return this.runOn(actionName, execution_dict['unix'], docPath, sitePath, execution_dict['stdout_type'], def_vars);
     }
   }
 
-  replace_path_vars(sourcePath, filePath, sitePath, vars){
+  replace_path_vars(sourcePath, docPath, sitePath, vars){
 
     vars.push({var_name: 'SITE_PATH', var_value: sitePath});
-    vars.push({var_name: 'DOCUMENT_PATH', var_value: filePath});
+    vars.push({var_name: 'DOCUMENT_PATH', var_value: docPath});
 
     let newSourcePath = sourcePath;
     vars.forEach((varItem)=>{
@@ -53,9 +53,9 @@ class DocumentBuildAction{
     return new_vars;
   }
 
-  file_path_replace(filePath,execution_dict){
+  file_path_replace(filePath,replace_arr){
 
-    let replace_arr = execution_dict.file_path_replace || [];
+    //let replace_arr = execution_dict.file_path_replace || [];
 
     let new_filePath = filePath;
     replace_arr.forEach((repl)=>{
@@ -65,18 +65,22 @@ class DocumentBuildAction{
     return new_filePath;
   }
 
-  runOn(actionName, execution_dict, filePath, sitePath, stdout_type, def_variables ){
+  runOn(actionName, execution_dict, docPath, sitePath, stdout_type, def_variables ){
+
+    let docPath_replaced = this.file_path_replace(docPath, (execution_dict.document_path_replace||[]))
+    console.log(docPath_replaced)
+    let sitePath_replaced = this.file_path_replace(sitePath, (execution_dict.site_path_replace||[]))
 
     let pref_variables = global.pogoconf['appVars'].slice();
 
     let variables = this.override(def_variables, pref_variables)
 
-    let command = this.replace_path_vars(execution_dict.command, filePath, sitePath, variables );
+    let command = this.replace_path_vars(execution_dict.command, docPath_replaced, sitePath_replaced, variables );
 
     let args = [];
     if (execution_dict.args && execution_dict.args.length > 0){
       args = execution_dict.args.map((arg) => {
-        return this.replace_path_vars(arg, filePath, sitePath, variables);
+        return this.replace_path_vars(arg, docPath_replaced, sitePath_replaced, variables);
       });
     }
 
@@ -94,8 +98,8 @@ class DocumentBuildAction{
               {
                 actionName: actionName,
                 stdoutType: stdout_type,
-                stdoutContent: this.file_path_replace(stdoutContent, execution_dict),
-                filePath: filePath
+                stdoutContent: this.file_path_replace(stdoutContent, (execution_dict.file_path_replace||[])),
+                //filePath: docPath
               }
             )
           }
