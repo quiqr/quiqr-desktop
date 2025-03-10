@@ -27,7 +27,8 @@ class DocumentBuildAction {
 
     let newSourcePath = sourcePath;
     vars.forEach((varItem)=>{
-      newSourcePath = newSourcePath.replace('%'+varItem.var_name, varItem.var_value);
+      const searcher = new RegExp('%'+varItem.var_name, 'g')
+      newSourcePath = newSourcePath.replace(searcher, varItem.var_value);
     });
 
     return newSourcePath;
@@ -59,7 +60,8 @@ class DocumentBuildAction {
 
     let new_filePath = filePath;
     replace_arr.forEach((repl)=>{
-      new_filePath = new_filePath.replace(repl.search, repl.replace);
+      const searcher = new RegExp(repl.search, 'g')
+      new_filePath = new_filePath.replace(searcher, repl.replace);
     });
 
     return new_filePath;
