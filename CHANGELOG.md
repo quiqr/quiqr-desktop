@@ -1,4 +1,6 @@
 # Quiqr App CHANGELOG
+## **WORK IN PROGRESS**
+
 ## 0.19.8 (2025-03-10)
 - fix: replace all in buildActions by switching to RegEx
 
