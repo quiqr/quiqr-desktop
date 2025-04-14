@@ -126,9 +126,7 @@ class AccordionDynamic extends BaseDynamic {
   }
 
   itemToNewLocation({toIndex, fromIndex}){
-    if(toIndex===fromIndex){
-      return;
-    }
+
     let context = this.props.context;
 
     //REMOVE ADDED LAZY ELEMENTS, WERE GOING TO ADD THEM AGAIN
@@ -138,21 +136,43 @@ class AccordionDynamic extends BaseDynamic {
       }
     });
 
-    let headArr = context.value.slice(0,toIndex);
-    service.api.logToConsole(headArr, "headArr")
+    if(toIndex >= fromIndex){
 
-    let tailArr0 = context.value.slice(0);
-    delete tailArr0[fromIndex];
-    let tailArr1 = tailArr0.slice(toIndex);
+      let headArr0 = context.value.slice(0);
+      headArr0.splice(fromIndex, 1);
 
-    let newArr = headArr.concat(
-      [context.value[fromIndex]],
-      tailArr1
-    );
+      let headArr2 = headArr0.slice(0,toIndex);
 
-    context.setValue(newArr);
+      let tailArr = context.value.slice(toIndex+1);
 
-    this.procDynamicFields();
+      let newArr = headArr2.concat(
+        [context.value[fromIndex]],
+        tailArr
+      );
+
+      context.setValue(newArr);
+      this.procDynamicFields();
+
+    }
+    else if(toIndex <= fromIndex){
+      let headArr = context.value.slice(0,toIndex);
+      let tailArr0 = context.value.slice(0);
+      tailArr0.splice(fromIndex, 1);
+      let tailArr1 = tailArr0.slice(toIndex);
+      let newArr = headArr.concat(
+        [context.value[fromIndex]],
+        tailArr1
+      );
+      context.setValue(newArr);
+      this.procDynamicFields();
+    }
+    /*
+    if(toIndex===fromIndex){
+      return;
+    }
+    */
+
+
   }
 
   //DRAG EVENTS
