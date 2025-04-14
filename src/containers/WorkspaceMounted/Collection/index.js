@@ -366,7 +366,6 @@ class Collection extends React.Component{
       .then((result)=>{
         if(result.copied){
           this.setState({modalBusy:false, view: undefined });
-          //service.api.logToConsole("copied to "+ destLang);
           snackMessageService.addSnackMessage(`Copies ${itemKey} to ${destLang}.`,'success');
         }
         else{

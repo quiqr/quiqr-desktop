@@ -386,7 +386,7 @@ class WorkspaceService{
       let globExpression = path.join(folder, `**/*.{${formatProviderResolver.allFormatsExt().join(',')}}`);
       let files = await globJob(globExpression, {});
       return files.map(function(item){
-        let key = item.replace(folder,'');
+        let key = path.basename(item);
         return {key, label:key};
       });
     }
