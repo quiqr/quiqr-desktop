@@ -125,8 +125,8 @@ class AccordionDynamic extends BaseDynamic {
     context.setValue(copy);
   }
 
-  swapItems({index, otherIndex}){
-    if(index===otherIndex){
+  itemToNewLocation({toIndex, fromIndex}){
+    if(toIndex===fromIndex){
       return;
     }
     let context = this.props.context;
@@ -138,11 +138,19 @@ class AccordionDynamic extends BaseDynamic {
       }
     });
 
-    let copy = context.value.slice(0);
-    let temp = copy[index];
-    copy[index] = copy[otherIndex];
-    copy[otherIndex] = temp;
-    context.setValue(copy);
+    let headArr = context.value.slice(0,toIndex);
+    service.api.logToConsole(headArr, "headArr")
+
+    let tailArr0 = context.value.slice(0);
+    delete tailArr0[fromIndex];
+    let tailArr1 = tailArr0.slice(toIndex);
+
+    let newArr = headArr.concat(
+      [context.value[fromIndex]],
+      tailArr1
+    );
+
+    context.setValue(newArr);
 
     this.procDynamicFields();
   }
@@ -150,8 +158,8 @@ class AccordionDynamic extends BaseDynamic {
   //DRAG EVENTS
   getDocumentMouseUpListener(){
     this.documentMouseUpListener = function(e){
-      if(this.state.dragFromIndex!=null&&this.state.dragToIndex!=null){
-        this.swapItems({index:this.state.dragFromIndex, otherIndex:this.state.dragToIndex});
+      if( this.state.dragFromIndex!=null && this.state.dragToIndex != null ){
+        this.itemToNewLocation({toIndex:this.state.dragToIndex, fromIndex:this.state.dragFromIndex});
         this.setState({ dragFromIndex: null, dragToIndex:null });
       }
       document.removeEventListener('mouseup', this.documentMouseUpListener);
