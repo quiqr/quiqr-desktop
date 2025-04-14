@@ -2,6 +2,7 @@
 ## **WORK IN PROGRESS**
 - fix: wrong item listing bug for content outside content dir.
 - fix: sorting Items in accordion. From swap items to real ordering
+=======
 
 ## 0.19.8 (2025-03-10)
 - fix: replace all in buildActions by switching to RegEx
