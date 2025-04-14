@@ -1,5 +1,5 @@
 # Quiqr App CHANGELOG
-## **WORK IN PROGRESS**
+## 0.19.9 (2025-04-14)
 - fix: wrong item listing bug for content outside content dir.
 - fix: sorting Items in accordion. From swap items to real ordering
 =======
