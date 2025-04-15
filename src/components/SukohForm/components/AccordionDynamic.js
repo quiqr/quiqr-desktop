@@ -65,8 +65,7 @@ class AccordionDynamic extends BaseDynamic {
     return 'accordion';
   }
 
-  normalizeState(state, field, stateBuilder){
-
+  normalizeState({state, field, stateBuilder}){
     if(field && field.arrayIndicesAreKeys!==true){
        dynamicComponentUtils.normalizeStateForArrayOfObject(state, field, stateBuilder);
     }
@@ -324,7 +323,7 @@ class AccordionDynamic extends BaseDynamic {
 
       if(matchedNode == null || matchedNode.uiState == null || matchedNode.uiState.childIndex == null){
         service.api.logToConsole(context.nodePath,"error");
-        throw new Error('Unexpected state.');
+        //throw new Error('Unexpected state.');
       }
 
       let childIndex = matchedNode.uiState.childIndex;
@@ -488,7 +487,7 @@ class AccordionDynamic extends BaseDynamic {
     let newNode = {
       field,
       state: context.value[childIndexOrKey],
-      uiState:{childIndexOrKey},
+      uiState:{childIndex: childIndexOrKey},
       parent: node
     };
 
