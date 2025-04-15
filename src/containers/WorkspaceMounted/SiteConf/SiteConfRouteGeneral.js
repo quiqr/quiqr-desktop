@@ -6,7 +6,7 @@ import TextField      from '@material-ui/core/TextField';
 import IconButton     from '@material-ui/core/IconButton';
 import Grid           from '@material-ui/core/Grid';
 import FolderIcon     from '@material-ui/icons/Folder';
-import LaunchIcon   from '@material-ui/icons/Launch';
+import LaunchIcon     from '@material-ui/icons/Launch';
 
 const useStyles = theme => ({
 

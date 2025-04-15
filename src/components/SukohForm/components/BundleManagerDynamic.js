@@ -63,7 +63,7 @@ class BundleManagerDynamic extends BaseDynamic {
 
         if(this.state.absFiles.length === 0){
           let files = _files.filter((item)=> {
-            return field.extensions.indexOf(path.extname(item.src).substr(1)) > -1
+            return (field.extensions.length === 0 || field.extensions.indexOf(path.extname(item.src).substr(1)) > -1)
           }).map(item => {
             item.src = path.join(field.path, item.src);
             return item;

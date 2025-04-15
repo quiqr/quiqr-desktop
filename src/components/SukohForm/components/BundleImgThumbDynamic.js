@@ -115,9 +115,7 @@ class BundleImgThumbDynamic extends BaseDynamic {
           });
       }
     }
-
   }
-
 
   componentDidMount(){
     this.checkThumbs();

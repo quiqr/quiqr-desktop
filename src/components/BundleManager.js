@@ -1,40 +1,65 @@
-import React          from 'react';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import FileCopyIcon   from '@material-ui/icons/FileCopy';
-import Tooltip        from '@material-ui/core/Tooltip';
-import IconButton     from '@material-ui/core/IconButton';
+import React                        from 'react';
+import ExpandLessIcon               from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon               from '@material-ui/icons/ExpandMore';
+import FileCopyIcon                 from '@material-ui/icons/FileCopy';
+import Tooltip                      from '@material-ui/core/Tooltip';
+import IconButton                   from '@material-ui/core/IconButton';
 import { snackMessageService }      from './../services/ui-service';
-//import service         from '../services/service';
+import LaunchIcon                   from '@material-ui/icons/Launch';
+import service                      from '../services/service';
 
 class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>{
 
   render(){
     let { active, headerLeftItems, headerRightItems, label, onClick, style } = this.props;
 
+    let orgLabel = label;
+    let isAbsolutePath = false;
+    if(label.substr(0,1) === '/'){
+      isAbsolutePath = true;
+    }
     if(label.substr(0,7) === '/static'){
       label = label.substr(7,(label.length-7))
     }
+
     let filename = label
     let fExtention = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
     let fBase = filename.slice(0,(filename.lastIndexOf(".") ));
 
-    if(fBase.length > 15){
-      filename = fBase.substr(0,7) + "..." + fBase.substr(-5) + "." +fExtention;
+    if(fBase.length > 25){
+      filename = fBase.substr(0,17) + "..." + fBase.substr(-5) + "." +fExtention;
     }
 
-    return (<div style={style} onClick={onClick}>
+    return (
+      <div style={style} onClick={onClick}>
+        <div>
       <span style={{ display:'inline-block', margin: '-10px 0px -10px -5px'}}>
         { headerLeftItems.map((item, index) => { return  (
           <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
         )})}
       </span>
       <span style={{ position:'absolute', top:'0px', right: '-5px'}}>
+
         <IconButton size="small" aria-label="Expand" onClick={()=>{
           const {clipboard} = window.require('electron')
           clipboard.writeText(encodeURI(label))
           snackMessageService.addSnackMessage('File path copied to clipboard');
-        }}><FileCopyIcon /></IconButton>
+        }}>
+          <FileCopyIcon />
+        </IconButton>
+
+        {(isAbsolutePath?
+          (
+            <IconButton size="small" aria-label="Expand" onClick={()=>{
+              service.api.openFileInEditor(orgLabel, false, true);
+            }}>
+              <LaunchIcon />
+            </IconButton>
+          )
+          :
+          null
+        )}
+
         { headerRightItems.map((item, index) => { return  (
           <span key={index}  style={{ display: 'inline-block', margin:'0 5px' }}>{item}</span>
         )})}
@@ -42,11 +67,14 @@ class BundleManagerHeader extends React.PureComponent<AccordionHeaderProps,void>
           <IconButton size="small" aria-label="Expand">{ active ? <ExpandLessIcon /> : <ExpandMoreIcon /> } </IconButton>
         }
       </span>
+      </div>
+        <div>
       <Tooltip title={label}>
         <span>
           {filename}
         </span>
       </Tooltip>
+      </div>
     </div>);
   }
 }

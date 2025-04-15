@@ -190,7 +190,7 @@ api.openFileExplorer = function({filepath, relativeToRoot=false}, context){
 api.openFileInEditor = function({filepath, create=false, relativeToRoot=false}, context){
 
   if(relativeToRoot){
-    filepath = path.join(pathHelper.getSiteRoot(global.currentSiteKey), filepath);
+    filepath = path.join(pathHelper.getSiteRootMountPath(), filepath);
   }
 
   try{
