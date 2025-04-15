@@ -1,5 +1,7 @@
 # Quiqr App CHANGELOG
 ## **WORK IN PROGRESS**
+- fix: fix nested accordions causing Unexpected state fix nested accordions causing Unexpected state 🎉
+- feature: add open with filemanager icon in bundle Manager
 - fix: filter extensions for bundle manager when having a starting / (abs path)
 
 ## 0.19.9 (2025-04-14)
