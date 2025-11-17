@@ -1,4 +1,5 @@
 const { BrowserView, BrowserWindow } = require('electron');
+const remoteMain                     = require('@electron/remote/main');
 const windowStateKeeper              = require('electron-window-state');
 const url                            = require('url')
 const path                           = require('path')
@@ -50,6 +51,8 @@ function createWindow () {
     backgroundColor:"#ffffff",
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
     },
     x: mainWindowState.x,
     y: mainWindowState.y,
@@ -61,6 +64,9 @@ function createWindow () {
   });
 
   mainWindowState.manage(mainWindow);
+
+  // Enable @electron/remote for this window
+  remoteMain.enable(mainWindow.webContents);
 
   if(process.env.DEVTOOLS){
     let devtools = new BrowserWindow()
