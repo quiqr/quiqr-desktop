@@ -12,7 +12,7 @@ let mainWindowState;
 function getLocation(){
 
   if (isDev) {
-    mainWindow.loadURL("http://localhost:4001"); // For development
+    mainWindow.loadURL("http://localhost:4002"); // For development
   } else {
 
     let lookups = [

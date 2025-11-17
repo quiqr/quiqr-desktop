@@ -1,6 +1,6 @@
 { pkgs, lib, ...}:
 
-pkgs.buildGo118Module rec {
+pkgs.buildGoModule rec {
   name = "embgit";
   version = "0.6.4";
 
@@ -11,7 +11,7 @@ pkgs.buildGo118Module rec {
     #sha256 = lib.fakeSha256;
   };
 
-  vendorSha256 = "sha256-e0CXBakEXyWOPOmw1ORHUmWfHCcWkNGR0dwtdNXG9Xo=";
+  vendorHash = "sha256-e0CXBakEXyWOPOmw1ORHUmWfHCcWkNGR0dwtdNXG9Xo=";
   #vendorSha256 = lib.fakeSha256;
 
   postInstall = ''
