@@ -74,6 +74,7 @@ class BundleManagerDynamic extends BaseDynamic {
     }
     else{
       context.form.props.plugins.getFilesInBundle( field.extensions, field.path, field.forceFileName).then((_files)=>{
+        if(!_files) _files = [];
 
         if(this.state.absFiles.length === 0){
           let files = _files.map(item => {
@@ -81,7 +82,6 @@ class BundleManagerDynamic extends BaseDynamic {
             return item;
           })
           this.setState({absFiles: files});
-          //context.setValue(files);
         }
       });
 
