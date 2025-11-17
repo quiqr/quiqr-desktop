@@ -215,7 +215,7 @@ export class API {
       properties = ['multiSelections', 'openFile'];
     }
 
-    let remote= window.require('electron').remote;
+    let remote= window.require('@electron/remote');
 
     let openDialogOptions = {
       title: title || 'Select Files',

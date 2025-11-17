@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
+const remoteMain = require('@electron/remote/main');
 const isDev = process.env.NODE_ENV === "development";
 const backend = require("../backend/server");
 const fs = require('fs-extra')
@@ -10,6 +11,8 @@ const menuManager       = require('./ui-managers/menu-manager');
 const outputConsole     = require('../backend/src-main/logger/output-console');
 
 const apiMain = require('../backend/src-main/bridge/api-main');
+
+remoteMain.initialize();
 
 let pogoconf = QuiqrAppConfig();
 global.pogoconf = pogoconf;
