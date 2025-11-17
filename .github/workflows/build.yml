@@ -1,0 +1,67 @@
+name: Build Electron App
+
+on:
+  push:
+    tags:
+      - v*
+    # branches:
+    #   - master
+  # pull_request:
+  #   branches:
+  #     - master
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node-version: [18]
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # Checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      # Navigate to frontend and install dependencies
+      - name: Install dependencies in frontend directory
+        working-directory: ./frontend
+        run: npm install
+
+      # Step 4: Build the frontend
+      - name: Build the frontend
+        env:
+          SKIP_PREFLIGHT_CHECK: "true"
+          NODE_OPTIONS: --openssl-legacy-provider
+        working-directory: ./frontend
+        run: SKIP_PREFLIGHT_CHECK=true NODE_OPTIONS=--openssl-legacy-provider npm run build && mkdir -p ../dist/frontend && rsync -av ./build/ ../dist/frontend/
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the app
+      - name: Build Electron App
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for electron-builder
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

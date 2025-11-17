@@ -1,35 +1,36 @@
 {
-  description = "Quiqr Desktop DevShell";
-
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    #systems.url = "github:nix-systems/default";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-       let
-         pkgs = import nixpkgs {
-           system = system;
-           config.allowUnfree = true;
-           config.permittedInsecurePackages = [ "electron-9.4.4"];
-         };
+  outputs =
+    { systems, nixpkgs, ... }@inputs:
+    let
+      eachSystem = f: nixpkgs.lib.genAttrs (import systems) (system: f nixpkgs.legacyPackages.${system});
+    in
+    {
+      devShells = eachSystem (pkgs:
+        {
+        default = pkgs.mkShell {
+          ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron}/bin/";
+          buildInputs = [
+            pkgs.nodejs
+            pkgs.electron
 
-         pkgs-unstable = import nixpkgs-unstable {
-           system = system;
-         };
+            # You can set the major version of Node.js to a specific one instead
+            # of the default version
+            # pkgs.nodejs-22_x
 
-         lib = pkgs.lib;
+            # Comment out one of these to use an alternative package manager.
+            # pkgs.yarn
+            pkgs.pnpm
+            # pkgs.bun
 
-       in
-       {
-         devShells.default = import ./shell.nix {
-           inherit pkgs;
-           inherit pkgs-unstable;
-           inherit lib;
-         };
-       }
-    );
+            pkgs.nodePackages.typescript
+            pkgs.nodePackages.typescript-language-server
+          ];
+        };
+      });
+    };
 }
-
