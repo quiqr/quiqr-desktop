@@ -62,7 +62,6 @@
     "node-fetch": "^2.6.11",
     "openai": "^4.64.0",
     "prop-types": "^15.8.1",
-    "react-codemod": "^5.4.4",
     "request": "2.87.0",
     "toml": "2.3.3",
     "tomlify-j0.4": "3.0.0",
@@ -73,6 +72,7 @@
     "@alcalzone/release-script": "^3.5.6",
     "@electron/notarize": "^3.1.1",
     "concurrently": "^9.1.2",
+    "react-codemod": "^5.4.4",
     "electron": "39.2.1",
     "electron-builder": "^26.0.12",
     "electron-builder-notarize": "^1.5.2",
@@ -95,8 +95,7 @@
     "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
     "productName": "Quiqr",
     "asarUnpack": [
-      "**/node_modules/har-validator/**/*",
-      "**/node_modules/flow-parser/**/*"
+      "**/node_modules/har-validator/**/*"
     ],
     "directories": {
       "buildResources": "public"
