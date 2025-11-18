@@ -1,24 +1,7 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { styled } from "@mui/material/styles";
 import { SvgIconComponent } from "@mui/icons-material";
-
-interface StyledButtonProps {
-  active?: string;
-}
-
-const StyledButton = styled(Button)<StyledButtonProps>(({ theme, active }) => ({
-  "& .MuiButton-label": {
-    flexDirection: "column",
-  },
-  textTransform: "none",
-  margin: theme.spacing(0),
-  padding: theme.spacing(0),
-  ...(active && {
-    color: "#757575",
-  }),
-}));
 
 interface ToolbarButtonProps {
   title: string;
@@ -32,9 +15,22 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({ title, action, icon, acti
 
   return (
     <Box p={0.5}>
-      <StyledButton onClick={action} active={active ? "true" : "false"} className='toolbar-button' startIcon={<UseIcon style={{ padding: 0 }} />}>
+      <Button
+        onClick={action}
+        className='toolbar-button'
+        startIcon={<UseIcon style={{ padding: 0 }} />}
+        sx={{
+          flexDirection: "column",
+          textTransform: "none",
+          m: 0,
+          p: 0,
+          ...(active && {
+            color: "#757575",
+          }),
+        }}
+      >
         {title}
-      </StyledButton>
+      </Button>
     </Box>
   );
 };
