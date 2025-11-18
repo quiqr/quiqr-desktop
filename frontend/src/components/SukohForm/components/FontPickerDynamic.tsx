@@ -82,7 +82,10 @@ class FontPickerDynamic extends BaseDynamic {
             />
 
 */}
-              <div style="color: red; font-size: 2rem;">
+              <div style={{
+                color: 'red', 
+                fontSize: '2rem'
+              }}>
                 This component has temporarily been disabled.
               </div>
             <div>

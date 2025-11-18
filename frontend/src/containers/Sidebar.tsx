@@ -49,7 +49,7 @@ class Sidebar extends React.Component{
         key={"itemFlat"+item.label}
         selected={item.selected}
         onClick={ item.onClick }
-        button>
+        button="true">
         {icon}
         <ListItemText primary={item.label} />
         {secondaryActionMenu}
