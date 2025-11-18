@@ -17,9 +17,9 @@ function getLocation(){
   } else {
 
     let lookups = [
-      path.join(__dirname, "../dist/frontend/index.html"),
-      path.normalize(path.join(__dirname, '/../../index.html')), //works in production
-      path.normalize(path.join(__dirname, '../frontend/build/index.html')), //works in development after react_build
+      path.join(__dirname, "../../frontend/build/index.html"), // Production: /electron/ui-managers -> / -> /frontend/build/index.html
+      path.join(__dirname, "../dist/frontend/index.html"), // Legacy path
+      path.normalize(path.join(__dirname, '/../../index.html')), // Legacy path
     ];
 
     let indexFile = null;
