@@ -14,7 +14,7 @@ let mainWindowState;
 function getLocation(){
 
   if (isDev) {
-    mainWindow.loadURL("http://localhost:4001/console"); // For development
+    mainWindow.loadURL("http://localhost:4002/console"); // For development
   } else {
 
     let lookups = [

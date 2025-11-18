@@ -17,8 +17,9 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:electron:wait\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
-    "dev:electron:wait": "wait-on http://localhost:4001 && npm run dev:electron",
-    "build": "npm run build:frontend && electron-builder",
+    "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
+    "build": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder",
+    "build:appimage": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
     "build:frontend": "cd frontend && npm run build",
     "release": "release-script --addPlaceholder",
     "dist": "electron-builder",
@@ -32,7 +33,7 @@
     "_mac-notarize": "node scripts/notarize.js",
     "devold:frontend-old": "cd frontend && vite",
     "devold": "concurrently  \"npm run dev:backend\" \"npm run dev:electron\"",
-    "devold:react": "cross-env APP_ENV=development BROWSERSLIST_IGNORE_OLD_DATA=true BROWSER=none PORT=4001 react-scripts start",
+    "devold:react": "cross-env APP_ENV=development BROWSERSLIST_IGNORE_OLD_DATA=true BROWSER=none PORT=4002 react-scripts start",
     "buildold:react": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true react-scripts build"
   },
   "keywords": [],
@@ -94,8 +95,16 @@
     "appId": "org.quiqr.quiqr-desktop",
     "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
     "productName": "Quiqr",
+    "files": [
+      "frontend/build/**/*",
+      "electron/**/*",
+      "backend/**/*",
+      "resources/**/*",
+      "package.json"
+    ],
     "directories": {
-      "buildResources": "public"
+      "buildResources": "public",
+      "output": "dist"
     },
     "publish": [
       {

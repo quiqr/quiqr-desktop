@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './', // Use relative paths for Electron file:// protocol
   plugins: [
     react({
       babel: {
@@ -13,7 +14,7 @@ export default defineConfig({
     })
   ],
   server: {
-    port: 4001,
+    port: 4002,
     open: false
   },
   build: {

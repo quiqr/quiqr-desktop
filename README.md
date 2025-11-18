@@ -1,12 +1,14 @@
-# New Quiqr Desktop Home
+# Quiqr Desktop NG (Next Generation)
 
-This is a template for building a desktop application using Electron, Vite,
-React, and Express. It is a full-stack application that uses Electron to run
-the React frontend and Express backend. The frontend is built using Vite, and
-the backend is built using Express.
+Quiqr Desktop NG is a major upgrade of the Quiqr source code including:
 
-The build will generate a standalone desktop application that can be run on
-Windows, macOS, and Linux.
+- Electron updates
+- React updates
+- MUI updates
+- migrate to Vite
+- and many more updates
+
+This `ng`-branch will replace the current `main` which we will rename to `legacy` ASAP.
 
 ## Running Locally
 

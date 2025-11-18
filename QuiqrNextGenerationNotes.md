@@ -18,7 +18,7 @@ cd frontend
 SKIP_PREFLIGHT_CHECK=true NODE_OPTIONS=--openssl-legacy-provider npm run dev
 ```
 
-open url: http://localhost:4001/sites
+open url: http://localhost:4002/sites
 
 ## M2 Backend service via http
 
@@ -49,7 +49,7 @@ axios.defaults.timeoutErrorMessage='timeout'
 - [ ] templates gallery not working
 - [ ] pipeline build failing
 - [ ] menu-> File->select sites not working
-- [ ] repo should be renamed
+- [x] repo should be renamed (merged in ng-branch)
 
 ## Webserver alternative/extra functions
 
