@@ -101,16 +101,6 @@
     "directories": {
       "buildResources": "public"
     },
-    "files": [
-      "frontend/build/**/*",
-      "electron/**/*",
-      "resources/**/*",
-      "backend/**/*",
-      "backend/server.js"
-    ],
-    "extraMetadata": {
-      "main": "electron/main.js"
-    },
     "publish": [
       {
         "provider": "github"
