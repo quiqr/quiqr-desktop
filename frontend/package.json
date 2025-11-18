@@ -2,7 +2,8 @@
   "homepage": "./",
   "private": true,
   "overrides": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "react-is": "^18.3.1"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -31,6 +32,7 @@
     "react-chartjs-2": "^4.3.0",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.3.1",
+    "react-is": "^18.3.1",
     "react-router-dom": "^5.3.4",
     "react-simplemde-editor": "^5.0.2",
     "react-transition-group": "^4.4.5"
