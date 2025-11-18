@@ -1,7 +1,7 @@
 import React           from 'react';
 import { BaseDynamic } from '../../HoForm';
 import FormItemWrapper from './shared/FormItemWrapper';
-import FontPicker      from "font-picker-react";
+// import FontPicker      from "font-picker-react";
 import Tip             from '../../Tip';
 
 class FontPickerDynamic extends BaseDynamic {
@@ -62,7 +62,7 @@ class FontPickerDynamic extends BaseDynamic {
               userSelect: 'none',
               }}>{field.title}</label>
 
-
+{/*
             <FontPicker
               pickerId={field.pickerId}
               apiKey="AIzaSyDb0hRL7w_7AAb4L8MFQNmi9pNpMC85oDU"
@@ -80,6 +80,11 @@ class FontPickerDynamic extends BaseDynamic {
                 }
               }}
             />
+
+*/}
+              <div style="color: red; font-size: 2rem;">
+                This component has temporarily been disabled.
+              </div>
             <div>
               <p className={"apply-font-"+field.pickerId}>
                 the quick brown fox jumps over the lazy dog.<br/>
