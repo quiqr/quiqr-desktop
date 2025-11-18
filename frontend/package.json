@@ -2,8 +2,6 @@
   "homepage": "./",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-brands-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
@@ -28,7 +26,6 @@
     "react-chartjs-2": "^4.3.0",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.3.1",
-    "react-fa-icon-picker": "^1.0.3",
     "react-router-dom": "^5.3.4",
     "react-simplemde-editor": "^5.0.2",
     "react-transition-group": "^4.4.5"
