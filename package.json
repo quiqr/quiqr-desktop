@@ -95,6 +95,13 @@
     "appId": "org.quiqr.quiqr-desktop",
     "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
     "productName": "Quiqr",
+    "files": [
+      "frontend/build/**/*",
+      "electron/**/*",
+      "backend/**/*",
+      "resources/**/*",
+      "package.json"
+    ],
     "directories": {
       "buildResources": "public",
       "output": "dist"
