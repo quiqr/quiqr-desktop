@@ -71,9 +71,11 @@
     "@alcalzone/release-script": "^3.5.6",
     "@electron/notarize": "^3.1.1",
     "concurrently": "^9.1.2",
+    "copyfiles": "2.1.0",
+    "cross-env": "^7.0.3",
     "electron": "39.2.1",
-    "electron-builder": "^26.0.12",
     "react-codemod": "^5.4.4",
+    "electron-builder": "^26.0.12",
     "electron-builder-notarize": "^1.5.2",
     "wait-on": "^8.0.4"
   },
@@ -93,13 +95,6 @@
     "appId": "org.quiqr.quiqr-desktop",
     "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
     "productName": "Quiqr",
-    "files": [
-      "frontend/build/**/*",
-      "electron/**/*",
-      "backend/**/*",
-      "resources/**/*",
-      "package.json"
-    ],
     "directories": {
       "buildResources": "public",
       "output": "dist"
