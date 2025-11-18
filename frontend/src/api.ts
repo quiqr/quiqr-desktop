@@ -177,7 +177,7 @@ export class API {
     return mainProcessBridge.request('checkFreeSiteName', {proposedSiteName});
   }
 
-  saveConfPrefKey(prefKey: string, prefValue: string){
+  saveConfPrefKey(prefKey: string, prefValue: unknown){
     return mainProcessBridge.request('saveConfPrefKey', {prefKey, prefValue});
   }
 
