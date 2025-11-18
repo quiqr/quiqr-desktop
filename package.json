@@ -71,9 +71,11 @@
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.6",
+    "@electron/notarize": "^3.1.1",
     "concurrently": "^9.1.2",
     "electron": "39.2.1",
     "electron-builder": "^26.0.12",
+    "electron-builder-notarize": "^1.5.2",
     "wait-on": "^8.0.4"
   },
   "disabledDeps": {
@@ -89,15 +91,17 @@
     "vite": "^6.0.11"
   },
   "build": {
-    "appId": "com.example.viteapp",
+    "appId": "org.quiqr.quiqr-desktop",
+    "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
+    "productName": "Quiqr",
+    "asarUnpack": [
+      "**/node_modules/har-validator/**/*",
+      "**/node_modules/flow-parser/**/*"
+    ],
     "directories": {
-      "output": "dist"
-    },
-    "publish": {
-      "provider": "github"
+      "buildResources": "public"
     },
     "files": [
-      "dist/**/*",
       "frontend/build/**/*",
       "electron/**/*",
       "resources/**/*",
@@ -107,21 +111,100 @@
     "extraMetadata": {
       "main": "electron/main.js"
     },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ],
+    "protocols": [
+      {
+        "name": "quiqr",
+        "role": "Editor",
+        "schemes": [
+          "quiqr"
+        ]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "resources/${os}",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "resources/all",
+        "to": "all",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "win": {
+      "icon": "public/icon.ico",
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32",
+            "x64"
+          ]
+        }
       ]
     },
+    "nsisWeb": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": true,
+      "unicode": true,
+      "installerIcon": "public/icon.ico",
+      "differentialPackage": true
+    },
+    "afterSign": "electron-builder-notarize",
     "mac": {
-      "target": "dmg"
+      "icon": "public/icon",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "linux": {
+      "icon": "public/icon",
       "target": [
         "AppImage",
         "deb",
         "rpm"
-      ]
-    }
+      ],
+      "category": "office"
+    },
+    "fileAssociations": [
+      {
+        "ext": "pogosite",
+        "name": "Quiqr Site File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogopass",
+        "name": "Quiqr Passport File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogocontent",
+        "name": "Quiqr Content File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogotheme",
+        "name": "Quiqr Theme File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      }
+    ]
   }
 }
