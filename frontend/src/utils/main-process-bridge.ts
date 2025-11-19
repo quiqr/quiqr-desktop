@@ -5,8 +5,6 @@ import { apiSchemas } from '../../types'
 axios.defaults.timeout = 30000
 axios.defaults.timeoutErrorMessage='timeout'
 
-export type AbortablePromise<T> = Promise<T> & { forceAbort: ()=>void };
-
 function validateApiResponse(method: string, response: any): any {
 
   // Check if we have a schema for this method
@@ -150,13 +148,7 @@ class MainProcessBridge{
 
     });
 
-    promise.forceAbort = ()=>{
-      _reject('Cancelled');
-    };
-
     return promise;
-
-
   }
 
   requestOLD( method, data, opts = {timeout:10000}
@@ -169,7 +161,6 @@ class MainProcessBridge{
       let timeoutId = setTimeout(function(){
         if(this._eraseCallback(token)){
           reject('timeout:'+method);
-          promise.forceAbort = function(){};
         }
       }.bind(this), opts.timeout);
       this.pendingCallbacks.push({
@@ -180,15 +171,9 @@ class MainProcessBridge{
             reject(response.error);
           }
           resolve(response);
-          promise.forceAbort = function(){};
         }
       });
     }.bind(this));
-
-    promise.forceAbort = function(){
-      _reject('Cancelled');
-      this._eraseCallback(token);
-    }.bind(this);
 
     return promise;
   }

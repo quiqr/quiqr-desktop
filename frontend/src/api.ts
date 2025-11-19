@@ -1,22 +1,9 @@
 import mainProcessBridge from './utils/main-process-bridge';
 import service from './services/service'
 
-// Type definitions
-interface AbortablePromise<T> extends Promise<T> {
-  forceAbort?: () => void;
-}
-
-interface Configurations {
-  [key: string]: any;
-}
-
-interface WorkspaceConfig {
-  [key: string]: any;
-}
-
 export class API {
 
-  getConfigurations(options?: {invalidateCache: boolean}): AbortablePromise<Configurations>{
+  getConfigurations(options?: {invalidateCache: boolean}) {
     return mainProcessBridge.request('getConfigurations', options);
   }
 
@@ -24,11 +11,11 @@ export class API {
     return mainProcessBridge.request('listWorkspaces', {siteKey});
   }
 
-  getWorkspaceModelParseInfo(siteKey: string, workspaceKey: string): AbortablePromise<WorkspaceConfig>{
+  getWorkspaceModelParseInfo(siteKey: string, workspaceKey: string) {
     return mainProcessBridge.request('getWorkspaceModelParseInfo', {siteKey, workspaceKey});
   }
 
-  getWorkspaceDetails(siteKey: string, workspaceKey: string): AbortablePromise<WorkspaceConfig>{
+  getWorkspaceDetails(siteKey: string, workspaceKey: string) {
     return mainProcessBridge.request('getWorkspaceDetails', {siteKey, workspaceKey});
   }
 
