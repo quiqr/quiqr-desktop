@@ -8,10 +8,36 @@ import { red }               from '@mui/material/colors';
 import service               from '../../../services/service';
 import ScreenShotPlaceholder from '../../../img-assets/screenshot-placeholder.png';
 
+interface SiteConfig {
+  key: string;
+  name: string;
+  screenshotURL?: string;
+  etalage?: {
+    screenshots?: string[];
+    favicons?: string[];
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
 
-class CardItem extends React.Component {
+interface CardItemProps {
+  site: SiteConfig;
+  siteClick: () => void;
+  itemMenuButton?: React.ReactNode;
+  itemMenuItems?: React.ReactNode;
+}
 
-  constructor(props){
+interface CardItemState {
+  expanded: boolean;
+  screenshot: string;
+  favicon: string;
+}
+
+class CardItem extends React.Component<CardItemProps, CardItemState> {
+
+  _ismounted: boolean = false;
+
+  constructor(props: CardItemProps){
     super(props);
     this.state = {
       expanded: false,
@@ -55,7 +81,7 @@ class CardItem extends React.Component {
     }
   }
 
-  componentDidUpdate(preProps){
+  componentDidUpdate(preProps: CardItemProps){
     if(this._ismounted && preProps.site.key !== this.props.site.key){
       this.getScreenshot();
       this.getFavicon();

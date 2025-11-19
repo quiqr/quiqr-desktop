@@ -4,7 +4,15 @@ import Paper               from '@mui/material/Paper';
 import Typography          from '@mui/material/Typography';
 import FolderIcon          from '@mui/icons-material/Folder';
 
-class CardNew extends React.Component{
+interface CardNewProps {
+  handleClick: () => void;
+  classes: {
+    paper: string;
+    [key: string]: unknown;
+  };
+}
+
+class CardNew extends React.Component<CardNewProps> {
 
   render(){
     return (
