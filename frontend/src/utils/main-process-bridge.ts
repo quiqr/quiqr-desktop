@@ -1,6 +1,6 @@
 import axios from "axios";
 import { z } from 'zod'
-import { apiSchemas } from '../../types'
+import { apiSchemas, ApiResponse } from '../../types'
 
 axios.defaults.timeout = 30000
 axios.defaults.timeoutErrorMessage='timeout'
@@ -118,21 +118,22 @@ class MainProcessBridge{
 
   }
 
-  request( method, data, opts = {timeout:90000}){
+  request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
     //console.log(method);
-    let _reject;
-    let promise = new Promise((resolve, reject)=>{
-      _reject = reject;
-
+    let promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
       axios
         .post("http://localhost:5150/api/"+method, {
           data: data,
+        }, {
+          timeout: opts.timeout
         })
         .then((response) => {
           // Validate response with Zod schema
           try {
             const validatedData = validateApiResponse(method, response.data);
-            resolve(validatedData);
+
+            // this typecast is safe, because we just validated the data using zod
+            resolve(validatedData as ApiResponse<M>); 
           } catch (validationError) {
             // Validation failed - reject the promise
             reject(validationError);

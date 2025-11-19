@@ -524,3 +524,12 @@ export type FileReference = z.infer<typeof fileReferenceSchema>
 export type CommunityTemplate = z.infer<typeof communityTemplateSchema>
 export type DynFormFields = z.infer<typeof dynFormFieldsSchema>
 export type UserPreferences = z.infer<typeof userPreferencesSchema>
+
+// This type includes all the api method names
+export type ApiMethod = keyof typeof apiSchemas
+
+// Map each method to its response type
+// For methods in apiSchemas, return the typed response; for unknown methods, return unknown
+export type ApiResponse<M extends string> = M extends ApiMethod
+  ? z.infer<typeof apiSchemas[M]>
+  : unknown
