@@ -386,3 +386,141 @@ export interface PageConfig extends SingleConfig {
 }
 
 export type SinglesConfig = SingleConfig[]
+
+// API Response Schemas
+export const workspaceSchema = z.object({
+  key: z.string(),
+  path: z.string(),
+  state: z.string()
+})
+
+export const serveConfigSchema = z.object({
+  key: z.string(),
+  config: z.string(),
+  hugoHidePreviewSite: z.boolean().optional()
+})
+
+export const buildConfigSchema = z.object({
+  key: z.string(),
+  config: z.string()
+})
+
+export const workspaceDetailsSchema = z.object({
+  hugover: z.string(),
+  serve: z.array(serveConfigSchema).optional(),
+  build: z.array(buildConfigSchema).optional(),
+  menu: menuSchema.optional()
+})
+
+export const configurationsSchema = z.object({
+  sites: z.array(siteConfigSchema)
+})
+
+export const collectionItemSchema = z.object({
+  key: z.string(),
+  label: z.string(),
+  sortval: z.string()
+})
+
+export const languageSchema = z.object({
+  source: z.string(),
+  target: z.string(),
+  lang: z.string()
+})
+
+export const fileReferenceSchema = z.object({
+  src: z.string()
+})
+
+export const hugoServerResponseSchema = z.object({
+  stopped: z.boolean()
+})
+
+export const collectionItemKeyResponseSchema = z.object({
+  key: z.string()
+})
+
+export const communityTemplateSchema = z.object({
+  HugoVersion: z.string(),
+  HugoTheme: z.string(),
+  QuiqrFormsEndPoints: z.number(),
+  QuiqrModel: z.string(),
+  QuiqrEtalageName: z.string(),
+  QuiqrEtalageDescription: z.string(),
+  QuiqrEtalageHomepage: z.string(),
+  QuiqrEtalageDemoUrl: z.string(),
+  QuiqrEtalageLicense: z.string(),
+  QuiqrEtalageLicenseURL: z.string(),
+  QuiqrEtalageAuthor: z.string(),
+  QuiqrEtalageAuthorHomepage: z.string(),
+  QuiqrEtalageScreenshots: z.array(z.string()),
+  ScreenshotImageType: z.string(),
+  SourceLink: z.string(),
+  NormalizedName: z.string()
+})
+
+export const dynFormFieldsSchema = z.object({
+  title: z.string().optional(),
+  fields: z.array(fieldSchema).optional(),
+  key: z.string().optional(),
+  content_type: z.string().optional()
+})
+
+export const userPreferencesSchema = z.object({
+  dataFolder: z.string().optional(),
+  interfaceStyle: z.string().optional(),
+  sitesListingView: z.string().optional(),
+  libraryView: z.string().optional(),
+  openAiApiKey: z.string().optional(),
+  systemGitBinPath: z.string().optional(),
+  customOpenInCommand: z.string().optional()
+})
+
+// API Schemas mapping - maps API method names to their response schemas
+export const apiSchemas = {
+  getConfigurations: configurationsSchema,
+  listWorkspaces: z.array(workspaceSchema),
+  getWorkspaceDetails: workspaceDetailsSchema,
+  getSingle: z.record(z.any()), // Returns dynamic content based on the single's fields
+  parseFileToObject: grayMatterParseResultSchema,
+  getCurrentBaseUrl: z.string(),
+  getDynFormFields: dynFormFieldsSchema,
+  getFilesInBundle: z.array(fileReferenceSchema),
+  shouldReloadForm: z.boolean(),
+  getCurrentFormAccordionIndex: z.string(),
+  setCurrentFormNodePath: z.boolean(),
+  globSync: z.array(z.string()),
+  getCurrentSiteKey: z.string(),
+  reloadThemeStyle: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
+  reloadCurrentForm: z.boolean(),
+  updateSingle: z.record(z.any()), // Returns the updated document
+  listCollectionItems: z.array(collectionItemSchema),
+  getLanguages: z.array(languageSchema),
+  createCollectionItemKey: collectionItemKeyResponseSchema,
+  getCollectionItem: z.record(z.any()), // Returns dynamic content based on collection's fields
+  getFilesFromAbsolutePath: z.array(fileReferenceSchema),
+  updateCollectionItem: z.record(z.any()), // Returns the updated document
+  showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
+  openSiteLibrary: z.boolean(),
+  readConfPrefKey: z.string(),
+  stopHugoServer: hugoServerResponseSchema,
+  getFilteredHugoVersions: z.array(z.string()),
+  getThumbnailForPath: z.string().optional(),
+  updateCommunityTemplates: z.array(communityTemplateSchema),
+  saveConfPrefKey: z.boolean(),
+  mountWorkspace: z.string(),
+  readConfKey: userPreferencesSchema,
+  getCreatorMessage: z.string(),
+  getSiteConfig: siteConfigSchema
+} as const
+
+// Export types for the API responses
+export type Workspace = z.infer<typeof workspaceSchema>
+export type WorkspaceDetails = z.infer<typeof workspaceDetailsSchema>
+export type Configurations = z.infer<typeof configurationsSchema>
+export type CollectionItem = z.infer<typeof collectionItemSchema>
+export type Language = z.infer<typeof languageSchema>
+export type FileReference = z.infer<typeof fileReferenceSchema>
+export type CommunityTemplate = z.infer<typeof communityTemplateSchema>
+export type DynFormFields = z.infer<typeof dynFormFieldsSchema>
+export type UserPreferences = z.infer<typeof userPreferencesSchema>
