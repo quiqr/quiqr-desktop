@@ -18,7 +18,8 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
-    "build": "npm run build:frontend && electron-builder",
+    "build": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder",
+    "build:appimage": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
     "build:frontend": "cd frontend && npm run build",
     "release": "release-script --addPlaceholder",
     "dist": "electron-builder",
@@ -37,13 +38,12 @@
   },
   "keywords": [],
   "dependencies": {
+    "@electron/remote": "^2.1.3",
     "7zip-bin": "3.1.0",
     "adm-zip": "0.4.13",
     "await-spawn": "4.0.1",
     "chokidar": "^3.5.3",
-    "copyfiles": "2.1.0",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.3",
     "date-fns": "^2.30.0",
     "deepmerge": "^4.2.2",
     "del": "^6.0.0",
@@ -61,7 +61,6 @@
     "node-fetch": "^2.6.11",
     "openai": "^4.64.0",
     "prop-types": "^15.8.1",
-    "react-codemod": "^5.4.4",
     "request": "2.87.0",
     "toml": "2.3.3",
     "tomlify-j0.4": "3.0.0",
@@ -70,9 +69,14 @@
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.6",
+    "@electron/notarize": "^3.1.1",
     "concurrently": "^9.1.2",
-    "electron": "^31.4.0",
-    "electron-builder": "^25.1.8",
+    "copyfiles": "2.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "39.2.1",
+    "react-codemod": "^5.4.4",
+    "electron-builder": "^26.0.12",
+    "electron-builder-notarize": "^1.5.2",
     "wait-on": "^8.0.4"
   },
   "disabledDeps": {
@@ -88,39 +92,114 @@
     "vite": "^6.0.11"
   },
   "build": {
-    "appId": "com.example.viteapp",
-    "directories": {
-      "output": "dist"
-    },
-    "publish": {
-      "provider": "github"
-    },
+    "appId": "org.quiqr.quiqr-desktop",
+    "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
+    "productName": "Quiqr",
     "files": [
-      "dist/**/*",
       "frontend/build/**/*",
       "electron/**/*",
-      "resources/**/*",
       "backend/**/*",
-      "backend/server.js"
+      "resources/**/*",
+      "package.json"
     ],
-    "extraMetadata": {
-      "main": "electron/main.js"
+    "directories": {
+      "buildResources": "public",
+      "output": "dist"
     },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ],
+    "protocols": [
+      {
+        "name": "quiqr",
+        "role": "Editor",
+        "schemes": [
+          "quiqr"
+        ]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "resources/${os}",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "resources/all",
+        "to": "all",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "win": {
+      "icon": "public/icon.ico",
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32",
+            "x64"
+          ]
+        }
       ]
     },
+    "nsisWeb": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": true,
+      "unicode": true,
+      "installerIcon": "public/icon.ico",
+      "differentialPackage": true
+    },
+    "afterSign": "electron-builder-notarize",
     "mac": {
-      "target": "dmg"
+      "icon": "public/icon",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "linux": {
+      "icon": "public/icon",
       "target": [
         "AppImage",
         "deb",
         "rpm"
-      ]
-    }
+      ],
+      "category": "office"
+    },
+    "fileAssociations": [
+      {
+        "ext": "pogosite",
+        "name": "Quiqr Site File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogopass",
+        "name": "Quiqr Passport File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogocontent",
+        "name": "Quiqr Content File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      },
+      {
+        "ext": "pogotheme",
+        "name": "Quiqr Theme File",
+        "role": "Editor",
+        "icon": "public/iconfile"
+      }
+    ]
   }
 }

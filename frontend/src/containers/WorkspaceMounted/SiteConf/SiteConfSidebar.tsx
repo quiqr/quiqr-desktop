@@ -1,11 +1,22 @@
 import * as React           from 'react';
 import { Route }            from 'react-router-dom';
 import Sidebar              from './../../Sidebar';
+import { History } from 'history';
 //import service              from './../../services/service';
 
-export class SiteConfSidebar extends React.Component {
+interface SiteConfSidebarProps {
+  siteKey: string;
+  workspaceKey: string;
+  [key: string]: unknown;
+}
 
-  constructor(props){
+interface SiteConfSidebarState {
+  selectedMenuItem: string;
+}
+
+export class SiteConfSidebar extends React.Component<SiteConfSidebarProps, SiteConfSidebarState> {
+
+  constructor(props: SiteConfSidebarProps){
 
     super(props);
     this.state = {
@@ -17,7 +28,7 @@ export class SiteConfSidebar extends React.Component {
     return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
   }
 
-  renderWithRoute(history){
+  renderWithRoute(history: History){
 
     let encodedSiteKey = this.props.siteKey;
     let encodedWorkspaceKey = this.props.workspaceKey;

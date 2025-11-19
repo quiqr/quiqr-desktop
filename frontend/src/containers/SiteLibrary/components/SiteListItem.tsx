@@ -7,10 +7,33 @@ import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
 import service              from '../../../services/service';
 
+interface SiteConfig {
+  key: string;
+  name: string;
+  remote?: boolean;
+  etalage?: {
+    favicons?: string[];
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
 
-class SiteListItem extends React.Component {
+interface SiteListItemProps {
+  site: SiteConfig;
+  siteClick: () => void;
+  itemMenuButton?: React.ReactNode;
+  itemMenuItems?: React.ReactNode;
+}
 
-  constructor(props){
+interface SiteListItemState {
+  favicon: string;
+}
+
+class SiteListItem extends React.Component<SiteListItemProps, SiteListItemState> {
+
+  _ismounted: boolean = false;
+
+  constructor(props: SiteListItemProps){
     super(props);
     this.state = {
       favicon: ""
@@ -38,7 +61,7 @@ class SiteListItem extends React.Component {
       }
   }
 
-  componentDidUpdate(preProps){
+  componentDidUpdate(preProps: SiteListItemProps){
     if(this._ismounted && preProps.site.key !== this.props.site.key){
       this.getFavicon();
     }

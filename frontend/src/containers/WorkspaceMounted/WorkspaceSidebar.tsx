@@ -1,13 +1,73 @@
 import React     from 'react';
 import { Route } from 'react-router-dom'
 import service   from './../../services/service'
-import Sidebar   from '../Sidebar';
+import Sidebar, { SidebarMenu } from '../Sidebar';
+import { History } from 'history';
 //import Box       from '@mui/material/Box';
 //import Switch    from '@mui/material/Switch';
 
-class WorkspaceSidebar extends React.Component{
+interface SiteConfig {
+  key: string;
+  [key: string]: unknown;
+}
 
-  constructor(props){
+interface WorkspaceCollection {
+  key: string;
+  title: string;
+  [key: string]: unknown;
+}
+
+interface WorkspaceSingle {
+  key: string;
+  title: string;
+  [key: string]: unknown;
+}
+
+interface WorkspaceMenuItem {
+  key: string;
+  disabled?: boolean;
+  [key: string]: unknown;
+}
+
+interface WorkspaceMenu {
+  title: string;
+  disabled?: boolean;
+  matchRole?: string;
+  menuItems: WorkspaceMenuItem[];
+}
+
+interface WorkspaceDetails {
+  collections: WorkspaceCollection[];
+  singles: WorkspaceSingle[];
+  menu?: WorkspaceMenu[];
+}
+
+interface WorkspaceSidebarProps {
+  siteKey: string;
+  workspaceKey: string;
+  hideItems?: boolean;
+  menuIsLocked?: boolean;
+  onLockMenuClicked?: () => void;
+  onToggleItemVisibility?: () => void;
+  applicationRole?: string;
+}
+
+interface WorkspaceSidebarState {
+  site: SiteConfig | null;
+  draftMode: boolean;
+  workspace: WorkspaceDetails | null;
+  menusCollapsed: string[];
+  error: string | null;
+  prefs?: Record<string, unknown>;
+  showEmpty?: boolean;
+  selectedMenuItem?: string;
+}
+
+class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceSidebarState>{
+
+  _ismounted: boolean = false;
+
+  constructor(props: WorkspaceSidebarProps){
     super(props);
 
     this.state = {
@@ -32,18 +92,21 @@ class WorkspaceSidebar extends React.Component{
     this.refresh();
 
     service.api.readConfKey('prefs').then((value)=>{
-      this.setState({prefs: value });
+      if (typeof value === 'object' && value !== null) {
+        this.setState({prefs: value as Record<string, unknown> });
 
-      if(value[this.props.siteKey+':collapsedMenus']){
-        this.setState({menusCollapsed: value[this.props.siteKey+':collapsedMenus'] });
-      }
-      else{
-        this.setState({menusCollapsed: []});
+        const collapsedMenusKey = this.props.siteKey+':collapsedMenus';
+        if(collapsedMenusKey in value && Array.isArray(value[collapsedMenusKey])){
+          this.setState({menusCollapsed: value[collapsedMenusKey] as string[] });
+        }
+        else{
+          this.setState({menusCollapsed: []});
+        }
       }
     });
   }
 
-  componentDidUpdate(preProps: compProps){
+  componentDidUpdate(preProps: WorkspaceSidebarProps){
 
     if(preProps.siteKey){
 
@@ -57,18 +120,18 @@ class WorkspaceSidebar extends React.Component{
   refresh = ()=>{
     let {siteKey, workspaceKey } = this.props;
     if(siteKey && workspaceKey){
-      let stateUpdate = {};
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-        stateUpdate.site = bundle.site;
-        stateUpdate.workspace = bundle.workspaceDetails;
-        stateUpdate.error = null;
         if(this._ismounted){
-          this.setState(stateUpdate);
+          this.setState({
+            site: bundle.site,
+            workspace: bundle.workspaceDetails,
+            error: null
+          });
         }
-      }).catch(e=>{
+      }).catch((e: Error | string)=>{
         if(this._ismounted){
-
-          this.setState({site: null, workspace: null, error: e});
+          const errorMessage = typeof e === 'string' ? e : e.message;
+          this.setState({site: null, workspace: null, error: errorMessage});
         }
       });
     }
@@ -87,20 +150,20 @@ class WorkspaceSidebar extends React.Component{
     return (<Route render={({history})=>{ return this.renderWithRoute(history) }} />);
   }
 
-  matchRole(menuslot){
+  matchRole(menuslot: WorkspaceMenu){
     if(typeof menuslot.matchRole === 'undefined' || menuslot.matchRole === '' || menuslot.matchRole === 'all' || this.props.applicationRole === menuslot.matchRole){
       return true;
     }
     return false;
   }
 
-  renderWithRoute(history: any){
+  renderWithRoute(history: History){
 
     let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
     let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
 
-    let menus: Array = [];
+    let menus: SidebarMenu[] = [];
 
     if(this.state.workspace){
 
@@ -233,7 +296,6 @@ class WorkspaceSidebar extends React.Component{
       <Sidebar
         hideItems={this.props.hideItems}
         statusPanel={statusPanel}
-        menuIsLocked={this.props.menuIsLocked}
         menus={menus}
         menusCollapsed={this.state.menusCollapsed}
         onMenuExpandToggle={(menuKey)=>{
@@ -253,8 +315,6 @@ class WorkspaceSidebar extends React.Component{
           this.setState({menusCollapsed: collapseList});
 
         }}
-        onLockMenuClicked={this.props.onLockMenuClicked}
-        onToggleItemVisibility={this.props.onToggleItemVisibility}
       />
       { this.state.error && (
         <p style={{

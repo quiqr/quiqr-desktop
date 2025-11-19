@@ -5,7 +5,7 @@ import TextField       from '@mui/material/TextField';
 import FormItemWrapper from './shared/FormItemWrapper';
 import { BaseDynamic } from '../../HoForm';
 import Tip             from '../../Tip';
-import { IconPicker }  from 'react-fa-icon-picker'
+// import { IconPicker }  from 'react-fa-icon-picker'
 //import service         from '../../../services/service';
 
 class FontIconPickerDynamic extends BaseDynamic {
@@ -88,8 +88,12 @@ class FontIconPickerDynamic extends BaseDynamic {
     return (
       <FormItemWrapper
         control={
-
-          <FormControl >
+              <div style="color: red; font-size: 2rem;">
+                This component has temporarily been disabled.
+              </div>
+/**
+ * 
+ *           <FormControl >
             <InputLabel id="demo-controlled-open-select-label">{field.title}</InputLabel>
             <IconPicker value={this.props.context.value} buttonStyles={{marginTop:"40px", width:"130px"}} buttonIconStyles={{fontSize:'100px', color: '#666'}} containerStyles={{marginLeft:'230px', height:'300px', width:"500px"}}  size={48} onChange={(v) => this.props.context.setValue(v)} />
             <TextField
@@ -98,6 +102,7 @@ class FontIconPickerDynamic extends BaseDynamic {
               fullWidth={true}
             />
           </FormControl>
+ */
         }
         iconButtons={iconButtons}
       />);

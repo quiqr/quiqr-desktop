@@ -13,19 +13,60 @@ import Dialog           from '@mui/material/Dialog';
 import DialogActions    from '@mui/material/DialogActions';
 import DialogTitle      from '@mui/material/DialogTitle';
 import DialogContent    from '@mui/material/DialogContent';
+import { History } from 'history';
 //targets
 import {Meta as GitHubMeta}   from './syncTypes/github'
 import {Meta as FolderMeta}   from './syncTypes/folder'
 import {Meta as SysGitMeta}   from './syncTypes/sysgit'
 
-export class SyncSidebar extends React.Component {
+interface PublishConfig {
+  key: string;
+  config?: {
+    type?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
 
-  history: any;
+interface SiteWithPublish {
+  key: string;
+  publish: PublishConfig[];
+  [key: string]: unknown;
+}
 
-  constructor(props){
+interface ServerDialogConfig {
+  open?: boolean;
+  modAction?: string;
+  closeText?: string;
+  publishConf?: PublishConfig;
+}
+
+interface SyncSidebarProps {
+  siteKey: string;
+  workspaceKey: string;
+  site: SiteWithPublish;
+  [key: string]: unknown;
+}
+
+interface SyncSidebarState {
+  site: SiteWithPublish;
+  selectedMenuItem: string;
+  anchorEl?: HTMLElement | null;
+  menuOpen?: number | null;
+  serverDialog?: ServerDialogConfig;
+  deleteDialogOpen?: boolean;
+  keyForDeletion?: string;
+}
+
+export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarState> {
+
+  history: History | null = null;
+
+  constructor(props: SyncSidebarProps){
     super(props);
     this.state = {
       site: {
+        key: '',
         publish: [],
       },
       selectedMenuItem: ''
@@ -33,7 +74,7 @@ export class SyncSidebar extends React.Component {
   }
 
 
-  componentDidUpdate(preProps){
+  componentDidUpdate(preProps: SyncSidebarProps){
     if(preProps.site !== this.props.site){
       this.initState();
       this.checkLastOpenedPublishConf();
@@ -47,9 +88,13 @@ export class SyncSidebar extends React.Component {
 
   checkLastOpenedPublishConf(){
     service.api.readConfKey('lastOpenedPublishTargetForSite').then((value)=>{
-      if(value){
-        if(this.props.siteKey in value){
-          this.setState({selectedMenuItem: value[this.props.siteKey]});
+      if(value && typeof value === 'object'){
+        const record = value as Record<string, unknown>;
+        if(this.props.siteKey in record){
+          const selectedValue = record[this.props.siteKey];
+          if (typeof selectedValue === 'string') {
+            this.setState({selectedMenuItem: selectedValue});
+          }
         }
       }
     });
@@ -70,7 +115,7 @@ export class SyncSidebar extends React.Component {
     } />
   }
 
-  renderButton(index,publ){
+  renderButton(index: number, publ: PublishConfig){
 
     return (
       <IconButton
@@ -85,7 +130,7 @@ export class SyncSidebar extends React.Component {
     );
   }
 
-  renderMenu(index, publ){
+  renderMenu(index: number, publ: PublishConfig){
     return (
       <Menu
         anchorEl={this.state.anchorEl}
@@ -131,7 +176,7 @@ export class SyncSidebar extends React.Component {
   }
 
 
-  deletePublishConfiguration(inkey){
+  deletePublishConfiguration(inkey: string){
     let encodedSiteKey = this.props.siteKey;
     let encodedWorkspaceKey = this.props.workspaceKey;
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
@@ -143,13 +188,13 @@ export class SyncSidebar extends React.Component {
       site.publish.splice(publConfIndex, 1);
 
       service.api.saveSiteConf(this.props.site.key, this.props.site).then(()=>{
-        this.history.push(`${basePath}/`)
+        this.history?.push(`${basePath}/`)
       });
     }
   }
 
 
-  renderWithRoute(history: {push:(path: string)=>void}){
+  renderWithRoute(history: History){
     let {site} = this.state;
 
     let encodedSiteKey = this.props.siteKey;
@@ -223,8 +268,8 @@ export class SyncSidebar extends React.Component {
 
       <React.Fragment>
         <SyncConfigDialog
-          {...this.state.serverDialog}
-          site={this.props.site}
+          {...(this.state.serverDialog as Record<string, unknown>)}
+          site={this.props.site as unknown as { key: string; publish: Array<{ key: string; config: unknown }> }}
           onSave={(publishKey)=>{
             this.history.push(`${basePath}/list/${publishKey}`)
             this.setState({serverDialog: {

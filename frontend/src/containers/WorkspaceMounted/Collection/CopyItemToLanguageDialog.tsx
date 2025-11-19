@@ -10,9 +10,34 @@ import Select            from '@mui/material/Select';
 import MenuItem          from '@mui/material/MenuItem';
 import Box               from '@mui/material/Box';
 
-class CopyItemToLanguageDialog extends React.Component{
+interface Language {
+  lang: string;
+  [key: string]: unknown;
+}
 
-  constructor(props ){
+interface CopyItemToLanguageDialogProps {
+  value: string;
+  viewKey: string;
+  handleClose?: () => void;
+  handleConfirm?: (value: string, initialValue: string, destLang: string) => void;
+  busy?: boolean;
+  confirmLabel?: string;
+  title?: string;
+  textfieldlabel?: string;
+  languages: Language[];
+}
+
+interface CopyItemToLanguageDialogState {
+  value: string;
+  initialValue: string;
+  destLang: string;
+  valid: boolean | null;
+  titleToKey?: string;
+}
+
+class CopyItemToLanguageDialog extends React.Component<CopyItemToLanguageDialogProps, CopyItemToLanguageDialogState>{
+
+  constructor(props: CopyItemToLanguageDialogProps){
     super(props);
 
     let valueBase = props.value
@@ -50,7 +75,7 @@ class CopyItemToLanguageDialog extends React.Component{
     }
   }
 
-  handleChange(e){
+  handleChange(e: React.ChangeEvent<HTMLInputElement>){
     let key  = e.target.value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     this.setState({
       value: e.target.value,

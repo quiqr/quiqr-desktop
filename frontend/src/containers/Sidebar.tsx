@@ -12,9 +12,43 @@ import ExpandLess              from '@mui/icons-material/ExpandLess';
 import ExpandMore              from '@mui/icons-material/ExpandMore';
 import IconButton              from '@mui/material/IconButton';
 
-class Sidebar extends React.Component{
+export interface SidebarMenuItem {
+  label: string;
+  selected?: boolean;
+  onClick?: () => void;
+  active?: boolean;
+  icon?: React.ReactNode;
+  secondaryMenu?: React.ReactNode;
+  secondaryButton?: React.ReactNode;
+  childItems?: SidebarMenuItem[];
+  spacer?: boolean;
+  divider?: boolean;
+}
 
-  constructor(props){
+export interface SidebarMenu {
+  title?: string;
+  key?: string;
+  expandable?: boolean;
+  items?: SidebarMenuItem[];
+}
+
+interface SidebarProps {
+  hideItems?: boolean;
+  menus: SidebarMenu[];
+  menusCollapsed?: string[];
+  onMenuExpandToggle?: (menuKey: string) => void;
+  statusPanel?: React.ReactNode;
+}
+
+interface SidebarState {
+  site: null;
+  workspace: null;
+  open?: number | null;
+}
+
+class Sidebar extends React.Component<SidebarProps, SidebarState>{
+
+  constructor(props: SidebarProps){
     super(props);
     this.state = {
       site: null,
@@ -22,10 +56,10 @@ class Sidebar extends React.Component{
     };
   }
 
-  renderFlatItem(item, index){
-    let icon = null;
-    let secondaryAction = null;
-    let secondaryActionMenu = null;
+  renderFlatItem(item: SidebarMenuItem, index: number){
+    let icon: React.ReactNode = null;
+    let secondaryAction: React.ReactNode = null;
+    let secondaryActionMenu: React.ReactNode = null;
 
     if(item.icon){
       icon = (
@@ -49,7 +83,7 @@ class Sidebar extends React.Component{
         key={"itemFlat"+item.label}
         selected={item.selected}
         onClick={ item.onClick }
-        button>
+        button="true">
         {icon}
         <ListItemText primary={item.label} />
         {secondaryActionMenu}
@@ -61,9 +95,9 @@ class Sidebar extends React.Component{
 
   }
 
-  renderNetstedItems(item, index){
-    let initOpen;
-    let childItems = item.childItems.map((itemChild, index)=>{
+  renderNetstedItems(item: SidebarMenuItem, index: number){
+    let initOpen: boolean | undefined;
+    let childItems = item.childItems!.map((itemChild, index)=>{
 
       if(itemChild.selected){
         initOpen = true;
@@ -111,8 +145,8 @@ class Sidebar extends React.Component{
     )
   }
 
-  toggleMenuExpand(menuKey){
-    this.props.onMenuExpandToggle(menuKey);
+  toggleMenuExpand(menuKey: string){
+    this.props.onMenuExpandToggle?.(menuKey);
   }
 
   render(){

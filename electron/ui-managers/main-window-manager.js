@@ -1,4 +1,5 @@
 const { BrowserView, BrowserWindow } = require('electron');
+const remoteMain                     = require('@electron/remote/main');
 const windowStateKeeper              = require('electron-window-state');
 const url                            = require('url')
 const path                           = require('path')
@@ -16,9 +17,9 @@ function getLocation(){
   } else {
 
     let lookups = [
-      path.join(__dirname, "../dist/frontend/index.html"),
-      path.normalize(path.join(__dirname, '/../../index.html')), //works in production
-      path.normalize(path.join(__dirname, '../frontend/build/index.html')), //works in development after react_build
+      path.join(__dirname, "../../frontend/build/index.html"), // Production: /electron/ui-managers -> / -> /frontend/build/index.html
+      path.join(__dirname, "../dist/frontend/index.html"), // Legacy path
+      path.normalize(path.join(__dirname, '/../../index.html')), // Legacy path
     ];
 
     let indexFile = null;
@@ -50,6 +51,8 @@ function createWindow () {
     backgroundColor:"#ffffff",
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
     },
     x: mainWindowState.x,
     y: mainWindowState.y,
@@ -61,6 +64,9 @@ function createWindow () {
   });
 
   mainWindowState.manage(mainWindow);
+
+  // Enable @electron/remote for this window
+  remoteMain.enable(mainWindow.webContents);
 
   if(process.env.DEVTOOLS){
     let devtools = new BrowserWindow()

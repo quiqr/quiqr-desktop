@@ -6,7 +6,6 @@ import { Chart as ChartJS, PointElement, Tooltip, Legend, registerables } from '
 import "chartjs-plugin-dragdata";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import autocolors from 'chartjs-plugin-autocolors';
 import { Bubble } from "react-chartjs-2";
 //import service                  from '../../../services/service';
 
@@ -45,7 +44,6 @@ const quadrants = {
 };
 
 ChartJS.register(
-  autocolors,
   ChartDataLabels,
   PointElement,
   Tooltip,

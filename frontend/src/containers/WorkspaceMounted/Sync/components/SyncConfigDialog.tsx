@@ -31,7 +31,7 @@ interface SyncConfigDialogProps {
     key: string;
     publish: Array<{
       key: string;
-      config: any;
+      config: unknown;
     }>;
   };
   publishConf?: {
@@ -40,8 +40,8 @@ interface SyncConfigDialogProps {
       type: string;
     };
   };
-  modAction: string;
-  closeText: string;
+  modAction?: string;
+  closeText?: string;
   onClose: () => void;
   onSave: (inkey: string) => void;
 }

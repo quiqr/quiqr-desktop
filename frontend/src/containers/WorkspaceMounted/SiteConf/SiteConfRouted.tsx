@@ -4,7 +4,14 @@ import  SiteConfRouteGeneral        from './SiteConfRouteGeneral';
 import  SiteConfRouteDogFoodSingle  from './SiteConfRouteDogFoodSingle';
 import  SiteConfRouteModel          from './SiteConfRouteModel';
 
-export class SiteConfRouted extends React.Component {
+interface SiteConfRoutedProps {
+  siteKey: string;
+  workspaceKey: string;
+}
+
+interface SiteConfRoutedState {}
+
+export class SiteConfRouted extends React.Component<SiteConfRoutedProps, SiteConfRoutedState> {
 
   render(){
     return (

@@ -12,7 +12,23 @@ import Meta                    from './Meta'
 import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
 
-class Dashboard extends React.Component{
+interface DashboardProps {
+  siteKey: string;
+  workspaceKey: string;
+  enableSyncFrom: boolean;
+  enableSyncTo: boolean;
+  publishConf: {
+    type: string;
+    path?: string;
+    publishScope?: string;
+    pullOnly?: boolean;
+    [key: string]: unknown;
+  };
+  onSyncDialogControl: (open: boolean, text: string, icon: React.ReactNode) => void;
+  onConfigure: () => void;
+}
+
+export class Dashboard extends React.Component<DashboardProps>{
 
   pullFromRemote(){
     this.props.onSyncDialogControl(

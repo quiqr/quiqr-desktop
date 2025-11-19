@@ -1,8 +1,9 @@
+import { PhotoSizeSelectActual } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
 
 const Spinner = ({ time = 3000, spins = 3, color = "rgba(0, 0, 0, 0.2)", margin = "40em", size = 48 }) => {
   const [rotated, setRotated] = useState(false);
-  const timeoutRef = useRef();
+  const timeoutRef = useRef(null);
 
   const spin = () => {
     timeoutRef.current = setTimeout(() => {
@@ -24,7 +25,7 @@ const Spinner = ({ time = 3000, spins = 3, color = "rgba(0, 0, 0, 0.2)", margin 
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const borderWidth = Math.max(1, parseInt(size / 10, 10));
+  const borderWidth = Math.max(1, size / 10);
   const borderStyle = `${borderWidth}em solid ${color}`;
   const style = {
     margin: margin,
@@ -39,7 +40,7 @@ const Spinner = ({ time = 3000, spins = 3, color = "rgba(0, 0, 0, 0.2)", margin 
     height: size || "80em",
     transition: "transform ease-in-out " + time + "ms",
     transform: "rotate(" + (rotated ? 360 * spins : 0) + "deg)",
-  };
+  } satisfies React.CSSProperties;
 
   return (
     <div>
