@@ -163,7 +163,7 @@ class App extends React.Component<{}, AppState> {
   setApplicationRole() {
     service.api.readConfPrefKey("applicationRole").then((role) => {
       if (!role) role = defaultApplicationRole;
-      
+
       // TODO: extract to typeguard, or do schema checking in service.api.readConfPrefKey
       if (typeof role === 'string') {
         this.setState({ applicationRole: role });
@@ -546,7 +546,6 @@ class App extends React.Component<{}, AppState> {
 
             return (
               <StyledEngineProvider injectFirst>
-                (
                 <ThemeProvider theme={this.state.theme}>
                   <CssBaseline />
                   <div className='App'>
@@ -560,7 +559,6 @@ class App extends React.Component<{}, AppState> {
                     </div>
                   </div>
                 </ThemeProvider>
-                )
               </StyledEngineProvider>
             );
           }}
@@ -572,7 +570,6 @@ class App extends React.Component<{}, AppState> {
             this.history = history;
             return (
               <StyledEngineProvider injectFirst>
-                (
                 <ThemeProvider theme={this.state.theme}>
                   <CssBaseline />
                   {welcomeScreen}
@@ -582,7 +579,6 @@ class App extends React.Component<{}, AppState> {
                     workspaceKey={decodeURIComponent(match.params.workspace)}
                   />
                 </ThemeProvider>
-                )
               </StyledEngineProvider>
             );
           }}
@@ -594,7 +590,6 @@ class App extends React.Component<{}, AppState> {
             this.history = history;
             return (
               <StyledEngineProvider injectFirst>
-                (
                 <ThemeProvider theme={this.state.theme}>
                   <CssBaseline />
                   {welcomeScreen}
@@ -604,7 +599,6 @@ class App extends React.Component<{}, AppState> {
                     workspaceKey={decodeURIComponent(match.params.workspace)}
                   />
                 </ThemeProvider>
-                )
               </StyledEngineProvider>
             );
           }}
