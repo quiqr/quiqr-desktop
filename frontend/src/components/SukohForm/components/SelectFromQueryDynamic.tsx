@@ -127,7 +127,6 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicProps, Se
   }
 
   runQuery() {
-    console.log(this.props.context.node)
     let { node } = this.props.context;
     let { field } = node;
 
@@ -194,16 +193,17 @@ class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicProps, Se
           context.setValue(newValue);
         }}
         renderOption={(props, option) => {
+          const { key, ...otherProps } = props;
           if (showImage) {
             return (
-              <Box component='li' {...props} sx={{ "& > img": { mr: 2, flexShrink: 0 } }}>
+              <Box component='li' key={key} {...otherProps} sx={{ "& > img": { mr: 2, flexShrink: 0 } }}>
                 <img alt='' loading='lazy' width={option_image_width} src={this.state["optimg_" + this.getOptionValue(option)]} />
                 &nbsp;
                 {this.getOptionLabel(option)}
               </Box>
             );
           } else {
-            return <Box component='li' {...props}>{this.getOptionLabel(option)}</Box>;
+            return <Box component='li' key={key} {...otherProps}>{this.getOptionLabel(option)}</Box>;
           }
         }}
         value={context.value}
