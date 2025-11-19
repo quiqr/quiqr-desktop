@@ -10,13 +10,63 @@ import { Dashboard as GitHubDashboard } from "./syncTypes/github";
 import { Dashboard as SysGitDashboard } from "./syncTypes/sysgit";
 import { Dashboard as FolderDashboard } from "./syncTypes/folder";
 
-class SyncRouteGeneral extends React.Component {
-  history: any;
+interface PublishConfig {
+  key: string;
+  config: {
+    type: string;
+    publishScope?: string;
+    pullOnly?: boolean;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
 
-  constructor(props) {
+interface SiteWithPublish {
+  key: string;
+  publish: PublishConfig[];
+  [key: string]: unknown;
+}
+
+interface ServerDialog {
+  open?: boolean;
+  modAction?: string;
+  serverTitle?: string;
+  closeText?: string;
+  publishConf?: PublishConfig;
+}
+
+interface ServerBusyDialog {
+  open?: boolean;
+  serverTitle?: string;
+  icon?: React.ReactNode;
+}
+
+interface SyncRouteGeneralProps {
+  siteKey: string;
+  workspaceKey: string;
+  site: SiteWithPublish;
+  syncConfKey?: string;
+  addRefresh?: unknown;
+}
+
+interface SyncRouteGeneralState {
+  site: SiteWithPublish;
+  serverDialog: ServerDialog;
+  serverBusyDialog: ServerBusyDialog;
+  lastOpenedPublishedKey: string | null;
+  addRefresh?: unknown;
+  menuOpen?: unknown;
+}
+
+class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteGeneralState> {
+  history: any;
+  basePath: string = '';
+
+  constructor(props: SyncRouteGeneralProps) {
     super(props);
     this.state = {
       site: {
+        key: '',
         publish: [],
       },
       serverDialog: {},
@@ -25,7 +75,7 @@ class SyncRouteGeneral extends React.Component {
     };
   }
 
-  componentDidUpdate(preProps) {
+  componentDidUpdate(preProps: SyncRouteGeneralProps) {
     if (this.state.addRefresh !== this.props.addRefresh) {
       this.openAddServerDialog();
     }
@@ -44,9 +94,10 @@ class SyncRouteGeneral extends React.Component {
 
   checkLastOpenedPublishConf() {
     service.api.readConfKey("lastOpenedPublishTargetForSite").then((value) => {
-      if (value) {
-        if (this.props.siteKey in value) {
-          this.setState({ lastOpenedPublishedKey: value[this.props.siteKey] });
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        const targets = value as Record<string, string>;
+        if (this.props.siteKey in targets) {
+          this.setState({ lastOpenedPublishedKey: targets[this.props.siteKey] });
         }
       }
     });
@@ -64,7 +115,7 @@ class SyncRouteGeneral extends React.Component {
     });
   }
 
-  onConfigure(publishConf) {
+  onConfigure(publishConf: PublishConfig) {
     this.setState({
       menuOpen: null,
       serverDialog: {
@@ -84,7 +135,7 @@ class SyncRouteGeneral extends React.Component {
     }
   }
 
-  syncDialogControl(open, title = "", icon = null) {
+  syncDialogControl(open: boolean, title: string = "", icon: React.ReactNode = null) {
     this.setState({
       serverBusyDialog: {
         open: open,
@@ -94,7 +145,7 @@ class SyncRouteGeneral extends React.Component {
     });
   }
 
-  savePublishData(inkey, data) {
+  savePublishData(inkey: string, data: { type: string; [key: string]: unknown }) {
     let site = this.state.site;
 
     if (!inkey) {
@@ -113,7 +164,7 @@ class SyncRouteGeneral extends React.Component {
     });
   }
 
-  renderMainCard(publishConf) {
+  renderMainCard(publishConf: PublishConfig) {
     let enableSyncFrom = false;
     let enableSyncTo = true;
 

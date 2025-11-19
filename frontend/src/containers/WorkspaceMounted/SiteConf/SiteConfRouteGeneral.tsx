@@ -8,11 +8,39 @@ import Box            from '@mui/material/Box';
 import FolderIcon     from '@mui/icons-material/Folder';
 import LaunchIcon   from '@mui/icons-material/Launch';
 
-class SiteConfRouteGeneral extends React.Component {
+interface SiteConfig {
+  key?: string;
+  name?: string;
+  source?: {
+    path?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
 
-  history;
+interface SiteConfRouteGeneralProps {
+  siteKey: string;
+  workspaceKey: string;
+  classes?: unknown;
+}
 
-  constructor(props){
+interface SiteConfRouteGeneralState {
+  siteconf: SiteConfig;
+  source: {
+    path?: string;
+    [key: string]: unknown;
+  };
+  parseInfo: Record<string, unknown>;
+  siteKey?: string;
+  prefs?: unknown;
+  customOpenInCommand?: string;
+}
+
+class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, SiteConfRouteGeneralState> {
+
+  _ismounted: boolean = false;
+
+  constructor(props: SiteConfRouteGeneralProps){
     super(props);
     this.state = {
       siteconf : {},
@@ -21,7 +49,7 @@ class SiteConfRouteGeneral extends React.Component {
     };
   }
 
-  componentDidUpdate(preProps){
+  componentDidUpdate(preProps: SiteConfRouteGeneralProps){
     if(this._ismounted && preProps.siteKey !== this.props.siteKey){
       this.checkSiteInProps();
     }
@@ -47,24 +75,26 @@ class SiteConfRouteGeneral extends React.Component {
     service.api.readConfKey('prefs').then((value)=>{
       this.setState({prefs: value });
 
-      if(value.customOpenInCommand){
-        this.setState({customOpenInCommand: value.customOpenInCommand });
-      }
-      else{
-        this.setState({customOpenInCommand: "" });
+      if(typeof value === 'object' && value !== null && 'customOpenInCommand' in value){
+        const prefs = value as { customOpenInCommand?: string };
+        if(prefs.customOpenInCommand){
+          this.setState({customOpenInCommand: prefs.customOpenInCommand });
+        }
+        else{
+          this.setState({customOpenInCommand: "" });
+        }
       }
 
     });
 
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      var stateUpdate  = {};
-      stateUpdate.siteconf = bundle.site;
+      this.setState({
+        siteconf: bundle.site as SiteConfig
+      });
 
       if(bundle.site.source){
-        this.setState({source: bundle.site.source});
+        this.setState({source: bundle.site.source as { path?: string; [key: string]: unknown }});
       }
-
-      this.setState(stateUpdate);
     })
   }
 

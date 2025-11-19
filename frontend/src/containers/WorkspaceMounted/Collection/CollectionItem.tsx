@@ -3,6 +3,23 @@ import service                       from './../../../services/service'
 import { SukohForm }                 from './../../../components/SukohForm';
 import Spinner                       from './../../../components/Spinner'
 
+interface WorkspaceCollection {
+  key: string;
+  title: string;
+  folder: string;
+  fields: unknown[];
+  build_actions?: unknown[];
+  hidePreviewIcon?: boolean;
+  hideExternalEditIcon?: boolean;
+  previewUrlBase?: string;
+  [key: string]: unknown;
+}
+
+interface WorkspaceDetails {
+  collections: WorkspaceCollection[];
+  [key: string]: unknown;
+}
+
 interface CollectionItemProps {
   siteKey: string;
   workspaceKey: string;
@@ -10,10 +27,15 @@ interface CollectionItemProps {
   collectionItemKey: string;
 }
 
-interface CollectionItemState {}
+interface CollectionItemState {
+  selectedWorkspaceDetails: WorkspaceDetails | null;
+  collectionItemValues: unknown;
+  currentBaseUrlPath?: string;
+  showSpinner?: boolean;
+}
 
 class CollectionItem extends React.Component<CollectionItemProps, CollectionItemState>{
-  constructor(props){
+  constructor(props: CollectionItemProps){
     super(props);
     this.state = {
       selectedWorkspaceDetails: null,
@@ -29,22 +51,18 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
 
     service.registerListener(this);
 
-    var stateUpdate  = {};
     var { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
     Promise.all([
-      service.api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails)=>{
-        stateUpdate.selectedWorkspaceDetails = workspaceDetails;
-      }),
-      service.api.getCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey).then((collectionItemValues)=>{
-        stateUpdate.collectionItemValues = collectionItemValues;
-      }),
-      service.api.getCurrentBaseUrl().then((currentBaseUrlPath)=>{
-        stateUpdate.currentBaseUrlPath = currentBaseUrlPath;
-      })
-
-    ]).then(()=>{
-      this.setState(stateUpdate);
+      service.api.getWorkspaceDetails(siteKey, workspaceKey),
+      service.api.getCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey),
+      service.api.getCurrentBaseUrl()
+    ]).then(([workspaceDetails, collectionItemValues, currentBaseUrlPath])=>{
+      this.setState({
+        selectedWorkspaceDetails: workspaceDetails as WorkspaceDetails,
+        collectionItemValues: collectionItemValues,
+        currentBaseUrlPath: typeof currentBaseUrlPath === 'string' ? currentBaseUrlPath : undefined
+      });
     });
   }
 
@@ -53,7 +71,7 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
     service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
   }
 
-  handleSave(context: any){
+  handleSave(context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }){
     let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
     let promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
     promise.then(function(updatedValues){
@@ -63,7 +81,7 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
     })
   }
 
-  generatePageUrl(collection){
+  generatePageUrl(collection: WorkspaceCollection){
 
     if(collection.hidePreviewIcon){
       return '';
@@ -110,7 +128,7 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
     let fields = collection.fields.slice(0);
     if(!collection.build_actions) collection.build_actions = [];
     let buildActions = collection.build_actions.slice(0);
-    let values =  Object.assign(this.state.collectionItemValues)
+    let values =  Object.assign({}, this.state.collectionItemValues)
 
     let pageUrl = this.generatePageUrl(collection);
 
@@ -125,7 +143,6 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
     collectionKey={collectionKey}
     collectionItemKey={collectionItemKey}
     values={values}
-    trim={false}
     buildActions={buildActions}
     plugins={{
 
