@@ -16,6 +16,7 @@ import DangerButton from "../../DangerButton";
 import { BaseDynamic, BaseDynamicProps, BaseDynamicState } from "../../HoForm";
 import type { FieldBase } from "../../HoForm/types";
 import service from "../../../services/service";
+import { isDynamicFormFieldConfig, isDynamicFormFieldConfigWithValues, isValidAppThemeConfiguration } from "../../../utils/type-guards";
 
 const Fragment = React.Fragment;
 
@@ -25,9 +26,9 @@ interface ExtendedFieldBase extends FieldBase {
   arrayTitle?: boolean;
 }
 
-interface AccordionField extends FieldBase {
+export interface AccordionField extends ExtendedFieldBase {
   title: string;
-  fields: ExtendedFieldBase[];
+  fields?: ExtendedFieldBase[];
   arrayIndicesAreKeys?: boolean;
   disableCreate?: boolean;
   disableSort?: boolean;
@@ -73,7 +74,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicProps, AccordionDynam
 
     let headerBackgroundColor = "#efefef";
     service.api.readConfKey("prefs").then((value) => {
-      if (value.interfaceStyle) {
+      if (isValidAppThemeConfiguration(value)) {
         if (value.interfaceStyle === "quiqr10-dark") {
           headerBackgroundColor = "#666";
         }
@@ -201,11 +202,12 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicProps, AccordionDynam
 
   getLastOpenState() {
     service.api.getCurrentFormAccordionIndex().then((pathPlusIndex) => {
-      if (pathPlusIndex) {
-        let arr = pathPlusIndex.split(" ");
+      if (typeof pathPlusIndex === "string" && pathPlusIndex) {
+        const arr = pathPlusIndex.split(" ");
+        const index = parseInt(arr[1]);
 
-        if (arr.length === 2 && arr[1] >= 0 && arr[0] === this.props.context.node.field.compositeKey) {
-          this.setState({ index: parseInt(arr[1]) });
+        if (arr.length === 2 && index >= 0 && arr[0] === this.props.context.node.field.compositeKey) {
+          this.setState({ index: index });
         }
       }
     });
@@ -243,7 +245,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicProps, AccordionDynam
         let dynSearchKeyVal = { key: searchKey, val: searchVal };
 
         await service.api.getDynFormFields(dynFormObjectRoot, dynSearchKeyVal).then((extraFields) => {
-          if (typeof extraFields !== "undefined" && extraFields.fields) {
+          if (isDynamicFormFieldConfigWithValues(extraFields)) {
             service.api.shouldReloadForm(context.node.field.compositeKey);
 
             this.setState({ shouldSaveAccordionState: true });

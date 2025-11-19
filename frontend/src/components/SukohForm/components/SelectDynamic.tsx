@@ -5,16 +5,25 @@ import FormControl     from '@mui/material/FormControl';
 import Select          from '@mui/material/Select';
 import Box             from '@mui/material/Box';
 import FormItemWrapper from './shared/FormItemWrapper';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, FieldBase } from '../../HoForm';
 import Tip             from '../../Tip';
 import service                  from '../../../services/service';
 
-class SelectDynamic extends BaseDynamic {
+
+interface SelectFromQueryDynamicField extends FieldBase {}
+interface SelectFromQueryDynamicState {
+  options: string[];
+  error_msg: string;
+}
+
+type SelectFromQueryDynamicProps = BaseDynamicProps<SelectFromQueryDynamicField>;
+
+
+class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQueryDynamicState> {
 
   constructor(props){
-
+    
     super(props);
-
     this.state = {
       options: [],
       error_msg: null,

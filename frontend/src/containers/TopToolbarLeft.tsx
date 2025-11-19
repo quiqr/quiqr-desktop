@@ -3,8 +3,8 @@ import Box from '@mui/material/Box';
 
 interface TopToolbarLeftProps { 
   title: string;
-  siteKey: string;
-  workspaceKey: string;
+  siteKey?: string;
+  workspaceKey?: string;
 }
 
 const TopToolbarLeft = ({ title, siteKey, workspaceKey }: TopToolbarLeftProps) => {
