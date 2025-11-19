@@ -19,24 +19,93 @@ import CardItem                     from './components/CardItem';
 import BlockDialog                  from './../../components/BlockDialog';
 import Spinner                      from './../../components/Spinner';
 import service                      from './../../services/service';
+import { History } from 'history';
 
 //PORTQUIQR
 //const net = window.require('electron').remote.net;
 
-class SiteLibraryRouted extends React.Component{
+interface SiteConfig {
+  key: string;
+  name: string;
+  tags?: string[];
+  template?: boolean;
+  screenshotURL?: string;
+  homepageURL?: string;
+  importSiteURL?: string;
+  [key: string]: unknown;
+}
 
-  constructor(props){
+interface WorkspaceConfig {
+  key: string;
+  [key: string]: unknown;
+}
+
+interface Configurations {
+  sites: SiteConfig[];
+  [key: string]: unknown;
+}
+
+interface CommunityTemplate {
+  NormalizedName: string;
+  QuiqrEtalageName: string;
+  QuiqrEtalageHomepage: string;
+  SourceLink: string;
+  ScreenshotImageType?: string;
+  [key: string]: unknown;
+}
+
+interface SiteLibraryRoutedProps {
+  newSite?: boolean;
+  importSite?: boolean;
+  importSiteURL?: string;
+  activeLibraryView?: string;
+  handleLibraryDialogCloseClick: () => void;
+}
+
+interface SiteLibraryRoutedState {
+  blockingOperation: string | null;
+  currentSiteKey: string | null;
+  showSpinner: boolean;
+  configurations: Configurations;
+  editTagsDialog: boolean;
+  renameDialog: boolean;
+  copyDialog: boolean;
+  deleteDialog: boolean;
+  dialogSiteConf: SiteConfig;
+  dialogNewSlashImportSite: {
+    open: boolean;
+    newOrImport: 'new' | 'import';
+  };
+  publishSiteDialog?: unknown;
+  siteCreatorMessage: string | null;
+  quiqrCommunityTemplates: CommunityTemplate[];
+  sitesListingView: string;
+  localsites?: string[];
+  selectedSite?: SiteConfig;
+  selectedSiteWorkspaces?: WorkspaceConfig[];
+  currentWorkspaceKey?: string;
+  importSiteURL?: string;
+  anchorEl?: HTMLElement | null;
+  menuOpen?: number | null;
+  quiqrCommunityTemplatesError?: string | null;
+}
+
+class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibraryRoutedState>{
+
+  history: History | null = null;
+
+  constructor(props: SiteLibraryRoutedProps){
     super(props);
     this.state = {
       blockingOperation: null,
       currentSiteKey: null,
       showSpinner: false,
-      configurations: [],
+      configurations: { sites: [] },
       editTagsDialog: false,
       renameDialog: false,
       copyDialog: false,
       deleteDialog: false,
-      dialogSiteConf: {},
+      dialogSiteConf: {} as SiteConfig,
       dialogNewSlashImportSite: {
         open: false,
         newOrImport: 'new'
@@ -138,7 +207,7 @@ class SiteLibraryRouted extends React.Component{
 
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps: SiteLibraryRoutedProps, nextState: SiteLibraryRoutedState) {
 
     if(this.props.newSite !== nextProps.newSite){
       this.setState({
@@ -166,14 +235,16 @@ class SiteLibraryRouted extends React.Component{
 
   }
 
-  mountSiteByKey(siteKey){
+  mountSiteByKey(siteKey: string){
     service.getConfigurations(true).then((c)=>{
       let site = c.sites.find((x)=>x.key===siteKey);
-      this.mountSite(site);
+      if (site) {
+        this.mountSite(site);
+      }
     });
   }
 
-  mountSite(site){
+  mountSite(site: SiteConfig){
     this.setState({selectedSite: site, selectedSiteWorkspaces:[]});
     this.setState({currentSiteKey: site.key});
 
@@ -186,18 +257,18 @@ class SiteLibraryRouted extends React.Component{
     });
   }
 
-  handleSelectWorkspaceClick = (e, siteKey, workspace)=> {
+  handleSelectWorkspaceClick = (e: React.MouseEvent, siteKey: string, workspace: WorkspaceConfig)=> {
     e.stopPropagation();
     this.selectWorkspace(siteKey, workspace);
   };
 
-  async selectWorkspace(siteKey: string, workspace ){
+  async selectWorkspace(siteKey: string, workspace: WorkspaceConfig){
     this.setState({currentWorkspaceKey: workspace.key});
     await service.api.mountWorkspace(siteKey, workspace.key);
-    this.history.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
+    this.history?.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
   }
 
-  renderItemMenuButton(index, siteconfig){
+  renderItemMenuButton(index: number, siteconfig: SiteConfig){
     return (
       <IconButton
         onClick={(event)=>{
@@ -212,7 +283,7 @@ class SiteLibraryRouted extends React.Component{
     );
   }
 
-  renderItemMenuItems(index, siteconfig){
+  renderItemMenuItems(index: number, siteconfig: SiteConfig){
 
     if(siteconfig.template){
       return (
@@ -302,7 +373,7 @@ class SiteLibraryRouted extends React.Component{
     }
   }
 
-  renderSelectSites(source, sourceArgument){
+  renderSelectSites(source: string, sourceArgument: string | null){
 
     if(this.state.showSpinner){
       return <Spinner />
@@ -378,7 +449,7 @@ class SiteLibraryRouted extends React.Component{
 
   }
 
-  renderCards(sites, listTitle){
+  renderCards(sites: SiteConfig[], listTitle: string){
     return (
 
       <Box m={3}>
@@ -410,8 +481,9 @@ class SiteLibraryRouted extends React.Component{
       </Box>
 
     );
-          }
-  handleSiteClick(site){
+  }
+
+  handleSiteClick(site: SiteConfig){
     if(site.template){
       this.setState({
         dialogNewSlashImportSite: {
@@ -427,7 +499,7 @@ class SiteLibraryRouted extends React.Component{
     }
   }
 
-  renderList(sites, listTitle){
+  renderList(sites: SiteConfig[], listTitle: string){
     return (
 
       <List
