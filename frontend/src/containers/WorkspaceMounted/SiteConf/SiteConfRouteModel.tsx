@@ -9,12 +9,55 @@ import Grid            from '@mui/material/Grid';
 import Box             from '@mui/material/Box';
 import FolderIcon from '@mui/icons-material/Folder';
 import BallotIcon from '@mui/icons-material/Ballot';
+import { History } from 'history';
 
-class SiteConfRouteModel extends React.Component {
+interface SiteConfig {
+  key?: string;
+  name?: string;
+  source?: {
+    path?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
 
-  history;
+interface FileItem {
+  key?: string;
+  filename?: string;
+  icon?: React.ReactNode;
+  [key: string]: unknown;
+}
 
-  constructor(props){
+interface ParseInfo {
+  baseFile?: string;
+  includeFiles?: FileItem[];
+  includeFilesSub?: FileItem[];
+  partialFiles?: FileItem[];
+  [key: string]: unknown;
+}
+
+interface SiteConfRouteModelProps {
+  siteKey: string;
+  workspaceKey: string;
+}
+
+interface SiteConfRouteModelState {
+  siteconf: SiteConfig;
+  source: {
+    path?: string;
+    [key: string]: unknown;
+  };
+  publish: Record<string, unknown>;
+  parseInfo: ParseInfo;
+  quiqrCloud: Record<string, unknown>;
+  siteKey?: string;
+}
+
+class SiteConfRouteModel extends React.Component<SiteConfRouteModelProps, SiteConfRouteModelState> {
+
+  _ismounted: boolean = false;
+
+  constructor(props: SiteConfRouteModelProps){
     super(props);
     this.state = {
       siteconf : {},
@@ -26,7 +69,7 @@ class SiteConfRouteModel extends React.Component {
     this._ismounted = false;
   }
 
-  componentDidUpdate(preProps){
+  componentDidUpdate(preProps: SiteConfRouteModelProps){
     if(this._ismounted && preProps.siteKey !== this.props.siteKey){
       this.checkSiteInProps();
     }
@@ -54,19 +97,18 @@ class SiteConfRouteModel extends React.Component {
     });
 
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      var stateUpdate  = {};
-      stateUpdate.siteconf = bundle.site;
+      this.setState({
+        siteconf: bundle.site as SiteConfig
+      });
 
       if(bundle.site.source){
-        this.setState({source: bundle.site.source});
+        this.setState({source: bundle.site.source as { path?: string; [key: string]: unknown }});
       }
-
-      this.setState(stateUpdate);
     })
 
   }
 
-  renderDogFoodIcon(item, history){
+  renderDogFoodIcon(item: FileItem, history: History){
     let encodedSiteKey = this.props.siteKey;
     let encodedWorkspaceKey = this.props.workspaceKey;
     let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
@@ -91,7 +133,7 @@ class SiteConfRouteModel extends React.Component {
 
   }
 
-  renderSection(title, files, history){
+  renderSection(title: string, files: FileItem[], history: History){
 //    let encodedSiteKey = this.props.siteKey;
 //    let encodedWorkspaceKey = this.props.workspaceKey;
 //    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
@@ -147,15 +189,15 @@ class SiteConfRouteModel extends React.Component {
     return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
   }
 
-  renderWithRoute(history){
+  renderWithRoute(history: History){
 
 
-    let includeFiles = [];
-    let includeFilesSub = [];
-    let partialFiles = [];
+    let includeFiles: FileItem[] = [];
+    let includeFilesSub: FileItem[] = [];
+    let partialFiles: FileItem[] = [];
     if(this.state.parseInfo && this.state.parseInfo.includeFiles && this.state.parseInfo.partialFiles){
       includeFiles = this.state.parseInfo.includeFiles;
-      includeFilesSub = this.state.parseInfo.includeFilesSub;
+      includeFilesSub = this.state.parseInfo.includeFilesSub || [];
       partialFiles = this.state.parseInfo.partialFiles;
     }
 

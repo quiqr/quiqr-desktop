@@ -3,9 +3,19 @@ import { Route }    from 'react-router-dom';
 import Sidebar      from './../Sidebar';
 import service      from './../../services/service';
 
+import { History } from 'history';
 
-export class SiteLibrarySidebar extends React.Component {
-  constructor(props){
+interface SiteLibrarySidebarProps {
+  [key: string]: unknown;
+}
+
+interface SiteLibrarySidebarState {
+  selectedMenuItem: string;
+  tags: string[];
+}
+
+export class SiteLibrarySidebar extends React.Component<SiteLibrarySidebarProps, SiteLibrarySidebarState> {
+  constructor(props: SiteLibrarySidebarProps){
 
     super(props);
     this.state = {
@@ -16,7 +26,9 @@ export class SiteLibrarySidebar extends React.Component {
 
   componentDidMount(){
     service.api.readConfPrefKey('sitesListingView').then((view)=>{
-      this.setState({selectedMenuItem: view });
+      if (typeof view === 'string') {
+        this.setState({selectedMenuItem: view });
+      }
     });
 
     let tags = [];
@@ -50,12 +62,12 @@ export class SiteLibrarySidebar extends React.Component {
     return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
   }
 
-  saveSelectedMenuItem(item){
+  saveSelectedMenuItem(item: string){
     service.api.saveConfPrefKey("sitesListingView",item);
     this.setState({selectedMenuItem:item});
   }
 
-  renderWithRoute(history){
+  renderWithRoute(history: History){
 
     let basePath = `/sites`;
 

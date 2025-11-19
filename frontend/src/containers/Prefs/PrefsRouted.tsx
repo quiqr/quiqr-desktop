@@ -3,7 +3,11 @@ import { Switch, Route } from 'react-router-dom';
 import  PrefsGeneral  from './PrefsGeneral';
 import  PrefsAdvanced  from './PrefsAdvanced';
 
-export class PrefsRouted extends React.Component {
+interface PrefsRoutedProps {}
+
+interface PrefsRoutedState {}
+
+export class PrefsRouted extends React.Component<PrefsRoutedProps, PrefsRoutedState> {
 
   render(){
     return (

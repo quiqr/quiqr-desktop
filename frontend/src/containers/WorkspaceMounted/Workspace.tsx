@@ -1,5 +1,5 @@
 import React                               from 'react';
-import { withRouter }                      from 'react-router';
+import { withRouter, RouteComponentProps }                      from 'react-router';
 import { Switch, Route }                   from 'react-router-dom'
 import AppsIcon                            from '@mui/icons-material/Apps';
 import SettingsApplicationsIcon            from '@mui/icons-material/SettingsApplications';
@@ -18,15 +18,64 @@ import WorkspaceSidebar                    from './WorkspaceSidebar';
 import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import { SyncSidebar, SyncRouted }         from './Sync';
 import service                             from '../../services/service';
+import { History } from 'history';
 
 //TODO use global
 import styleLightDefault from '../../app-ui-styles/quiqr10/style-light.js';
 import styleDarkDefault from '../../app-ui-styles/quiqr10/style-dark.js';
 let style = styleLightDefault;
 
-class WorkSpace extends React.Component{
+interface SiteConfig {
+  key: string;
+  name: string;
+  publish?: Array<{
+    key: string;
+    config?: {
+      type?: string;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
 
-  constructor(props){
+interface WorkspaceConfig {
+  serve?: Array<{
+    hugoHidePreviewSite?: boolean;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
+
+interface StyleConfig {
+  container: Record<string, unknown>;
+  menuContainer: Record<string, unknown>;
+  contentContainer: Record<string, unknown>;
+  topToolbar: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+interface WorkspaceProps extends RouteComponentProps {
+  siteKey: string;
+  workspaceKey: string;
+  applicationRole?: string;
+}
+
+interface WorkspaceState {
+  site: SiteConfig | null;
+  workspace: WorkspaceConfig | null;
+  error: string | null;
+  style: StyleConfig;
+  menuIsLocked: boolean;
+  forceShowMenu: boolean;
+  skipMenuTransition: boolean;
+}
+
+class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
+
+  _ismounted: boolean = false;
+
+  constructor(props: WorkspaceProps){
     super(props);
 
     //PORTQUIQR
@@ -67,22 +116,25 @@ class WorkSpace extends React.Component{
 
   setThemeStyleFromPrefs(){
     service.api.readConfKey('prefs').then((value)=>{
-      if(value.interfaceStyle){
+      if(typeof value === 'object' && value !== null && 'interfaceStyle' in value){
+        const prefs = value as { interfaceStyle?: string };
 
-        let themeStyle='light';
-        if(value.interfaceStyle ==='quiqr10-dark'){
-          themeStyle='dark';
+        if(prefs.interfaceStyle){
+          let themeStyle='light';
+          if(prefs.interfaceStyle ==='quiqr10-dark'){
+            themeStyle='dark';
+          }
+
+          this.setState({
+            style: themeStyle === 'light' ? styleLightDefault : styleDarkDefault,
+          });
         }
-
-        this.setState({
-          style: themeStyle === 'light' ? styleLightDefault : styleDarkDefault,
-        });
       }
     });
   }
 
 
-  componentDidUpdate(preProps){
+  componentDidUpdate(preProps: WorkspaceProps){
 
     if(preProps.siteKey){
 
@@ -96,17 +148,17 @@ class WorkSpace extends React.Component{
   refresh(){
     let {siteKey, workspaceKey } = this.props;
     if(siteKey && workspaceKey){
-      let stateUpdate = {};
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-        stateUpdate.site = bundle.site;
-        stateUpdate.workspace = bundle.workspaceDetails;
-        stateUpdate.error = null;
         if(this._ismounted){
-          this.setState(stateUpdate);
+          this.setState({
+            site: bundle.site as SiteConfig,
+            workspace: bundle.workspaceDetails as WorkspaceConfig,
+            error: null
+          });
         }
-      }).catch(e=>{
+      }).catch((e: unknown)=>{
         if(this._ismounted){
-          this.setState({site: null, workspace: null, error: e});
+          this.setState({site: null, workspace: null, error: String(e)});
         }
       });
     }
@@ -129,15 +181,13 @@ class WorkSpace extends React.Component{
     this.setState({forceShowMenu});
   }
 
-  renderWorkspaceSidebar = (history, url, site, workspace)=>{
+  renderWorkspaceSidebar = (_history: History, url: string, site: string, workspace: string)=>{
 
     return <WorkspaceSidebar
       key={ url }
       applicationRole={ this.props.applicationRole }
-      siteKey={ site ? decodeURIComponent(site) : null }
-      site={this.state.site}
-      workspaceKey={ workspace ? decodeURIComponent(workspace) : null }
-      history={history}
+      siteKey={ site ? decodeURIComponent(site) : '' }
+      workspaceKey={ workspace ? decodeURIComponent(workspace) : '' }
       hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
       menuIsLocked={this.state.menuIsLocked}
       onToggleItemVisibility={()=>{this.toggleForceShowMenu()}}
@@ -162,7 +212,7 @@ class WorkSpace extends React.Component{
     </Switch>);
   }
 
-  toolbarItemsLeft(siteKey, workspaceKey, activeButton, history){
+  toolbarItemsLeft(siteKey: string, workspaceKey: string, activeButton: string, history: History){
     return [
       <ToolbarButton
         key="buttonContent"
@@ -198,7 +248,7 @@ class WorkSpace extends React.Component{
     ];
   }
 
-  toolbarItemsRight(siteKey, history){
+  toolbarItemsRight(siteKey: string, history: History){
 
     return [
       <ToolbarButton
@@ -252,8 +302,10 @@ class WorkSpace extends React.Component{
 
     let currentBaseUrlPath = '';
     service.api.getCurrentBaseUrl().then((path)=>{
-      currentBaseUrlPath = path;
-      window.require('electron').shell.openExternal('http://localhost:13131'+currentBaseUrlPath);
+      if (typeof path === 'string') {
+        currentBaseUrlPath = path;
+        window.require('electron').shell.openExternal('http://localhost:13131'+currentBaseUrlPath);
+      }
     });
   }
 
@@ -313,7 +365,7 @@ class WorkSpace extends React.Component{
       <Route path='/sites/:site/workspaces/:workspace/sync' render={ ({match})=> {
         return (<SyncSidebar
           menus={[]}
-          site={ this.state.site }
+          site={ this.state.site as SiteConfig & { publish: Array<{ key: string; config?: { type?: string; [key: string]: unknown } }> } }
           workspace={ this.state.workspace }
           siteKey={ decodeURIComponent(match.params.site) }
           workspaceKey={ decodeURIComponent(match.params.workspace) }
@@ -343,7 +395,7 @@ class WorkSpace extends React.Component{
     </Switch>);
   }
 
-  renderDashboard(match){
+  renderDashboard(match: { url: string; params: { [key: string]: string } }){
     return <Dashboard
       key={ match.url }
       applicationRole={ this.props.applicationRole }
@@ -351,7 +403,7 @@ class WorkSpace extends React.Component{
       workspaceKey={ decodeURIComponent(match.params.workspace) } />
   }
 
-  renderSync(match){
+  renderSync(match: { url: string; params: { [key: string]: string } }){
     return <SyncRouted
       key={ match.url }
       site={ this.state.site }
@@ -461,7 +513,7 @@ class WorkSpace extends React.Component{
         menuContainerStyle.transition = transition;
       }
 
-      this.state.setState({skipMenuTransition: false});
+      this.setState({skipMenuTransition: false});
     }
 
     return (<Switch>

@@ -2,7 +2,13 @@ import * as React from "react";
 import { Switch, Route } from "react-router-dom";
 import SyncRouteGeneral from "./SyncRouteGeneral";
 
-export class SyncRouted extends React.Component {
+interface SyncRoutedProps {
+  [key: string]: unknown;
+}
+
+interface SyncRoutedState {}
+
+export class SyncRouted extends React.Component<SyncRoutedProps, SyncRoutedState> {
   render() {
     return (
       <Switch>

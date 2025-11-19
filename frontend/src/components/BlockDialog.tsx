@@ -6,7 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 interface BlockDialogProps {
   open: boolean;
-  children: React.ReactElement;
+  children: React.ReactElement | string;
 }
 
 const BlockDialog = ({ open, children }: BlockDialogProps) => {

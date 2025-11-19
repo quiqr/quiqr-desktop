@@ -3,8 +3,42 @@ import service       from './../../services/service'
 import { SukohForm } from './../../components/SukohForm';
 import Spinner       from './../../components/Spinner';
 
-class Single extends React.Component{
-  constructor(props){
+interface SingleProps {
+  siteKey: string;
+  workspaceKey: string;
+  singleKey: string;
+  fileOverride?: string;
+  refreshed?: boolean;
+}
+
+interface WorkspaceSingle {
+  key: string;
+  title: string;
+  fields: unknown[];
+  build_actions?: unknown[];
+  hidePreviewIcon?: boolean;
+  previewUrl?: string;
+  hideExternalEditIcon?: boolean;
+  hideSaveButton?: boolean;
+  [key: string]: unknown;
+}
+
+interface WorkspaceDetails {
+  singles: WorkspaceSingle[];
+  [key: string]: unknown;
+}
+
+interface SingleState {
+  selectedWorkspaceDetails: WorkspaceDetails | null;
+  single: WorkspaceSingle | null;
+  previewUrl: string | null;
+  singleValues: unknown;
+  showSpinner?: boolean;
+  currentBaseUrlPath?: string;
+}
+
+class Single extends React.Component<SingleProps, SingleState>{
+  constructor(props: SingleProps){
     super(props);
     this.state = {
       selectedWorkspaceDetails: null,
@@ -23,24 +57,20 @@ class Single extends React.Component{
     */
 
     service.registerListener(this);
-    var stateUpdate  = {};
 
     //fileOverride is used for some dynamic dogFood editors
     var { siteKey, workspaceKey, singleKey, fileOverride } = this.props;
 
     Promise.all([
-      service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride).then((single)=>{
-        stateUpdate.singleValues = single;
-      }),
-      service.api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails)=>{
-        stateUpdate.selectedWorkspaceDetails = workspaceDetails;
-      }),
-      service.api.getCurrentBaseUrl().then((currentBaseUrlPath)=>{
-        stateUpdate.currentBaseUrlPath = currentBaseUrlPath;
-      })
-
-    ]).then(()=>{
-      this.setState(stateUpdate);
+      service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride),
+      service.api.getWorkspaceDetails(siteKey, workspaceKey),
+      service.api.getCurrentBaseUrl()
+    ]).then(([single, workspaceDetails, currentBaseUrlPath])=>{
+      this.setState({
+        singleValues: single,
+        selectedWorkspaceDetails: workspaceDetails as WorkspaceDetails,
+        currentBaseUrlPath: typeof currentBaseUrlPath === 'string' ? currentBaseUrlPath : undefined
+      });
     }).catch((e)=>{
         service.api.logToConsole(e, 'error')
     });
@@ -51,7 +81,7 @@ class Single extends React.Component{
     service.unregisterListener(this);
   }
 
-  handleOpenInEditor(context){
+  handleOpenInEditor(context: { reject: (message: string) => void }){
     var { siteKey, workspaceKey, singleKey } = this.props;
 
     let promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
@@ -62,7 +92,7 @@ class Single extends React.Component{
     })
   }
 
-  handleSave(context){
+  handleSave(context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }){
 
     var { siteKey, workspaceKey, singleKey } = this.props;
 
