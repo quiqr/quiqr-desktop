@@ -1,5 +1,6 @@
 import React from "react";
-import { BaseDynamic, BaseDynamicProps } from "../../HoForm";
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from "../../HoForm";
+import type { FormStateBuilder } from "../../HoForm/types";
 import Typography from "@mui/material/Typography";
 import FormItemWrapper from "./shared/FormItemWrapper";
 import Tip from "../../Tip";
@@ -9,8 +10,33 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { Autocomplete } from "@mui/material";
 
-class SelectFromQueryDynamic extends BaseDynamic {
-  constructor(props) {
+type SelectOption = string | { value: string; text: string };
+
+interface SelectFromQueryDynamicField extends FieldBase {
+  query_glob: string;
+  query_string: string;
+  option_image_path?: string;
+  option_image_width?: number;
+  option_image_extension?: string;
+  default?: string | string[];
+  multiple?: boolean;
+  tip?: string;
+  title: string;
+  arrayTitle?: boolean;
+}
+
+interface SelectFromQueryDynamicState extends BaseDynamicState {
+  options: SelectOption[];
+  [key: string]: any; // For dynamic optimg_ properties
+}
+
+type SelectFromQueryDynamicProps = BaseDynamicProps<SelectFromQueryDynamicField>;
+
+
+
+
+class SelectFromQueryDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQueryDynamicState> {
+  constructor(props: SelectFromQueryDynamicProps) {
     super(props);
 
     this.state = {
@@ -19,7 +45,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
     };
   }
 
-  normalizeState({ state, field, stateBuilder }) {
+  normalizeState({ state, field, stateBuilder }: { state: any; field: SelectFromQueryDynamicField; stateBuilder?: FormStateBuilder }) {
     //TODO: clear if value is not a valid option
     let key = field.key;
     let isArrayType = field.multiple === true;
@@ -38,7 +64,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
     return "select-from-query";
   }
 
-  parseFileMetaDataQuery(query_string, files) {
+  parseFileMetaDataQuery(query_string: string, files: string[]): string[] {
     let options = [];
     files.forEach((filepath) => {
       if (query_string === "#parent_dir[]") {
@@ -62,7 +88,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
     return options;
   }
 
-  parseFileContentDataQuery(query_string, files) {
+  parseFileContentDataQuery(query_string: string, files: string[]): void {
     if (files.length > 1) {
       this.setState({ error_msg: "Object queries are currently only possible in max. 1 one file." });
       return;
@@ -70,7 +96,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
 
     if ((query_string.match(/\./g) || []).length === 1 && query_string.slice(-2) === "[]") {
       files.forEach((filepath) => {
-        service.api.parseFileToObject(filepath).then((parsedFileObject) => {
+        service.api.parseFileToObject(filepath).then((parsedFileObject: any) => {
           let options = parsedFileObject[query_string.slice(1, -2)];
           this.setState({ options: options });
           this.setOptionImages(options);
@@ -82,17 +108,17 @@ class SelectFromQueryDynamic extends BaseDynamic {
     }
   }
 
-  setOptionImages(options) {
+  setOptionImages(options: SelectOption[]): void {
     let { node } = this.props.context;
     let { field } = node;
 
     if (typeof field.option_image_path === "string") {
-      service.api.getCurrentSiteKey().then((currentSiteKey) => {
+      service.api.getCurrentSiteKey().then((currentSiteKey: string) => {
         options.forEach((option) => {
           //service.api.logToConsole(field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension);
           service.api
             .getThumbnailForPath(currentSiteKey, "source", field.option_image_path + "/" + this.getOptionValue(option) + "." + field.option_image_extension)
-            .then((img) => {
+            .then((img: any) => {
               this.setState({ ["optimg_" + this.getOptionValue(option)]: img });
             });
         });
@@ -101,12 +127,13 @@ class SelectFromQueryDynamic extends BaseDynamic {
   }
 
   runQuery() {
+    console.log(this.props.context.node)
     let { node } = this.props.context;
     let { field } = node;
 
     service.api
       .globSync(field.query_glob, {})
-      .then((files) => {
+      .then((files: string[]) => {
         let options = [];
         if (field.query_string.startsWith("#")) {
           options = this.parseFileMetaDataQuery(field.query_string, files);
@@ -118,6 +145,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
         }
       })
       .catch(() => {
+        console.log('error!!!')
         this.setState({
           options: [],
           error_msg: "Query failed while searching for file(s)",
@@ -126,7 +154,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
       });
   }
 
-  getOptionValue(option) {
+  getOptionValue(option: SelectOption): string {
     if (typeof option === "string") {
       return option;
     } else {
@@ -134,7 +162,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
     }
   }
 
-  getOptionLabel(option) {
+  getOptionLabel(option: SelectOption): string {
     if (typeof option === "string") {
       return option;
     } else {
@@ -146,11 +174,11 @@ class SelectFromQueryDynamic extends BaseDynamic {
     this.runQuery();
   }
 
-  renderAutoComplete(field, context) {
+  renderAutoComplete(field: SelectFromQueryDynamicField, context: any) {
     const options = this.state.options;
 
     let showImage = false;
-    let option_image_width;
+    let option_image_width: number;
 
     if (typeof field.option_image_path === "string") {
       showImage = true;
@@ -159,22 +187,23 @@ class SelectFromQueryDynamic extends BaseDynamic {
 
     return (
       <Autocomplete
+      style={{'minHeight': '350px'}}
         id='auto-complete'
         options={options}
         onChange={(_, newValue) => {
           context.setValue(newValue);
         }}
-        renderOption={(option) => {
+        renderOption={(props, option) => {
           if (showImage) {
             return (
-              <Box component='li' sx={{ "& > img": { mr: 2, flexShrink: 0 } }}>
+              <Box component='li' {...props} sx={{ "& > img": { mr: 2, flexShrink: 0 } }}>
                 <img alt='' loading='lazy' width={option_image_width} src={this.state["optimg_" + this.getOptionValue(option)]} />
                 &nbsp;
                 {this.getOptionLabel(option)}
               </Box>
             );
           } else {
-            return this.getOptionLabel(option);
+            return <Box component='li' {...props}>{this.getOptionLabel(option)}</Box>;
           }
         }}
         value={context.value}
@@ -213,7 +242,7 @@ class SelectFromQueryDynamic extends BaseDynamic {
     return (
       <React.Fragment>
         {this.state.error_msg ? (
-          <Typography variant='body2'>{this.state.error_msg}</Typography>
+          <Typography>{this.state.error_msg}</Typography>
         ) : (
           <FormItemWrapper style={{ paddingTop: "20px" }} control={this.renderAutoComplete(field, context)} iconButtons={iconButtons} />
         )}

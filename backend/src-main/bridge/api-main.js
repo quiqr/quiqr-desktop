@@ -424,7 +424,7 @@ api.shouldReloadForm = async function({reloadFormPath}, context){
   context.resolve(true);
 }
 
-api.reloadCurrentForm = async function(){
+api.reloadCurrentForm = async function(_, context){
   if(global.currentFormNodePath){
     let currentPath = global.currentFormNodePath.endsWith('/') ? global.currentFormNodePath.slice(0, -1) : global.currentFormNodePath;
     currentPath = currentPath.toLowerCase().replace('/','.');
@@ -435,6 +435,8 @@ api.reloadCurrentForm = async function(){
       mainWindow.webContents.send("redirectToGivenLocation", urlpath);
     }
   }
+
+  context.resolve(true);
 }
 
 api.redirectTo = async function({location,forceRefresh}){

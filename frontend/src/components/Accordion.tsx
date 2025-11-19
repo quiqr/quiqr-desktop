@@ -119,10 +119,6 @@ const Accordion: React.FC<AccordionProps> = ({ index, onChange, style, forceActi
 
   const openedIndex = index !== undefined ? index : internalIndex;
 
-  useEffect(() => {
-    console.log(children);
-  });
-
   const handleChange = React.useCallback(
     (i: number) => {
       return () => {
