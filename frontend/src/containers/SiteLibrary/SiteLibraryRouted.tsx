@@ -63,7 +63,7 @@ interface SiteLibraryRoutedProps {
 }
 
 interface SiteLibraryRoutedState {
-  blockingOperation: string | null;
+  blockingOperation: string | null | React.ReactNode;
   currentSiteKey: string | null;
   showSpinner: boolean;
   configurations: Configurations;

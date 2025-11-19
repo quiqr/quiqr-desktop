@@ -1,7 +1,13 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 
-const TopToolbarLeft = ({ title }) => {
+interface TopToolbarLeftProps { 
+  title: string;
+  siteKey: string;
+  workspaceKey: string;
+}
+
+const TopToolbarLeft = ({ title, siteKey, workspaceKey }: TopToolbarLeftProps) => {
   return (
     <Box
       textOverflow="ellipsis"

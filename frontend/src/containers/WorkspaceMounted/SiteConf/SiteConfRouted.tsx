@@ -4,7 +4,10 @@ import  SiteConfRouteGeneral        from './SiteConfRouteGeneral';
 import  SiteConfRouteDogFoodSingle  from './SiteConfRouteDogFoodSingle';
 import  SiteConfRouteModel          from './SiteConfRouteModel';
 
-interface SiteConfRoutedProps {}
+interface SiteConfRoutedProps {
+  siteKey: string;
+  workspaceKey: string;
+}
 
 interface SiteConfRoutedState {}
 

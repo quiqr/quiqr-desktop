@@ -3,7 +3,16 @@ import service                       from './../../../services/service'
 import { SukohForm }                 from './../../../components/SukohForm';
 import Spinner                       from './../../../components/Spinner'
 
-class CollectionItem extends React.Component{
+interface CollectionItemProps {
+  siteKey: string;
+  workspaceKey: string;
+  collectionKey: string;
+  collectionItemKey: string;
+}
+
+interface CollectionItemState {}
+
+class CollectionItem extends React.Component<CollectionItemProps, CollectionItemState>{
   constructor(props){
     super(props);
     this.state = {

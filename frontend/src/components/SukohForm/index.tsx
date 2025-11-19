@@ -31,6 +31,7 @@ type SukohFormProps = {
   onSave?: (context: SaveContext) => void;
   hideSaveButton?: boolean;
   refreshed?: boolean;
+  debug: boolean;
 };
 
 type SukohFormState = {
