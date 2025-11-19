@@ -25,7 +25,7 @@ const Spinner = ({ time = 3000, spins = 3, color = "rgba(0, 0, 0, 0.2)", margin 
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const borderWidth = Math.max(1, size);
+  const borderWidth = Math.max(1, size / 10);
   const borderStyle = `${borderWidth}em solid ${color}`;
   const style = {
     margin: margin,
