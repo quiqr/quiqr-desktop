@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { notarize } = require('electron-notarize');
+const { notarize } = require('@electron/notarize');
 
 var notconf = {
     appBundleId: 'com.lingewoud.quiqr',
