@@ -23,6 +23,7 @@ import { History } from 'history';
 //TODO use global
 import styleLightDefault from '../../app-ui-styles/quiqr10/style-light.js';
 import styleDarkDefault from '../../app-ui-styles/quiqr10/style-dark.js';
+import { UserPreferences } from '../../../types';
 let style = styleLightDefault;
 
 interface SiteConfig {
@@ -115,20 +116,16 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
   }
 
   setThemeStyleFromPrefs(){
-    service.api.readConfKey('prefs').then((value)=>{
-      if(typeof value === 'object' && value !== null && 'interfaceStyle' in value){
-        const prefs = value as { interfaceStyle?: string };
-
-        if(prefs.interfaceStyle){
-          let themeStyle='light';
-          if(prefs.interfaceStyle ==='quiqr10-dark'){
-            themeStyle='dark';
-          }
-
-          this.setState({
-            style: themeStyle === 'light' ? styleLightDefault : styleDarkDefault,
-          });
+    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
+      if(value.interfaceStyle){
+        let themeStyle='light';
+        if(value.interfaceStyle ==='quiqr10-dark'){
+          themeStyle='dark';
         }
+
+        this.setState({
+          style: themeStyle === 'light' ? styleLightDefault : styleDarkDefault,
+        });
       }
     });
   }

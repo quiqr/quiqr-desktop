@@ -3,6 +3,7 @@ import { Route } from 'react-router-dom'
 import service   from './../../services/service'
 import Sidebar, { SidebarMenu } from '../Sidebar';
 import { History } from 'history';
+import { UserPreferences } from '../../../types';
 //import Box       from '@mui/material/Box';
 //import Switch    from '@mui/material/Switch';
 
@@ -91,18 +92,17 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
     this._ismounted = true;
     this.refresh();
 
-    service.api.readConfKey('prefs').then((value)=>{
-      if (typeof value === 'object' && value !== null) {
-        this.setState({prefs: value as Record<string, unknown> });
+    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
 
-        const collapsedMenusKey = this.props.siteKey+':collapsedMenus';
-        if(collapsedMenusKey in value && Array.isArray(value[collapsedMenusKey])){
-          this.setState({menusCollapsed: value[collapsedMenusKey] as string[] });
-        }
-        else{
-          this.setState({menusCollapsed: []});
-        }
+      this.setState({prefs: value});
+
+      const collapsedMenusKey = this.props.siteKey+':collapsedMenus';
+      if(collapsedMenusKey in value && Array.isArray(value[collapsedMenusKey])){
+        this.setState({menusCollapsed: value[collapsedMenusKey] as string[] });
+      } else {
+        this.setState({menusCollapsed: []});
       }
+      
     });
   }
 

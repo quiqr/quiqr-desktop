@@ -54,6 +54,8 @@ class Service extends BaseService {
             }).then((workspaceDetails)=>{
                 bundle.workspaceDetails = workspaceDetails;
                 this._siteAndWorkspaceDataPromise = null;
+                console.log('WORKSPACE DATA·BUNDLE!');
+                console.log(bundle);
                 return bundle;
             }).catch(error=>{
                 this._siteAndWorkspaceDataPromise = null;

@@ -4,8 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import App               from './App';
 import service           from './services/service';
 import SnackbarManager   from './components/SnackbarManager';
+import { UserPreferences } from '../types';
 
-service.api.readConfKey('prefs').then((value)=>{
+service.api.readConfKey('prefs').then((value: UserPreferences)=>{
 
   let appUiStyle = 'quiqr10';
 
