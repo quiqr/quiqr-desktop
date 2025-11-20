@@ -1,8 +1,7 @@
 # Quiqr App CHANGELOG
 
+## **WORK IN PROGRESS**
 
-
-## Next
 - chore: react 19
 - chore: electron 39
 - WIP: migrate to TS 
