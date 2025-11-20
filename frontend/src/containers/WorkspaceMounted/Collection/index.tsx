@@ -274,10 +274,14 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
       setState(prev => ({ ...prev, showSpinner: true }));
     });
     */
-    
-    const componentRef = { setState };
+
+    const componentRef = {
+      forceUpdate: () => {
+        setState(prev => ({ ...prev }));
+      }
+    };
     service.registerListener(componentRef);
-    
+
     service.api.getLanguages(siteKey, workspaceKey).then((langs) => {
       setState(prev => ({ ...prev, languages: langs }));
     });

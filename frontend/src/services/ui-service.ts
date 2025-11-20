@@ -1,21 +1,12 @@
 import {BaseService} from './base-service';
 import mainProcessBridge from '../utils/main-process-bridge';
+import { SnackMessage, ConsoleMessage, uiServiceSchemas } from '../../types';
 
-type SnackSeverity = 'success' | 'warning'
+class SnackMessageService extends BaseService<typeof uiServiceSchemas> {
 
-
-type SnackArgs = {
-    severity: SnackSeverity; 
-    action?: any, onActionClick?: unknown; 
-    autoHideDuration?: number
-}
-
-type SnackQueueItem = { message: string } & SnackArgs;
-class SnackMessageService extends BaseService {
-
-    _snackMessageQueue: SnackQueueItem[]
-    _currentSnackMessage: SnackQueueItem | undefined;
-    _previousSnackMessage: SnackQueueItem | undefined;
+    _snackMessageQueue: SnackMessage[]
+    _currentSnackMessage: SnackMessage | undefined;
+    _previousSnackMessage: SnackMessage | undefined;
 
     constructor(){
 
@@ -23,6 +14,10 @@ class SnackMessageService extends BaseService {
         this._snackMessageQueue = [];
         this._currentSnackMessage = undefined;
         this._previousSnackMessage = undefined;
+    }
+
+    protected _getSchemas() {
+        return uiServiceSchemas;
     }
 
     _tryAssingCurrentSnack(){
@@ -37,7 +32,7 @@ class SnackMessageService extends BaseService {
         return false;
     }
 
-    addSnackMessage(message: string, { severity, action, onActionClick, autoHideDuration = 3000 }: SnackArgs ){
+    addSnackMessage(message: string, { severity, action, onActionClick, autoHideDuration = 3000 }: Omit<SnackMessage, 'message'> ){
         this._snackMessageQueue.push({message, severity, action, onActionClick, autoHideDuration});
         if(this._tryAssingCurrentSnack())
             this._notifyChanges();
@@ -50,23 +45,25 @@ class SnackMessageService extends BaseService {
         this._notifyChanges();
     }
 
-    getCurrentSnackMessage(){
-        return this._currentSnackMessage;
+    getCurrentSnackMessage(): SnackMessage | undefined {
+        // Validate the response - type is automatically inferred!
+        return this._validateResponse('getCurrentSnackMessage', this._currentSnackMessage);
     }
 
-    getPreviousSnackMessage(){
-        return this._previousSnackMessage;
+    getPreviousSnackMessage(): SnackMessage | undefined {
+        // Validate the response - type is automatically inferred!
+        return this._validateResponse('getPreviousSnackMessage', this._previousSnackMessage);
     }
 }
 
 
-class ConsoleService extends BaseService {
+class ConsoleService extends BaseService<typeof uiServiceSchemas> {
 
     _consoleIsHiddden: boolean
     _consoleTimeout: any
-    _consoleMessages: { id: number, line: string }[]
-    _consoleBuffer: { id: number, line: string }[]
-    consoleMessageLastId: number 
+    _consoleMessages: ConsoleMessage[]
+    _consoleBuffer: ConsoleMessage[]
+    consoleMessageLastId: number
 
     constructor(){
         super();
@@ -81,6 +78,10 @@ class ConsoleService extends BaseService {
 
         //PORTQUIQR
         mainProcessBridge.addMessageHandler('console', this._onConsole.bind(this));
+    }
+
+    protected _getSchemas() {
+        return uiServiceSchemas;
     }
 
     _onConsole({line}){
@@ -104,8 +105,9 @@ class ConsoleService extends BaseService {
         }, 50);
     }
 
-    getConsoleMessages(){
-        return this._consoleMessages;
+    getConsoleMessages(): ConsoleMessage[] {
+        // Validate the response - type is automatically inferred!
+        return this._validateResponse('getConsoleMessages', this._consoleMessages);
     }
 
     /*

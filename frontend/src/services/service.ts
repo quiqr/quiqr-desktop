@@ -7,7 +7,7 @@ import {
     WorkspaceDetails
 } from '../../types';
 
-class Service extends BaseService {
+class Service extends BaseService<typeof serviceSchemas> {
 
     api: typeof api.instance;
     _configurations: Configurations | undefined;
@@ -23,6 +23,10 @@ class Service extends BaseService {
         this._siteAndWorkspaceDataPromise = undefined;
     }
 
+    protected _getSchemas() {
+        return serviceSchemas;
+    }
+
     getConfigurations(refetch?: boolean): Promise<Configurations> {
         if (this._configurations) {
             if (refetch === true)
@@ -32,12 +36,8 @@ class Service extends BaseService {
         }
         if (!this._configurationsPromise) {
             this._configurationsPromise = this.api.getConfigurations({ invalidateCache: refetch || false }).then((configurations) => {
-                // Validate the response
-                const validated = this._validateResponse(
-                    'getConfigurations',
-                    configurations,
-                    serviceSchemas.getConfigurations
-                );
+                // Validate the response - type is automatically inferred!
+                const validated = this._validateResponse('getConfigurations', configurations);
                 this._configurations = validated;
                 this._configurationsPromise = undefined;
                 return validated;
@@ -65,15 +65,8 @@ class Service extends BaseService {
                     bundle.workspaceDetails = workspaceDetails;
                     this._siteAndWorkspaceDataPromise = undefined;
 
-                    console.log('WORKSPACE DATA·BUNDLE!');
-                    console.log(bundle);
-
-                    // Validate the complete bundle before returning
-                    const validated = this._validateResponse(
-                        'getSiteAndWorkspaceData',
-                        bundle,
-                        serviceSchemas.getSiteAndWorkspaceData
-                    );
+                    // Validate the complete bundle before returning - type is automatically inferred!
+                    const validated = this._validateResponse('getSiteAndWorkspaceData', bundle);
 
                     return validated;
                 }).catch(error => {
@@ -87,23 +80,15 @@ class Service extends BaseService {
 
     getWorkspaceDetails(siteKey: string, workspaceKey: string): Promise<WorkspaceDetails> {
         return this.api.getWorkspaceDetails(siteKey, workspaceKey).then((details) => {
-            // Validate the response
-            return this._validateResponse(
-                'getWorkspaceDetails',
-                details,
-                serviceSchemas.getWorkspaceDetails
-            );
+            // Validate the response - type is automatically inferred!
+            return this._validateResponse('getWorkspaceDetails', details);
         });
     }
 
     getSiteCreatorMessage(siteKey: string, workspaceKey: string): Promise<string> {
         return this.api.getCreatorMessage(siteKey, workspaceKey).then((message) => {
-            // Validate the response
-            return this._validateResponse(
-                'getSiteCreatorMessage',
-                message,
-                serviceSchemas.getSiteCreatorMessage
-            );
+            // Validate the response - type is automatically inferred!
+            return this._validateResponse('getSiteCreatorMessage', message);
         });
     }
 
@@ -114,7 +99,7 @@ class Service extends BaseService {
     openWorkspaceDir(siteKey: string, workspaceKey: string): void {
         this.getSiteAndWorkspaceData(siteKey, workspaceKey)
             .then((bundle) => {
-                this.api.openFileExplorer(bundle.workspace.path);
+                this.api.openFileExplorer(bundle.workspace.path, false);
             });
     }
 }

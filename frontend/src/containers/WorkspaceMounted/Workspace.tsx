@@ -23,22 +23,8 @@ import { History } from 'history';
 //TODO use global
 import styleLightDefault from '../../app-ui-styles/quiqr10/style-light.js';
 import styleDarkDefault from '../../app-ui-styles/quiqr10/style-dark.js';
-import { UserPreferences } from '../../../types';
+import { SiteConfig, UserPreferences } from '../../../types';
 let style = styleLightDefault;
-
-interface SiteConfig {
-  key: string;
-  name: string;
-  publish?: Array<{
-    key: string;
-    config?: {
-      type?: string;
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  }>;
-  [key: string]: unknown;
-}
 
 interface WorkspaceConfig {
   serve?: Array<{
