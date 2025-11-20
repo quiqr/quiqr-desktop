@@ -10,7 +10,7 @@
   <a href="https://book.quiqr.org/docs/10-getting-started/01.installation/">Install</a>
   ·
   <a href="https://book.quiqr.org">Documentation</a>
-  .
+  ·
   <a href="https://discord.gg/nJ2JH7jvmV">Discord</a>    
 </p>
 
