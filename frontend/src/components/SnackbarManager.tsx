@@ -1,16 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { snackMessageService } from './../services/ui-service';
 
 const SnackbarManager = () => {
-  const componentRef = useRef({});
+  const [, forceUpdate] = useState({});
+  const listenerRef = useRef<{ forceUpdate: () => void } | null>(null);
 
   useEffect(() => {
-    snackMessageService.registerListener(componentRef.current);
-    
+    // Create a listener object with forceUpdate method that triggers re-render
+    listenerRef.current = {
+      forceUpdate: () => {
+        forceUpdate({});
+      }
+    };
+
+    snackMessageService.registerListener(listenerRef.current);
+
     return () => {
-      snackMessageService.unregisterListener(componentRef.current);
+      if (listenerRef.current) {
+        snackMessageService.unregisterListener(listenerRef.current);
+      }
     };
   }, []);
 

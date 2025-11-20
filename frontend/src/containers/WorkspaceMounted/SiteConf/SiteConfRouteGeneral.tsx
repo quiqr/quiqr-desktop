@@ -7,6 +7,7 @@ import Grid           from '@mui/material/Grid';
 import Box            from '@mui/material/Box';
 import FolderIcon     from '@mui/icons-material/Folder';
 import LaunchIcon   from '@mui/icons-material/Launch';
+import { UserPreferences } from '../../../../types';
 
 interface SiteConfig {
   key?: string;
@@ -46,6 +47,7 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
       siteconf : {},
       source : {},
       parseInfo : {},
+      customOpenInCommand: ""
     };
   }
 
@@ -72,18 +74,11 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
       siteKey: this.props.siteKey
     })
 
-    service.api.readConfKey('prefs').then((value)=>{
+    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
       this.setState({prefs: value });
 
-      if(typeof value === 'object' && value !== null && 'customOpenInCommand' in value){
-        const prefs = value as { customOpenInCommand?: string };
-        if(prefs.customOpenInCommand){
-          this.setState({customOpenInCommand: prefs.customOpenInCommand });
-        }
-        else{
-          this.setState({customOpenInCommand: "" });
-        }
-      }
+      const customOpenInCommand = value.customOpenInCommand || ""
+      this.setState({ customOpenInCommand });
 
     });
 

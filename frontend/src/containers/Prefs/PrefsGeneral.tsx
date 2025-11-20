@@ -7,16 +7,11 @@ import MenuItem              from '@mui/material/MenuItem';
 import FormControl           from '@mui/material/FormControl';
 import service               from './../../services/service';
 import FolderPicker          from '../../components/FolderPicker';
+import { UserPreferences } from '../../../types';
 
 interface PrefsGeneralProps {}
-
-interface Prefs {
-  interfaceStyle?: string;
-  dataFolder?: string;
-}
-
 interface PrefsGeneralState {
-  prefs: Prefs;
+  prefs: UserPreferences;
   prefsDataFolder: string;
   prefsInterfaceStyle: string;
 }
@@ -38,7 +33,7 @@ class PrefsGeneral extends React.Component<PrefsGeneralProps, PrefsGeneralState>
   componentDidMount(){
 
     //service.registerListener(this);
-    service.api.readConfKey('prefs').then((value: Prefs)=>{
+    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
       this.setState({prefs: value });
 
       if(value.interfaceStyle){

@@ -3,28 +3,10 @@ import service        from './../../services/service';
 import Typography     from '@mui/material/Typography';
 import TextField      from '@mui/material/TextField';
 import Box            from '@mui/material/Box';
+import { UserPreferences } from '../../../types';
 
 interface PrefsAdvancedProps {}
-
-interface PrefsAdvancedState {
-  // Global prefs object read from config file via readConfKey('prefs')
-  prefs: {
-    dataFolder?: string;
-    interfaceStyle?: string;
-    sitesListingView?: string;
-    libraryView?: string;
-    openAiApiKey?: string;
-    systemGitBinPath?: string;
-    customOpenInCommand?: string;
-    [key: string]: any; // Allow other preference keys
-  };
-  // Individual input field state (mirrors values from prefs for controlled inputs)
-  systemGitBinPath?: string;
-  openAiApiKey?: string;
-  customOpenInCommand?: string;
-}
-
-class PrefsAdvanced extends React.Component<PrefsAdvancedProps, PrefsAdvancedState> {
+class PrefsAdvanced extends React.Component<PrefsAdvancedProps, UserPreferences> {
 
   history: any;
 
@@ -50,21 +32,15 @@ class PrefsAdvanced extends React.Component<PrefsAdvancedProps, PrefsAdvancedSta
   componentDidMount(){
 
     //service.registerListener(this);
-    service.api.readConfKey('prefs').then((value)=>{
+    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
       this.setState({prefs: value });
 
       this.setStringPrefToState('systemGitBinPath',value)
       this.setStringPrefToState('openAiApiKey',value)
       this.setStringPrefToState('customOpenInCommand',value)
 
-      /*
-      if(value.customOpenInCommand){
-        this.setState({customOpenInCommand: value.customOpenInCommand });
-      }
-      else{
-        this.setState({customOpenInCommand: "" });
-      }
-      */
+      const customOpenInCommand = value.customOpenInCommand || ""
+      this.setState({customOpenInCommand });
 
     });
   }

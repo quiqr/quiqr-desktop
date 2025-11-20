@@ -3,6 +3,7 @@ import Typography     from '@mui/material/Typography';
 import Box            from '@mui/material/Box';
 import Single         from '../Single';
 import service        from './../../../services/service';
+import { UserPreferences } from '../../../../types';
 
 interface SiteConfig {
   key?: string;
@@ -70,18 +71,11 @@ class SiteConfRouteEtalage extends React.Component<SiteConfRouteEtalageProps, Si
       siteKey: this.props.siteKey
     })
 
-    service.api.readConfKey('prefs').then((value)=>{
+    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
       this.setState({prefs: value });
 
-      if(typeof value === 'object' && value !== null && 'customOpenInCommand' in value){
-        const prefs = value as { customOpenInCommand?: string };
-        if(prefs.customOpenInCommand){
-          this.setState({customOpenInCommand: prefs.customOpenInCommand });
-        }
-        else{
-          this.setState({customOpenInCommand: "" });
-        }
-      }
+      const customOpenInCommand = value.customOpenInCommand || '';
+      this.setState({ customOpenInCommand });
 
     });
 

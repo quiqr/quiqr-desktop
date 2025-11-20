@@ -1,9 +1,34 @@
 import axios from "axios";
+import { z } from 'zod'
+import { apiSchemas, ApiResponse } from '../../types'
 
 axios.defaults.timeout = 30000
 axios.defaults.timeoutErrorMessage='timeout'
 
-export type AbortablePromise<T> = Promise<T> & { forceAbort: ()=>void };
+function validateApiResponse(method: string, response: any): any {
+
+  // Check if we have a schema for this method
+  const schema = apiSchemas[method as keyof typeof apiSchemas];
+
+  // This means we need to create a new zod schema in types.ts
+  if (!schema) {
+    console.warn(`[API Validation] No schema found for method: ${method}`);
+    return response;
+  }
+
+  try {
+    const validated = schema.parse(response);
+    return validated;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(`[API Validation] Schema validation failed for ${method}:`, error.errors);
+      console.error('Response data:', JSON.stringify(response, null, 2));
+
+      throw new Error(`API response validation failed for ${method}: ${error.message}`);
+    }
+    throw error;
+  }
+}
 
 class MainProcessBridge{
   private _messageHandlers: { [key: string]: any[] };
@@ -93,34 +118,38 @@ class MainProcessBridge{
 
   }
 
-  request( method, data, opts = {timeout:90000}){
+  request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
     //console.log(method);
-    let _reject;
-    let promise = new Promise((resolve, reject)=>{
-      _reject = reject;
-
+    let promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
       axios
         .post("http://localhost:5150/api/"+method, {
           data: data,
+        }, {
+          timeout: opts.timeout
         })
         .then((response) => {
-          //console.log(response.data)
-          resolve(response.data);
+          // Validate response with Zod schema
+          try {
+            const validatedData = validateApiResponse(method, response.data);
+
+            // this typecast is safe, because we just validated the data using zod
+            resolve(validatedData as ApiResponse<M>); 
+          } catch (validationError) {
+            // Validation failed - reject the promise
+            reject(validationError);
+          }
         })
-        .catch((error) => console.error("Error sending data:", error));
+        .catch((error) => {
+          console.error("Error sending data:", error);
+          reject(error);
+        });
 
         //this.ipcRenderer.send('message', {data, token, handler:method});
         //resolve({data:1});
 
     });
 
-    promise.forceAbort = ()=>{
-      _reject('Cancelled');
-    };
-
     return promise;
-
-
   }
 
   requestOLD( method, data, opts = {timeout:10000}
@@ -133,7 +162,6 @@ class MainProcessBridge{
       let timeoutId = setTimeout(function(){
         if(this._eraseCallback(token)){
           reject('timeout:'+method);
-          promise.forceAbort = function(){};
         }
       }.bind(this), opts.timeout);
       this.pendingCallbacks.push({
@@ -144,15 +172,9 @@ class MainProcessBridge{
             reject(response.error);
           }
           resolve(response);
-          promise.forceAbort = function(){};
         }
       });
     }.bind(this));
-
-    promise.forceAbort = function(){
-      _reject('Cancelled');
-      this._eraseCallback(token);
-    }.bind(this);
 
     return promise;
   }
