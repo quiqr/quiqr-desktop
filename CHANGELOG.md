@@ -1,6 +1,5 @@
 # Quiqr App CHANGELOG
-
-## **WORK IN PROGRESS**
+## 0.21.2 (2025-11-20)
 
 - chore: react 19
 - chore: electron 39
