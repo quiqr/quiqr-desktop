@@ -8,14 +8,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { SiteConfig } from '../../../../types';
 
 interface EditTagsDialogsProps {
   open: boolean;
-  siteconf: {
-    key: string;
-    name: string;
-    tags?: string[];
-  };
+  siteconf: SiteConfig;
   onSavedClick: () => void;
   onCancelClick: () => void;
 }

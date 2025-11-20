@@ -6,17 +6,7 @@ import ListItemAvatar          from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
 import service              from '../../../services/service';
-
-interface SiteConfig {
-  key: string;
-  name: string;
-  remote?: boolean;
-  etalage?: {
-    favicons?: string[];
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}
+import { SiteConfig } from '../../../../types';
 
 interface SiteListItemProps {
   site: SiteConfig;

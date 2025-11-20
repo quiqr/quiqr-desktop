@@ -8,13 +8,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { SiteConfig } from '../../../../types';
 
 interface RenameDialogProps {
   open: boolean;
-  siteconf: {
-    key: string;
-    name: string;
-  };
+  siteconf: SiteConfig;
   localsites?: string[];
   onSavedClick: () => void;
   onCancelClick: () => void;

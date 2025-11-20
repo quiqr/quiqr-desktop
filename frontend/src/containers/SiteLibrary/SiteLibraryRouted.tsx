@@ -20,39 +20,10 @@ import BlockDialog                  from './../../components/BlockDialog';
 import Spinner                      from './../../components/Spinner';
 import service                      from './../../services/service';
 import { History } from 'history';
+import { SiteConfig, Workspace, Configurations, CommunityTemplate } from './../../../types';
 
 //PORTQUIQR
 //const net = window.require('electron').remote.net;
-
-interface SiteConfig {
-  key: string;
-  name: string;
-  tags?: string[];
-  template?: boolean;
-  screenshotURL?: string;
-  homepageURL?: string;
-  importSiteURL?: string;
-  [key: string]: unknown;
-}
-
-interface WorkspaceConfig {
-  key: string;
-  [key: string]: unknown;
-}
-
-interface Configurations {
-  sites: SiteConfig[];
-  [key: string]: unknown;
-}
-
-interface CommunityTemplate {
-  NormalizedName: string;
-  QuiqrEtalageName: string;
-  QuiqrEtalageHomepage: string;
-  SourceLink: string;
-  ScreenshotImageType?: string;
-  [key: string]: unknown;
-}
 
 interface SiteLibraryRoutedProps {
   newSite?: boolean;
@@ -82,7 +53,7 @@ interface SiteLibraryRoutedState {
   sitesListingView: string;
   localsites?: string[];
   selectedSite?: SiteConfig;
-  selectedSiteWorkspaces?: WorkspaceConfig[];
+  selectedSiteWorkspaces?: Workspace[];
   currentWorkspaceKey?: string;
   importSiteURL?: string;
   anchorEl?: HTMLElement | null;
@@ -105,7 +76,10 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
       renameDialog: false,
       copyDialog: false,
       deleteDialog: false,
-      dialogSiteConf: {} as SiteConfig,
+      dialogSiteConf: {
+        key: '',
+        name: ''
+      },
       dialogNewSlashImportSite: {
         open: false,
         newOrImport: 'new'
@@ -134,7 +108,10 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
     */
 
     service.api.readConfPrefKey('sitesListingView').then((view)=>{
-      this.setState({sitesListingView: view });
+      // TODO: type preferences config
+      if (typeof view === 'string') {
+        this.setState({sitesListingView: view });
+      }
     });
 
   }
@@ -188,9 +165,9 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
 
   updateLocalSites(){
     let localsites = [];
-    service.getConfigurations(true).then((c)=>{
+    service.getConfigurations(true).then((configurations)=>{
 
-      c.sites.forEach((site) =>{
+      configurations.sites.forEach((site) =>{
         localsites.push(site.name);
       });
 
@@ -198,11 +175,7 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
         localsites :localsites
       });
 
-      var stateUpdate  = {};
-      stateUpdate.configurations = c;
-
-
-      this.setState(stateUpdate);
+      this.setState({ configurations });
     });
 
   }
@@ -257,12 +230,12 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
     });
   }
 
-  handleSelectWorkspaceClick = (e: React.MouseEvent, siteKey: string, workspace: WorkspaceConfig)=> {
+  handleSelectWorkspaceClick = (e: React.MouseEvent, siteKey: string, workspace: Workspace)=> {
     e.stopPropagation();
     this.selectWorkspace(siteKey, workspace);
   };
 
-  async selectWorkspace(siteKey: string, workspace: WorkspaceConfig){
+  async selectWorkspace(siteKey: string, workspace: Workspace){
     this.setState({currentWorkspaceKey: workspace.key});
     await service.api.mountWorkspace(siteKey, workspace.key);
     this.history?.push(`/sites/${decodeURIComponent(siteKey)}/workspaces/${decodeURIComponent(workspace.key)}/home/init`);
@@ -381,7 +354,7 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
 
     let listingSource = '';
     let listTitle = '';
-    let sites = [];
+    let sites: SiteConfig[] = [];
 
     if(source === 'last'){
 
@@ -402,7 +375,7 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
       sites = [];
       this.state.quiqrCommunityTemplates.forEach((template)=>{
 
-        let screenshotURL = null;
+        let screenshotURL: string | undefined = undefined;
         if(template.ScreenshotImageType){
           screenshotURL = "https://quiqr.github.io/quiqr-community-templates/templates/"+template.NormalizedName+"/screenshot."+template.ScreenshotImageType;
         }
@@ -414,7 +387,7 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
           homepageURL: template.QuiqrEtalageHomepage,
           importSiteURL: template.SourceLink.trim(),
           template: true,
-        })
+        } as SiteConfig)
       });
 
     }

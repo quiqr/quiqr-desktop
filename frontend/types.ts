@@ -395,7 +395,7 @@ export const siteConfigSchema = z.object({
   source: z.object({
     type: z.literal('folder'),
     path: z.string()
-  }),
+  }).optional(),
   serve: z
     .object({
       key: z.string(),
@@ -418,6 +418,15 @@ export const siteConfigSchema = z.object({
     )
     .optional(),
   tags: z.array(z.string()).optional(),
+  template: z.boolean().optional(),
+  remote: z.boolean().optional(),
+  screenshotURL: z.string().optional(),
+  homepageURL: z.string().optional(),
+  importSiteURL: z.string().optional(),
+  etalage: z.object({
+    screenshots: z.array(z.string()).optional(),
+    favicons: z.array(z.string()).optional()
+  }).passthrough().optional(),
   lastPublish: z.number().optional(),
   publishStatus: z.number().int().min(0).max(8).optional(),
   lastEdit: z.number().optional(),
