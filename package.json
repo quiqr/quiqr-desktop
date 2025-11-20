@@ -74,7 +74,6 @@
     "copyfiles": "2.1.0",
     "cross-env": "^7.0.3",
     "electron": "39.2.1",
-    "react-codemod": "^5.4.4",
     "electron-builder": "^26.0.12",
     "electron-builder-notarize": "^1.5.2",
     "wait-on": "^8.0.4"
