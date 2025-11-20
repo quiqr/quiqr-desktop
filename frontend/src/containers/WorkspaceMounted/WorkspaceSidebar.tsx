@@ -180,11 +180,11 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
                 let item = null;
                 let itemType = null;
 
-                if(this.state.workspace.collections.some(e => e.key === menuitem.key)) {
+                if(this.state.workspace?.collections?.some(e => e.key === menuitem.key)) {
                   item = this.state.workspace.collections.find(e => e.key === menuitem.key);
                   itemType = "collections";
                 }
-                else if(this.state.workspace.singles.some(e => e.key === menuitem.key)) {
+                else if(this.state.workspace?.singles?.some(e => e.key === menuitem.key)) {
                   item = this.state.workspace.singles.find(e => e.key === menuitem.key);
                   itemType = "singles";
                 }

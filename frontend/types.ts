@@ -5,7 +5,14 @@ const baseFieldSchema = z.object({
   key: z.string(),
   title: z.string().optional(),
   arrayTitle: z.boolean().optional(),
-  hidden: z.boolean().optional()
+  hidden: z.boolean().optional(),
+  default: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  tip: z.string().optional(),
+  name: z.string().optional(),
+  group: z.string().optional(),
+  groupdata: z.boolean().optional(),
+  content: z.string().optional(),
+  theme: z.string().optional()
 })
 
 // Extended base schema that includes the type property
@@ -28,14 +35,27 @@ const hiddenFieldSchema = baseFieldSchema.extend({
 })
 
 const dateFieldSchema = baseFieldSchema.extend({
-  type: z.literal('date'),
-  default: z.string().optional()
+  type: z.literal('date')
+})
+
+const booleanFieldSchema = baseFieldSchema.extend({
+  type: z.literal('boolean')
+})
+
+const numberFieldSchema = baseFieldSchema.extend({
+  type: z.literal('number')
 })
 
 const selectFieldSchema = baseFieldSchema.extend({
   type: z.literal('select'),
   multiple: z.boolean().optional(),
-  options: z.array(z.string())
+  options: z.union([
+    z.array(z.string()),
+    z.array(z.object({
+      text: z.string(),
+      value: z.string()
+    }))
+  ])
 })
 
 // Chips field schema
@@ -57,12 +77,13 @@ const bundleManagerFieldSchema = baseFieldSchema.extend({
   addButtonLocationTop: z.boolean().optional(),
   extensions: z.array(z.string()).optional(),
   fields: z.array(fieldSchemaRef).optional()
-})
+}).passthrough() // TODO fix nested types
 
 const accordionFieldSchema = baseFieldSchema.extend({
   type: z.literal('accordion'),
-  fields: z.array(fieldSchemaRef)
-})
+  fields: z.array(fieldSchemaRef),
+  dynFormSearchKey: z.string().optional()
+}).passthrough() // TODO fix nested types
 
 const bundleImageThumbnailFieldSchema = baseFieldSchema.extend({
   type: z.literal('bundle-image-thumbnail')
@@ -73,6 +94,8 @@ const CoreFields = {
   markdown: markdownFieldSchema,
   hidden: hiddenFieldSchema,
   date: dateFieldSchema,
+  boolean: booleanFieldSchema,
+  number: numberFieldSchema,
   select: selectFieldSchema,
   chips: chipsFieldSchema,
   imageSelect: imageSelectFieldSchema,
@@ -86,6 +109,8 @@ const coreFieldSchemas = [
   markdownFieldSchema,
   hiddenFieldSchema,
   dateFieldSchema,
+  booleanFieldSchema,
+  numberFieldSchema,
   selectFieldSchema,
   chipsFieldSchema,
   imageSelectFieldSchema,
@@ -124,12 +149,14 @@ const baseConfigSchema = z.object({
 export const singleConfigSchema = z.object({
   key: z.string(),
   title: z.string().optional(),
-  file: z.string(),
+  file: z.string().optional(),
   previewUrl: z.string().optional(),
+  description: z.string().optional(),
   _mergePartial: z.string().optional(),
   hidePreviewIcon: z.boolean().optional(),
   hideExternalEditIcon: z.boolean().optional(),
   hideSaveButton: z.boolean().optional(),
+  pullOuterRootKey: z.string().optional(),
   fields: z.array(fieldSchema).optional()
 })
 
@@ -154,7 +181,7 @@ export const menuItemSchema = z.object({
 
 export const menuSectionSchema = z.object({
   title: z.string(),
-  key: z.string(),
+  key: z.string().optional(),
   matchRole: z.string().optional(),
   menuItems: z.array(menuItemSchema)
 })
@@ -227,6 +254,8 @@ export {
   markdownFieldSchema,
   hiddenFieldSchema,
   dateFieldSchema,
+  booleanFieldSchema,
+  numberFieldSchema,
   selectFieldSchema,
   chipsFieldSchema,
   imageSelectFieldSchema,
@@ -241,6 +270,8 @@ export type StringField = z.infer<typeof stringFieldSchema>
 export type MarkdownField = z.infer<typeof markdownFieldSchema>
 export type HiddenField = z.infer<typeof hiddenFieldSchema>
 export type DateField = z.infer<typeof dateFieldSchema>
+export type BooleanField = z.infer<typeof booleanFieldSchema>
+export type NumberField = z.infer<typeof numberFieldSchema>
 export type SelectField = z.infer<typeof selectFieldSchema>
 export type ChipsField = z.infer<typeof chipsFieldSchema>
 export type ImageSelectField = z.infer<typeof imageSelectFieldSchema>
@@ -409,7 +440,9 @@ export const workspaceDetailsSchema = z.object({
   hugover: z.string(),
   serve: z.array(serveConfigSchema).optional(),
   build: z.array(buildConfigSchema).optional(),
-  menu: menuSchema.optional()
+  menu: menuSchema.optional(),
+  collections: z.array(collectionConfigSchema),
+  singles: z.array(singleConfigSchema)
 })
 
 export const configurationsSchema = z.object({
@@ -460,10 +493,11 @@ export const communityTemplateSchema = z.object({
 })
 
 export const dynFormFieldsSchema = z.object({
-  title: z.string().optional(),
-  fields: z.array(fieldSchema).optional(),
+  title: z.union([z.string(), z.number()]).optional(),
+  fields: z.array(fieldSchema).nullable().optional(),
   key: z.string().optional(),
-  content_type: z.string().optional()
+  content_type: z.string().optional(),
+  form_field_type: z.string().optional()
 })
 
 export const userPreferencesSchema = z.object({
@@ -473,7 +507,29 @@ export const userPreferencesSchema = z.object({
   libraryView: z.string().optional(),
   openAiApiKey: z.string().optional(),
   systemGitBinPath: z.string().optional(),
-  customOpenInCommand: z.string().optional()
+  customOpenInCommand: z.string().optional(),
+  showSplashAtStartup: z.boolean().optional(),
+  applicationRole: z.string().optional()
+}).passthrough() // TODO fix nested types
+
+// Schema for the full application config object (global.pogoconf in backend)
+export const appConfigSchema = z.object({
+  lastOpenedSite: z.object({
+    siteKey: z.string().nullable(),
+    workspaceKey: z.string().nullable(),
+    sitePath: z.string().nullable()
+  }),
+  prefs: userPreferencesSchema,
+  lastOpenedPublishTargetForSite: z.record(z.string()),
+  skipWelcomeScreen: z.boolean(),
+  experimentalFeatures: z.boolean(),
+  disablePartialCache: z.boolean(),
+  devLocalApi: z.boolean(),
+  devDisableAutoHugoServe: z.boolean(),
+  hugoServeDraftMode: z.boolean(),
+  devShowCurrentUser: z.boolean(),
+  sitesListingView: z.string(),
+  currentUsername: z.string().nullable()
 })
 
 // API Schemas mapping - maps API method names to their response schemas
@@ -502,16 +558,27 @@ export const apiSchemas = {
   updateCollectionItem: z.record(z.any()), // Returns the updated document
   showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
   openSiteLibrary: z.boolean(),
-  readConfPrefKey: z.string(),
+  readConfPrefKey: z.union([z.string(), z.boolean(), z.undefined()]),
   stopHugoServer: hugoServerResponseSchema,
   getFilteredHugoVersions: z.array(z.string()),
   getThumbnailForPath: z.string().optional(),
   updateCommunityTemplates: z.array(communityTemplateSchema),
   saveConfPrefKey: z.boolean(),
   mountWorkspace: z.string(),
-  readConfKey: userPreferencesSchema,
+  readConfKey: z.union([
+    userPreferencesSchema, // When reading "prefs"
+    z.boolean(), // For boolean flags
+    z.string().nullable(), // For currentUsername, sitesListingView
+    z.record(z.string()), // For lastOpenedPublishTargetForSite
+    z.object({
+      siteKey: z.string().nullable(),
+      workspaceKey: z.string().nullable(),
+      sitePath: z.string().nullable()
+    }) // For lastOpenedSite
+  ]),
   getCreatorMessage: z.string(),
-  getSiteConfig: siteConfigSchema
+  getSiteConfig: siteConfigSchema,
+  serveWorkspace: z.any() // Returns void/undefined, server action
 } as const
 
 // Export types for the API responses
