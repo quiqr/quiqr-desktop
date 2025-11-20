@@ -23,18 +23,9 @@
     "build:frontend": "cd frontend && npm run build",
     "release": "release-script --addPlaceholder",
     "dist": "electron-builder",
-    "_copy-electron-code": "copyfiles -u 1 \"./src-main/**/*\" \"./build/electron/\"",
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
     "_hugo_versions": "node scripts/getHugoVersions.js"
-  },
-  "oldscripts": {
-    "_electron-lint": "cross-env NODE_ENV=development eslint ./backend/src-main",
-    "_mac-notarize": "node scripts/notarize.js",
-    "devold:frontend-old": "cd frontend && vite",
-    "devold": "concurrently  \"npm run dev:backend\" \"npm run dev:electron\"",
-    "devold:react": "cross-env APP_ENV=development BROWSERSLIST_IGNORE_OLD_DATA=true BROWSER=none PORT=4002 react-scripts start",
-    "buildold:react": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true react-scripts build"
   },
   "keywords": [],
   "dependencies": {
@@ -61,7 +52,6 @@
     "node-fetch": "^2.6.11",
     "openai": "^4.64.0",
     "prop-types": "^15.8.1",
-    "request": "2.87.0",
     "toml": "2.3.3",
     "tomlify-j0.4": "3.0.0",
     "user-home": "2.0.0",
@@ -71,7 +61,6 @@
     "@alcalzone/release-script": "^3.5.6",
     "@electron/notarize": "^3.1.1",
     "concurrently": "^9.1.2",
-    "copyfiles": "2.1.0",
     "cross-env": "^7.0.3",
     "electron": "39.2.1",
     "electron-builder": "^26.0.12",

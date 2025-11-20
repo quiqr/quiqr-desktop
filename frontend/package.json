@@ -51,26 +51,17 @@
     "vite": "^7.0.6"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha",
     "clean": "rm -Rf dist && rm -Rf build",
     "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4002 electron --no-sandbox .",
-    "_react-dev": "cross-env APP_ENV=development vite",
-    "_react-dev-cra": "cross-env APP_ENV=development BROWSERSLIST_IGNORE_OLD_DATA=true BROWSER=none PORT=4002 react-scripts start",
     "dev": "cross-env APP_ENV=development vite",
     "build": "cross-env APP_ENV=development vite build",
-    "build-cra": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true react-scripts build",
-    "preview": "vite preview",
-    "_copy-electron-code": "copyfiles -u 1 \"./src-main/**/*\" \"./build/electron/\"",
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
     "_hugo_versions": "node scripts/getHugoVersions.js",
     "_mac-notarize": "node scripts/notarize.js",
-    "_electron-lint": "cross-env NODE_ENV=development eslint ./src-main",
-    "servemain": "npm run _electron-lint && npm run _electron-dev",
-    "xbuild": "npm run clean && npm run _build_info && npm run _react-build && npm run _copy-electron-code && npm run _pack_embgit",
     "dist": "electron-builder",
     "packdev": "electron-builder -p never",
-    "start": "concurrently --kill-others \"npm run _react-dev\" \"npm run _electron-dev\""
+    "start": "concurrently --kill-others \"npm run dev\" \"npm run _electron-dev\""
   },
   "browserslist": [
     ">0.2%",
