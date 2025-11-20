@@ -32,12 +32,12 @@ const stringFieldSchema = baseFieldSchema.extend({
 const markdownFieldSchema = baseFieldSchema.extend({
   type: z.literal('markdown'),
   default: z.string().optional(),
-  tip: z.string().optional()
+  tip: z.string().optional(),
 })
 
 const hiddenFieldSchema = baseFieldSchema.extend({
   type: z.literal('hidden'),
-  default: z.string().optional()
+  default: z.string().optional(),
 })
 
 const dateFieldSchema = baseFieldSchema.extend({
@@ -63,7 +63,7 @@ const selectFieldSchema = baseFieldSchema.extend({
 const chipsFieldSchema = baseFieldSchema.extend({
   type: z.literal('chips'),
   default: z.array(z.any()).optional(),
-  tip: z.string().optional()
+  tip: z.string().optional(),
 })
 
 const imageSelectFieldSchema = baseFieldSchema.extend({
@@ -97,7 +97,6 @@ const accordionFieldSchema = baseFieldSchema.extend({
   disableCreate: z.boolean().optional(),
   disableSort: z.boolean().optional(),
   disableDelete: z.boolean().optional(),
-  dynFormSearchKey: z.string().optional(),
   dynFormObjectRoot: z.string().optional(),
   lazy: z.boolean().optional(),
   lazyTemp: z.boolean().optional()
@@ -442,8 +441,6 @@ export {
   markdownFieldSchema,
   hiddenFieldSchema,
   dateFieldSchema,
-  booleanFieldSchema,
-  numberFieldSchema,
   selectFieldSchema,
   chipsFieldSchema,
   imageSelectFieldSchema,
@@ -484,8 +481,6 @@ export type BundleManagerField = z.infer<typeof bundleManagerFieldSchema>
 export type AccordionField = z.infer<typeof accordionFieldSchema>
 export type BundleImageThumbnailField = z.infer<typeof bundleImageThumbnailFieldSchema>
 export type FontPickerField = z.infer<typeof fontPickerFieldSchema>
-export type BooleanField = z.infer<typeof booleanFieldSchema>
-export type NumberField = z.infer<typeof numberFieldSchema>
 export type SliderField = z.infer<typeof sliderFieldSchema>
 export type ColorField = z.infer<typeof colorFieldSchema>
 export type FontIconPickerField = z.infer<typeof fontIconPickerFieldSchema>
