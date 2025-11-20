@@ -16,6 +16,7 @@ import { TopToolbarRight, ToolbarButton } from "./containers/TopToolbarRight";
 import service from "./services/service";
 import styleLightDefault from "./app-ui-styles/quiqr10/style-light.js";
 import styleDarkDefault from "./app-ui-styles/quiqr10/style-dark.js";
+import { UserPreferences } from "../types";
 
 let defaultApplicationRole = "contentEditor";
 
@@ -72,7 +73,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   setThemeStyleFromPrefs() {
-    service.api.readConfKey("prefs").then((value: any) => {
+    service.api.readConfKey("prefs").then((value: UserPreferences) => {
       if (value.interfaceStyle) {
         let themeStyle: "light" | "dark" = "light";
         if (value.interfaceStyle === "quiqr10-dark") {

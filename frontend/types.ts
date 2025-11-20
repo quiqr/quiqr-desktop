@@ -502,7 +502,7 @@ export const dynFormFieldsSchema = z.object({
 
 export const userPreferencesSchema = z.object({
   dataFolder: z.string().optional(),
-  interfaceStyle: z.string().optional(),
+  interfaceStyle: z.union([z.literal('quiqr10-dark'), z.literal('quiqr10-light')]),
   sitesListingView: z.string().optional(),
   libraryView: z.string().optional(),
   openAiApiKey: z.string().optional(),
