@@ -289,7 +289,6 @@ const coreFieldSchemas = [
   accordionFieldSchema,
   bundleImageThumbnailFieldSchema,
   fontPickerFieldSchema,
-  numberFieldSchema,
   sliderFieldSchema,
   colorFieldSchema,
   fontIconPickerFieldSchema,
