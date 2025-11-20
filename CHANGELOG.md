@@ -1,5 +1,13 @@
 # Quiqr App CHANGELOG
 
+
+
+## Next
+- chore: react 19
+- chore: electron 39
+- WIP: migrate to TS 
+- WIP: migrate to MUI 6
+
 ## 0.21.1 (2025-02-24)
 - fix: cleanups in package.jsons
 - fix: add scripts
@@ -17,7 +25,6 @@
 ## 0.19.9 (2025-04-14)
 - fix: wrong item listing bug for content outside content dir.
 - fix: sorting Items in accordion. From swap items to real ordering
-=======
 
 ## 0.19.8 (2025-03-10)
 - fix: replace all in buildActions by switching to RegEx
