@@ -1,10 +1,17 @@
 import React           from 'react';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, FieldBase } from '../../HoForm';
 import FormItemWrapper from './shared/FormItemWrapper';
 // import FontPicker      from "font-picker-react";
 import Tip             from '../../Tip';
+import type { FontPickerField } from '../../../../types';
 
-class FontPickerDynamic extends BaseDynamic {
+type FontPickerDynamicField = FontPickerField & FieldBase & {
+  pickerId?: string;
+};
+
+type FontPickerDynamicProps = BaseDynamicProps<FontPickerDynamicField>;
+
+class FontPickerDynamic extends BaseDynamic<FontPickerDynamicProps> {
 
   getType(){
     return 'font-picker';

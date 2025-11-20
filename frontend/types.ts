@@ -89,6 +89,17 @@ const bundleImageThumbnailFieldSchema = baseFieldSchema.extend({
   type: z.literal('bundle-image-thumbnail')
 })
 
+const fontPickerFieldSchema = baseFieldSchema.extend({
+  type: z.literal('font-picker'),
+  tip: z.string().optional(),
+  default: z.string().optional(),
+  autoSave: z.boolean().optional(),
+  limit: z.number().int().optional(),
+  families: z.array(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
+  variants: z.array(z.string()).optional()
+})
+
 const CoreFields = {
   string: stringFieldSchema,
   markdown: markdownFieldSchema,
@@ -101,7 +112,8 @@ const CoreFields = {
   imageSelect: imageSelectFieldSchema,
   bundleManager: bundleManagerFieldSchema,
   accordion: accordionFieldSchema,
-  bundleImageThumbnail: bundleImageThumbnailFieldSchema
+  bundleImageThumbnail: bundleImageThumbnailFieldSchema,
+  fontPicker: fontPickerFieldSchema
 } as const
 
 const coreFieldSchemas = [
@@ -116,7 +128,8 @@ const coreFieldSchemas = [
   imageSelectFieldSchema,
   bundleManagerFieldSchema,
   accordionFieldSchema,
-  bundleImageThumbnailFieldSchema
+  bundleImageThumbnailFieldSchema,
+  fontPickerFieldSchema
 ] as const
 
 // For generic custom fields, create a catch-all schema
@@ -261,7 +274,8 @@ export {
   imageSelectFieldSchema,
   bundleManagerFieldSchema,
   accordionFieldSchema,
-  bundleImageThumbnailFieldSchema
+  bundleImageThumbnailFieldSchema,
+  fontPickerFieldSchema
 }
 
 export type BaseField = z.infer<typeof baseFieldSchema>
@@ -278,6 +292,7 @@ export type ImageSelectField = z.infer<typeof imageSelectFieldSchema>
 export type BundleManagerField = z.infer<typeof bundleManagerFieldSchema>
 export type AccordionField = z.infer<typeof accordionFieldSchema>
 export type BundleImageThumbnailField = z.infer<typeof bundleImageThumbnailFieldSchema>
+export type FontPickerField = z.infer<typeof fontPickerFieldSchema>
 
 export type Field = z.infer<typeof fieldSchema>
 
