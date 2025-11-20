@@ -11,7 +11,7 @@
     "url": "https://github.com/quiqr/quiqr-desktop-ng.git"
   },
   "description": "Local-first CMS for static files and engines like Quarto or Hugo SSG",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:electron:wait\"",
