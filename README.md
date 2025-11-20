@@ -18,10 +18,7 @@ Quiqr is a open source, cross platform, offline
 desktop CMS for Hugo with build in Git functionality for deploying static
 sites to any hosting server. Read all about it Quiqr at our [website](<https://quiqr.org>).
 
-## Feature block
-
-- CMS for Hugo
-
+**20 november 2025: We are actively working on a major version update. Read our blog post [Quiqr Next Generation](https://quiqr.org/blog/quiqr-next-generation/)
 
 ## Supported Platforms
 
