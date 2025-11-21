@@ -46,7 +46,6 @@
     "ajv": "^8.17.1",
     "cross-env": "^7.0.3",
     "path-browserify": "^1.0.1",
-    "react-scripts": "5.0.1",
     "typescript": "^5.8.3",
     "vite": "^7.0.6"
   },
