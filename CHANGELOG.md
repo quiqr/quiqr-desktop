@@ -1,6 +1,14 @@
 # Quiqr App CHANGELOG
-## 0.21.2 (2025-11-20)
 
+## 0.21.3 (2025-11-21)
+- chore: Start using npm workspaces
+- chore: Added tons of zod schemas and types.
+- chore: Replaced most of the types that were declared locally in the dynamic fields.
+- chore: The single source of truth is now frontend/types.ts.
+- chore: Added typing to BaseService, Service and UIService.
+- fix: Fixed SnackbarManager. Notifications/toasts work now!
+
+## 0.21.2 (2025-11-20)
 - chore: react 19
 - chore: electron 39
 - WIP: migrate to TS 
