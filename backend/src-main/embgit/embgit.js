@@ -1,5 +1,6 @@
 const path                                  = require('path');
 const fs                                    = require('fs-extra');
+const electron                              = require('electron');
 const rootPath                              = require('../utils/electron-root-path').rootPath;
 const spawnAw                               = require('await-spawn')
 const cliExecuteHelper                      = require('../utils/cli-execute-helper');
@@ -61,13 +62,11 @@ class Embgit{
         default:{ throw new Error('Not implemented.') }
       }
 
-      if(process.env.NODE_ENV === 'production'){
+      if(electron.app.isPackaged){
         cmd = path.join(pathHelper.getApplicationResourcesDir(), "bin", executable);
       }
       else{
-        //const rootPath = electron.app.getAppPath();
         cmd = path.join(rootPath, 'resources', platform, executable);
-
       }
     }
     return cmd;
