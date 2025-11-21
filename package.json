@@ -201,5 +201,8 @@
         "icon": "public/iconfile"
       }
     ]
-  }
+  },
+  "workspaces": [
+    "frontend"
+  ]
 }
