@@ -20,6 +20,7 @@
     "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
     "build": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder",
     "build:appimage": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
+    "build:rpm": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --linux rpm",
     "build:frontend": "cd frontend && npm run build",
     "release": "release-script --addPlaceholder",
     "dist": "electron-builder",
