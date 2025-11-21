@@ -357,7 +357,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicProps, AccordionDynam
         <ListItem
           style={{ padding: "20px 16px", border: "solid 1px #d8d8d8", borderRadius: "7px" }}
           role={undefined}
-          button
+          button="true"
           onClick={() => {
             this.handleAccordionClick(context, node);
           }}>

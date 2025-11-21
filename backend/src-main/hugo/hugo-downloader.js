@@ -5,7 +5,7 @@ const fs                                        = require('fs-extra');
 const mkdirp                                    = require("mkdirp");
 const path                                      = require("path");
 const glob                                      = require("glob");
-const request                                   = require('request');
+const fetch                                     = require('node-fetch');
 
 const pathHelper                                = require('./../utils/path-helper');
 const { EnvironmentResolver, ARCHS, PLATFORMS } = require('./../utils/environment-resolver');
@@ -148,20 +148,27 @@ class HugoDownloader{
     if(!exists)
       mkdirp.sync(dir);
 
-    return new Promise((resolve, reject) =>{
-      let stream = fs.createWriteStream(dest);
-      stream.on('finish', () => {
-        resolve();
-      });
+    return new Promise(async (resolve, reject) =>{
+      try {
+        const response = await fetch(url, { method: 'GET' });
 
-      request.get({
-          uri: url,
-          method: 'GET'
-        })
-        .on('error', function(err) {
+        if (!response.ok) {
+          reject(new Error(`Failed to download: ${response.status} ${response.statusText}`));
+          return;
+        }
+
+        let stream = fs.createWriteStream(dest);
+        stream.on('finish', () => {
+          resolve();
+        });
+        stream.on('error', (err) => {
           reject(err);
-        })
-        .pipe(stream)
+        });
+
+        response.body.pipe(stream);
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 

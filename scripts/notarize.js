@@ -8,6 +8,6 @@ var notconf = {
     appleIdPassword: process.env.APPLEIDPASS,
 }
 console.log(notconf);
-notarize(notconf);
 
-
+// TODO: Re-enable signing
+// notarize(notconf);

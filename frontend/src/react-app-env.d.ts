@@ -1,5 +1,3 @@
-/// <reference types="react-scripts" />
-
 // Type declarations for importing image files
 declare module '*.png' {
   const value: string;

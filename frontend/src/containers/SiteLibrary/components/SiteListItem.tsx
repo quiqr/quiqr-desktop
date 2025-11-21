@@ -73,7 +73,7 @@ class SiteListItem extends React.Component<SiteListItemProps, SiteListItemState>
           id={"list-siteselectable-"+this.props.site.name}
           key={"sitelistitem-"+this.props.site.key}
           onClick={ this.props.siteClick }
-          button={true}>
+          button="true">
 
           <ListItemAvatar>
             {siteAvatar}
@@ -97,5 +97,3 @@ class SiteListItem extends React.Component<SiteListItemProps, SiteListItemState>
 }
 
 export default SiteListItem;
-
-

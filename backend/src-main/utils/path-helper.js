@@ -80,7 +80,7 @@ class PathHelper{
 
     let enviromnent = new EnvironmentResolver().resolve();
 
-    if(process.env.NODE_ENV === 'production'){
+    if(electron.app.isPackaged){
       if(enviromnent.platform == PLATFORMS.macOS){
         return path.join(rootPath, 'Resources');
       }
@@ -89,7 +89,10 @@ class PathHelper{
       }
       else if(this.isLinuxAppImage()){
         const appPath = electron.app.getAppPath();
-        return path.join(appPath.substring(0, appPath.lastIndexOf('/')));
+        // appPath is typically /tmp/.mount_xxx/resources/app.asar
+        // extraResources (bin/, all/) are at /tmp/.mount_xxx/resources/
+        // So we just need to go up one level to get the resources directory
+        return path.dirname(appPath);
       }
       else{
         return path.join(rootPath, 'resources');
@@ -150,7 +153,7 @@ class PathHelper{
 
   /* HELPERS */
   isLinuxAppImage(){
-    return electron.app.getAppPath().indexOf("/tmp/.mount_") === 0
+    return electron.app.getAppPath().indexOf("/tmp/.mount_") === 0;
   }
 
   hugoConfigFilePath(hugoRootDir){

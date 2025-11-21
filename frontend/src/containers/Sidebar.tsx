@@ -118,7 +118,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
     return (
       <React.Fragment key={"itemNestOut"+item.label} >
         <ListItem
-          button
+          button="true"
           selected={item.selected}
           onClick={()=>{
             initOpen = false;

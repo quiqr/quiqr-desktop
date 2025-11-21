@@ -7,7 +7,7 @@ const InitialWorkspaceConfigBuilder = require('./initial-workspace-config-builde
 const formatProviderResolver        = require('./../../utils/format-provider-resolver');
 const pathHelper                    = require('./../../utils/path-helper');
 const deepmerge                     = require('deepmerge');
-const request                       = require('request');
+const fetch                         = require('node-fetch');
 
 class WorkspaceConfigProvider{
 
@@ -311,44 +311,22 @@ class WorkspaceConfigProvider{
     });
   }
 
-  _getRemotePartial(url, destination){
+  async _getRemotePartial(url, destination){
 
-    let data='';
+    try {
+      const response = await fetch(url);
 
-    return new Promise((resolve, reject)=>{
+      if (!response.ok) {
+        throw new Error(`Failed to fetch remote partial: ${response.status} ${response.statusText}`);
+      }
 
-      const req = request({
-        url: url
-      });
-
-      req.on('error', (err) => {
-        console.log(err)
-      });
-
-      req.on('response', (response) => {
-        response.on('error', (error) => {
-          reject(error);
-        })
-
-        response.on('end', async () => {
-          try{
-            fs.writeFileSync( destination, data);
-            resolve(destination);
-          }
-          catch(e){
-            console.log(e);
-          }
-
-        });
-        response.on("close", () => {
-        });
-        response.on("data", chunk => {
-          data += chunk;
-        });
-      })
-      req.end()
-
-    });
+      const data = await response.text();
+      fs.writeFileSync(destination, data);
+      return destination;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 
 

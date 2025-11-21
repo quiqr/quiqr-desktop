@@ -68,7 +68,7 @@ class NestDynamic extends BaseDynamic {
 
           <ListItem
             style={{ padding: '20px 16px', border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
-            role={undefined}  button
+            role={undefined}  button="true"
             onClick={function(){ context.setPath(node) } }
           >
             <ListItemIcon>

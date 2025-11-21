@@ -2,7 +2,7 @@ const electron                  = require('electron');
 const BrowserWindow             = electron.BrowserWindow;
 const path                      = require('path')
 const fs                        = require('fs-extra')
-const request = require('request')
+const fetch                     = require('node-fetch')
 
 let screenshotWindow;
 
@@ -56,20 +56,37 @@ function createScreenshotAndFavicon(host, port, targetPath) {
         if(urls.length > 0){
           console.log(urls)
           if (!fs.existsSync(path.join(targetPath, 'favicon'))) fs.mkdirSync(path.join(targetPath, 'favicon'), {recursive: true});
-          urls.forEach((favUrl)=>{
+
+          for (const favUrl of urls) {
             const faviconFile = favUrl.split('/').pop();
 
-            request.head(favUrl, () => {
-              const req = request.get(favUrl)
-                .on('response', function (res) {
-                  if (res.statusCode === 200) {
-                    req.pipe(fs.createWriteStream(path.join(targetPath,'favicon', faviconFile )))
-                  }
-                })
-                .on('close',()=>{ console.log("favicon downloaded")});
-            })
+            try {
+              // First check if the favicon exists with HEAD request
+              const headResponse = await fetch(favUrl, { method: 'HEAD' });
 
-          })
+              if (headResponse.ok) {
+                // Download the favicon
+                const response = await fetch(favUrl);
+
+                if (response.ok) {
+                  const dest = path.join(targetPath, 'favicon', faviconFile);
+                  const fileStream = fs.createWriteStream(dest);
+
+                  response.body.pipe(fileStream);
+
+                  fileStream.on('finish', () => {
+                    console.log("favicon downloaded");
+                  });
+
+                  fileStream.on('error', (err) => {
+                    console.log("Error writing favicon:", err);
+                  });
+                }
+              }
+            } catch (err) {
+              console.log("Error fetching favicon:", err);
+            }
+          }
         }
       });
     }
