@@ -386,6 +386,7 @@ export const folderPublishConfSchema = z.object({
 // GitHub publish configuration
 export const githubPublishConfSchema = z.object({
   type: z.literal('github'),
+  title: z.string().optional(),
   username: z.string(),
   email: z.string(),
   repository: z.string(),
@@ -394,15 +395,42 @@ export const githubPublishConfSchema = z.object({
   deployPublicKey: z.string(),
   publishScope: z.string(),
   setGitHubActions: z.boolean(),
-  keyPairBusy: z.boolean(),
+  keyPairBusy: z.boolean().optional(),
   overrideBaseURLSwitch: z.boolean(),
-  overrideBaseURL: z.string()
+  overrideBaseURL: z.string(),
+  pullOnly: z.boolean().optional(),
+  backupAtPull: z.boolean().optional(),
+  syncSelection: z.string().optional(),
+  CNAMESwitch: z.boolean().optional(),
+  CNAME: z.string().optional()
+})
+
+// System Git publish configuration
+export const sysgitPublishConfSchema = z.object({
+  type: z.literal('sysgit'),
+  title: z.string().optional(),
+  git_server_url: z.string(),
+  email: z.string(),
+  branch: z.string(),
+  deployPrivateKey: z.string(),
+  deployPublicKey: z.string(),
+  publishScope: z.string(),
+  setGitHubActions: z.boolean(),
+  keyPairBusy: z.boolean().optional(),
+  overrideBaseURLSwitch: z.boolean(),
+  overrideBaseURL: z.string(),
+  pullOnly: z.boolean().optional(),
+  backupAtPull: z.boolean().optional(),
+  syncSelection: z.string().optional(),
+  CNAMESwitch: z.boolean().optional(),
+  CNAME: z.string().optional()
 })
 
 // Union of all publish config types
 export const publConfSchema = z.discriminatedUnion('type', [
   folderPublishConfSchema,
-  githubPublishConfSchema
+  githubPublishConfSchema,
+  sysgitPublishConfSchema
 ])
 
 export const siteConfigSchema = z.object({
@@ -534,6 +562,7 @@ export type CollectionConfig = z.infer<typeof collectionConfigSchema>
 // export type MenuConfig = z.infer<typeof menuSchema>
 export type FolderPublishConf = z.infer<typeof folderPublishConfSchema>
 export type GithubPublishConf = z.infer<typeof githubPublishConfSchema>
+export type SysgitPublishConf = z.infer<typeof sysgitPublishConfSchema>
 export type PublConf = z.infer<typeof publConfSchema>
 export type SiteConfig = z.infer<typeof siteConfigSchema>
 

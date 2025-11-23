@@ -8,25 +8,18 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FolderPicker from "../../../../../components/FolderPicker";
-
-interface PubData {
-  type: string;
-  path: string | null;
-  publishScope: string;
-  overrideBaseURLSwitch: boolean;
-  overrideBaseURL: string;
-}
+import { FolderPublishConf } from "../../../../../../types";
 
 interface FormConfigProps {
   publishConf?: {
-    config: PubData;
+    config: FolderPublishConf;
   };
-  setData: (data: PubData) => void;
+  setData: (data: FolderPublishConf) => void;
   setSaveEnabled: (enabled: boolean) => void;
 }
 
 interface FormConfigState {
-  pubData: PubData;
+  pubData: FolderPublishConf;
 }
 
 class FormConfig extends React.Component<FormConfigProps, FormConfigState> {
@@ -36,7 +29,7 @@ class FormConfig extends React.Component<FormConfigProps, FormConfigState> {
     this.state = {
       pubData: {
         type: "folder",
-        path: null,
+        path: "",
         publishScope: "build",
         overrideBaseURLSwitch: false,
         overrideBaseURL: "",
@@ -50,7 +43,7 @@ class FormConfig extends React.Component<FormConfigProps, FormConfigState> {
     }
   }
 
-  updatePubData(newData: Partial<PubData>, callback: (() => void) | null = null) {
+  updatePubData(newData: Partial<FolderPublishConf>, callback: (() => void) | null = null) {
     let pubData = { ...this.state.pubData, ...newData };
     this.setState({ pubData: pubData }, () => {
       this.props.setData(pubData);

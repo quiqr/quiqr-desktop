@@ -17,34 +17,16 @@ import MenuItem            from '@mui/material/MenuItem';
 import LinearProgress      from '@mui/material/LinearProgress';
 import Select              from '@mui/material/Select';
 import Paper               from '@mui/material/Paper';
-
-interface PubData {
-  type: string;
-  title: string;
-  git_server_url: string;
-  email: string;
-  branch: string;
-  deployPrivateKey: string;
-  deployPublicKey: string;
-  publishScope: string;
-  setGitHubActions: boolean;
-  overrideBaseURLSwitch: boolean;
-  overrideBaseURL: string;
-  pullOnly: boolean;
-  backupAtPull: boolean;
-  syncSelection: string;
-  CNAMESwitch: boolean;
-  CNAME: string;
-}
+import { SysgitPublishConf } from '../../../../../../types';
 
 interface PublishConfig {
   key: string;
-  config: PubData;
+  config: SysgitPublishConf;
 }
 
 interface FormConfigProps {
   publishConf?: PublishConfig;
-  setData: (data: PubData) => void;
+  setData: (data: SysgitPublishConf) => void;
   setSaveEnabled: (enabled: boolean) => void;
 }
 
@@ -53,7 +35,7 @@ interface FormConfigState {
   setGitHubActionsSwitchEnable: boolean;
   syncSelectionSwitchEnable: boolean;
   keyPairBusy: boolean;
-  pubData: PubData;
+  pubData: SysgitPublishConf;
 }
 
 export class FormConfig extends React.Component<FormConfigProps, FormConfigState>{
@@ -124,7 +106,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
     }
   }
 
-  updatePubData(newData: Partial<PubData>, callback: (() => void) | null = null){
+  updatePubData(newData: Partial<SysgitPublishConf>, callback: (() => void) | null = null){
     let pubData = {...this.state.pubData, ...newData};
     this.setState({pubData: pubData}, ()=>{
       this.props.setData(pubData);

@@ -25,18 +25,14 @@ import SettingsIcon            from '@mui/icons-material/Settings';
 import Meta                    from './Meta'
 import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
+import { GithubPublishConf }   from '../../../../../../types';
 
 interface DashboardProps {
   siteKey: string;
   workspaceKey: string;
   enableSyncFrom: boolean;
   enableSyncTo: boolean;
-  publishConf: {
-    type: string;
-    publishScope?: string;
-    pullOnly?: boolean;
-    [key: string]: unknown;
-  };
+  publishConf: GithubPublishConf;
   onSyncDialogControl: (open: boolean, text: string, icon: React.ReactNode) => void;
   onConfigure: () => void;
 }

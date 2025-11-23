@@ -11,19 +11,14 @@ import ArrowDownwardIcon       from '@mui/icons-material/ArrowDownward';
 import Meta                    from './Meta'
 import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
+import { FolderPublishConf }   from '../../../../../../types';
 
 interface DashboardProps {
   siteKey: string;
   workspaceKey: string;
   enableSyncFrom: boolean;
   enableSyncTo: boolean;
-  publishConf: {
-    type: string;
-    path?: string;
-    publishScope?: string;
-    pullOnly?: boolean;
-    [key: string]: unknown;
-  };
+  publishConf: FolderPublishConf;
   onSyncDialogControl: (open: boolean, text: string, icon: React.ReactNode) => void;
   onConfigure: () => void;
 }

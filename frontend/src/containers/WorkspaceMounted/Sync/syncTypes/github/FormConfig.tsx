@@ -17,35 +17,16 @@ import MenuItem            from '@mui/material/MenuItem';
 import LinearProgress      from '@mui/material/LinearProgress';
 import Select              from '@mui/material/Select';
 import Paper               from '@mui/material/Paper';
-
-interface PubData {
-  type: string;
-  title: string;
-  username: string;
-  email: string;
-  repository: string;
-  branch: string;
-  deployPrivateKey: string;
-  deployPublicKey: string;
-  publishScope: string;
-  setGitHubActions: boolean;
-  overrideBaseURLSwitch: boolean;
-  overrideBaseURL: string;
-  pullOnly: boolean;
-  backupAtPull: boolean;
-  syncSelection: string;
-  CNAMESwitch: boolean;
-  CNAME: string;
-}
+import { GithubPublishConf } from '../../../../../../types';
 
 interface PublishConfig {
   key: string;
-  config: PubData;
+  config: GithubPublishConf;
 }
 
 interface FormConfigProps {
   publishConf?: PublishConfig;
-  setData: (data: PubData) => void;
+  setData: (data: GithubPublishConf) => void;
   setSaveEnabled: (enabled: boolean) => void;
 }
 
@@ -54,7 +35,7 @@ interface FormConfigState {
   setGitHubActionsSwitchEnable: boolean;
   syncSelectionSwitchEnable: boolean;
   keyPairBusy: boolean;
-  pubData: PubData;
+  pubData: GithubPublishConf;
 }
 
 export class FormConfig extends React.Component<FormConfigProps, FormConfigState>{
@@ -126,7 +107,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
     }
   }
 
-  updatePubData(newData: Partial<PubData>, callback: (() => void) | null = null){
+  updatePubData(newData: Partial<GithubPublishConf>, callback: (() => void) | null = null){
     let pubData = {...this.state.pubData, ...newData};
     this.setState({pubData: pubData}, ()=>{
       this.props.setData(pubData);
