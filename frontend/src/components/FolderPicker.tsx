@@ -1,6 +1,7 @@
 import * as React       from 'react';
 import Button       from '@mui/material/Button';
 import TextField       from '@mui/material/TextField';
+import service from '../services/service';
 
 interface FolderPickerProps {
   selectedFolder?: string | null;
@@ -21,20 +22,13 @@ export default class FolderPicker extends React.Component<FolderPickerProps, Fol
     this.openPicker();
   }
 
-  openPicker(){
-    let { remote } = window.require('electron');
-
-    remote.dialog.showOpenDialog(
-      remote.getCurrentWindow(),
-      { properties: ['openDirectory']}
-    ).then( (result)=> {
-      let selectedFolder = (result.filePaths||[])[0];
-      this.props.onFolderSelected(selectedFolder||null);
-    }).catch( (err) => {
-
-    });
-
-
+  async openPicker(){
+    try {
+      const result = await service.api.showOpenFolderDialog();
+      this.props.onFolderSelected(result.selectedFolder || null);
+    } catch (err) {
+      console.error('Error opening folder dialog:', err);
+    }
   }
 
   render(){

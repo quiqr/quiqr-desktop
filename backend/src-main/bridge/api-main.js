@@ -1059,4 +1059,23 @@ api.updateCommunityTemplates = function(data, context) {
   bindResponseToContext(updateCommunityTemplatesJob(), context);
 }
 
+api.showOpenFolderDialog = async function(_, context) {
+  const { dialog } = require('electron');
+  try {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    });
+
+    if (result.canceled) {
+      context.resolve({ selectedFolder: null });
+    } else {
+      const selectedFolder = (result.filePaths || [])[0] || null;
+      context.resolve({ selectedFolder });
+    }
+  } catch (error) {
+    console.error('Error opening folder dialog:', error);
+    context.reject(error);
+  }
+}
+
 module.exports = api;

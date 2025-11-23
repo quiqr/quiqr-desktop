@@ -369,6 +369,10 @@ export class API {
     return mainProcessBridge.request('updateCommunityTemplates', {});
   }
 
+  showOpenFolderDialog() {
+    return mainProcessBridge.request('showOpenFolderDialog', {});
+  }
+
 }
 
 export const instance = new API();

@@ -374,8 +374,18 @@ export const menuSectionSchema = z.object({
 
 export const menuSchema = z.array(menuSectionSchema)
 
-export const publConfSchema = z.object({
-  type: z.string(),
+// Folder publish configuration
+export const folderPublishConfSchema = z.object({
+  type: z.literal('folder'),
+  path: z.string(),
+  publishScope: z.string(),
+  overrideBaseURLSwitch: z.boolean(),
+  overrideBaseURL: z.string()
+})
+
+// GitHub publish configuration
+export const githubPublishConfSchema = z.object({
+  type: z.literal('github'),
   username: z.string(),
   email: z.string(),
   repository: z.string(),
@@ -389,9 +399,15 @@ export const publConfSchema = z.object({
   overrideBaseURL: z.string()
 })
 
+// Union of all publish config types
+export const publConfSchema = z.discriminatedUnion('type', [
+  folderPublishConfSchema,
+  githubPublishConfSchema
+])
+
 export const siteConfigSchema = z.object({
   key: z.string(),
-  name: z.string(),
+  name: z.string().optional(),
   source: z.object({
     type: z.literal('folder'),
     path: z.string()
@@ -512,6 +528,8 @@ export type CollectionConfig = z.infer<typeof collectionConfigSchema>
 // export type MenuItem = z.infer<typeof menuItemSchema>
 // export type MenuSection = z.infer<typeof menuSectionSchema>
 // export type MenuConfig = z.infer<typeof menuSchema>
+export type FolderPublishConf = z.infer<typeof folderPublishConfSchema>
+export type GithubPublishConf = z.infer<typeof githubPublishConfSchema>
 export type PublConf = z.infer<typeof publConfSchema>
 export type SiteConfig = z.infer<typeof siteConfigSchema>
 
@@ -698,6 +716,10 @@ export const collectionItemKeyResponseSchema = z.object({
   key: z.string()
 })
 
+export const folderDialogResponseSchema = z.object({
+  selectedFolder: z.string().nullable()
+})
+
 export const communityTemplateSchema = z.object({
   HugoVersion: z.string(),
   HugoTheme: z.string(),
@@ -803,7 +825,8 @@ export const apiSchemas = {
   ]),
   getCreatorMessage: z.string(),
   getSiteConfig: siteConfigSchema,
-  serveWorkspace: z.any() // Returns void/undefined, server action
+  serveWorkspace: z.any(), // Returns void/undefined, server action
+  showOpenFolderDialog: folderDialogResponseSchema
 } as const
 
 // Export types for the API responses
@@ -816,6 +839,7 @@ export type FileReference = z.infer<typeof fileReferenceSchema>
 export type CommunityTemplate = z.infer<typeof communityTemplateSchema>
 export type DynFormFields = z.infer<typeof dynFormFieldsSchema>
 export type UserPreferences = z.infer<typeof userPreferencesSchema>
+export type FolderDialogResponse = z.infer<typeof folderDialogResponseSchema>
 
 // This type includes all the api method names
 export type ApiMethod = keyof typeof apiSchemas
