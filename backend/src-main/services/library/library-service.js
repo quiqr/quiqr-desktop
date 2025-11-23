@@ -146,6 +146,10 @@ class LibraryService{
 
   async writeSiteConf(newConf, siteKey){
     newConf = this.deleteInvalidConfKeys(newConf);
+    // Ensure name field always exists - use key as fallback
+    if (!newConf.name) {
+      newConf.name = newConf.key || siteKey;
+    }
     await fssimple.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
     return true;
   }

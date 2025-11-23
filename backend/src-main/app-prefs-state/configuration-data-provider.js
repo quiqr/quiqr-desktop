@@ -77,6 +77,37 @@ function get(callback, {invalidateCache} = {}){
         let formatProvider = formatProviderResolver.resolveForFilePath(conffile);
         if(formatProvider==null) throw new Error(`Could not resolve a format provider for file ${conffile}.`)
         let site = formatProvider.parse(strData);
+
+        // Migration: Ensure required fields exist
+        let needsMigration = false;
+
+        // Ensure name field exists - use key as fallback
+        if (!site.name && site.key) {
+          site.name = site.key;
+          needsMigration = true;
+          outputConsole.appendLine(`Migration: Added missing 'name' field to '${conffile}'`);
+        }
+
+        // Ensure source field exists - use default folder source
+        if (!site.source) {
+          site.source = {
+            type: 'folder',
+            path: 'main'
+          };
+          needsMigration = true;
+          outputConsole.appendLine(`Migration: Added missing 'source' field to '${conffile}'`);
+        }
+
+        // Save the fixed config back to disk
+        if (needsMigration) {
+          try {
+            fs.writeFileSync(conffile, JSON.stringify(site), { encoding: "utf8"});
+            outputConsole.appendLine(`Migrated site config '${conffile}'`);
+          } catch(writeErr) {
+            outputConsole.appendLine(`Warning: Could not save migrated config '${conffile}': ${writeErr.toString()}`);
+          }
+        }
+
         validateSite(site);
         site.published = 'unknown';
 

@@ -447,7 +447,11 @@ export const siteConfigSchema = z.object({
   publishStatus: z.number().int().min(0).max(8).optional(),
   lastEdit: z.number().optional(),
   transform: z.array(z.unknown()).optional()
-})
+}).transform((data) => ({
+  ...data,
+  // Ensure name always exists - use key as fallback
+  name: data.name || data.key
+}))
 
 export const grayMatterParseResultSchema = z.object({
   content: z.string(),
