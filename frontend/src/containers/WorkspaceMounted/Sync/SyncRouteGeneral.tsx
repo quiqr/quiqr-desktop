@@ -5,27 +5,14 @@ import Box from "@mui/material/Box";
 import SyncConfigDialog from "./components/SyncConfigDialog";
 import SyncBusyDialog from "./components/SyncBusyDialog";
 import Button from "@mui/material/Button";
+import { SiteConfig } from "../../../../types";
 //targets
 import { Dashboard as GitHubDashboard } from "./syncTypes/github";
 import { Dashboard as SysGitDashboard } from "./syncTypes/sysgit";
 import { Dashboard as FolderDashboard } from "./syncTypes/folder";
 
-interface PublishConfig {
-  key: string;
-  config: {
-    type: string;
-    publishScope?: string;
-    pullOnly?: boolean;
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}
-
-interface SiteWithPublish {
-  key: string;
-  publish: PublishConfig[];
-  [key: string]: unknown;
-}
+// Extract the publish config type from SiteConfig
+type PublishConfig = NonNullable<SiteConfig['publish']>[number];
 
 interface ServerDialog {
   open?: boolean;
@@ -44,13 +31,13 @@ interface ServerBusyDialog {
 interface SyncRouteGeneralProps {
   siteKey: string;
   workspaceKey: string;
-  site: SiteWithPublish;
+  site: SiteConfig | null;
   syncConfKey?: string;
   addRefresh?: unknown;
 }
 
 interface SyncRouteGeneralState {
-  site: SiteWithPublish;
+  site: SiteConfig | null;
   serverDialog: ServerDialog;
   serverBusyDialog: ServerBusyDialog;
   lastOpenedPublishedKey: string | null;
@@ -65,10 +52,7 @@ class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteG
   constructor(props: SyncRouteGeneralProps) {
     super(props);
     this.state = {
-      site: {
-        key: '',
-        publish: [],
-      },
+      site: null,
       serverDialog: {},
       serverBusyDialog: {},
       lastOpenedPublishedKey: null,
@@ -148,8 +132,18 @@ class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteG
   savePublishData(inkey: string, data: { type: string; [key: string]: unknown }) {
     let site = this.state.site;
 
+    if (!site) {
+      console.error('Cannot save publish data: site is null');
+      return;
+    }
+
     if (!inkey) {
       inkey = `publ-${Math.random()}`;
+    }
+
+    // Ensure publish array exists
+    if (!site.publish) {
+      site.publish = [];
     }
 
     const publConfIndex = site.publish.findIndex(({ key }) => key === inkey);
@@ -159,7 +153,7 @@ class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteG
       site.publish.push({ key: inkey, config: data });
     }
 
-    service.api.saveSiteConf(this.state.site.key, this.state.site).then(() => {
+    service.api.saveSiteConf(site.key, site).then(() => {
       this.history.push(`${this.basePath}/list/${inkey}`);
     });
   }
@@ -234,7 +228,19 @@ class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteG
     const { site, serverDialog } = this.state;
     let content = null;
 
-    if (site.publish.length < 1) {
+    // If site is not loaded yet, show nothing (or a loading state)
+    if (!site || !site.key) {
+      return (
+        <Route
+          render={({ history }) => {
+            this.history = history;
+            return <Box sx={{ height: '100%', padding: 2 }}>Loading...</Box>;
+          }}
+        />
+      );
+    }
+
+    if (!site.publish || site.publish.length < 1) {
       content = (
         <Box>
           <p>No sync server is configured. Add one first.</p>
@@ -287,7 +293,10 @@ class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteG
 
               <SyncConfigDialog
                 {...serverDialog}
-                site={this.state.site}
+                site={{
+                  key: this.state.site?.key || '',
+                  publish: this.state.site?.publish || []
+                }}
                 onSave={(publishKey) => {
                   this.history.push(`${this.basePath}/list/${publishKey}`);
 

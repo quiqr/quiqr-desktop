@@ -6,8 +6,8 @@ import GitHubIcon          from '@mui/icons-material/GitHub';
 
 interface CardNewProps {
   handleClick: () => void;
-  classes: {
-    paper: string;
+  classes?: {
+    paper?: string;
     [key: string]: unknown;
   };
 }
@@ -20,7 +20,8 @@ class CardNew extends React.Component<CardNewProps> {
         onClick={()=>{
           this.props.handleClick();
         }}
-        className={this.props.classes.paper}
+        className={this.props.classes?.paper}
+        sx={{ cursor: 'pointer', padding: 2 }}
         elevation={5}
       >
         <Box display="flex" alignItems="center" justifyContent="center" height={63}>
@@ -30,7 +31,7 @@ class CardNew extends React.Component<CardNewProps> {
           <Typography variant="h5">Git Target</Typography>
         </Box>
         <Box display="flex" textAlign="center">
-          <Typography variant="p">Sync with git server using system git binary</Typography>
+          <Typography variant="body2">Sync with git server using system git binary</Typography>
         </Box>
 
 

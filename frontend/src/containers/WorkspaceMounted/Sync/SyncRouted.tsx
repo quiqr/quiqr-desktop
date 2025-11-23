@@ -1,9 +1,17 @@
 import * as React from "react";
 import { Switch, Route } from "react-router-dom";
 import SyncRouteGeneral from "./SyncRouteGeneral";
+import { SiteConfig } from "../../../../types";
+
+interface WorkspaceConfig {
+  [key: string]: unknown;
+}
 
 interface SyncRoutedProps {
-  [key: string]: unknown;
+  site: SiteConfig | null;
+  workspace: WorkspaceConfig | null;
+  siteKey: string;
+  workspaceKey: string;
 }
 
 interface SyncRoutedState {}

@@ -6,8 +6,8 @@ import FolderIcon          from '@mui/icons-material/Folder';
 
 interface CardNewProps {
   handleClick: () => void;
-  classes: {
-    paper: string;
+  classes?: {
+    paper?: string;
     [key: string]: unknown;
   };
 }
@@ -20,7 +20,8 @@ class CardNew extends React.Component<CardNewProps> {
         onClick={()=>{
           this.props.handleClick();
         }}
-        className={this.props.classes.paper}
+        className={this.props.classes?.paper}
+        sx={{ cursor: 'pointer', padding: 2 }}
         elevation={5}
       >
         <Box display="flex" alignItems="center"  justifyContent="center" height={63}>
@@ -30,7 +31,7 @@ class CardNew extends React.Component<CardNewProps> {
           <Typography variant="h5">Folder Target</Typography>
         </Box>
         <Box display="flex" textAlign="center">
-          <Typography variant="p">Sync to folder on local filesystem</Typography>
+          <Typography variant="body2">Sync to folder on local filesystem</Typography>
         </Box>
       </Paper>
     )
