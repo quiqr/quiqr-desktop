@@ -211,7 +211,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
       <React.Fragment>
         <Box
           style={
-            Object.assign({}, { width:'280px', transition: 'all .2s' }, hideItems? { opacity:0, pointerEvents:'none' } : { opacity:1 })
+            Object.assign({}, { width:'280px', transition: 'all .2s' }, hideItems? { opacity:0, pointerEvents:'none' as const } : { opacity:1 })
           }>
           { menusNodes }
         </Box>
