@@ -191,6 +191,7 @@
   },
   "workspaces": [
     "packages/types",
+    "packages/backend",
     "frontend"
   ]
 }
