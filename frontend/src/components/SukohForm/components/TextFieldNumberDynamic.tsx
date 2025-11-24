@@ -2,9 +2,21 @@ import React                     from 'react';
 import FormItemWrapper           from './shared/FormItemWrapper';
 import TextField                 from '@mui/material/TextField';
 import Tip                       from '../../Tip';
-import { BaseDynamic }           from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 
-class TextFieldNumberDynamic extends BaseDynamic {
+// Define field interface with all properties used by this component
+export interface TextFieldNumberDynamicField extends FieldBase {
+  title?: string;
+  default?: number;
+  tip?: string;
+}
+
+// Define props and state types
+type TextFieldNumberDynamicProps = BaseDynamicProps<TextFieldNumberDynamicField>;
+
+type TextFieldNumberDynamicState = BaseDynamicState;
+
+class TextFieldNumberDynamic extends BaseDynamic<TextFieldNumberDynamicProps, TextFieldNumberDynamicState> {
 
   normalizeState({state, field}){
     let key = field.key;
@@ -27,7 +39,7 @@ class TextFieldNumberDynamic extends BaseDynamic {
       return (null);
     }
 
-    let getNumberValue = function(e){
+    let getNumberValue = function(){
       return (context.value||'').toString();
     };
 
