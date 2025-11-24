@@ -7,12 +7,27 @@ import FormControl      from '@mui/material/FormControl';
 import DatePicker       from "react-datepicker";
 import                       "react-datepicker/dist/react-datepicker.css";
 import Tip              from '../../Tip';
-import { BaseDynamic }  from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase }  from '../../HoForm';
 
+// Define field interface with all properties used by the component
+export interface DateDynamicField extends FieldBase {
+  title?: string;
+  tip?: string;
+  default?: string;
+  dateFormat?: string;
+}
 
-class DateDynamic extends BaseDynamic {
+// Use the field interface as a generic parameter
+type DateDynamicProps = BaseDynamicProps<DateDynamicField>;
 
-  state = {
+type DateDynamicState = BaseDynamicState & {
+  startDate: Date;
+};
+
+class DateDynamic extends BaseDynamic<DateDynamicProps, DateDynamicState> {
+
+  state: DateDynamicState = {
+    error_msg: '',
     startDate: new Date(),
   };
 
