@@ -1,17 +1,33 @@
 import React            from 'react';
 import List             from '@mui/material/List';
-import ListItem         from '@mui/material/ListItem';
+import ListItemButton   from '@mui/material/ListItemButton';
 import ListItemIcon     from '@mui/material/ListItemIcon';
 import ListItemText     from '@mui/material/ListItemText';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderIcon       from '@mui/icons-material/Folder';
-import { BaseDynamic }  from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase }  from '../../HoForm';
 
-class NestDynamic extends BaseDynamic {
-  constructor(props){
+// Define field interface with all properties used by nest field type
+export interface NestDynamicField extends FieldBase {
+  title?: string;
+  fields: any[]; // Array of nested field definitions
+  groupdata?: boolean; // Controls whether child values nest under parent key (default: true)
+}
+
+// Define props type using the field interface
+type NestDynamicProps = BaseDynamicProps<NestDynamicField>;
+
+// Define state type with component-specific properties
+type NestDynamicState = BaseDynamicState & {
+  childLabels: string;
+};
+
+class NestDynamic extends BaseDynamic<NestDynamicProps, NestDynamicState> {
+  constructor(props: NestDynamicProps){
     super(props);
     this.state = {
-      childLabels: ''
+      childLabels: '',
+      error_msg: ''
     };
   }
 
@@ -66,9 +82,8 @@ class NestDynamic extends BaseDynamic {
       return (
         <List style={{marginBottom:16, padding: 0}}>
 
-          <ListItem
+          <ListItemButton
             style={{ padding: '20px 16px', border: 'solid 1px #d8d8d8', borderRadius:'7px'}}
-            role={undefined}  button="true"
             onClick={function(){ context.setPath(node) } }
           >
             <ListItemIcon>
@@ -81,7 +96,7 @@ class NestDynamic extends BaseDynamic {
               secondary={this.state.childLabels}
             />
             <ChevronRightIcon />
-          </ListItem>
+          </ListItemButton>
 
         </List>
       );
