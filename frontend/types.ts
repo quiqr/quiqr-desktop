@@ -827,7 +827,7 @@ export const apiSchemas = {
   listWorkspaces: z.array(workspaceSchema),
   getWorkspaceDetails: workspaceDetailsSchema,
   getSingle: z.record(z.any()), // Returns dynamic content based on the single's fields
-  parseFileToObject: grayMatterParseResultSchema,
+  parseFileToObject: z.any(), // any is needed here because a select-from-query file could have any shape
   getCurrentBaseUrl: z.string(),
   getDynFormFields: dynFormFieldsSchema,
   getFilesInBundle: z.array(fileReferenceSchema),
