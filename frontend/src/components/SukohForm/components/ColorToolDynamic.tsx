@@ -3,9 +3,20 @@ import DefaultWrapper from './shared/DefaultWrapper';
 import FormItemWrapper from './shared/FormItemWrapper';
 import Tip from '../../Tip';
 import TextField from '@mui/material/TextField';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 //import service                              from './../../../services/service'
 
+// Define field interface with all properties used by the component
+export interface ColorToolDynamicField extends FieldBase {
+  title?: string;
+  tip?: string;
+  autoSave?: boolean;
+}
+
+// Use the field interface as a generic parameter
+type ColorToolDynamicProps = BaseDynamicProps<ColorToolDynamicField>;
+
+type ColorToolDynamicState = BaseDynamicState;
 
 const palette = {
   red: '#ff0000',
@@ -22,7 +33,7 @@ const palette = {
   pink: 'pink',
   darkblue: 'darkblue',
 };
-class ColorToolDynamic extends BaseDynamic {
+class ColorToolDynamic extends BaseDynamic<ColorToolDynamicProps, ColorToolDynamicState> {
 
   getType(){
     return 'color';
