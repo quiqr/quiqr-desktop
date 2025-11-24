@@ -5,9 +5,23 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import DefaultWrapper from "./shared/DefaultWrapper";
 import IconButtonGroup from "../../IconButtonGroup";
-import { BaseDynamic } from "../../HoForm";
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from "../../HoForm";
 
-class TextFieldLabelMock extends React.Component {
+export interface LeafArrayDynamicField extends FieldBase {
+  title?: string;
+  default?: any[];
+  field: any; // The field definition for each array item
+}
+
+type LeafArrayDynamicProps = BaseDynamicProps<LeafArrayDynamicField>;
+
+type LeafArrayDynamicState = BaseDynamicState;
+
+interface TextFieldLabelMockProps {
+  children?: React.ReactNode;
+}
+
+class TextFieldLabelMock extends React.Component<TextFieldLabelMockProps> {
   render() {
     return (
       <label
@@ -24,8 +38,8 @@ class TextFieldLabelMock extends React.Component {
   }
 }
 
-class LeafArrayDynamic extends BaseDynamic {
-  normalizeState({ state, field }) {
+class LeafArrayDynamic extends BaseDynamic<LeafArrayDynamicProps, LeafArrayDynamicState> {
+  normalizeState({ state, field }: { state: any; field: LeafArrayDynamicField }) {
     let key = field.key;
     if (state[key] === undefined) {
       state[key] = field.default || [];
@@ -56,7 +70,7 @@ class LeafArrayDynamic extends BaseDynamic {
     context.setValue(valueCopy);
   }
 
-  getOnRequestDeleteHandler(index) {
+  getOnRequestDeleteHandler(index: number) {
     return () => {
       let context = this.props.context;
       let copy = context.value.slice(0);
@@ -65,7 +79,7 @@ class LeafArrayDynamic extends BaseDynamic {
     };
   }
 
-  getOnItemChange(index) {
+  getOnItemChange(index: number) {
     return (value: any) => {
       let context = this.props.context;
       let copy = context.value.slice(0);
