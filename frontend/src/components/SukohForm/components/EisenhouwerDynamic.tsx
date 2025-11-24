@@ -1,6 +1,6 @@
 import React           from 'react';
 import FormItemWrapper from './shared/FormItemWrapper';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 import Tip             from '../../Tip';
 import { Chart as ChartJS, PointElement, Tooltip, Legend, registerables } from 'chart.js';
 import "chartjs-plugin-dragdata";
@@ -9,18 +9,52 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import { Bubble } from "react-chartjs-2";
 //import service                  from '../../../services/service';
 
-const arrayToObject = (arrayIn, keyField) => {
+// Define field interface with all properties used by the component
+export interface EisenhouwerDynamicField extends FieldBase {
+  title?: string;
+  tip?: string;
+  dataSetsDataPointsKeyToItem?: boolean;
+  dataSetsDataPointPosXPath?: string;
+  dataSetsDataPointPosYPath?: string;
+  dataSetsPath?: string;
+  dataSetsKeyToLabel?: boolean;
+  dataSetsDataPointsPath?: string;
+  xScaleTitle?: string;
+  yScaleTitle?: string;
+  pointRadius?: number;
+  labelDoNow?: string;
+  labelToPlan?: string;
+  labelDelegate?: string;
+  labelDelete?: string;
+  dataSetsDataPointLabelTemplate?: string;
+}
+
+// Define quadrants plugin options interface
+interface qdtOptions {
+  topLeft: string;
+  topRight: string;
+  bottomRight: string;
+  bottomLeft: string;
+}
+
+type EisenhouwerDynamicProps = BaseDynamicProps<EisenhouwerDynamicField>;
+
+type EisenhouwerDynamicState = BaseDynamicState & {
+  error_msg: string | null;
+};
+
+const arrayToObject = (arrayIn: any[], keyField: string) => {
     return arrayIn.reduce((obj, item) => {
       obj[item[keyField]] = item
 
       return obj
-    }, {})
+    }, {} as Record<string, any>)
   }
 
 const quadrants = {
   id: 'quadrants',
 
-  beforeDraw(chart:any, args:any, options: qdtOptions) {
+  beforeDraw(chart: any, _args: any, options: qdtOptions) {
     const {
       ctx,
       chartArea: {left, top, right, bottom},
@@ -61,9 +95,10 @@ const emptyDataSet = {
     };
 
 
-class EisenhouwerDynamic extends BaseDynamic {
+class EisenhouwerDynamic extends BaseDynamic<EisenhouwerDynamicProps, EisenhouwerDynamicState> {
+  cdata: any;
 
-  constructor(props){
+  constructor(props: EisenhouwerDynamicProps){
 
     super(props);
 
@@ -78,9 +113,9 @@ class EisenhouwerDynamic extends BaseDynamic {
     return 'eisenhouwer';
   }
 
-  inParsePoints(newPData, field){
+  inParsePoints(newPData: any, field: EisenhouwerDynamicField){
 
-    let points = [];
+    let points: any[] = [];
     if(field.dataSetsDataPointsKeyToItem) {
       points = Object.keys(newPData).map(key => {
         let rval = newPData[key]
@@ -102,18 +137,18 @@ class EisenhouwerDynamic extends BaseDynamic {
     return points;
   }
 
-  createNestedObject( base, names ) {
+  createNestedObject( base: any, names: string[] ) {
     for( let i = 0; i < names.length; i++ ) {
       base = base[ names[i] ] = base[ names[i] ] || {};
     }
   }
 
-  inParseDataSets(data, field){
+  inParseDataSets(data: any, field: EisenhouwerDynamicField){
 
     // eslint-disable-next-line
     let newData = eval("data"+(field.dataSetsPath||""))
 
-    let rdatasets = [];
+    let rdatasets: any[] = [];
     if(field.dataSetsKeyToLabel){
       rdatasets = Object.keys(newData).map(key => {
         // eslint-disable-next-line
@@ -122,7 +157,7 @@ class EisenhouwerDynamic extends BaseDynamic {
       })
     }
     else{
-      rdatasets = newData.map((item)=>{
+      rdatasets = newData.map((item: any)=>{
         // eslint-disable-next-line
         let newPData = eval("item"+(field.dataSetsDataPointsPath||""))
         item.data = this.inParsePoints(newPData,field);
@@ -147,7 +182,7 @@ class EisenhouwerDynamic extends BaseDynamic {
     this.cdata = cdata;
   }
 
-  outParsePoints(points, field){
+  outParsePoints(points: any[], field: EisenhouwerDynamicField){
 
     points.map((point)=>{
       if(field.dataSetsDataPointPosXPath){
@@ -163,13 +198,13 @@ class EisenhouwerDynamic extends BaseDynamic {
     return points;
   }
 
-  outParseDataSets(cdata,field){
+  outParseDataSets(cdata: any, field: EisenhouwerDynamicField){
 
     let cdataIn = { ...cdata }
-    let cdataOut = {}
+    let cdataOut: any = {}
 
     if(field.dataSetsKeyToLabel){
-      let dsets={}
+      let dsets: Record<string, any> = {}
 
       cdataIn.datasets = arrayToObject(cdataIn.datasets, "label");
 
@@ -201,11 +236,11 @@ class EisenhouwerDynamic extends BaseDynamic {
     }
     else {
 
-        let dsets = []
+        let dsets: any[] = []
 
-        cdataIn.datasets.forEach((ds) => {
+        cdataIn.datasets.forEach((ds: any) => {
 
-          let newDs = {}
+          let newDs: any = {}
           if(field.dataSetsDataPointsPath){
             newDs[field.dataSetsDataPointsPath.substring(1)] = ds.data
           }
@@ -227,7 +262,7 @@ class EisenhouwerDynamic extends BaseDynamic {
     return cdataOut;
   }
 
-  handleChange(field){
+  handleChange(field: EisenhouwerDynamicField){
     this.props.context.setValue(this.outParseDataSets(this.cdata, field), 250);
   }
 
