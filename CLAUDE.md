@@ -132,6 +132,46 @@ When adding new field types:
 3. Create the component in `/components/SukohForm/components/`
 4. Register in the form field router
 
+### TypeScript Pattern for Dynamic Components
+
+All SukohForm Dynamic components should follow this pattern for proper TypeScript typing:
+
+**Define a component-specific field interface that extends `FieldBase`:**
+```typescript
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
+
+// Define field interface with all properties used by the component
+export interface MyComponentDynamicField extends FieldBase {
+  title?: string;
+  path: string;
+  customProperty?: string;
+  // ... other properties
+}
+
+// Use the field interface as a generic parameter
+type MyComponentDynamicProps = BaseDynamicProps<MyComponentDynamicField>;
+
+type MyComponentDynamicState = BaseDynamicState & {
+  // ... component-specific state properties
+};
+
+class MyComponentDynamic extends BaseDynamic<MyComponentDynamicProps, MyComponentDynamicState> {
+  // Now this.props.context.node.field is properly typed as MyComponentDynamicField
+  // No type assertions needed!
+}
+```
+
+**Key points:**
+- Define a field interface that extends `FieldBase` from HoForm (provides `key`, `compositeKey`, `type`)
+- Add all component-specific properties to this interface
+- Pass the field interface as a generic to `BaseDynamicProps<T>`
+- Use `&` to extend `BaseDynamicState` for component state
+- Avoid type assertions (`as unknown as`); the field should be properly typed throughout
+
+**Example references:**
+- See `EasyMarkDownDynamic.tsx` for a complete working example
+- See `BundleManagerDynamic.tsx` and `BundleImgThumbDynamic.tsx` for recent implementations
+
 ## Important Patterns
 
 ### Adding a New API Method
