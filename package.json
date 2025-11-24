@@ -190,6 +190,7 @@
     ]
   },
   "workspaces": [
+    "packages/types",
     "frontend"
   ]
 }
