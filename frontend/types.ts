@@ -49,8 +49,12 @@ const dateFieldSchema = baseFieldSchema.extend({
 
 const selectFieldSchema = baseFieldSchema.extend({
   type: z.literal('select'),
-  options: z.array(z.union([z.string(), z.object({ value: z.string(), text: z.string() })])),
-  default: z.union([z.string(), z.array(z.string())]).optional(),
+  options: z.array(z.union([
+    z.string(),
+    z.number(),
+    z.object({ value: z.union([z.string(), z.number()]), text: z.string() })
+  ])),
+  default: z.union([z.string(), z.number(), z.array(z.union([z.string(), z.number()]))]).optional(),
   multiple: z.boolean().optional(),
   tip: z.string().optional(),
   autoSave: z.boolean().optional(),
@@ -307,24 +311,26 @@ const coreFieldSchemas = [
 
 // For generic custom fields, create a catch-all schema
 // This will match any field with a type not covered by built-in schemas
-const customFieldSchema = typedBaseFieldSchema
-  .extend({
-    // Ensure it doesn't match any built-in types
-    type: z
-      .string()
-      .refine(
-        (type) => !Object.values(CoreFields).some((schema) => schema.shape.type.value === type),
-        { message: 'Type already exists as a built-in field type' }
-      )
-  })
-  .catchall(z.any())
+// COMMENTED OUT: Causing validation issues, masking real errors
+// const customFieldSchema = typedBaseFieldSchema
+//   .extend({
+//     // Ensure it doesn't match any built-in types
+//     type: z
+//       .string()
+//       .refine(
+//         (type) => !Object.values(CoreFields).some((schema) => schema.shape.type.value === type),
+//         { message: 'Type already exists as a built-in field type' }
+//       )
+//   })
+//   .catchall(z.any())
 
 // Create the field schema as a union of built-in fields and custom fields
 // First create a discriminated union of all built-in fields
 const coreFieldSchema = z.discriminatedUnion('type', coreFieldSchemas)
 
-// Then create a union with the custom field schema
-const fieldSchema = z.union([coreFieldSchema, customFieldSchema])
+// Use only core field schema for now (custom fields disabled)
+// const fieldSchema = z.union([coreFieldSchema, customFieldSchema])
+const fieldSchema = coreFieldSchema
 
 const baseConfigSchema = z.object({
   key: z.string(),
