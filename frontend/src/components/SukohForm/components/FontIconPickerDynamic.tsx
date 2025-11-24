@@ -3,17 +3,32 @@ import InputLabel      from '@mui/material/InputLabel';
 import FormControl     from '@mui/material/FormControl';
 import TextField       from '@mui/material/TextField';
 import FormItemWrapper from './shared/FormItemWrapper';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 import Tip             from '../../Tip';
 // import { IconPicker }  from 'react-fa-icon-picker'
 //import service         from '../../../services/service';
 
-class FontIconPickerDynamic extends BaseDynamic {
+export interface FontIconPickerDynamicField extends FieldBase {
+  title?: string;
+  tip?: string;
+  multiple?: boolean;
+  default?: string | string[];
+  autoSave?: boolean;
+}
 
-  constructor(props){
+type FontIconPickerDynamicProps = BaseDynamicProps<FontIconPickerDynamicField>;
+
+type FontIconPickerDynamicState = BaseDynamicState & {
+  value: string;
+};
+
+class FontIconPickerDynamic extends BaseDynamic<FontIconPickerDynamicProps, FontIconPickerDynamicState> {
+
+  constructor(props: FontIconPickerDynamicProps){
     super(props);
     this.state = {
       value: '',
+      error_msg: '',
     };
   }
 
@@ -88,7 +103,7 @@ class FontIconPickerDynamic extends BaseDynamic {
     return (
       <FormItemWrapper
         control={
-              <div style="color: red; font-size: 2rem;">
+              <div style={{'color': 'red', 'fontSize': '2rem'}}>
                 This component has temporarily been disabled.
               </div>
 /**
