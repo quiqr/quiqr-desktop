@@ -95,7 +95,7 @@ class AiAssist extends React.Component<AiAssistProps, AiAssistState> {
         if (content !== "") {
           this.setState({ assistendNotReady: true, aiBusy: true });
 
-          const stream = AIclient.beta.chat.completions.stream({
+          const stream = AIclient.chat.completions.stream({
             model: "gpt-4",
             messages: [{ role: "user", content: content }],
             stream: true,
