@@ -3,17 +3,30 @@ import IconBroken            from '@mui/icons-material/BrokenImage';
 import MovieIcon             from '@mui/icons-material/Movie';
 import PictureAsPdfIcon      from '@mui/icons-material/PictureAsPdf';
 import InsertDriveFileIcon   from '@mui/icons-material/InsertDriveFile';
-import { BaseDynamic }       from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase }       from '../../HoForm';
 import Spinner               from '../../Spinner';
 
-class BundleImgThumbDynamic extends BaseDynamic {
+export interface BundleImgThumbDynamicField extends FieldBase {
+  src?: string;
+}
 
-  constructor(props){
+type BundleImgThumbDynamicProps = BaseDynamicProps<BundleImgThumbDynamicField>;
+
+type BundleImgThumbDynamicState = BaseDynamicState & {
+  srcFile: string | undefined;
+  src: string | undefined;
+};
+
+class BundleImgThumbDynamic extends BaseDynamic<BundleImgThumbDynamicProps, BundleImgThumbDynamicState> {
+
+  constructor(props: BundleImgThumbDynamicProps){
     super(props);
     if(props){
       this.state = {
         srcFile: undefined,
-        src: undefined };
+        src: undefined,
+        error_msg: null
+      };
     }
   }
 
@@ -55,11 +68,11 @@ class BundleImgThumbDynamic extends BaseDynamic {
     }
   }
 
-  getExt(file){
-    return file.split('.').pop().toLowerCase();
+  getExt(file: string){
+    return file.split('.').pop()?.toLowerCase() || '';
   }
 
-  isPDF(file){
+  isPDF(file: string){
     const extname = this.getExt(file);
     if(extname==='pdf'
     ){
@@ -68,7 +81,7 @@ class BundleImgThumbDynamic extends BaseDynamic {
 
     return false;
   }
-  isImage(file){
+  isImage(file: string){
     const extname = this.getExt(file);
     if(extname ==='gif' ||
       extname === 'png' ||
@@ -82,7 +95,7 @@ class BundleImgThumbDynamic extends BaseDynamic {
     return false;
   }
 
-  isVideo(file){
+  isVideo(file: string){
     const extname = this.getExt(file);
     if(extname ==='mov' ||
       extname === 'mpg' ||
@@ -95,7 +108,7 @@ class BundleImgThumbDynamic extends BaseDynamic {
     return false;
   }
 
-  componentDidUpdate(preProps: HomeProps){
+  componentDidUpdate(preProps: BundleImgThumbDynamicProps){
     this.checkThumbs();
   }
 
@@ -109,7 +122,7 @@ class BundleImgThumbDynamic extends BaseDynamic {
 
         this.setState({srcFile: state[field.src||'src'] });
         form.props.plugins.getBundleThumbnailSrc(state[field.src||'src'])
-          .then((src)=>{
+          .then((src: string)=>{
 
             this.setState({src});
           });
