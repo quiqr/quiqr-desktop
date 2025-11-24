@@ -8,6 +8,7 @@ import Tip from "../../Tip";
 import AiAssist from "../../AiAssist";
 import service from "../../../services/service";
 import { hasOpenAiApiKey } from "../../../utils/type-guards";
+import { UserPreferences } from "../../../../types";
 
 const md = new MarkdownIt({ html: true });
 const imgIcon =
@@ -45,10 +46,7 @@ interface MarkdownDynamicState extends BaseDynamicState {
   enableAiAssist: boolean;
   preview: string;
   maxHeight: number | null;
-  prefs?: {
-    openAiApiKey?: string;
-    [key: string]: any;
-  };
+  prefs?: UserPreferences
 }
 
 class MarkdownDynamic extends BaseDynamic<MarkdownDynamicProps, MarkdownDynamicState> {
