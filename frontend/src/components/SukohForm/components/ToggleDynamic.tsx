@@ -3,11 +3,21 @@ import Switch           from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormItemWrapper  from './shared/FormItemWrapper';
 import Tip              from '../../Tip';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 
-class ToggleDynamic extends BaseDynamic {
+export interface ToggleDynamicField extends FieldBase {
+  default?: boolean;
+  title?: string;
+  tip?: string;
+}
 
-  normalizeState({state, field, stateBuilder}){
+type ToggleDynamicProps = BaseDynamicProps<ToggleDynamicField>;
+
+type ToggleDynamicState = BaseDynamicState;
+
+class ToggleDynamic extends BaseDynamic<ToggleDynamicProps, ToggleDynamicState> {
+
+  normalizeState({state, field}: {state: any; field: ToggleDynamicField; stateBuilder: any}){
     let key = field.key;
     if(state[key]===undefined){
       state[key] = field.default!==undefined?field.default:false;
