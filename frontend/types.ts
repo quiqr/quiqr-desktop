@@ -744,7 +744,8 @@ export const languageSchema = z.object({
 })
 
 export const fileReferenceSchema = z.object({
-  src: z.string()
+  src: z.string(),
+  filename: z.string().optional()
 })
 
 export const hugoServerResponseSchema = z.object({

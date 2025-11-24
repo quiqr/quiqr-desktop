@@ -64,8 +64,8 @@ interface DialogConf {
 interface FormProps {
   siteKey: string;
   workspaceKey: string;
-  collectionKey: string;
-  collectionItemKey: string;
+  collectionKey?: string;
+  collectionItemKey?: string;
 }
 
 interface ImageItem {
@@ -78,7 +78,7 @@ type SelectImagesDialogProps = {
   formProps: FormProps;
   uploadPath: string;
   reload: () => void;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   imageItems: ImageItem[];
   getBundleThumbnailSrc: (imagePath: string) => Promise<string>;
   handleSelect: (filename: string) => void;

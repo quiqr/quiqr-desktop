@@ -8,12 +8,39 @@ import Button from "@mui/material/Button";
 import FormItemWrapper from "./shared/FormItemWrapper";
 import Spinner from "../../Spinner";
 import Tip from "../../Tip";
-import { BaseDynamic } from "../../HoForm";
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from "../../HoForm";
 import SelectImagesDialog from "../../SelectImagesDialog";
 import service from "../../../services/service";
 
-class ImageSelectDynamic extends BaseDynamic {
-  constructor(props) {
+// Define field interface with all properties used by the component
+export interface ImageSelectDynamicField extends FieldBase {
+  title?: string;
+  path: string;
+  extensions?: string[];
+  forceFileName?: string;
+  real_fs_path?: string;
+  default?: string;
+  tip?: string;
+  buttonTitle?: string;
+  autoSave?: boolean;
+}
+
+type ImageSelectDynamicProps = BaseDynamicProps<ImageSelectDynamicField>;
+
+type ImageSelectDynamicState = BaseDynamicState & {
+  absFiles: Array<{ src: string; filename: string }>;
+  selectImagesDialogConf: {
+    title: string;
+    message: string;
+    percent: number;
+    visible: boolean;
+  };
+  srcFile: string | undefined;
+  src: string | undefined;
+};
+
+class ImageSelectDynamic extends BaseDynamic<ImageSelectDynamicProps, ImageSelectDynamicState> {
+  constructor(props: ImageSelectDynamicProps) {
     super(props);
 
     this.state = {
@@ -26,6 +53,7 @@ class ImageSelectDynamic extends BaseDynamic {
       },
       srcFile: undefined,
       src: undefined,
+      error_msg: ''
     };
   }
 
@@ -53,7 +81,7 @@ class ImageSelectDynamic extends BaseDynamic {
             //service.api.logToConsole(item.src)
 
             return item;
-          });
+          }) as Array<{ src: string; filename: string }>;
           this.setState({ absFiles: files });
         }
       });
@@ -64,7 +92,7 @@ class ImageSelectDynamic extends BaseDynamic {
             item.filename = item.src;
             item.src = pathJoin(item.src);
             return item;
-          });
+          }) as Array<{ src: string; filename: string }>;
           this.setState({ absFiles: files });
         }
       });
@@ -182,7 +210,7 @@ class ImageSelectDynamic extends BaseDynamic {
       return null;
     }
 
-    if (typeof field.buttonTitle !== "string" || !(field.buttonTitle instanceof String)) {
+    if (typeof field.buttonTitle !== "string") {
       field.buttonTitle = "Select Image";
     }
 

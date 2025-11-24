@@ -31,8 +31,8 @@ interface FormProps {
   fields: Array<FieldBase>;
   values?: any;
   componentRegistry: ComponentRegistry;
-  siteKey?: string;
-  workspaceKey?: string;
+  siteKey: string;
+  workspaceKey: string;
   collectionKey?: string;
   collectionItemKey?: string;
   singleKey?: string;
