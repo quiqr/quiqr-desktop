@@ -2,9 +2,18 @@ import React from 'react';
 import DefaultWrapper from './shared/DefaultWrapper';
 import Chips from '../../Chips';
 import Tip from '../../Tip';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 
-class ChipsDynamic extends BaseDynamic {
+export interface ChipsDynamicField extends FieldBase {
+  default?: string[];
+  tip?: string;
+}
+
+type ChipsDynamicProps = BaseDynamicProps<ChipsDynamicField>;
+
+type ChipsDynamicState = BaseDynamicState;
+
+class ChipsDynamic extends BaseDynamic<ChipsDynamicProps, ChipsDynamicState> {
 
   normalizeState({state, field, stateBuilder}){
     let key = field.key;
