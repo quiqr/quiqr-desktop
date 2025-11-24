@@ -3,6 +3,7 @@ import Divider                 from '@mui/material/Divider';
 import List                    from '@mui/material/List';
 import ListSubheader           from '@mui/material/ListSubheader';
 import ListItem                from '@mui/material/ListItem';
+import ListItemButton          from '@mui/material/ListItemButton';
 import ListItemIcon            from '@mui/material/ListItemIcon';
 import ListItemText            from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
@@ -81,15 +82,15 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
     return (
       <ListItem
         key={"itemFlat"+item.label}
-        selected={item.selected}
-        onClick={ item.onClick }
-        button="true">
-        {icon}
-        <ListItemText primary={item.label} />
-        {secondaryActionMenu}
-        {secondaryAction}
-
-
+        disablePadding
+        secondaryAction={secondaryAction}>
+        <ListItemButton
+          selected={item.selected}
+          onClick={ item.onClick }>
+          {icon}
+          <ListItemText primary={item.label} />
+          {secondaryActionMenu}
+        </ListItemButton>
       </ListItem>
     )
 
@@ -106,10 +107,13 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
       return (
         <ListItem
           key={"itemNestChild"+itemChild.label}
-          onClick={ itemChild.onClick }
-          selected={itemChild.selected}
-          button sx={{ pl: 4 }} >
-          <ListItemText primary={itemChild.label} />
+          disablePadding>
+          <ListItemButton
+            onClick={ itemChild.onClick }
+            selected={itemChild.selected}
+            sx={{ pl: 4 }}>
+            <ListItemText primary={itemChild.label} />
+          </ListItemButton>
         </ListItem>
       )
     })
@@ -117,23 +121,24 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
 
     return (
       <React.Fragment key={"itemNestOut"+item.label} >
-        <ListItem
-          button="true"
-          selected={item.selected}
-          onClick={()=>{
-            initOpen = false;
-            if(this.state.open === index){
-              this.setState({open:null});
-            }
-            else{
-              this.setState({open:index});
-            }
-          }}
-        >
-          <ListItemText primary={item.label} />
+        <ListItem disablePadding>
+          <ListItemButton
+            selected={item.selected}
+            onClick={()=>{
+              initOpen = false;
+              if(this.state.open === index){
+                this.setState({open:null});
+              }
+              else{
+                this.setState({open:index});
+              }
+            }}
+          >
+            <ListItemText primary={item.label} />
 
-          {( (initOpen || this.state.open === index) ? <ExpandLess /> : <ExpandMore />)}
+            {( (initOpen || this.state.open === index) ? <ExpandLess /> : <ExpandMore />)}
 
+          </ListItemButton>
         </ListItem>
 
         <Collapse in={( (initOpen || this.state.open === index) ? true : false)} timeout="auto" unmountOnExit>

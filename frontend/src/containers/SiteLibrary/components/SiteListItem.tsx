@@ -1,5 +1,6 @@
 import React from 'react';
 import ListItem                from '@mui/material/ListItem';
+import ListItemButton          from '@mui/material/ListItemButton';
 import ListItemText            from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemAvatar          from '@mui/material/ListItemAvatar';
@@ -72,22 +73,21 @@ class SiteListItem extends React.Component<SiteListItemProps, SiteListItemState>
         <ListItem
           id={"list-siteselectable-"+this.props.site.name}
           key={"sitelistitem-"+this.props.site.key}
-          onClick={ this.props.siteClick }
-          button="true">
+          disablePadding
+          secondaryAction={
+            this.props.site.remote ? null : (
+              <ListItemSecondaryAction>
+                {this.props.itemMenuButton}
+              </ListItemSecondaryAction>
+            )
+          }>
+          <ListItemButton onClick={ this.props.siteClick }>
+            <ListItemAvatar>
+              {siteAvatar}
+            </ListItemAvatar>
 
-          <ListItemAvatar>
-            {siteAvatar}
-          </ListItemAvatar>
-
-          <ListItemText primary={this.props.site.name} />
-          {(this.props.site.remote?null:
-          <ListItemSecondaryAction>
-            {
-              this.props.itemMenuButton
-            }
-          </ListItemSecondaryAction>
-          )}
-
+            <ListItemText primary={this.props.site.name} />
+          </ListItemButton>
         </ListItem>
         {this.props.itemMenuItems}
       </React.Fragment>

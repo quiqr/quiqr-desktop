@@ -10,7 +10,7 @@ import FormControlLabel              from '@mui/material/FormControlLabel';
 import Divider                       from '@mui/material/Divider';
 import List                          from '@mui/material/List';
 import ListItem                      from '@mui/material/ListItem';
-import ListItemSecondaryAction       from '@mui/material/ListItemSecondaryAction';
+import ListItemButton                from '@mui/material/ListItemButton';
 import ListItemText                  from '@mui/material/ListItemText';
 import TextField                     from '@mui/material/TextField';
 import Paper                         from '@mui/material/Paper';
@@ -184,9 +184,9 @@ const CollectionListItems: React.FC<CollectionListItemsProps> = React.memo(({
         return (
           <Fragment key={item.key}>
             {index !== 0 && <Divider />}
-            <ListItem role={undefined} button onClick={() => onItemClick(item)}>
-              <ListItemText id={text} primary={`${text}`} />
-              <ListItemSecondaryAction>
+            <ListItem
+              disablePadding
+              secondaryAction={
                 <IconButton
                   edge="end"
                   aria-label="comments"
@@ -194,7 +194,10 @@ const CollectionListItems: React.FC<CollectionListItemsProps> = React.memo(({
                   size="large">
                   <MoreVertIcon />
                 </IconButton>
-              </ListItemSecondaryAction>
+              }>
+              <ListItemButton onClick={() => onItemClick(item)}>
+                <ListItemText id={text} primary={`${text}`} />
+              </ListItemButton>
             </ListItem>
           </Fragment>
         );

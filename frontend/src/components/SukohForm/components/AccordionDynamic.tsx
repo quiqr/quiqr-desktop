@@ -1,6 +1,7 @@
 import React from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -354,19 +355,19 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicProps, AccordionDynam
 
     return (
       <List style={{ marginBottom: 16, padding: 0 }}>
-        <ListItem
-          style={{ padding: "20px 16px", border: "solid 1px #d8d8d8", borderRadius: "7px" }}
-          role={undefined}
-          button="true"
-          onClick={() => {
-            this.handleAccordionClick(context, node);
-          }}>
-          <ListItemIcon>
-            <FolderIcon />
-          </ListItemIcon>
+        <ListItem disablePadding>
+          <ListItemButton
+            style={{ padding: "20px 16px", border: "solid 1px #d8d8d8", borderRadius: "7px" }}
+            onClick={() => {
+              this.handleAccordionClick(context, node);
+            }}>
+            <ListItemIcon>
+              <FolderIcon />
+            </ListItemIcon>
 
-          <ListItemText id={title} primary={`${title}`} secondary={`${count + " items"}`} />
-          <ChevronRightIcon />
+            <ListItemText id={title} primary={`${title}`} secondary={`${count + " items"}`} />
+            <ChevronRightIcon />
+          </ListItemButton>
         </ListItem>
       </List>
     );
