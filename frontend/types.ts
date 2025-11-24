@@ -812,6 +812,9 @@ export const appConfigSchema = z.object({
   currentUsername: z.string().nullable()
 })
 
+// Type mapping for readConfKey - extracts types from appConfigSchema
+export type ReadConfKeyMap = z.infer<typeof appConfigSchema>
+
 // API Schemas mapping - maps API method names to their response schemas
 export const apiSchemas = {
   getConfigurations: configurationsSchema,

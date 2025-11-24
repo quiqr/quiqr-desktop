@@ -1,5 +1,6 @@
 import mainProcessBridge from './utils/main-process-bridge';
 import service from './services/service'
+import type { ReadConfKeyMap } from '../types';
 
 export class API {
 
@@ -152,8 +153,8 @@ export class API {
     return mainProcessBridge.request('matchRole', {role});
   }
 
-  readConfKey(confkey: string){
-    return mainProcessBridge.request('readConfKey', {confkey});
+  readConfKey<K extends keyof ReadConfKeyMap>(confkey: K): Promise<ReadConfKeyMap[K]> {
+    return mainProcessBridge.request('readConfKey', {confkey}) as Promise<ReadConfKeyMap[K]>;
   }
 
   readConfPrefKey(confkey: string){
