@@ -2,27 +2,40 @@ import React           from 'react';
 import InputLabel      from '@mui/material/InputLabel';
 import MenuItem        from '@mui/material/MenuItem';
 import FormControl     from '@mui/material/FormControl';
-import Select          from '@mui/material/Select';
+import Select, { SelectChangeEvent }          from '@mui/material/Select';
 import Box             from '@mui/material/Box';
 import FormItemWrapper from './shared/FormItemWrapper';
-import { BaseDynamic, BaseDynamicProps, FieldBase } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 import Tip             from '../../Tip';
 import service                  from '../../../services/service';
 
 
-interface SelectFromQueryDynamicField extends FieldBase {}
-interface SelectFromQueryDynamicState {
-  options: string[];
-  error_msg: string;
+type SelectOption = string | { value: string; text: string };
+
+export interface SelectDynamicField extends FieldBase {
+  title?: string;
+  options: SelectOption[];
+  tip?: string;
+  default?: string | number | string[] | number[];
+  multiple?: boolean;
+  autoSave?: boolean;
+  option_image_path?: string;
+  option_image_width?: number;
+  option_image_extension?: string;
 }
 
-type SelectFromQueryDynamicProps = BaseDynamicProps<SelectFromQueryDynamicField>;
+type SelectDynamicProps = BaseDynamicProps<SelectDynamicField>;
 
+type SelectDynamicState = BaseDynamicState & {
+  options: string[];
+  error_msg: string | null;
+  [key: `optimg_${string}`]: string | undefined;
+};
 
-class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQueryDynamicState> {
+class SelectDynamic extends BaseDynamic<SelectDynamicProps, SelectDynamicState> {
 
-  constructor(props){
-    
+  constructor(props: SelectDynamicProps){
+
     super(props);
     this.state = {
       options: [],
@@ -37,12 +50,12 @@ class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQ
     this.setOptionImages(field.options);
   }
 
-  normalizeState({state, field}){
+  normalizeState({state, field}: {state: any; field: SelectDynamicField}){
     //TODO: clear if value is not a valid option
     let key = field.key;
     let isArrayType = field.multiple===true;
     if(state[key]===undefined){
-      state[key] = field.default || isArrayType?[]:'';
+      state[key] = field.default || (isArrayType?[]:'')
     }
     else{
       if(isArrayType && !Array.isArray(state[key])){
@@ -58,24 +71,12 @@ class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQ
     return 'select';
   }
 
-  handleChange(e){
+  handleChange(e: SelectChangeEvent<string | string[]>){
     let {context} = this.props;
     let field = context.node.field;
 
-    if(e.target.options && field.multiple===true){
-      const { options } = e.target;
-      const value = [];
-      for (let i = 0, l = options.length; i < l; i += 1) {
-        if (options[i].selected) {
-          value.push(options[i].value);
-        }
-      }
+    if(e.target.value !== context.value){
       context.setValue(e.target.value)
-    }
-    else{
-      if(e.target.value !== context.value){
-        context.setValue(e.target.value)
-      }
     }
 
     if(field.autoSave === true){
@@ -83,7 +84,7 @@ class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQ
     }
   }
 
-  setOptionImages(options){
+  setOptionImages(options: SelectOption[]){
     let {node} = this.props.context;
     let {field } = node;
 
@@ -92,8 +93,8 @@ class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQ
       service.api.getCurrentSiteKey().then((currentSiteKey)=>{
 
           options.forEach((option)=>{
-            service.api.getThumbnailForPath(currentSiteKey, 'source', field.option_image_path +"/"+ this.getOptionValue(option)+"."+field.option_image_extension).then((img)=>{
-              this.setState({ ["optimg_"+this.getOptionValue(option)]: img });
+            service.api.getThumbnailForPath(currentSiteKey, 'source', field.option_image_path! +"/"+ this.getOptionValue(option)+"."+field.option_image_extension!).then((img)=>{
+              this.setState({ [`optimg_${this.getOptionValue(option)}`]: img } as any);
             })
           });
       })
@@ -102,7 +103,7 @@ class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQ
   }
 
 
-  getOptionValue(option){
+  getOptionValue(option: SelectOption): string{
     if(typeof option === "string"){
       return option;
     }
@@ -111,7 +112,7 @@ class SelectDynamic extends BaseDynamic<SelectFromQueryDynamicProps, SelectFromQ
     }
   }
 
-  getOptionLabel(option){
+  getOptionLabel(option: SelectOption): string{
     if(typeof option === "string"){
       return option;
     }
