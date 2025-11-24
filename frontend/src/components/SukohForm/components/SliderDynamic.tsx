@@ -4,10 +4,24 @@ import DefaultWrapper from './shared/DefaultWrapper';
 import Slider from '@mui/material/Slider';
 import Tip from '../../Tip';
 import Typography from '@mui/material/Typography';
-import { BaseDynamic } from '../../HoForm';
+import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
 //import service                              from './../../../services/service'
 
-class SliderDynamic extends BaseDynamic {
+export interface SliderDynamicField extends FieldBase {
+  title?: string;
+  tip?: string;
+  default?: number;
+  autoSave?: boolean;
+  step?: number;
+  min?: number;
+  max?: number;
+}
+
+type SliderDynamicProps = BaseDynamicProps<SliderDynamicField>;
+
+type SliderDynamicState = BaseDynamicState;
+
+class SliderDynamic extends BaseDynamic<SliderDynamicProps, SliderDynamicState> {
 
   /*
   normalizeState({state, field}: {state: any, field: SliderDynamicField}){
