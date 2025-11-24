@@ -95,7 +95,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
 
   }
 
-  renderNetstedItems(item: SidebarMenuItem, index: number){
+  renderNestedItems(item: SidebarMenuItem, index: number){
     let initOpen: boolean | undefined;
     let childItems = item.childItems!.map((itemChild, index)=>{
 
@@ -193,7 +193,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
                   return <Divider key={"menu"+index} />
                 }
                 else if(item.childItems){
-                  return this.renderNetstedItems(item, index)
+                  return this.renderNestedItems(item, index)
                 }
                 else{
                   return this.renderFlatItem(item, index)
