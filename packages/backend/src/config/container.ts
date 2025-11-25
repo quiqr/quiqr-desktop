@@ -12,6 +12,7 @@ import { PathHelper } from '../utils/path-helper.js';
 import { FormatProviderResolver } from '../utils/format-provider-resolver.js';
 import { ConfigurationDataProvider, ConsoleLogger } from '../services/configuration/index.js';
 import { HugoUtils } from '../hugo/hugo-utils.js';
+import { LibraryService } from '../services/library/library-service.js';
 
 /**
  * Main application container with all dependencies
@@ -51,6 +52,11 @@ export interface AppContainer {
    * Hugo utilities (site creation, config generation)
    */
   hugoUtils: HugoUtils;
+
+  /**
+   * Library service (site management and CRUD operations)
+   */
+  libraryService: LibraryService;
 }
 
 /**
@@ -112,7 +118,8 @@ export function createContainer(options: ContainerOptions): AppContainer {
   // Create Hugo utilities
   const hugoUtils = new HugoUtils();
 
-  return {
+  // Create the container object first (needed for circular dependency)
+  const container: AppContainer = {
     config,
     state,
     adapters,
@@ -120,7 +127,13 @@ export function createContainer(options: ContainerOptions): AppContainer {
     formatResolver,
     configurationProvider,
     hugoUtils,
-  };
+  } as AppContainer;
+
+  // Create library service with container dependency
+  const libraryService = new LibraryService(container);
+  container.libraryService = libraryService;
+
+  return container;
 }
 
 /**

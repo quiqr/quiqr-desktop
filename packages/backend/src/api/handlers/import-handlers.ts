@@ -6,6 +6,7 @@
  */
 
 import type { AppContainer } from '../../config/container.js';
+import type { HugoConfigFormat } from '../../hugo/hugo-utils.js';
 
 export function createImportSiteActionHandler(container: AppContainer) {
   return async () => {
@@ -79,9 +80,16 @@ export function createNewSiteFromScratchHandler(container: AppContainer) {
   }: {
     siteName: string;
     hugoVersion: string;
-    configFormat: string;
+    configFormat: HugoConfigFormat;
   }) => {
-    throw new Error('newSiteFromScratch: Not yet implemented - needs LibraryService migration');
+    const siteKey = await container.libraryService.createNewHugoQuiqrSite(
+      siteName,
+      hugoVersion,
+      configFormat
+    );
+    // Invalidate cache so the new site appears in the list
+    container.configurationProvider.invalidateCache();
+    return siteKey;
   };
 }
 

@@ -25,13 +25,21 @@ export function createGetSiteConfigHandler(container: AppContainer) {
 
 export function createCheckFreeSiteNameHandler(container: AppContainer) {
   return async ({ proposedSiteName }: { proposedSiteName: string }) => {
-    throw new Error('checkFreeSiteName: Not yet implemented - needs LibraryService migration');
+    // Check if name is already in use
+    const isDuplicate = await container.libraryService.checkDuplicateSiteConfAttrStringValue(
+      'name',
+      proposedSiteName
+    );
+    return !isDuplicate; // Return true if name is free
   };
 }
 
 export function createSaveSiteConfHandler(container: AppContainer) {
-  return async ({ siteKey, newConf }: { siteKey: string; newConf: any }) => {
-    throw new Error('saveSiteConf: Not yet implemented - needs LibraryService migration');
+  return async ({ siteKey, newConf }: { siteKey: string; newConf: Record<string, unknown> }) => {
+    await container.libraryService.writeSiteConf(newConf, siteKey);
+    // Invalidate cache so next read gets fresh data
+    container.configurationProvider.invalidateCache();
+    return true;
   };
 }
 
@@ -43,7 +51,10 @@ export function createCopySiteHandler(container: AppContainer) {
 
 export function createDeleteSiteHandler(container: AppContainer) {
   return async ({ siteKey }: { siteKey: string }) => {
-    throw new Error('deleteSite: Not yet implemented - needs LibraryService migration');
+    await container.libraryService.deleteSite(siteKey);
+    // Invalidate cache so next read gets fresh data
+    container.configurationProvider.invalidateCache();
+    return true;
   };
 }
 
