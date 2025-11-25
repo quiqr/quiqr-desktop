@@ -13,6 +13,9 @@ export * from './adapters/index.js';
 // Configuration
 export * from './config/index.js';
 
+// Services
+export * from './services/index.js';
+
 // Utilities
 export * from './utils/index.js';
 
