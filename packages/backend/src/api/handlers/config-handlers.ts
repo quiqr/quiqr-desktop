@@ -86,12 +86,10 @@ export function createGetCurrentBaseUrlHandler(container: AppContainer) {
 
 /**
  * Invalidate the configuration cache
- * Note: This will need to be implemented when we migrate configuration-data-provider
  */
 export function createInvalidateCacheHandler(container: AppContainer) {
   return async () => {
-    // TODO: Implement cache invalidation when configuration-data-provider is migrated
-    // For now, just return success
+    container.configurationProvider.invalidateCache();
     return true;
   };
 }

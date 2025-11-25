@@ -2,20 +2,24 @@
  * Site Management API Handlers
  *
  * Handles site configuration and management.
- * TODO: Implement when SiteService and LibraryService are migrated.
  */
 
 import type { AppContainer } from '../../config/container.js';
+import type { Configurations } from '@quiqr/types';
 
 export function createGetConfigurationsHandler(container: AppContainer) {
-  return async (options: any) => {
-    throw new Error('getConfigurations: Not yet implemented - needs configuration-data-provider migration');
+  return async (options?: { invalidateCache?: boolean }): Promise<Configurations> => {
+    return container.configurationProvider.getConfigurations(options || {});
   };
 }
 
 export function createGetSiteConfigHandler(container: AppContainer) {
   return async ({ siteKey }: { siteKey: string }) => {
-    throw new Error('getSiteConfig: Not yet implemented - needs SiteService migration');
+    const siteConfig = await container.configurationProvider.getSiteConfig(siteKey);
+    if (!siteConfig) {
+      throw new Error(`Site not found: ${siteKey}`);
+    }
+    return siteConfig;
   };
 }
 

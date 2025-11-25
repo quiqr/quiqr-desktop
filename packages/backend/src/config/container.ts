@@ -9,6 +9,8 @@ import type { PlatformAdapters } from '../adapters/types.js';
 import { AppConfig } from './app-config.js';
 import { AppState } from './app-state.js';
 import { PathHelper } from '../utils/path-helper.js';
+import { FormatProviderResolver } from '../utils/format-provider-resolver.js';
+import { ConfigurationDataProvider, ConsoleLogger } from '../services/configuration/index.js';
 
 /**
  * Main application container with all dependencies
@@ -33,6 +35,16 @@ export interface AppContainer {
    * Path helper utilities
    */
   pathHelper: PathHelper;
+
+  /**
+   * Format provider resolver (JSON, YAML, TOML)
+   */
+  formatResolver: FormatProviderResolver;
+
+  /**
+   * Configuration data provider (site configs)
+   */
+  configurationProvider: ConfigurationDataProvider;
 }
 
 /**
@@ -80,11 +92,24 @@ export function createContainer(options: ContainerOptions): AppContainer {
     }
   );
 
+  // Create format resolver
+  const formatResolver = new FormatProviderResolver();
+
+  // Create configuration provider with dependencies
+  const logger = new ConsoleLogger();
+  const configurationProvider = new ConfigurationDataProvider(
+    pathHelper,
+    formatResolver,
+    logger
+  );
+
   return {
     config,
     state,
     adapters,
     pathHelper,
+    formatResolver,
+    configurationProvider,
   };
 }
 
