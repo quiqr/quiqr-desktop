@@ -17,6 +17,7 @@ import { SyncFactory } from '../sync/sync-factory.js';
 import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
 import { WorkspaceConfigProvider } from '../services/workspace/workspace-config-provider.js';
 import { FolderImporter } from '../import/folder-importer.js';
+import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 
 /**
  * Main application container with all dependencies
@@ -81,6 +82,16 @@ export interface AppContainer {
    * Folder importer (imports sites from local directories)
    */
   folderImporter: FolderImporter;
+
+  /**
+   * Factory function to create WorkspaceService instances
+   * WorkspaceService is per-workspace, not a singleton
+   */
+  createWorkspaceService: (
+    workspacePath: string,
+    workspaceKey: string,
+    siteKey: string
+  ) => WorkspaceService;
 }
 
 /**
@@ -189,6 +200,26 @@ export function createContainer(options: ContainerOptions): AppContainer {
     workspaceConfigProvider
   );
   container.folderImporter = folderImporter;
+  // Create WorkspaceService factory
+  // Note: OutputConsole and ScreenshotWindowManager are provided by Electron runtime
+  container.createWorkspaceService = (
+    workspacePath: string,
+    workspaceKey: string,
+    siteKey: string
+  ) => {
+    const dependencies: WorkspaceServiceDependencies = {
+      workspaceConfigProvider,
+      formatProviderResolver: formatResolver,
+      pathHelper,
+      appConfig: config,
+      windowAdapter: adapters.window,
+      outputConsole: adapters.outputConsole,
+      screenshotWindowManager: adapters.screenshotWindowManager,
+    };
+
+    return new WorkspaceService(workspacePath, workspaceKey, siteKey, dependencies);
+  };
+
 
   return container;
 }

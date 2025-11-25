@@ -84,5 +84,17 @@ export function createDevAdapters(): PlatformAdapters {
         }
       },
     },
+
+    outputConsole: {
+      appendLine(line: string) {
+        console.log('[Hugo Output]', line);
+      },
+    },
+
+    screenshotWindowManager: {
+      createScreenshotAndFavicon(host: string, port: number, outputDir: string) {
+        console.log('[DevAdapter] createScreenshotAndFavicon called:', host, port, outputDir);
+      },
+    },
   };
 }

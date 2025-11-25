@@ -159,6 +159,32 @@ export interface AppInfoAdapter {
 }
 
 // ============================================================================
+// Output Console Adapter - Console logging for Hugo server/build output
+// ============================================================================
+
+export interface OutputConsole {
+  /**
+   * Append a line to the output console
+   */
+  appendLine(line: string): void;
+}
+
+// ============================================================================
+// Screenshot Window Manager - For generating workspace screenshots
+// ============================================================================
+
+export interface ScreenshotWindowManager {
+  /**
+   * Create screenshot and favicon for a workspace
+   */
+  createScreenshotAndFavicon(host: string, port: number, outputDir: string): void;
+}
+
+// Note: AppConfig is defined in config/app-config.ts
+// We import it as a type here to avoid circular dependencies
+// The actual AppConfig class is passed through the container
+
+// ============================================================================
 // Combined Platform Adapters
 // ============================================================================
 
@@ -171,4 +197,6 @@ export interface PlatformAdapters {
   window: WindowAdapter;
   menu: MenuAdapter;
   appInfo: AppInfoAdapter;
+  outputConsole: OutputConsole;
+  screenshotWindowManager: ScreenshotWindowManager;
 }
