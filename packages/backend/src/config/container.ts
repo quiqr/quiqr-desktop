@@ -13,6 +13,8 @@ import { FormatProviderResolver } from '../utils/format-provider-resolver.js';
 import { ConfigurationDataProvider, ConsoleLogger } from '../services/configuration/index.js';
 import { HugoUtils } from '../hugo/hugo-utils.js';
 import { LibraryService } from '../services/library/library-service.js';
+import { SyncFactory } from '../sync/sync-factory.js';
+import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
 
 /**
  * Main application container with all dependencies
@@ -57,6 +59,16 @@ export interface AppContainer {
    * Library service (site management and CRUD operations)
    */
   libraryService: LibraryService;
+
+  /**
+   * Sync factory (creates sync service instances)
+   */
+  syncFactory: SyncFactory;
+
+  /**
+   * Site source factory (creates site source instances)
+   */
+  siteSourceFactory: SiteSourceFactory;
 }
 
 /**
@@ -118,6 +130,10 @@ export function createContainer(options: ContainerOptions): AppContainer {
   // Create Hugo utilities
   const hugoUtils = new HugoUtils();
 
+  // Create factories
+  const syncFactory = new SyncFactory();
+  const siteSourceFactory = new SiteSourceFactory();
+
   // Create the container object first (needed for circular dependency)
   const container: AppContainer = {
     config,
@@ -127,6 +143,8 @@ export function createContainer(options: ContainerOptions): AppContainer {
     formatResolver,
     configurationProvider,
     hugoUtils,
+    syncFactory,
+    siteSourceFactory,
   } as AppContainer;
 
   // Create library service with container dependency

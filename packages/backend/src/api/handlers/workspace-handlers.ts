@@ -6,16 +6,25 @@
  */
 
 import type { AppContainer } from '../../config/container.js';
+import { SiteService } from '../../services/site/site-service.js';
 
 /**
  * List all workspaces for a site
  */
 export function createListWorkspacesHandler(container: AppContainer) {
   return async ({ siteKey }: { siteKey: string }) => {
-    // TODO: Implement with migrated SiteService
-    // Original: let service = await getSiteServicePromise(siteKey);
-    //           let workspaces = await service.listWorkspaces();
-    throw new Error('listWorkspaces: Not yet implemented - needs SiteService migration');
+    // Get site configuration
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+
+    // Create SiteService instance
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+
+    // List workspaces
+    return await siteService.listWorkspaces();
   };
 }
 
@@ -52,9 +61,23 @@ export function createMountWorkspaceHandler(container: AppContainer) {
     siteKey: string;
     workspaceKey: string;
   }) => {
-    // TODO: Implement with migrated SiteService
-    // This also updates window title and menu
-    throw new Error('mountWorkspace: Not yet implemented - needs SiteService migration');
+    // Get site configuration
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+
+    // Create SiteService instance
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+
+    // Mount the workspace
+    await siteService.mountWorkspace(workspaceKey);
+
+    // Get the workspace head to return details
+    const workspaceHead = await siteService.getWorkspaceHead(workspaceKey);
+
+    return workspaceHead;
   };
 }
 
