@@ -1689,3 +1689,181 @@ After **Phase 4** completion, you should have:
 ---
 
 *"The journey of a thousand lines of TypeScript begins with a single `import`."*
+
+---
+
+## 📊 Phase 2 Status Update (2025-11-25)
+
+### Completed So Far:
+- ✅ **2.1-2.4:** Package setup, adapters, utilities, config → DI
+- ✅ **2.5:** Workspace configuration services
+- ✅ **2.7-2.8:** Hugo integration (utils, config, builder, server)
+- ✅ **2.9-2.10.1:** Core services (Library, Site, FolderImporter)
+- ✅ **2.13:** WorkspaceService migration (~1000 lines) ⭐
+
+### Current State Analysis:
+
+**TypeScript Migration:** ~67% complete ✅
+- 10,000+ lines migrated to TypeScript
+- Zero compilation errors
+- Strong type system and DI throughout
+
+**Runtime Functionality:** ~35% operational ⚠️
+- Services exist but not connected to API
+- 82 API handlers are stubbed (throw errors)
+- Application would crash on most operations
+
+**The Gap:** Code compiles perfectly but doesn't run!
+
+### Next: Phase 2.14 - Connect Handlers (CRITICAL)
+
+**New Task Breakdown:**
+
+- [ ] **2.14.1: Implement Collection Handlers** (Priority: 🔴 CRITICAL)
+  - Wire 16 collection handlers to WorkspaceService
+  - Implement: list, get, create, update, delete, rename, copy, etc.
+  - File: `packages/backend/src/api/handlers/collection-handlers.ts`
+  - Time: 4-6 hours
+
+- [ ] **2.14.2: Implement Single Handlers** (Priority: 🔴 CRITICAL)
+  - Wire 4 single handlers to WorkspaceService
+  - Implement: get, update, open in editor
+  - File: `packages/backend/src/api/handlers/single-handlers.ts`
+  - Time: 1-2 hours
+
+- [ ] **2.14.3: Implement Build Handlers** (Priority: 🔴 CRITICAL)
+  - Wire 3 Hugo operation handlers
+  - Implement: serve, stop server, build
+  - File: `packages/backend/src/api/handlers/build-handlers.ts`
+  - Time: 2-3 hours
+
+- [ ] **2.14.4: Migrate Jobs Module** (Priority: 🔴 HIGH)
+  - Migrate thumbnail generation
+  - Source: `/backend/src-main/jobs/`
+  - Target: `packages/backend/src/jobs/`
+  - Enables image thumbnails throughout app
+  - Time: 4-6 hours
+
+- [ ] **2.14.5: Migrate Build-Actions Module** (Priority: 🟡 MEDIUM)
+  - Migrate DocumentBuildAction
+  - Update schemas in @quiqr/types (add build_actions property)
+  - Source: `/backend/src-main/build-actions/`
+  - Target: `packages/backend/src/build-actions/`
+  - Enables Quarto and custom builds
+  - Time: 3-4 hours
+
+- [ ] **2.14.6: End-to-End Testing** (Priority: 🔴 CRITICAL)
+  - Test all core CMS workflows
+  - Verify collections, singles, Hugo integration
+  - Document any remaining issues
+  - Time: 4-6 hours
+
+**Estimated Total:** 2-3 days focused work
+
+**Post-2.14 Functionality:**
+- ✅ Edit content (collections and singles)
+- ✅ Preview with Hugo dev server
+- ✅ Build static sites
+- ✅ Image thumbnails
+- ✅ Custom build actions (Quarto)
+- ❌ Git sync (deferred - Embgit dependency)
+- ❌ Git import (deferred - Embgit dependency)
+
+### Explicitly Deferred Work:
+
+**Git Operations** (Blocked by Embgit migration):
+- [ ] 2.10.2: Git Importer
+- [ ] 2.11: Sync Modules (git parts)
+- [ ] Embgit module migration (separate major effort)
+
+**Advanced Features** (Lower priority):
+- [ ] Advanced workspace handlers (getDynFormFields, etc.)
+- [ ] Scaffold-model
+- [ ] Some site handlers (copySite, etc.)
+
+### Why This Matters:
+
+**Before Phase 2.14:**
+```
+User clicks "Edit Post" → API handler throws "Not implemented" → 💥 Crash
+```
+
+**After Phase 2.14:**
+```
+User clicks "Edit Post" → Handler calls WorkspaceService → Content loads → ✅ Success
+```
+
+**Risk Assessment:**
+- Current: 🟡 MEDIUM (compiles but doesn't run)
+- After 2.14: 🟢 LOW (core features operational)
+
+### Success Metrics:
+
+After Phase 2.14 completion, user should be able to:
+1. Mount and browse workspaces ✅
+2. List and edit blog posts ✅
+3. Edit homepage and static pages ✅
+4. Preview site with Hugo ✅
+5. Build production site ✅
+6. View image previews ✅
+7. Run Quarto builds ✅
+8. ❌ Git sync (explicitly deferred)
+
+---
+
+## 📋 Updated Progress Tracking
+
+- [x] **Phase 1**: Extract Shared Types ✅ COMPLETE (2025-11-24)
+- [ ] **Phase 2**: Modernize Backend ⏳ IN PROGRESS (67% TypeScript, 35% Runtime)
+  - [x] 2.1-2.4: Foundation
+  - [x] 2.5: Workspace Configuration
+  - [x] 2.7-2.8: Hugo Integration
+  - [x] 2.9-2.10.1: Core Services
+  - [x] 2.13: WorkspaceService Migration
+  - [ ] **2.14: Connect Handlers** ← NEXT (CRITICAL)
+  - [ ] 2.15: Polish and optimize (after 2.14)
+- [ ] **Phase 3**: Create Electron Adapter (Est. 1 week)
+- [ ] **Phase 4**: Testing & Validation (Est. 1 week)
+- [ ] **Phase 5**: Standalone Adapter (Optional, Est. 1-2 weeks)
+
+**Current Phase**: Phase 2.14 Ready to Start
+**Last Updated**: 2025-11-25
+**Status**: Phase 1 ✅ | Phase 2 67% ⏳ | Critical gap identified: handlers not connected
+
+---
+
+## 💡 Key Insights from Phase 2.13
+
+### What We Learned:
+
+1. **Compilation ≠ Functionality**
+   - Zero TypeScript errors doesn't mean it runs
+   - Need to track both migration % and runtime %
+   - Stubs hide the functionality gap
+
+2. **Services First, Handlers Later Was Wrong Order**
+   - Should have connected handlers incrementally
+   - Created false sense of completion
+   - Phase 2.14 closes this gap
+
+3. **Dependency Mapping Critical**
+   - Embgit identified as major blocker late
+   - Jobs and build-actions smaller but blocking features
+   - Better upfront analysis needed
+
+### Going Forward:
+
+- ✅ Track two metrics: TypeScript % and Runtime %
+- ✅ Test each service as completed
+- ✅ Wire handlers incrementally
+- ✅ Identify blockers upfront
+- ✅ Be explicit about deferred work
+
+---
+
+## 📝 Reference Documents
+
+- **Stub Analysis:** `.claude/plans/phase-2-stub-analysis.md`
+- **Phase 2.14 Plan:** `.claude/plans/phase-2.14-connect-handlers-prompt.md`
+- **Phase 2.13 Plan:** `.claude/plans/phase-2.13-workspace-service-prompt.md`
+
