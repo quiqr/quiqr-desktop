@@ -11,6 +11,7 @@ import { AppState } from './app-state.js';
 import { PathHelper } from '../utils/path-helper.js';
 import { FormatProviderResolver } from '../utils/format-provider-resolver.js';
 import { ConfigurationDataProvider, ConsoleLogger } from '../services/configuration/index.js';
+import { HugoUtils } from '../hugo/hugo-utils.js';
 
 /**
  * Main application container with all dependencies
@@ -45,6 +46,11 @@ export interface AppContainer {
    * Configuration data provider (site configs)
    */
   configurationProvider: ConfigurationDataProvider;
+
+  /**
+   * Hugo utilities (site creation, config generation)
+   */
+  hugoUtils: HugoUtils;
 }
 
 /**
@@ -103,6 +109,9 @@ export function createContainer(options: ContainerOptions): AppContainer {
     logger
   );
 
+  // Create Hugo utilities
+  const hugoUtils = new HugoUtils();
+
   return {
     config,
     state,
@@ -110,6 +119,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
     pathHelper,
     formatResolver,
     configurationProvider,
+    hugoUtils,
   };
 }
 
