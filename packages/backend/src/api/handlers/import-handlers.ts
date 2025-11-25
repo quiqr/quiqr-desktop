@@ -68,7 +68,15 @@ export function createNewSiteFromLocalDirectoryHandler(container: AppContainer) 
     generateQuiqrModel: boolean;
     hugoVersion: string;
   }) => {
-    throw new Error('newSiteFromLocalDirectory: Not yet implemented - needs folder-importer migration');
+    const siteKey = await container.folderImporter.newSiteFromLocalDirectory(
+      directory,
+      siteName,
+      generateQuiqrModel,
+      hugoVersion
+    );
+    // Invalidate cache so the new site appears in the list
+    container.configurationProvider.invalidateCache();
+    return siteKey;
   };
 }
 
@@ -107,7 +115,7 @@ export function createHugothemeGitRepoShowHandler(container: AppContainer) {
 
 export function createHugositeDirectoryShowHandler(container: AppContainer) {
   return async ({ folder }: { folder: string }) => {
-    throw new Error('hugosite_dir_show: Not yet implemented - needs folder-importer migration');
+    return await container.folderImporter.siteDirectoryInspect(folder);
   };
 }
 

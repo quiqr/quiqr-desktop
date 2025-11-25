@@ -15,6 +15,8 @@ import { HugoUtils } from '../hugo/hugo-utils.js';
 import { LibraryService } from '../services/library/library-service.js';
 import { SyncFactory } from '../sync/sync-factory.js';
 import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
+import { WorkspaceConfigProvider } from '../services/workspace/workspace-config-provider.js';
+import { FolderImporter } from '../import/folder-importer.js';
 
 /**
  * Main application container with all dependencies
@@ -69,6 +71,16 @@ export interface AppContainer {
    * Site source factory (creates site source instances)
    */
   siteSourceFactory: SiteSourceFactory;
+
+  /**
+   * Workspace config provider (loads workspace configs)
+   */
+  workspaceConfigProvider: WorkspaceConfigProvider;
+
+  /**
+   * Folder importer (imports sites from local directories)
+   */
+  folderImporter: FolderImporter;
 }
 
 /**
@@ -134,6 +146,23 @@ export function createContainer(options: ContainerOptions): AppContainer {
   const syncFactory = new SyncFactory();
   const siteSourceFactory = new SiteSourceFactory();
 
+  // Create environment info from platform
+  const environmentInfo = {
+    platform:
+      process.platform === 'darwin' ? 'macOS' as const :
+      process.platform === 'win32' ? 'windows' as const :
+      'linux' as const,
+    isPackaged: adapters.appInfo.isPackaged(),
+  };
+
+  // Create workspace config provider
+  const workspaceConfigProvider = new WorkspaceConfigProvider(
+    formatResolver,
+    pathHelper,
+    config,
+    environmentInfo
+  );
+
   // Create the container object first (needed for circular dependency)
   const container: AppContainer = {
     config,
@@ -145,11 +174,21 @@ export function createContainer(options: ContainerOptions): AppContainer {
     hugoUtils,
     syncFactory,
     siteSourceFactory,
+    workspaceConfigProvider,
   } as AppContainer;
 
   // Create library service with container dependency
   const libraryService = new LibraryService(container);
   container.libraryService = libraryService;
+
+  // Create folder importer with all dependencies
+  const folderImporter = new FolderImporter(
+    pathHelper,
+    formatResolver,
+    libraryService,
+    workspaceConfigProvider
+  );
+  container.folderImporter = folderImporter;
 
   return container;
 }
