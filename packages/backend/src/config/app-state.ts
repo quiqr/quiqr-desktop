@@ -45,6 +45,26 @@ export class AppState {
    */
   currentBuildDir: string | undefined;
 
+  /**
+   * Current base URL for the site
+   */
+  currentBaseUrl: string | undefined;
+
+  /**
+   * Current form node path (for form state management)
+   */
+  currentFormNodePath: string | undefined;
+
+  /**
+   * Current form accordion index (for form state management)
+   */
+  currentFormAccordionIndex: number | undefined;
+
+  /**
+   * Path of form that should be reloaded
+   */
+  currentFormShouldReload: string | undefined;
+
   constructor() {
     this.currentSiteKey = undefined;
     this.currentWorkspaceKey = undefined;
@@ -53,6 +73,10 @@ export class AppState {
     this.isServerRunning = false;
     this.serverPort = undefined;
     this.currentBuildDir = undefined;
+    this.currentBaseUrl = undefined;
+    this.currentFormNodePath = undefined;
+    this.currentFormAccordionIndex = undefined;
+    this.currentFormShouldReload = undefined;
   }
 
   /**
@@ -109,6 +133,10 @@ export class AppState {
       isServerRunning: this.isServerRunning,
       serverPort: this.serverPort,
       currentBuildDir: this.currentBuildDir,
+      currentBaseUrl: this.currentBaseUrl,
+      currentFormNodePath: this.currentFormNodePath,
+      currentFormAccordionIndex: this.currentFormAccordionIndex,
+      currentFormShouldReload: this.currentFormShouldReload,
     };
   }
 }
