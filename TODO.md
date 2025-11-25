@@ -296,11 +296,11 @@ export class ElectronDialogAdapter implements DialogAdapter {
 
 ### Tasks:
 
-**2.1: Setup Package Structure**
+**2.1: Setup Package Structure** ✅
 
-- [ ] 2.1.1: Create `packages/backend/` directory structure (see above)
+- [x] 2.1.1: Create `packages/backend/` directory structure (see above)
 
-- [ ] 2.1.2: Create package.json for `@quiqr/backend`
+- [x] 2.1.2: Create package.json for `@quiqr/backend`
   ```json
   {
     "name": "@quiqr/backend",
@@ -338,7 +338,7 @@ export class ElectronDialogAdapter implements DialogAdapter {
   }
   ```
 
-- [ ] 2.1.3: Create tsconfig.json for `@quiqr/backend`
+- [x] 2.1.3: Create tsconfig.json for `@quiqr/backend`
   ```json
   {
     "extends": "../../tsconfig.base.json",
@@ -355,7 +355,7 @@ export class ElectronDialogAdapter implements DialogAdapter {
   }
   ```
 
-- [ ] 2.1.4: Update root package.json workspaces
+- [x] 2.1.4: Update root package.json workspaces
   ```json
   {
     "workspaces": [
@@ -367,9 +367,9 @@ export class ElectronDialogAdapter implements DialogAdapter {
   ```
   **⚠️ USER ACTION NEEDED**: Run `npm install`
 
-**2.2: Define Adapter Interfaces**
+**2.2: Define Adapter Interfaces** ✅
 
-- [ ] 2.2.1: Create `src/adapters/types.ts` with all adapter interfaces
+- [x] 2.2.1: Create `src/adapters/types.ts` with all adapter interfaces
   ```typescript
   // Dialog operations
   export interface DialogAdapter {
@@ -415,7 +415,7 @@ export class ElectronDialogAdapter implements DialogAdapter {
   }
   ```
 
-- [ ] 2.2.2: Create placeholder adapters for development (no-op implementations)
+- [x] 2.2.2: Create placeholder adapters for development (no-op implementations)
   ```typescript
   // src/adapters/dev-adapters.ts
   export const createDevAdapters = (): PlatformAdapters => ({
@@ -428,34 +428,34 @@ export class ElectronDialogAdapter implements DialogAdapter {
   })
   ```
 
-**2.3: Migrate Core Utilities (No Dependencies)**
+**2.3: Migrate Core Utilities (No Dependencies)** ✅
 
 These can be converted first as they don't depend on other modules:
 
-- [ ] 2.3.1: Migrate `utils/content-formats.js` → `src/utils/content-formats.ts`
+- [x] 2.3.1: Migrate `utils/content-formats.js` → `src/utils/content-formats.ts`
   - Convert to ESM
   - Add TypeScript types
   - Use `export const` instead of `module.exports`
 
-- [ ] 2.3.2: Migrate `utils/format-providers/*.js` → `src/utils/format-providers/*.ts`
+- [x] 2.3.2: Migrate `utils/format-providers/*.js` → `src/utils/format-providers/*.ts`
   - Convert YAML, TOML, JSON providers
   - Create TypeScript interfaces for providers
 
-- [ ] 2.3.3: Migrate `utils/path-helper.js` → `src/utils/path-helper.ts`
+- [x] 2.3.3: Migrate `utils/path-helper.js` → `src/utils/path-helper.ts`
   - Remove Electron dependencies (use adapter if needed)
   - Update to ESM
 
-- [ ] 2.3.4: Migrate `utils/file-dir-utils.js` → `src/utils/file-dir-utils.ts`
+- [x] 2.3.4: Migrate `utils/file-dir-utils.js` → `src/utils/file-dir-utils.ts`
 
-- [ ] 2.3.5: Migrate `utils/format-provider-resolver.js` → `src/utils/format-provider-resolver.ts`
+- [x] 2.3.5: Migrate `utils/format-provider-resolver.js` → `src/utils/format-provider-resolver.ts`
 
-**2.4: Replace Global State with Dependency Injection**
+**2.4: Replace Global State with Dependency Injection** ✅
 
 Current problem: `global.pogoconf`, `global.currentSiteKey`, etc.
 
 Solution: Create configuration service with dependency injection
 
-- [ ] 2.4.1: Create `src/config/app-config.ts`
+- [x] 2.4.1: Create `src/config/app-config.ts`
   ```typescript
   import { z } from 'zod'
   import { appConfigSchema } from '@quiqr/types'
@@ -475,7 +475,7 @@ Solution: Create configuration service with dependency injection
   }
   ```
 
-- [ ] 2.4.2: Create `src/config/app-state.ts` for runtime state
+- [x] 2.4.2: Create `src/config/app-state.ts` for runtime state
   ```typescript
   export class AppState {
     currentSiteKey: string | undefined
@@ -485,7 +485,7 @@ Solution: Create configuration service with dependency injection
   }
   ```
 
-- [ ] 2.4.3: Create dependency injection container
+- [x] 2.4.3: Create dependency injection container
   ```typescript
   // src/container.ts
   export interface AppContainer {
@@ -505,22 +505,22 @@ Solution: Create configuration service with dependency injection
 
 Strategy: Start with services that have fewest dependencies, work up to complex ones.
 
-- [ ] 2.5.1: Migrate `services/workspace/folder-helper.js` → `src/services/workspace/folder-helper.ts`
+- [x] 2.5.1: Migrate `services/workspace/folder-helper.js` → `src/services/workspace/folder-helper.ts`
   - Convert to ESM
   - Add types
   - No Electron dependencies
 
-- [ ] 2.5.2: Migrate `services/workspace/workspace-config-validator.js` → `src/services/workspace/workspace-config-validator.ts`
+- [x] 2.5.2: Migrate `services/workspace/workspace-config-validator.js` → `src/services/workspace/workspace-config-validator.ts`
   - Use `@quiqr/types` schemas
   - Convert Joi schemas to Zod if needed
 
-- [ ] 2.5.3: Migrate `services/workspace/workspace-config-provider.js` → `src/services/workspace/workspace-config-provider.ts`
+- [x] 2.5.3: Migrate `services/workspace/workspace-config-provider.js` → `src/services/workspace/workspace-config-provider.ts`
   - Update imports to ESM
   - Use `AppConfig` instead of `global.pogoconf`
 
-- [ ] 2.5.4: Migrate `services/workspace/initial-workspace-config-builder.js` → `src/services/workspace/initial-workspace-config-builder.ts`
+- [x] 2.5.4: Migrate `services/workspace/initial-workspace-config-builder.js` → `src/services/workspace/initial-workspace-config-builder.ts`
 
-- [ ] 2.5.5: Migrate `services/workspace/workspace-service.js` → `src/services/workspace/workspace-service.ts`
+- [x] 2.5.5: Migrate `services/workspace/workspace-service.js` → `src/services/workspace/workspace-service.ts`
   - Replace `require('electron').shell` with `ShellAdapter`
   - Inject dependencies via constructor
   ```typescript
@@ -532,9 +532,9 @@ Strategy: Start with services that have fewest dependencies, work up to complex 
   }
   ```
 
-- [ ] 2.5.6: Migrate `services/site/site-service.js` → `src/services/site/site-service.ts`
+- [x] 2.5.6: Migrate `services/site/site-service.js` → `src/services/site/site-service.ts`
 
-- [ ] 2.5.7: Migrate `services/library/library-service.js` → `src/services/library/library-service.ts`
+- [x] 2.5.7: Migrate `services/library/library-service.js` → `src/services/library/library-service.ts`
 
 **2.6: Migrate Sync Modules**
 
