@@ -1,179 +1,246 @@
-import { AppConfig, Configurations } from "@quiqr/types";
+/**
+ * Library Service
+ *
+ * Service class containing utility functions for creating and manipulating unmounted sites.
+ */
+
+import type { SiteConfig } from '@quiqr/types';
 import del from 'del';
 import fs from 'fs-extra';
 import path from 'path';
-import { PathHelper } from "../../utils";
-import { ConfigurationDataProvider } from "../configuration";
-import { AppContainer } from "../../config";
+import type { AppContainer } from '../../config/index.js';
+import type { HugoConfigFormat } from '../../hugo/hugo-utils.js';
+import { InitialWorkspaceConfigBuilder } from '../workspace/initial-workspace-config-builder.js';
 
-// const del                           = require('del');
-// const fs                            = require('fs-extra');
-// const pathHelper                    = require('../../utils/path-helper');
-const configurationDataProvider     = require('../../app-prefs-state/configuration-data-provider')
-const InitialWorkspaceConfigBuilder = require('../workspace/initial-workspace-config-builder');
-const hugoUtils                     = require('./../../hugo/hugo-utils');
+/**
+ * Site configuration that can be written to disk (subset of SiteConfig)
+ */
+interface WritableSiteConfig {
+  key: string;
+  name: string;
+  source: {
+    type: string;
+    path: string;
+  };
+  publish?: unknown[];
+  lastPublish?: number;
+  [key: string]: unknown;
+}
 
-/*
-
-This service class containes utility functions for creating and manipulating unmounted sites
-
-*/
-
-class LibraryService {
-
+/**
+ * LibraryService handles site configuration management and site lifecycle operations
+ */
+export class LibraryService {
   private appContainer: AppContainer;
 
-  constructor(
-    appContainer: AppContainer,
-  ) {
+  constructor(appContainer: AppContainer) {
     this.appContainer = appContainer;
   }
 
-  async getSiteConf(siteKey: string){
-    const options = { invalidateCache: true }
-    const configurations = await this.appContainer.configurationProvider.getConfigurations(options);
-    let site = configurations.sites.find((x) => x.key === siteKey);
+  /**
+   * Get a site configuration by its key
+   *
+   * @param siteKey - The unique key identifying the site
+   * @returns The site configuration
+   * @throws Error if site is not found
+   */
+  async getSiteConf(siteKey: string): Promise<SiteConfig> {
+    const options = { invalidateCache: true };
+    const configurations = await this.appContainer.configurationProvider.getConfigurations(
+      options
+    );
+    const site = configurations.sites.find((x) => x.key === siteKey);
 
-    if (! site) {
-      throw new Error(`Could not find siteconf with sitekey ${siteKey}`)
+    if (!site) {
+      throw new Error(`Could not find siteconf with sitekey ${siteKey}`);
     }
 
     return site;
   }
 
-  async checkDuplicateSiteConfAttrStringValue(attr, value){
-    return new Promise((resolve, reject) => {
+  /**
+   * Check if a site configuration attribute value is already in use
+   *
+   * @param attr - The attribute name to check (e.g., 'key', 'name')
+   * @param value - The value to check for duplicates
+   * @returns True if duplicate exists, false otherwise
+   */
+  async checkDuplicateSiteConfAttrStringValue(
+    attr: string,
+    value: string
+  ): Promise<boolean> {
+    const options = { invalidateCache: false };
+    const configurations = await this.appContainer.configurationProvider.getConfigurations(
+      options
+    );
 
-      configurationDataProvider.get(function(err, data){
-        if(err){
-          reject(err);
-        }
-        else {
-          let duplicate;
-          let response;
+    const duplicate = configurations.sites.find(
+      (x) => x[attr as keyof SiteConfig]?.toString().toLowerCase() === value.toLowerCase()
+    );
 
-          duplicate = data.sites.find((x)=>x[attr].toLowerCase() === value.toLowerCase());
-          if(duplicate){
-            response = true;
-          }
-          else{
-            response = false;
-          }
-
-          resolve(response);
-        }
-      }, {invalidateCache: false});
-    });
+    return !!duplicate;
   }
 
-  async createNewHugoQuiqrSite(siteName, hugoVersion, configFormat){
-    return new Promise(async (resolve, reject) => {
+  /**
+   * Create a new Hugo site with Quiqr configuration
+   *
+   * @param siteName - The display name for the site
+   * @param hugoVersion - The Hugo version to use
+   * @param configFormat - The configuration file format (toml, yaml, json)
+   * @returns The generated site key
+   */
+  async createNewHugoQuiqrSite(
+    siteName: string,
+    hugoVersion: string,
+    configFormat: HugoConfigFormat
+  ): Promise<string> {
+    const siteKey = await this.createSiteKeyFromName(siteName);
 
-      try{
-        const siteKey = await this.createSiteKeyFromName(siteName);
+    const pathSite = this.appContainer.pathHelper.getSiteRoot(siteKey);
+    if (!pathSite) {
+      throw new Error(`Could not create site root for siteKey: ${siteKey}`);
+    }
+    await fs.ensureDir(pathSite);
 
-        const pathSite = pathHelper.getSiteRoot(siteKey);
-        await fs.ensureDir(pathSite);
+    const pathSource = path.join(pathSite, 'main');
+    await this.appContainer.hugoUtils.createSiteDir(pathSource, siteName, configFormat);
 
-        const pathSource = path.join(pathHelper.getSiteRoot(siteKey), "main");
-        await hugoUtils.createSiteDir(pathSource, siteName, configFormat);
+    const configBuilder = new InitialWorkspaceConfigBuilder(
+      pathSource,
+      this.appContainer.formatResolver,
+      this.appContainer.pathHelper
+    );
+    configBuilder.buildAll(hugoVersion);
 
-        let configBuilder = new InitialWorkspaceConfigBuilder(pathSource);
-        configBuilder.buildAll(hugoVersion);
+    const newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
+    await fs.writeFile(
+      this.appContainer.pathHelper.getSiteMountConfigPath(siteKey),
+      JSON.stringify(newConf, null, 2),
+      { encoding: 'utf8' }
+    );
 
-        let newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
-        await fs.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
-        resolve(siteKey);
-      }
-      catch(err){
-        reject(err)
-      }
-
-    });
+    return siteKey;
   }
 
-  async createSiteKeyFromName(name){
-    return new Promise((resolve, reject) => {
+  /**
+   * Generate a unique site key from a site name
+   *
+   * @param name - The site name to convert to a key
+   * @returns A unique, URL-safe site key
+   */
+  async createSiteKeyFromName(name: string): Promise<string> {
+    let newKey = name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
 
-      let newKey = name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+    const duplicate = await this.checkDuplicateSiteConfAttrStringValue('key', newKey);
+    if (duplicate) {
+      newKey = newKey + '-' + this.appContainer.pathHelper.randomPathSafeString(4);
+    }
 
-      this.checkDuplicateSiteConfAttrStringValue('key', newKey)
-        .then((duplicate)=>{
-          if(duplicate){
-            newKey = newKey + '-' + pathHelper.randomPathSafeString(4);
-          }
-          resolve(newKey);
-        })
-        .catch((err)=>{
-          reject(err);
-        })
-
-
-    });
+    return newKey;
   }
 
-
-  createMountConfUnmanaged(siteKey, siteName, pathSource){
-    let newConf = {};
-    newConf.key = siteKey;
-    newConf.name = siteName;
-    newConf.source = {};
-    newConf.source.type = 'folder';
-    newConf.source.path = path.basename(pathSource); // 30sep2024, always relative from now on
-    newConf.publish = [];
-    newConf.lastPublish = 0;
-    return newConf;
+  /**
+   * Create an unmanaged site mount configuration
+   *
+   * @param siteKey - The unique site key
+   * @param siteName - The display name
+   * @param pathSource - The source directory path
+   * @returns Site configuration object
+   */
+  createMountConfUnmanaged(
+    siteKey: string,
+    siteName: string,
+    pathSource: string
+  ): WritableSiteConfig {
+    return {
+      key: siteKey,
+      name: siteName,
+      source: {
+        type: 'folder',
+        path: path.basename(pathSource), // Always relative from 30sep2024
+      },
+      publish: [],
+      lastPublish: 0,
+    };
   }
 
-  async createNewSiteWithTempDirAndKey(siteKey, tempDir){
+  /**
+   * Create a new site from an existing temporary directory
+   *
+   * @param siteKey - The unique site key
+   * @param tempDir - The temporary directory containing the site files
+   */
+  async createNewSiteWithTempDirAndKey(siteKey: string, tempDir: string): Promise<void> {
+    const pathSite = this.appContainer.pathHelper.getSiteRoot(siteKey);
+    if (!pathSite) {
+      throw new Error(`Could not create site root for siteKey: ${siteKey}`);
+    }
 
-    const pathSite = pathHelper.getSiteRoot(siteKey);
-    const pathSource = path.join(pathHelper.getSiteRoot(siteKey), "main");
+    const pathSource = path.join(pathSite, 'main');
 
     await fs.ensureDir(pathSite);
-    await fs.moveSync(tempDir, pathSource);
+    await fs.move(tempDir, pathSource);
 
-    let newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
-    await fs.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+    const newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
+    await fs.writeFile(
+      this.appContainer.pathHelper.getSiteMountConfigPath(siteKey),
+      JSON.stringify(newConf, null, 2),
+      { encoding: 'utf8' }
+    );
   }
 
-  // REMOVE INVALID KEYS
-  deleteInvalidConfKeys(newConf){
-    delete newConf['configPath']
-    delete newConf['owner']
-    delete newConf['published']
-    delete newConf['publishKey']
-    delete newConf['etalage']
+  /**
+   * Remove invalid configuration keys that shouldn't be persisted
+   *
+   * @param conf - The configuration object to clean
+   * @returns The cleaned configuration
+   */
+  private deleteInvalidConfKeys(conf: Record<string, unknown>): Record<string, unknown> {
+    const cleanConf = { ...conf };
+    delete cleanConf['configPath'];
+    delete cleanConf['owner'];
+    delete cleanConf['published'];
+    delete cleanConf['publishKey'];
+    delete cleanConf['etalage'];
 
-    return newConf;
+    return cleanConf;
   }
 
-  async writeSiteConf(newConf, siteKey){
-    newConf = this.deleteInvalidConfKeys(newConf);
+  /**
+   * Write a site configuration to disk
+   *
+   * @param newConf - The configuration to write
+   * @param siteKey - The site key
+   * @returns True on success
+   */
+  async writeSiteConf(newConf: Record<string, unknown>, siteKey: string): Promise<boolean> {
+    let cleanConf = this.deleteInvalidConfKeys(newConf);
+
     // Ensure name field always exists - use key as fallback
-    if (!newConf.name) {
-      newConf.name = newConf.key || siteKey;
+    if (!cleanConf.name) {
+      cleanConf.name = cleanConf.key || siteKey;
     }
-    await fs.writeFileSync(pathHelper.getSiteMountConfigPath(siteKey), JSON.stringify(newConf), { encoding: "utf8"});
+
+    await fs.writeFile(
+      this.appContainer.pathHelper.getSiteMountConfigPath(siteKey),
+      JSON.stringify(cleanConf, null, 2),
+      { encoding: 'utf8' }
+    );
+
     return true;
   }
 
-  async deleteSite(siteKey){
-    return new Promise(async (resolve, reject) => {
-      try{
-        fs.remove(pathHelper.getSiteMountConfigPath(siteKey));
-        del.sync([pathHelper.getSiteRoot(siteKey)],{force:true});
-        resolve();
-      }
-      catch(err){
-        reject(err)
-      }
+  /**
+   * Delete a site and all its files
+   *
+   * @param siteKey - The site key to delete
+   */
+  async deleteSite(siteKey: string): Promise<void> {
+    await fs.remove(this.appContainer.pathHelper.getSiteMountConfigPath(siteKey));
 
-    });
+    const siteRoot = this.appContainer.pathHelper.getSiteRoot(siteKey);
+    if (siteRoot) {
+      await del([siteRoot], { force: true });
+    }
   }
-
-
-
 }
-
-module.exports = new LibraryService;
