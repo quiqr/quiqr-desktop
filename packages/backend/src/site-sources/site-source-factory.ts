@@ -6,6 +6,7 @@
  */
 
 import type { Workspace } from '@quiqr/types';
+import { FolderSiteSource } from './folder-site-source.js';
 
 /**
  * Source configuration for a site
@@ -55,10 +56,7 @@ export class SiteSourceFactory {
     const type = config.type.toLowerCase();
 
     if (type === 'folder') {
-      // For now, delegate to old JavaScript implementation
-      // This will be migrated to TypeScript in a future phase
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const FolderSiteSource = require('../../../backend/src-main/site-sources/folder-site-source');
+      // Use new ESM implementation
       return FolderSiteSource;
     } else {
       throw new Error(`Site source (${config.type}) not implemented.`);

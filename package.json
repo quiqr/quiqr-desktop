@@ -12,7 +12,7 @@
   },
   "description": "Local-first CMS for static files and engines like Quarto or Hugo SSG",
   "version": "0.21.2",
-  "main": "electron/main.js",
+  "main": "packages/adapters/electron/dist/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:electron:wait\"",
     "dev:frontend": "cd frontend && npm run dev",
@@ -85,7 +85,7 @@
     "productName": "Quiqr",
     "files": [
       "frontend/build/**/*",
-      "electron/**/*",
+      "packages/adapters/electron/dist/**/*",
       "backend/**/*",
       "resources/**/*",
       "package.json"
@@ -192,6 +192,7 @@
   "workspaces": [
     "packages/types",
     "packages/backend",
+    "packages/adapters/electron",
     "frontend"
   ]
 }

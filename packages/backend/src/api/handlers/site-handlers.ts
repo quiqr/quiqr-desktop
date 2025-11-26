@@ -4,8 +4,11 @@
  * Handles site configuration and management.
  */
 
+import path from 'path';
 import type { AppContainer } from '../../config/container.js';
 import type { Configurations } from '@quiqr/types';
+import { platform } from 'os';
+import fs from 'fs';
 
 export function createGetConfigurationsHandler(container: AppContainer) {
   return async (options?: { invalidateCache?: boolean }): Promise<Configurations> => {
@@ -60,7 +63,21 @@ export function createDeleteSiteHandler(container: AppContainer) {
 
 export function createGetFilteredHugoVersionsHandler(container: AppContainer) {
   return async () => {
-    throw new Error('getFilteredHugoVersions: Not yet implemented');
+    // throw new Error('getFilteredHugoVersions: Not yet implemented');
+    // TODO remove stub args
+    const args = {
+      platform: 'linux' as const,
+      isPackaged: true
+    }
+    const jsonFile = path.join(container.pathHelper.getApplicationResourcesDir(args), "all", "filteredHugoVersions.json");
+    let filteredVersions = ["v0.100.2"];
+
+    if (fs.existsSync(jsonFile)) {
+      const jsonContent = await fs.readFileSync(jsonFile, { encoding: 'utf8', flag: 'r' })
+      filteredVersions = JSON.parse(jsonContent);
+    }
+
+    return filteredVersions;
   };
 }
 

@@ -32,23 +32,41 @@ export function createListWorkspacesHandler(container: AppContainer) {
  * Get workspace details and configuration
  */
 export function createGetWorkspaceDetailsHandler(container: AppContainer) {
-  return async ({
-    siteKey,
-    workspaceKey,
-  }: {
-    siteKey: string;
-    workspaceKey: string;
-  }) => {
-    // TODO: Implement with migrated WorkspaceService
-    // This is a complex handler that:
-    // 1. Gets workspace configuration
-    // 2. Updates global state (currentSiteKey, currentWorkspaceKey, currentSitePath)
-    // 3. Saves last opened site to config
-    // 4. Sets up file watcher for model directory
-    // 5. Downloads Hugo if needed
-    throw new Error('getWorkspaceDetails: Not yet implemented - needs WorkspaceService migration');
+  return async ({ siteKey, workspaceKey }: { siteKey: string; workspaceKey: string }) => {
+    // 1. Get workspace path from mounted workspace
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    const siteService = new SiteService(siteConfig, container.siteSourceFactory, container.syncFactory);
+    const workspace = await siteService.getWorkspaceHead(workspaceKey);
+
+    if (!workspace) throw new Error('Workspace not found');
+
+    // 2. Create WorkspaceService for this workspace
+    const workspaceService = container.createWorkspaceService(
+      workspace.path,
+      workspaceKey,
+      siteKey
+    );
+
+    // 3. Get configuration - delegates to WorkspaceService
+    const config = await workspaceService.getConfigurationsData();
+
+    // 4. Update state - delegates to AppState
+    container.state.setCurrentSite(siteKey, workspaceKey, workspace.path);
+
+    // 5. Save last opened - delegates to AppConfig  
+    container.config.setLastOpenedSite(siteKey, workspaceKey, workspace.path);
+    await container.config.save();
+
+    // 6. Set up file watcher - NEW helper method needed
+    // setupModelWatcher(container, workspace.path);
+
+    // 7. Hugo download - STUB for MVP (or skip entirely)
+    // await ensureHugoAvailable(config.hugover);
+
+    return config;
   };
 }
+
 
 /**
  * Mount a workspace (make it active)
@@ -74,10 +92,19 @@ export function createMountWorkspaceHandler(container: AppContainer) {
     // Mount the workspace
     await siteService.mountWorkspace(workspaceKey);
 
-    // Get the workspace head to return details
+    // Get the workspace head to find the path
     const workspaceHead = await siteService.getWorkspaceHead(workspaceKey);
 
-    return workspaceHead;
+    // Update container state (similar to old backend's global state)
+    container.state.currentSiteKey = siteKey;
+    container.state.currentWorkspaceKey = workspaceKey;
+    container.state.currentSitePath = workspaceHead?.path || '';
+
+    // TODO: Set window title, update menu
+    // TODO: Save last opened site to config
+
+    // Return workspace path as string (matches frontend schema)
+    return workspaceHead?.path || '';
   };
 }
 
