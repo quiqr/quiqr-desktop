@@ -9,6 +9,8 @@ import type { AppContainer } from '../../config/container.js';
 import { SiteService } from '../../services/site/site-service.js';
 import fs from 'fs-extra';
 import { globSync } from 'glob';
+import path from 'path';
+import { createWorkspaceServiceForParams, getCurrentWorkspaceService } from './helpers/workspace-helper.js';
 
 /**
  * List all workspaces for a site
@@ -121,8 +123,12 @@ export function createGetWorkspaceModelParseInfoHandler(container: AppContainer)
     siteKey: string;
     workspaceKey: string;
   }) => {
-    // TODO: Implement with migrated WorkspaceService
-    throw new Error('getWorkspaceModelParseInfo: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await createWorkspaceServiceForParams(
+      container,
+      siteKey,
+      workspaceKey
+    );
+    return await workspaceService.getModelParseInfo();
   };
 }
 
@@ -137,8 +143,12 @@ export function createGetCreatorMessageHandler(container: AppContainer) {
     siteKey: string;
     workspaceKey: string;
   }) => {
-    // TODO: Implement with migrated WorkspaceService
-    throw new Error('getCreatorMessage: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await createWorkspaceServiceForParams(
+      container,
+      siteKey,
+      workspaceKey
+    );
+    return await workspaceService.getCreatorMessage();
   };
 }
 
@@ -153,8 +163,12 @@ export function createGetLanguagesHandler(container: AppContainer) {
     siteKey: string;
     workspaceKey: string;
   }) => {
-    // TODO: Implement with migrated WorkspaceService
-    throw new Error('getLanguages: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await createWorkspaceServiceForParams(
+      container,
+      siteKey,
+      workspaceKey
+    );
+    return await workspaceService.getHugoConfigLanguages();
   };
 }
 
@@ -163,8 +177,8 @@ export function createGetLanguagesHandler(container: AppContainer) {
  */
 export function createGetFilesFromAbsolutePathHandler(container: AppContainer) {
   return async ({ path }: { path: string }) => {
-    // TODO: Implement with migrated WorkspaceService
-    throw new Error('getFilesFromAbsolutePath: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = getCurrentWorkspaceService(container);
+    return await workspaceService.getFilesFromAbsolutePath(path);
   };
 }
 
@@ -179,8 +193,20 @@ export function createGetDynFormFieldsHandler(container: AppContainer) {
     searchRootNode: string;
     searchLevelKeyVal: { key: string; val: string };
   }) => {
-    // TODO: Implement with migrated WorkspaceService
-    throw new Error('getDynFormFields: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = getCurrentWorkspaceService(container);
+    const configuration = await workspaceService.getConfigurationsData();
+
+    if (searchRootNode in configuration) {
+      const configArray = (configuration as any)[searchRootNode];
+      if (Array.isArray(configArray)) {
+        const dynConf = configArray.find(
+          (x: any) => x[searchLevelKeyVal.key] === searchLevelKeyVal.val
+        );
+        return dynConf;
+      }
+    }
+
+    return null;
   };
 }
 
@@ -195,8 +221,21 @@ export function createGetValueByConfigPathHandler(container: AppContainer) {
     searchRootNode: string;
     path: string;
   }) => {
-    // TODO: Implement with migrated WorkspaceService
-    throw new Error('getValueByConfigPath: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = getCurrentWorkspaceService(container);
+    const configuration = await workspaceService.getConfigurationsData();
+
+    if (searchRootNode in configuration) {
+      const configArray = (configuration as any)[searchRootNode];
+      if (Array.isArray(configArray)) {
+        const confObj = configArray.find((x: any) => x['key'] === 'mainConfig');
+        if (confObj && confObj.fields) {
+          const value = confObj.fields.find((x: any) => x['key'] === path);
+          return value;
+        }
+      }
+    }
+
+    return null;
   };
 }
 
@@ -205,8 +244,31 @@ export function createGetValueByConfigPathHandler(container: AppContainer) {
  */
 export function createGetPreviewCheckConfigurationHandler(container: AppContainer) {
   return async () => {
-    // TODO: Implement - reads quiqr/previewchecksettings.json
-    throw new Error('getPreviewCheckConfiguration: Not yet implemented');
+    const { state } = container;
+    if (!state.currentSitePath) {
+      throw new Error('No workspace is currently mounted');
+    }
+
+    const filePath = path.join(state.currentSitePath, 'quiqr', 'previewchecksettings.json');
+
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+
+    try {
+      const strData = await fs.readFile(filePath, { encoding: 'utf-8' });
+      const formatProvider = container.formatResolver.resolveForFilePath(filePath);
+
+      if (!formatProvider) {
+        throw new Error(`Could not resolve a format provider for file ${filePath}.`);
+      }
+
+      const obj = formatProvider.parse(strData);
+      return obj;
+    } catch (e) {
+      console.error('Error reading preview check configuration:', e);
+      return null;
+    }
   };
 }
 
