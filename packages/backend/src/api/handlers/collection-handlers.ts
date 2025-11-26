@@ -1,3 +1,5 @@
+import path from 'path'
+
 /**
  * Collection API Handlers
  *
@@ -277,8 +279,9 @@ export function createGetThumbnailForPathHandler(container: AppContainer) {
   }) => {
     const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
     const workspacePath = workspaceService.getWorkspacePath();
-    const path = await import('path');
-    const absolutePath = path.join(workspacePath, targetPath);
+    // Remove leading slashes to ensure path.join works correctly
+    const normalizedPath = targetPath.replace(/^[/\\]+/, '');
+    const absolutePath = path.join(workspacePath, normalizedPath);
     return await workspaceService.getThumbnailForAbsoluteImgPath(absolutePath, targetPath);
   };
 }
