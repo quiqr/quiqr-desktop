@@ -6,6 +6,7 @@
  */
 
 import type { Workspace } from '@quiqr/types';
+import type { PathHelper } from '../utils/path-helper.js';
 import { FolderSiteSource } from './folder-site-source.js';
 
 /**
@@ -32,6 +33,12 @@ export interface SiteSource {
  * SiteSourceFactory creates site source instances based on source configuration
  */
 export class SiteSourceFactory {
+  private pathHelper: PathHelper;
+
+  constructor(pathHelper: PathHelper) {
+    this.pathHelper = pathHelper;
+  }
+
   /**
    * Get a site source instance for the given configuration
    *
@@ -42,7 +49,7 @@ export class SiteSourceFactory {
    */
   get(key: string, config: SourceConfig): SiteSource {
     const Type = this.getType(config);
-    return new Type({ ...config, key });
+    return new Type({ ...config, key }, this.pathHelper);
   }
 
   /**
@@ -52,7 +59,7 @@ export class SiteSourceFactory {
    * @returns The site source class constructor
    * @throws Error if the source type is not implemented
    */
-  private getType(config: SourceConfig): new (config: SourceConfig) => SiteSource {
+  private getType(config: SourceConfig): new (config: SourceConfig, pathHelper: PathHelper) => SiteSource {
     const type = config.type.toLowerCase();
 
     if (type === 'folder') {

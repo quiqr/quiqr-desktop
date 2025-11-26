@@ -189,7 +189,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
 
   // Create factories
   const syncFactory = new SyncFactory();
-  const siteSourceFactory = new SiteSourceFactory();
+  const siteSourceFactory = new SiteSourceFactory(pathHelper);
 
   // Create environment info from platform
   const environmentInfo = {
