@@ -30,13 +30,26 @@ export function createImportSiteFromPrivateGitRepoHandler(container: AppContaine
     saveSyncTarget: boolean;
     siteName: string;
   }) => {
-    throw new Error('importSiteFromPrivateGitRepo: Not yet implemented - needs git-importer migration');
+    const siteKey = await container.gitImporter.importSiteFromPrivateGitRepo(
+      gitOrg,
+      gitRepo,
+      privKey,
+      gitEmail,
+      saveSyncTarget,
+      siteName
+    );
+    // Invalidate cache so the new site appears in the list
+    container.configurationProvider.invalidateCache();
+    return siteKey;
   };
 }
 
 export function createImportSiteFromPublicGitUrlHandler(container: AppContainer) {
   return async ({ siteName, url }: { siteName: string; url: string }) => {
-    throw new Error('importSiteFromPublicGitUrl: Not yet implemented - needs git-importer migration');
+    const siteKey = await container.gitImporter.importSiteFromPublicGitUrl(url, siteName);
+    // Invalidate cache so the new site appears in the list
+    container.configurationProvider.invalidateCache();
+    return siteKey;
   };
 }
 
@@ -52,7 +65,15 @@ export function createNewSiteFromPublicHugoThemeUrlHandler(container: AppContain
     themeInfo: any;
     hugoVersion: string;
   }) => {
-    throw new Error('newSiteFromPublicHugoThemeUrl: Not yet implemented - needs git-importer migration');
+    const siteKey = await container.gitImporter.newSiteFromPublicHugoThemeUrl(
+      url,
+      siteName,
+      themeInfo,
+      hugoVersion
+    );
+    // Invalidate cache so the new site appears in the list
+    container.configurationProvider.invalidateCache();
+    return siteKey;
   };
 }
 
@@ -103,13 +124,13 @@ export function createNewSiteFromScratchHandler(container: AppContainer) {
 
 export function createQuiqrGitRepoShowHandler(container: AppContainer) {
   return async ({ url }: { url: string }) => {
-    throw new Error('quiqr_git_repo_show: Not yet implemented - needs Embgit migration');
+    return await container.embgit.repo_show_quiqrsite(url);
   };
 }
 
 export function createHugothemeGitRepoShowHandler(container: AppContainer) {
   return async ({ url }: { url: string }) => {
-    throw new Error('hugotheme_git_repo_show: Not yet implemented - needs Embgit migration');
+    return await container.embgit.repo_show_hugotheme(url);
   };
 }
 

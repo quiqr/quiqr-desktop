@@ -17,6 +17,8 @@ import { SyncFactory } from '../sync/sync-factory.js';
 import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
 import { WorkspaceConfigProvider } from '../services/workspace/workspace-config-provider.js';
 import { FolderImporter } from '../import/folder-importer.js';
+import { GitImporter } from '../import/git-importer.js';
+import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 import { BuildActionService } from '../build-actions/index.js';
 
@@ -83,6 +85,16 @@ export interface AppContainer {
    * Folder importer (imports sites from local directories)
    */
   folderImporter: FolderImporter;
+
+  /**
+   * Embgit (embedded git client)
+   */
+  embgit: Embgit;
+
+  /**
+   * Git importer (imports sites from git repositories)
+   */
+  gitImporter: GitImporter;
 
   /**
    * Factory function to create WorkspaceService instances
@@ -216,6 +228,25 @@ export function createContainer(options: ContainerOptions): AppContainer {
     workspaceConfigProvider
   );
   container.folderImporter = folderImporter;
+
+  // Create embgit with dependencies
+  const embgit = new Embgit(
+    pathHelper,
+    adapters.outputConsole,
+    adapters.appInfo,
+    rootPath,
+    environmentInfo
+  );
+  container.embgit = embgit;
+
+  // Create git importer with dependencies
+  const gitImporter = new GitImporter(
+    embgit,
+    pathHelper,
+    formatResolver,
+    libraryService
+  );
+  container.gitImporter = gitImporter;
   // Create BuildActionService (uses outputConsole for logging)
   const buildActionService = new BuildActionService(adapters.outputConsole);
 
