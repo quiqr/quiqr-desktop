@@ -92,6 +92,21 @@ export interface AppContainer {
     workspaceKey: string,
     siteKey: string
   ) => WorkspaceService;
+
+  /**
+   * Helper to get a WorkspaceService instance
+   * Handles the common pattern of: get site → get workspace → create service
+   */
+  getWorkspaceService: (
+    siteKey: string,
+    workspaceKey: string
+  ) => Promise<WorkspaceService>;
+
+  /**
+   * Get the currently cached WorkspaceService (for operations that need persistence like Hugo server)
+   * Returns undefined if no workspace is currently cached
+   */
+  getCurrentWorkspaceService: () => WorkspaceService | undefined;
 }
 
 /**
@@ -220,6 +235,63 @@ export function createContainer(options: ContainerOptions): AppContainer {
     return new WorkspaceService(workspacePath, workspaceKey, siteKey, dependencies);
   };
 
+  // Cache for the current WorkspaceService (needed for Hugo server persistence)
+  let cachedWorkspaceService: WorkspaceService | undefined;
+  let cachedWorkspaceKey: string | undefined;
+  let cachedSiteKey: string | undefined;
+
+  // Helper to get WorkspaceService (common pattern used across handlers)
+  container.getWorkspaceService = async (
+    siteKey: string,
+    workspaceKey: string
+  ): Promise<WorkspaceService> => {
+    // Return cached instance if it matches the requested workspace
+    if (
+      cachedWorkspaceService &&
+      cachedSiteKey === siteKey &&
+      cachedWorkspaceKey === workspaceKey
+    ) {
+      return cachedWorkspaceService;
+    }
+
+    // Import SiteService dynamically to avoid circular dependency
+    const { SiteService } = await import('../services/site/site-service.js');
+
+    // Get site configuration
+    const siteConfig = await libraryService.getSiteConf(siteKey);
+
+    // Create SiteService instance
+    const siteService = new SiteService(
+      siteConfig,
+      siteSourceFactory,
+      syncFactory
+    );
+
+    // Get workspace head to find the path
+    const workspaceHead = await siteService.getWorkspaceHead(workspaceKey);
+
+    if (!workspaceHead) {
+      throw new Error(`Workspace not found: ${workspaceKey}`);
+    }
+
+    // Create WorkspaceService and cache it
+    const workspaceService = container.createWorkspaceService(
+      workspaceHead.path,
+      workspaceKey,
+      siteKey
+    );
+
+    cachedWorkspaceService = workspaceService;
+    cachedSiteKey = siteKey;
+    cachedWorkspaceKey = workspaceKey;
+
+    return workspaceService;
+  };
+
+  // Get the currently cached WorkspaceService
+  container.getCurrentWorkspaceService = () => {
+    return cachedWorkspaceService;
+  };
 
   return container;
 }

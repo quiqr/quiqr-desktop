@@ -2,7 +2,6 @@
  * Collection API Handlers
  *
  * Handles collection operations (blog posts, products, etc.).
- * TODO: Implement when WorkspaceService is migrated.
  */
 
 import type { AppContainer } from '../../config/container.js';
@@ -17,7 +16,8 @@ export function createListCollectionItemsHandler(container: AppContainer) {
     workspaceKey: string;
     collectionKey: string;
   }) => {
-    throw new Error('listCollectionItems: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.listCollectionItems(collectionKey);
   };
 }
 
@@ -33,7 +33,8 @@ export function createGetCollectionItemHandler(container: AppContainer) {
     collectionKey: string;
     collectionItemKey: string;
   }) => {
-    throw new Error('getCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.getCollectionItem(collectionKey, collectionItemKey);
   };
 }
 
@@ -51,7 +52,8 @@ export function createCreateCollectionItemKeyHandler(container: AppContainer) {
     collectionItemKey: string;
     itemTitle: string;
   }) => {
-    throw new Error('createCollectionItemKey: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.createCollectionItemKey(collectionKey, collectionItemKey, itemTitle);
   };
 }
 
@@ -69,7 +71,8 @@ export function createUpdateCollectionItemHandler(container: AppContainer) {
     collectionItemKey: string;
     document: any;
   }) => {
-    throw new Error('updateCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.updateCollectionItem(collectionKey, collectionItemKey, document);
   };
 }
 
@@ -85,7 +88,9 @@ export function createDeleteCollectionItemHandler(container: AppContainer) {
     collectionKey: string;
     collectionItemKey: string;
   }) => {
-    throw new Error('deleteCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    const deleted = await workspaceService.deleteCollectionItem(collectionKey, collectionItemKey);
+    return { deleted };
   };
 }
 
@@ -103,7 +108,8 @@ export function createRenameCollectionItemHandler(container: AppContainer) {
     collectionItemKey: string;
     collectionItemNewKey: string;
   }) => {
-    throw new Error('renameCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.renameCollectionItem(collectionKey, collectionItemKey, collectionItemNewKey);
   };
 }
 
@@ -121,7 +127,8 @@ export function createCopyCollectionItemHandler(container: AppContainer) {
     collectionItemKey: string;
     collectionItemNewKey: string;
   }) => {
-    throw new Error('copyCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.copyCollectionItem(collectionKey, collectionItemKey, collectionItemNewKey);
   };
 }
 
@@ -141,7 +148,8 @@ export function createCopyCollectionItemToLangHandler(container: AppContainer) {
     collectionItemNewKey: string;
     destLang: string;
   }) => {
-    throw new Error('copyCollectionItemToLang: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.copyCollectionItemToLang(collectionKey, collectionItemKey, collectionItemNewKey, destLang);
   };
 }
 
@@ -157,7 +165,8 @@ export function createOpenFileDialogForCollectionItemHandler(container: AppConta
     collectionKey: string;
     collectionItemKey: string;
   }) => {
-    throw new Error('openFileDialogForCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.openCollectionItemInEditor(collectionKey, collectionItemKey);
   };
 }
 
@@ -175,7 +184,8 @@ export function createBuildCollectionItemHandler(container: AppContainer) {
     collectionItemKey: string;
     buildAction: string;
   }) => {
-    throw new Error('buildCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.buildCollectionItem(collectionKey, collectionItemKey, buildAction);
   };
 }
 
@@ -191,7 +201,9 @@ export function createMakePageBundleCollectionItemHandler(container: AppContaine
     collectionKey: string;
     collectionItemKey: string;
   }) => {
-    throw new Error('makePageBundleCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    const result = await workspaceService.makePageBundleCollectionItem(collectionKey, collectionItemKey);
+    return { deleted: result };
   };
 }
 
@@ -213,7 +225,14 @@ export function createCopyFilesIntoCollectionItemHandler(container: AppContainer
     files: string[];
     forceFileName?: string;
   }) => {
-    throw new Error('copyFilesIntoCollectionItem: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.copyFilesIntoCollectionItem(
+      collectionKey,
+      collectionItemKey,
+      targetPath,
+      files,
+      forceFileName
+    );
   };
 }
 
@@ -235,7 +254,14 @@ export function createGetFilesInBundleHandler(container: AppContainer) {
     extensions: string[];
     forceFileName?: string;
   }) => {
-    throw new Error('getFilesInBundle: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.getFilesInBundle(
+      collectionKey,
+      collectionItemKey,
+      targetPath,
+      extensions,
+      forceFileName
+    );
   };
 }
 
@@ -249,7 +275,11 @@ export function createGetThumbnailForPathHandler(container: AppContainer) {
     workspaceKey: string;
     targetPath: string;
   }) => {
-    throw new Error('getThumbnailForPath: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    const workspacePath = workspaceService.getWorkspacePath();
+    const path = await import('path');
+    const absolutePath = path.join(workspacePath, targetPath);
+    return await workspaceService.getThumbnailForAbsoluteImgPath(absolutePath, targetPath);
   };
 }
 
@@ -267,7 +297,12 @@ export function createGetThumbnailForCollectionOrSingleItemImageHandler(containe
     collectionItemKey: string;
     targetPath: string;
   }) => {
-    throw new Error('getThumbnailForCollectionOrSingleItemImage: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.getThumbnailForCollectionOrSingleItemImage(
+      collectionKey,
+      collectionItemKey,
+      targetPath
+    );
   };
 }
 
@@ -279,7 +314,9 @@ export function createGenereateEtalageImagesHandler(container: AppContainer) {
     siteKey: string;
     workspaceKey: string;
   }) => {
-    throw new Error('genereateEtalageImages: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    await workspaceService.genereateEtalageImages();
+    return true;
   };
 }
 

@@ -17,13 +17,25 @@ export function createServeWorkspaceHandler(container: AppContainer) {
     workspaceKey: string;
     serveKey: string;
   }) => {
-    throw new Error('serveWorkspace: Not yet implemented - needs WorkspaceService migration');
+    // Get the cached WorkspaceService (this will cache it for Hugo server persistence)
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+
+    // Note: The migrated serve() method doesn't use serveKey directly
+    // It automatically selects the first matching serve configuration from workspace config
+    await workspaceService.serve();
   };
 }
 
 export function createStopHugoServerHandler(container: AppContainer) {
   return async () => {
-    throw new Error('stopHugoServer: Not yet implemented - needs hugo-server migration');
+    // Get the currently cached WorkspaceService (where the Hugo server is running)
+    const workspaceService = container.getCurrentWorkspaceService();
+
+    if (workspaceService) {
+      workspaceService.stopHugoServer();
+    }
+
+    return { stopped: true };
   };
 }
 
@@ -39,7 +51,8 @@ export function createBuildWorkspaceHandler(container: AppContainer) {
     buildKey: string;
     extraConfig?: any;
   }) => {
-    throw new Error('buildWorkspace: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    await workspaceService.build(buildKey, extraConfig || {});
   };
 }
 

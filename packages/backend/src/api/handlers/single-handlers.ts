@@ -19,7 +19,8 @@ export function createGetSingleHandler(container: AppContainer) {
     singleKey: string;
     fileOverride?: string;
   }) => {
-    throw new Error('getSingle: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.getSingle(singleKey, fileOverride);
   };
 }
 
@@ -35,7 +36,8 @@ export function createUpdateSingleHandler(container: AppContainer) {
     singleKey: string;
     document: any;
   }) => {
-    throw new Error('updateSingle: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.updateSingle(singleKey, document);
   };
 }
 
@@ -49,7 +51,8 @@ export function createOpenSingleInEditorHandler(container: AppContainer) {
     workspaceKey: string;
     singleKey: string;
   }) => {
-    throw new Error('openSingleInEditor: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.openSingleInEditor(singleKey);
   };
 }
 
@@ -65,7 +68,8 @@ export function createBuildSingleHandler(container: AppContainer) {
     singleKey: string;
     buildAction: string;
   }) => {
-    throw new Error('buildSingle: Not yet implemented - needs WorkspaceService migration');
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    return await workspaceService.buildSingle(singleKey, buildAction);
   };
 }
 
