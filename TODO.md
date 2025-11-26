@@ -9,7 +9,8 @@ Modernize the backend from CommonJS/JavaScript/Electron-coupled to ESM/TypeScrip
 
 **IMPORTANT - Claude's Operating Rules:**
 1. ✅ **NEVER run** `npm install`, `npm run dev`, or `npm run build` automatically
-2. ✅ **ALWAYS ask the user** to run these commands when needed
+   - **EXCEPTION**: You MAY run `npm run build -w @quiqr/types` and `npm run build -w @quiqr/backend` for type checking during Phase 2
+2. ✅ **ALWAYS ask the user** to run these commands when needed (except for the workspace-specific builds above)
 3. ✅ **NOTIFY user BEFORE marking any task complete** - wait for user verification
 4. ✅ Only mark tasks as ✅ after user confirms completion
 
