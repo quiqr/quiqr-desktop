@@ -7,8 +7,7 @@
 import path from 'path';
 import type { AppContainer } from '../../config/container.js';
 import type { Configurations } from '@quiqr/types';
-import { platform } from 'os';
-import fs from 'fs';
+import fs from 'fs-extra';
 
 export function createGetConfigurationsHandler(container: AppContainer) {
   return async (options?: { invalidateCache?: boolean }): Promise<Configurations> => {
@@ -48,7 +47,50 @@ export function createSaveSiteConfHandler(container: AppContainer) {
 
 export function createCopySiteHandler(container: AppContainer) {
   return async ({ siteKey, newConf }: { siteKey: string; newConf: any }) => {
-    throw new Error('copySite: Not yet implemented - needs FolderImporter migration');
+    // Get the source site configuration
+    const sourceSiteConfig = await container.libraryService.getSiteConf(siteKey);
+
+    // Validate source configuration
+    if (!sourceSiteConfig.source?.path) {
+      throw new Error(`Invalid source configuration for siteKey: ${siteKey}`);
+    }
+
+    // Get the source site's source path
+    const siteRoot = container.pathHelper.getSiteRoot(siteKey);
+    if (!siteRoot) {
+      throw new Error(`Could not get site root for siteKey: ${siteKey}`);
+    }
+    const sourcePath = path.join(siteRoot, sourceSiteConfig.source.path);
+
+    // Validate source path exists
+    if (!fs.existsSync(sourcePath)) {
+      throw new Error(`Source path does not exist: ${sourcePath}`);
+    }
+
+    // Create a new site key from the new site name
+    const newSiteName = newConf.name || sourceSiteConfig.name + ' (copy)';
+    const newSiteKey = await container.libraryService.createSiteKeyFromName(newSiteName);
+
+    // Copy source directory to temp location
+    const tempCopyDir = path.join(container.pathHelper.getTempDir(), 'copySite-' + newSiteKey);
+    await fs.copy(sourcePath, tempCopyDir);
+
+    // Create the new site from the temp directory
+    await container.libraryService.createNewSiteWithTempDirAndKey(newSiteKey, tempCopyDir);
+
+    // Update the site config with the new name and any other properties
+    const updatedConf = {
+      ...sourceSiteConfig,
+      ...newConf,
+      key: newSiteKey,
+      name: newSiteName,
+    };
+    await container.libraryService.writeSiteConf(updatedConf, newSiteKey);
+
+    // Invalidate cache so next read gets fresh data
+    container.configurationProvider.invalidateCache();
+
+    return true;
   };
 }
 
@@ -73,7 +115,7 @@ export function createGetFilteredHugoVersionsHandler(container: AppContainer) {
     let filteredVersions = ["v0.100.2"];
 
     if (fs.existsSync(jsonFile)) {
-      const jsonContent = await fs.readFileSync(jsonFile, { encoding: 'utf8', flag: 'r' })
+      const jsonContent = fs.readFileSync(jsonFile, { encoding: 'utf8', flag: 'r' })
       filteredVersions = JSON.parse(jsonContent);
     }
 
