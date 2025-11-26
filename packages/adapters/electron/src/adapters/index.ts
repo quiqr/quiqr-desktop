@@ -85,6 +85,32 @@ export class ElectronWindowAdapter implements WindowAdapter {
       this.mainWindow.webContents.send(channel, data);
     }
   }
+
+  async openSiteLibrary(): Promise<void> {
+    // Import dynamically to avoid circular dependency
+    const { closeSiteAndShowSelectSites } = await import('../ui-managers/main-window-manager.js');
+    await closeSiteAndShowSelectSites();
+  }
+
+  setMenuBarVisibility(visible: boolean): void {
+    if (this.mainWindow) {
+      this.mainWindow.setMenuBarVisibility(visible);
+    }
+  }
+
+  appendToOutputConsole(line: string): void {
+    // Import dynamically to avoid circular dependency
+    import('../ui-managers/log-window-manager.js').then(({ getCurrentInstance }) => {
+      const logWindow = getCurrentInstance();
+      if (logWindow) {
+        // Send the line to the log window renderer
+        logWindow.webContents.send('hugo-output-line', line);
+      } else {
+        // Fallback to console if log window not open
+        console.log('[HUGO OUTPUT]', line);
+      }
+    });
+  }
 }
 
 // ============================================================================
@@ -134,8 +160,11 @@ export class ElectronAppInfoAdapter implements AppInfoAdapter {
 // ============================================================================
 
 export class ElectronOutputConsole implements OutputConsole {
+  constructor(private windowAdapter: ElectronWindowAdapter) {}
+
   appendLine(line: string): void {
-    console.log('[HUGO OUTPUT]', line);
+    // Send to log window via window adapter
+    this.windowAdapter.appendToOutputConsole(line);
   }
 }
 
@@ -166,7 +195,7 @@ export function createElectronAdapters(): { adapters: PlatformAdapters; windowAd
       window: windowAdapter,
       menu: new ElectronMenuAdapter(),
       appInfo: new ElectronAppInfoAdapter(),
-      outputConsole: new ElectronOutputConsole(),
+      outputConsole: new ElectronOutputConsole(windowAdapter),
       screenshotWindowManager: new ElectronScreenshotWindowManager()
     },
     windowAdapter

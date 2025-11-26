@@ -10,13 +10,11 @@ import type { AppContainer } from '../../config/container.js';
 
 /**
  * Open the site library view
- * Note: This requires access to the main window manager (global.mainWM)
  */
 export function createOpenSiteLibraryHandler(container: AppContainer) {
   return async () => {
-    // TODO: This needs to be implemented when we have window management in adapters
-    // Original: global.mainWM.closeSiteAndShowSelectSites()
-    throw new Error('openSiteLibrary: Not yet implemented - needs window adapter');
+    await container.adapters.window.openSiteLibrary();
+    return true;
   };
 }
 
@@ -25,9 +23,8 @@ export function createOpenSiteLibraryHandler(container: AppContainer) {
  */
 export function createShowMenuBarHandler(container: AppContainer) {
   return async () => {
-    // TODO: This needs to be implemented when we have window management in adapters
-    // Original: global.mainWM.getCurrentInstanceOrNew().setMenuBarVisibility(true)
-    throw new Error('showMenuBar: Not yet implemented - needs window adapter');
+    container.adapters.window.setMenuBarVisibility(true);
+    return true;
   };
 }
 
@@ -36,9 +33,8 @@ export function createShowMenuBarHandler(container: AppContainer) {
  */
 export function createHideMenuBarHandler(container: AppContainer) {
   return async () => {
-    // TODO: This needs to be implemented when we have window management in adapters
-    // Original: global.mainWM.getCurrentInstanceOrNew().setMenuBarVisibility(false)
-    throw new Error('hideMenuBar: Not yet implemented - needs window adapter');
+    container.adapters.window.setMenuBarVisibility(false);
+    return true;
   };
 }
 
@@ -53,8 +49,6 @@ export function createRedirectToHandler(container: AppContainer) {
     location: string;
     forceRefresh?: boolean;
   }) => {
-    // TODO: This needs window adapter support
-    // Original: global.mainWM.getCurrentInstanceOrNew().webContents.send("redirectToGivenLocation", location)
     container.adapters.window.sendToRenderer('redirectToGivenLocation', {
       location,
       forceRefresh,
@@ -95,9 +89,8 @@ export function createReloadThemeStyleHandler(container: AppContainer) {
  */
 export function createShowLogWindowHandler(container: AppContainer) {
   return async () => {
-    // TODO: This needs to be implemented when we have window management
-    // Original: global.logWindow = logWindowManager.getCurrentInstanceOrNew()
-    throw new Error('showLogWindow: Not yet implemented - needs window adapter');
+    container.adapters.window.showLogWindow('');
+    return true;
   };
 }
 

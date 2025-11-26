@@ -50,6 +50,15 @@ export function createDevAdapters(): PlatformAdapters {
       sendToRenderer(channel: string, data: any) {
         console.log('[DevAdapter] sendToRenderer called:', channel, data);
       },
+      async openSiteLibrary() {
+        console.log('[DevAdapter] openSiteLibrary called');
+      },
+      setMenuBarVisibility(visible: boolean) {
+        console.log('[DevAdapter] setMenuBarVisibility called:', visible);
+      },
+      appendToOutputConsole(line: string) {
+        console.log('[DevAdapter] appendToOutputConsole:', line);
+      },
     },
 
     menu: {

@@ -114,6 +114,21 @@ export interface WindowAdapter {
    * Send data to the renderer process
    */
   sendToRenderer(channel: string, data: any): void;
+
+  /**
+   * Close the current site and redirect to site library
+   */
+  openSiteLibrary(): Promise<void>;
+
+  /**
+   * Show or hide the menu bar
+   */
+  setMenuBarVisibility(visible: boolean): void;
+
+  /**
+   * Append a line to the output console/log window
+   */
+  appendToOutputConsole(line: string): void;
 }
 
 // ============================================================================

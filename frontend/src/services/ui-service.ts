@@ -78,6 +78,9 @@ class ConsoleService extends BaseService<typeof uiServiceSchemas> {
 
         //PORTQUIQR
         mainProcessBridge.addMessageHandler('console', this._onConsole.bind(this));
+
+        // Listen for Hugo server output from new backend
+        mainProcessBridge.addMessageHandler('hugo-output-line', this._onHugoOutput.bind(this));
     }
 
     protected _getSchemas() {
@@ -91,6 +94,27 @@ class ConsoleService extends BaseService<typeof uiServiceSchemas> {
         line = line.replace(/\u001b[^m]*?m/g,"")
 
         this._consoleBuffer.push({id:this.consoleMessageLastId++, line});
+        if(this._consoleTimeout)
+            clearTimeout(this._consoleTimeout);
+
+        this._consoleTimeout = setTimeout(()=>{
+            let max = 100;
+            this._consoleMessages = this._consoleMessages.concat(this._consoleBuffer);
+            this._consoleBuffer = [];
+            if(this._consoleMessages.length>max){
+                this._consoleMessages = this._consoleMessages.slice(this._consoleMessages.length-max,max);
+            }
+            this._notifyChanges();
+        }, 50);
+    }
+
+    _onHugoOutput(line: string){
+        // Hugo output comes as a string directly, not an object
+        // This removes console escape codes.
+        // eslint-disable-next-line
+        const cleanLine = line.replace(/\u001b[^m]*?m/g,"")
+
+        this._consoleBuffer.push({id:this.consoleMessageLastId++, line: cleanLine});
         if(this._consoleTimeout)
             clearTimeout(this._consoleTimeout);
 
