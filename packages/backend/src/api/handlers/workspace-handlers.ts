@@ -7,6 +7,8 @@
 
 import type { AppContainer } from '../../config/container.js';
 import { SiteService } from '../../services/site/site-service.js';
+import fs from 'fs-extra';
+import { globSync } from 'glob';
 
 /**
  * List all workspaces for a site
@@ -213,8 +215,6 @@ export function createGetPreviewCheckConfigurationHandler(container: AppContaine
  */
 export function createParseFileToObjectHandler(container: AppContainer) {
   return async ({ file }: { file: string }) => {
-    const fs = await import('fs-extra');
-
     // Read the file contents
     const fileContent = await fs.readFile(file, 'utf-8');
 
@@ -243,8 +243,10 @@ export function createGlobSyncHandler(container: AppContainer) {
     pattern: string;
     options?: any;
   }) => {
-    // TODO: Implement with glob library
-    throw new Error('globSync: Not yet implemented');
+    // Run glob pattern synchronously
+    const matches = globSync(pattern, options || {});
+
+    return matches;
   };
 }
 
