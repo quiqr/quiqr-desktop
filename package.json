@@ -18,10 +18,11 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
-    "build": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder",
-    "build:appimage": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
-    "build:rpm": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --linux rpm",
-    "build:windows": "npm run _build_info && npm run build:frontend && npm run _pack_embgit && electron-builder --win",
+    "build": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder",
+    "build:appimage": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
+    "build:rpm": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --linux rpm",
+    "build:windows": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --win",
+    "build:packages": "npm run build -w @quiqr/types && npm run build -w @quiqr/backend && npm run build -w @quiqr/adapter-electron",
     "build:frontend": "cd frontend && npm run build",
     "release": "release-script --addPlaceholder",
     "dist": "electron-builder",
@@ -45,7 +46,7 @@
     "express": "^4.21.2",
     "front-matter": "^4.0.2",
     "fs-extra": "5.0.0",
-    "glob": "^7.2.3",
+    "glob": "^10.4.5",
     "jimp": "^1.6.0",
     "joi": "^17.13.3",
     "js-yaml": ">=3.13.1",
@@ -86,9 +87,31 @@
     "files": [
       "frontend/build/**/*",
       "packages/adapters/electron/dist/**/*",
-      "backend/**/*",
+      "packages/adapters/electron/package.json",
+      "packages/backend/dist/**/*",
+      "packages/backend/package.json",
+      "packages/types/dist/**/*",
+      "packages/types/package.json",
       "resources/**/*",
-      "package.json"
+      "package.json",
+      {
+        "from": "packages/types",
+        "to": "node_modules/@quiqr/types",
+        "filter": ["dist/**/*", "package.json"]
+      },
+      {
+        "from": "packages/backend",
+        "to": "node_modules/@quiqr/backend",
+        "filter": ["dist/**/*", "package.json"]
+      },
+      {
+        "from": "packages/adapters/electron",
+        "to": "node_modules/@quiqr/adapter-electron",
+        "filter": ["dist/**/*", "package.json"]
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/@quiqr/**/*"
     ],
     "directories": {
       "buildResources": "public",
