@@ -24,6 +24,7 @@ import {Meta as SysGitMeta}             from '../syncTypes/sysgit'
 import {Meta as FolderMeta}             from '../syncTypes/folder'
 import {FormConfig as FolderExportForm} from '../syncTypes/folder'
 import {CardNew as CardNewFolder}       from '../syncTypes/folder'
+import DialogTitle from "@mui/material/DialogTitle";
 
 interface SyncConfigDialogProps {
   open?: boolean;
@@ -220,27 +221,21 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
 
     return (
       <Dialog
-        open={open||false}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        open={open || false}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
         fullWidth={true}
-        maxWidth={this.state.dialogSize} >
-
-        <MuiDialogTitle disableTypography sx={{ margin: 0, p: 2 }}>
-          <Box sx={{ position: 'absolute', right: '24px', top: '24px' }}>
-          {serverFormLogo}
-          </Box>
-          <Typography variant="h6">{modAction + " " + configDialogTitle}</Typography>
-        </MuiDialogTitle>
+        maxWidth={this.state.dialogSize}>
+        <DialogTitle sx={{ margin: 0, p: 2 }}>
+          <Box sx={{ position: "absolute", right: "24px", top: "24px" }}>{serverFormLogo}</Box>
+          <Typography variant='h6'>{modAction + " " + configDialogTitle}</Typography>
+        </DialogTitle>
 
         <DialogContent>
           {content}
-          <DialogContentText id="alert-dialog-description">
-          </DialogContentText>
+          <DialogContentText id='alert-dialog-description'></DialogContentText>
         </DialogContent>
-        <DialogActions>
-          {actions}
-        </DialogActions>
+        <DialogActions>{actions}</DialogActions>
       </Dialog>
     );
   }
