@@ -39,6 +39,25 @@ export function createStopHugoServerHandler(container: AppContainer) {
   };
 }
 
+export function createRestartHugoServerHandler(container: AppContainer) {
+  return async () => {
+    // Get the currently cached WorkspaceService (where the Hugo server is running)
+    const workspaceService = container.getCurrentWorkspaceService();
+
+    if (workspaceService) {
+      // Stop the existing server
+      workspaceService.stopHugoServer();
+
+      // Start it again (serve method will handle the restart)
+      await workspaceService.serve();
+
+      return { restarted: true };
+    }
+
+    return { restarted: false, error: 'No workspace is currently running' };
+  };
+}
+
 export function createBuildWorkspaceHandler(container: AppContainer) {
   return async ({
     siteKey,
@@ -60,6 +79,7 @@ export function createBuildHandlers(container: AppContainer) {
   return {
     serveWorkspace: createServeWorkspaceHandler(container),
     stopHugoServer: createStopHugoServerHandler(container),
+    restartHugoServer: createRestartHugoServerHandler(container),
     buildWorkspace: createBuildWorkspaceHandler(container),
   };
 }

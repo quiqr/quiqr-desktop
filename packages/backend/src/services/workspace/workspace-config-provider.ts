@@ -482,4 +482,8 @@ export class WorkspaceConfigProvider {
   getModelParseInfo(): ParseInfo {
     return this.parseInfo;
   }
+
+  getEnvironmentInfo(): EnvironmentInfo {
+    return this.environmentInfo;
+  }
 }

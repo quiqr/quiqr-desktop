@@ -9,6 +9,7 @@
 import { Menu, app, shell, dialog, BrowserWindow } from 'electron';
 import path from 'path';
 import fs from 'fs-extra';
+import type { AppContainer } from '@quiqr/backend';
 
 interface MenuManagerOptions {
   mainWindow: BrowserWindow | null;
@@ -24,6 +25,7 @@ export class MenuManager {
   private mainWindow: BrowserWindow | null = null;
   private currentMenu: Menu | null = null;
   private options: MenuManagerOptions;
+  private container: AppContainer | null = null;
 
   constructor() {
     this.options = {
@@ -34,6 +36,34 @@ export class MenuManager {
       hugoServeDraftMode: false,
       devDisableAutoHugoServe: false,
       applicationRole: 'contentEditor'
+    };
+  }
+
+  /**
+   * Set the container reference (called during initialization)
+   */
+  setContainer(container: AppContainer): void {
+    this.container = container;
+    this.updateOptionsFromConfig();
+  }
+
+  /**
+   * Update menu options from container config
+   */
+  private updateOptionsFromConfig(): void {
+    if (!this.container) return;
+
+    const config = this.container.config;
+    const state = this.container.state;
+
+    this.options = {
+      ...this.options,
+      siteSelected: !!state.currentSiteKey,
+      experimentalFeatures: config.experimentalFeatures,
+      disablePartialCache: config.disablePartialCache,
+      hugoServeDraftMode: config.hugoServeDraftMode,
+      devDisableAutoHugoServe: config.devDisableAutoHugoServe,
+      applicationRole: config.prefs.applicationRole || 'contentEditor'
     };
   }
 
@@ -117,11 +147,24 @@ export class MenuManager {
       label: role.label,
       type: 'checkbox',
       checked: role.key === this.options.applicationRole,
-      click: () => {
-        // TODO: Wire up to backend API to change role
-        console.log(`Role changed to: ${role.key}`);
-        if (this.mainWindow) {
-          this.mainWindow.webContents.send('role-changed', role.key);
+      click: async () => {
+        if (!this.container) return;
+
+        try {
+          // Update role via container config
+          this.container.config.setPrefKey('applicationRole', role.key);
+          await this.container.config.save();
+
+          // Update menu options and rebuild
+          this.updateOptionsFromConfig();
+          this.createMainMenu();
+
+          // Notify frontend
+          if (this.mainWindow) {
+            this.mainWindow.webContents.send('role-changed', role.key);
+          }
+        } catch (error) {
+          console.error('Failed to change role:', error);
         }
       }
     }));
@@ -136,17 +179,33 @@ export class MenuManager {
         label: 'Disable CMS Partials Cache',
         type: 'checkbox',
         checked: this.options.disablePartialCache,
-        click: () => {
-          // TODO: Wire up to backend API
-          console.log('Toggle partial cache');
+        click: async () => {
+          if (!this.container) return;
+
+          try {
+            const newValue = !this.options.disablePartialCache;
+            this.container.config.setDisablePartialCache(newValue);
+            await this.container.config.save();
+
+            this.updateOptionsFromConfig();
+            this.createMainMenu();
+          } catch (error) {
+            console.error('Failed to toggle partial cache:', error);
+          }
         }
       },
       {
         id: 'invalidate-cache',
         label: 'Invalidate Sites Cache',
-        click: () => {
-          // TODO: Wire up to backend API
-          console.log('Invalidate cache');
+        click: async () => {
+          if (!this.container) return;
+
+          try {
+            this.container.configurationProvider.invalidateCache();
+            console.log('Cache invalidated successfully');
+          } catch (error) {
+            console.error('Failed to invalidate cache:', error);
+          }
         }
       },
       {
@@ -259,9 +318,20 @@ export class MenuManager {
             label: 'Enable Experimental',
             type: 'checkbox',
             checked: this.options.experimentalFeatures,
-            click: () => {
-              // TODO: Wire up to backend API
-              console.log('Toggle experimental features');
+            click: async () => {
+
+              if (!this.container) return;
+
+              try {
+                const newValue = !this.options.experimentalFeatures;
+                this.container.config.setExperimentalFeatures(newValue);
+                await this.container.config.save();
+
+                this.updateOptionsFromConfig();
+                this.createMainMenu();
+              } catch (error) {
+                console.error('Failed to toggle experimental features:', error);
+              }
             }
           },
           ...(this.options.experimentalFeatures ? [{
@@ -304,9 +374,23 @@ export class MenuManager {
             id: 'restart-server',
             label: 'Restart Server',
             enabled: this.options.siteSelected,
-            click: () => {
-              // TODO: Wire up to backend API to restart Hugo server
-              console.log('Restart Hugo server');
+            click: async () => {
+              if (!this.container) return;
+
+              try {
+                const workspaceService = this.container.getCurrentWorkspaceService();
+
+                if (workspaceService) {
+                  // Stop and restart the server
+                  workspaceService.stopHugoServer();
+                  await workspaceService.serve();
+                  console.log('Hugo server restarted successfully');
+                } else {
+                  console.warn('No workspace is currently running');
+                }
+              } catch (error) {
+                console.error('Failed to restart Hugo server:', error);
+              }
             }
           },
           { type: 'separator' },
@@ -314,18 +398,41 @@ export class MenuManager {
             label: 'Server Draft Mode',
             type: 'checkbox',
             checked: this.options.hugoServeDraftMode,
-            click: () => {
-              // TODO: Wire up to backend API
-              console.log('Toggle draft mode');
+            click: async () => {
+              if (!this.container) return;
+
+              try {
+                const newValue = !this.options.hugoServeDraftMode;
+                this.container.config.setHugoServeDraftMode(newValue);
+                await this.container.config.save();
+
+                this.updateOptionsFromConfig();
+                this.createMainMenu();
+
+                // Note: The server will need to be restarted for this to take effect
+                console.log(`Draft mode ${newValue ? 'enabled' : 'disabled'}. Restart server for changes to take effect.`);
+              } catch (error) {
+                console.error('Failed to toggle draft mode:', error);
+              }
             }
           },
           {
             label: 'Disable Auto Serve',
             type: 'checkbox',
             checked: this.options.devDisableAutoHugoServe,
-            click: () => {
-              // TODO: Wire up to backend API
-              console.log('Toggle auto serve');
+            click: async () => {
+              if (!this.container) return;
+
+              try {
+                const newValue = !this.options.devDisableAutoHugoServe;
+                this.container.config.setDevDisableAutoHugoServe(newValue);
+                await this.container.config.save();
+
+                this.updateOptionsFromConfig();
+                this.createMainMenu();
+              } catch (error) {
+                console.error('Failed to toggle auto serve:', error);
+              }
             }
           }
         ]
@@ -381,6 +488,9 @@ export class MenuManager {
    * Create and set the main application menu
    */
   createMainMenu(): void {
+    // Update options from config before building menu
+    this.updateOptionsFromConfig();
+
     const template = this.buildMainMenuTemplate();
     this.currentMenu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(this.currentMenu);

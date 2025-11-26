@@ -57,14 +57,17 @@ export function createGetWorkspaceDetailsHandler(container: AppContainer) {
     // 4. Update state - delegates to AppState
     container.state.setCurrentSite(siteKey, workspaceKey, workspace.path);
 
-    // 5. Save last opened - delegates to AppConfig  
+    // 5. Save last opened - delegates to AppConfig
     container.config.setLastOpenedSite(siteKey, workspaceKey, workspace.path);
     await container.config.save();
 
-    // 6. Set up file watcher - NEW helper method needed
+    // 6. Update menu to reflect that a site is now selected
+    container.adapters.menu.createMainMenu();
+
+    // 7. Set up file watcher - NEW helper method needed
     // setupModelWatcher(container, workspace.path);
 
-    // 7. Hugo download - STUB for MVP (or skip entirely)
+    // 8. Hugo download - STUB for MVP (or skip entirely)
     // await ensureHugoAvailable(config.hugover);
 
     return config;
@@ -104,8 +107,12 @@ export function createMountWorkspaceHandler(container: AppContainer) {
     container.state.currentWorkspaceKey = workspaceKey;
     container.state.currentSitePath = workspaceHead?.path || '';
 
-    // TODO: Set window title, update menu
-    // TODO: Save last opened site to config
+    // Save last opened site to config
+    container.config.setLastOpenedSite(siteKey, workspaceKey, workspaceHead?.path || null);
+    await container.config.save();
+
+    // Update menu to reflect that a site is now selected
+    container.adapters.menu.createMainMenu();
 
     // Return workspace path as string (matches frontend schema)
     return workspaceHead?.path || '';

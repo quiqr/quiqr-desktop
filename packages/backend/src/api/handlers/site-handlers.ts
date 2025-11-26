@@ -105,13 +105,9 @@ export function createDeleteSiteHandler(container: AppContainer) {
 
 export function createGetFilteredHugoVersionsHandler(container: AppContainer) {
   return async () => {
-    // throw new Error('getFilteredHugoVersions: Not yet implemented');
-    // TODO remove stub args
-    const args = {
-      platform: 'linux' as const,
-      isPackaged: true
-    }
-    const jsonFile = path.join(container.pathHelper.getApplicationResourcesDir(args), "all", "filteredHugoVersions.json");
+    const environmentInfo = container.workspaceConfigProvider.getEnvironmentInfo();
+
+    const jsonFile = path.join(container.pathHelper.getApplicationResourcesDir(environmentInfo), "all", "filteredHugoVersions.json");
     let filteredVersions = ["v0.100.2"];
 
     if (fs.existsSync(jsonFile)) {

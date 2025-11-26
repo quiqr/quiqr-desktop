@@ -147,6 +147,84 @@ export function createShouldReloadFormHandler(container: AppContainer) {
 }
 
 /**
+ * Toggle experimental features
+ */
+export function createToggleExperimentalFeaturesHandler(container: AppContainer) {
+  return async ({ enabled }: { enabled: boolean }) => {
+    container.config.setExperimentalFeatures(enabled);
+    await container.config.save();
+
+    // Rebuild menu with new state
+    container.adapters.menu.createMainMenu();
+
+    return true;
+  };
+}
+
+/**
+ * Toggle partial cache
+ */
+export function createTogglePartialCacheHandler(container: AppContainer) {
+  return async ({ enabled }: { enabled: boolean }) => {
+    container.config.setDisablePartialCache(enabled);
+    await container.config.save();
+
+    // Rebuild menu with new state
+    container.adapters.menu.createMainMenu();
+
+    return true;
+  };
+}
+
+/**
+ * Toggle Hugo serve draft mode
+ */
+export function createToggleDraftModeHandler(container: AppContainer) {
+  return async ({ enabled }: { enabled: boolean }) => {
+    container.config.setHugoServeDraftMode(enabled);
+    await container.config.save();
+
+    // Rebuild menu with new state
+    container.adapters.menu.createMainMenu();
+
+    return true;
+  };
+}
+
+/**
+ * Toggle auto Hugo serve
+ */
+export function createToggleAutoHugoServeHandler(container: AppContainer) {
+  return async ({ enabled }: { enabled: boolean }) => {
+    container.config.setDevDisableAutoHugoServe(enabled);
+    await container.config.save();
+
+    // Rebuild menu with new state
+    container.adapters.menu.createMainMenu();
+
+    return true;
+  };
+}
+
+/**
+ * Change application role
+ */
+export function createChangeApplicationRoleHandler(container: AppContainer) {
+  return async ({ role }: { role: string }) => {
+    container.config.setPrefKey('applicationRole', role);
+    await container.config.save();
+
+    // Rebuild menu with new state
+    container.adapters.menu.createMainMenu();
+
+    // Notify frontend
+    container.adapters.window.sendToRenderer('role-changed', role);
+
+    return true;
+  };
+}
+
+/**
  * Create all config-related handlers
  */
 export function createConfigHandlers(container: AppContainer) {
@@ -165,5 +243,10 @@ export function createConfigHandlers(container: AppContainer) {
     setCurrentFormAccordionIndex:
       createSetCurrentFormAccordionIndexHandler(container),
     shouldReloadForm: createShouldReloadFormHandler(container),
+    toggleExperimentalFeatures: createToggleExperimentalFeaturesHandler(container),
+    togglePartialCache: createTogglePartialCacheHandler(container),
+    toggleDraftMode: createToggleDraftModeHandler(container),
+    toggleAutoHugoServe: createToggleAutoHugoServeHandler(container),
+    changeApplicationRole: createChangeApplicationRoleHandler(container),
   };
 }

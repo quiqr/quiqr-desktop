@@ -50,8 +50,8 @@ async function startBackend() {
 
     console.log('='.repeat(60));
 
-    // Return windowAdapter so we can wire it up to the window later
-    return windowAdapter;
+    // Return both windowAdapter and container
+    return { windowAdapter, container };
   } catch (error) {
     console.error('Failed to start backend:', error);
     throw error;
@@ -61,11 +61,14 @@ async function startBackend() {
 /**
  * Create the main application window
  */
-function createWindow(): BrowserWindow {
+function createWindow(container?: any): BrowserWindow {
   // Use the main window manager
   mainWindow = getCurrentInstanceOrNew();
 
-  // Set up menu manager
+  // Set up menu manager with container
+  if (container) {
+    menuManager.setContainer(container);
+  }
   menuManager.setMainWindow(mainWindow);
   menuManager.createMainMenu();
 
@@ -84,10 +87,10 @@ app.on('ready', async () => {
   initializeRemoteMain();
 
   // Start backend first
-  const windowAdapter = await startBackend();
+  const { windowAdapter, container } = await startBackend();
 
-  // Create the window
-  mainWindow = createWindow();
+  // Create the window with container reference
+  mainWindow = createWindow(container);
 
   // Wire up the window adapter to the actual window
   if (windowAdapter && mainWindow) {
