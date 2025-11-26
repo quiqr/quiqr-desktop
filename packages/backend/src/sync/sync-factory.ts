@@ -6,6 +6,12 @@
  */
 
 import type { PublConf } from '@quiqr/types';
+import type { PathHelper } from '../utils/path-helper.js';
+import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
+import type { ConfigurationDataProvider } from '../services/configuration/index.js';
+import { FolderSync } from './folder/folder-sync.js';
+import { GithubSync } from './github/github-sync.js';
+import { SysgitSync } from './sysgit/sysgit-sync.js';
 
 /**
  * Generic sync service interface
@@ -16,32 +22,64 @@ export interface SyncService {
 }
 
 /**
+ * Dependencies required by sync services
+ */
+export interface SyncServiceDependencies {
+  pathHelper: PathHelper;
+  outputConsole: OutputConsole;
+  windowAdapter: WindowAdapter;
+  configurationProvider: ConfigurationDataProvider;
+}
+
+/**
  * SyncFactory creates sync service instances based on publisher configuration
  */
 export class SyncFactory {
+  private dependencies?: SyncServiceDependencies;
+
+  /**
+   * Set dependencies for sync services
+   * This should be called once during app initialization
+   */
+  setDependencies(dependencies: SyncServiceDependencies): void {
+    this.dependencies = dependencies;
+  }
+
   /**
    * Get a sync service instance for the given publisher configuration
    *
    * @param publisherConfig - The publisher configuration (folder, github, or sysgit)
    * @param siteKey - The site key
    * @returns A sync service instance
-   * @throws Error if the sync type is not implemented
+   * @throws Error if the sync type is not implemented or dependencies not set
    */
   getPublisher(publisherConfig: PublConf, siteKey: string): SyncService {
+    if (!this.dependencies) {
+      throw new Error('SyncFactory dependencies not set. Call setDependencies() first.');
+    }
+
+    const { pathHelper, outputConsole, windowAdapter, configurationProvider } = this.dependencies;
     const type = publisherConfig.type;
 
-    try {
-      // For now, delegate to old JavaScript implementations
-      // These will be migrated to TypeScript in Phase 2.11
-      const typePath = `../../../backend/src-main/sync/${type}/${type}-sync`;
+    switch (type) {
+      case 'folder':
+        return new FolderSync(
+          publisherConfig,
+          siteKey,
+          pathHelper,
+          outputConsole,
+          windowAdapter,
+          configurationProvider
+        );
 
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const SyncServiceClass = require(typePath);
-      return new SyncServiceClass(publisherConfig, siteKey);
-    } catch (e) {
-      console.error(`ERR could not instantiate SyncService: ${type}`);
-      console.error(e);
-      throw new Error(`Failed to create sync service for type: ${type}`);
+      case 'github':
+        return new GithubSync(publisherConfig, siteKey);
+
+      case 'sysgit':
+        return new SysgitSync(publisherConfig, siteKey);
+
+      default:
+        throw new Error(`Unknown sync type: ${type}`);
     }
   }
 }

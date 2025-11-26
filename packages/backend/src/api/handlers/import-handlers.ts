@@ -1,18 +1,12 @@
 /**
  * Import API Handlers
  *
- * Handles importing sites from various sources.
- * TODO: Implement when import modules are migrated.
+ * Handles importing sites from various sources (git repositories, local directories).
+ * Note: ZIP-based import (importSiteAction) is in site-handlers.ts.
  */
 
 import type { AppContainer } from '../../config/container.js';
 import type { HugoConfigFormat } from '../../hugo/hugo-utils.js';
-
-export function createImportSiteActionHandler(container: AppContainer) {
-  return async () => {
-    throw new Error('importSiteAction: Not yet implemented - needs pogozipper migration');
-  };
-}
 
 export function createImportSiteFromPrivateGitRepoHandler(container: AppContainer) {
   return async ({
@@ -142,7 +136,7 @@ export function createHugositeDirectoryShowHandler(container: AppContainer) {
 
 export function createImportHandlers(container: AppContainer) {
   return {
-    importSiteAction: createImportSiteActionHandler(container),
+    // Note: importSiteAction (ZIP import) is in site-handlers.ts
     importSiteFromPrivateGitRepo: createImportSiteFromPrivateGitRepoHandler(container),
     importSiteFromPublicGitUrl: createImportSiteFromPublicGitUrlHandler(container),
     newSiteFromPublicHugoThemeUrl: createNewSiteFromPublicHugoThemeUrlHandler(container),

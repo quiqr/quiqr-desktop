@@ -191,6 +191,9 @@ export function createContainer(options: ContainerOptions): AppContainer {
   const syncFactory = new SyncFactory();
   const siteSourceFactory = new SiteSourceFactory(pathHelper);
 
+  // Initialize syncFactory with dependencies (will be set after configurationProvider is created)
+  // This is done below after all dependencies are available
+
   // Create environment info from platform
   const environmentInfo = {
     platform:
@@ -262,6 +265,14 @@ export function createContainer(options: ContainerOptions): AppContainer {
     adapters.window
   );
   container.pogozipper = pogozipper;
+
+  // Initialize syncFactory with dependencies
+  syncFactory.setDependencies({
+    pathHelper,
+    outputConsole: adapters.outputConsole,
+    windowAdapter: adapters.window,
+    configurationProvider,
+  });
 
   // Create BuildActionService (uses outputConsole for logging)
   const buildActionService = new BuildActionService(adapters.outputConsole);
