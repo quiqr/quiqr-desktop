@@ -213,8 +213,22 @@ export function createGetPreviewCheckConfigurationHandler(container: AppContaine
  */
 export function createParseFileToObjectHandler(container: AppContainer) {
   return async ({ file }: { file: string }) => {
-    // TODO: Implement with FormatProviderResolver
-    throw new Error('parseFileToObject: Not yet implemented');
+    const fs = await import('fs-extra');
+
+    // Read the file contents
+    const fileContent = await fs.readFile(file, 'utf-8');
+
+    // Resolve the format provider based on file extension
+    const formatProvider = container.formatResolver.resolveForFilePath(file);
+
+    if (!formatProvider) {
+      throw new Error(`Unsupported file format for file: ${file}`);
+    }
+
+    // Parse the file content
+    const parsed = formatProvider.parse(fileContent);
+
+    return parsed;
   };
 }
 
