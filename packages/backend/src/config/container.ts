@@ -18,6 +18,7 @@ import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
 import { WorkspaceConfigProvider } from '../services/workspace/workspace-config-provider.js';
 import { FolderImporter } from '../import/folder-importer.js';
 import { GitImporter } from '../import/git-importer.js';
+import { Pogozipper } from '../import/pogozipper.js';
 import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 import { BuildActionService } from '../build-actions/index.js';
@@ -95,6 +96,11 @@ export interface AppContainer {
    * Git importer (imports sites from git repositories)
    */
   gitImporter: GitImporter;
+
+  /**
+   * Pogozipper (ZIP-based import/export for sites, themes, content)
+   */
+  pogozipper: Pogozipper;
 
   /**
    * Factory function to create WorkspaceService instances
@@ -247,6 +253,16 @@ export function createContainer(options: ContainerOptions): AppContainer {
     libraryService
   );
   container.gitImporter = gitImporter;
+
+  // Create pogozipper with dependencies
+  const pogozipper = new Pogozipper(
+    pathHelper,
+    libraryService,
+    adapters.dialog,
+    adapters.window
+  );
+  container.pogozipper = pogozipper;
+
   // Create BuildActionService (uses outputConsole for logging)
   const buildActionService = new BuildActionService(adapters.outputConsole);
 

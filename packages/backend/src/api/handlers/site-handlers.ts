@@ -123,6 +123,138 @@ export function createGetFilteredHugoVersionsHandler(container: AppContainer) {
   };
 }
 
+/**
+ * Import site from a .pogosite ZIP file
+ */
+export function createImportSiteActionHandler(container: AppContainer) {
+  return async (params?: { filePath?: string }) => {
+    await container.pogozipper.importSite({
+      filePath: params?.filePath,
+      autoConfirm: false,
+    });
+    // Invalidate cache so next read gets fresh data
+    container.configurationProvider.invalidateCache();
+  };
+}
+
+/**
+ * Export a site to a .pogosite ZIP file
+ */
+export function createExportSiteHandler(container: AppContainer) {
+  return async ({ siteKey, newSiteKey }: { siteKey: string; newSiteKey?: string }) => {
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    if (!siteConfig.source?.path) {
+      throw new Error(`Invalid source configuration for siteKey: ${siteKey}`);
+    }
+
+    const siteRoot = container.pathHelper.getSiteRoot(siteKey);
+    if (!siteRoot) {
+      throw new Error(`Could not get site root for siteKey: ${siteKey}`);
+    }
+    const sitePath = path.join(siteRoot, siteConfig.source.path);
+
+    await container.pogozipper.exportSite({
+      siteKey,
+      sitePath,
+      newSiteKey,
+    });
+  };
+}
+
+/**
+ * Export a theme to a .pogotheme ZIP file
+ */
+export function createExportThemeHandler(container: AppContainer) {
+  return async ({ siteKey }: { siteKey: string }) => {
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    if (!siteConfig.source?.path) {
+      throw new Error(`Invalid source configuration for siteKey: ${siteKey}`);
+    }
+
+    const siteRoot = container.pathHelper.getSiteRoot(siteKey);
+    if (!siteRoot) {
+      throw new Error(`Could not get site root for siteKey: ${siteKey}`);
+    }
+    const sitePath = path.join(siteRoot, siteConfig.source.path);
+
+    await container.pogozipper.exportTheme({
+      siteKey,
+      sitePath,
+    });
+  };
+}
+
+/**
+ * Import a theme from a .pogotheme ZIP file
+ */
+export function createImportThemeHandler(container: AppContainer) {
+  return async ({ siteKey, filePath }: { siteKey: string; filePath?: string }) => {
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    if (!siteConfig.source?.path) {
+      throw new Error(`Invalid source configuration for siteKey: ${siteKey}`);
+    }
+
+    const siteRoot = container.pathHelper.getSiteRoot(siteKey);
+    if (!siteRoot) {
+      throw new Error(`Could not get site root for siteKey: ${siteKey}`);
+    }
+    const sitePath = path.join(siteRoot, siteConfig.source.path);
+
+    await container.pogozipper.importTheme({
+      siteKey,
+      sitePath,
+      filePath,
+    });
+  };
+}
+
+/**
+ * Export content to a .pogocontent ZIP file
+ */
+export function createExportContentHandler(container: AppContainer) {
+  return async ({ siteKey }: { siteKey: string }) => {
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    if (!siteConfig.source?.path) {
+      throw new Error(`Invalid source configuration for siteKey: ${siteKey}`);
+    }
+
+    const siteRoot = container.pathHelper.getSiteRoot(siteKey);
+    if (!siteRoot) {
+      throw new Error(`Could not get site root for siteKey: ${siteKey}`);
+    }
+    const sitePath = path.join(siteRoot, siteConfig.source.path);
+
+    await container.pogozipper.exportContent({
+      siteKey,
+      sitePath,
+    });
+  };
+}
+
+/**
+ * Import content from a .pogocontent ZIP file
+ */
+export function createImportContentHandler(container: AppContainer) {
+  return async ({ siteKey, filePath }: { siteKey: string; filePath?: string }) => {
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    if (!siteConfig.source?.path) {
+      throw new Error(`Invalid source configuration for siteKey: ${siteKey}`);
+    }
+
+    const siteRoot = container.pathHelper.getSiteRoot(siteKey);
+    if (!siteRoot) {
+      throw new Error(`Could not get site root for siteKey: ${siteKey}`);
+    }
+    const sitePath = path.join(siteRoot, siteConfig.source.path);
+
+    await container.pogozipper.importContent({
+      siteKey,
+      sitePath,
+      filePath,
+    });
+  };
+}
+
 export function createSiteHandlers(container: AppContainer) {
   return {
     getConfigurations: createGetConfigurationsHandler(container),
@@ -132,5 +264,12 @@ export function createSiteHandlers(container: AppContainer) {
     copySite: createCopySiteHandler(container),
     deleteSite: createDeleteSiteHandler(container),
     getFilteredHugoVersions: createGetFilteredHugoVersionsHandler(container),
+    // ZIP import/export handlers
+    importSiteAction: createImportSiteActionHandler(container),
+    exportSite: createExportSiteHandler(container),
+    exportTheme: createExportThemeHandler(container),
+    importTheme: createImportThemeHandler(container),
+    exportContent: createExportContentHandler(container),
+    importContent: createImportContentHandler(container),
   };
 }
