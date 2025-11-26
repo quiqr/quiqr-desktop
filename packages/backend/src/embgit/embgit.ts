@@ -277,4 +277,146 @@ export class Embgit {
       throw error;
     }
   }
+
+  /**
+   * Add all files to git staging area
+   */
+  async addAll(destination_path: string): Promise<boolean> {
+    try {
+      await this.executeEmbgit(
+        ['add_all', destination_path],
+        `Adding all files: ${destination_path}`
+      );
+      this.outputConsole.appendLine('Git add all success ...');
+      return true;
+    } catch (error) {
+      this.outputConsole.appendLine(`Git add all failed: ${destination_path}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Commit changes
+   */
+  async commit(
+    destination_path: string,
+    message: string,
+    authorName?: string,
+    authorEmail?: string
+  ): Promise<boolean> {
+    const name = authorName || this.userconf.name;
+    const email = authorEmail || this.userconf.email;
+
+    try {
+      await this.executeEmbgit(
+        ['commit', '-a', '-n', name, '-e', email, '-m', message, destination_path],
+        `Committing changes: ${destination_path}`
+      );
+      this.outputConsole.appendLine('Git commit success ...');
+      return true;
+    } catch (error) {
+      this.outputConsole.appendLine(`Git commit failed: ${destination_path}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Push changes to remote repository
+   */
+  async push(destination_path: string, privateKeyPath?: string): Promise<boolean> {
+    const keyPath = privateKeyPath || this.userconf.privateKey;
+    if (!keyPath) {
+      throw new Error('Private key not set for git push');
+    }
+
+    try {
+      await this.executeEmbgit(
+        ['push', '-s', '-i', keyPath, destination_path],
+        `Pushing to remote: ${destination_path}`
+      );
+      this.outputConsole.appendLine('Git push success ...');
+      return true;
+    } catch (error) {
+      this.outputConsole.appendLine(`Git push failed: ${destination_path}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Get remote commit history
+   */
+  async logRemote(url: string, privateKeyPath?: string): Promise<any[]> {
+    const keyPath = privateKeyPath || this.userconf.privateKey;
+    if (!keyPath) {
+      throw new Error('Private key not set for git log remote');
+    }
+
+    try {
+      const output = await this.executeEmbgit(
+        ['log_remote', '-s', '-i', keyPath, url],
+        `Getting remote commits: ${url}`
+      );
+      return JSON.parse(output);
+    } catch (error) {
+      this.outputConsole.appendLine(`Git log remote failed: ${url}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Get local commit history
+   */
+  async logLocal(destination_path: string): Promise<any[]> {
+    try {
+      const output = await this.executeEmbgit(
+        ['log_local', destination_path],
+        `Getting local commits: ${destination_path}`
+      );
+      return JSON.parse(output);
+    } catch (error) {
+      this.outputConsole.appendLine(`Git log local failed: ${destination_path}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Checkout a specific ref/commit
+   */
+  async checkout(ref: string, destination_path: string): Promise<boolean> {
+    try {
+      await this.executeEmbgit(
+        ['checkout', '-r', ref, destination_path],
+        `Checking out ref ${ref}: ${destination_path}`
+      );
+      this.outputConsole.appendLine('Git checkout success ...');
+      return true;
+    } catch (error) {
+      this.outputConsole.appendLine(`Git checkout failed: ${destination_path}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Generate SSH key pair (ECDSA)
+   */
+  async generateKeyPair(): Promise<{ privateKey: string; publicKey: string }> {
+    const tempDir = this.pathHelper.getTempDir();
+
+    try {
+      await this.executeEmbgit(['keygen_ecdsa'], `Generating SSH key pair`);
+
+      const privateKey = await fs.readFile(path.join(tempDir, 'id_ecdsa_quiqr'), 'utf-8');
+      const publicKey = await fs.readFile(path.join(tempDir, 'id_ecdsa_quiqr.pub'), 'utf-8');
+
+      // Clean up key files
+      await fs.unlink(path.join(tempDir, 'id_ecdsa_quiqr'));
+      await fs.unlink(path.join(tempDir, 'id_ecdsa_quiqr.pub'));
+
+      this.outputConsole.appendLine('SSH key pair generated successfully');
+      return { privateKey, publicKey };
+    } catch (error) {
+      this.outputConsole.appendLine('SSH key generation failed');
+      throw error;
+    }
+  }
 }

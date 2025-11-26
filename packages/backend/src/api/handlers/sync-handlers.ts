@@ -17,7 +17,21 @@ export function createMergeSiteWithRemoteHandler(container: AppContainer) {
     siteKey: string;
     publishConf: any;
   }) => {
-    throw new Error('mergeSiteWithRemote: Not yet implemented - needs SiteService migration');
+    // Import SiteService dynamically to avoid circular dependency
+    const { SiteService } = await import('../../services/site/site-service.js');
+
+    // Get site configuration
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+
+    // Create SiteService instance
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+
+    // Dispatch pullFromRemote action to merge with remote
+    return await siteService.publisherDispatchAction(publishConf, 'pullFromRemote');
   };
 }
 
@@ -29,7 +43,22 @@ export function createPublishSiteHandler(container: AppContainer) {
     siteKey: string;
     publishConf: any;
   }) => {
-    throw new Error('publishSite: Not yet implemented - needs SiteService migration');
+    // Import SiteService dynamically to avoid circular dependency
+    const { SiteService } = await import('../../services/site/site-service.js');
+
+    // Get site configuration
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+
+    // Create SiteService instance
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+
+    // Dispatch push action to publish the site
+    const action = publishConf.type === 'folder' ? 'pushToRemote' : 'pushWithSoftMerge';
+    return await siteService.publisherDispatchAction(publishConf, action);
   };
 }
 
@@ -45,7 +74,21 @@ export function createPublisherDispatchActionHandler(container: AppContainer) {
     action: string;
     actionParameters: any;
   }) => {
-    throw new Error('publisherDispatchAction: Not yet implemented - needs SiteService migration');
+    // Import SiteService dynamically to avoid circular dependency
+    const { SiteService } = await import('../../services/site/site-service.js');
+
+    // Get site configuration
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+
+    // Create SiteService instance
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+
+    // Dispatch the action with parameters
+    return await siteService.publisherDispatchAction(publishConf, action, actionParameters);
   };
 }
 
@@ -56,8 +99,8 @@ export function createUpdateCommunityTemplatesHandler(container: AppContainer) {
 }
 
 export function createCreateKeyPairGithubHandler(container: AppContainer) {
-  return async () => {
-    throw new Error('createKeyPairGithub: Not yet implemented - needs GithubKeyManager migration');
+  return async (): Promise<{ privateKey: string; publicKey: string }> => {
+    return await container.embgit.generateKeyPair();
   };
 }
 
