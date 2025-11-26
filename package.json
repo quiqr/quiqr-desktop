@@ -14,7 +14,7 @@
   "version": "0.21.2",
   "main": "packages/adapters/electron/dist/main.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:electron:wait\"",
+    "dev": "concurrently --names \"types,backend,adapter,frontend,electron\" -c \"blue,magenta,cyan,green,yellow\" \"npm run dev -w @quiqr/types\" \"npm run dev -w @quiqr/backend\" \"npm run dev -w @quiqr/adapter-electron\" \"npm run dev:frontend\" \"npm run dev:electron:wait\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
