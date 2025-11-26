@@ -297,15 +297,6 @@ export function createContainer(options: ContainerOptions): AppContainer {
     siteKey: string,
     workspaceKey: string
   ): Promise<WorkspaceService> => {
-    // Return cached instance if it matches the requested workspace
-    if (
-      cachedWorkspaceService &&
-      cachedSiteKey === siteKey &&
-      cachedWorkspaceKey === workspaceKey
-    ) {
-      return cachedWorkspaceService;
-    }
-
     // Import SiteService dynamically to avoid circular dependency
     const { SiteService } = await import('../services/site/site-service.js');
 
@@ -319,23 +310,43 @@ export function createContainer(options: ContainerOptions): AppContainer {
       syncFactory
     );
 
+    // Handle special workspace keys that should resolve to the default workspace
+    let resolvedWorkspaceKey = workspaceKey;
+    if (workspaceKey === 'source' || workspaceKey === 'default') {
+      // Resolve to the first available workspace
+      const workspaces = await siteService.listWorkspaces();
+      if (workspaces.length === 0) {
+        throw new Error(`No workspaces found for site: ${siteKey}`);
+      }
+      resolvedWorkspaceKey = workspaces[0].key;
+    }
+
+    // Return cached instance if it matches the requested workspace
+    if (
+      cachedWorkspaceService &&
+      cachedSiteKey === siteKey &&
+      cachedWorkspaceKey === resolvedWorkspaceKey
+    ) {
+      return cachedWorkspaceService;
+    }
+
     // Get workspace head to find the path
-    const workspaceHead = await siteService.getWorkspaceHead(workspaceKey);
+    const workspaceHead = await siteService.getWorkspaceHead(resolvedWorkspaceKey);
 
     if (!workspaceHead) {
-      throw new Error(`Workspace not found: ${workspaceKey}`);
+      throw new Error(`Workspace not found: ${resolvedWorkspaceKey} for site: ${siteKey}`);
     }
 
     // Create WorkspaceService and cache it
     const workspaceService = container.createWorkspaceService(
       workspaceHead.path,
-      workspaceKey,
+      resolvedWorkspaceKey,
       siteKey
     );
 
     cachedWorkspaceService = workspaceService;
     cachedSiteKey = siteKey;
-    cachedWorkspaceKey = workspaceKey;
+    cachedWorkspaceKey = resolvedWorkspaceKey;
 
     return workspaceService;
   };

@@ -32,7 +32,14 @@ export class SiteService {
    * @private
    */
   private getSiteSource(): SiteSource {
-    return this.siteSourceFactory.get(this.config.key, this.config.source);
+    // If no source configuration exists, create a default folder source
+    // with "main" as the default workspace path
+    const sourceConfig = this.config.source || {
+      type: 'folder' as const,
+      path: 'main'
+    };
+
+    return this.siteSourceFactory.get(this.config.key, sourceConfig);
   }
 
   /**
