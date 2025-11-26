@@ -7,6 +7,43 @@ export const baseConfigSchema = z.object({
   fields: z.array(fieldSchema).optional()
 })
 
+// Build action variable schema (custom variable declarations)
+export const buildActionVariableSchema = z.object({
+  name: z.string(),
+  value: z.string()
+})
+
+// Build action path replacement schema (for WSL path mapping, etc.)
+export const buildActionPathReplaceSchema = z.object({
+  search: z.string(),
+  replace: z.string()
+})
+
+// Build action command schema (platform-specific)
+export const buildActionCommandSchema = z.object({
+  command: z.string(),
+  args: z.array(z.string()).optional(),
+  file_path_replace: z.array(buildActionPathReplaceSchema).optional(),
+  document_path_replace: z.array(buildActionPathReplaceSchema).optional(),
+  site_path_replace: z.array(buildActionPathReplaceSchema).optional()
+})
+
+// Build action execute dictionary (contains windows/unix commands)
+export const buildActionExecuteSchema = z.object({
+  windows: buildActionCommandSchema,
+  unix: buildActionCommandSchema,
+  variables: z.array(buildActionVariableSchema).optional(),
+  stdout_type: z.string().optional()
+})
+
+// Build action schema (used in collections and singles)
+export const buildActionSchema = z.object({
+  key: z.string(),
+  title: z.string().optional(),
+  button_text: z.string(),
+  execute: buildActionExecuteSchema
+})
+
 export const singleConfigSchema = z.object({
   key: z.string(),
   title: z.string().optional(),
@@ -18,7 +55,8 @@ export const singleConfigSchema = z.object({
   hideExternalEditIcon: z.boolean().optional(),
   hideSaveButton: z.boolean().optional(),
   pullOuterRootKey: z.string().optional(),
-  fields: z.array(fieldSchema).optional()
+  fields: z.array(fieldSchema).optional(),
+  build_actions: z.array(buildActionSchema).optional()
 })
 
 export const collectionConfigSchema = z.object({
@@ -33,7 +71,8 @@ export const collectionConfigSchema = z.object({
   _mergePartial: z.string().optional(),
   sortkey: z.string().optional(),
   hidePreviewIcon: z.boolean().optional(),
-  fields: z.array(fieldSchema)
+  fields: z.array(fieldSchema),
+  build_actions: z.array(buildActionSchema).optional()
 })
 
 export const menuItemSchema = z.object({
@@ -228,6 +267,11 @@ export const grayMatterParseResultSchema = z.object({
 
 // Type exports
 export type BaseConfig = z.infer<typeof baseConfigSchema>
+export type BuildActionVariable = z.infer<typeof buildActionVariableSchema>
+export type BuildActionPathReplace = z.infer<typeof buildActionPathReplaceSchema>
+export type BuildActionCommand = z.infer<typeof buildActionCommandSchema>
+export type BuildActionExecute = z.infer<typeof buildActionExecuteSchema>
+export type BuildAction = z.infer<typeof buildActionSchema>
 export type SingleConfig = z.infer<typeof singleConfigSchema>
 export type CollectionConfig = z.infer<typeof collectionConfigSchema>
 export type MenuItem = z.infer<typeof menuItemSchema>

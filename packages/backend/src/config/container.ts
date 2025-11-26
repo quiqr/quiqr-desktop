@@ -18,6 +18,7 @@ import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
 import { WorkspaceConfigProvider } from '../services/workspace/workspace-config-provider.js';
 import { FolderImporter } from '../import/folder-importer.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
+import { BuildActionService } from '../build-actions/index.js';
 
 /**
  * Main application container with all dependencies
@@ -215,6 +216,9 @@ export function createContainer(options: ContainerOptions): AppContainer {
     workspaceConfigProvider
   );
   container.folderImporter = folderImporter;
+  // Create BuildActionService (uses outputConsole for logging)
+  const buildActionService = new BuildActionService(adapters.outputConsole);
+
   // Create WorkspaceService factory
   // Note: OutputConsole and ScreenshotWindowManager are provided by Electron runtime
   container.createWorkspaceService = (
@@ -230,6 +234,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       windowAdapter: adapters.window,
       outputConsole: adapters.outputConsole,
       screenshotWindowManager: adapters.screenshotWindowManager,
+      buildActionService,
     };
 
     return new WorkspaceService(workspacePath, workspaceKey, siteKey, dependencies);

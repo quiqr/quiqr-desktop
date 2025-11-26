@@ -26,21 +26,11 @@ import { createThumbnailJob } from '../../jobs/index.js';
 import { HugoBuilder, type HugoBuildConfig } from '../../hugo/hugo-builder.js';
 import { HugoServer, type HugoServerConfig } from '../../hugo/hugo-server.js';
 import { HugoConfig, type QSiteConfig } from '../../hugo/hugo-config.js';
-// TODO: Migrate build-actions module
-// import { DocumentBuildAction } from '../../build-actions/document-build-action.js';
+import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
 import type { SingleConfig, CollectionConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager } from '../../adapters/types.js';
-
-/**
- * TODO: Temporary placeholder until build-actions module is migrated
- */
-class DocumentBuildAction {
-  static runAction(action: string, execute: string, filePath: string, workspacePath: string): Promise<any> {
-    throw new Error('DocumentBuildAction.runAction: Not yet implemented - needs build-actions migration');
-  }
-}
 
 /**
  * Dependencies required by WorkspaceService
@@ -53,6 +43,7 @@ export interface WorkspaceServiceDependencies {
   windowAdapter: WindowAdapter;
   outputConsole: OutputConsole;
   screenshotWindowManager: ScreenshotWindowManager;
+  buildActionService: BuildActionService;
 }
 
 /**
@@ -134,6 +125,7 @@ export class WorkspaceService {
   private windowAdapter: WindowAdapter;
   private outputConsole: OutputConsole;
   private screenshotWindowManager: ScreenshotWindowManager;
+  private buildActionService: BuildActionService;
   private currentHugoServer?: HugoServer;
 
   constructor(
@@ -152,6 +144,7 @@ export class WorkspaceService {
     this.windowAdapter = dependencies.windowAdapter;
     this.outputConsole = dependencies.outputConsole;
     this.screenshotWindowManager = dependencies.screenshotWindowManager;
+    this.buildActionService = dependencies.buildActionService;
   }
 
   /**
@@ -818,49 +811,50 @@ export class WorkspaceService {
 
   /**
    * Build a collection item using a build action
-   * TODO: Re-enable when build-actions module is migrated and build_actions is added to CollectionConfig schema
    */
   async buildCollectionItem(
     collectionKey: string,
     collectionItemKey: string,
     buildAction: string
-  ): Promise<any> {
-    throw new Error('buildCollectionItem: Not yet implemented - needs build-actions migration and schema update');
-    // const collection = await this.getCollectionByKey(collectionKey);
-    // const filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
-    // const buildActionDict = (collection as any).build_actions?.find((x: any) => x.key === buildAction);
-    // if (!buildActionDict) {
-    //   throw new Error(`Build action ${buildAction} not found`);
-    // }
-    // return DocumentBuildAction.runAction(
-    //   buildAction,
-    //   buildActionDict['execute'],
-    //   filePath,
-    //   this.workspacePath
-    // );
+  ): Promise<BuildActionResult> {
+    const collection = await this.getCollectionByKey(collectionKey);
+    const filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+
+    const buildActionDict = collection.build_actions?.find((x) => x.key === buildAction);
+    if (!buildActionDict) {
+      throw new Error(`Build action ${buildAction} not found in collection ${collectionKey}`);
+    }
+
+    return this.buildActionService.runAction(
+      buildAction,
+      buildActionDict.execute,
+      filePath,
+      this.workspacePath
+    );
   }
 
   /**
    * Build a single using a build action
-   * TODO: Re-enable when build-actions module is migrated and build_actions is added to SingleConfig schema
    */
-  async buildSingle(singleKey: string, buildAction: string): Promise<any> {
-    throw new Error('buildSingle: Not yet implemented - needs build-actions migration and schema update');
-    // const config = await this.getConfigurationsData();
-    // const single = config.singles.find((x) => x.key === singleKey);
-    // if (single == null) throw new Error('Could not find single.');
-    // if (!single.file) throw new Error(`Single '${singleKey}' has no file configured`);
-    // const filePath = path.join(this.workspacePath, single.file);
-    // const buildActionDict = (single as any).build_actions?.find((x: any) => x.key === buildAction);
-    // if (!buildActionDict) {
-    //   throw new Error(`Build action ${buildAction} not found`);
-    // }
-    // return DocumentBuildAction.runAction(
-    //   buildAction,
-    //   buildActionDict['execute'],
-    //   filePath,
-    //   this.workspacePath
-    // );
+  async buildSingle(singleKey: string, buildAction: string): Promise<BuildActionResult> {
+    const config = await this.getConfigurationsData();
+    const single = config.singles.find((x) => x.key === singleKey);
+    if (single == null) throw new Error('Could not find single.');
+    if (!single.file) throw new Error(`Single '${singleKey}' has no file configured`);
+
+    const filePath = path.join(this.workspacePath, single.file);
+
+    const buildActionDict = single.build_actions?.find((x) => x.key === buildAction);
+    if (!buildActionDict) {
+      throw new Error(`Build action ${buildAction} not found in single ${singleKey}`);
+    }
+
+    return this.buildActionService.runAction(
+      buildAction,
+      buildActionDict.execute,
+      filePath,
+      this.workspacePath
+    );
   }
 
   /**
