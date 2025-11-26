@@ -1,34 +1,38 @@
-// Electron main with NEW backend architecture!
+/**
+ * Electron Main Process - New Architecture
+ * Wires up the backend with Electron adapters and UI managers
+ */
+
 import { app, BrowserWindow } from 'electron';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { createElectronAdapters } from './adapters/index.js';
 import { createContainer } from '@quiqr/backend';
 import { startServer } from '@quiqr/backend/api';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { getCurrentInstanceOrNew, initializeRemoteMain } from './ui-managers/main-window-manager.js';
+import { menuManager } from './ui-managers/menu-manager.js';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
 
-// Start the NEW backend with adapters!
+/**
+ * Start the backend server with Electron adapters
+ */
 async function startBackend() {
-  console.log('STARTING FROM @quiqr/adapter-electron with NEW BACKEND!');
+  console.log('='.repeat(60));
+  console.log('Starting Quiqr Desktop with NEW Backend Architecture');
+  console.log('='.repeat(60));
 
   try {
     // Create Electron adapters
     const { adapters, windowAdapter } = createElectronAdapters();
-    console.log('Electron adapters created!');
+    console.log('Electron adapters created');
 
     // Get paths
     const userDataPath = app.getPath('userData');
     const rootPath = app.getAppPath();
 
-    console.log('Creating container with adapters...');
-    console.log('  userDataPath:', userDataPath);
-    console.log('  rootPath:', rootPath);
+    console.log(`User Data: ${userDataPath}`);
+    console.log(`App Path: ${rootPath}`);
 
     // Create container with all dependencies
     const container = createContainer({
@@ -38,11 +42,13 @@ async function startBackend() {
       configFileName: 'quiqr-app-config.json'
     });
 
-    console.log('Container created!');
+    console.log('Container created with dependency injection');
 
     // Start the backend server with container
     startServer(container, { port: 5150 });
-    console.log('Backend server started on port 5150!');
+    console.log('Backend server started on http://localhost:5150');
+
+    console.log('='.repeat(60));
 
     // Return windowAdapter so we can wire it up to the window later
     return windowAdapter;
@@ -52,60 +58,65 @@ async function startBackend() {
   }
 }
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 1055,
-    minHeight: 700,
-    backgroundColor: '#ffffff',
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  });
+/**
+ * Create the main application window
+ */
+function createWindow(): BrowserWindow {
+  // Use the main window manager
+  mainWindow = getCurrentInstanceOrNew();
 
-  // Load the frontend
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:4002');
-    mainWindow.webContents.openDevTools();
-  } else {
-    // In production, load from the built frontend
-    const indexPath = path.join(__dirname, '../../../..', 'frontend/build/index.html');
-    mainWindow.loadFile(indexPath);
-  }
+  // Set up menu manager
+  menuManager.setMainWindow(mainWindow);
+  menuManager.createMainMenu();
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
-  });
+  console.log('Main window and menu created');
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
-
-  console.log('Main window created!');
+  return mainWindow;
 }
 
+/**
+ * Application ready event
+ */
 app.on('ready', async () => {
   console.log('Electron app ready!');
+
+  // Initialize @electron/remote
+  initializeRemoteMain();
+
+  // Start backend first
   const windowAdapter = await startBackend();
-  createWindow();
+
+  // Create the window
+  mainWindow = createWindow();
 
   // Wire up the window adapter to the actual window
   if (windowAdapter && mainWindow) {
     windowAdapter.setMainWindow(mainWindow);
-    console.log('Window adapter connected to main window!');
+    console.log('Window adapter connected to main window');
   }
+
+  console.log('');
+  console.log('🎉 Quiqr Desktop ready!');
+  console.log('   Frontend: ' + (isDev ? 'http://localhost:4002' : 'file://...'));
+  console.log('   Backend:  http://localhost:5150');
+  console.log('');
 });
 
+/**
+ * All windows closed event
+ */
 app.on('window-all-closed', () => {
+  // On macOS, keep the app running even when all windows are closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
+/**
+ * Activate event (macOS)
+ */
 app.on('activate', () => {
+  // On macOS, recreate window when dock icon is clicked and no windows are open
   if (mainWindow === null) {
     createWindow();
   }

@@ -68,8 +68,10 @@ export class ElectronWindowAdapter implements WindowAdapter {
   }
 
   showLogWindow(content: string): void {
-    // TODO: Implement log window
-    console.log('[LOG WINDOW]', content);
+    // Import dynamically to avoid circular dependency
+    import('../ui-managers/log-window-manager.js').then(({ showLogWindow }) => {
+      showLogWindow(content);
+    });
   }
 
   reloadMainWindow(): void {
@@ -86,16 +88,22 @@ export class ElectronWindowAdapter implements WindowAdapter {
 }
 
 // ============================================================================
-// Menu Adapter - Minimal stub for now
+// Menu Adapter - Uses MenuManager for menu operations
 // ============================================================================
 
 export class ElectronMenuAdapter implements MenuAdapter {
   setMenuItemEnabled(itemId: string, enabled: boolean): void {
-    console.log('[STUB] setMenuItemEnabled', itemId, enabled);
+    // Import dynamically to avoid circular dependency
+    import('../ui-managers/menu-manager.js').then(({ menuManager }) => {
+      menuManager.setMenuItemEnabled(itemId, enabled);
+    });
   }
 
   createMainMenu(): void {
-    console.log('[STUB] createMainMenu');
+    // Import dynamically to avoid circular dependency
+    import('../ui-managers/menu-manager.js').then(({ menuManager }) => {
+      menuManager.createMainMenu();
+    });
   }
 }
 
@@ -132,12 +140,15 @@ export class ElectronOutputConsole implements OutputConsole {
 }
 
 // ============================================================================
-// Screenshot Window Manager - Stub for now
+// Screenshot Window Manager - Real implementation
 // ============================================================================
 
 export class ElectronScreenshotWindowManager implements ScreenshotWindowManager {
-  createScreenshotAndFavicon(host: string, port: number, outputDir: string): void {
-    console.log('[STUB] createScreenshotAndFavicon', host, port, outputDir);
+  createScreenshotAndFavicon(host: string, port: number, outputDir: string, baseUrl?: string): void {
+    // Import dynamically to avoid circular dependency
+    import('../ui-managers/screenshot-window-manager.js').then(({ createScreenshotAndFavicon }) => {
+      createScreenshotAndFavicon(host, port, outputDir, baseUrl);
+    });
   }
 }
 
