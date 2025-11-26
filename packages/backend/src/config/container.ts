@@ -290,6 +290,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       pathHelper,
       appConfig: config,
       windowAdapter: adapters.window,
+      shellAdapter: adapters.shell,
       outputConsole: adapters.outputConsole,
       screenshotWindowManager: adapters.screenshotWindowManager,
       buildActionService,

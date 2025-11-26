@@ -11,7 +11,6 @@
 
 import path from 'path';
 import { glob } from 'glob';
-import { shell } from 'electron';
 import fs from 'fs-extra';
 import fssimple from 'fs';
 import fm from 'front-matter';
@@ -30,7 +29,7 @@ import { BuildActionService, type BuildActionResult } from '../../build-actions/
 import type { SingleConfig, CollectionConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
-import { WindowAdapter, OutputConsole, ScreenshotWindowManager } from '../../adapters/types.js';
+import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
 
 /**
  * Dependencies required by WorkspaceService
@@ -41,6 +40,7 @@ export interface WorkspaceServiceDependencies {
   pathHelper: PathHelper;
   appConfig: AppConfig;
   windowAdapter: WindowAdapter;
+  shellAdapter: ShellAdapter;
   outputConsole: OutputConsole;
   screenshotWindowManager: ScreenshotWindowManager;
   buildActionService: BuildActionService;
@@ -123,6 +123,7 @@ export class WorkspaceService {
   private pathHelper: PathHelper;
   private appConfig: AppConfig;
   private windowAdapter: WindowAdapter;
+  private shellAdapter: ShellAdapter;
   private outputConsole: OutputConsole;
   private screenshotWindowManager: ScreenshotWindowManager;
   private buildActionService: BuildActionService;
@@ -142,6 +143,7 @@ export class WorkspaceService {
     this.pathHelper = dependencies.pathHelper;
     this.appConfig = dependencies.appConfig;
     this.windowAdapter = dependencies.windowAdapter;
+    this.shellAdapter = dependencies.shellAdapter;
     this.outputConsole = dependencies.outputConsole;
     this.screenshotWindowManager = dependencies.screenshotWindowManager;
     this.buildActionService = dependencies.buildActionService;
@@ -356,7 +358,7 @@ export class WorkspaceService {
     if (single == null) throw new Error('Could not find single.');
     if (!single.file) throw new Error(`Single '${singleKey}' has no file configured`);
     const filePath = path.join(this.workspacePath, single.file);
-    shell.openPath(filePath);
+    await this.shellAdapter.openPath(filePath);
   }
 
   /**
@@ -794,7 +796,7 @@ export class WorkspaceService {
     if (collection == null) throw new Error('Could not find collection.');
     const filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
 
-    shell.openPath(filePath);
+    await this.shellAdapter.openPath(filePath);
   }
 
   /**
