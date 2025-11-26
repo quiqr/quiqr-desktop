@@ -6,6 +6,8 @@
  */
 
 import type { AppContainer } from '../../config/container.js';
+import { updateCommunityTemplatesJob } from '../../jobs/index.js';
+import type { CommunityTemplate } from '@quiqr/types';
 
 export function createMergeSiteWithRemoteHandler(container: AppContainer) {
   return async ({
@@ -48,8 +50,8 @@ export function createPublisherDispatchActionHandler(container: AppContainer) {
 }
 
 export function createUpdateCommunityTemplatesHandler(container: AppContainer) {
-  return async () => {
-    throw new Error('updateCommunityTemplates: Not yet implemented - needs jobs migration');
+  return async (): Promise<CommunityTemplate[]> => {
+    return updateCommunityTemplatesJob();
   };
 }
 

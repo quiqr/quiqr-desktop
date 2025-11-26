@@ -23,7 +23,8 @@
     "glob": "^10.x.x",
     "js-yaml": "^4.x.x",
     "front-matter": "^4.x.x",
-    "toml": "^3.x.x"
+    "toml": "^3.x.x",
+    "jimp": "^1.6.0"
   },
   "devDependencies": {
     "typescript": "^5.x.x",

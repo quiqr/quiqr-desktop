@@ -22,8 +22,7 @@ import type { FormatProvider } from '../../utils/format-providers/types.js';
 import { isContentFile, SUPPORTED_CONTENT_EXTENSIONS } from '../../utils/content-formats.js';
 import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
-// TODO: Migrate jobs module
-// import { createThumbnailJob } from '../../jobs/index.js';
+import { createThumbnailJob } from '../../jobs/index.js';
 import { HugoBuilder, type HugoBuildConfig } from '../../hugo/hugo-builder.js';
 import { HugoServer, type HugoServerConfig } from '../../hugo/hugo-server.js';
 import { HugoConfig, type QSiteConfig } from '../../hugo/hugo-config.js';
@@ -33,13 +32,6 @@ import type { SingleConfig, CollectionConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager } from '../../adapters/types.js';
-
-/**
- * TODO: Temporary placeholder until jobs module is migrated
- */
-async function createThumbnailJob(sourcePath: string, destPath: string): Promise<void> {
-  throw new Error('createThumbnailJob: Not yet implemented - needs jobs module migration');
-}
 
 /**
  * TODO: Temporary placeholder until build-actions module is migrated
