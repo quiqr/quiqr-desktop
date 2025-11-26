@@ -115,8 +115,8 @@ class NewSiteDialog extends React.Component<NewSiteDialogProps, NewSiteDialogSta
   }
 
   checkFreeSiteName(name) {
-    service.api.checkFreeSiteName(name).then((res) => {
-      if (res.nameFree) {
+    service.api.checkFreeSiteName(name).then((isFreeSiteName) => {
+      if (isFreeSiteName) {
         this.setState({
           newReadyForNew: true,
           newSiteNameErrorText: "",
