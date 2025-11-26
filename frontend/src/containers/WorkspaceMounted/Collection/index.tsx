@@ -66,16 +66,24 @@ const MakePageBundleItemKeyDialog: React.FC<MakePageBundleItemKeyDialogProps> = 
 
   return (
     <Dialog open={true}>
-      <DialogTitle id="simple-dialog-title">Convert as Page Bundle</DialogTitle>
+      <DialogTitle id='simple-dialog-title'>Convert as Page Bundle</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {!state.valid && <p>Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?</p>}
+          {!state.valid && (
+            <div>
+              Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?
+            </div>
+          )}
           {busy && <Spinner />}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button disabled={busy} onClick={handleCloseClick} color="primary">Cancel</Button>
-        <Button disabled={busy} onClick={handleConfirmClick} color="primary">Convert as Page Bundle</Button>
+        <Button disabled={busy} onClick={handleCloseClick} color='primary'>
+          Cancel
+        </Button>
+        <Button disabled={busy} onClick={handleConfirmClick} color='primary'>
+          Convert as Page Bundle
+        </Button>
       </DialogActions>
     </Dialog>
   );

@@ -42,27 +42,27 @@ class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps, Dele
     let { busy, itemLabel } = this.props;
 
     return (
-      <Dialog
-        fullWidth={true}
-        maxWidth="sm"
-        open={true}
-        onClose={this.handleClose}
-      >
+      <Dialog fullWidth={true} maxWidth='sm' open={true} onClose={this.handleClose}>
         <DialogTitle>Delete Item</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {this.state.valid? undefined :
-            <p>Do you really want to delete <b>"{itemLabel}"</b>?</p>}
+            {this.state.valid ? undefined : (
+              <div>
+                Do you really want to delete <b>"{itemLabel}"</b>?
+              </div>
+            )}
 
-            { busy ? <Spinner /> : undefined }
+            {busy ? <Spinner /> : undefined}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button disabled={busy} onClick={this.handleClose.bind(this)} color="primary">Cancel</Button>
-          <Button disabled={busy} onClick={this.handleConfirm.bind(this)} color="primary">Delete</Button>
+          <Button disabled={busy} onClick={this.handleClose.bind(this)} color='primary'>
+            Cancel
+          </Button>
+          <Button disabled={busy} onClick={this.handleConfirm.bind(this)} color='primary'>
+            Delete
+          </Button>
         </DialogActions>
-
-
       </Dialog>
     );
   }

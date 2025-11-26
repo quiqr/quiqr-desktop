@@ -22,30 +22,25 @@ class DeleteSiteDialog extends React.Component<DeleteSiteDialogProps>{
     let { open, siteconf } = this.props;
 
     return (
-      <Dialog
-        open={open}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth={true}
-        maxWidth={"sm"} >
-
-        <DialogTitle id="alert-dialog-title">{"Edit site name: "+siteconf.name}</DialogTitle>
+      <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
+        <DialogTitle id='alert-dialog-title'>{"Edit site name: " + siteconf.name}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText id='alert-dialog-description'>
             <Box>
-              <p>Are you sure you want to delete {siteconf.name} ?</p>
+              <div>Are you sure you want to delete {siteconf.name} ?</div>
 
-              <p>This cannot be undone.</p>
+              <div>This cannot be undone.</div>
             </Box>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>{ this.props.onCancelClick(); }}>
+          <Button
+            onClick={() => {
+              this.props.onCancelClick();
+            }}>
             Cancel
           </Button>
-          <Button onClick={()=>this.props.onDelete(siteconf.key)} >
-            Delete
-          </Button>
+          <Button onClick={() => this.props.onDelete(siteconf.key)}>Delete</Button>
         </DialogActions>
       </Dialog>
     );
