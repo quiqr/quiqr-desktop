@@ -15,6 +15,9 @@
   "main": "packages/adapters/electron/dist/main.js",
   "scripts": {
     "dev": "concurrently --names \"types,backend,adapter,frontend,electron\" -c \"blue,magenta,cyan,green,yellow\" \"npm run dev -w @quiqr/types\" \"npm run dev -w @quiqr/backend\" \"npm run dev -w @quiqr/adapter-electron\" \"npm run dev:frontend\" \"npm run dev:electron:wait\"",
+    "dev:backend": "npm run dev -w @quiqr/backend",
+    "dev:backend:standalone": "concurrently --names \"types,backend,standalone,server\" -c \"blue,magenta,cyan,green\" \"npm run dev -w @quiqr/types\" \"npm run dev -w @quiqr/backend\" \"npm run dev -w @quiqr/adapter-standalone\" \"npm run dev:start -w @quiqr/adapter-standalone\"",
+    "start:backend:standalone": "npm run build -w @quiqr/types && npm run build -w @quiqr/backend && npm run build -w @quiqr/adapter-standalone && npm run start -w @quiqr/adapter-standalone",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
@@ -22,7 +25,7 @@
     "build:appimage": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
     "build:rpm": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --linux rpm",
     "build:windows": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --win",
-    "build:packages": "npm run build -w @quiqr/types && npm run build -w @quiqr/backend && npm run build -w @quiqr/adapter-electron",
+    "build:packages": "npm run build -w @quiqr/types && npm run build -w @quiqr/backend && npm run build -w @quiqr/adapter-electron && npm run build -w @quiqr/adapter-standalone",
     "build:frontend": "cd frontend && npm run build",
     "release": "release-script --addPlaceholder",
     "dist": "electron-builder",
@@ -226,6 +229,7 @@
     "packages/types",
     "packages/backend",
     "packages/adapters/electron",
+    "packages/adapters/standalone",
     "frontend"
   ]
 }
