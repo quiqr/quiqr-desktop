@@ -19,10 +19,10 @@ This `ng`-branch will replace the current `main` which we will rename to `legacy
 5. React app will be running on [http://localhost:4002](http://localhost:5173)
 
 > [!TIP]
-> You can also run the backend without electron. It will just start the API:
-> `npm run dev:backend:standalone`
-> `npm run dev:frontend`
-> Visit http://localhost:4002 in your browser.
+> You can also run the backend without electron. It will just start the API:  
+> `npm run dev:backend:standalone`  
+> `npm run dev:frontend`  
+> Visit http://localhost:4002 in your browser. 
 > If you use Firefox you might run into CORS issues.
 
 
