@@ -9,9 +9,45 @@ import { createDevAdapters } from '@quiqr/backend/adapters';
 import { createContainer } from '@quiqr/backend';
 import { startServer } from '@quiqr/backend/api';
 import { homedir } from 'os';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { existsSync, readFileSync } from 'fs';
 
 const isDev = process.env.NODE_ENV === 'development';
+
+/**
+ * Find the project root by looking for package.json with workspaces
+ */
+function findProjectRoot(): string {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+
+  // Start from the current directory and go up
+  let currentDir = __dirname;
+
+  while (currentDir !== dirname(currentDir)) {
+    const packageJsonPath = join(currentDir, 'package.json');
+
+    // Check if package.json exists and has workspaces (indicates project root)
+    if (existsSync(packageJsonPath)) {
+      try {
+        const pkgContent = readFileSync(packageJsonPath, 'utf-8');
+        const pkg = JSON.parse(pkgContent);
+        if (pkg.workspaces) {
+          return currentDir;
+        }
+      } catch (e) {
+        // Continue searching
+      }
+    }
+
+    // Go up one directory
+    currentDir = dirname(currentDir);
+  }
+
+  // Fallback to cwd
+  return process.cwd();
+}
 
 /**
  * Start the standalone backend server
@@ -29,7 +65,9 @@ async function startStandaloneBackend() {
     // Get paths
     // For standalone mode, use a dedicated directory in user's home
     const userDataPath = join(homedir(), '.quiqr-standalone');
-    const rootPath = process.cwd();
+
+    // Find the project root (where resources folder is located)
+    const rootPath = findProjectRoot();
 
     console.log(`User Data: ${userDataPath}`);
     console.log(`Root Path: ${rootPath}`);
