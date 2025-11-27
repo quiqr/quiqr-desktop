@@ -5,7 +5,6 @@
  */
 
 import fs from 'fs-extra';
-import del from 'del';
 import path from 'path';
 import type { PathHelper } from '../utils/path-helper.js';
 import type { FormatProviderResolver } from '../utils/format-provider-resolver.js';
@@ -116,7 +115,7 @@ export class FolderImporter {
 
     // Copy directory to temp location
     const tempCopyDir = path.join(this.pathHelper.getTempDir(), 'siteFromDir');
-    del.sync([tempCopyDir], { force: true });
+    fs.removeSync(tempCopyDir);
     await fs.copy(directory, tempCopyDir);
 
     // Generate Quiqr model if requested

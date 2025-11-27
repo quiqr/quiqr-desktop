@@ -5,7 +5,6 @@
  */
 
 import fs from 'fs-extra';
-import del from 'del';
 import path from 'path';
 import type { PathHelper } from '../utils/path-helper.js';
 import type { FormatProviderResolver } from '../utils/format-provider-resolver.js';
@@ -62,7 +61,7 @@ export class GitImporter {
     const tempCloneDir = path.join(this.pathHelper.getTempDir(), 'siteFromGit');
 
     // Clean up any existing temp directory
-    del.sync([tempCloneDir], { force: true });
+    fs.removeSync(tempCloneDir);
 
     try {
       // Clone the repository
@@ -113,7 +112,7 @@ export class GitImporter {
     const tempCloneDir = path.join(this.pathHelper.getTempDir(), 'siteFromGit');
 
     // Clean up any existing temp directory
-    del.sync([tempCloneDir], { force: true });
+    fs.removeSync(tempCloneDir);
 
     try {
       // Clone the repository
@@ -148,7 +147,7 @@ export class GitImporter {
     const tempCloneThemeDir = path.join(tempDir, 'themes', themeName);
 
     // Clean up any existing temp directory
-    del.sync([tempDir], { force: true });
+    fs.removeSync(tempDir);
     await fs.ensureDir(tempDir);
     await fs.ensureDir(path.join(tempDir, 'themes'));
 

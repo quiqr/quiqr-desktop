@@ -5,7 +5,6 @@
  */
 
 import type { SiteConfig } from '@quiqr/types';
-import del from 'del';
 import fs from 'fs-extra';
 import path from 'path';
 import type { AppContainer } from '../../config/index.js';
@@ -240,7 +239,7 @@ export class LibraryService {
 
     const siteRoot = this.appContainer.pathHelper.getSiteRoot(siteKey);
     if (siteRoot) {
-      await del([siteRoot], { force: true });
+      await fs.remove(siteRoot);
     }
   }
 }

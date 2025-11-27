@@ -1,5 +1,5 @@
 const fs = require('fs');
-const fetch = require('node-fetch');
+// fetch is globally available in Node.js 18+
 
 async function getRemoteReleases(username, repository, page) {
   if(!username) throw new TypeError("Username was not provided (first parameter), received " + username);

@@ -4,7 +4,6 @@
  * Helper functions for file system operations.
  */
 
-import del from 'del';
 import fs from 'fs-extra';
 import fssimple from 'fs';
 
@@ -24,7 +23,7 @@ export async function recurForceRemove(dirPath: string): Promise<void> {
     const lstat = fs.lstatSync(dirPath);
 
     if (lstat.isDirectory()) {
-      del.sync([dirPath], { force: true });
+      fs.removeSync(dirPath);
     } else if (lstat.isFile()) {
       fs.unlinkSync(dirPath);
     }
