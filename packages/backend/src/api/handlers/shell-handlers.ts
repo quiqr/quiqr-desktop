@@ -1,3 +1,5 @@
+import util from 'util';
+
 /**
  * Shell API Handlers
  *
@@ -102,7 +104,7 @@ export function createLogToConsoleHandler(container: AppContainer) {
     if (label) {
       console.log('\n--- ' + label.toUpperCase() + ' --> ');
     }
-    console.log(require('util').inspect(message, false, null, true));
+    console.log(util.inspect(message, false, null, true));
     return true;
   };
 }
