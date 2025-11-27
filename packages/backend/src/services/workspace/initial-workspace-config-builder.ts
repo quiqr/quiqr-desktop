@@ -84,6 +84,7 @@ export class InitialWorkspaceConfigBuilder {
           menuItems: [{ key: 'mainConfig' }],
         },
       ],
+      collections: [],
       singles: [
         {
           key: 'mainConfig',
