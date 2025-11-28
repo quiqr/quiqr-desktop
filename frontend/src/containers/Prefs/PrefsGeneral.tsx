@@ -89,7 +89,7 @@ class PrefsGeneral extends React.Component<PrefsGeneralProps, PrefsGeneralState>
               }}
               label="Interface Style"
             >
-              <MenuItem key={"quiqr10"} value={"quiqr10"}>Light</MenuItem>
+              <MenuItem key={"quiqr10"} value={"quiqr10-light"}>Light</MenuItem>
               <MenuItem key={"quiqr10-dark"} value={"quiqr10-dark"}>Dark</MenuItem>
             </Select>
           </FormControl>
