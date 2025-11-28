@@ -15,35 +15,29 @@ interface DeleteSiteDialogProps {
   onDelete: (key: string) => void;
 }
 
-class DeleteSiteDialog extends React.Component<DeleteSiteDialogProps>{
+const DeleteSiteDialog = ({ open, siteconf, onCancelClick, onDelete }: DeleteSiteDialogProps) => {
+  return (
+    <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
+      <DialogTitle id='alert-dialog-title'>{"Edit site name: " + siteconf.name}</DialogTitle>
+      <DialogContent>
+        <DialogContentText id='alert-dialog-description'>
+          <Box>
+            <div>Are you sure you want to delete {siteconf.name} ?</div>
 
-  render(){
-
-    let { open, siteconf } = this.props;
-
-    return (
-      <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
-        <DialogTitle id='alert-dialog-title'>{"Edit site name: " + siteconf.name}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id='alert-dialog-description'>
-            <Box>
-              <div>Are you sure you want to delete {siteconf.name} ?</div>
-
-              <div>This cannot be undone.</div>
-            </Box>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              this.props.onCancelClick();
-            }}>
-            Cancel
-          </Button>
-          <Button onClick={() => this.props.onDelete(siteconf.key)}>Delete</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
-}
+            <div>This cannot be undone.</div>
+          </Box>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => {
+            onCancelClick();
+          }}>
+          Cancel
+        </Button>
+        <Button onClick={() => onDelete(siteconf.key)}>Delete</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 export default DeleteSiteDialog;
