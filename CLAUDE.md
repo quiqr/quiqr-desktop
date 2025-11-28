@@ -220,3 +220,4 @@ Projects use NPM workspaces with `/frontend` as a workspace. Install dependencie
 - Prefer generic typing over union types with manual type guards
 - Frontend components use Material-UI (MUI) v6 with Emotion styling
 - Backend remains JavaScript (Node.js)
+- Do not use React.FC, just create a const and type the props. Do not use props.somevar, but destructure them in the args of the functional component.
