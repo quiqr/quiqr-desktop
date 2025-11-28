@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  quiqr-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5150:5150"
+    environment:
+      - NODE_ENV=production
+      - PORT=5150
+    volumes:
+      # Mount a volume for persistent user data
+      - quiqr-data:/root/.quiqr-standalone
+    restart: unless-stopped
+    container_name: quiqr-standalone
+
+volumes:
+  quiqr-data:
+    driver: local
