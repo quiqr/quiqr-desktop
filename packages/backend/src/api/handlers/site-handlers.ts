@@ -60,7 +60,9 @@ export function createCopySiteHandler(container: AppContainer) {
     if (!siteRoot) {
       throw new Error(`Could not get site root for siteKey: ${siteKey}`);
     }
-    const sourcePath = path.join(siteRoot, sourceSiteConfig.source.path);
+    const sourcePath = path.isAbsolute(sourceSiteConfig.source.path)
+      ? sourceSiteConfig.source.path
+      : path.join(siteRoot, sourceSiteConfig.source.path);
 
     // Validate source path exists
     if (!fs.existsSync(sourcePath)) {
@@ -147,7 +149,9 @@ export function createExportSiteHandler(container: AppContainer) {
     if (!siteRoot) {
       throw new Error(`Could not get site root for siteKey: ${siteKey}`);
     }
-    const sitePath = path.join(siteRoot, siteConfig.source.path);
+    const sitePath = path.isAbsolute(siteConfig.source.path)
+      ? siteConfig.source.path
+      : path.join(siteRoot, siteConfig.source.path);
 
     await container.pogozipper.exportSite({
       siteKey,
@@ -171,7 +175,9 @@ export function createExportThemeHandler(container: AppContainer) {
     if (!siteRoot) {
       throw new Error(`Could not get site root for siteKey: ${siteKey}`);
     }
-    const sitePath = path.join(siteRoot, siteConfig.source.path);
+    const sitePath = path.isAbsolute(siteConfig.source.path)
+      ? siteConfig.source.path
+      : path.join(siteRoot, siteConfig.source.path);
 
     await container.pogozipper.exportTheme({
       siteKey,
@@ -194,7 +200,9 @@ export function createImportThemeHandler(container: AppContainer) {
     if (!siteRoot) {
       throw new Error(`Could not get site root for siteKey: ${siteKey}`);
     }
-    const sitePath = path.join(siteRoot, siteConfig.source.path);
+    const sitePath = path.isAbsolute(siteConfig.source.path)
+      ? siteConfig.source.path
+      : path.join(siteRoot, siteConfig.source.path);
 
     await container.pogozipper.importTheme({
       siteKey,
@@ -218,7 +226,9 @@ export function createExportContentHandler(container: AppContainer) {
     if (!siteRoot) {
       throw new Error(`Could not get site root for siteKey: ${siteKey}`);
     }
-    const sitePath = path.join(siteRoot, siteConfig.source.path);
+    const sitePath = path.isAbsolute(siteConfig.source.path)
+      ? siteConfig.source.path
+      : path.join(siteRoot, siteConfig.source.path);
 
     await container.pogozipper.exportContent({
       siteKey,
@@ -241,7 +251,9 @@ export function createImportContentHandler(container: AppContainer) {
     if (!siteRoot) {
       throw new Error(`Could not get site root for siteKey: ${siteKey}`);
     }
-    const sitePath = path.join(siteRoot, siteConfig.source.path);
+    const sitePath = path.isAbsolute(siteConfig.source.path)
+      ? siteConfig.source.path
+      : path.join(siteRoot, siteConfig.source.path);
 
     await container.pogozipper.importContent({
       siteKey,
