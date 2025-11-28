@@ -130,39 +130,6 @@ class SiteLibraryRouted extends React.Component<SiteLibraryRoutedProps, SiteLibr
       });
   }
 
-  //PORTQUIQR
-  /*
-  updateCommunityTemplates(){
-
-    const url = "https://quiqr.github.io/quiqr-community-templates/templates.json";
-    let request = net.request(url);
-
-    let data='';
-
-    request.on('error', (err) => {
-      this.setState({quiqrCommunityTemplatesError:"Can't download templates. Your computer might be offline."});
-    });
-
-    request.on('response', (response) => {
-      response.on('error', (error) => {
-        this.setState({quiqrCommunityTemplatesError:"Can't download templates. Server might have problems."});
-      })
-
-      response.on('end', () => {
-        this.setState({
-          quiqrCommunityTemplatesError: null,
-          quiqrCommunityTemplates:JSON.parse(data)});
-      });
-      response.on("close", () => {
-      });
-      response.on("data", chunk => {
-        data += chunk;
-      });
-    })
-    request.end()
-  }
-  */
-
   updateLocalSites(){
     let localsites = [];
     service.getConfigurations(true).then((configurations)=>{
