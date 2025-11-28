@@ -17,130 +17,99 @@ interface EditTagsDialogsProps {
   onCancelClick: () => void;
 }
 
-interface EditTagsDialogsState {
-  execButtonsDisabled: boolean;
-  errorTextSiteName: string;
-  busy: boolean;
-  cancelText: string;
-  siteconf: {
+const EditSiteTagsDialogs: React.FC<EditTagsDialogsProps> = ({ open, siteconf, onSavedClick, onCancelClick }) => {
+  const [execButtonsDisabled, setExecButtonsDisabled] = React.useState(true);
+  const [editedSiteConf, setEditedSiteConf] = React.useState<{
     key?: string;
     name?: string;
     tags?: string[];
-  };
-  open?: boolean;
-  failure?: boolean;
-}
+  }>({});
 
-class EditTagsDialogs extends React.Component<EditTagsDialogsProps, EditTagsDialogsState> {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      execButtonsDisabled: true,
-      errorTextSiteName: "",
-      busy: false,
-      cancelText: "cancel",
-      siteconf: {},
-    };
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    if (this.props.siteconf.key !== nextProps.siteconf.key) {
-      let siteconf = nextProps.siteconf;
-      if (!siteconf.tags) siteconf.tags = [];
-      this.setState({ siteconf: nextProps.siteconf, execButtonsDisabled: true });
+  // Sync siteconf from props when it changes
+  React.useEffect(() => {
+    if (siteconf.key) {
+      const conf = { ...siteconf };
+      if (!conf.tags) conf.tags = [];
+      setEditedSiteConf(conf);
+      setExecButtonsDisabled(true);
     }
-  }
+  }, [siteconf.key]);
 
-  renderFailure() {
-    return <div>Something went wrong.</div>;
-  }
-
-  handlePushItem(val) {
+  const handlePushItem = (val: string) => {
     if (val === "") return;
-    let siteconf = this.state.siteconf;
-    let copy = siteconf.tags.slice(0);
-    copy.push(val);
-    siteconf.tags = copy;
-    this.setState({ siteconf: siteconf, execButtonsDisabled: false });
-  }
+    setEditedSiteConf(prev => ({
+      ...prev,
+      tags: [...(prev.tags || []), val]
+    }));
+    setExecButtonsDisabled(false);
+  };
 
-  handleSwap(e: Event, { index, otherIndex }: { index: number; otherIndex: number }) {
-    let siteconf = this.state.siteconf;
-    let val = siteconf.tags.slice(0);
-    let temp = val[otherIndex];
-    val[otherIndex] = val[index];
-    val[index] = temp;
-
-    siteconf.tags = val;
-    this.setState({ siteconf: siteconf, execButtonsDisabled: false });
-  }
-
-  handleRequestDelete(index: number) {
-    let siteconf = this.state.siteconf;
-    let copy = siteconf.tags.slice(0);
-    copy.splice(index, 1);
-    siteconf.tags = copy;
-    this.setState({ siteconf: siteconf, execButtonsDisabled: false });
-  }
-
-  saveSiteConf() {
-    service.api.saveSiteConf(this.state.siteconf.key, this.state.siteconf).then(() => {
-      this.props.onSavedClick();
+  const handleSwap = (_e: Event, { index, otherIndex }: { index: number; otherIndex: number }) => {
+    setEditedSiteConf(prev => {
+      const newTags = [...(prev.tags || [])];
+      const temp = newTags[otherIndex];
+      newTags[otherIndex] = newTags[index];
+      newTags[index] = temp;
+      return { ...prev, tags: newTags };
     });
-  }
+    setExecButtonsDisabled(false);
+  };
 
-  renderBody() {
-    let field = { title: "tags" };
-    return (
-      <Box>
-        <Chips
-          items={this.state.siteconf.tags}
-          sortable={true}
-          fullWidth={true}
-          field={field}
-          onRequestDelete={this.handleRequestDelete.bind(this)}
-          onPushItem={this.handlePushItem.bind(this)}
-          onSwap={this.handleSwap.bind(this)}
-        />
-      </Box>
-    );
-  }
+  const handleRequestDelete = (index: number) => {
+    setEditedSiteConf(prev => {
+      const newTags = [...(prev.tags || [])];
+      newTags.splice(index, 1);
+      return { ...prev, tags: newTags };
+    });
+    setExecButtonsDisabled(false);
+  };
 
-  render() {
-    let { open, siteconf } = this.props;
-    let failure = this.state.failure;
+  const saveSiteConf = () => {
+    if (editedSiteConf.key) {
+      service.api.saveSiteConf(editedSiteConf.key, editedSiteConf).then(() => {
+        onSavedClick();
+      });
+    }
+  };
 
-    const actions = [
-      <Button
-        key={"menuAction1" + siteconf.name}
-        onClick={() => {
-          this.setState(
-            {
-              open: false,
-            },
-            () => {
-              this.props.onCancelClick();
-            }
-          );
-        }}>
-        {this.state.cancelText}
-      </Button>,
+  const field = { title: "tags" };
 
-      <Button key={"menuAction2" + siteconf.name} disabled={this.state.execButtonsDisabled} onClick={() => this.saveSiteConf()}>
-        SAVE
-      </Button>,
-    ];
+  const actions = [
+    <Button
+      key={"menuAction1" + siteconf.name}
+      onClick={onCancelClick}>
+      cancel
+    </Button>,
 
-    return (
-      <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
-        <DialogTitle id='alert-dialog-title'>{"Edit tags of site: " + siteconf.name}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id='alert-dialog-description'>{failure ? this.renderFailure() : this.renderBody()}</DialogContentText>
-        </DialogContent>
-        <DialogActions>{actions}</DialogActions>
-      </Dialog>
-    );
-  }
-}
-export default EditTagsDialogs;
+    <Button
+      key={"menuAction2" + siteconf.name}
+      disabled={execButtonsDisabled}
+      onClick={saveSiteConf}>
+      SAVE
+    </Button>,
+  ];
+
+  return (
+    <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
+      <DialogTitle id='alert-dialog-title'>{"Edit tags of site: " + siteconf.name}</DialogTitle>
+      <DialogContent>
+        <DialogContentText id='alert-dialog-description'>
+          <Box>
+            <Chips
+              items={editedSiteConf.tags || []}
+              sortable={true}
+              fullWidth={true}
+              field={field}
+              onRequestDelete={handleRequestDelete}
+              onPushItem={handlePushItem}
+              onSwap={handleSwap}
+            />
+          </Box>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>{actions}</DialogActions>
+    </Dialog>
+  );
+};
+
+export default EditSiteTagsDialogs;
