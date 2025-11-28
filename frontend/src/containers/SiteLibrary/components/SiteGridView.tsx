@@ -24,7 +24,7 @@ const SiteGridView = ({ sites, listTitle, error, onSiteClick, onMenuAction }: Si
       {error}
       <Grid container spacing={3}>
         {sites.map((site, index) => {
-          const menu = <SiteItemMenu site={site} index={index} onMenuAction={onMenuAction} />;
+          const menu = <SiteItemMenu site={site} onMenuAction={onMenuAction} />;
           return (
             <Grid key={"siteCard" + index} item>
               <CardItem siteClick={() => onSiteClick(site)} site={site} itemMenuButton={menu} itemMenuItems={null} />
