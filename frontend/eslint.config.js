@@ -8,21 +8,28 @@ export default [
   ...tseslint.configs.recommended,
   {
     plugins: {
-      'react-you-might-not-need-an-effect': reactYouMightNotNeedAnEffect
+      "react-you-might-not-need-an-effect": reactYouMightNotNeedAnEffect,
     },
     rules: {
       ...reactYouMightNotNeedAnEffect.configs.recommended.rules,
-      'no-console': 0,
-      'no-async-promise-executor': 0,
+      "no-console": 0,
+      "no-async-promise-executor": 0,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          varsIgnorePattern: "^_",
+          argsIgnorePattern: "^_",
+        },
+      ],
     },
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module',
+      sourceType: "module",
       globals: {
         ...globals.browser,
         ...globals.node,
         ...globals.es2021,
-      }
-    }
-  }
+      },
+    },
+  },
 ];
