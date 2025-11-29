@@ -25,7 +25,12 @@ const RenameDialog = ({ open, siteconf, onSuccess, onClose }: RenameDialogProps)
   const [localsites, setLocalsites] = useState<string[]>([]);
   const [execButtonsDisabled, setExecButtonsDisabled] = useState(false);
   const [errorTextSiteName, setErrorTextSiteName] = useState("");
-  const [editedSiteConf, setEditedSiteConf] = useState<{ key?: string; name?: string }>({});
+  const [editedName, setEditedName] = useState(siteconf.name);
+
+  const editedSiteConf = {
+    ...siteconf,
+    name: editedName,
+  };
 
   // Fetch local sites when dialog opens
   useEffect(() => {
@@ -35,15 +40,6 @@ const RenameDialog = ({ open, siteconf, onSuccess, onClose }: RenameDialogProps)
       });
     }
   }, [open]);
-
-  // Sync siteconf from props when it changes
-  useEffect(() => {
-    if (siteconf.key) {
-      setEditedSiteConf({ ...siteconf });
-      setExecButtonsDisabled(true);
-      setError(null);
-    }
-  }, [siteconf.key]);
 
   const validateSiteName = useCallback((newName: string) => {
     let errorText = "";
@@ -61,7 +57,7 @@ const RenameDialog = ({ open, siteconf, onSuccess, onClose }: RenameDialogProps)
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     validateSiteName(newName);
-    setEditedSiteConf({ ...editedSiteConf, name: newName });
+    setEditedName(newName);
   };
 
   const saveSiteConf = async () => {
@@ -93,7 +89,7 @@ const RenameDialog = ({ open, siteconf, onSuccess, onClose }: RenameDialogProps)
               id='standard-full-width'
               label='Site Name'
               fullWidth
-              value={editedSiteConf.name || ''}
+              value={editedName}
               onChange={handleNameChange}
               error={errorTextSiteName !== ""}
               helperText={errorTextSiteName}
