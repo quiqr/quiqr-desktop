@@ -50,7 +50,7 @@ class SyncBusyDialog extends React.Component<SyncBusyDialogProps, SyncBusyDialog
         fullWidth={true}
         maxWidth="sm" >
 
-        <MuiDialogTitle sx={{ margin: 0 }}>
+        <MuiDialogTitle sx={{ margin: 0 }} component={'div'}>
           <Box sx={{ position: 'absolute', right: '24px', top: '24px' }}>
           {this.props.icon}
           </Box>

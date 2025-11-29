@@ -226,7 +226,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
         aria-describedby='alert-dialog-description'
         fullWidth={true}
         maxWidth={this.state.dialogSize}>
-        <DialogTitle sx={{ margin: 0, p: 2 }}>
+        <DialogTitle sx={{ margin: 0, p: 2 }} component={'div'}>
           <Box sx={{ position: "absolute", right: "24px", top: "24px" }}>{serverFormLogo}</Box>
           <Typography variant='h6'>{modAction + " " + configDialogTitle}</Typography>
         </DialogTitle>
