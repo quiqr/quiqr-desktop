@@ -4,6 +4,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
 import { snackMessageService } from "../services/ui-service";
 
 //import service         from '../services/service';
@@ -147,7 +148,7 @@ const BundleManagerItem: React.FC<BundleManagerItemProps> = ({
   };
 
   return (
-    <div style={_style} className='BundleManager-item col-xl-2 col-lg-4 col-6' {...wrapperProps}>
+    <Grid item xl={2} lg={4} xs={6} style={_style} className='BundleManager-item' {...wrapperProps}>
       <div style={_bundleStyle}>
         <BundleManagerHeader
           style={_headStyle}
@@ -160,7 +161,7 @@ const BundleManagerItem: React.FC<BundleManagerItemProps> = ({
         />
         <div style={_bodyStyle}>{active ? body : null}</div>
       </div>
-    </div>
+    </Grid>
   );
 };
 
@@ -186,7 +187,7 @@ const BundleManager: React.FC<BundleManagerProps> = ({ style, children, forceAct
   );
 
   return (
-    <div className='BundleManager row' style={style}>
+    <Grid container spacing={2} className='BundleManager' style={style}>
       {children.map((item, idx) => {
         const active = forceActive || idx === openedIndex;
 
@@ -201,7 +202,7 @@ const BundleManager: React.FC<BundleManagerProps> = ({ style, children, forceAct
         }
         return null;
       })}
-    </div>
+    </Grid>
   );
 };
 

@@ -6,6 +6,7 @@ import Dialog            from '@mui/material/Dialog';
 import DialogActions     from '@mui/material/DialogActions';
 import DialogContent     from '@mui/material/DialogContent';
 import DialogTitle       from '@mui/material/DialogTitle';
+import Grid              from '@mui/material/Grid';
 import Spinner           from './Spinner';
 import service           from '../services/service';
 
@@ -131,7 +132,7 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
             Add File
           </Button>
 
-            <div className="BundleManager row" style={this.props.style}>
+            <Grid container spacing={2} className="BundleManager" style={this.props.style}>
               {
                 this.props.imageItems.map((item, index)=>{
 
@@ -146,7 +147,7 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
 
                   if(this.isImage(item.filename)){
                     return (
-                      <div className="BundleManager-item col-xl-2 col-lg-4 col-6" key={"imageitem-"+index}>
+                      <Grid item xl={2} lg={4} xs={6} className="BundleManager-item" key={"imageitem-"+index}>
                         <Button title={fBase} onClick={()=>{this.props.handleSelect(item.filename)}} color="primary">
                           {filename}
                         </Button>
@@ -157,7 +158,7 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
                             imagePath={item.src} />
                         </Button>
 
-                      </div>
+                      </Grid>
                     )
                   }
                   else{
@@ -165,7 +166,7 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
                   }
                 })
               }
-            </div>
+            </Grid>
 
         </DialogContent>
         <DialogActions>
