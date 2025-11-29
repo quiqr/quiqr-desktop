@@ -3,9 +3,9 @@ import { Switch, Route } from "react-router-dom";
 import AppsIcon from "@mui/icons-material/Apps";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
-import { createTheme, ThemeProvider, StyledEngineProvider, Theme } from "@mui/material/styles";
+import { ThemeProvider, StyledEngineProvider, Theme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { blue } from "@mui/material/colors";
+import Box from "@mui/material/Box";
 import Workspace from "./containers/WorkspaceMounted/Workspace";
 import Console from "./containers/Console";
 import TopToolbarLeft from "./containers/TopToolbarLeft";
@@ -14,8 +14,7 @@ import SplashDialog from "./dialogs/SplashDialog";
 import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from "./containers/SiteLibrary";
 import { TopToolbarRight, ToolbarButton } from "./containers/TopToolbarRight";
 import service from "./services/service";
-import styleLightDefault from "./app-ui-styles/quiqr10/style-light.js";
-import styleDarkDefault from "./app-ui-styles/quiqr10/style-dark.js";
+import { getThemeByName } from "./theme";
 import { UserPreferences } from "../types";
 
 const defaultApplicationRole = "contentEditor";
@@ -25,7 +24,6 @@ type AppState = {
   showSplashAtStartup: boolean;
   applicationRole: string;
   libraryView: string;
-  style: unknown;
   theme: Theme;
   menuIsLocked: boolean;
   forceShowMenu: boolean;
@@ -42,15 +40,7 @@ class App extends React.Component<null, AppState> {
   constructor(props: null) {
     super(props);
 
-    const style = styleLightDefault;
-    const theme = createTheme({
-      palette: {
-        mode: "light",
-        primary: {
-          main: blue[500],
-        },
-      },
-    });
+    const theme = getThemeByName('light');
 
     this.state = {
       splashDialogOpen: false,
@@ -58,7 +48,6 @@ class App extends React.Component<null, AppState> {
       applicationRole: defaultApplicationRole,
       libraryView: "cards",
       //maximized:win.isMaximized(),
-      style: style,
       theme: theme,
       menuIsLocked: true,
       forceShowMenu: false,
@@ -72,23 +61,9 @@ class App extends React.Component<null, AppState> {
   setThemeStyleFromPrefs() {
     service.api.readConfKey("prefs").then((value: UserPreferences) => {
       if (value.interfaceStyle) {
-        let themeStyle: "light" | "dark" = "light";
-        if (value.interfaceStyle === "quiqr10-dark") {
-          themeStyle = "dark";
-        }
-
-        const theme = createTheme({
-          palette: {
-            mode: themeStyle,
-            primary: {
-              main: blue[500],
-            },
-          },
-        });
-
+        const themeMode = value.interfaceStyle === "quiqr10-dark" ? "dark" : "light";
         this.setState({
-          style: themeStyle === "light" ? styleLightDefault : styleDarkDefault,
-          theme: theme,
+          theme: getThemeByName(themeMode),
         });
       }
     });
@@ -444,14 +419,6 @@ class App extends React.Component<null, AppState> {
   }
 
   renderBodyWithToolbars() {
-    const marginStyles = {
-      marginRight: "0px",
-    };
-
-    const containerStyle = this.state.style.container;
-    const menuContainerStyle = this.state.style.menuContainer;
-    const topToolbarStyle = this.state.style.topToolbar;
-    const contentContainerStyle = this.state.style.contentContainer;
     const welcomeScreen = this.renderWelcomeScreen();
 
     return (
@@ -461,28 +428,107 @@ class App extends React.Component<null, AppState> {
           <React.Fragment>
             {welcomeScreen}
 
-            <div className='App' style={marginStyles}>
-              <div style={topToolbarStyle}>
-                <div className='toolbarLeft'>{this.renderTopToolbarLeftSwitch()}</div>
+            <Box sx={{ marginRight: 0 }}>
+              {/* Top Toolbar */}
+              <Box
+                sx={{
+                  borderTop: (theme) => `solid 1px ${theme.palette.toolbar.border}`,
+                  borderBottom: (theme) => `solid 1px ${theme.palette.toolbar.border}`,
+                  top: 0,
+                  position: 'absolute',
+                  display: 'flex',
+                  width: '100%',
+                  backgroundColor: (theme) => theme.palette.toolbar.background,
+                }}
+              >
+                {/* Toolbar Left */}
+                <Box
+                  sx={{
+                    flex: '0 0 280px',
+                    borderRight: (theme) => `solid 1px ${theme.palette.toolbar.border}`,
+                    overflowY: 'hidden',
+                    overflowX: 'hidden',
+                    height: '50px',
+                  }}
+                >
+                  {this.renderTopToolbarLeftSwitch()}
+                </Box>
 
-                <div className='toolbarRight'>{this.renderTopToolbarRightSwitch()}</div>
-              </div>
+                {/* Toolbar Right */}
+                <Box sx={{ flex: 'auto', height: '50px', overflow: 'hidden' }}>
+                  {this.renderTopToolbarRightSwitch()}
+                </Box>
+              </Box>
 
-              <div style={containerStyle}>
-                <div style={menuContainerStyle} className='hideScrollbar'>
+              {/* Main Container */}
+              <Box
+                sx={{
+                  position: 'relative',
+                  display: 'flex',
+                  height: 'calc(100vh - 52px)',
+                  marginTop: '52px',
+                  overflowX: 'hidden',
+                }}
+              >
+                {/* Sidebar/Menu */}
+                <Box
+                  className="hideScrollbar"
+                  sx={{
+                    flex: '0 0 280px',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    userSelect: 'none',
+                    background: (theme) => theme.palette.sidebar.background,
+                    // Dynamic: unlocked menu behavior
+                    ...(this.state.menuIsLocked
+                      ? {}
+                      : {
+                          position: 'absolute',
+                          zIndex: 2,
+                          height: '100%',
+                          width: '280px',
+                          transform: this.state.forceShowMenu
+                            ? 'translateX(0px)'
+                            : 'translateX(-214px)',
+                          transition: this.state.skipMenuTransition
+                            ? 'none'
+                            : 'all ease-in-out 0.3s',
+                        }),
+                  }}
+                >
                   {this.renderMenuSwitch()}
-                </div>
+                </Box>
 
-                <div
+                {/* Content */}
+                <Box
                   key='main-content'
-                  style={contentContainerStyle}
                   onClick={() => {
                     if (this.state.forceShowMenu) this.toggleForceShowMenu();
-                  }}>
+                  }}
+                  sx={{
+                    flex: 'auto',
+                    userSelect: 'none',
+                    overflow: 'auto',
+                    overflowX: 'hidden',
+                    // Dynamic: unlocked menu content shift
+                    ...(this.state.menuIsLocked
+                      ? {}
+                      : {
+                          display: 'block',
+                          paddingLeft: '66px',
+                          transform: this.state.forceShowMenu
+                            ? 'translateX(214px)'
+                            : 'translateX(0px)',
+                          transition: this.state.skipMenuTransition
+                            ? 'none'
+                            : 'all ease-in-out 0.3s',
+                        }),
+                  }}
+                >
                   {this.renderContentSwitch()}
-                </div>
-              </div>
-            </div>
+                </Box>
+              </Box>
+            </Box>
           </React.Fragment>
         </ThemeProvider>
       </StyledEngineProvider>
@@ -490,30 +536,10 @@ class App extends React.Component<null, AppState> {
   }
 
   render() {
-    let menuContainerStyle = this.state.style.menuContainer;
-    let contentContainerStyle = this.state.style.contentContainer;
     const welcomeScreen = this.renderWelcomeScreen();
 
-    if (!this.state.menuIsLocked) {
-      contentContainerStyle = Object.assign({}, contentContainerStyle, { display: "block", paddingLeft: "66px" });
-      menuContainerStyle = Object.assign({}, menuContainerStyle, {
-        position: "absolute",
-        zIndex: "2",
-        height: "100%",
-        width: "280px",
-        transform: "translateX(-214px)",
-      });
-
-      if (this.state.forceShowMenu) {
-        menuContainerStyle.transform = "translateX(0px)";
-        contentContainerStyle.transform = "translateX(214px)";
-      }
-      if (!this.state.skipMenuTransition) {
-        const transition = "all ease-in-out .3s";
-        contentContainerStyle.transition = transition;
-        menuContainerStyle.transition = transition;
-      }
-
+    // Reset skipMenuTransition if it was set
+    if (this.state.skipMenuTransition) {
       this.setState({ skipMenuTransition: false });
     }
 
@@ -529,16 +555,20 @@ class App extends React.Component<null, AppState> {
               <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
                   <CssBaseline />
-                  <div className='App'>
-                    <div
-                      key='main-content'
-                      style={contentContainerStyle}
-                      onClick={() => {
-                        if (this.state.forceShowMenu) this.toggleForceShowMenu();
-                      }}>
-                      <Console />
-                    </div>
-                  </div>
+                  <Box
+                    key='main-content'
+                    onClick={() => {
+                      if (this.state.forceShowMenu) this.toggleForceShowMenu();
+                    }}
+                    sx={{
+                      flex: 'auto',
+                      userSelect: 'none',
+                      overflow: 'auto',
+                      overflowX: 'hidden',
+                    }}
+                  >
+                    <Console />
+                  </Box>
                 </ThemeProvider>
               </StyledEngineProvider>
             );
