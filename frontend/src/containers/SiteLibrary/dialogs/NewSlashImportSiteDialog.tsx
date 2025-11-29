@@ -14,8 +14,9 @@ import Typography from "@mui/material/Typography";
 import FolderIcon from "@mui/icons-material/Folder";
 import BuildIcon from "@mui/icons-material/Build";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
+import Grid from '@mui/material/Grid2';
 import Paper from "@mui/material/Paper";
+import Item from "@mui/material/Grid2";
 import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -166,8 +167,8 @@ const NewSiteDialog: React.FC<NewSiteDialogProps> = ({ open, newOrImport, import
 
     const sourceCards = sourceDefs.map((source) => {
       return (
-        <Grid item xs={6} key={source.title}>
-          <Paper
+          <Item
+            key={source.title}
             onClick={source.stateUpdate}
             sx={{
               height: "160px",
@@ -177,23 +178,21 @@ const NewSiteDialog: React.FC<NewSiteDialogProps> = ({ open, newOrImport, import
                 backgroundColor: "#eee",
                 color: "#222",
               }
-            }}
-            elevation={5}>
+            }}>
             <Box display='flex' alignItems='center' justifyContent='center'>
               {source.icon}
             </Box>
             <Box display='flex' alignItems='center' justifyContent='center' p={1} height={70}>
               <Typography variant='h5'>{source.title}</Typography>
             </Box>
-          </Paper>
-        </Grid>
+          </Item>
       );
     });
 
     return (
       <Box y={2}>
         <p>{instructions}</p>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} columns={2}>
           {sourceCards}
         </Grid>
       </Box>
