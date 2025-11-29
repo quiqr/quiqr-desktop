@@ -7,8 +7,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CircularProgress from "@mui/material/CircularProgress";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
 import { SiteConfig } from "../../../../types";
 import { useCallback, useState, useEffect } from "react";
 
@@ -21,15 +19,14 @@ interface CopyDialogProps {
 
 const CopyDialog = ({ open, siteconf, onSuccess, onClose }: CopyDialogProps) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
   const [localsites, setLocalsites] = useState<string[]>([]);
-  const [errorTextSiteName, setErrorTextSiteName] = useState("");
-  const [editedName, setEditedName] = useState("");
+  const [editedName, setEditedName] = useState(siteconf.name + " (copy)");
 
   const editedSiteConf = {
     ...siteconf,
-    name: open ? editedName || siteconf.key + " (copy)" : "",
-    key: open ? editedName || siteconf.key + " (copy)" : "",
+    name: editedName,
+    key: editedName,
   };
 
   // Fetch local sites when dialog opens
@@ -41,16 +38,16 @@ const CopyDialog = ({ open, siteconf, onSuccess, onClose }: CopyDialogProps) => 
     }
   }, [open]);
 
-  const execButtonsDisabled = !siteconf.key || errorTextSiteName !== "";
+  const execButtonsDisabled = !siteconf.key || error !== "";
 
   const validateSiteName = useCallback(
     (newName: string) => {
       if (!(localsites && localsites.includes(newName))) {
-        setErrorTextSiteName("");
+        setError("");
         return;
       }
 
-      setErrorTextSiteName("Name is already used.");
+      setError("Name is already used.");
     },
     [localsites]
   );
@@ -67,7 +64,7 @@ const CopyDialog = ({ open, siteconf, onSuccess, onClose }: CopyDialogProps) => 
     }
 
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
       await service.api.copySite(siteconf.key, editedSiteConf);
@@ -89,21 +86,16 @@ const CopyDialog = ({ open, siteconf, onSuccess, onClose }: CopyDialogProps) => 
             id='standard-full-width'
             label='Site Name'
             fullWidth
-            value={editedSiteConf?.name || ""}
+            value={editedName}
             onChange={handleNameChange}
-            error={errorTextSiteName !== ""}
-            helperText={errorTextSiteName}
+            error={error !== ""}
+            helperText={error}
             disabled={loading}
             sx={{
               marginTop: (theme) => theme.spacing(1),
             }}
           />
         </DialogContentText>
-        {error && (
-          <Box mt={2}>
-            <Alert severity="error">{error}</Alert>
-          </Box>
-        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>Cancel</Button>
