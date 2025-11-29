@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import service from "../../../services/service";
 import Chips from "../../../components/Chips";
 import Button from "@mui/material/Button";
@@ -10,7 +10,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
-import { SiteConfig } from '../../../../types';
+import { SiteConfig } from "../../../../types";
 
 interface EditTagsDialogsProps {
   open: boolean;
@@ -23,48 +23,35 @@ const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDia
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [execButtonsDisabled, setExecButtonsDisabled] = useState(true);
-  const [editedSiteConf, setEditedSiteConf] = useState<{
-    key?: string;
-    name?: string;
-    tags?: string[];
-  }>({});
+  const [editedTags, setEditedTags] = useState<string[]>(siteconf.tags || []);
 
-  // Sync siteconf from props when it changes
-  useEffect(() => {
-    if (siteconf.key) {
-      const conf = { ...siteconf };
-      if (!conf.tags) conf.tags = [];
-      setEditedSiteConf(conf);
-      setExecButtonsDisabled(true);
-      setError(null);
-    }
-  }, [siteconf.key]);
+  const editedSiteConf = {
+    ...siteconf,
+    tags: editedTags,
+  };
 
   const handlePushItem = (val: string) => {
     if (val === "") return;
-    setEditedSiteConf(prev => ({
-      ...prev,
-      tags: [...(prev.tags || []), val]
-    }));
+    setEditedTags((prev) => [...prev, val]);
     setExecButtonsDisabled(false);
   };
 
   const handleSwap = (_e: Event, { index, otherIndex }: { index: number; otherIndex: number }) => {
-    setEditedSiteConf(prev => {
-      const newTags = [...(prev.tags || [])];
+    setEditedTags((prev) => {
+      const newTags = [...prev];
       const temp = newTags[otherIndex];
       newTags[otherIndex] = newTags[index];
       newTags[index] = temp;
-      return { ...prev, tags: newTags };
+      return newTags;
     });
     setExecButtonsDisabled(false);
   };
 
   const handleRequestDelete = (index: number) => {
-    setEditedSiteConf(prev => {
-      const newTags = [...(prev.tags || [])];
+    setEditedTags((prev) => {
+      const newTags = [...prev];
       newTags.splice(index, 1);
-      return { ...prev, tags: newTags };
+      return newTags;
     });
     setExecButtonsDisabled(false);
   };
@@ -84,7 +71,7 @@ const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDia
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save tags');
+      setError(err instanceof Error ? err.message : "Failed to save tags");
     } finally {
       setLoading(false);
     }
@@ -96,10 +83,10 @@ const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDia
     <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
       <DialogTitle id='alert-dialog-title'>Edit tags of site: {siteconf.name}</DialogTitle>
       <DialogContent>
-        <DialogContentText id='alert-dialog-description'>
+        <DialogContentText id='alert-dialog-description' component={"div"}>
           <Box>
             <Chips
-              items={editedSiteConf.tags || []}
+              items={editedTags}
               sortable={true}
               fullWidth={true}
               field={field}
@@ -111,7 +98,7 @@ const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDia
         </DialogContentText>
         {error && (
           <Box mt={2}>
-            <Alert severity="error">{error}</Alert>
+            <Alert severity='error'>{error}</Alert>
           </Box>
         )}
       </DialogContent>
@@ -120,7 +107,7 @@ const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDia
           Cancel
         </Button>
         <Button onClick={saveSiteConf} disabled={execButtonsDisabled || loading}>
-          {loading ? <CircularProgress size={20} /> : 'Save'}
+          {loading ? <CircularProgress size={20} /> : "Save"}
         </Button>
       </DialogActions>
     </Dialog>
