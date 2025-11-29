@@ -98,7 +98,7 @@ const getBaseTheme = (): ThemeOptions => ({
             textAlign: 'left',
             borderBottom: '1px solid #E1E1E1',
           },
-          '& th:first-child, & td:first-child': {
+          '& th:first-of-type, & td:first-of-type': {
             paddingLeft: 0,
           },
           '& th:last-child, & td:last-child': {
