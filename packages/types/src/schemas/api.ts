@@ -63,39 +63,136 @@ export const dynFormFieldsSchema = z.object({
   form_field_type: z.string().optional()
 })
 
+// Parse info - tracks which files were used to build the workspace config
+export const parseInfoIncludeFileSchema = z.object({
+  key: z.string(),
+  filename: z.string()
+})
+
+export const parseInfoSchema = z.object({
+  baseFile: z.string(),
+  includeFiles: z.array(parseInfoIncludeFileSchema),
+  includeFilesSub: z.array(parseInfoIncludeFileSchema)
+})
+
+// Build action result - returned by buildSingle and buildCollectionItem
+export const buildActionResultSchema = z.object({
+  actionName: z.string(),
+  stdoutType: z.string().optional(),
+  stdoutContent: z.string()
+})
+
+// Collection item operation results
+export const deleteCollectionItemResponseSchema = z.object({
+  deleted: z.boolean()
+})
+
+export const renameCollectionItemResponseSchema = z.object({
+  renamed: z.boolean(),
+  item: collectionItemSchema.optional()
+})
+
+export const copyCollectionItemResponseSchema = z.object({
+  copied: z.boolean(),
+  item: collectionItemSchema.optional()
+})
+
+// Key pair response for createKeyPairGithub
+export const keyPairResponseSchema = z.object({
+  privateKey: z.string(),
+  publicKey: z.string()
+})
+
+// Site inventory - returned by hugosite_dir_show
+export const siteInventorySchema = z.object({
+  dirExist: z.boolean(),
+  dirName: z.string(),
+  hugoConfigExists: z.boolean(),
+  hugoConfigParsed: z.any().nullable(),
+  hugoThemesDirExists: z.boolean(),
+  hugoContentDirExists: z.boolean(),
+  hugoDataDirExists: z.boolean(),
+  hugoStaticDirExists: z.boolean(),
+  quiqrModelDirExists: z.boolean(),
+  quiqrFormsDirExists: z.boolean(),
+  quiqrDirExists: z.boolean(),
+  quiqrModelParsed: z.any().nullable() // WorkspaceConfig, but using any to avoid circular dependency
+})
+
 // API Schemas mapping - maps API method names to their response schemas
 export const apiSchemas = {
+  // Workspace operations
   getConfigurations: configurationsSchema,
   listWorkspaces: z.array(workspaceSchema),
   getWorkspaceDetails: workspaceDetailsSchema,
+  getWorkspaceModelParseInfo: parseInfoSchema,
+  getPreviewCheckConfiguration: z.any().nullable(), // Reads from JSON file, shape varies
+  mountWorkspace: z.string(),
+  serveWorkspace: z.any(), // Returns void/undefined, server action
+  buildWorkspace: z.union([z.void(), z.string()]), // No return value
+
+  // Single content operations
   getSingle: z.record(z.any()), // Returns dynamic content based on the single's fields
+  updateSingle: z.record(z.any()), // Returns the updated document
+  saveSingle: z.record(z.any()), // Returns the saved document
+  openSingleInEditor: z.void(),
+  buildSingle: buildActionResultSchema,
+
+  // Collection operations
+  listCollectionItems: z.array(collectionItemSchema),
+  getCollectionItem: z.record(z.any()), // Returns dynamic content based on collection's fields
+  updateCollectionItem: z.record(z.any()), // Returns the updated document
+  createCollectionItemKey: collectionItemKeyResponseSchema,
+  deleteCollectionItem: deleteCollectionItemResponseSchema,
+  renameCollectionItem: renameCollectionItemResponseSchema,
+  copyCollectionItem: copyCollectionItemResponseSchema,
+  copyCollectionItemToLang: copyCollectionItemResponseSchema,
+  makePageBundleCollectionItem: deleteCollectionItemResponseSchema, // Uses same shape: { deleted: boolean }
+  buildCollectionItem: buildActionResultSchema,
+  openCollectionItemInEditor: z.void(),
+
+  // File operations
   parseFileToObject: z.any(), // any is needed here because a select-from-query file could have any shape
-  getCurrentBaseUrl: z.string(),
-  getDynFormFields: dynFormFieldsSchema,
+  globSync: z.array(z.string()),
   getFilesInBundle: z.array(fileReferenceSchema),
+  getFilesFromAbsolutePath: z.array(fileReferenceSchema),
+  getThumbnailForPath: z.string().optional(),
+  getThumbnailForCollectionOrSingleItemImage: z.string().optional(),
+
+  // Site management
+  getSiteConfig: siteConfigSchema,
+  saveSiteConf: z.boolean(),
+  copySite: z.boolean(),
+  deleteSite: z.boolean(),
+  checkFreeSiteName: z.boolean(),
+  getCurrentSiteKey: z.string(),
+  getCurrentBaseUrl: z.string(),
+  getLanguages: z.array(languageSchema),
+  getCreatorMessage: z.string(),
+
+  // Site import/creation
+  importSiteAction: z.void(), // ZIP-based import, no return value
+  importSiteFromPrivateGitRepo: z.string(), // Returns siteKey
+  importSiteFromPublicGitUrl: z.string(), // Returns siteKey
+  newSiteFromPublicHugoThemeUrl: z.string(), // Returns siteKey
+  newSiteFromLocalDirectory: z.string(), // Returns siteKey
+  newSiteFromScratch: z.string(), // Returns siteKey
+
+  // Git repository inspection
+  quiqr_git_repo_show: z.record(z.any()), // RepoInfo - dynamic structure
+  hugotheme_git_repo_show: z.record(z.any()), // RepoInfo - dynamic structure
+  hugosite_dir_show: siteInventorySchema,
+
+  // Form state
+  getDynFormFields: dynFormFieldsSchema,
   shouldReloadForm: z.boolean(),
   getCurrentFormAccordionIndex: z.string(),
+  setCurrentFormAccordionIndex: z.boolean(),
+  getCurrentFormNodePath: z.string(),
   setCurrentFormNodePath: z.boolean(),
-  globSync: z.array(z.string()),
-  getCurrentSiteKey: z.string(),
-  reloadThemeStyle: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
   reloadCurrentForm: z.boolean(),
-  updateSingle: z.record(z.any()), // Returns the updated document
-  listCollectionItems: z.array(collectionItemSchema),
-  getLanguages: z.array(languageSchema),
-  createCollectionItemKey: collectionItemKeyResponseSchema,
-  getCollectionItem: z.record(z.any()), // Returns dynamic content based on collection's fields
-  getFilesFromAbsolutePath: z.array(fileReferenceSchema),
-  updateCollectionItem: z.record(z.any()), // Returns the updated document
-  showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
-  openSiteLibrary: z.boolean(),
-  readConfPrefKey: z.union([z.string(), z.boolean(), z.undefined()]),
-  stopHugoServer: hugoServerResponseSchema,
-  getFilteredHugoVersions: z.array(z.string()),
-  getThumbnailForPath: z.string().optional(),
-  updateCommunityTemplates: z.array(communityTemplateSchema),
-  saveConfPrefKey: z.boolean(),
-  mountWorkspace: z.string(),
+
+  // Configuration and preferences
   readConfKey: z.union([
     userPreferencesSchema, // When reading "prefs"
     z.boolean(), // For boolean flags
@@ -107,9 +204,36 @@ export const apiSchemas = {
       sitePath: z.string().nullable()
     }) // For lastOpenedSite
   ]),
-  getCreatorMessage: z.string(),
-  getSiteConfig: siteConfigSchema,
-  serveWorkspace: z.any(), // Returns void/undefined, server action
+  readConfPrefKey: z.union([z.string(), z.boolean(), z.undefined()]),
+  saveConfPrefKey: z.boolean(),
+  matchRole: z.boolean(),
+  invalidateCache: z.boolean(),
+
+  // Hugo operations
+  stopHugoServer: hugoServerResponseSchema,
+  getFilteredHugoVersions: z.array(z.string()),
+  getHugoTemplates: z.any(), // Not implemented in backend
+
+  // Window management
+  showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
+  showMenuBar: z.boolean(),
+  hideMenuBar: z.boolean(),
+  redirectTo: z.boolean(),
+  parentMountWorkspace: z.boolean(),
+  reloadThemeStyle: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
+
+  // External/shell operations
+  openExternal: z.boolean(),
+  openCustomCommand: z.any(), // Not implemented, throws error
+  logToConsole: z.boolean(),
+
+  // Sync/publish operations
+  publisherDispatchAction: z.any(), // Return type varies by action
+  createKeyPairGithub: keyPairResponseSchema,
+
+  // Site library
+  openSiteLibrary: z.boolean(),
+  updateCommunityTemplates: z.array(communityTemplateSchema),
   showOpenFolderDialog: folderDialogResponseSchema
 } as const
 
@@ -122,6 +246,14 @@ export type CollectionItemKeyResponse = z.infer<typeof collectionItemKeyResponse
 export type FolderDialogResponse = z.infer<typeof folderDialogResponseSchema>
 export type CommunityTemplate = z.infer<typeof communityTemplateSchema>
 export type DynFormFields = z.infer<typeof dynFormFieldsSchema>
+export type ParseInfoIncludeFile = z.infer<typeof parseInfoIncludeFileSchema>
+export type ParseInfo = z.infer<typeof parseInfoSchema>
+export type BuildActionResult = z.infer<typeof buildActionResultSchema>
+export type DeleteCollectionItemResponse = z.infer<typeof deleteCollectionItemResponseSchema>
+export type RenameCollectionItemResponse = z.infer<typeof renameCollectionItemResponseSchema>
+export type CopyCollectionItemResponse = z.infer<typeof copyCollectionItemResponseSchema>
+export type KeyPairResponse = z.infer<typeof keyPairResponseSchema>
+export type SiteInventory = z.infer<typeof siteInventorySchema>
 
 // This type includes all the api method names
 export type ApiMethod = keyof typeof apiSchemas
