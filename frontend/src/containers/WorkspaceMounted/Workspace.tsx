@@ -19,26 +19,14 @@ import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
 import { SyncSidebar, SyncRouted }         from './Sync';
 import service                             from '../../services/service';
 import { History } from 'history';
-
-//TODO use global
-import styleLightDefault from '../../app-ui-styles/quiqr10/style-light.js';
-import styleDarkDefault from '../../app-ui-styles/quiqr10/style-dark.js';
-import { SiteConfig, UserPreferences } from '../../../types';
-let style = styleLightDefault;
+import Box from '@mui/material/Box';
+import { SiteConfig } from '../../../types';
 
 interface WorkspaceConfig {
   serve?: Array<{
     hugoHidePreviewSite?: boolean;
     [key: string]: unknown;
   }>;
-  [key: string]: unknown;
-}
-
-interface StyleConfig {
-  container: Record<string, unknown>;
-  menuContainer: Record<string, unknown>;
-  contentContainer: Record<string, unknown>;
-  topToolbar: Record<string, unknown>;
   [key: string]: unknown;
 }
 
@@ -52,7 +40,6 @@ interface WorkspaceState {
   site: SiteConfig | null;
   workspace: WorkspaceConfig | null;
   error: string | null;
-  style: StyleConfig;
   menuIsLocked: boolean;
   forceShowMenu: boolean;
   skipMenuTransition: boolean;
@@ -73,7 +60,6 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
       workspace: null,
       error: null,
       //maximized:win.isMaximized(),
-      style: style,
       menuIsLocked: true,
       forceShowMenu: false,
       skipMenuTransition: false,
@@ -98,22 +84,6 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
     */
 
     this.refresh();
-    this.setThemeStyleFromPrefs();
-  }
-
-  setThemeStyleFromPrefs(){
-    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
-      if(value.interfaceStyle){
-        let themeStyle='light';
-        if(value.interfaceStyle ==='quiqr10-dark'){
-          themeStyle='dark';
-        }
-
-        this.setState({
-          style: themeStyle === 'light' ? styleLightDefault : styleDarkDefault,
-        });
-      }
-    });
   }
 
 
@@ -468,35 +438,9 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
 
   render() {
 
-    let marginStyles = {
-      marginRight:'0px'
-    };
-
-    let containerStyle = this.state.style.container;
-    let menuContainerStyle = this.state.style.menuContainer;
-    let contentContainerStyle = this.state.style.contentContainer;
-    let topToolbarStyle = this.state.style.topToolbar;
-
-    if(!this.state.menuIsLocked){
-      contentContainerStyle = Object.assign({}, contentContainerStyle, {display: 'block', paddingLeft:'66px' });
-      menuContainerStyle = Object.assign({}, menuContainerStyle, {
-        position: 'absolute',
-        zIndex: '2',
-        height:'100%',
-        width:'280px',
-        transform: 'translateX(-214px)' } )
-
-      if(this.state.forceShowMenu){
-        menuContainerStyle.transform='translateX(0px)';
-        contentContainerStyle.transform='translateX(214px)';
-      }
-      if(!this.state.skipMenuTransition){
-        let transition = 'all ease-in-out .3s';
-        contentContainerStyle.transition = transition;
-        menuContainerStyle.transition = transition;
-      }
-
-      this.setState({skipMenuTransition: false});
+    // Reset skipMenuTransition if it was set
+    if (this.state.skipMenuTransition) {
+      this.setState({ skipMenuTransition: false });
     }
 
     return (<Switch>
@@ -506,26 +450,101 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
 
         return (
 
-            <div className="App" style={marginStyles}>
-
-              <div style={topToolbarStyle}>
-
-                <div className="toolbarLeft">
+            <Box sx={{ marginRight: 0 }}>
+              {/* Top Toolbar */}
+              <Box
+                sx={{
+                  borderTop: (theme) => `solid 1px ${theme.palette.toolbar.border}`,
+                  borderBottom: (theme) => `solid 1px ${theme.palette.toolbar.border}`,
+                  top: 0,
+                  position: 'absolute',
+                  display: 'flex',
+                  width: '100%',
+                  backgroundColor: (theme) => theme.palette.toolbar.background,
+                }}
+              >
+                {/* Toolbar Left */}
+                <Box
+                  sx={{
+                    flex: '0 0 280px',
+                    borderRight: (theme) => `solid 1px ${theme.palette.toolbar.border}`,
+                    overflowY: 'hidden',
+                    overflowX: 'hidden',
+                    height: '50px',
+                  }}
+                >
                   { this.renderTopToolbarLeftSwitch() }
-                </div>
+                </Box>
 
-                <div className="toolbarRight">
+                {/* Toolbar Right */}
+                <Box sx={{ flex: 'auto', height: '50px', overflow: 'hidden' }}>
                   { this.renderTopToolbarRightSwitch() }
-                </div>
-              </div>
+                </Box>
+              </Box>
 
-              <div style={containerStyle}>
-
-                <div style={menuContainerStyle} className='hideScrollbar' >
+              {/* Main Container */}
+              <Box
+                sx={{
+                  position: 'relative',
+                  display: 'flex',
+                  height: 'calc(100vh - 52px)',
+                  marginTop: '52px',
+                  overflowX: 'hidden',
+                }}
+              >
+                {/* Sidebar/Menu */}
+                <Box
+                  className='hideScrollbar'
+                  sx={{
+                    flex: '0 0 280px',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    userSelect: 'none',
+                    background: (theme) => theme.palette.sidebar.background,
+                    // Dynamic: unlocked menu behavior
+                    ...(this.state.menuIsLocked
+                      ? {}
+                      : {
+                          position: 'absolute',
+                          zIndex: 2,
+                          height: '100%',
+                          width: '280px',
+                          transform: this.state.forceShowMenu
+                            ? 'translateX(0px)'
+                            : 'translateX(-214px)',
+                          transition: this.state.skipMenuTransition
+                            ? 'none'
+                            : 'all ease-in-out 0.3s',
+                        }),
+                  }}
+                >
                   { this.renderMenuSwitch() }
-                </div>
+                </Box>
 
-                <div key="main-content" style={contentContainerStyle} onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}>
+                {/* Content */}
+                <Box
+                  key="main-content"
+                  onClick={()=>{ if(this.state.forceShowMenu) this.toggleForceShowMenu() }}
+                  sx={{
+                    flex: 'auto',
+                    userSelect: 'none',
+                    overflow: 'auto',
+                    overflowX: 'hidden',
+                    // Dynamic: unlocked menu content shift
+                    ...(this.state.menuIsLocked
+                      ? {}
+                      : {
+                          display: 'block',
+                          paddingLeft: '66px',
+                          transform: this.state.forceShowMenu
+                            ? 'translateX(214px)'
+                            : 'translateX(0px)',
+                          transition: this.state.skipMenuTransition
+                            ? 'none'
+                            : 'all ease-in-out 0.3s',
+                        }),
+                  }}
+                >
                   { this.state.error && (<p style={{
                     color: '#EC407A', padding: '10px', margin: '16px',
                     fontSize:'14px', border: 'solid 1px #EC407A',
@@ -533,11 +552,11 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
                   }}>{this.state.error}</p>) }
 
                   { this.renderContentSwitch() }
-                </div>
+                </Box>
 
-              </div>
+              </Box>
 
-            </div>
+            </Box>
         );
 
       }} />
