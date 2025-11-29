@@ -18,14 +18,14 @@ import styleLightDefault from "./app-ui-styles/quiqr10/style-light.js";
 import styleDarkDefault from "./app-ui-styles/quiqr10/style-dark.js";
 import { UserPreferences } from "../types";
 
-let defaultApplicationRole = "contentEditor";
+const defaultApplicationRole = "contentEditor";
 
 type AppState = {
   splashDialogOpen: boolean;
   showSplashAtStartup: boolean;
   applicationRole: string;
   libraryView: string;
-  style: any;
+  style: unknown;
   theme: Theme;
   menuIsLocked: boolean;
   forceShowMenu: boolean;
@@ -35,16 +35,15 @@ type AppState = {
   importSiteDialogOpen?: boolean;
 };
 
-class App extends React.Component<{}, AppState> {
+class App extends React.Component<null, AppState> {
   _ismounted?: boolean;
-  history?: any;
+  history?: unknown;
 
-  constructor(props: {}) {
+  constructor(props: null) {
     super(props);
 
-    //let win = window.require('electron').remote.getCurrentWindow();
-    let style = styleLightDefault;
-    let theme = createTheme({
+    const style = styleLightDefault;
+    const theme = createTheme({
       palette: {
         mode: "light",
         primary: {
@@ -67,9 +66,7 @@ class App extends React.Component<{}, AppState> {
       quiqrDomain: "",
     };
 
-    //win.on('maximize', () => { this.setState({maximized: true}); });
-    //win.on('unmaximize', ()=>{ this.setState({maximized: false}); });
-    (window as any).state = this.state;
+    // (window as any).state = this.state;
   }
 
   setThemeStyleFromPrefs() {
@@ -80,7 +77,7 @@ class App extends React.Component<{}, AppState> {
           themeStyle = "dark";
         }
 
-        let theme = createTheme({
+        const theme = createTheme({
           palette: {
             mode: themeStyle,
             primary: {
@@ -166,36 +163,20 @@ class App extends React.Component<{}, AppState> {
       if (!role) role = defaultApplicationRole;
 
       // TODO: extract to typeguard, or do schema checking in service.api.readConfPrefKey
-      if (typeof role === 'string') {
+      if (typeof role === "string") {
         this.setState({ applicationRole: role });
       }
     });
   }
 
-  /*
-  closeWindow(){
-    window.require('electron').remote.getCurrentWindow().close();
-  }
-
-  toggleWindowMode(){
-    let win = window.require('electron').remote.getCurrentWindow();
-    if(!this.state.maximized){
-      win.maximize();
-    }
-    else{
-      win.unmaximize();
-    }
-  }
-  */
-
-  toggleMenuIsLocked(){
-    let menuIsLocked = !this.state.menuIsLocked;
-    this.setState({menuIsLocked, forceShowMenu: true, skipMenuTransition:true});
-    window.dispatchEvent(new Event('resize'));
+  toggleMenuIsLocked() {
+    const menuIsLocked = !this.state.menuIsLocked;
+    this.setState({ menuIsLocked, forceShowMenu: true, skipMenuTransition: true });
+    window.dispatchEvent(new Event("resize"));
   }
 
   toggleForceShowMenu() {
-    var forceShowMenu = !this.state.forceShowMenu;
+    const forceShowMenu = !this.state.forceShowMenu;
     this.setState({ forceShowMenu });
   }
 
@@ -219,7 +200,7 @@ class App extends React.Component<{}, AppState> {
             const sp = new URLSearchParams(history.location.search);
             let backurl = "/sites/last";
             if (sp.has("siteKey")) {
-              let siteKey = sp.get("siteKey");
+              const siteKey = sp.get("siteKey");
               backurl = `/sites/${siteKey}/workspaces/source`;
             }
             const leftButtons = [
@@ -257,12 +238,11 @@ class App extends React.Component<{}, AppState> {
             return <TopToolbarRight itemsLeft={leftButtons} itemsCenter={[]} itemsRight={rightButtons} />;
           }}
         />
-
-        {/*REMOVE ONE OF THESE*/}
+        ;{/*REMOVE ONE OF THESE*/}
         <Route
           path='/'
           exact={true}
-          render={({ match, history }) => {
+          render={() => {
             return (
               <SiteLibraryToolbarRight
                 handleChange={(v) => this.handleLibraryViewChange(v)}
@@ -272,7 +252,7 @@ class App extends React.Component<{}, AppState> {
             );
           }}
         />
-
+        ;
         <Route
           path='/sites/*'
           exact
@@ -296,14 +276,14 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/sites'
           exact={true}
-          render={({ match, history }) => {
+          render={() => {
             return <SiteLibrarySidebar />;
           }}
         />
         <Route
           path='/sites/*'
           exact={true}
-          render={({ match, history }) => {
+          render={() => {
             return <SiteLibrarySidebar />;
           }}
         />
@@ -311,7 +291,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/create-new'
           exact={true}
-          render={({ match, history }) => {
+          render={() => {
             return null;
           }}
         />
@@ -319,7 +299,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/welcome'
           exact={true}
-          render={({ match, history }) => {
+          render={() => {
             return null;
           }}
         />
@@ -327,7 +307,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/prefs'
           exact={false}
-          render={({ match, history }) => {
+          render={() => {
             return (
               <PrefsSidebar
                 menus={[]}
@@ -347,7 +327,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='*'
           exact={true}
-          render={({ match, history }) => {
+          render={() => {
             return <SiteLibrarySidebar />;
           }}
         />
@@ -375,7 +355,7 @@ class App extends React.Component<{}, AppState> {
     this.setState({ libraryView: view });
   }
 
-  renderSelectSites(openDialog?: string) {
+  renderSelectSites(_openDialog?: string) {
     return (
       <SiteLibraryRouted
         handleLibraryDialogCloseClick={() => this.handleLibraryDialogCloseClick()}
@@ -417,7 +397,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/sites/import-site-url/:url'
           exact={false}
-          render={({ match, history }) => {
+          render={({ match }) => {
             return (
               <SiteLibraryRouted
                 handleLibraryDialogCloseClick={() => this.handleLibraryDialogCloseClick()}
@@ -464,15 +444,15 @@ class App extends React.Component<{}, AppState> {
   }
 
   renderBodyWithToolbars() {
-    let marginStyles = {
+    const marginStyles = {
       marginRight: "0px",
     };
 
-    let containerStyle = this.state.style.container;
-    let menuContainerStyle = this.state.style.menuContainer;
-    let topToolbarStyle = this.state.style.topToolbar;
-    let contentContainerStyle = this.state.style.contentContainer;
-    let welcomeScreen = this.renderWelcomeScreen();
+    const containerStyle = this.state.style.container;
+    const menuContainerStyle = this.state.style.menuContainer;
+    const topToolbarStyle = this.state.style.topToolbar;
+    const contentContainerStyle = this.state.style.contentContainer;
+    const welcomeScreen = this.renderWelcomeScreen();
 
     return (
       <StyledEngineProvider injectFirst>
@@ -512,7 +492,7 @@ class App extends React.Component<{}, AppState> {
   render() {
     let menuContainerStyle = this.state.style.menuContainer;
     let contentContainerStyle = this.state.style.contentContainer;
-    let welcomeScreen = this.renderWelcomeScreen();
+    const welcomeScreen = this.renderWelcomeScreen();
 
     if (!this.state.menuIsLocked) {
       contentContainerStyle = Object.assign({}, contentContainerStyle, { display: "block", paddingLeft: "66px" });
@@ -529,7 +509,7 @@ class App extends React.Component<{}, AppState> {
         contentContainerStyle.transform = "translateX(214px)";
       }
       if (!this.state.skipMenuTransition) {
-        let transition = "all ease-in-out .3s";
+        const transition = "all ease-in-out .3s";
         contentContainerStyle.transition = transition;
         menuContainerStyle.transition = transition;
       }
@@ -542,7 +522,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/console'
           exact={false}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
 
             return (
@@ -607,7 +587,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/refresh'
           exact={true}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return (
               <StyledEngineProvider injectFirst>
@@ -632,7 +612,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/'
           exact={true}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
 
             const sp = new URLSearchParams(history.location.search);
@@ -646,7 +626,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/sites'
           exact={true}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return this.renderBodyWithToolbars();
           }}
@@ -654,7 +634,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/sites/*'
           exact={true}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return this.renderBodyWithToolbars();
           }}
@@ -662,7 +642,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/create-new'
           exact={true}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return this.renderBodyWithToolbars();
           }}
@@ -670,7 +650,7 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/welcome'
           exact={true}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return this.renderBodyWithToolbars();
           }}
@@ -678,14 +658,14 @@ class App extends React.Component<{}, AppState> {
         <Route
           path='/prefs'
           exact={false}
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return this.renderBodyWithToolbars();
           }}
         />
         <Route
           path='*'
-          render={({ match, history }) => {
+          render={({ history }) => {
             this.history = history;
             return this.renderBodyWithToolbars();
           }}
