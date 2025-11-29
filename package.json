@@ -46,12 +46,14 @@
     "electron-window-state": "^5.0.3",
     "express": "^4.21.2",
     "front-matter": "^4.0.2",
+    "fs-extra": "^11.2.0",
     "glob": "^10.4.5",
     "jimp": "^1.6.0",
     "js-yaml": ">=3.13.1",
     "toml": "2.3.3",
     "tomlify-j0.4": "3.0.0",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.6",
