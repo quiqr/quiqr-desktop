@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SiteDialogsContainer from "./dialogs/SiteDialogsContainer";
 import SiteGridView from "./components/SiteGridView";
 import SiteListView from "./components/SiteListView";
@@ -38,13 +38,12 @@ const SiteLibraryContent = ({
     historyRef.current = historyObj;
   }, [historyObj]);
 
-  const { configurations, quiqrCommunityTemplates, localsites, sitesListingView, error: quiqrCommunityTemplatesError, updateLocalSites } = useSiteLibraryData();
+  const { configurations, quiqrCommunityTemplates, sitesListingView, error: quiqrCommunityTemplatesError, updateLocalSites } = useSiteLibraryData();
 
   const { dialogState, openDialog, closeDialog } = useSiteDialogs({ newSite, importSite, importSiteURL });
 
   const { mountSiteByKey, mountSite } = useSiteOperations(historyRef);
 
-  const [blockingOperation] = useState<string | null | ReactNode>(null);
   const [showSpinner] = useState(false);
 
   const handleSiteClick = (site: SiteConfig) => {
@@ -89,8 +88,6 @@ const SiteLibraryContent = ({
 
       <SiteDialogsContainer
         dialogState={dialogState}
-        localsites={localsites}
-        blockingOperation={blockingOperation}
         onClose={closeDialog}
         onSuccess={updateLocalSites}
         onLibraryDialogClose={handleLibraryDialogCloseClick}

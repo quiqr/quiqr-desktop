@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect, useCallback } from "react";
 import service from "../../../services/service";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -8,30 +8,44 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
 import { SiteConfig } from '../../../../types';
 
 interface RenameDialogProps {
   open: boolean;
   siteconf: SiteConfig;
-  localsites?: string[];
-  onSavedClick: () => void;
-  onCancelClick: () => void;
+  onSuccess: () => void;
+  onClose: () => void;
 }
 
-const RenameDialog: React.FC<RenameDialogProps> = ({ open, siteconf, localsites, onSavedClick, onCancelClick }) => {
-  const [execButtonsDisabled, setExecButtonsDisabled] = React.useState(false);
-  const [errorTextSiteName, setErrorTextSiteName] = React.useState("");
-  const [editedSiteConf, setEditedSiteConf] = React.useState<{ key?: string; name?: string }>({});
+const RenameDialog = ({ open, siteconf, onSuccess, onClose }: RenameDialogProps) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [localsites, setLocalsites] = useState<string[]>([]);
+  const [execButtonsDisabled, setExecButtonsDisabled] = useState(false);
+  const [errorTextSiteName, setErrorTextSiteName] = useState("");
+  const [editedSiteConf, setEditedSiteConf] = useState<{ key?: string; name?: string }>({});
+
+  // Fetch local sites when dialog opens
+  useEffect(() => {
+    if (open) {
+      service.getConfigurations().then((configurations) => {
+        setLocalsites(configurations.sites.map(site => site.name));
+      });
+    }
+  }, [open]);
 
   // Sync siteconf from props when it changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (siteconf.key) {
       setEditedSiteConf({ ...siteconf });
       setExecButtonsDisabled(true);
+      setError(null);
     }
   }, [siteconf.key]);
 
-  const validateSiteName = React.useCallback((newName: string) => {
+  const validateSiteName = useCallback((newName: string) => {
     let errorText = "";
     let disabled = false;
 
@@ -50,32 +64,28 @@ const RenameDialog: React.FC<RenameDialogProps> = ({ open, siteconf, localsites,
     setEditedSiteConf({ ...editedSiteConf, name: newName });
   };
 
-  const saveSiteConf = () => {
-    if (editedSiteConf.key) {
-      service.api.saveSiteConf(editedSiteConf.key, editedSiteConf).then(() => {
-        onSavedClick();
-      });
+  const saveSiteConf = async () => {
+    if (!editedSiteConf.key) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await service.api.saveSiteConf(editedSiteConf.key, editedSiteConf);
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to rename site');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const actions = [
-    <Button
-      key={"menuAction1" + siteconf.name}
-      onClick={onCancelClick}>
-      cancel
-    </Button>,
-
-    <Button
-      key={"menuAction2" + siteconf.name}
-      disabled={execButtonsDisabled}
-      onClick={saveSiteConf}>
-      SAVE
-    </Button>,
-  ];
-
   return (
     <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
-      <DialogTitle id='alert-dialog-title'>{"Edit site name: " + siteconf.name}</DialogTitle>
+      <DialogTitle id='alert-dialog-title'>Edit site name: {siteconf.name}</DialogTitle>
       <DialogContent>
         <DialogContentText id='alert-dialog-description'>
           <Box>
@@ -87,11 +97,24 @@ const RenameDialog: React.FC<RenameDialogProps> = ({ open, siteconf, localsites,
               onChange={handleNameChange}
               error={errorTextSiteName !== ""}
               helperText={errorTextSiteName}
+              disabled={loading}
             />
           </Box>
         </DialogContentText>
+        {error && (
+          <Box mt={2}>
+            <Alert severity="error">{error}</Alert>
+          </Box>
+        )}
       </DialogContent>
-      <DialogActions>{actions}</DialogActions>
+      <DialogActions>
+        <Button onClick={onClose} disabled={loading}>
+          Cancel
+        </Button>
+        <Button onClick={saveSiteConf} disabled={execButtonsDisabled || loading}>
+          {loading ? <CircularProgress size={20} /> : 'Save'}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

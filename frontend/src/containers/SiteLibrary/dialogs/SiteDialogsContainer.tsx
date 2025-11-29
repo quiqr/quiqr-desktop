@@ -1,17 +1,12 @@
-import React from 'react';
 import DeleteSiteDialog from './DeleteSiteDialog';
 import RenameSiteDialog from './RenameSiteDialog';
 import CopySiteDialog from './CopySiteDialog';
 import EditSiteTagsDialogs from './EditSiteTagsDialogs';
 import NewSlashImportSiteDialog from './NewSlashImportSiteDialog';
-import BlockDialog from '../../../components/BlockDialog';
-import service from '../../../services/service';
 import { DialogState } from '../hooks/useSiteDialogs';
 
 interface SiteDialogsContainerProps {
   dialogState: DialogState;
-  localsites: string[];
-  blockingOperation: string | null | React.ReactNode;
   onClose: () => void;
   onSuccess: () => void;
   onLibraryDialogClose: () => void;
@@ -20,74 +15,39 @@ interface SiteDialogsContainerProps {
 
 const SiteDialogsContainer = ({
   dialogState,
-  localsites,
-  blockingOperation,
   onClose,
   onSuccess,
   onLibraryDialogClose,
   mountSiteByKey,
-} : SiteDialogsContainerProps) => {
+}: SiteDialogsContainerProps) => {
   return (
-    <div>
-      <DeleteSiteDialog
-        open={dialogState.activeDialog === "delete"}
-        siteconf={dialogState.siteconf}
-        onCancelClick={onClose}
-        onDelete={(siteKey) => {
-          service.api.deleteSite(siteKey);
-          onSuccess();
-          onClose();
-        }}
-      />
+    <>
+      <DeleteSiteDialog open={dialogState.activeDialog === "delete"} siteconf={dialogState.siteconf} onClose={onClose} onSuccess={onSuccess} />
 
-      <RenameSiteDialog
-        open={dialogState.activeDialog === "rename"}
-        localsites={localsites}
-        siteconf={dialogState.siteconf}
-        onCancelClick={onClose}
-        onSavedClick={() => {
-          onSuccess();
-          onClose();
-        }}
-      />
+      <RenameSiteDialog open={dialogState.activeDialog === "rename"} siteconf={dialogState.siteconf} onClose={onClose} onSuccess={onSuccess} />
 
       <CopySiteDialog
         open={dialogState.activeDialog === "copy"}
-        localsites={localsites}
         siteconf={dialogState.siteconf}
-        onCancelClick={onClose}
-        onSavedClick={() => {
-          onSuccess();
-          onClose();
-        }}
+        onClose={onClose}
+        onSuccess={onSuccess}
+        key={dialogState.siteconf.key}
       />
 
-      <EditSiteTagsDialogs
-        open={dialogState.activeDialog === "editTags"}
-        siteconf={dialogState.siteconf}
-        onCancelClick={onClose}
-        onSavedClick={() => {
-          service.api.redirectTo("/sites/last", true);
-          onClose();
-        }}
-      />
+      <EditSiteTagsDialogs open={dialogState.activeDialog === "editTags"} siteconf={dialogState.siteconf} onClose={onClose} onSuccess={onSuccess} />
 
       <NewSlashImportSiteDialog
         open={dialogState.activeDialog === "newSlashImport"}
-        onClose={() => {
-          onLibraryDialogClose();
-          onSuccess();
-          onClose();
-        }}
         newOrImport={dialogState.newOrImport || "new"}
         importSiteURL={dialogState.importURL}
-        mountSite={(siteKey) => {
-          mountSiteByKey(siteKey);
+        mountSite={mountSiteByKey}
+        onSuccess={() => {
+          onLibraryDialogClose();
+          onSuccess();
         }}
+        onClose={onClose}
       />
-
-      <BlockDialog open={blockingOperation != null}>{blockingOperation}</BlockDialog>
-    </div>
+    </>
   );
 };
 

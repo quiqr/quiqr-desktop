@@ -33,10 +33,11 @@ interface NewSiteDialogProps {
   newOrImport: "new" | "import";
   importSiteURL?: string;
   mountSite: (siteKey: string) => void;
+  onSuccess: () => void;
   onClose: () => void;
 }
 
-const NewSiteDialog: React.FC<NewSiteDialogProps> = ({ open, newOrImport, importSiteURL, mountSite, onClose }) => {
+const NewSiteDialog: React.FC<NewSiteDialogProps> = ({ open, newOrImport, importSiteURL, mountSite, onSuccess, onClose }) => {
   const [title, setTitle] = React.useState(newOrImport === "import" ? "Import Quiqr Site" : "New Quiqr Site");
   const [filteredHugoVersions, setFilteredHugoVersions] = React.useState<string[]>([]);
   const [newType, setNewType] = React.useState("");
@@ -408,6 +409,7 @@ const NewSiteDialog: React.FC<NewSiteDialogProps> = ({ open, newOrImport, import
 
   const handleOpenNewSite = () => {
     if (newSiteKey) {
+      onSuccess();
       mountSite(newSiteKey);
       onClose();
     }
