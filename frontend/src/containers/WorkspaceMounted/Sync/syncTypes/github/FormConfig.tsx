@@ -3,7 +3,6 @@ import service             from '../../../../../services/service';
 import TextField           from '@mui/material/TextField';
 import Button              from '@mui/material/Button';
 import Box                 from '@mui/material/Box';
-import clsx                from 'clsx';
 import OutlinedInput       from '@mui/material/OutlinedInput';
 import InputLabel          from '@mui/material/InputLabel';
 import InputAdornment      from '@mui/material/InputAdornment';
@@ -75,10 +74,10 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
       keyPairBusy: true
     });
 
-    let promise = service.api.createKeyPairGithub();
+    const promise = service.api.createKeyPairGithub();
 
     promise.then((resp)=>{
-      this.updatePubData({deployPrivateKey: resp.keyPair[0], deployPublicKey: resp.keyPair[1] },
+      this.updatePubData({deployPrivateKey: resp.privateKey, deployPublicKey: resp.publicKey },
         ()=>{
           this.setState({ keyPairBusy: false })
         }
@@ -108,7 +107,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
   }
 
   updatePubData(newData: Partial<GithubPublishConf>, callback: (() => void) | null = null){
-    let pubData = {...this.state.pubData, ...newData};
+    const pubData = {...this.state.pubData, ...newData};
     this.setState({pubData: pubData}, ()=>{
       this.props.setData(pubData);
 
@@ -118,9 +117,12 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
       else{
         this.props.setSaveEnabled(false);
       }
-      typeof callback === 'function' && callback();
-    });
+      
+      if (typeof callback === 'function') {
+        callback();
+      }
 
+    });
   }
 
   renderGitHubActionsForm(){
@@ -359,7 +361,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
                   id="outlined-adornment-password"
                   type={this.state.showPassword ? 'text' : 'password'}
                   value={this.state.pubData.deployPublicKey}
-                  onChange={(e)=>{
+                  onChange={(_e)=>{
                     //this.updatePubData({deployPublicKey: e.target.value });
                   }}
 
@@ -443,4 +445,3 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
 }
 
 export default FormConfig;
-

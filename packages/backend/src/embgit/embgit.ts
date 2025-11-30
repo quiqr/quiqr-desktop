@@ -127,7 +127,7 @@ export class Embgit {
   /**
    * Execute embgit command
    */
-  private async executeEmbgit(args: string[], logMessage?: string): Promise<string> {
+  private async executeEmbgit(args: string[], logMessage?: string, cwd?: string): Promise<string> {
     const gitBinary = this.getGitBin();
 
     if (logMessage) {
@@ -139,6 +139,7 @@ export class Embgit {
         windowsHide: true,
         timeout: 300000, // 5 minutes
         maxBuffer: 1024 * 1024 * 10, // 10MB
+        cwd,
       });
       return stdout;
     } catch (error: any) {
@@ -403,7 +404,7 @@ export class Embgit {
     const tempDir = this.pathHelper.getTempDir();
 
     try {
-      await this.executeEmbgit(['keygen_ecdsa'], `Generating SSH key pair`);
+      await this.executeEmbgit(['keygen_ecdsa'], `Generating SSH key pair`, tempDir);
 
       const privateKey = await fs.readFile(path.join(tempDir, 'id_ecdsa_quiqr'), 'utf-8');
       const publicKey = await fs.readFile(path.join(tempDir, 'id_ecdsa_quiqr.pub'), 'utf-8');
