@@ -107,7 +107,7 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">General Configuration</Typography>
         <Grid container  spacing={1} alignItems="flex-end">
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               id="standard-full-width"
               label="Site key"
@@ -121,7 +121,7 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
               }} />
 
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
           <TextField
             id="standard-full-width"
             label="Site Name"
@@ -136,7 +136,7 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
 
           </Grid>
 
-          <Grid item xs={10}>
+          <Grid size={10}>
 
           <TextField
             id="standard-full-width"
@@ -152,7 +152,7 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
 
           </Grid>
 
-          <Grid item xs={2}>
+          <Grid size={2}>
             <IconButton
               color="primary"
               sx={{ padding: '10px' }}

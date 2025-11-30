@@ -147,7 +147,7 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
 
                   if(this.isImage(item.filename)){
                     return (
-                      <Grid item xl={2} lg={4} xs={6} className="BundleManager-item" key={"imageitem-"+index}>
+                      <Grid size={{ xl: 2, lg: 4, xs: 6 }} className="BundleManager-item" key={"imageitem-"+index}>
                         <Button title={fBase} onClick={()=>{this.props.handleSelect(item.filename)}} color="primary">
                           {filename}
                         </Button>

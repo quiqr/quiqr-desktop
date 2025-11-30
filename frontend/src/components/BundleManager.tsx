@@ -148,7 +148,7 @@ const BundleManagerItem: React.FC<BundleManagerItemProps> = ({
   };
 
   return (
-    <Grid item xl={2} lg={4} xs={6} style={_style} className='BundleManager-item' {...wrapperProps}>
+    <Grid size={{ xl: 2, lg: 4, xs: 6 }} style={_style} className='BundleManager-item' {...wrapperProps}>
       <div style={_bundleStyle}>
         <BundleManagerHeader
           style={_headStyle}

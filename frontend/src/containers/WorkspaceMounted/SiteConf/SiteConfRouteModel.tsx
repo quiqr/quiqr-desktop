@@ -107,7 +107,7 @@ const SiteConfRouteModel = ({ siteKey, workspaceKey }: SiteConfRouteModelProps) 
           {files.map((item, index) => {
             return (
               <Grid container key={'grid' + index} spacing={1} alignItems="flex-end">
-                <Grid item xs={11}>
+                <Grid size={11}>
                   <TextField
                     id="standard-full-width"
                     label={item.key}
@@ -120,7 +120,7 @@ const SiteConfRouteModel = ({ siteKey, workspaceKey }: SiteConfRouteModelProps) 
                     }}
                   />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid size={1}>
                   <IconButton
                     color="primary"
                     sx={{ padding: '10px' }}

@@ -51,7 +51,7 @@ interface SyncConfigDialogState {
   serverType: string | null;
   saveEnabled: boolean;
   pubData: any;
-  dialogSize: string;
+  dialogSize: "xs" | "sm" | "md" | "lg" | "xl";
   publishKey?: string;
 }
 
@@ -107,7 +107,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
         <Grid container  spacing={2}>
 
           { (sysGitBinAvailable ?
-          <Grid item xs={6}>
+          <Grid size={6}>
             <CardNewSysGit
               handleClick={()=>{
                 this.setState({serverType: 'sysgit',
@@ -117,7 +117,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
           </Grid>
           : null) }
 
-          <Grid item xs={6}>
+          <Grid size={6}>
 
             <CardNewGitHub
               handleClick={()=>{
@@ -128,7 +128,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
 
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={6}>
             <CardNewFolder
               handleClick={()=>{
                 this.setState({serverType: 'folder',
