@@ -1,11 +1,11 @@
 import * as React from "react";
 import FormItemWrapper from "./shared/FormItemWrapper";
-import SimpleMDE from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
+// import SimpleMDE from "react-simplemde-editor";
+// import "easymde/dist/easymde.min.css";
 import Tip from "../../Tip";
 import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from "../../HoForm";
 //import service                              from './../../../services/service'
-import { EditorChange } from "codemirror";
+// import { EditorChange } from "codemirror";
 
 export interface EasyMarkdownDynamicField extends FieldBase {
   default?: string;
@@ -18,14 +18,9 @@ type EasyMarkdownDynamicProps = BaseDynamicProps<EasyMarkdownDynamicField>;
 
 type EasyMarkdownDynamicState = BaseDynamicState;
 
-const autofocusNoSpellcheckerOptions = {
-  autofocus: false,
-  spellChecker: false,
-};
-
 class EasyMarkdownDynamic extends BaseDynamic<EasyMarkdownDynamicProps, EasyMarkdownDynamicState> {
   normalizeState({ state, field }: { state: any; field: EasyMarkdownDynamicField }) {
-    let key = field.key;
+    const key = field.key;
     if (state[key] === undefined) {
       state[key] = field.default || "";
     }
@@ -35,26 +30,25 @@ class EasyMarkdownDynamic extends BaseDynamic<EasyMarkdownDynamicProps, EasyMark
     return "easymde";
   }
 
-  handleChange = (value: string, e: EditorChange) => {
-    this.forceUpdate();
-    this.props.context.setValue(e, 250);
-  };
-
   renderComponent() {
-    let { context } = this.props;
-    let { node, currentPath, parentPath } = context;
-    let { field } = node;
+    const { context } = this.props;
+    const { node, currentPath, parentPath } = context;
+    const { field } = node;
 
     if (currentPath !== parentPath) {
       return null;
     }
 
-    let iconButtons = [];
+    const iconButtons = [];
     if (field.tip) iconButtons.push(<Tip markdown={field.tip} />);
 
     return (
       <FormItemWrapper
-        control={<SimpleMDE options={autofocusNoSpellcheckerOptions} value={context.value} onChange={this.handleChange} />}
+        control={
+          <div style={{ color: "red", fontSize: "2rem" }}>
+            This component has temporarily been disabled.
+          </div>
+        }
         iconButtons={iconButtons}
       />
     );

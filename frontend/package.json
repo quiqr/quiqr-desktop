@@ -8,10 +8,6 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@fortawesome/fontawesome-svg-core": "^6.4.0",
-    "@fortawesome/free-brands-svg-icons": "^6.4.0",
-    "@fortawesome/free-solid-svg-icons": "^6.4.0",
-    "@fortawesome/react-fontawesome": "^0.2.0",
     "@kurkle/color": "^0.4.0",
     "@mui/icons-material": "^6.0.0",
     "@mui/lab": "6.0.0-beta.10-dev.20240919-130050-82a6448768",
@@ -24,8 +20,6 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-dragdata": "^2.3.1",
     "clsx": "^2.1.1",
-    "easymde": "^2.16.1",
-    "markdown-it": ">=12.3.2",
     "openai": "^6.9.0",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
@@ -33,16 +27,13 @@
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",
-    "react-router-dom": "^5.3.4",
-    "react-simplemde-editor": "^5.0.2",
-    "react-transition-group": "^4.4.5"
+    "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-flow-strip-types": "^7.27.1",
     "@eslint/js": "^9.39.1",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.1",
-    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.7.0",
     "ajv": "^8.17.1",
     "cross-env": "^7.0.3",
