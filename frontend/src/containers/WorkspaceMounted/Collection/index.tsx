@@ -1,5 +1,5 @@
 import * as React                    from 'react';
-import { useNavigate }               from 'react-router-dom';
+import { useNavigate }               from 'react-router';
 import DialogTitle                   from '@mui/material/DialogTitle';
 import Dialog                        from '@mui/material/Dialog';
 import DialogActions                 from '@mui/material/DialogActions';

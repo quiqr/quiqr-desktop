@@ -1,5 +1,5 @@
 import * as React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { SvgIconComponent } from "@mui/icons-material";

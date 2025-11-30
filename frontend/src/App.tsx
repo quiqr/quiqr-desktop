@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useParams, useNavigate, useLocation } from "react-router";
 import AppsIcon from "@mui/icons-material/Apps";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";

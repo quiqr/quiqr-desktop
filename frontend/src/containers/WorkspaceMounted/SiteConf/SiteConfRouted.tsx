@@ -1,4 +1,4 @@
-import { Routes, Route, useParams } from 'react-router-dom';
+import { Routes, Route, useParams } from 'react-router';
 import SiteConfRouteGeneral from './SiteConfRouteGeneral';
 import SiteConfRouteDogFoodSingle from './SiteConfRouteDogFoodSingle';
 import SiteConfRouteModel from './SiteConfRouteModel';

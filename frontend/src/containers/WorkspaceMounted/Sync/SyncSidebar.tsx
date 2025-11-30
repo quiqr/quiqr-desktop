@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import Sidebar from './../../Sidebar';
 import service from './../../../services/service';
 import AddIcon from '@mui/icons-material/Add';

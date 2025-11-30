@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router';
 import AppsIcon from '@mui/icons-material/Apps';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';

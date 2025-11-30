@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup } from "../TopToolbarRight";
 import AppsIcon from "@mui/icons-material/Apps";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router';
 import PrefsGeneral from './PrefsGeneral';
 import PrefsAdvanced from './PrefsAdvanced';
 

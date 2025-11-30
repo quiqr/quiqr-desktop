@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import service from "../../../services/service";
 import Chips from "../../../components/Chips";
 import Button from "@mui/material/Button";

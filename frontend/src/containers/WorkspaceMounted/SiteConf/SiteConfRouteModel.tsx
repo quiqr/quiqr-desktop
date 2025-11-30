@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import service from './../../../services/service';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';

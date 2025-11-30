@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Form, ComponentRegistry } from '../HoForm';
 import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';

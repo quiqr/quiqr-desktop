@@ -1,5 +1,5 @@
 import React                   from 'react';
-import { NavLink }             from 'react-router-dom';
+import { NavLink }             from 'react-router';
 import Divider                 from '@mui/material/Divider';
 import List                    from '@mui/material/List';
 import ListSubheader           from '@mui/material/ListSubheader';

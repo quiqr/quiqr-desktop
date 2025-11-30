@@ -1,4 +1,4 @@
-import { Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router";
 import SiteLibraryContent from "./SiteLibraryContent";
 
 interface SiteLibraryRoutedProps {

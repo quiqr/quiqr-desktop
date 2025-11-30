@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Component } from 'react';
 import service from './../../../services/service';
 import Spinner from './../../../components/Spinner';
