@@ -1,40 +1,26 @@
 import * as React   from 'react';
-import { Route }    from 'react-router-dom';
 import Sidebar      from './../Sidebar';
 import service      from './../../services/service';
-
-import { History } from 'history';
 
 interface SiteLibrarySidebarProps {
   [key: string]: unknown;
 }
 
 interface SiteLibrarySidebarState {
-  selectedMenuItem: string;
   tags: string[];
 }
 
 export class SiteLibrarySidebar extends React.Component<SiteLibrarySidebarProps, SiteLibrarySidebarState> {
   constructor(props: SiteLibrarySidebarProps){
-
     super(props);
     this.state = {
-      selectedMenuItem: 'local-all',
       tags: [],
     }
   }
 
   componentDidMount(){
-    service.api.readConfPrefKey('sitesListingView').then((view)=>{
-      if (typeof view === 'string') {
-        this.setState({selectedMenuItem: view });
-      }
-    });
-
-    let tags = [];
+    const tags: string[] = [];
     service.getConfigurations(true).then((c)=>{
-
-
       c.sites.forEach((site)=>{
         if(site.tags){
           site.tags.forEach((t)=>{
@@ -44,71 +30,35 @@ export class SiteLibrarySidebar extends React.Component<SiteLibrarySidebarProps,
           })
         }
       })
-      tags.sort(function(a, b){
-        var nameA=a.toLowerCase(), nameB=b.toLowerCase()
-        if (nameA < nameB) //sort string ascending
-          return -1
-        if (nameA > nameB)
-          return 1
-        return 0 //default return value (no sorting)
-      })
+      tags.sort((a, b) => {
+        const nameA = a.toLowerCase();
+        const nameB = b.toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+      });
 
-
-      this.setState({tags:tags});
+      this.setState({ tags });
     });
   }
 
   render(){
-    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
-  }
+    const basePath = `/sites`;
 
-  saveSelectedMenuItem(item: string){
-    service.api.saveConfPrefKey("sitesListingView",item);
-    this.setState({selectedMenuItem:item});
-  }
+    const tagsMenus = this.state.tags.map((tag) => ({
+      active: true,
+      label: tag,
+      to: `${basePath}/tags/${tag}`,
+    }));
 
-  renderWithRoute(history: History){
-
-    let basePath = `/sites`;
-
-    let tagsMenus = [];
-    this.state.tags.forEach((tag,index)=>{
-      tagsMenus.push(
-        {
-          active: true,
-          label: tag,
-          selected: (this.state.selectedMenuItem === 'local-tags-'+tag ? true : false),
-          onClick: ()=>{
-            this.saveSelectedMenuItem('local-tags-'+tag);
-            history.push(`${basePath}/tags/${tag}`)
-          }
-        }
-      );
-    });
-
-    let menus = [
+    const menus = [
       {
         title: 'On this computer',
         items: [
-          /*
-          {
-            active: true,
-            label: "Root",
-            selected: (this.state.selectedMenuItem==='local-root' ? true : false),
-            onClick: ()=>{
-              this.saveSelectedMenuItem('local-root');
-              history.push(`${basePath}/local`)
-            }
-          },
-          */
           {
             active: true,
             label: "All",
-            selected: (this.state.selectedMenuItem==='local-all' ? true : false),
-            onClick: ()=>{
-              this.saveSelectedMenuItem('local-all');
-              history.push(`${basePath}/local`)
-            }
+            to: `${basePath}/local`,
           },
           {
             active: true,
@@ -123,31 +73,11 @@ export class SiteLibrarySidebar extends React.Component<SiteLibrarySidebarProps,
           {
             active: true,
             label: "Quiqr Community Templates",
-            selected: (this.state.selectedMenuItem==='quiqr-community-templates' ? true : false),
-            onClick: ()=>{
-              this.saveSelectedMenuItem('quiqr-community-templates');
-              history.push(`${basePath}/quiqr-community-templates`)
-            }
+            to: `${basePath}/quiqr-community-templates`,
           },
         ]
       },
-      /*
-      {
-        title: 'Hugo Templates',
-        items: [
-          {
-            active: true,
-            label: "Themes from gohugo.io",
-            selected: (this.state.selectedMenuItem==='themes-gohugo-io' ? true : false),
-            onClick: ()=>{
-              this.saveSelectedMenuItem('themes-gohugo-io');
-              history.push(`${basePath}/themes/gohugo-io`)
-            }
-          },
-        ]
-      },
-      */
-    ]
+    ];
 
     return <Sidebar {...this.props} menus={menus} />
   }

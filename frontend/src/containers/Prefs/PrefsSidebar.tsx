@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Route } from 'react-router-dom';
 import Sidebar from './../Sidebar';
 
 type PrefsSidebarProps = {
@@ -13,28 +12,21 @@ type PrefsSidebarProps = {
 export class PrefsSidebar extends React.Component<PrefsSidebarProps> {
 
   render(){
-    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
-  }
-
-  renderWithRoute(history: {push:(path: string)=>void}){
-
-    let menu = {
+    const menu = {
       title: 'Preferences',
       items: [
-      {
-        active: true,
-        label: "General",
-        onClick: ()=>{
-          history.push('/prefs/general');
+        {
+          active: true,
+          label: "General",
+          to: '/prefs/general',
+          exact: true,
+        },
+        {
+          active: true,
+          label: "Advanced",
+          to: '/prefs/advanced',
+          exact: true,
         }
-      },
-      {
-        active: true,
-        label: "Advanced",
-        onClick: ()=>{
-          history.push('/prefs/advanced');
-        }
-      }
       ]
     }
 

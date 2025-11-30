@@ -50,7 +50,6 @@ interface SyncSidebarProps {
 
 interface SyncSidebarState {
   site: SiteWithPublish;
-  selectedMenuItem: string;
   anchorEl?: HTMLElement | null;
   menuOpen?: number | null;
   serverDialog?: ServerDialogConfig;
@@ -69,7 +68,6 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
         key: '',
         publish: [],
       },
-      selectedMenuItem: ''
     }
   }
 
@@ -77,27 +75,11 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
   componentDidUpdate(preProps: SyncSidebarProps){
     if(preProps.site !== this.props.site){
       this.initState();
-      this.checkLastOpenedPublishConf();
     }
   }
 
   componentDidMount(){
     this.initState();
-    this.checkLastOpenedPublishConf();
-  }
-
-  checkLastOpenedPublishConf(){
-    service.api.readConfKey('lastOpenedPublishTargetForSite').then((value)=>{
-      if(value && typeof value === 'object'){
-        const record = value as Record<string, unknown>;
-        if(this.props.siteKey in record){
-          const selectedValue = record[this.props.siteKey];
-          if (typeof selectedValue === 'string') {
-            this.setState({selectedMenuItem: selectedValue});
-          }
-        }
-      }
-    });
   }
 
   initState(){
@@ -177,17 +159,18 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
 
 
   deletePublishConfiguration(inkey: string){
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
+    const encodedSiteKey = this.props.siteKey;
+    const encodedWorkspaceKey = this.props.workspaceKey;
+    const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
 
-    let site= this.props.site;
+    const site = this.props.site;
 
     const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
     if(publConfIndex > -1){
       site.publish.splice(publConfIndex, 1);
 
       service.api.saveSiteConf(this.props.site.key, this.props.site).then(()=>{
+        // Must stay imperative - navigation after async operation
         this.history?.push(`${basePath}/`)
       });
     }
@@ -195,13 +178,13 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
 
 
   renderWithRoute(history: History){
-    let {site} = this.state;
+    const {site} = this.state;
 
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
+    const encodedSiteKey = this.props.siteKey;
+    const encodedWorkspaceKey = this.props.workspaceKey;
+    const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
 
-    let targets = [];
+    const targets = [];
     let index = 0;
 
     site.publish.forEach((publ)=>{
@@ -230,18 +213,14 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
           label: label,
           secondaryMenu: this.renderMenu(index, publ),
           secondaryButton: this.renderButton(index, publ),
-          selected: (this.state.selectedMenuItem===publ.key ? true : false),
-          onClick: ()=>{
-            this.setState({selectedMenuItem:publ.key});
-            history.push(`${basePath}/list/${publ.key}/`)
-          }
+          to: `${basePath}/list/${publ.key}/`,
         });
       }
 
       index++;
     })
 
-    let menus = [{
+    const menus = [{
       title: 'Sync Targets',
       items: targets
     },
@@ -254,8 +233,8 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
           {
             icon: <AddIcon />,
             label: "ADD SYNC TARGET",
+            // Must stay imperative - uses Math.random() for cache busting
             onClick: ()=>{
-              this.setState({selectedMenuItem:'general'});
               history.push(`${basePath}/add/x${Math.random()}`)
             }
           }
@@ -271,6 +250,7 @@ export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarSt
           {...(this.state.serverDialog as Record<string, unknown>)}
           site={this.props.site as unknown as { key: string; publish: Array<{ key: string; config: unknown }> }}
           onSave={(publishKey)=>{
+            // Must stay imperative - navigation after async operation
             this.history.push(`${basePath}/list/${publishKey}`)
             this.setState({serverDialog: {
               open:false

@@ -1,11 +1,7 @@
 import React     from 'react';
-import { Route } from 'react-router-dom'
 import service   from './../../services/service'
 import Sidebar, { SidebarMenu } from '../Sidebar';
-import { History } from 'history';
 import { UserPreferences } from '../../../types';
-//import Box       from '@mui/material/Box';
-//import Switch    from '@mui/material/Switch';
 
 interface SiteConfig {
   key: string;
@@ -61,7 +57,6 @@ interface WorkspaceSidebarState {
   error: string | null;
   prefs?: Record<string, unknown>;
   showEmpty?: boolean;
-  selectedMenuItem?: string;
 }
 
 class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceSidebarState>{
@@ -82,13 +77,6 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
   }
 
   componentDidMount(){
-    /* PORTQUIQR
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showEmpty: true});
-    });
-    service.registerListener(this);
-    */
-
     this._ismounted = true;
     this.refresh();
 
@@ -102,7 +90,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
       } else {
         this.setState({menusCollapsed: []});
       }
-      
+
     });
   }
 
@@ -142,14 +130,6 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
     this._ismounted = false;
   }
 
-  render(){
-    if(this.state.showEmpty){
-      return (<div />);
-    }
-    else{}
-    return (<Route render={({history})=>{ return this.renderWithRoute(history) }} />);
-  }
-
   matchRole(menuslot: WorkspaceMenu){
     if(typeof menuslot.matchRole === 'undefined' || menuslot.matchRole === '' || menuslot.matchRole === 'all' || this.props.applicationRole === menuslot.matchRole){
       return true;
@@ -157,26 +137,28 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
     return false;
   }
 
-  renderWithRoute(history: History){
+  render(){
+    if(this.state.showEmpty){
+      return (<div />);
+    }
 
-    let encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
-    let encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+    const encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
+    const encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
+    const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
 
-    let menus: SidebarMenu[] = [];
+    const menus: SidebarMenu[] = [];
 
     if(this.state.workspace){
 
-      //TODO only allow menu not singles and collections remove this if
       if("menu" in this.state.workspace){
-        this.state.workspace.menu.map((menuslot, mindex) => {
+        this.state.workspace.menu.map((menuslot) => {
 
           if(this.matchRole(menuslot) && menuslot.disabled !== true){
 
             menus.push({
               title: menuslot.title,
               expandable: true,
-              items: menuslot.menuItems.filter( (item)=> item.disabled !== true ).map((menuitem, iindex) => {
+              items: menuslot.menuItems.filter( (item)=> item.disabled !== true ).map((menuitem) => {
                 let item = null;
                 let itemType = null;
 
@@ -192,10 +174,8 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
                 if(item){
                   return {
                     label: item.title,
-                    selected: (this.state.selectedMenuItem===`menu-${mindex}-${iindex}` ? true : false),
+                    to: `${basePath}/${itemType}/${encodeURIComponent(item.key)}`,
                     onClick: () => {
-                      this.setState({selectedMenuItem:`menu-${mindex}-${iindex}`})
-                      history.push(`${basePath}/${itemType}/${encodeURIComponent(item.key)}`);
                       this.refresh();
                     },
                     active: false
@@ -222,11 +202,11 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
         if(this.state.workspace.collections.length > 0){
           menus.push({
             title: 'Collections',
-            items: this.state.workspace.collections.map((collection, index) => {
+            items: this.state.workspace.collections.map((collection) => {
               return {
                 label: collection.title,
+                to: `${basePath}/collections/${encodeURIComponent(collection.key)}`,
                 onClick: () => {
-                  history.push(`${basePath}/collections/${encodeURIComponent(collection.key)}`);
                   this.refresh();
                 },
                 active: false
@@ -239,11 +219,11 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
         if(this.state.workspace.singles.length > 0){
           menus.push({
             title: 'Singles',
-            items: this.state.workspace.singles.map((collection, index) => {
+            items: this.state.workspace.singles.map((single) => {
               return {
-                label: collection.title,
+                label: single.title,
+                to: `${basePath}/singles/${encodeURIComponent(single.key)}`,
                 onClick: () => {
-                  history.push(`${basePath}/singles/${encodeURIComponent(collection.key)}`)
                   this.refresh();
                 },
                 active: false
@@ -255,42 +235,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
       }
     }
 
-    let statusPanel = null;
-    /*let statusPanel = (
-
-        <Box
-          className="status-panel"
-          style={{
-            borderTop:'solid 1px #c7c5c4',
-            backgroundColor:'#d8d9da',
-            width:'280px',
-            height:'100px',
-            bottom:'0px',
-            position:'absolute'
-          }}>
-          <Box m={1}><div className="led led-green"></div>Hugo Server Running</Box>
-          <Box m={1}><div className="led led-green" ></div>Build Success</Box>
-          <Box m={1}> 
-            <Switch
-              size="small"
-              checked={this.state.draftMode}
-              onChange={(e)=>{
-                if(e.target.checked){
-                  this.setState({draftMode:true})
-                }
-                else{
-                  this.setState({draftMode:false})
-                }
-              }}
-
-              name="draftmode"
-              color="primary"
-            />
-            Draft Mode</Box>
-
-        </Box>
-    )
-    */
+    const statusPanel = null;
 
     return (<React.Fragment>
       <Sidebar

@@ -1,8 +1,5 @@
 import * as React           from 'react';
-import { Route }            from 'react-router-dom';
 import Sidebar              from './../../Sidebar';
-import { History } from 'history';
-//import service              from './../../services/service';
 
 interface SiteConfSidebarProps {
   siteKey: string;
@@ -10,69 +7,35 @@ interface SiteConfSidebarProps {
   [key: string]: unknown;
 }
 
-interface SiteConfSidebarState {
-  selectedMenuItem: string;
-}
-
-export class SiteConfSidebar extends React.Component<SiteConfSidebarProps, SiteConfSidebarState> {
-
-  constructor(props: SiteConfSidebarProps){
-
-    super(props);
-    this.state = {
-      selectedMenuItem: 'general'
-    }
-  }
+export class SiteConfSidebar extends React.Component<SiteConfSidebarProps> {
 
   render(){
-    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
-  }
+    const { siteKey, workspaceKey } = this.props;
+    const basePath = `/sites/${siteKey}/workspaces/${workspaceKey}/siteconf`;
 
-  renderWithRoute(history: History){
-
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
-
-    let menus = [
+    const menus = [
       {
         title: 'Site Information',
         items: [
           {
             active: true,
-            label: "Mount Information ",
-            selected: (this.state.selectedMenuItem==='general' ? true : false),
-            onClick: ()=>{
-              this.setState({selectedMenuItem:'general'});
-              history.push(`${basePath}/general/`)
-            }
+            label: "Mount Information",
+            to: `${basePath}/general/`,
           },
           {
             active: true,
             label: "Etalage",
-            selected: (this.state.selectedMenuItem==='etalage' ? true : false),
-            onClick: ()=>{
-              this.setState({selectedMenuItem:'etalage'});
-              history.push(`${basePath}/etalage/`)
-            }
+            to: `${basePath}/etalage/`,
           },
           {
             active: true,
             label: "Site Readme",
-            selected: (this.state.selectedMenuItem==='sitereadme' ? true : false),
-            onClick: ()=>{
-              this.setState({selectedMenuItem:'sitereadme'});
-              history.push(`${basePath}/sitereadme/`)
-            }
+            to: `${basePath}/sitereadme/`,
           },
           {
             active: true,
             label: "Project Readme",
-            selected: (this.state.selectedMenuItem==='projectreadme' ? true : false),
-            onClick: ()=>{
-              this.setState({selectedMenuItem:'projectreadme'});
-              history.push(`${basePath}/projectreadme/`)
-            }
+            to: `${basePath}/projectreadme/`,
           },
         ]
       },
@@ -82,11 +45,7 @@ export class SiteConfSidebar extends React.Component<SiteConfSidebarProps, SiteC
           {
             active: true,
             label: "Preview Check Settings",
-            selected: (this.state.selectedMenuItem==='previewchecksettings' ? true : false),
-            onClick: ()=>{
-              this.setState({selectedMenuItem:'previewchecksettings'});
-              history.push(`${basePath}/previewchecksettings/`)
-            }
+            to: `${basePath}/previewchecksettings/`,
           },
         ]
       },
@@ -96,15 +55,11 @@ export class SiteConfSidebar extends React.Component<SiteConfSidebarProps, SiteC
           {
             active: true,
             label: "Model",
-            selected: (this.state.selectedMenuItem==='model' ? true : false),
-            onClick: ()=>{
-              this.setState({selectedMenuItem:'model'});
-              history.push(`${basePath}/model/`)
-            }
+            to: `${basePath}/model/`,
           },
         ]
       },
-    ]
+    ];
 
     return <Sidebar {...this.props} menus={menus} />
   }

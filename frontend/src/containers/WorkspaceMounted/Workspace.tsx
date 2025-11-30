@@ -165,23 +165,19 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
     </Switch>);
   }
 
-  toolbarItemsLeft(siteKey: string, workspaceKey: string, activeButton: string, history: History){
+  toolbarItemsLeft(siteKey: string, workspaceKey: string, activeButton: string){
     return [
       <ToolbarButton
         key="buttonContent"
         active={(activeButton === "content" ? true : false)}
-        action={()=>{
-          history.push(`/sites/${siteKey}/workspaces/${workspaceKey}`);
-        }}
+        to={`/sites/${siteKey}/workspaces/${workspaceKey}`}
         title="Content"
         icon={LibraryBooksIcon}
       />,
       <ToolbarButton
         key="buttonSync"
         active={(activeButton === "sync" ? true : false)}
-        action={()=>{
-          history.push(`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`);
-        }}
+        to={`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`}
         title="Sync"
         icon={SyncIcon}
       />,
@@ -191,9 +187,7 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
       <ToolbarButton
         key="buttonSiteConf"
         active={(activeButton === "tools" ? true : false)}
-        action={()=>{
-          history.push(`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`);
-        }}
+        to={`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`}
         title="Tools"
         icon={BuildIcon}
       />
@@ -214,6 +208,7 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
       />,
       <ToolbarButton
         key="buttonLibrary"
+        // Must stay imperative - calls API before navigation
         action={()=>{
           service.api.openSiteLibrary().then(()=>{
             history.push(`/sites/last`);
@@ -224,9 +219,7 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
       />,
       <ToolbarButton
         key="buttonPrefs"
-        action={()=>{
-          history.push(`/prefs/?siteKey=${siteKey}`);
-        }}
+        to={`/prefs/?siteKey=${siteKey}`}
         title="Preferences"
         icon={SettingsApplicationsIcon}
       />,
@@ -272,7 +265,7 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
         return <TopToolbarRight
 
           key="toolbar-right-workspace-siteconf"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "tools", history)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "tools")}
           itemsCenter={[]}
           itemsRight={this.toolbarItemsRight(siteKey, history)}
         />
@@ -287,7 +280,7 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
 
         return <TopToolbarRight
           key="toolbar-right-workspace-dashboard"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "sync", history)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "sync")}
           itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight(siteKey, history)}
         />
@@ -302,7 +295,7 @@ class WorkSpace extends React.Component<WorkspaceProps, WorkspaceState>{
 
         return <TopToolbarRight
           key="toolbar-right-workspace-dashboard"
-          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "content", history)}
+          itemsLeft={this.toolbarItemsLeft(siteKey, workspaceKey, "content")}
           itemsCenter={toolbarItemsCenter}
           itemsRight={this.toolbarItemsRight(siteKey, history)}
         />

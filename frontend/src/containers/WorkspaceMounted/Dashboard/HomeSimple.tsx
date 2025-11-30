@@ -1,4 +1,4 @@
-import { Route }    from 'react-router-dom';
+import { Route, Link }    from 'react-router-dom';
 import React        from 'react';
 import service      from './../../../services/service';
 import Spinner      from './../../../components/Spinner';
@@ -163,17 +163,18 @@ class Home extends React.Component{
           </Typography>
         </CardContent>
         <CardActions>
-          {(type === 'collection' ? null : <Button size="small" color="primary"
-            onClick={()=>{
-              service.api.redirectTo(`${this.state.basePath}/singles/${encodeURIComponent(key)}`)
-            }}
+          {(type === 'collection' ? null : <Button
+            size="small"
+            color="primary"
+            component={Link}
+            to={`${this.state.basePath}/singles/${encodeURIComponent(key)}`}
           >Open</Button>)}
 
-          {(type === 'collection' ? <Button size="small" color="primary"
-
-            onClick={()=>{
-              service.api.redirectTo(`${this.state.basePath}/collections/${encodeURIComponent(key)}`)
-            }}
+          {(type === 'collection' ? <Button
+            size="small"
+            color="primary"
+            component={Link}
+            to={`${this.state.basePath}/collections/${encodeURIComponent(key)}`}
           >List</Button> : null)}
         </CardActions>
       </Card>

@@ -1,4 +1,5 @@
 import React                   from 'react';
+import { NavLink }             from 'react-router-dom';
 import Divider                 from '@mui/material/Divider';
 import List                    from '@mui/material/List';
 import ListSubheader           from '@mui/material/ListSubheader';
@@ -17,6 +18,8 @@ export interface SidebarMenuItem {
   label: string;
   selected?: boolean;
   onClick?: () => void;
+  to?: string;               // Route path for NavLink navigation
+  exact?: boolean;           // Whether to match exact path only (default: false)
   active?: boolean;
   icon?: React.ReactNode;
   secondaryMenu?: React.ReactNode;
@@ -79,6 +82,29 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
       )
     }
 
+    // If `to` is provided, render as NavLink (also supports onClick for side effects)
+    if (item.to) {
+      return (
+        <ListItem
+          key={"itemFlat"+item.label}
+          disablePadding
+          secondaryAction={secondaryAction}>
+          <ListItemButton
+            component={NavLink}
+            to={item.to}
+            exact={item.exact}
+            activeClassName="Mui-selected"
+            onClick={item.onClick}
+          >
+            {icon}
+            <ListItemText primary={item.label} />
+            {secondaryActionMenu}
+          </ListItemButton>
+        </ListItem>
+      )
+    }
+
+    // Otherwise render with onClick handler
     return (
       <ListItem
         key={"itemFlat"+item.label}
@@ -98,10 +124,29 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
 
   renderNestedItems(item: SidebarMenuItem, index: number){
     let initOpen: boolean | undefined;
-    let childItems = item.childItems!.map((itemChild, index)=>{
+    let childItems = item.childItems!.map((itemChild, childIndex)=>{
 
       if(itemChild.selected){
         initOpen = true;
+      }
+
+      // If child item has `to`, render as NavLink (also supports onClick for side effects)
+      if (itemChild.to) {
+        return (
+          <ListItem
+            key={"itemNestChild"+itemChild.label}
+            disablePadding>
+            <ListItemButton
+              component={NavLink}
+              to={itemChild.to}
+              exact={itemChild.exact}
+              activeClassName="Mui-selected"
+              onClick={itemChild.onClick}
+              sx={{ pl: 4 }}>
+              <ListItemText primary={itemChild.label} />
+            </ListItemButton>
+          </ListItem>
+        )
       }
 
       return (
