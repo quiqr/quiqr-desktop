@@ -174,7 +174,7 @@ class Home extends Component<HomeProps, HomeState> {
         <Grid container spacing={3} key={"section" + index}>
           {section.cards.map((card, cardIndex) => {
             return (
-              <Grid key={"siteCardA" + cardIndex} item>
+              <Grid key={"siteCardA" + cardIndex}>
                 <Typography>
                   {cardIndex === 0 ? section.title : <span>&nbsp;</span>}
                 </Typography>

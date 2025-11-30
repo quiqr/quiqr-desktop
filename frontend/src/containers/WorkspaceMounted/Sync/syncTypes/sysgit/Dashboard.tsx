@@ -402,7 +402,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
             Refresh History
           </Button>
         </Box>
-        <Timeline xalign="alternate">
+        <Timeline position="alternate">
 
           {unpushedChanges ?
             <TimelineItem>
@@ -532,7 +532,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
 
         </Timeline>
         { this.state.historyArr.length > this.state.resultsShowing ?
-          <Box py={1} variant="div"
+          <Box py={1}
             style={{
               display:'flex',
               justifyContent: 'center',

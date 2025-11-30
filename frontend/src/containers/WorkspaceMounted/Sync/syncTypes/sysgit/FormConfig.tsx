@@ -318,7 +318,6 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
                       </IconButton>
                     </InputAdornment>
                   }
-                  labelWidth={140}
                 />
               </FormControl>
             </React.Fragment>

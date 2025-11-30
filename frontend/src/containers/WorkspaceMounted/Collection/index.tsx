@@ -697,7 +697,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
           { trunked ? (
             <React.Fragment>
               <Divider />
-              <ListItem disabled style={{color:'rgba(0,0,0,.3)'}}>
+              <ListItem sx={{ opacity: 0.5, color: 'rgba(0,0,0,.3)' }}>
                 <ListItemText primary={`Max records limit reached (${MAX_RECORDS})`} />
               </ListItem>
             </React.Fragment>

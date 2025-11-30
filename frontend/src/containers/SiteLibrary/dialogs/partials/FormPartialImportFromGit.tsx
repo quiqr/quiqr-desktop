@@ -312,7 +312,6 @@ const FormPartialNewFromScratch = (props) => {
                       </IconButton>
                     </InputAdornment>
                   }
-                  labelWidth={140}
                 />
               </FormControl>
             </React.Fragment>
