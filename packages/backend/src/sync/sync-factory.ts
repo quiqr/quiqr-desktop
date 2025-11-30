@@ -9,6 +9,7 @@ import type { PublConf } from '@quiqr/types';
 import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
 import type { ConfigurationDataProvider } from '../services/configuration/index.js';
+import type { Embgit } from '../embgit/embgit.js';
 import { FolderSync } from './folder/folder-sync.js';
 import { GithubSync } from './github/github-sync.js';
 import { SysgitSync } from './sysgit/sysgit-sync.js';
@@ -29,6 +30,7 @@ export interface SyncServiceDependencies {
   outputConsole: OutputConsole;
   windowAdapter: WindowAdapter;
   configurationProvider: ConfigurationDataProvider;
+  embgit: Embgit;
 }
 
 /**
@@ -73,10 +75,10 @@ export class SyncFactory {
         );
 
       case 'github':
-        return new GithubSync(publisherConfig, siteKey);
+        return new GithubSync(publisherConfig, siteKey, this.dependencies);
 
       case 'sysgit':
-        return new SysgitSync(publisherConfig, siteKey);
+        return new SysgitSync(publisherConfig, siteKey, this.dependencies);
 
       default:
         throw new Error(`Unknown sync type: ${type}`);

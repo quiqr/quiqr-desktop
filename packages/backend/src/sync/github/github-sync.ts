@@ -1,59 +1,45 @@
 /**
  * GitHub Sync Service
  *
- * Handles git-based sync with GitHub repositories.
- * TODO: Full implementation in Phase 2.5.3 (Git Operations)
- *
- * For now, this is a stub that throws "Not yet implemented" for all operations.
- * Import/export functionality works because it uses Embgit directly, not GithubSync.
+ * Handles git-based sync with GitHub repositories using embgit.
+ * Extends EmbgitSyncBase with GitHub-specific URL construction.
  */
 
 import type { PublConf } from '@quiqr/types';
-import type { SyncService } from '../sync-factory.js';
+import type { SyncServiceDependencies } from '../sync-factory.js';
+import { EmbgitSyncBase, type BaseSyncConfig } from '../embgit-sync-base.js';
 
 /**
  * GitHub sync configuration
  */
-export interface GithubSyncConfig {
+export interface GithubSyncConfig extends BaseSyncConfig {
   type: 'github';
-  username?: string;
-  email?: string;
-  repository?: string;
-  branch?: string;
-  deployPrivateKey?: string;
-  deployPublicKey?: string;
-  publishScope?: 'build' | 'source';
-  setGitHubActions?: boolean;
-  overrideBaseURLSwitch?: boolean;
-  overrideBaseURL?: string;
+  username: string;
+  repository: string;
 }
 
 /**
  * GithubSync - Git-based sync with GitHub
- *
- * STUB IMPLEMENTATION - Full git sync coming in Phase 2.5.3
  */
-export class GithubSync implements SyncService {
-  private config: GithubSyncConfig;
-  private siteKey: string;
+export class GithubSync extends EmbgitSyncBase {
+  protected override config: GithubSyncConfig;
 
-  constructor(config: PublConf, siteKey: string) {
+  constructor(config: PublConf, siteKey: string, dependencies: SyncServiceDependencies) {
+    super(config, siteKey, dependencies);
     this.config = config as GithubSyncConfig;
-    this.siteKey = siteKey;
   }
 
   /**
-   * Dispatch sync actions
-   *
-   * TODO: Implement in Phase 2.5.3
-   * Actions: readRemote, refreshRemote, checkoutRef, pullFromRemote,
-   *          hardPush, checkoutLatest, pushWithSoftMerge
+   * Get the GitHub SSH URL
    */
-  async actionDispatcher(action: string, parameters?: unknown): Promise<unknown> {
-    throw new Error(
-      `GithubSync.${action}: Not yet implemented. ` +
-      `Full git sync functionality will be implemented in Phase 2.5.3. ` +
-      `Note: Git-based imports work via Embgit directly.`
-    );
+  getGitUrl(): string {
+    return `git@github.com:${this.config.username}/${this.config.repository}.git`;
+  }
+
+  /**
+   * Get the log prefix for console output
+   */
+  getLogPrefix(): string {
+    return 'GITHUB';
   }
 }

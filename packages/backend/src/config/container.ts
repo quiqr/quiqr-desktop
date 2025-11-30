@@ -272,6 +272,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
     outputConsole: adapters.outputConsole,
     windowAdapter: adapters.window,
     configurationProvider,
+    embgit,
   });
 
   // Create BuildActionService (uses outputConsole for logging)
