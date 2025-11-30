@@ -42,16 +42,8 @@
   },
   "scripts": {
     "clean": "rm -Rf dist && rm -Rf build",
-    "_electron-dev": "cross-env APP_ENV=development cross-env REACT_DEV_URL=http://localhost:4002 electron --no-sandbox .",
     "dev": "cross-env APP_ENV=development vite",
-    "build": "cross-env APP_ENV=development vite build",
-    "_pack_embgit": "node scripts/embgit-sh-runner.js",
-    "_build_info": "node scripts/build_info.js",
-    "_hugo_versions": "node scripts/getHugoVersions.js",
-    "_mac-notarize": "node scripts/notarize.js",
-    "dist": "electron-builder",
-    "packdev": "electron-builder -p never",
-    "start": "concurrently --kill-others \"npm run dev\" \"npm run _electron-dev\""
+    "build": "cross-env APP_ENV=development vite build"
   },
   "browserslist": [
     ">0.2%",
