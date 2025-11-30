@@ -27,6 +27,19 @@ import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
 import { GithubPublishConf }   from '../../../../../../types';
 
+interface HistoryItem {
+  message: string;
+  author: string;
+  date: string;
+  ref: string;
+  local?: boolean;
+}
+
+interface SourceInfo {
+  path: string;
+  type: string;
+}
+
 interface DashboardProps {
   siteKey: string;
   workspaceKey: string;
@@ -39,8 +52,8 @@ interface DashboardProps {
 
 interface DashboardState {
   siteconf: Record<string, unknown>;
-  source: Record<string, unknown>;
-  historyArr: unknown[];
+  source: SourceInfo | null;
+  historyArr: HistoryItem[];
   lastRefresh: string;
   resultsShowing: number;
   siteKey?: string;
@@ -55,7 +68,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
     super(props);
     this.state = {
       siteconf : {},
-      source : {},
+      source : null,
       historyArr: [],
       lastRefresh: '',
       resultsShowing: 0,
@@ -69,7 +82,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
 
   checkSiteInProps(){
 
-    var { siteKey, workspaceKey } = this.props;
+    const { siteKey, workspaceKey } = this.props;
 
     this.setState({
       siteKey: this.props.siteKey
@@ -80,14 +93,10 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
     });
 
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      var stateUpdate  = {};
-      stateUpdate.siteconf = bundle.site;
-
-      if(bundle.site.source){
-        this.setState({source: bundle.site.source});
+      this.setState({ siteconf: bundle.site });
+      if (bundle.site.source) {
+        this.setState({ source: bundle.site.source });
       }
-
-      this.setState(stateUpdate);
     })
 
   }
@@ -125,7 +134,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
     });
   }
 
-  refreshRemoteStatus(showSnack){
+  refreshRemoteStatus(showSnack: boolean){
     this.props.onSyncDialogControl(
       true,
       'Refreshing commit history',
@@ -161,14 +170,14 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
     });
   }
 
-  checkoutRef(refHash){
+  checkoutRef(refHash: string){
     this.props.onSyncDialogControl(
       true,
       'Refreshing commit history',
       Meta.icon()
     );
 
-    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'checkoutRef',{ref: refHash},90000).then((results)=>{
+    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'checkoutRef',{ref: refHash},90000).then((_results)=>{
 
       this.props.onSyncDialogControl(
         false,
@@ -197,7 +206,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
     });
   }
 
-  pullFromRemote(mode='pull'){
+  pullFromRemote(mode: string = 'pull'){
 
     let dispatchCommand = 'checkoutLatest';
     if(mode==='pull')
@@ -221,13 +230,18 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
 
     }).catch((e)=>{
       snackMessageService.addSnackMessage(`Sync: ${mode} from remote failed.`, {severity: 'warning'});
+            
+      if (e instanceof Error) {
+        snackMessageService.addSnackMessage(e.message, {severity: 'warning'});
+      }
+    
       this.props.onSyncDialogControl(
         false,
         Meta.syncingText, Meta.icon());
     });
   }
 
-  pushToRemote(mode='soft'){
+  pushToRemote(mode: string = 'soft'){
     let dispatchCommand = 'hardPush';
     if(mode==='soft')
     {
@@ -261,10 +275,10 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
   }
 
   render(){
-    let lastStatusCheck = this.state.lastRefresh;
-    let unpushedChanges = false;
-    let remoteDiffers = true;
-    let historyArr = this.state.historyArr;
+    const lastStatusCheck = this.state.lastRefresh;
+    const unpushedChanges = false;
+    const remoteDiffers = true;
+    const historyArr = this.state.historyArr;
 
     return (
       <React.Fragment>
@@ -300,7 +314,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
             </Button>
             <Button
               onClick={()=>{
-                let filename = this.state.source.path + "/quiqr/sync_ignore.txt"
+                const filename = this.state.source?.path + "/quiqr/sync_ignore.txt"
                 service.api.openFileInEditor(filename, true);
               }}
               size="small"
@@ -462,7 +476,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
 
           {historyArr.slice(0,this.state.resultsShowing).map((item, index)=>{
 
-            let content = (
+            const content = (
               <Paper elevation={3} key={"commit-"+index}>
                 <Box p={2}>
                   <Typography variant="h6" component="h1">
@@ -470,7 +484,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
                   </Typography>
                   <Typography>Author: {item.author}</Typography>
                   <Typography>Date: {item.date}</Typography>
-                  <Typography>Ref: {item.ref.substr(0,7)}</Typography>
+                  <Typography>Ref: {item.ref.substring(0,7)}</Typography>
                     <Box py={1}>
                       {/*
                         item.local ? null :
