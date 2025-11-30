@@ -1,8 +1,6 @@
-import React             from 'react';
 import { createRoot }    from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom'
 import App               from './App.jsx';
-import service           from './services/service';
 import SnackbarManager   from './components/SnackbarManager.jsx';
 
 // Import theme CSS files
