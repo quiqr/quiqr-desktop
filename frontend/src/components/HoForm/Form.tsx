@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Route } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import OpenInBrowserIcon from "@mui/icons-material/OpenInBrowser";
@@ -46,6 +45,7 @@ interface FormProps {
   saveFormHandler: () => void;
   onOpenInEditor: () => void;
   plugins:any;
+  navigate?: (path: string) => void;
 }
 
 interface FormState {
@@ -63,7 +63,6 @@ class Form extends React.Component<FormProps, FormState> {
   stateBuilder: FormStateBuilder;
   root: any;
   currentNode: any;
-  history: any;
   forceUpdateThis: () => void;
   cache: string[];
 
@@ -259,7 +258,7 @@ class Form extends React.Component<FormProps, FormState> {
   }
 
   handleBackButton() {
-    this.history.push(this.generateParentPath());
+    this.props.navigate?.(this.generateParentPath());
   }
 
   /**
@@ -543,14 +542,7 @@ class Form extends React.Component<FormProps, FormState> {
       </div>
     );
 
-    return (
-      <Route
-        render={({ history }) => {
-          this.history = history;
-          return form;
-        }}
-      />
-    );
+    return form;
   }
 }
 

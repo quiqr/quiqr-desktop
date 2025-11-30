@@ -1,15 +1,14 @@
-import React           from 'react';
-import { Route }            from 'react-router-dom';
-import service         from './../../../services/service';
-import Typography      from '@mui/material/Typography';
-import TextField       from '@mui/material/TextField';
-import IconButton      from '@mui/material/IconButton';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import service from './../../../services/service';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
 import DescriptionIcon from '@mui/icons-material/Description';
-import Grid            from '@mui/material/Grid';
-import Box             from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 import FolderIcon from '@mui/icons-material/Folder';
 import BallotIcon from '@mui/icons-material/Ballot';
-import { History } from 'history';
 
 interface SiteConfig {
   key?: string;
@@ -41,115 +40,73 @@ interface SiteConfRouteModelProps {
   workspaceKey: string;
 }
 
-interface SiteConfRouteModelState {
-  siteconf: SiteConfig;
-  source: {
-    path?: string;
-    [key: string]: unknown;
-  };
-  publish: Record<string, unknown>;
-  parseInfo: ParseInfo;
-  quiqrCloud: Record<string, unknown>;
-  siteKey?: string;
-}
+const SiteConfRouteModel = ({ siteKey, workspaceKey }: SiteConfRouteModelProps) => {
+  const navigate = useNavigate();
+  const isMountedRef = useRef(false);
 
-class SiteConfRouteModel extends React.Component<SiteConfRouteModelProps, SiteConfRouteModelState> {
+  const [siteconf, setSiteconf] = useState<SiteConfig>({});
+  const [source, setSource] = useState<{ path?: string; [key: string]: unknown }>({});
+  const [parseInfo, setParseInfo] = useState<ParseInfo>({});
 
-  _ismounted: boolean = false;
+  useEffect(() => {
+    isMountedRef.current = true;
 
-  constructor(props: SiteConfRouteModelProps){
-    super(props);
-    this.state = {
-      siteconf : {},
-      source : {},
-      publish : {},
-      parseInfo : {},
-      quiqrCloud : {}
-    };
-    this._ismounted = false;
-  }
-
-  componentDidUpdate(preProps: SiteConfRouteModelProps){
-    if(this._ismounted && preProps.siteKey !== this.props.siteKey){
-      this.checkSiteInProps();
-    }
-  }
-
-  componentDidMount(){
-    this.checkSiteInProps();
-    this._ismounted = true;
-  }
-  componentWillUnmount(){
-    this._ismounted = false;
-    service.unregisterListener(this);
-  }
-
-  checkSiteInProps(){
-
-    var { siteKey, workspaceKey } = this.props;
-
-    this.setState({
-      siteKey: this.props.siteKey
-    })
-
-    service.api.getWorkspaceModelParseInfo(siteKey, workspaceKey).then((parseInfo)=>{
-      this.setState({parseInfo: parseInfo});
-    });
-
-    service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      this.setState({
-        siteconf: bundle.site as SiteConfig
+    const checkSiteInProps = () => {
+      service.api.getWorkspaceModelParseInfo(siteKey, workspaceKey).then((info) => {
+        if (isMountedRef.current) {
+          setParseInfo(info);
+        }
       });
 
-      if(bundle.site.source){
-        this.setState({source: bundle.site.source as { path?: string; [key: string]: unknown }});
-      }
-    })
+      service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle) => {
+        if (isMountedRef.current) {
+          setSiteconf(bundle.site as SiteConfig);
+          if (bundle.site.source) {
+            setSource(bundle.site.source as { path?: string; [key: string]: unknown });
+          }
+        }
+      });
+    };
 
-  }
+    checkSiteInProps();
 
-  renderDogFoodIcon(item: FileItem, history: History){
-    let encodedSiteKey = this.props.siteKey;
-    let encodedWorkspaceKey = this.props.workspaceKey;
-    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [siteKey, workspaceKey]);
 
-    if(item.filename && item.filename.includes("/quiqr/model/includes/menu.yaml")){
+  const basePath = `/sites/${siteKey}/workspaces/${workspaceKey}/siteconf`;
+
+  const renderDogFoodIcon = (item: FileItem) => {
+    if (item.filename && item.filename.includes('/quiqr/model/includes/menu.yaml')) {
       return (
         <IconButton
           color="primary"
           sx={{ padding: '10px' }}
           aria-label="directions"
-          onClick={()=>{
-            let fileBaseName = item.filename.split('/').reverse()[0];
-            history.push(`${basePath}/dogfoodIncludesMenu/${fileBaseName}`)
-
+          onClick={() => {
+            const fileBaseName = item.filename!.split('/').reverse()[0];
+            navigate(`${basePath}/dogfoodIncludesMenu/${fileBaseName}`);
           }}
-          size="large">
-          {(item.icon ? item.icon : <BallotIcon />)}
+          size="large"
+        >
+          {item.icon ? item.icon : <BallotIcon />}
         </IconButton>
       );
     }
-    return null
+    return null;
+  };
 
-  }
-
-  renderSection(title: string, files: FileItem[], history: History){
-//    let encodedSiteKey = this.props.siteKey;
-//    let encodedWorkspaceKey = this.props.workspaceKey;
-//    let basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/siteconf`;
-
-
-    if(files.length === 0) return null;
+  const renderSection = (title: string, files: FileItem[]) => {
+    if (files.length === 0) return null;
 
     return (
       <Box m={2}>
         <Typography variant="h6">{title}</Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-
-          {files.map((item, index)=>{
-
+          {files.map((item, index) => {
             return (
-              <Grid container key={"grid"+index} spacing={1} alignItems="flex-end">
+              <Grid container key={'grid' + index} spacing={1} alignItems="flex-end">
                 <Grid item xs={11}>
                   <TextField
                     id="standard-full-width"
@@ -160,22 +117,22 @@ class SiteConfRouteModel extends React.Component<SiteConfRouteModelProps, SiteCo
                     margin="normal"
                     InputLabelProps={{
                       shrink: true,
-                    }} />
+                    }}
+                  />
                 </Grid>
                 <Grid item xs={1}>
-
                   <IconButton
                     color="primary"
                     sx={{ padding: '10px' }}
                     aria-label="directions"
-                    onClick={()=>{
+                    onClick={() => {
                       service.api.openFileInEditor(item.filename);
-
                     }}
-                    size="large">
-                    {(item.icon ? item.icon : <DescriptionIcon />)}
+                    size="large"
+                  >
+                    {item.icon ? item.icon : <DescriptionIcon />}
                   </IconButton>
-                  {this.renderDogFoodIcon(item,history)}
+                  {renderDogFoodIcon(item)}
                 </Grid>
               </Grid>
             );
@@ -183,39 +140,26 @@ class SiteConfRouteModel extends React.Component<SiteConfRouteModelProps, SiteCo
         </Box>
       </Box>
     );
-  }
+  };
 
-  render(){
-    return <Route render={({history})=>{ return this.renderWithRoute(history) }} />
-  }
+  const includeFiles: FileItem[] = parseInfo?.includeFiles || [];
+  const includeFilesSub: FileItem[] = parseInfo?.includeFilesSub || [];
+  const partialFiles: FileItem[] = parseInfo?.partialFiles || [];
 
-  renderWithRoute(history: History){
+  return (
+    <Box sx={{ padding: '20px', height: '100%' }}>
+      <Typography variant="h4">Site: {siteconf.name}</Typography>
+      <Typography variant="h5">Model Configuration</Typography>
 
-
-    let includeFiles: FileItem[] = [];
-    let includeFilesSub: FileItem[] = [];
-    let partialFiles: FileItem[] = [];
-    if(this.state.parseInfo && this.state.parseInfo.includeFiles && this.state.parseInfo.partialFiles){
-      includeFiles = this.state.parseInfo.includeFiles;
-      includeFilesSub = this.state.parseInfo.includeFilesSub || [];
-      partialFiles = this.state.parseInfo.partialFiles;
-    }
-
-    return (
-      <Box sx={{ padding: '20px', height: '100%' }}>
-
-        <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
-        <Typography variant="h5">Model Configuration</Typography>
-
-        {this.renderSection("Model Directory", [{key:'directory',filename:this.state.source.path + "/quiqr/model", icon: <FolderIcon />}],history)}
-        {this.renderSection("Base", [{key:'baseFile',filename:this.state.parseInfo.baseFile }], history)}
-        {this.renderSection("Include Files", includeFiles, history)}
-        {this.renderSection("Include Files Subs", includeFilesSub, history)}
-        {this.renderSection("Partial Files", partialFiles, history)}
-
-      </Box>
-    );
-  }
-}
+      {renderSection('Model Directory', [
+        { key: 'directory', filename: source.path + '/quiqr/model', icon: <FolderIcon /> },
+      ])}
+      {renderSection('Base', [{ key: 'baseFile', filename: parseInfo.baseFile }])}
+      {renderSection('Include Files', includeFiles)}
+      {renderSection('Include Files Subs', includeFilesSub)}
+      {renderSection('Partial Files', partialFiles)}
+    </Box>
+  );
+};
 
 export default SiteConfRouteModel;

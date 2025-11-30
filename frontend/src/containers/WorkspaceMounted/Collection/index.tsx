@@ -1,5 +1,5 @@
 import * as React                    from 'react';
-import { Route }                     from 'react-router-dom';
+import { useNavigate }               from 'react-router-dom';
 import DialogTitle                   from '@mui/material/DialogTitle';
 import Dialog                        from '@mui/material/Dialog';
 import DialogActions                 from '@mui/material/DialogActions';
@@ -237,7 +237,7 @@ interface CollectionState {
 
 const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collectionKey }) => {
   const filterDebounce = React.useRef(new Debounce(200));
-  const historyRef = React.useRef<any>(null);
+  const navigate = useNavigate();
   
   const [state, setState] = React.useState<CollectionState>({
     selectedWorkspaceDetails: null,
@@ -461,7 +461,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
         setState(prev => ({ ...prev, modalBusy: false }));
       }).then(() => {
         const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`;
-        historyRef.current?.push(path);
+        navigate(path);
       });
   };
 
@@ -499,7 +499,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
 
   const handleItemClick = (item: any) => {
     const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(item.key)}`;
-    historyRef.current?.push(path);
+    navigate(path);
   };
 
   const handleDeleteItemClick = (item: any) => {
@@ -622,95 +622,92 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
     }
   }
 
-  return(<Route render={ ({history}) => {
-    historyRef.current = history;
-    return (
-      <div style={{padding:'20px'}}>
+  return (
+    <div style={{padding:'20px'}}>
 
-        <Typography variant="button" display="block" gutterBottom> {collection.title} </Typography>
+      <Typography variant="button" display="block" gutterBottom> {collection.title} </Typography>
 
-        <Button variant="contained" onClick={setCreateItemView}>
-          {'New '+ collection.itemtitle }
-        </Button>
+      <Button variant="contained" onClick={setCreateItemView}>
+        {'New '+ collection.itemtitle }
+      </Button>
 
-        <TextField
-          style={{margin:'10px 0'}}
-          label="Filter"
-          onChange={handleFilterChange}
-          fullWidth={true}
-          value={state.filter}
-          helperText="Item name" />
+      <TextField
+        style={{margin:'10px 0'}}
+        label="Filter"
+        onChange={handleFilterChange}
+        fullWidth={true}
+        value={state.filter}
+        helperText="Item name" />
 
-        <div style={{display: 'flex', flexWrap: 'wrap', padding: '10px 0'}}>
-          { state.dirs.map((dir: string) => {
-            return (<Chip key={dir} style={{marginRight:'5px'}} onClick={handleDirClick} data-dir={dir} label={"/"+dir} />);
-          }) }
+      <div style={{display: 'flex', flexWrap: 'wrap', padding: '10px 0'}}>
+        { state.dirs.map((dir: string) => {
+          return (<Chip key={dir} style={{marginRight:'5px'}} onClick={handleDirClick} data-dir={dir} label={"/"+dir} />);
+        }) }
+      </div>
+
+      <Paper>
+        <div style={{/*backgroundColor: "#eee",*/ display: 'flex',justifyContent: "flex-end", flexWrap: 'nowrap', padding: '10px 10px'}}>
+
+
+          <FormControlLabel
+            label="Sort descending"
+            control={
+
+              <Switch
+                checked={state.sortDescending}
+                onChange={(e, value) => {
+                  setState(prev => ({
+                    ...prev,
+                    sortDescending: !prev.sortDescending
+                  }));
+                }}
+                 />
+            }
+          />
+
+          <FormControlLabel
+            label="Show sorting value"
+            control={
+              <Switch
+                checked={state.showSortValue}
+                onChange={(e, value) => {
+                  setState(prev => ({
+                    ...prev,
+                    showSortValue: !prev.showSortValue
+                  }));
+                }}
+                />
+            }/>
         </div>
 
-          <Paper>
-            <div style={{/*backgroundColor: "#eee",*/ display: 'flex',justifyContent: "flex-end", flexWrap: 'nowrap', padding: '10px 10px'}}>
+        <List>
+          <CollectionListItems
+            languages={state.languages}
+            collectionExtension={collection.extension}
+            filteredItems={filteredItems}
+            onItemClick={handleItemClick}
+            onRenameItemClick={handleRenameItemClick}
+            onCopyToLangClick={handleCopyToLangClick}
+            onCopyItemClick={handleCopyItemClick}
+            onDeleteItemClick={handleDeleteItemClick}
+            onMakePageBundleItemClick={handleMakePageBundleItemClick}
+            sortDescending={state.sortDescending}
+            showSortValue={state.showSortValue}
+          />
+          { trunked ? (
+            <React.Fragment>
+              <Divider />
+              <ListItem disabled style={{color:'rgba(0,0,0,.3)'}}>
+                <ListItemText primary={`Max records limit reached (${MAX_RECORDS})`} />
+              </ListItem>
+            </React.Fragment>
+          ) : (null) }
+        </List>
+      </Paper>
 
-
-              <FormControlLabel
-                label="Sort descending"
-                control={
-
-                  <Switch
-                    checked={state.sortDescending}
-                    onChange={(e, value) => {
-                      setState(prev => ({
-                        ...prev,
-                        sortDescending: !prev.sortDescending
-                      }));
-                    }}
-                     />
-                }
-              />
-
-              <FormControlLabel
-                label="Show sorting value"
-                control={
-                  <Switch
-                    checked={state.showSortValue}
-                    onChange={(e, value) => {
-                      setState(prev => ({
-                        ...prev,
-                        showSortValue: !prev.showSortValue
-                      }));
-                    }}
-                    />
-                }/>
-            </div>
-
-            <List>
-              <CollectionListItems
-                languages={state.languages}
-                collectionExtension={collection.extension}
-                filteredItems={filteredItems}
-                onItemClick={handleItemClick}
-                onRenameItemClick={handleRenameItemClick}
-                onCopyToLangClick={handleCopyToLangClick}
-                onCopyItemClick={handleCopyItemClick}
-                onDeleteItemClick={handleDeleteItemClick}
-                onMakePageBundleItemClick={handleMakePageBundleItemClick}
-                sortDescending={state.sortDescending}
-                showSortValue={state.showSortValue}
-              />
-              { trunked ? (
-                <React.Fragment>
-                  <Divider />
-                  <ListItem disabled style={{color:'rgba(0,0,0,.3)'}}>
-                    <ListItemText primary={`Max records limit reached (${MAX_RECORDS})`} />
-                  </ListItem>
-                </React.Fragment>
-              ) : (null) }
-            </List>
-          </Paper>
-
-          { dialog }
-        </div>
-      );
-    }} />);
+      { dialog }
+    </div>
+  );
 };
 
 export default Collection;

@@ -1,86 +1,38 @@
-import * as React                   from 'react';
-import { Switch, Route }            from 'react-router-dom';
-import  SiteConfRouteGeneral        from './SiteConfRouteGeneral';
-import  SiteConfRouteDogFoodSingle  from './SiteConfRouteDogFoodSingle';
-import  SiteConfRouteModel          from './SiteConfRouteModel';
+import { Routes, Route, useParams } from 'react-router-dom';
+import SiteConfRouteGeneral from './SiteConfRouteGeneral';
+import SiteConfRouteDogFoodSingle from './SiteConfRouteDogFoodSingle';
+import SiteConfRouteModel from './SiteConfRouteModel';
 
 interface SiteConfRoutedProps {
   siteKey: string;
   workspaceKey: string;
 }
 
-interface SiteConfRoutedState {}
+// Wrapper component for dogfoodIncludesMenu route that needs fileOverride param
+const DogFoodIncludesMenuRoute = ({ siteKey, workspaceKey }: { siteKey: string; workspaceKey: string }) => {
+  const { fileOverride } = useParams();
+  return (
+    <SiteConfRouteDogFoodSingle
+      title="Menu Editor"
+      singleKey="dogfoodIncludesMenu"
+      siteKey={siteKey}
+      workspaceKey={workspaceKey}
+      fileOverride={"quiqr/model/includes/" + decodeURIComponent(fileOverride || '')}
+    />
+  );
+};
 
-export class SiteConfRouted extends React.Component<SiteConfRoutedProps, SiteConfRoutedState> {
-
-  render(){
-    return (
-    <Switch>
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf' exact render={ ({match})=> {
-        return <SiteConfRouteGeneral
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/etalage' exact render={ ({match})=> {
-        return <SiteConfRouteDogFoodSingle
-        title="etalage"
-        singleKey="dogfoodEtalageTemplateJson"
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/sitereadme' exact render={ ({match})=> {
-        return <SiteConfRouteDogFoodSingle
-        title="Site Readme"
-        singleKey="dogfoodReadmeSiteMd"
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/previewchecksettings' exact render={ ({match})=> {
-        return <SiteConfRouteDogFoodSingle
-        title="Preview Check Settings"
-        singleKey="dogfoodPreviewCheckSettings"
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/projectreadme' exact render={ ({match})=> {
-        return <SiteConfRouteDogFoodSingle
-        title="Developers Readme"
-        singleKey="dogfoodReadmeProjectMd"
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/general' exact render={ ({match})=> {
-        return <SiteConfRouteGeneral
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/model' exact render={ ({match})=> {
-        return <SiteConfRouteModel
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) } />
-      }} />
-
-      <Route path='/sites/:site/workspaces/:workspace/siteconf/dogfoodIncludesMenu/:fileOverride' exact render={ ({match})=> {
-        return <SiteConfRouteDogFoodSingle
-        title="Menu Editor"
-        singleKey="dogfoodIncludesMenu"
-        siteKey={ decodeURIComponent(match.params.site) }
-        workspaceKey={ decodeURIComponent(match.params.workspace) }
-        fileOverride={ "quiqr/model/includes/" + decodeURIComponent(match.params.fileOverride) }
-        />
-      }} />
-
-
-
-    </Switch>
-
-    );
-  }
-}
+export const SiteConfRouted = ({ siteKey, workspaceKey }: SiteConfRoutedProps) => {
+  return (
+    <Routes>
+      <Route path="/" element={<SiteConfRouteGeneral siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="etalage" element={<SiteConfRouteDogFoodSingle title="etalage" singleKey="dogfoodEtalageTemplateJson" siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="sitereadme" element={<SiteConfRouteDogFoodSingle title="Site Readme" singleKey="dogfoodReadmeSiteMd" siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="previewchecksettings" element={<SiteConfRouteDogFoodSingle title="Preview Check Settings" singleKey="dogfoodPreviewCheckSettings" siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="projectreadme" element={<SiteConfRouteDogFoodSingle title="Developers Readme" singleKey="dogfoodReadmeProjectMd" siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="general" element={<SiteConfRouteGeneral siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="model" element={<SiteConfRouteModel siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="dogfoodIncludesMenu/:fileOverride" element={<DogFoodIncludesMenuRoute siteKey={siteKey} workspaceKey={workspaceKey} />} />
+    </Routes>
+  );
+};

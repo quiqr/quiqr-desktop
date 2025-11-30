@@ -1,5 +1,5 @@
-import React from "react";
-import { Switch, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Routes, Route, useParams, useNavigate, useLocation } from "react-router-dom";
 import AppsIcon from "@mui/icons-material/Apps";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
@@ -19,378 +19,300 @@ import { UserPreferences } from "../types";
 
 const defaultApplicationRole = "contentEditor";
 
-type AppState = {
-  splashDialogOpen: boolean;
-  showSplashAtStartup: boolean;
-  applicationRole: string;
-  libraryView: string;
-  theme: Theme;
-  menuIsLocked: boolean;
-  forceShowMenu: boolean;
-  skipMenuTransition: boolean;
-  quiqrDomain: string;
-  newSiteDialogOpen?: boolean;
-  importSiteDialogOpen?: boolean;
+// Wrapper component for Workspace route that needs params
+const WorkspaceRoute = ({ applicationRole, welcomeScreen, theme }: { applicationRole: string; welcomeScreen: React.ReactNode; theme: Theme }) => {
+  const { site, workspace } = useParams();
+  return (
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {welcomeScreen}
+        <Workspace
+          applicationRole={applicationRole}
+          siteKey={decodeURIComponent(site || '')}
+          workspaceKey={decodeURIComponent(workspace || '')}
+        />
+      </ThemeProvider>
+    </StyledEngineProvider>
+  );
 };
 
-class App extends React.Component<null, AppState> {
-  _ismounted?: boolean;
-  history?: { push: (path: string, state?: unknown) => void };
-
-  constructor(props: null) {
-    super(props);
-
-    const theme = getThemeByName('light');
-
-    this.state = {
-      splashDialogOpen: false,
-      showSplashAtStartup: false,
-      applicationRole: defaultApplicationRole,
-      libraryView: "cards",
-      theme: theme,
-      menuIsLocked: true,
-      forceShowMenu: false,
-      skipMenuTransition: false,
-      quiqrDomain: "",
-    };
+// Prefs toolbar with navigation
+const PrefsToolbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const sp = new URLSearchParams(location.search);
+  let backurl = "/sites/last";
+  if (sp.has("siteKey")) {
+    const siteKey = sp.get("siteKey");
+    backurl = `/sites/${siteKey}/workspaces/source`;
   }
 
-  setThemeStyleFromPrefs() {
+  const leftButtons = [
+    <ToolbarButton
+      key="back"
+      action={() => navigate(backurl)}
+      title="Back"
+      icon={ArrowBackIcon}
+    />,
+  ];
+
+  const rightButtons = [
+    <ToolbarButton
+      key="toolbarbutton-library"
+      to="/sites/last"
+      title="Site Library"
+      icon={AppsIcon}
+    />,
+    <ToolbarButton
+      key="buttonPrefs"
+      active={true}
+      to="/prefs"
+      title="Preferences"
+      icon={SettingsApplicationsIcon}
+    />,
+  ];
+
+  return <TopToolbarRight itemsLeft={leftButtons} itemsCenter={[]} itemsRight={rightButtons} />;
+};
+
+// Console redirect handler
+const ConsoleRedirectHandler = ({ children }: { children: React.ReactNode }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.has("console")) {
+      navigate("/console");
+    }
+  }, [navigate]);
+
+  return <>{children}</>;
+};
+
+const App = () => {
+  const [splashDialogOpen, setSplashDialogOpen] = useState(false);
+  const [showSplashAtStartup, setShowSplashAtStartup] = useState(false);
+  const [applicationRole, setApplicationRole] = useState(defaultApplicationRole);
+  const [libraryView, setLibraryView] = useState("cards");
+  const [theme, setTheme] = useState<Theme>(getThemeByName('light'));
+  const [menuIsLocked, setMenuIsLocked] = useState(true);
+  const [forceShowMenu, setForceShowMenu] = useState(false);
+  const [skipMenuTransition, setSkipMenuTransition] = useState(false);
+  const [newSiteDialogOpen, setNewSiteDialogOpen] = useState(false);
+  const [importSiteDialogOpen, setImportSiteDialogOpen] = useState(false);
+
+  useEffect(() => {
+    // Set theme from prefs
     service.api.readConfKey("prefs").then((value: UserPreferences) => {
       if (value.interfaceStyle) {
         const themeMode = value.interfaceStyle === "quiqr10-dark" ? "dark" : "light";
-        this.setState({
-          theme: getThemeByName(themeMode),
-        });
+        setTheme(getThemeByName(themeMode));
       }
     });
-  }
 
-  componentDidMount() {
-    this._ismounted = true;
-
-    this.setThemeStyleFromPrefs();
-
+    // Set library view from prefs
     service.api.readConfPrefKey("libraryView").then((view) => {
       if (typeof view === "string") {
-        this.setState({ libraryView: view });
+        setLibraryView(view);
       }
     });
 
+    // Set splash screen visibility
     service.api.readConfPrefKey("showSplashAtStartup").then((show) => {
-      if (typeof show == "undefined") {
+      if (typeof show === "undefined") {
         show = true;
       }
-
       const showBool = show === true || show === "true";
-      this.setState({
-        splashDialogOpen: showBool,
-        showSplashAtStartup: showBool,
-      });
+      setSplashDialogOpen(showBool);
+      setShowSplashAtStartup(showBool);
     });
 
-    this.setApplicationRole();
-  }
-
-  setApplicationRole() {
+    // Set application role
     service.api.readConfPrefKey("applicationRole").then((role) => {
       if (!role) role = defaultApplicationRole;
-
       if (typeof role === "string") {
-        this.setState({ applicationRole: role });
+        setApplicationRole(role);
       }
     });
-  }
+  }, []);
 
-  toggleMenuIsLocked() {
-    const menuIsLocked = !this.state.menuIsLocked;
-    this.setState({ menuIsLocked, forceShowMenu: true, skipMenuTransition: true });
+  // Reset skipMenuTransition after it's used
+  useEffect(() => {
+    if (skipMenuTransition) {
+      setSkipMenuTransition(false);
+    }
+  }, [skipMenuTransition]);
+
+  const toggleMenuIsLocked = () => {
+    setMenuIsLocked(!menuIsLocked);
+    setForceShowMenu(true);
+    setSkipMenuTransition(true);
     window.dispatchEvent(new Event("resize"));
-  }
+  };
 
-  toggleForceShowMenu() {
-    const forceShowMenu = !this.state.forceShowMenu;
-    this.setState({ forceShowMenu });
-  }
+  const toggleForceShowMenu = () => {
+    setForceShowMenu(!forceShowMenu);
+  };
 
-  handleLibraryDialogCloseClick() {
-    this.setState({
-      newSiteDialogOpen: false,
-      importSiteDialogOpen: false,
-    });
-  }
+  const handleLibraryDialogCloseClick = () => {
+    setNewSiteDialogOpen(false);
+    setImportSiteDialogOpen(false);
+  };
 
-  handleLibraryDialogClick(openDialog: string) {
+  const handleLibraryDialogClick = (openDialog: string) => {
     if (openDialog === "newSiteDialog") {
-      this.setState({ newSiteDialogOpen: true });
+      setNewSiteDialogOpen(true);
     } else if (openDialog === "importSiteDialog") {
-      this.setState({ importSiteDialogOpen: true });
+      setImportSiteDialogOpen(true);
     }
-  }
+  };
 
-  handleLibraryViewChange(view: string) {
+  const handleLibraryViewChange = (view: string) => {
     service.api.saveConfPrefKey("libraryView", view);
-    this.setState({ libraryView: view });
-  }
+    setLibraryView(view);
+  };
 
-  renderWelcomeScreen() {
-    return (
-      <SplashDialog
-        open={this.state.splashDialogOpen}
-        showSplashAtStartup={this.state.showSplashAtStartup}
-        onClose={() => {
-          this.setState({ splashDialogOpen: false });
-        }}
-        onChangeSplashCheck={(show) => {
-          service.api.saveConfPrefKey("showSplashAtStartup", show);
-        }}
+  const welcomeScreen = (
+    <SplashDialog
+      open={splashDialogOpen}
+      showSplashAtStartup={showSplashAtStartup}
+      onClose={() => setSplashDialogOpen(false)}
+      onChangeSplashCheck={(show) => {
+        service.api.saveConfPrefKey("showSplashAtStartup", show);
+      }}
+    />
+  );
+
+  const renderSiteLibraryRouted = (importSiteURL?: string) => (
+    <SiteLibraryRouted
+      handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
+      activeLibraryView={libraryView}
+      key="selectSite"
+      newSite={newSiteDialogOpen}
+      importSite={importSiteDialogOpen || !!importSiteURL}
+      importSiteURL={importSiteURL}
+    />
+  );
+
+  // Toolbar right content
+  const renderToolbarRight = () => (
+    <Routes>
+      <Route path="/prefs/*" element={<PrefsToolbar />} />
+      <Route
+        path="*"
+        element={
+          <SiteLibraryToolbarRight
+            handleChange={handleLibraryViewChange}
+            handleLibraryDialogClick={handleLibraryDialogClick}
+            activeLibraryView={libraryView}
+          />
+        }
       />
-    );
-  }
+    </Routes>
+  );
 
-  renderSiteLibraryRouted(importSiteURL?: string) {
-    return (
-      <SiteLibraryRouted
-        handleLibraryDialogCloseClick={() => this.handleLibraryDialogCloseClick()}
-        activeLibraryView={this.state.libraryView}
-        key={"selectSite"}
-        newSite={this.state.newSiteDialogOpen}
-        importSite={this.state.importSiteDialogOpen || !!importSiteURL}
-        importSiteURL={importSiteURL}
+  // Sidebar content
+  const renderSidebar = () => (
+    <Routes>
+      <Route
+        path="/prefs/*"
+        element={
+          <PrefsSidebar
+            menus={[]}
+            hideItems={!forceShowMenu && !menuIsLocked}
+            menuIsLocked={menuIsLocked}
+            onToggleItemVisibility={toggleForceShowMenu}
+            onLockMenuClicked={toggleMenuIsLocked}
+          />
+        }
       />
-    );
-  }
+      <Route path="/create-new" element={null} />
+      <Route path="/welcome" element={null} />
+      <Route path="*" element={<SiteLibrarySidebar />} />
+    </Routes>
+  );
 
-  // Render toolbar based on current route
-  renderToolbarRight() {
-    return (
-      <Switch>
-        <Route
-          path='/prefs'
-          render={({ history }) => {
-            const sp = new URLSearchParams(history.location.search);
-            let backurl = "/sites/last";
-            if (sp.has("siteKey")) {
-              const siteKey = sp.get("siteKey");
-              backurl = `/sites/${siteKey}/workspaces/source`;
-            }
-            const leftButtons = [
-              <ToolbarButton
-                key={"back"}
-                action={() => {
-                  history.push(backurl);
-                }}
-                title='Back'
-                icon={ArrowBackIcon}
-              />,
-            ];
+  // Main content
+  const renderContent = () => (
+    <Routes>
+      <Route path="/prefs/*" element={<PrefsRouted />} />
+      <Route path="/sites/*" element={renderSiteLibraryRouted()} />
+      <Route path="*" element={renderSiteLibraryRouted()} />
+    </Routes>
+  );
 
-            const rightButtons = [
-              <ToolbarButton
-                key={"toolbarbutton-library"}
-                to="/sites/last"
-                title='Site Library'
-                icon={AppsIcon}
-              />,
-              <ToolbarButton
-                key='buttonPrefs'
-                active={true}
-                to="/prefs"
-                title='Preferences'
-                icon={SettingsApplicationsIcon}
-              />,
-            ];
-
-            return <TopToolbarRight itemsLeft={leftButtons} itemsCenter={[]} itemsRight={rightButtons} />;
-          }}
-        />
-        <Route
-          path='/'
-          render={() => (
-            <SiteLibraryToolbarRight
-              handleChange={(v) => this.handleLibraryViewChange(v)}
-              handleLibraryDialogClick={(v) => this.handleLibraryDialogClick(v)}
-              activeLibraryView={this.state.libraryView}
-            />
-          )}
-        />
-      </Switch>
-    );
-  }
-
-  // Render sidebar based on current route
-  renderSidebar() {
-    return (
-      <Switch>
-        <Route
-          path='/prefs'
-          render={() => (
-            <PrefsSidebar
-              menus={[]}
-              hideItems={!this.state.forceShowMenu && !this.state.menuIsLocked}
-              menuIsLocked={this.state.menuIsLocked}
-              onToggleItemVisibility={() => {
-                this.toggleForceShowMenu();
-              }}
-              onLockMenuClicked={() => {
-                this.toggleMenuIsLocked();
-              }}
-            />
-          )}
-        />
-        <Route
-          path='/create-new'
-          render={() => null}
-        />
-        <Route
-          path='/welcome'
-          render={() => null}
-        />
-        <Route
-          path='/'
-          render={() => <SiteLibrarySidebar />}
-        />
-      </Switch>
-    );
-  }
-
-  // Render content based on current route
-  renderContent() {
-    return (
-      <Switch>
-        <Route
-          path='/prefs'
-          render={() => <PrefsRouted />}
-        />
-        <Route
-          path='/sites/import-site-url/:url'
-          render={({ match }) => this.renderSiteLibraryRouted(decodeURIComponent(match.params.url))}
-        />
-        <Route
-          path='/'
-          render={() => this.renderSiteLibraryRouted()}
-        />
-      </Switch>
-    );
-  }
-
-  // Main layout with toolbar, sidebar, and content
-  renderMainLayout(history: { push: (path: string, state?: unknown) => void }) {
-    this.history = history;
-    const welcomeScreen = this.renderWelcomeScreen();
-
-    // Handle ?console query param redirect
-    const sp = new URLSearchParams(window.location.search);
-    if (sp.has("console")) {
-      history.push("/console");
-      return null;
-    }
-
-    return (
+  // Main layout wrapper
+  const MainLayoutWrapper = () => (
+    <ConsoleRedirectHandler>
       <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={this.state.theme}>
+        <ThemeProvider theme={theme}>
           <CssBaseline />
-          <React.Fragment>
-            {welcomeScreen}
-            <MainLayout
-              toolbarRight={this.renderToolbarRight()}
-              sidebar={this.renderSidebar()}
-              menuIsLocked={this.state.menuIsLocked}
-              forceShowMenu={this.state.forceShowMenu}
-              skipMenuTransition={this.state.skipMenuTransition}
-              onContentClick={() => {
-                if (this.state.forceShowMenu) this.toggleForceShowMenu();
-              }}
-            >
-              {this.renderContent()}
-            </MainLayout>
-          </React.Fragment>
+          {welcomeScreen}
+          <MainLayout
+            toolbarRight={renderToolbarRight()}
+            sidebar={renderSidebar()}
+            menuIsLocked={menuIsLocked}
+            forceShowMenu={forceShowMenu}
+            skipMenuTransition={skipMenuTransition}
+            onContentClick={() => {
+              if (forceShowMenu) toggleForceShowMenu();
+            }}
+          >
+            {renderContent()}
+          </MainLayout>
         </ThemeProvider>
       </StyledEngineProvider>
-    );
-  }
+    </ConsoleRedirectHandler>
+  );
 
-  render() {
-    const welcomeScreen = this.renderWelcomeScreen();
+  return (
+    <Routes>
+      {/* Console - standalone layout */}
+      <Route
+        path="/console"
+        element={
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Box
+                key="main-content"
+                sx={{
+                  flex: 'auto',
+                  userSelect: 'none',
+                  overflow: 'auto',
+                  overflowX: 'hidden',
+                }}
+              >
+                <Console />
+              </Box>
+            </ThemeProvider>
+          </StyledEngineProvider>
+        }
+      />
 
-    // Reset skipMenuTransition if it was set
-    if (this.state.skipMenuTransition) {
-      this.setState({ skipMenuTransition: false });
-    }
+      {/* Workspace - standalone layout */}
+      <Route
+        path="/sites/:site/workspaces/:workspace/*"
+        element={<WorkspaceRoute applicationRole={applicationRole} welcomeScreen={welcomeScreen} theme={theme} />}
+      />
 
-    return (
-      <Switch>
-        {/* Console - standalone layout */}
-        <Route
-          path='/console'
-          render={({ history }) => {
-            this.history = history;
-            return (
-              <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={this.state.theme}>
-                  <CssBaseline />
-                  <Box
-                    key='main-content'
-                    sx={{
-                      flex: 'auto',
-                      userSelect: 'none',
-                      overflow: 'auto',
-                      overflowX: 'hidden',
-                    }}
-                  >
-                    <Console />
-                  </Box>
-                </ThemeProvider>
-              </StyledEngineProvider>
-            );
-          }}
-        />
+      {/* Refresh route - empty */}
+      <Route
+        path="/refresh"
+        element={
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <div />
+            </ThemeProvider>
+          </StyledEngineProvider>
+        }
+      />
 
-        {/* Workspace - standalone layout */}
-        <Route
-          path='/sites/:site/workspaces/:workspace'
-          render={({ match, history }) => {
-            this.history = history;
-            return (
-              <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={this.state.theme}>
-                  <CssBaseline />
-                  {welcomeScreen}
-                  <Workspace
-                    applicationRole={this.state.applicationRole}
-                    siteKey={decodeURIComponent(match.params.site)}
-                    workspaceKey={decodeURIComponent(match.params.workspace)}
-                  />
-                </ThemeProvider>
-              </StyledEngineProvider>
-            );
-          }}
-        />
-
-        {/* Refresh route - empty */}
-        <Route
-          path='/refresh'
-          exact
-          render={({ history }) => {
-            this.history = history;
-            return (
-              <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={this.state.theme}>
-                  <div />
-                </ThemeProvider>
-              </StyledEngineProvider>
-            );
-          }}
-        />
-
-        {/* All other routes use MainLayout */}
-        <Route
-          path='/'
-          render={({ history }) => this.renderMainLayout(history)}
-        />
-      </Switch>
-    );
-  }
-}
+      {/* All other routes use MainLayout */}
+      <Route path="*" element={<MainLayoutWrapper />} />
+    </Routes>
+  );
+};
 
 export default App;

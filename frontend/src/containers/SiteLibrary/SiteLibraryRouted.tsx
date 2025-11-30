@@ -1,4 +1,4 @@
-import { Switch, Route } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
 import SiteLibraryContent from "./SiteLibraryContent";
 
 interface SiteLibraryRoutedProps {
@@ -9,123 +9,65 @@ interface SiteLibraryRoutedProps {
   handleLibraryDialogCloseClick: () => void;
 }
 
-const SiteLibraryRouted = ({ newSite, importSite, importSiteURL, activeLibraryView, handleLibraryDialogCloseClick }: SiteLibraryRoutedProps) => {
+// Wrapper for import-site-url/:url route
+const ImportSiteUrlRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+  const { url } = useParams();
   return (
-    <Switch>
-      <Route
-        path='/sites/import-site-url/:url'
-        exact
-        render={({ match, history }) => {
-          const url = decodeURIComponent(match.params.url);
-          return (
-            <SiteLibraryContent
-              source={url}
-              sourceArgument={null}
-              newSite={newSite}
-              importSite={importSite}
-              importSiteURL={importSiteURL}
-              activeLibraryView={activeLibraryView}
-              handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-              historyObj={history}
-            />
-          );
-        }}
-      />
-      <Route
-        path='/sites/import-site/:refresh'
-        exact
-        render={({ match, history }) => {
-          const refresh = decodeURIComponent(match.params.refresh);
-          return (
-            <SiteLibraryContent
-              source={refresh}
-              sourceArgument={null}
-              newSite={newSite}
-              importSite={importSite}
-              importSiteURL={importSiteURL}
-              activeLibraryView={activeLibraryView}
-              handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-              historyObj={history}
-            />
-          );
-        }}
-      />
-      <Route
-        path='/sites/:source'
-        exact
-        render={({ match, history }) => {
-          const source = decodeURIComponent(match.params.source);
-          return (
-            <SiteLibraryContent
-              source={source}
-              sourceArgument={null}
-              newSite={newSite}
-              importSite={importSite}
-              importSiteURL={importSiteURL}
-              activeLibraryView={activeLibraryView}
-              handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-              historyObj={history}
-            />
-          );
-        }}
-      />
+    <SiteLibraryContent
+      source={decodeURIComponent(url || '')}
+      sourceArgument={null}
+      {...props}
+    />
+  );
+};
 
-      <Route
-        path='/sites/:source/:args'
-        exact
-        render={({ match, history }) => {
-          const source = decodeURIComponent(match.params.source);
-          const sourceArgument = decodeURIComponent(match.params.args);
-          return (
-            <SiteLibraryContent
-              source={source}
-              sourceArgument={sourceArgument}
-              newSite={newSite}
-              importSite={importSite}
-              importSiteURL={importSiteURL}
-              activeLibraryView={activeLibraryView}
-              handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-              historyObj={history}
-            />
-          );
-        }}
-      />
+// Wrapper for import-site/:refresh route
+const ImportSiteRefreshRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+  const { refresh } = useParams();
+  return (
+    <SiteLibraryContent
+      source={decodeURIComponent(refresh || '')}
+      sourceArgument={null}
+      {...props}
+    />
+  );
+};
 
-      <Route
-        path='/'
-        render={({ history }) => {
-          return (
-            <SiteLibraryContent
-              source="last"
-              sourceArgument={null}
-              newSite={newSite}
-              importSite={importSite}
-              importSiteURL={importSiteURL}
-              activeLibraryView={activeLibraryView}
-              handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-              historyObj={history}
-            />
-          );
-        }}
-      />
-      <Route
-        path='/sites'
-        render={({ history }) => {
-          return (
-            <SiteLibraryContent
-              source="last"
-              sourceArgument={null}
-              newSite={newSite}
-              importSite={importSite}
-              importSiteURL={importSiteURL}
-              activeLibraryView={activeLibraryView}
-              handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-              historyObj={history}
-            />
-          );
-        }}
-      />
-    </Switch>
+// Wrapper for /sites/:source route
+const SiteSourceRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+  const { source } = useParams();
+  return (
+    <SiteLibraryContent
+      source={decodeURIComponent(source || 'last')}
+      sourceArgument={null}
+      {...props}
+    />
+  );
+};
+
+// Wrapper for /sites/:source/:args route
+const SiteSourceArgsRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+  const { source, args } = useParams();
+  return (
+    <SiteLibraryContent
+      source={decodeURIComponent(source || 'last')}
+      sourceArgument={decodeURIComponent(args || '')}
+      {...props}
+    />
+  );
+};
+
+const SiteLibraryRouted = ({ newSite, importSite, importSiteURL, activeLibraryView, handleLibraryDialogCloseClick }: SiteLibraryRoutedProps) => {
+  const commonProps = { newSite, importSite, importSiteURL, activeLibraryView, handleLibraryDialogCloseClick };
+
+  return (
+    <Routes>
+      <Route path="import-site-url/:url" element={<ImportSiteUrlRoute {...commonProps} />} />
+      <Route path="import-site/:refresh" element={<ImportSiteRefreshRoute {...commonProps} />} />
+      <Route path=":source/:args" element={<SiteSourceArgsRoute {...commonProps} />} />
+      <Route path=":source" element={<SiteSourceRoute {...commonProps} />} />
+      <Route path="*" element={<SiteLibraryContent source="last" sourceArgument={null} {...commonProps} />} />
+    </Routes>
   );
 };
 

@@ -1,5 +1,4 @@
-import * as React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
 import SyncRouteGeneral from "./SyncRouteGeneral";
 import { SiteConfig } from "../../../../types";
 
@@ -14,36 +13,25 @@ interface SyncRoutedProps {
   workspaceKey: string;
 }
 
-interface SyncRoutedState {}
+// Wrapper for add/:refresh route
+const SyncAddRefreshRoute = (props: SyncRoutedProps) => {
+  const { refresh } = useParams();
+  return <SyncRouteGeneral {...props} addRefresh={decodeURIComponent(refresh || '')} />;
+};
 
-export class SyncRouted extends React.Component<SyncRoutedProps, SyncRoutedState> {
-  render() {
-    return (
-      <Switch>
-        <Route
-          path='/sites/:site/workspaces/:workspace/sync/add/:refresh'
-          exact
-          render={({ match }) => {
-            return <SyncRouteGeneral {...this.props} addRefresh={decodeURIComponent(match.params.refresh)} />;
-          }}
-        />
+// Wrapper for list/:syncConfKey route
+const SyncListRoute = (props: SyncRoutedProps) => {
+  const { syncConfKey } = useParams();
+  return <SyncRouteGeneral {...props} syncConfKey={decodeURIComponent(syncConfKey || '')} />;
+};
 
-        <Route
-          path='/sites/:site/workspaces/:workspace/sync/list/:syncConfKey'
-          exact
-          render={({ match }) => {
-            return <SyncRouteGeneral {...this.props} syncConfKey={decodeURIComponent(match.params.syncConfKey)} />;
-          }}
-        />
-
-        <Route
-          path='/sites/:site/workspaces/:workspace/sync/'
-          exact
-          render={({ match }) => {
-            return <SyncRouteGeneral {...this.props} />;
-          }}
-        />
-      </Switch>
-    );
-  }
-}
+export const SyncRouted = (props: SyncRoutedProps) => {
+  return (
+    <Routes>
+      <Route path="add/:refresh" element={<SyncAddRefreshRoute {...props} />} />
+      <Route path="list/:syncConfKey" element={<SyncListRoute {...props} />} />
+      <Route path="/" element={<SyncRouteGeneral {...props} />} />
+      <Route path="*" element={<SyncRouteGeneral {...props} />} />
+    </Routes>
+  );
+};

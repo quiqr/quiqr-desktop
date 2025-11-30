@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import SiteDialogsContainer from "./dialogs/SiteDialogsContainer";
 import SiteGridView from "./components/SiteGridView";
 import SiteListView from "./components/SiteListView";
 import Spinner from "./../../components/Spinner";
-import { History } from "history";
 import { SiteConfig } from "./../../../types";
 import { useSiteLibraryData } from "./hooks/useSiteLibraryData";
 import { useSiteDialogs } from "./hooks/useSiteDialogs";
@@ -18,7 +17,6 @@ interface SiteLibraryContentProps {
   importSiteURL?: string;
   activeLibraryView?: string;
   handleLibraryDialogCloseClick: () => void;
-  historyObj: History;
 }
 
 const SiteLibraryContent = ({
@@ -29,20 +27,12 @@ const SiteLibraryContent = ({
   importSiteURL,
   activeLibraryView,
   handleLibraryDialogCloseClick,
-  historyObj,
 }: SiteLibraryContentProps) => {
-  const historyRef = useRef<History | null>(historyObj);
-
-  // Update historyRef when historyObj changes
-  useEffect(() => {
-    historyRef.current = historyObj;
-  }, [historyObj]);
-
   const { configurations, quiqrCommunityTemplates, sitesListingView, error: quiqrCommunityTemplatesError, updateLocalSites } = useSiteLibraryData();
 
   const { dialogState, openDialog, closeDialog } = useSiteDialogs({ newSite, importSite, importSiteURL });
 
-  const { mountSiteByKey, mountSite } = useSiteOperations(historyRef);
+  const { mountSiteByKey, mountSite } = useSiteOperations();
 
   const [showSpinner] = useState(false);
 

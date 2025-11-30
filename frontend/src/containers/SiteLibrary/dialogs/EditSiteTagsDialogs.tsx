@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import service from "../../../services/service";
 import Chips from "../../../components/Chips";
 import Button from "@mui/material/Button";
@@ -21,7 +21,7 @@ interface EditTagsDialogsProps {
 }
 
 const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDialogsProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [execButtonsDisabled, setExecButtonsDisabled] = useState(true);
@@ -69,7 +69,7 @@ const EditSiteTagsDialogs = ({ open, siteconf, onSuccess, onClose }: EditTagsDia
     try {
       await service.api.saveSiteConf(editedSiteConf.key, editedSiteConf);
       // Navigate to refresh the site library view
-      history.push("/sites/last");
+      navigate("/sites/last");
       onSuccess();
       onClose();
     } catch (err) {

@@ -1,5 +1,5 @@
-import React from "react";
-import { Route } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import service from "./../../../services/service";
 import Box from "@mui/material/Box";
 import SyncConfigDialog from "./components/SyncConfigDialog";
@@ -36,290 +36,209 @@ interface SyncRouteGeneralProps {
   addRefresh?: unknown;
 }
 
-interface SyncRouteGeneralState {
-  site: SiteConfig | null;
-  serverDialog: ServerDialog;
-  serverBusyDialog: ServerBusyDialog;
-  lastOpenedPublishedKey: string | null;
-  addRefresh?: unknown;
-  menuOpen?: unknown;
-}
+const SyncRouteGeneral = ({
+  siteKey,
+  workspaceKey,
+  site: propsSite,
+  syncConfKey,
+  addRefresh,
+}: SyncRouteGeneralProps) => {
+  const navigate = useNavigate();
+  const basePath = `/sites/${siteKey}/workspaces/${workspaceKey}/sync`;
 
-class SyncRouteGeneral extends React.Component<SyncRouteGeneralProps, SyncRouteGeneralState> {
-  history: any;
-  basePath: string = '';
+  const [site, setSite] = useState<SiteConfig | null>(null);
+  const [serverDialog, setServerDialog] = useState<ServerDialog>({});
+  const [serverBusyDialog, setServerBusyDialog] = useState<ServerBusyDialog>({});
+  const [lastOpenedPublishedKey, setLastOpenedPublishedKey] = useState<string | null>(null);
+  const [prevAddRefresh, setPrevAddRefresh] = useState<unknown>(null);
 
-  constructor(props: SyncRouteGeneralProps) {
-    super(props);
-    this.state = {
-      site: null,
-      serverDialog: {},
-      serverBusyDialog: {},
-      lastOpenedPublishedKey: null,
-    };
-  }
+  const openAddServerDialog = useCallback(() => {
+    setServerDialog({
+      open: true,
+      modAction: "Add",
+      serverTitle: "Sync Target",
+      closeText: "Cancel",
+    });
+  }, []);
 
-  componentDidUpdate(preProps: SyncRouteGeneralProps) {
-    if (this.state.addRefresh !== this.props.addRefresh) {
-      this.openAddServerDialog();
+  useEffect(() => {
+    if (propsSite) {
+      setSite(propsSite);
     }
+  }, [propsSite]);
 
-    if (preProps.site !== this.props.site) {
-      this.initState();
-      this.checkLastOpenedPublishConf();
-    }
-  }
-
-  componentDidMount() {
-    this.initState();
-    this.checkLastOpenedPublishConf();
-    this.basePath = `/sites/${this.props.siteKey}/workspaces/${this.props.workspaceKey}/sync`;
-  }
-
-  checkLastOpenedPublishConf() {
+  useEffect(() => {
     service.api.readConfKey("lastOpenedPublishTargetForSite").then((value) => {
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         const targets = value as Record<string, string>;
-        if (this.props.siteKey in targets) {
-          this.setState({ lastOpenedPublishedKey: targets[this.props.siteKey] });
+        if (siteKey in targets) {
+          setLastOpenedPublishedKey(targets[siteKey]);
         }
       }
     });
-  }
+  }, [siteKey]);
 
-  openAddServerDialog() {
-    this.setState({
-      addRefresh: this.props.addRefresh,
-      serverDialog: {
-        open: true,
-        modAction: "Add",
-        serverTitle: "Sync Target",
-        closeText: "Cancel",
-      },
+  useEffect(() => {
+    if (addRefresh !== prevAddRefresh && addRefresh !== undefined) {
+      openAddServerDialog();
+      setPrevAddRefresh(addRefresh);
+    }
+  }, [addRefresh, prevAddRefresh, openAddServerDialog]);
+
+  const onConfigure = (publishConf: PublishConfig) => {
+    setServerDialog({
+      open: true,
+      modAction: "Edit",
+      closeText: "Cancel",
+      publishConf: publishConf,
     });
-  }
+  };
 
-  onConfigure(publishConf: PublishConfig) {
-    this.setState({
-      menuOpen: null,
-      serverDialog: {
-        open: true,
-        modAction: "Edit",
-        closeText: "Cancel",
-        publishConf: publishConf,
-      },
+  const syncDialogControl = (open: boolean, title: string = "", icon: React.ReactNode = null) => {
+    setServerBusyDialog({
+      open: open,
+      serverTitle: title,
+      icon: icon,
     });
-  }
+  };
 
-  initState() {
-    if (this.props.site) {
-      this.setState({
-        site: this.props.site,
-      });
-    }
-  }
-
-  syncDialogControl(open: boolean, title: string = "", icon: React.ReactNode = null) {
-    this.setState({
-      serverBusyDialog: {
-        open: open,
-        serverTitle: title,
-        icon: icon,
-      },
-    });
-  }
-
-  savePublishData(inkey: string, data: { type: string; [key: string]: unknown }) {
-    let site = this.state.site;
-
-    if (!site) {
-      console.error('Cannot save publish data: site is null');
-      return;
-    }
-
-    if (!inkey) {
-      inkey = `publ-${Math.random()}`;
-    }
-
-    // Ensure publish array exists
-    if (!site.publish) {
-      site.publish = [];
-    }
-
-    const publConfIndex = site.publish.findIndex(({ key }) => key === inkey);
-    if (publConfIndex !== -1) {
-      site.publish[publConfIndex] = { key: inkey, config: data };
-    } else {
-      site.publish.push({ key: inkey, config: data });
-    }
-
-    service.api.saveSiteConf(site.key, site).then(() => {
-      this.history.push(`${this.basePath}/list/${inkey}`);
-    });
-  }
-
-  renderMainCard(publishConf: PublishConfig) {
+  const renderMainCard = (publishConf: PublishConfig) => {
     let enableSyncFrom = false;
     let enableSyncTo = true;
 
-    let dashboard;
+    const config = publishConf.config as {
+      type?: string;
+      publishScope?: string;
+      pullOnly?: boolean;
+      [key: string]: unknown;
+    };
 
-    if (publishConf.config.publishScope === "source" || publishConf.config.publishScope === "build_and_source") {
+    if (config.publishScope === "source" || config.publishScope === "build_and_source") {
       enableSyncFrom = true;
     }
-    if (publishConf.config.pullOnly === true) {
+    if (config.pullOnly === true) {
       enableSyncTo = false;
     }
 
-    if (publishConf.config.type === "github") {
-      dashboard = (
+    if (config.type === "github") {
+      return (
         <GitHubDashboard
-          siteKey={this.props.siteKey}
-          workspaceKey={this.props.workspaceKey}
+          siteKey={siteKey}
+          workspaceKey={workspaceKey}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
-          publishConf={publishConf.config}
+          publishConf={config as any}
           onSyncDialogControl={(open, text, icon) => {
-            this.syncDialogControl(open, text, icon);
+            syncDialogControl(open, text, icon);
           }}
           onConfigure={() => {
-            this.onConfigure(publishConf);
+            onConfigure(publishConf);
           }}
         />
       );
-    } else if (publishConf.config.type === "sysgit") {
-      dashboard = (
+    } else if (config.type === "sysgit") {
+      return (
         <SysGitDashboard
-          siteKey={this.props.siteKey}
-          workspaceKey={this.props.workspaceKey}
+          siteKey={siteKey}
+          workspaceKey={workspaceKey}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
-          publishConf={publishConf.config}
+          publishConf={config as any}
           onSyncDialogControl={(open, text, icon) => {
-            this.syncDialogControl(open, text, icon);
+            syncDialogControl(open, text, icon);
           }}
           onConfigure={() => {
-            this.onConfigure(publishConf);
+            onConfigure(publishConf);
           }}
         />
       );
-    } else if (publishConf.config.type === "folder") {
-      dashboard = (
+    } else if (config.type === "folder") {
+      return (
         <FolderDashboard
-          siteKey={this.props.siteKey}
-          workspaceKey={this.props.workspaceKey}
+          siteKey={siteKey}
+          workspaceKey={workspaceKey}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
-          publishConf={publishConf.config}
+          publishConf={config as any}
           onSyncDialogControl={(open, text, icon) => {
-            this.syncDialogControl(open, text, icon);
+            syncDialogControl(open, text, icon);
           }}
           onConfigure={() => {
-            this.onConfigure(publishConf);
+            onConfigure(publishConf);
           }}
         />
       );
     }
 
-    return dashboard;
+    return null;
+  };
+
+  // If site is not loaded yet, show loading state
+  if (!site || !site.key) {
+    return <Box sx={{ height: '100%', padding: 2 }}>Loading...</Box>;
   }
 
-  render() {
-    const { site, serverDialog } = this.state;
-    let content = null;
+  let content = null;
 
-    // If site is not loaded yet, show nothing (or a loading state)
-    if (!site || !site.key) {
-      return (
-        <Route
-          render={({ history }) => {
-            this.history = history;
-            return <Box sx={{ height: '100%', padding: 2 }}>Loading...</Box>;
+  if (!site.publish || site.publish.length < 1) {
+    content = (
+      <Box>
+        <p>No sync server is configured. Add one first.</p>
+        <Button
+          onClick={() => {
+            navigate(`${basePath}/add/x${Math.random()}`);
           }}
-        />
-      );
+          color='primary'
+          variant='contained'>
+          add sync server
+        </Button>
+      </Box>
+    );
+  } else if (site.publish.length === 1) {
+    content = renderMainCard(site.publish[0]);
+  } else if (syncConfKey) {
+    const publConf = site.publish.find(({ key }) => key === syncConfKey);
+    if (publConf) {
+      content = renderMainCard(publConf);
     }
-
-    if (!site.publish || site.publish.length < 1) {
-      content = (
-        <Box>
-          <p>No sync server is configured. Add one first.</p>
-          <Button
-            onClick={() => {
-              this.history.push(`${this.basePath}/add/x${Math.random()}`);
-            }}
-            color='primary'
-            variant='contained'>
-            add sync server
-          </Button>
-        </Box>
-      );
-    } else if (site.publish.length === 1) {
-      content = this.renderMainCard(site.publish[0]);
-    } else if (this.props.syncConfKey) {
-      const publConf = site.publish.find(({ key }) => key === this.props.syncConfKey);
-      if (publConf) {
-        content = this.renderMainCard(publConf);
-      }
-    } else if (this.state.lastOpenedPublishedKey) {
-      const publConf = site.publish.find(({ key }) => key === this.state.lastOpenedPublishedKey);
-      if (publConf) {
-        content = this.renderMainCard(publConf);
-      }
+  } else if (lastOpenedPublishedKey) {
+    const publConf = site.publish.find(({ key }) => key === lastOpenedPublishedKey);
+    if (publConf) {
+      content = renderMainCard(publConf);
     }
+  }
 
-    if (!content) {
-      content = this.renderMainCard(site.publish[0]);
-    }
+  if (!content && site.publish && site.publish.length > 0) {
+    content = renderMainCard(site.publish[0]);
+  }
 
-    return (
-      <Route
-        render={({ history }) => {
-          this.history = history;
-          return (
-            <React.Fragment>
-              <Box sx={{ height: '100%' }}>{content}</Box>
+  return (
+    <>
+      <Box sx={{ height: '100%' }}>{content}</Box>
 
-              <SyncBusyDialog
-                {...this.state.serverBusyDialog}
-                onClose={() => {
-                  this.setState({
-                    serverBusyDialog: {
-                      open: false,
-                    },
-                  });
-                }}
-              />
-
-              <SyncConfigDialog
-                {...serverDialog}
-                site={{
-                  key: this.state.site?.key || '',
-                  publish: this.state.site?.publish || []
-                }}
-                onSave={(publishKey) => {
-                  this.history.push(`${this.basePath}/list/${publishKey}`);
-
-                  this.setState({
-                    serverDialog: {
-                      open: false,
-                    },
-                  });
-                }}
-                onClose={() => {
-                  this.setState({
-                    serverDialog: {
-                      open: false,
-                    },
-                  });
-                }}
-              />
-            </React.Fragment>
-          );
+      <SyncBusyDialog
+        {...serverBusyDialog}
+        onClose={() => {
+          setServerBusyDialog({ open: false });
         }}
       />
-    );
-  }
-}
+
+      <SyncConfigDialog
+        {...serverDialog}
+        site={{
+          key: site?.key || '',
+          publish: site?.publish || []
+        }}
+        onSave={(publishKey: string) => {
+          navigate(`${basePath}/list/${publishKey}`);
+          setServerDialog({ open: false });
+        }}
+        onClose={() => {
+          setServerDialog({ open: false });
+        }}
+      />
+    </>
+  );
+};
 
 export default SyncRouteGeneral;

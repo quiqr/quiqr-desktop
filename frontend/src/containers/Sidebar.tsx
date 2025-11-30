@@ -89,17 +89,15 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
           key={"itemFlat"+item.label}
           disablePadding
           secondaryAction={secondaryAction}>
-          <ListItemButton
-            component={NavLink}
-            to={item.to}
-            exact={item.exact}
-            activeClassName="Mui-selected"
-            onClick={item.onClick}
-          >
-            {icon}
-            <ListItemText primary={item.label} />
-            {secondaryActionMenu}
-          </ListItemButton>
+          <NavLink to={item.to} end={item.exact} style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}>
+            {({ isActive }) => (
+              <ListItemButton selected={isActive} onClick={item.onClick}>
+                {icon}
+                <ListItemText primary={item.label} />
+                {secondaryActionMenu}
+              </ListItemButton>
+            )}
+          </NavLink>
         </ListItem>
       )
     }
@@ -136,15 +134,13 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
           <ListItem
             key={"itemNestChild"+itemChild.label}
             disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to={itemChild.to}
-              exact={itemChild.exact}
-              activeClassName="Mui-selected"
-              onClick={itemChild.onClick}
-              sx={{ pl: 4 }}>
-              <ListItemText primary={itemChild.label} />
-            </ListItemButton>
+            <NavLink to={itemChild.to} end={itemChild.exact} style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}>
+              {({ isActive }) => (
+                <ListItemButton selected={isActive} onClick={itemChild.onClick} sx={{ pl: 4 }}>
+                  <ListItemText primary={itemChild.label} />
+                </ListItemButton>
+              )}
+            </NavLink>
           </ListItem>
         )
       }

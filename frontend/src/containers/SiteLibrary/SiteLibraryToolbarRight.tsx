@@ -1,5 +1,4 @@
-import * as React from "react";
-import { Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup } from "../TopToolbarRight";
 import AppsIcon from "@mui/icons-material/Apps";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
@@ -14,75 +13,68 @@ interface SiteLibraryToolbarRightProps {
   handleChange: (viewName: string) => void;
 }
 
-export class SiteLibraryToolbarRight extends React.Component<SiteLibraryToolbarRightProps> {
-  renderWithRoute(history: any) {
-    const leftButtons = [
-      <ToolbarButton
-        key='buttonNewSite'
-        action={() => {
-          this.props.handleLibraryDialogClick("newSiteDialog");
-        }}
-        title='New'
-        icon={AddIcon}
-      />,
+export const SiteLibraryToolbarRight = ({
+  handleLibraryDialogClick,
+  activeLibraryView,
+  handleChange,
+}: SiteLibraryToolbarRightProps) => {
+  const navigate = useNavigate();
 
-      <ToolbarButton
-        key='buttonImportSite'
-        action={() => {
-          this.props.handleLibraryDialogClick("importSiteDialog");
-        }}
-        title='Import'
-        icon={InputIcon}
-      />,
-    ];
-    const centerButtons = [
-      <ToolbarToggleButtonGroup
-        key='buttonViewGroup'
-        activeOption={this.props.activeLibraryView}
-        handleChange={this.props.handleChange}
-        optionItems={[
-          {
-            icon: <ViewListIcon />,
-            value: "list",
-          },
-          {
-            icon: <ViewModuleIcon />,
-            value: "cards",
-          },
-        ]}
-      />,
-    ];
+  const leftButtons = [
+    <ToolbarButton
+      key='buttonNewSite'
+      action={() => handleLibraryDialogClick("newSiteDialog")}
+      title='New'
+      icon={AddIcon}
+    />,
+    <ToolbarButton
+      key='buttonImportSite'
+      action={() => handleLibraryDialogClick("importSiteDialog")}
+      title='Import'
+      icon={InputIcon}
+    />,
+  ];
 
-    const rightButtons = [
-      <ToolbarButton
-        key={"toolbarbutton-library"}
-        active={true}
-        action={() => {
-          history.push("/sites/last");
-        }}
-        title='Site Library'
-        icon={AppsIcon}
-      />,
-      <ToolbarButton
-        key='buttonPrefs'
-        action={() => {
-          history.push("/prefs/");
-        }}
-        title='Preferences'
-        icon={SettingsApplicationsIcon}
-      />,
-    ];
+  const centerButtons = [
+    <ToolbarToggleButtonGroup
+      key='buttonViewGroup'
+      activeOption={activeLibraryView}
+      handleChange={handleChange}
+      optionItems={[
+        {
+          icon: <ViewListIcon />,
+          value: "list",
+        },
+        {
+          icon: <ViewModuleIcon />,
+          value: "cards",
+        },
+      ]}
+    />,
+  ];
 
-    return <TopToolbarRight key='toolbar-right-new-site' itemsLeft={leftButtons} itemsCenter={centerButtons} itemsRight={rightButtons} />;
-  }
+  const rightButtons = [
+    <ToolbarButton
+      key={"toolbarbutton-library"}
+      active={true}
+      action={() => navigate("/sites/last")}
+      title='Site Library'
+      icon={AppsIcon}
+    />,
+    <ToolbarButton
+      key='buttonPrefs'
+      action={() => navigate("/prefs/")}
+      title='Preferences'
+      icon={SettingsApplicationsIcon}
+    />,
+  ];
 
-  render() {
-    return (
-      <Route
-        render={({ history }) => {
-          return this.renderWithRoute(history);
-        }}
-      />
-    );
-  }
-}
+  return (
+    <TopToolbarRight
+      key='toolbar-right-new-site'
+      itemsLeft={leftButtons}
+      itemsCenter={centerButtons}
+      itemsRight={rightButtons}
+    />
+  );
+};

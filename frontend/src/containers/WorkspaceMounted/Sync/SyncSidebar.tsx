@@ -1,23 +1,22 @@
-import * as React       from 'react';
-import { Route }        from 'react-router-dom';
-import Sidebar          from './../../Sidebar';
-import service          from './../../../services/service';
-import AddIcon          from '@mui/icons-material/Add';
-import IconButton       from '@mui/material/IconButton';
-import MoreVertIcon     from '@mui/icons-material/MoreVert';
-import Menu             from '@mui/material/Menu';
-import MenuItem         from '@mui/material/MenuItem';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Sidebar from './../../Sidebar';
+import service from './../../../services/service';
+import AddIcon from '@mui/icons-material/Add';
+import IconButton from '@mui/material/IconButton';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import SyncConfigDialog from './components/SyncConfigDialog';
-import Button           from '@mui/material/Button';
-import Dialog           from '@mui/material/Dialog';
-import DialogActions    from '@mui/material/DialogActions';
-import DialogTitle      from '@mui/material/DialogTitle';
-import DialogContent    from '@mui/material/DialogContent';
-import { History } from 'history';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 //targets
-import {Meta as GitHubMeta}   from './syncTypes/github'
-import {Meta as FolderMeta}   from './syncTypes/folder'
-import {Meta as SysGitMeta}   from './syncTypes/sysgit'
+import { Meta as GitHubMeta } from './syncTypes/github';
+import { Meta as FolderMeta } from './syncTypes/folder';
+import { Meta as SysGitMeta } from './syncTypes/sysgit';
 
 interface PublishConfig {
   key: string;
@@ -48,248 +47,198 @@ interface SyncSidebarProps {
   [key: string]: unknown;
 }
 
-interface SyncSidebarState {
-  site: SiteWithPublish;
-  anchorEl?: HTMLElement | null;
-  menuOpen?: number | null;
-  serverDialog?: ServerDialogConfig;
-  deleteDialogOpen?: boolean;
-  keyForDeletion?: string;
-}
+export const SyncSidebar = ({
+  siteKey,
+  workspaceKey,
+  site: propsSite,
+  ...restProps
+}: SyncSidebarProps) => {
+  const navigate = useNavigate();
+  const [site, setSite] = useState<SiteWithPublish>({ key: '', publish: [] });
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [menuOpen, setMenuOpen] = useState<number | null>(null);
+  const [serverDialog, setServerDialog] = useState<ServerDialogConfig>({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [keyForDeletion, setKeyForDeletion] = useState<string>('');
 
-export class SyncSidebar extends React.Component<SyncSidebarProps, SyncSidebarState> {
-
-  history: History | null = null;
-
-  constructor(props: SyncSidebarProps){
-    super(props);
-    this.state = {
-      site: {
-        key: '',
-        publish: [],
-      },
+  useEffect(() => {
+    if (propsSite) {
+      setSite(propsSite);
     }
-  }
+  }, [propsSite]);
 
+  const encodedSiteKey = siteKey;
+  const encodedWorkspaceKey = workspaceKey;
+  const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
 
-  componentDidUpdate(preProps: SyncSidebarProps){
-    if(preProps.site !== this.props.site){
-      this.initState();
-    }
-  }
+  const deletePublishConfiguration = (inkey: string) => {
+    const publConfIndex = propsSite.publish.findIndex(({ key }) => key === inkey);
+    if (publConfIndex > -1) {
+      propsSite.publish.splice(publConfIndex, 1);
 
-  componentDidMount(){
-    this.initState();
-  }
-
-  initState(){
-    if(this.props.site){
-      this.setState({
-        site: this.props.site
+      service.api.saveSiteConf(propsSite.key, propsSite).then(() => {
+        navigate(`${basePath}/`);
       });
     }
-  }
+  };
 
-  render(){
-    return <Route render={({history})=>{
-      this.history = history;
-      return this.renderWithRoute(history) }
-    } />
-  }
-
-  renderButton(index: number, publ: PublishConfig){
-
+  const renderButton = (index: number) => {
     return (
       <IconButton
         edge="end"
         aria-label="comments"
-        onClick={(e)=>{
-          this.setState({anchorEl:e.currentTarget, menuOpen:index})
+        onClick={(e) => {
+          setAnchorEl(e.currentTarget);
+          setMenuOpen(index);
         }}
-        size="large">
+        size="large"
+      >
         <MoreVertIcon />
       </IconButton>
     );
-  }
+  };
 
-  renderMenu(index: number, publ: PublishConfig){
+  const renderMenu = (index: number, publ: PublishConfig) => {
     return (
       <Menu
-        anchorEl={this.state.anchorEl}
-        open={(this.state.menuOpen===index?true:false)}
+        anchorEl={anchorEl}
+        open={menuOpen === index}
         keepMounted
-        onClose={()=>{
-          this.setState({menuOpen:null});
-        }}
+        onClose={() => setMenuOpen(null)}
       >
-        <MenuItem key="configure"
-          onClick={
-            ()=>{
-              this.setState({
-                menuOpen:null,
-                serverDialog: {
-                  open:true,
-                  modAction: "Edit",
-                  closeText: "Cancel",
-                  publishConf: publ
-                }
-              })
-            }
-          }>
+        <MenuItem
+          key="configure"
+          onClick={() => {
+            setMenuOpen(null);
+            setServerDialog({
+              open: true,
+              modAction: 'Edit',
+              closeText: 'Cancel',
+              publishConf: publ,
+            });
+          }}
+        >
           Configure
         </MenuItem>
 
-        <MenuItem key="delete"
-          onClick={
-            ()=>{
-              this.setState({
-                menuOpen:null,
-                deleteDialogOpen: true,
-                keyForDeletion: publ.key
-              })
-
-            }
-          }>
+        <MenuItem
+          key="delete"
+          onClick={() => {
+            setMenuOpen(null);
+            setDeleteDialogOpen(true);
+            setKeyForDeletion(publ.key);
+          }}
+        >
           Delete
         </MenuItem>
-
       </Menu>
-    )
-  }
+    );
+  };
 
+  const targets: Array<{
+    active: boolean;
+    icon: React.ReactNode;
+    label: string;
+    secondaryMenu: React.ReactNode;
+    secondaryButton: React.ReactNode;
+    to: string;
+  }> = [];
 
-  deletePublishConfiguration(inkey: string){
-    const encodedSiteKey = this.props.siteKey;
-    const encodedWorkspaceKey = this.props.workspaceKey;
-    const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
+  let index = 0;
+  site.publish.forEach((publ) => {
+    let label = '';
+    let icon: React.ReactNode = null;
 
-    const site = this.props.site;
+    if (publ.config && publ.config.type === 'github') {
+      label = GitHubMeta.sidebarLabel(publ.config);
+      icon = GitHubMeta.icon();
+    } else if (publ.config && publ.config.type === 'sysgit') {
+      label = SysGitMeta.sidebarLabel(publ.config);
+      icon = SysGitMeta.icon();
+    } else if (publ.config && publ.config.type === 'folder') {
+      label = FolderMeta.sidebarLabel(publ.config);
+      icon = FolderMeta.icon();
+    }
 
-    const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
-    if(publConfIndex > -1){
-      site.publish.splice(publConfIndex, 1);
-
-      service.api.saveSiteConf(this.props.site.key, this.props.site).then(()=>{
-        // Must stay imperative - navigation after async operation
-        this.history?.push(`${basePath}/`)
+    label = label.length > 17 ? `${label.substring(0, 17)}..` : label;
+    if (label) {
+      targets.push({
+        active: true,
+        icon: icon,
+        label: label,
+        secondaryMenu: renderMenu(index, publ),
+        secondaryButton: renderButton(index),
+        to: `${basePath}/list/${publ.key}/`,
       });
     }
-  }
 
+    index++;
+  });
 
-  renderWithRoute(history: History){
-    const {site} = this.state;
-
-    const encodedSiteKey = this.props.siteKey;
-    const encodedWorkspaceKey = this.props.workspaceKey;
-    const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}/sync`;
-
-    const targets = [];
-    let index = 0;
-
-    site.publish.forEach((publ)=>{
-
-      let label, icon
-
-      if(publ.config && publ.config.type === "github" ){
-        label = GitHubMeta.sidebarLabel(publ.config);
-        icon = GitHubMeta.icon();
-      }
-      else if(publ.config && publ.config.type === "sysgit" ){
-        label = SysGitMeta.sidebarLabel(publ.config);
-        icon = SysGitMeta.icon();
-      }
-
-      else if(publ.config && publ.config.type === "folder" ){
-        label = FolderMeta.sidebarLabel(publ.config);
-        icon = FolderMeta.icon();
-      }
-
-      label = (label.length >  17 ? `${label.substring(0, 17)}..` : label);
-      if(label){
-        targets.push({
-          active: true,
-          icon: icon,
-          label: label,
-          secondaryMenu: this.renderMenu(index, publ),
-          secondaryButton: this.renderButton(index, publ),
-          to: `${basePath}/list/${publ.key}/`,
-        });
-      }
-
-      index++;
-    })
-
-    const menus = [{
+  const menus = [
+    {
       title: 'Sync Targets',
-      items: targets
+      items: targets,
     },
-      {
-        title: '',
-        items: [
-          {
-            spacer: true,
+    {
+      title: '',
+      items: [
+        {
+          label: '',
+          spacer: true,
+        },
+        {
+          icon: <AddIcon />,
+          label: 'ADD SYNC TARGET',
+          onClick: () => {
+            navigate(`${basePath}/add/x${Math.random()}`);
           },
-          {
-            icon: <AddIcon />,
-            label: "ADD SYNC TARGET",
-            // Must stay imperative - uses Math.random() for cache busting
-            onClick: ()=>{
-              history.push(`${basePath}/add/x${Math.random()}`)
-            }
-          }
-        ]
+        },
+      ],
+    },
+  ];
 
-      }
-    ]
+  return (
+    <>
+      <SyncConfigDialog
+        {...(serverDialog as Record<string, unknown>)}
+        site={propsSite as unknown as { key: string; publish: Array<{ key: string; config: unknown }> }}
+        onSave={(publishKey: string) => {
+          navigate(`${basePath}/list/${publishKey}`);
+          setServerDialog({ open: false });
+        }}
+        onClose={() => {
+          setServerDialog({ open: false });
+        }}
+      />
 
-    return (
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {'Are you sure you want to delete this configuration?'}
+        </DialogTitle>
+        <DialogContent></DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setDeleteDialogOpen(false);
+              deletePublishConfiguration(keyForDeletion);
+            }}
+            color="primary"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      <React.Fragment>
-        <SyncConfigDialog
-          {...(this.state.serverDialog as Record<string, unknown>)}
-          site={this.props.site as unknown as { key: string; publish: Array<{ key: string; config: unknown }> }}
-          onSave={(publishKey)=>{
-            // Must stay imperative - navigation after async operation
-            this.history.push(`${basePath}/list/${publishKey}`)
-            this.setState({serverDialog: {
-              open:false
-            }})
-
-          }}
-          onClose={()=>{
-            this.setState({serverDialog: {
-              open:false
-            }})
-          }}
-
-        />
-
-        <Dialog
-          open={this.state.deleteDialogOpen||false}
-          onClose={()=>{this.setState({deleteDialogOpen:false})}}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete this configuration?"}</DialogTitle>
-          <DialogContent>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={()=>{this.setState({deleteDialogOpen:false})}} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={()=>{
-              this.setState({deleteDialogOpen:false})
-              this.deletePublishConfiguration(this.state.keyForDeletion);
-            }} color="primary">
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-
-        <Sidebar {...this.props} menus={menus} />
-      </React.Fragment>
-    )
-  }
-}
+      <Sidebar {...restProps} menus={menus} />
+    </>
+  );
+};
