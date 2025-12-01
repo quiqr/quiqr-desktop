@@ -57,7 +57,10 @@ const SiteDialogsContainer = ({
           onLibraryDialogClose();
           onSuccess();
         }}
-        onClose={onClose}
+        onClose={() => {
+          onLibraryDialogClose();
+          onClose();
+        }}
       />
     </>
   );
