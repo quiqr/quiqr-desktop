@@ -365,6 +365,11 @@ export function createContainer(options: ContainerOptions): AppContainer {
       return cachedWorkspaceService;
     }
 
+    // Stop Hugo server from the old workspace before switching
+    if (cachedWorkspaceService) {
+      cachedWorkspaceService.stopHugoServer();
+    }
+
     // Get workspace head to find the path
     const workspaceHead = await siteService.getWorkspaceHead(resolvedWorkspaceKey);
 
