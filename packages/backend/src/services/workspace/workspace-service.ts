@@ -29,6 +29,7 @@ import { BuildActionService, type BuildActionResult } from '../../build-actions/
 import type { SingleConfig, CollectionConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
+import type { AppState } from '../../config/app-state.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
 
 /**
@@ -39,6 +40,7 @@ export interface WorkspaceServiceDependencies {
   formatProviderResolver: FormatProviderResolver;
   pathHelper: PathHelper;
   appConfig: AppConfig;
+  appState: AppState;
   windowAdapter: WindowAdapter;
   shellAdapter: ShellAdapter;
   outputConsole: OutputConsole;
@@ -122,6 +124,7 @@ export class WorkspaceService {
   private formatProviderResolver: FormatProviderResolver;
   private pathHelper: PathHelper;
   private appConfig: AppConfig;
+  private appState: AppState;
   private windowAdapter: WindowAdapter;
   private shellAdapter: ShellAdapter;
   private outputConsole: OutputConsole;
@@ -142,6 +145,7 @@ export class WorkspaceService {
     this.formatProviderResolver = dependencies.formatProviderResolver;
     this.pathHelper = dependencies.pathHelper;
     this.appConfig = dependencies.appConfig;
+    this.appState = dependencies.appState;
     this.windowAdapter = dependencies.windowAdapter;
     this.shellAdapter = dependencies.shellAdapter;
     this.outputConsole = dependencies.outputConsole;
@@ -1149,7 +1153,9 @@ export class WorkspaceService {
    * Set current base URL from Hugo config
    */
   setCurrentBaseUrl(hugoServerConfig: QSiteConfig): void {
-    // Reset currentBaseUrl - stored in appConfig
+    // Reset currentBaseUrl
+    this.appState.currentBaseUrl = undefined;
+
     const hugoConfService = new HugoConfig(
       JSON.parse(JSON.stringify(hugoServerConfig)),
       this.pathHelper
@@ -1174,11 +1180,9 @@ export class WorkspaceService {
         if (currentBaseUrl && currentBaseUrl !== '/') {
           try {
             const url = new URL(currentBaseUrl);
-            // TODO: Store in appState.currentBaseUrl instead of appConfig
-            // For now, we'll just log it - this needs to be refactored to use appState
-            console.log('Setting currentBaseUrl:', url.pathname);
-          } catch (e) {
-            console.log(e);
+            this.appState.currentBaseUrl = url.pathname;
+          } catch {
+            // Invalid URL, leave currentBaseUrl as undefined
           }
         }
       }
