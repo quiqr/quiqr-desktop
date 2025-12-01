@@ -227,7 +227,7 @@ const ConfigureSourceStep = ({
       </Box>
 
       <Box my={2}>
-        <FormControl variant="outlined" sx={{ m: 1, minWidth: 300 }}>
+        <FormControl variant="outlined" sx={{ minWidth: 300 }}>
           <InputLabel id="hugo-version-label">Hugo Version</InputLabel>
           <Select
             labelId="hugo-version-label"

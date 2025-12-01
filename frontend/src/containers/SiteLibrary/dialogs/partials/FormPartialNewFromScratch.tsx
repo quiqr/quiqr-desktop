@@ -31,7 +31,7 @@ class FormPartialNewFromScratch extends React.Component<FormPartialNewFromScratc
   render(){
     return (
       <React.Fragment>
-          <FormControl variant="outlined" sx={{ m: 1, minWidth: 300 }}>
+          <FormControl variant="outlined" sx={{ minWidth: 300 }}>
             <InputLabel id="demo-simple-select-outlined-label">Config Format</InputLabel>
             <Select
               labelId="demo-simple-select-outlined-label"
@@ -64,5 +64,3 @@ class FormPartialNewFromScratch extends React.Component<FormPartialNewFromScratc
 }
 
 export default FormPartialNewFromScratch;
-
-
