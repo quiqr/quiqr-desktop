@@ -312,6 +312,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       pathHelper,
       appConfig: config,
       appState: state,
+      hugoDownloader,
       windowAdapter: adapters.window,
       shellAdapter: adapters.shell,
       outputConsole: adapters.outputConsole,

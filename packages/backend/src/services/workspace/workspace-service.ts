@@ -30,6 +30,7 @@ import type { SingleConfig, CollectionConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
+import type { HugoDownloader } from '../../hugo/hugo-downloader.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
 
 /**
@@ -41,6 +42,7 @@ export interface WorkspaceServiceDependencies {
   pathHelper: PathHelper;
   appConfig: AppConfig;
   appState: AppState;
+  hugoDownloader: HugoDownloader;
   windowAdapter: WindowAdapter;
   shellAdapter: ShellAdapter;
   outputConsole: OutputConsole;
@@ -125,6 +127,7 @@ export class WorkspaceService {
   private pathHelper: PathHelper;
   private appConfig: AppConfig;
   private appState: AppState;
+  private hugoDownloader: HugoDownloader;
   private windowAdapter: WindowAdapter;
   private shellAdapter: ShellAdapter;
   private outputConsole: OutputConsole;
@@ -146,6 +149,7 @@ export class WorkspaceService {
     this.pathHelper = dependencies.pathHelper;
     this.appConfig = dependencies.appConfig;
     this.appState = dependencies.appState;
+    this.hugoDownloader = dependencies.hugoDownloader;
     this.windowAdapter = dependencies.windowAdapter;
     this.shellAdapter = dependencies.shellAdapter;
     this.outputConsole = dependencies.outputConsole;
@@ -1231,6 +1235,10 @@ export class WorkspaceService {
    */
   async serve(): Promise<void> {
     const workspaceDetails = await this.getConfigurationsData();
+
+    // Ensure Hugo is installed before trying to serve
+    await this.hugoDownloader.ensureAvailable(workspaceDetails.hugover);
+
     return new Promise((resolve, reject) => {
       let serveConfig: any;
       if (workspaceDetails.serve && workspaceDetails.serve.length) {
