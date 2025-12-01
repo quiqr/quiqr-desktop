@@ -9,6 +9,13 @@ import fs from 'fs-extra';
 import path from 'path';
 import { glob } from 'glob';
 import deepmerge from 'deepmerge';
+
+/**
+ * Convert Windows backslash paths to forward slashes for glob compatibility
+ */
+function toGlobPath(p: string): string {
+  return p.replace(/\\/g, '/');
+}
 import type { FormatProvider } from '../../utils/format-providers/types.js';
 import { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
 import { WorkspaceConfigValidator, type WorkspaceConfig } from './workspace-config-validator.js';
@@ -134,7 +141,7 @@ export class WorkspaceConfigProvider {
       'base.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
 
-    const primaryFiles = glob.sync(fileExpPrimary);
+    const primaryFiles = glob.sync(toGlobPath(fileExpPrimary));
     if (primaryFiles.length > 0) {
       return primaryFiles[0];
     }
@@ -143,7 +150,7 @@ export class WorkspaceConfigProvider {
       workspacePath,
       'sukoh.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
-    const fallbackFiles = glob.sync(fileExpFallback);
+    const fallbackFiles = glob.sync(toGlobPath(fileExpFallback));
     return fallbackFiles[0];
   }
 
@@ -293,7 +300,7 @@ export class WorkspaceConfigProvider {
    * Load includes and merge into config object
    */
   private _loadIncludes(configObject: any, fileIncludes: string, showInParseInfo: boolean): any {
-    const files = glob.sync(fileIncludes);
+    const files = glob.sync(toGlobPath(fileIncludes));
 
     const newObject: any = {};
 
@@ -327,7 +334,7 @@ export class WorkspaceConfigProvider {
     fileIncludes: string,
     showInParseInfo: boolean
   ): any {
-    const files = glob.sync(fileIncludes);
+    const files = glob.sync(toGlobPath(fileIncludes));
 
     const newObject: any = { ...configObject };
 
@@ -400,7 +407,7 @@ export class WorkspaceConfigProvider {
           this.formatProviderResolver.allFormatsExt().join(',') +
           '}'
       );
-      const files = glob.sync(filePartialPattern);
+      const files = glob.sync(toGlobPath(filePartialPattern));
       if (files.length > 0) {
         filePartial = files[0];
       }
@@ -412,7 +419,7 @@ export class WorkspaceConfigProvider {
         'partials',
         mergeKey._mergePartial + '.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
       );
-      const files = glob.sync(filePartialPattern);
+      const files = glob.sync(toGlobPath(filePartialPattern));
       if (files.length > 0) {
         filePartial = files[0];
       }
