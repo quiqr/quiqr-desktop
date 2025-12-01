@@ -51,6 +51,10 @@ export class API {
     return mainProcessBridge.request('getFilteredHugoVersions', {});
   }
 
+  checkHugoVersion(version: string) {
+    return mainProcessBridge.request('checkHugoVersion', { version });
+  }
+
   importSiteFromPrivateGitRepo(gitOrg: string, gitRepo: string, privKey: string, gitEmail: string, saveSyncTarget: boolean, siteName: string){
     return mainProcessBridge.request('importSiteFromPrivateGitRepo', {gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget,siteName}, {timeout: 1000000});
   }

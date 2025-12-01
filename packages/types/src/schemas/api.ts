@@ -28,6 +28,11 @@ export const hugoServerResponseSchema = z.object({
   stopped: z.boolean()
 })
 
+export const hugoVersionCheckResponseSchema = z.object({
+  installed: z.boolean(),
+  version: z.string()
+})
+
 export const collectionItemKeyResponseSchema = z.object({
   key: z.string()
 })
@@ -213,6 +218,7 @@ export const apiSchemas = {
   stopHugoServer: hugoServerResponseSchema,
   getFilteredHugoVersions: z.array(z.string()),
   getHugoTemplates: z.any(), // Not implemented in backend
+  checkHugoVersion: hugoVersionCheckResponseSchema,
 
   // Window management
   showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
@@ -242,6 +248,7 @@ export type CollectionItem = z.infer<typeof collectionItemSchema>
 export type Language = z.infer<typeof languageSchema>
 export type FileReference = z.infer<typeof fileReferenceSchema>
 export type HugoServerResponse = z.infer<typeof hugoServerResponseSchema>
+export type HugoVersionCheckResponse = z.infer<typeof hugoVersionCheckResponseSchema>
 export type CollectionItemKeyResponse = z.infer<typeof collectionItemKeyResponseSchema>
 export type FolderDialogResponse = z.infer<typeof folderDialogResponseSchema>
 export type CommunityTemplate = z.infer<typeof communityTemplateSchema>
