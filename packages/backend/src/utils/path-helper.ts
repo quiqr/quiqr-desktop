@@ -99,11 +99,7 @@ export class PathHelper {
    * Get the Hugo binary root directory
    */
   getHugoBinRoot(): string {
-    const hugobinroot = path.join(this.getRoot(), 'tools', 'hugobin');
-    console.log('HUGO BIN ROOT!!!');
-    console.log(hugobinroot)
-
-    return hugobinroot;
+    return path.join(this.getRoot(), 'tools', 'hugobin');
   }
 
   /**
