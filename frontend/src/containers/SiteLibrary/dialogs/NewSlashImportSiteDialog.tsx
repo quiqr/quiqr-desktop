@@ -1,489 +1,348 @@
-import * as React from "react";
-import service from "./../../../services/service";
-import { snackMessageService } from "./../../../services/ui-service";
-import SnackbarManager from "./../../../components/SnackbarManager";
-import LogosGitServices from "../../../svg-assets/LogosGitServices";
-import IconHugo from "../../../svg-assets/IconHugo";
-import FormPartialNewFromHugoTheme from "./partials/FormPartialNewFromHugoTheme";
-import FormPartialNewFromScratch from "./partials/FormPartialNewFromScratch";
-import FormPartialNewFromFolder from "./partials/FormPartialNewFromFolder";
-import FormPartialImportFromGit from "./partials/FormPartialImportFromGit";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import FolderIcon from "@mui/icons-material/Folder";
-import BuildIcon from "@mui/icons-material/Build";
+import { useReducer, useEffect, useMemo } from "react";
 import Box from "@mui/material/Box";
-import Grid from '@mui/material/Grid';
-import Paper from "@mui/material/Paper";
-import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import Select from "@mui/material/Select";
-import Switch from "@mui/material/Switch";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import SnackbarManager from "../../../components/SnackbarManager";
+import service from "../../../services/service";
+import { snackMessageService } from "../../../services/ui-service";
+import {
+  DialogMode,
+  SourceType,
+  dialogReducer,
+  initialDialogState,
+  PrivateRepoData,
+  HugoThemeInfo,
+} from "./newSiteDialogTypes";
+import SourceTypeStep from "./steps/SourceTypeStep";
+import ConfigureSourceStep from "./steps/ConfigureSourceStep";
+import SuccessStep from "./steps/SuccessStep";
 
 interface NewSiteDialogProps {
   open: boolean;
-  newOrImport: "new" | "import";
+  newOrImport: DialogMode;
   importSiteURL?: string;
   mountSite: (siteKey: string) => void;
   onSuccess: () => void;
   onClose: () => void;
 }
 
-const NewSiteDialog: React.FC<NewSiteDialogProps> = ({ open, newOrImport, importSiteURL, mountSite, onSuccess, onClose }) => {
-  const [title, setTitle] = React.useState(newOrImport === "import" ? "Import Quiqr Site" : "New Quiqr Site");
-  const [filteredHugoVersions, setFilteredHugoVersions] = React.useState<string[]>([]);
-  const [newType, setNewType] = React.useState("");
-  const [newReadyForNew, setNewReadyForNew] = React.useState(false);
-  const [newReadyForNaming, setNewReadyForNaming] = React.useState(false);
-  const [newLastStepBusy, setNewLastStepBusy] = React.useState(false);
-  const [hugoVersionSelectDisable, setHugoVersionSelectDisable] = React.useState(false);
-  const [hugoExtended, setHugoExtended] = React.useState<boolean | string>("");
-  const [hugoVersion, setHugoVersion] = React.useState("");
-  const [generateQuiqrModel, setGenerateQuiqrModel] = React.useState(false);
-  const [newSiteNameErrorText, setNewSiteNameErrorText] = React.useState("");
-  const [newSiteName, setNewSiteName] = React.useState("");
-  const [newTypeHugoThemeLastValidatedUrl, setNewTypeHugoThemeLastValidatedUrl] = React.useState<string | undefined>();
-  const [newHugoThemeInfoDict, setNewHugoThemeInfoDict] = React.useState<any>();
-  const [newSiteKey, setNewSiteKey] = React.useState<string | null>(null);
-  const [newTypeScratchConfigFormat, setNewTypeScratchConfigFormat] = React.useState<string | undefined>();
-  const [newTypeFolderLastValidatedPath, setNewTypeFolderLastValidatedPath] = React.useState<string | undefined>();
-  const [gitPrivateRepo, setGitPrivateRepo] = React.useState<boolean | undefined>();
-  const [privData, setPrivData] = React.useState<{
-    username: string;
-    repository: string;
-    deployPrivateKey: string;
-    email: string;
-  } | undefined>();
-  const [importTypeGitLastValidatedUrl, setImportTypeGitLastValidatedUrl] = React.useState<string | undefined>();
-  const [hugoExtendedEnabled, setHugoExtendedEnabled] = React.useState<boolean | undefined>();
-  const [dialogSize, setDialogSize] = React.useState<string | undefined>();
+const STEPS_NEW = ["Choose Method", "Configure Site", "Done"];
+const STEPS_IMPORT = ["Choose Source", "Configure Import", "Done"];
 
-  // Handle importSiteURL prop changes
-  React.useEffect(() => {
-    if (importSiteURL) {
-      setNewType("git");
+const NewSiteDialog = ({
+  open,
+  newOrImport,
+  importSiteURL,
+  mountSite,
+  onSuccess,
+  onClose,
+}: NewSiteDialogProps) => {
+  const [state, dispatch] = useReducer(dialogReducer, initialDialogState);
+
+  const steps = newOrImport === "new" ? STEPS_NEW : STEPS_IMPORT;
+
+  // Handle importSiteURL prop - auto-select git and move to step 1
+  useEffect(() => {
+    if (importSiteURL && open) {
+      dispatch({ type: "SET_SOURCE_TYPE", payload: "git" });
+      dispatch({ type: "SET_GIT_URL", payload: importSiteURL });
+      dispatch({ type: "SET_ACTIVE_STEP", payload: 1 });
     }
-  }, [importSiteURL]);
+  }, [importSiteURL, open]);
 
-  React.useEffect(() => {
-    service.api.getFilteredHugoVersions().then((versions) => {
-      setFilteredHugoVersions(versions);
-    });
-  }, []);
-
-  const checkFreeSiteName = (name: string) => {
-    service.api.checkFreeSiteName(name).then((isFreeSiteName) => {
-      if (isFreeSiteName) {
-        setNewReadyForNew(true);
-        setNewSiteNameErrorText("");
-      } else {
-        setNewReadyForNew(false);
-        setNewSiteNameErrorText("Site name is already in use. Please choose another name.");
-      }
-    });
-  };
-
-  const handleSetVersion = (hugover: string | null) => {
-    if (hugover) {
-      setGenerateQuiqrModel(false);
-      setHugoExtendedEnabled(false);
-      setHugoVersionSelectDisable(true);
-
-      if (hugover.startsWith("extended_")) {
-        setHugoVersion("v" + hugover.replace("extended_", ""));
-        setHugoExtended(true);
-      } else {
-        setHugoVersion("v" + hugover);
-        setHugoExtended(false);
-      }
-    } else {
-      setGenerateQuiqrModel(true);
-      setHugoVersion("");
-      setHugoExtended(false);
-      setHugoExtendedEnabled(true);
-      setHugoVersionSelectDisable(false);
+  // Reset dialog when closed
+  useEffect(() => {
+    if (!open) {
+      dispatch({ type: "RESET_ALL" });
     }
-  };
+  }, [open]);
 
-  const renderStep1Cards = () => {
-    const sourceDefsNew = [
-      {
-        type: "scratch",
-        title: "FROM SCRATCH",
-        icon: <BuildIcon fontSize='large' />,
-        stateUpdate: () => {
-          setNewType("scratch");
-          setTitle("New Quiqr Site from scratch");
-          setDialogSize("md");
-          setNewReadyForNew(true);
-          setNewReadyForNaming(true);
-        },
-      },
-      {
-        type: "hugotheme",
-        title: "FROM A HUGO THEME",
-        icon: <IconHugo style={{ transform: "scale(1.0)" }} />,
-        stateUpdate: () => {
-          setNewType("hugotheme");
-          setTitle("New Quiqr Site from Hugo Theme");
-          setDialogSize("md");
-        },
-      },
-    ];
-    const sourceDefsImport = [
-      {
-        type: "folder",
-        title: "FROM FOLDER",
-        icon: <FolderIcon fontSize='large' />,
-        stateUpdate: () => {
-          setNewType("folder");
-          setTitle("Import Site from a folder with a Hugo site");
-          setDialogSize("md");
-        },
-      },
-      {
-        type: "git",
-        title: "FROM GIT SERVER URL",
-        icon: <LogosGitServices />,
-        stateUpdate: () => {
-          setNewType("git");
-          setTitle("Import Quiqr Site from GitHub, GitLab or Generic Git URL");
-          setDialogSize("md");
-        },
-      },
-    ];
-
-    const sourceDefs = newOrImport === "new" ? sourceDefsNew : sourceDefsImport;
-    const instructions = newOrImport === "new" ? "How to create a new site..." : "Choose the source you want to import from...";
-
-    const sourceCards = sourceDefs.map((source) => {
-      return (
-          <Paper
-            key={source.title}
-            onClick={source.stateUpdate}
-            sx={{
-              height: "160px",
-              padding: "40px",
-              cursor: "pointer",
-              "&:hover": {
-                backgroundColor: "#eee",
-                color: "#222",
-              }
-            }}>
-            <Box display='flex' alignItems='center' justifyContent='center'>
-              {source.icon}
-            </Box>
-            <Box display='flex' alignItems='center' justifyContent='center' p={1} height={70}>
-              <Typography variant='h5'>{source.title}</Typography>
-            </Box>
-          </Paper>
-      );
-    });
-
-    return (
-      <Box my={2}>
-        <p>{instructions}</p>
-        <Grid container spacing={2} columns={2}>
-          {sourceCards}
-        </Grid>
-      </Box>
-    );
-  };
-
-  const renderStep2Form = () => {
-    const filteredVersionItems = filteredHugoVersions.map((version, index) => {
-      return (
-        <MenuItem key={"version-" + version} value={version}>
-          {version}
-        </MenuItem>
-      );
-    });
-
-    let fromForm;
-    const finalButtonText = newOrImport === "new" ? "Create Site" : "Import Site";
-
-    if (newType === "hugotheme") {
-      fromForm = (
-        <FormPartialNewFromHugoTheme
-          onSetName={setNewSiteName}
-          onValidationDone={(newState) => {
-            checkFreeSiteName(newSiteName);
-            setNewReadyForNaming(newState.newReadyForNaming ?? false);
-            setNewTypeHugoThemeLastValidatedUrl(newState.newTypeHugoThemeLastValidatedUrl);
-            setNewHugoThemeInfoDict(newState.newHugoThemeInfoDict);
-          }}
-        />
-      );
-    } else if (newType === "git") {
-      fromForm = (
-        <FormPartialImportFromGit
-          importSiteURL={importSiteURL}
-          onSetName={setNewSiteName}
-          onSetVersion={handleSetVersion}
-          onValidationDone={(newState) => {
-            checkFreeSiteName(newSiteName);
-            setNewReadyForNaming(newState.newReadyForNaming ?? false);
-            setGitPrivateRepo(newState.gitPrivateRepo);
-            setPrivData(newState.privData);
-            setImportTypeGitLastValidatedUrl(newState.importTypeGitLastValidatedUrl);
-          }}
-        />
-      );
-    } else if (newType === "scratch") {
-      fromForm = (
-        <FormPartialNewFromScratch
-          onChange={(newState) => {
-            setNewSiteName(newState.newSiteName ?? "");
-            setNewTypeScratchConfigFormat(newState.newTypeScratchConfigFormat);
-          }}
-        />
-      );
-    } else if (newType === "folder") {
-      fromForm = (
-        <FormPartialNewFromFolder
-          onSetName={setNewSiteName}
-          onSetVersion={handleSetVersion}
-          onValidationDone={(newState) => {
-            checkFreeSiteName(newSiteName);
-            setNewReadyForNaming(newState.newReadyForNaming ?? false);
-            setNewTypeFolderLastValidatedPath(newState.newTypeFolderLastValidatedPath);
-          }}
-        />
-      );
+  const dialogTitle = useMemo(() => {
+    if (state.createdSiteKey) {
+      return "Site Created";
     }
 
-    const handleCreateSite = () => {
-      const hugover = (hugoExtended ? "extended_" : "") + hugoVersion.replace("v", "");
-      setNewLastStepBusy(true);
-
-      if (newType === "hugotheme") {
-        service.api
-          .newSiteFromPublicHugoThemeUrl(
-            newSiteName,
-            newTypeHugoThemeLastValidatedUrl,
-            newHugoThemeInfoDict,
-            hugover
-          )
-          .then((siteKey) => {
-            setNewLastStepBusy(false);
-            setNewSiteKey(siteKey);
-          })
-          .catch(() => {
-            setNewLastStepBusy(false);
-          });
-      }
-
-      if (newType === "scratch") {
-        service.api
-          .newSiteFromScratch(newSiteName, hugover, newTypeScratchConfigFormat)
-          .then((siteKey) => {
-            setNewLastStepBusy(false);
-            setNewSiteKey(siteKey);
-          })
-          .catch(() => {
-            setNewLastStepBusy(false);
-          });
-      }
-
-      if (newType === "folder") {
-        service.api
-          .newSiteFromLocalDirectory(newSiteName, newTypeFolderLastValidatedPath, generateQuiqrModel, hugover)
-          .then((siteKey) => {
-            setNewLastStepBusy(false);
-            setNewSiteKey(siteKey);
-          })
-          .catch(() => {
-            setNewLastStepBusy(false);
-          });
-      }
-
-      if (newType === "git") {
-        if (gitPrivateRepo && privData) {
-          service.api
-            .importSiteFromPrivateGitRepo(privData.username, privData.repository, privData.deployPrivateKey, privData.email, true, newSiteName)
-            .then((siteKey) => {
-              setNewLastStepBusy(false);
-              setNewSiteKey(siteKey);
-            })
-            .catch(() => {
-              snackMessageService.addSnackMessage("Import Failed");
-              setNewLastStepBusy(false);
-            });
-        } else {
-          service.api
-            .importSiteFromPublicGitUrl(newSiteName, importTypeGitLastValidatedUrl)
-            .then((siteKey) => {
-              setNewLastStepBusy(false);
-              setNewSiteKey(siteKey);
-            })
-            .catch(() => {
-              setNewLastStepBusy(false);
-            });
-        }
-      }
+    const titles: Record<SourceType, string> = {
+      scratch: "New Quiqr Site from Scratch",
+      hugotheme: "New Quiqr Site from Hugo Theme",
+      folder: "Import Site from Folder",
+      git: "Import Site from Git",
+      "": newOrImport === "new" ? "New Quiqr Site" : "Import Quiqr Site",
     };
 
-    return (
-      <React.Fragment>
-        {fromForm}
+    return titles[state.sourceType];
+  }, [state.sourceType, state.createdSiteKey, newOrImport]);
 
-        <Box my={2}>
-          <TextField
-            fullWidth
-            id='standard-full-width'
-            label='Name'
-            value={newSiteName}
-            disabled={!newReadyForNaming}
-            variant='outlined'
-            error={newSiteNameErrorText !== ""}
-            helperText={newSiteNameErrorText}
-            onChange={(e) => {
-              setNewSiteName(e.target.value);
-              checkFreeSiteName(e.target.value);
-            }}
-          />
-          {newLastStepBusy ? <CircularProgress size={20} /> : null}
-        </Box>
+  const handleSourceSelect = (sourceType: SourceType) => {
+    dispatch({ type: "SET_SOURCE_TYPE", payload: sourceType });
+    dispatch({ type: "SET_ACTIVE_STEP", payload: 1 });
 
-        <Box my={2}>
-          <FormControl variant='outlined' sx={{ m: 1, minWidth: 300 }}>
-            <InputLabel id='demo-simple-select-outlined-label'>Hugo Version</InputLabel>
-            <Select
-              labelId='demo-simple-select-outlined-label'
-              id='demo-simple-select-outlined'
-              disabled={hugoVersionSelectDisable}
-              value={hugoVersion || ""}
-              onChange={(e) => {
-                const featureVersion = Number(e.target.value.split(".")[1]);
-                if (featureVersion > 42) {
-                  setHugoVersion(e.target.value);
-                  setHugoExtendedEnabled(true);
-                } else {
-                  setHugoVersion(e.target.value);
-                  setHugoExtendedEnabled(false);
-                  setHugoExtended(false);
-                }
-              }}
-              label='Publish Source and Build'>
-              {filteredVersionItems}
-            </Select>
-          </FormControl>
-
-          <FormControlLabel
-            sx={{ m: 1, mt: 2 }}
-            control={
-              <Switch
-                checked={hugoExtended || false}
-                disabled={!hugoExtendedEnabled}
-                onChange={(e) => {
-                  setHugoExtended(e.target.checked);
-                }}
-                name='configureActions'
-                color='primary'
-              />
-            }
-            label='Hugo Extended'
-          />
-        </Box>
-
-        <Button
-          variant='contained'
-          disabled={hugoVersion === "" || !newReadyForNew || newLastStepBusy}
-          onClick={handleCreateSite}
-          color='primary'>
-          {finalButtonText}
-        </Button>
-      </React.Fragment>
-    );
+    // For scratch, enable naming immediately
+    if (sourceType === "scratch") {
+      dispatch({ type: "SET_FORM_VALID", payload: true });
+      dispatch({ type: "SET_NAME_VALID", payload: true });
+    }
   };
 
-  const handleOpenNewSite = () => {
-    if (newSiteKey) {
+  const handleBack = () => {
+    if (state.activeStep === 1) {
+      dispatch({ type: "RESET_TO_SOURCE_SELECTION" });
+    }
+  };
+
+  const handleClose = () => {
+    dispatch({ type: "RESET_ALL" });
+    onClose();
+  };
+
+  const handleOpenSite = () => {
+    if (state.createdSiteKey) {
       onSuccess();
-      mountSite(newSiteKey);
+      mountSite(state.createdSiteKey);
       onClose();
     }
   };
 
-  const renderStep3NewFinished = () => {
-    return (
-      <div>
-        The site has been succesfully created.{" "}
-        <Button onClick={handleOpenNewSite}>
-          Open {newSiteName} now
-        </Button>
-        .
-      </div>
-    );
+  const handleCreateSite = async () => {
+    const hugover = (state.hugoExtended ? "extended_" : "") + state.hugoVersion.replace("v", "");
+    dispatch({ type: "SET_CREATING", payload: true });
+
+    try {
+      let siteKey: string | null = null;
+
+      switch (state.sourceType) {
+        case "hugotheme":
+          siteKey = await service.api.newSiteFromPublicHugoThemeUrl(
+            state.siteName,
+            state.hugoThemeUrl,
+            state.hugoThemeInfo,
+            hugover
+          );
+          break;
+
+        case "scratch":
+          siteKey = await service.api.newSiteFromScratch(
+            state.siteName,
+            hugover,
+            state.scratchConfigFormat
+          );
+          break;
+
+        case "folder":
+          siteKey = await service.api.newSiteFromLocalDirectory(
+            state.siteName,
+            state.folderPath,
+            state.generateQuiqrModel,
+            hugover
+          );
+          break;
+
+        case "git":
+          if (state.gitPrivateRepo && state.privateRepoData) {
+            const { username, repository, deployPrivateKey, email } = state.privateRepoData;
+            siteKey = await service.api.importSiteFromPrivateGitRepo(
+              username,
+              repository,
+              deployPrivateKey,
+              email,
+              true,
+              state.siteName
+            );
+          } else {
+            siteKey = await service.api.importSiteFromPublicGitUrl(
+              state.siteName,
+              state.gitUrl
+            );
+          }
+          break;
+      }
+
+      dispatch({ type: "SET_CREATING", payload: false });
+
+      if (siteKey) {
+        dispatch({ type: "SET_CREATED_SITE_KEY", payload: siteKey });
+        dispatch({ type: "SET_ACTIVE_STEP", payload: 2 });
+      }
+    } catch {
+      dispatch({ type: "SET_CREATING", payload: false });
+      snackMessageService.addSnackMessage("Failed to create site", { severity: "warning" });
+    }
   };
 
-  let newButtonHidden = true;
-  let backButtonHidden = true;
-  let closeText = "cancel";
-  let content;
+  const handleSiteNameChange = (name: string) => {
+    dispatch({ type: "SET_SITE_NAME", payload: name });
+  };
 
-  if (!newSiteKey && !newType) {
-    content = renderStep1Cards();
-    backButtonHidden = true;
-  } else if (!newSiteKey) {
-    content = renderStep2Form();
-    backButtonHidden = false;
-  } else {
-    content = renderStep3NewFinished();
-    newButtonHidden = false;
-    backButtonHidden = true;
-    closeText = "close";
-  }
+  const handleSiteNameValidation = (isValid: boolean, error: string) => {
+    dispatch({ type: "SET_NAME_VALID", payload: isValid });
+    dispatch({ type: "SET_SITE_NAME_ERROR", payload: error });
+  };
 
-  if (importSiteURL) {
-    backButtonHidden = true;
-  }
+  const handleHugoVersionChange = (config: {
+    version: string;
+    extended: boolean;
+    disabled: boolean;
+    extendedEnabled: boolean;
+    generateModel: boolean;
+  }) => {
+    dispatch({ type: "SET_HUGO_CONFIG", payload: config });
+  };
 
-  const actions = [
-    backButtonHidden ? null : (
-      <Button
-        key={"actionNewDialog2"}
-        color='primary'
-        onClick={() => {
-          setNewType("");
-        }}>
-        {"back"}
+  const handleFormValidation = (isValid: boolean) => {
+    dispatch({ type: "SET_FORM_VALID", payload: isValid });
+  };
+
+  const handleHugoThemeValidation = (url: string, info: HugoThemeInfo) => {
+    dispatch({ type: "SET_HUGO_THEME_URL", payload: url });
+    dispatch({ type: "SET_HUGO_THEME_INFO", payload: info });
+  };
+
+  const handleGitValidation = (url: string, isPrivate: boolean, privData?: PrivateRepoData) => {
+    dispatch({ type: "SET_GIT_URL", payload: url });
+    dispatch({ type: "SET_GIT_PRIVATE_REPO", payload: isPrivate });
+    if (privData) {
+      dispatch({ type: "SET_PRIVATE_REPO_DATA", payload: privData });
+    }
+  };
+
+  const handleFolderValidation = (path: string) => {
+    dispatch({ type: "SET_FOLDER_PATH", payload: path });
+  };
+
+  const handleScratchConfigChange = (format: string) => {
+    dispatch({ type: "SET_SCRATCH_CONFIG_FORMAT", payload: format });
+  };
+
+  const isCreateDisabled =
+    !state.hugoVersion ||
+    !state.isNameValid ||
+    state.isCreating ||
+    !state.siteName;
+
+  const renderStepContent = () => {
+    switch (state.activeStep) {
+      case 0:
+        return (
+          <SourceTypeStep
+            mode={newOrImport}
+            onSelectSource={handleSourceSelect}
+          />
+        );
+
+      case 1:
+        return (
+          <ConfigureSourceStep
+            sourceType={state.sourceType}
+            importSiteURL={importSiteURL}
+            state={state}
+            onSiteNameChange={handleSiteNameChange}
+            onSiteNameValidation={handleSiteNameValidation}
+            onHugoVersionChange={handleHugoVersionChange}
+            onFormValidation={handleFormValidation}
+            onHugoThemeValidation={handleHugoThemeValidation}
+            onGitValidation={handleGitValidation}
+            onFolderValidation={handleFolderValidation}
+            onScratchConfigChange={handleScratchConfigChange}
+          />
+        );
+
+      case 2:
+        return (
+          <SuccessStep
+            siteName={state.siteName}
+            onOpenSite={handleOpenSite}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const renderActions = () => {
+    const actions: React.ReactNode[] = [];
+
+    // Back button (only on step 1, and not when using importSiteURL)
+    if (state.activeStep === 1 && !importSiteURL) {
+      actions.push(
+        <Button key="back" color="primary" onClick={handleBack}>
+          Back
+        </Button>
+      );
+    }
+
+    // Cancel/Close button
+    actions.push(
+      <Button key="close" color="primary" onClick={handleClose}>
+        {state.activeStep === 2 ? "Close" : "Cancel"}
       </Button>
-    ),
-    <Button
-      key={"actionNewDialog1"}
-      color='primary'
-      onClick={() => {
-        setNewSiteKey(null);
-        onClose();
-      }}>
-      {closeText}
-    </Button>,
-    newButtonHidden ? null : (
-      <Button
-        key={"actionNewDialog3"}
-        color='primary'
-        onClick={handleOpenNewSite}>
-        {"open " + newSiteName}
-      </Button>
-    ),
-  ];
+    );
+
+    // Create button (only on step 1)
+    if (state.activeStep === 1) {
+      const buttonText = newOrImport === "new" ? "Create Site" : "Import Site";
+      actions.push(
+        <Button
+          key="create"
+          variant="contained"
+          disabled={isCreateDisabled}
+          onClick={handleCreateSite}
+          color="primary"
+        >
+          {state.isCreating ? "Creating..." : buttonText}
+        </Button>
+      );
+    }
+
+    // Open button (only on step 2)
+    if (state.activeStep === 2) {
+      actions.push(
+        <Button
+          key="open"
+          variant="contained"
+          color="primary"
+          onClick={handleOpenSite}
+        >
+          Open {state.siteName}
+        </Button>
+      );
+    }
+
+    return actions;
+  };
 
   return (
-    <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"md"}>
+    <Dialog
+      open={open}
+      aria-labelledby="new-site-dialog-title"
+      fullWidth
+      maxWidth="md"
+    >
       <SnackbarManager />
 
-      <DialogTitle id='alert-dialog-title'>{title}</DialogTitle>
-      <DialogContent>{content}</DialogContent>
-      <DialogActions>{actions}</DialogActions>
+      <DialogTitle id="new-site-dialog-title">{dialogTitle}</DialogTitle>
+
+      <DialogContent>
+        <Box sx={{ width: "100%", mb: 3 }}>
+          <Stepper activeStep={state.activeStep}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+
+        {renderStepContent()}
+      </DialogContent>
+
+      <DialogActions>{renderActions()}</DialogActions>
     </Dialog>
   );
 };
