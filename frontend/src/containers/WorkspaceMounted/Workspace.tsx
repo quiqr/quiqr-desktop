@@ -19,12 +19,15 @@ import { SyncSidebar, SyncRouted } from './Sync';
 import service from '../../services/service';
 import Box from '@mui/material/Box';
 import { SiteConfig } from '../../../types';
+import { useHugoDownload } from '../../hooks/useHugoDownload';
+import ProgressDialog from '../../components/ProgressDialog';
 
 interface WorkspaceConfig {
   serve?: Array<{
     hugoHidePreviewSite?: boolean;
     [key: string]: unknown;
   }>;
+  hugover?: string;
   [key: string]: unknown;
 }
 
@@ -86,6 +89,9 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   const [menuIsLocked, setMenuIsLocked] = useState(true);
   const [forceShowMenu, setForceShowMenu] = useState(false);
   const [skipMenuTransition, setSkipMenuTransition] = useState(false);
+  const [hugoReady, setHugoReady] = useState(false);
+
+  const { progress: hugoProgress, downloadHugo } = useHugoDownload();
 
   const refresh = useCallback(() => {
     if (siteKey && workspaceKey) {
@@ -112,6 +118,32 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
       refresh();
     }
   }, [site, refresh]);
+
+  // Check Hugo version when workspace is loaded
+  useEffect(() => {
+    if (workspace?.hugover) {
+      const checkAndDownloadHugo = async () => {
+        try {
+          const result = await service.api.checkHugoVersion(workspace.hugover!);
+          if (result.installed) {
+            setHugoReady(true);
+          } else {
+            // Hugo not installed, trigger download
+            await downloadHugo(workspace.hugover!);
+            setHugoReady(true);
+          }
+        } catch (err) {
+          console.error('Failed to check/download Hugo:', err);
+          // Continue anyway - user can still browse content
+          setHugoReady(true);
+        }
+      };
+      checkAndDownloadHugo();
+    } else {
+      // No hugover specified, assume ready
+      setHugoReady(true);
+    }
+  }, [workspace?.hugover, downloadHugo]);
 
   // Reset skipMenuTransition after it's used
   useEffect(() => {
@@ -388,9 +420,14 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
               {error}
             </p>
           )}
-          {renderContent()}
+          {hugoReady && renderContent()}
         </Box>
       </Box>
+
+      {/* Hugo Download Progress Dialog */}
+      {hugoProgress && (
+        <ProgressDialog conf={hugoProgress} />
+      )}
     </Box>
   );
 };

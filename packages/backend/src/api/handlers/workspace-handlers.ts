@@ -320,6 +320,16 @@ export function createGlobSyncHandler(container: AppContainer) {
 }
 
 /**
+ * Check if a Hugo version is installed
+ */
+export function createCheckHugoVersionHandler(container: AppContainer) {
+  return async ({ version }: { version: string }) => {
+    const installed = container.hugoDownloader.isVersionInstalled(version);
+    return { installed, version };
+  };
+}
+
+/**
  * Create all workspace-related handlers
  */
 export function createWorkspaceHandlers(container: AppContainer) {
@@ -336,5 +346,6 @@ export function createWorkspaceHandlers(container: AppContainer) {
     getPreviewCheckConfiguration: createGetPreviewCheckConfigurationHandler(container),
     parseFileToObject: createParseFileToObjectHandler(container),
     globSync: createGlobSyncHandler(container),
+    checkHugoVersion: createCheckHugoVersionHandler(container),
   };
 }

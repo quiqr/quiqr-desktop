@@ -77,6 +77,37 @@ export function createServer(
     })
   );
 
+  // SSE route for Hugo download progress streaming
+  app.get(
+    '/api/hugo/download/:version',
+    async (req: Request, res: Response) => {
+      const { version } = req.params;
+
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+
+      try {
+        // Stream progress updates from the async generator
+        for await (const progress of container.hugoDownloader.download(version)) {
+          res.write(`data: ${JSON.stringify(progress)}\n\n`);
+
+          // End stream on completion or error
+          if (progress.complete || progress.error) {
+            break;
+          }
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        res.write(`data: ${JSON.stringify({ percent: 0, message: errorMessage, complete: false, error: errorMessage })}\n\n`);
+      }
+
+      res.end();
+    }
+  );
+
   // Error handling middleware (must be last)
   app.use(errorHandler);
 

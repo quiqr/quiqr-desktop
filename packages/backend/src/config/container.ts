@@ -22,6 +22,8 @@ import { Pogozipper } from '../import/pogozipper.js';
 import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 import { BuildActionService } from '../build-actions/index.js';
+import { HugoDownloader } from '../hugo/hugo-downloader.js';
+import type { EnvironmentInfo } from '../utils/path-helper.js';
 
 /**
  * Main application container with all dependencies
@@ -101,6 +103,16 @@ export interface AppContainer {
    * Pogozipper (ZIP-based import/export for sites, themes, content)
    */
   pogozipper: Pogozipper;
+
+  /**
+   * Hugo downloader (downloads and installs Hugo binaries)
+   */
+  hugoDownloader: HugoDownloader;
+
+  /**
+   * Environment information (platform, packaging status)
+   */
+  environmentInfo: EnvironmentInfo;
 
   /**
    * Factory function to create WorkspaceService instances
@@ -195,13 +207,20 @@ export function createContainer(options: ContainerOptions): AppContainer {
   // This is done below after all dependencies are available
 
   // Create environment info from platform
-  const environmentInfo = {
+  const environmentInfo: EnvironmentInfo = {
     platform:
       process.platform === 'darwin' ? 'macOS' as const :
       process.platform === 'win32' ? 'windows' as const :
       'linux' as const,
     isPackaged: adapters.appInfo.isPackaged(),
   };
+
+  // Create Hugo downloader
+  const hugoDownloader = new HugoDownloader({
+    pathHelper,
+    outputConsole: adapters.outputConsole,
+    environmentInfo,
+  });
 
   // Create workspace config provider
   const workspaceConfigProvider = new WorkspaceConfigProvider(
@@ -223,6 +242,8 @@ export function createContainer(options: ContainerOptions): AppContainer {
     syncFactory,
     siteSourceFactory,
     workspaceConfigProvider,
+    hugoDownloader,
+    environmentInfo,
   } as AppContainer;
 
   // Create library service with container dependency
@@ -290,6 +311,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       formatProviderResolver: formatResolver,
       pathHelper,
       appConfig: config,
+      appState: state,
       windowAdapter: adapters.window,
       shellAdapter: adapters.shell,
       outputConsole: adapters.outputConsole,
