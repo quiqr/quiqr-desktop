@@ -125,7 +125,7 @@
       "node_modules/7zip-bin-mac/**/*"
     ],
     "directories": {
-      "buildResources": "public",
+      "buildResources": "frontend/public",
       "output": "dist"
     },
     "publish": [
@@ -159,7 +159,7 @@
       }
     ],
     "win": {
-      "icon": "public/icon.ico",
+      "icon": "icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -176,19 +176,18 @@
       "allowToChangeInstallationDirectory": true,
       "runAfterFinish": true,
       "unicode": true,
-      "installerIcon": "public/icon.ico",
+      "installerIcon": "icon.ico",
       "differentialPackage": true
     },
-    "afterSign": "scripts/notarize.js",
     "mac": {
-      "icon": "public/icon",
+      "icon": "icon",
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.plist",
       "gatekeeperAssess": false,
       "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "linux": {
-      "icon": "public/icon",
+      "icon": "icon",
       "target": [
         "AppImage",
         "deb",
@@ -201,25 +200,25 @@
         "ext": "pogosite",
         "name": "Quiqr Site File",
         "role": "Editor",
-        "icon": "public/iconfile"
+        "icon": "iconfile"
       },
       {
         "ext": "pogopass",
         "name": "Quiqr Passport File",
         "role": "Editor",
-        "icon": "public/iconfile"
+        "icon": "iconfile"
       },
       {
         "ext": "pogocontent",
         "name": "Quiqr Content File",
         "role": "Editor",
-        "icon": "public/iconfile"
+        "icon": "iconfile"
       },
       {
         "ext": "pogotheme",
         "name": "Quiqr Theme File",
         "role": "Editor",
-        "icon": "public/iconfile"
+        "icon": "iconfile"
       }
     ]
   },
