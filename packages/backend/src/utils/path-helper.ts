@@ -150,7 +150,10 @@ export class PathHelper {
       if (environment.platform === 'macOS') {
         return path.join(this.rootPath, 'Resources');
       } else if (environment.platform === 'windows') {
-        return this.rootPath;
+        // On Windows, extraResources are in the resources folder next to app.asar
+        // rootPath is app.getAppPath() which returns path to app.asar
+        // So we need to go up one level to get the resources directory
+        return path.dirname(this.rootPath);
       } else if (this.isLinuxAppImage()) {
         const appPath = this.appInfo.getAppPath();
         // appPath is typically /tmp/.mount_xxx/resources/app.asar

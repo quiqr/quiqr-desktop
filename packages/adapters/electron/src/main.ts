@@ -4,15 +4,37 @@
  */
 
 import { app, BrowserWindow } from 'electron';
+import express from 'express';
+import path from 'path';
+import fs from 'fs-extra';
 import { createElectronAdapters } from './adapters/index.js';
 import { createContainer } from '@quiqr/backend';
-import { startServer } from '@quiqr/backend/api';
+import { createServer } from '@quiqr/backend/api';
 import { getCurrentInstanceOrNew, initializeRemoteMain } from './ui-managers/main-window-manager.js';
 import { menuManager } from './ui-managers/menu-manager.js';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
+
+/**
+ * Find the frontend build directory
+ */
+function findFrontendBuildDir(): string | null {
+  const rootPath = app.getAppPath();
+  const lookups = [
+    path.join(rootPath, 'frontend/build'),
+    path.join(rootPath, 'packages/frontend/build'),
+    path.join(rootPath, 'dist/frontend'),
+  ];
+
+  for (const dir of lookups) {
+    if (fs.existsSync(path.join(dir, 'index.html'))) {
+      return dir;
+    }
+  }
+  return null;
+}
 
 /**
  * Start the backend server with Electron adapters
@@ -44,9 +66,36 @@ async function startBackend() {
 
     console.log('Container created with dependency injection');
 
-    // Start the backend server with container
-    startServer(container, { port: 5150 });
-    console.log('Backend server started on http://localhost:5150');
+    // Create the Express app from backend
+    const expressApp = createServer(container, { port: 5150 });
+
+    // In production, serve the frontend from the same Express server
+    if (!isDev) {
+      const frontendDir = findFrontendBuildDir();
+      if (frontendDir) {
+        console.log(`Serving frontend from: ${frontendDir}`);
+
+        // Serve static files from the frontend build directory
+        expressApp.use(express.static(frontendDir));
+
+        // SPA catch-all: serve index.html for any non-API route
+        expressApp.get('*', (req, res) => {
+          // Don't catch API routes
+          if (req.path.startsWith('/api')) {
+            res.status(404).json({ error: 'API endpoint not found' });
+            return;
+          }
+          res.sendFile(path.join(frontendDir, 'index.html'));
+        });
+      } else {
+        console.warn('Frontend build directory not found!');
+      }
+    }
+
+    // Start listening
+    expressApp.listen(5150, () => {
+      console.log('Server running on http://localhost:5150');
+    });
 
     console.log('='.repeat(60));
 

@@ -2,11 +2,9 @@
  * Main Window Manager - Manages the primary Electron window
  */
 
-import { BrowserWindow, app } from 'electron';
+import { BrowserWindow } from 'electron';
 import remoteMain from '@electron/remote/main/index.js';
 import windowStateKeeper from 'electron-window-state';
-import path from 'path';
-import fs from 'fs-extra';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -21,29 +19,9 @@ function getLocation(window: BrowserWindow): void {
     // Development: Connect to Vite dev server
     window.loadURL('http://localhost:4002');
   } else {
-    // Production: Load from built frontend
-    // Try multiple possible locations for the frontend index.html
-    const lookups = [
-      path.join(app.getAppPath(), 'packages/frontend/build/index.html'),
-      path.join(app.getAppPath(), 'frontend/build/index.html'),
-      path.join(app.getAppPath(), 'dist/frontend/index.html'),
-      path.join(app.getAppPath(), 'index.html')
-    ];
-
-    let indexFile: string | null = null;
-    for (const lookup of lookups) {
-      if (fs.existsSync(lookup)) {
-        indexFile = lookup;
-        console.log(`Found frontend at: ${indexFile}`);
-        break;
-      }
-    }
-
-    if (!indexFile) {
-      throw new Error(`Could not find frontend index.html. Tried: ${lookups.join(', ')}`);
-    }
-
-    window.loadFile(indexFile);
+    // Production: Load from Express server which serves the frontend
+    // This ensures BrowserRouter works correctly (no file:// protocol issues)
+    window.loadURL('http://localhost:5150');
   }
 }
 
