@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router';
 import AppsIcon from '@mui/icons-material/Apps';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
@@ -88,7 +88,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   const [error, setError] = useState<string | null>(null);
   const [menuIsLocked, setMenuIsLocked] = useState(true);
   const [forceShowMenu, setForceShowMenu] = useState(false);
-  const [skipMenuTransition, setSkipMenuTransition] = useState(false);
+  const skipMenuTransitionRef = useRef(false);
   const [hugoReady, setHugoReady] = useState(false);
 
   const { progress: hugoProgress, downloadHugo } = useHugoDownload();
@@ -112,12 +112,6 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   useEffect(() => {
     refresh();
   }, [refresh]);
-
-  useEffect(() => {
-    if (!site) {
-      refresh();
-    }
-  }, [site, refresh]);
 
   // Check Hugo version when workspace is loaded
   useEffect(() => {
@@ -145,18 +139,15 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     }
   }, [workspace?.hugover, downloadHugo]);
 
-  // Reset skipMenuTransition after it's used
-  useEffect(() => {
-    if (skipMenuTransition) {
-      setSkipMenuTransition(false);
-    }
-  }, [skipMenuTransition]);
-
   const toggleMenuIsLocked = () => {
     setMenuIsLocked(!menuIsLocked);
     setForceShowMenu(true);
-    setSkipMenuTransition(true);
+    skipMenuTransitionRef.current = true;
     window.dispatchEvent(new Event('resize'));
+    // Reset after the next frame so the transition skip only applies once
+    requestAnimationFrame(() => {
+      skipMenuTransitionRef.current = false;
+    });
   };
 
   const toggleForceShowMenu = () => {
@@ -378,7 +369,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
                   height: '100%',
                   width: '280px',
                   transform: forceShowMenu ? 'translateX(0px)' : 'translateX(-214px)',
-                  transition: skipMenuTransition ? 'none' : 'all ease-in-out 0.3s',
+                  transition: skipMenuTransitionRef.current ? 'none' : 'all ease-in-out 0.3s',
                 }),
           }}
         >
@@ -402,7 +393,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
                   display: 'block',
                   paddingLeft: '66px',
                   transform: forceShowMenu ? 'translateX(214px)' : 'translateX(0px)',
-                  transition: skipMenuTransition ? 'none' : 'all ease-in-out 0.3s',
+                  transition: skipMenuTransitionRef.current ? 'none' : 'all ease-in-out 0.3s',
                 }),
           }}
         >
