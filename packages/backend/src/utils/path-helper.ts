@@ -197,13 +197,20 @@ export class PathHelper {
 
   /**
    * Get the 7-Zip binary path
+   * When packaged, the binary is in app.asar.unpacked instead of app.asar
    */
   get7zaBin(): string {
     if (process.env.P7ZIP_PATH) {
       return process.env.P7ZIP_PATH;
-    } else {
-      return path7za;
     }
+
+    // When running in a packaged Electron app, the 7za binary is extracted
+    // to app.asar.unpacked but path7za still points to app.asar
+    if (this.appInfo.isPackaged() && path7za.includes('app.asar')) {
+      return path7za.replace('app.asar', 'app.asar.unpacked');
+    }
+
+    return path7za;
   }
 
   /**

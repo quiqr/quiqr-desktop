@@ -118,7 +118,11 @@
       }
     ],
     "asarUnpack": [
-      "node_modules/@quiqr/**/*"
+      "node_modules/@quiqr/**/*",
+      "node_modules/7zip-bin/**/*",
+      "node_modules/7zip-bin-win/**/*",
+      "node_modules/7zip-bin-linux/**/*",
+      "node_modules/7zip-bin-mac/**/*"
     ],
     "directories": {
       "buildResources": "public",
