@@ -4,7 +4,7 @@ interface Component {
     forceUpdate(): void;
 }
 
-abstract class BaseService<TSchemas extends Record<string, z.ZodType<any>>> {
+abstract class BaseService<TSchemas extends Record<string, z.ZodType<unknown>>> {
     protected _listeners: Component[];
     private _notifyChangesTimeout?: NodeJS.Timeout;
 
@@ -42,7 +42,7 @@ abstract class BaseService<TSchemas extends Record<string, z.ZodType<any>>> {
     }
 
     unregisterListener(component: Component) {
-        let index = this._listeners.indexOf(component);
+        const index = this._listeners.indexOf(component);
         if (index >= 0)
             this._listeners.splice(index, 1);
     }
@@ -64,7 +64,7 @@ abstract class BaseService<TSchemas extends Record<string, z.ZodType<any>>> {
         // This means we need to create a new zod schema in types.ts
         if (!schema) {
             console.warn(`[Service Validation] No schema found for method: ${String(method)}`);
-            return response as z.infer<TSchemas[M]>;
+            return response as unknown;
         }
 
         try {

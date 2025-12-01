@@ -1,5 +1,5 @@
 import { BaseService } from './base-service';
-import * as api from './../api';
+import { instance as api } from './../api';
 import {
     serviceSchemas,
     Configurations,
@@ -9,15 +9,13 @@ import {
 
 class Service extends BaseService<typeof serviceSchemas> {
 
-    api: typeof api.instance;
+    api = api;
     _configurations: Configurations | undefined;
     _configurationsPromise: Promise<Configurations> | undefined;
     _siteAndWorkspaceDataPromise: Promise<SiteAndWorkspaceData> | undefined;
 
     constructor() {
         super();
-        this.api = api.instance;
-
         this._configurations = undefined;
         this._configurationsPromise = undefined;
         this._siteAndWorkspaceDataPromise = undefined;

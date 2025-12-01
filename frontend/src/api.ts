@@ -1,5 +1,4 @@
 import mainProcessBridge from './utils/main-process-bridge';
-import service from './services/service'
 import type { ReadConfKeyMap } from '../types';
 
 export class API {
@@ -226,7 +225,7 @@ export class API {
             );
           }
         }).catch(err => {
-          service.api.logToConsole(err, 'copyFilesIntoCollectionItemFromDialog error');
+          this.logToConsole(err, 'copyFilesIntoCollectionItemFromDialog error');
         });
 
       })
