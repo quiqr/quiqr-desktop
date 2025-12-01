@@ -40,9 +40,18 @@ export function createServer(
   if (enableCors) {
     app.use(cors());
   }
-  app.use(express.json());
 
-  // Create handler registry
+  // We need to raise this limit because we import theme screenshots.
+  // The screenshots are base64 encoded images and can get quite large. 
+  app.use(express.json({ limit: '5mb' }));
+
+  /**
+   * Create handler registry
+   * The handlers are platform specific and implemented in adapters
+   * 
+   * For example: the electron adapter defines handlers to open a file in an editor
+   * The standalone adapter does not, and just console.log a no-op.
+   */
   const apiHandlers = createApiHandlers(container);
 
   // API route - handles all POST /api/:method requests
