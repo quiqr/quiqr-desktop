@@ -91,7 +91,13 @@ export function createServer(
 
       try {
         // Stream progress updates from the async generator
+        // the for..of syntax is basically a nice way to do something like
+        // const generator = container.hugoDownloader.download(version);
+        // generator.next(); (repeat untill the SSE stream closes)
         for await (const progress of container.hugoDownloader.download(version)) {
+
+          // the data: prefix is required
+          // the \n\n is the way the browser knows it's the end of the message
           res.write(`data: ${JSON.stringify(progress)}\n\n`);
 
           // End stream on completion or error
