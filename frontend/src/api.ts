@@ -365,6 +365,10 @@ export class API {
     return mainProcessBridge.request('createKeyPairGithub',{}, {timeout:90000});
   }
 
+  derivePublicKey(privateKey: string){
+    return mainProcessBridge.request('derivePublicKey', { privateKey });
+  }
+
   invalidateCache(){
     return mainProcessBridge.request('invalidateCache', {});
   }

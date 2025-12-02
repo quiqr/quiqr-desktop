@@ -7,6 +7,7 @@
 
 import path from 'path';
 import fs from 'fs-extra';
+import crypto from 'crypto';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import type { PathHelper, EnvironmentInfo } from '../utils/path-helper.js';
@@ -417,6 +418,70 @@ export class Embgit {
       return { privateKey, publicKey };
     } catch (error) {
       this.outputConsole.appendLine('SSH key generation failed');
+      throw error;
+    }
+  }
+
+  /**
+   * Derive public key from private key (ECDSA)
+   * Returns the public key in OpenSSH format
+   * Supports P-256 (nistp256), P-384 (nistp384), and P-521 (nistp521) curves
+   */
+  derivePublicKeyFromPrivate(privateKeyPem: string): string {
+    try {
+      // Create key object from private key PEM
+      const privateKey = crypto.createPrivateKey(privateKeyPem);
+
+      // Get the public key
+      const publicKey = crypto.createPublicKey(privateKey);
+
+      // Export as JWK to get the raw key data
+      const jwk = publicKey.export({ format: 'jwk' }) as crypto.JsonWebKey;
+
+      // Map JWK curve names to SSH curve names
+      const curveMap: Record<string, { keyType: string; curve: string }> = {
+        'P-256': { keyType: 'ecdsa-sha2-nistp256', curve: 'nistp256' },
+        'P-384': { keyType: 'ecdsa-sha2-nistp384', curve: 'nistp384' },
+        'P-521': { keyType: 'ecdsa-sha2-nistp521', curve: 'nistp521' },
+      };
+
+      const curveInfo = curveMap[jwk.crv!];
+      if (!curveInfo) {
+        throw new Error(`Unsupported curve: ${jwk.crv}`);
+      }
+
+      const { keyType, curve } = curveInfo;
+
+      // Decode the x and y coordinates from base64url
+      const x = Buffer.from(jwk.x!, 'base64url');
+      const y = Buffer.from(jwk.y!, 'base64url');
+
+      // Create uncompressed point (0x04 || x || y)
+      const point = Buffer.concat([Buffer.from([0x04]), x, y]);
+
+      // Build the SSH key blob
+      // Format: [length][key-type][length][curve][length][point]
+      const keyTypeLen = Buffer.alloc(4);
+      keyTypeLen.writeUInt32BE(keyType.length);
+
+      const curveLen = Buffer.alloc(4);
+      curveLen.writeUInt32BE(curve.length);
+
+      const pointLen = Buffer.alloc(4);
+      pointLen.writeUInt32BE(point.length);
+
+      const blob = Buffer.concat([
+        keyTypeLen,
+        Buffer.from(keyType),
+        curveLen,
+        Buffer.from(curve),
+        pointLen,
+        point,
+      ]);
+
+      return `${keyType} ${blob.toString('base64')}`;
+    } catch (error) {
+      this.outputConsole.appendLine(`Failed to derive public key: ${error}`);
       throw error;
     }
   }

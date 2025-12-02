@@ -75,6 +75,9 @@ export class GitImporter {
         const siteConf = await this.libraryService.getSiteConf(siteKey);
         const inkey = `publ-${Math.random()}`;
 
+        // Derive public key from private key
+        const deployPublicKey = this.embgit.derivePublicKeyFromPrivate(privKey);
+
         const publConf = {
           type: 'github' as const,
           username: gitOrg,
@@ -82,7 +85,7 @@ export class GitImporter {
           repository: gitRepo,
           branch: 'main',
           deployPrivateKey: privKey,
-          deployPublicKey: 'SET BUT UNKNOWN',
+          deployPublicKey,
           publishScope: 'source' as const,
           setGitHubActions: false,
           keyPairBusy: false,

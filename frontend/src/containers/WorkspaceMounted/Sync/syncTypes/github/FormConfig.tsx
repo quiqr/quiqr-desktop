@@ -93,17 +93,43 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
 
   componentDidMount(){
     if(this.props.publishConf){
-      this.setState({pubData: this.props.publishConf.config});
-      if(this.props.publishConf.config.publishScope !== "build"){
+      const config = this.props.publishConf.config;
+      // Merge with defaults to ensure all boolean fields have proper values
+      // This prevents controlled/uncontrolled warnings for fields added after config was saved
+      const mergedPubData = { ...this.state.pubData, ...config };
+
+      this.setState({
+        pubData: mergedPubData,
+        keyPairBusy: false
+      });
+
+      if(config.publishScope !== "build"){
         this.setState({
           setGitHubActionsSwitchEnable:true
         });
       }
 
+      // If public key is unknown but private key exists, derive it
+      if(config.deployPublicKey === 'SET BUT UNKNOWN' && config.deployPrivateKey){
+        this.derivePublicKeyFromPrivate(config.deployPrivateKey);
+      }
     }
     else{
       this.getKeyPair();
     }
+  }
+
+  derivePublicKeyFromPrivate(privateKey: string){
+    this.setState({ keyPairBusy: true });
+
+    service.api.derivePublicKey(privateKey).then((resp: { publicKey: string })=>{
+      this.updatePubData({ deployPublicKey: resp.publicKey }, ()=>{
+        this.setState({ keyPairBusy: false });
+      });
+    }, (e: Error)=>{
+      service.api.logToConsole(e.message, "ERROR");
+      this.setState({ keyPairBusy: false });
+    });
   }
 
   updatePubData(newData: Partial<GithubPublishConf>, callback: (() => void) | null = null){

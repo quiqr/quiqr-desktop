@@ -104,6 +104,13 @@ export function createCreateKeyPairGithubHandler(container: AppContainer) {
   };
 }
 
+export function createDerivePublicKeyHandler(container: AppContainer) {
+  return async ({ privateKey }: { privateKey: string }): Promise<{ publicKey: string }> => {
+    const publicKey = container.embgit.derivePublicKeyFromPrivate(privateKey);
+    return { publicKey };
+  };
+}
+
 export function createOpenCustomCommandHandler(container: AppContainer) {
   return async ({ command }: { command: string }) => {
     throw new Error('openCustomCommand: Not yet implemented');
@@ -117,6 +124,7 @@ export function createSyncHandlers(container: AppContainer) {
     publisherDispatchAction: createPublisherDispatchActionHandler(container),
     updateCommunityTemplates: createUpdateCommunityTemplatesHandler(container),
     createKeyPairGithub: createCreateKeyPairGithubHandler(container),
+    derivePublicKey: createDerivePublicKeyHandler(container),
     openCustomCommand: createOpenCustomCommandHandler(container),
   };
 }
