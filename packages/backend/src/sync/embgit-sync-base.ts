@@ -326,7 +326,13 @@ export abstract class EmbgitSyncBase implements SyncService {
     let historyLocalArr: any[] = [];
     if (await fs.pathExists(this.fullDestinationPath())) {
       this.sendProgress('Comparing with local commit history', 80);
-      historyLocalArr = await this.embgit.logLocal(this.fullDestinationPath());
+      try {
+        historyLocalArr = await this.embgit.logLocal(this.fullDestinationPath());
+      } catch (error) {
+        // Log local may fail if repo is in detached HEAD state after checkout
+        this.outputConsole.appendLine(`Warning: Could not get local commit history: ${error}`);
+        historyLocalArr = [];
+      }
     }
 
     const historyMergedArr: CommitInfo[] = historyRemoteArr.map((commit: any) => {
