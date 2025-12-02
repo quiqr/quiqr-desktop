@@ -260,7 +260,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
           false,
           Meta.syncingText, Meta.icon());
 
-        //this.refreshRemoteStatus(false);
+        this.refreshRemoteStatus(false);
 
         snackMessageService.addSnackMessage('Sync: Push to remote finished.', {severity: 'success'});
       }).catch(()=>{
