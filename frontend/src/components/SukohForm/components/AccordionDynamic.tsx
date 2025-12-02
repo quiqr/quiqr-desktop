@@ -529,6 +529,7 @@ class AccordionDynamic extends BaseDynamic<AccordionDynamicProps, AccordionDynam
                   this.removeItemAtIndex(childIndexOrKey, arrayIndicesAreKeys);
                 }
               }}
+              loadedProps={{}}
               loadedButton={
                 <IconButton size='small' color='secondary' aria-label='delete'>
                   {" "}
