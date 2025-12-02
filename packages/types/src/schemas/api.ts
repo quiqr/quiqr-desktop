@@ -108,6 +108,11 @@ export const keyPairResponseSchema = z.object({
   publicKey: z.string()
 })
 
+// Public key response for derivePublicKey
+export const publicKeyResponseSchema = z.object({
+  publicKey: z.string()
+})
+
 // Site inventory - returned by hugosite_dir_show
 export const siteInventorySchema = z.object({
   dirExist: z.boolean(),
@@ -236,6 +241,7 @@ export const apiSchemas = {
   // Sync/publish operations
   publisherDispatchAction: z.any(), // Return type varies by action
   createKeyPairGithub: keyPairResponseSchema,
+  derivePublicKey: publicKeyResponseSchema,
 
   // Site library
   openSiteLibrary: z.boolean(),
@@ -260,6 +266,7 @@ export type DeleteCollectionItemResponse = z.infer<typeof deleteCollectionItemRe
 export type RenameCollectionItemResponse = z.infer<typeof renameCollectionItemResponseSchema>
 export type CopyCollectionItemResponse = z.infer<typeof copyCollectionItemResponseSchema>
 export type KeyPairResponse = z.infer<typeof keyPairResponseSchema>
+export type PublicKeyResponse = z.infer<typeof publicKeyResponseSchema>
 export type SiteInventory = z.infer<typeof siteInventorySchema>
 
 // This type includes all the api method names
