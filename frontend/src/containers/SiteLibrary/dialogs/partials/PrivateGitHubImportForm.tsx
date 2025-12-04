@@ -1,17 +1,8 @@
-import { useState } from "react";
-import service from "../../../../services/service";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import LinearProgress from "@mui/material/LinearProgress";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Paper from "@mui/material/Paper";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormHelperText from "@mui/material/FormHelperText";
@@ -55,63 +46,39 @@ const PrivateGitHubImportForm = ({
     deployPrivateKey: "",
     deployPublicKey: "",
   });
-  const [isGeneratingKeyPair, setIsGeneratingKeyPair] = useState<boolean | undefined>(undefined);
-  const [showPassword, setShowPassword] = useState(false);
 
-  const notifyIfValid = (data: PrivData) => {
-    // Check if all required fields are filled, including the private key
-    if (data.gitBaseUrl && data.username && data.repository && data.branch && data.email && data.deployPrivateKey) {
+  const notifyParent = (data: PrivData) => {
+    // Check if all required fields are filled (deploy key will be added in step 3)
+    const isValid = !!(data.gitBaseUrl && data.username && data.repository && data.email);
+
+    if (isValid) {
       onSetName(data.repository);
-      // Construct the Git URL from base URL, username and repository
-      const scheme = data.gitBaseUrl.startsWith('localhost') ? 'http' : 'https';
-      const gitUrl = `${scheme}://${data.gitBaseUrl}/${data.username}/${data.repository}.git`;
-      onValidationDone({
-        newReadyForNaming: true,
-        importTypeGitLastValidatedUrl: gitUrl,
-        gitPrivateRepo: true,
-        privData: data,
-      });
     }
-  };
 
-  const generateKeyPair = async () => {
-    setIsGeneratingKeyPair(true);
-    try {
-      const resp = await service.api.createKeyPairGithub();
-      setPrivData((prev) => {
-        const updated = {
-          ...prev,
-          deployPrivateKey: resp.privateKey,
-          deployPublicKey: resp.publicKey,
-        };
-        // Notify parent if all fields are now valid
-        notifyIfValid(updated);
-        return updated;
-      });
-    } catch (e) {
-      service.api.logToConsole(e, "ERRR");
-    } finally {
-      setIsGeneratingKeyPair(false);
-    }
+    // Construct the Git URL from base URL, username and repository
+    const scheme = data.gitBaseUrl.startsWith('localhost') ? 'http' : 'https';
+    const gitUrl = `${scheme}://${data.gitBaseUrl}/${data.username}/${data.repository}.git`;
+
+    onValidationDone({
+      newReadyForNaming: isValid,
+      importTypeGitLastValidatedUrl: gitUrl,
+      gitPrivateRepo: true,
+      privData: data,
+    });
   };
 
   const updateField = (field: Partial<PrivData>) => {
     setPrivData((prev) => {
       const updated = { ...prev, ...field };
-      notifyIfValid(updated);
+      notifyParent(updated);
       return updated;
     });
   };
 
-  const copyToClipboard = () => {
-    const { clipboard } = window.require("electron");
-    clipboard.writeText(privData.deployPublicKey);
-  };
-
-  // Generate key pair on first render
-  if (isGeneratingKeyPair === undefined) {
-    generateKeyPair();
-  }
+  // Notify parent on initial render
+  useEffect(() => {
+    notifyParent(privData);
+  }, []);
 
   return (
     <>
@@ -187,88 +154,6 @@ const PrivateGitHubImportForm = ({
           value={privData.repository}
           onChange={(e) => updateField({ repository: e.target.value })}
         />
-      </Box>
-
-      <Box my={1}>
-        {isGeneratingKeyPair !== false ? (
-          <FormControl sx={{ margin: (theme) => theme.spacing(1) }}>
-            <InputLabel
-              shrink
-              htmlFor="progress"
-              sx={{
-                marginLeft: (theme) => theme.spacing(3),
-                backgroundColor: "white",
-              }}
-            >
-              Deploy Public Key
-            </InputLabel>
-            <Paper
-              variant="outlined"
-              id="progress"
-              elevation={1}
-              sx={{
-                height: "160px",
-                padding: "40px",
-                cursor: "pointer",
-                backgroundColor: "#eee",
-                "&:hover": { backgroundColor: "#ccc" },
-              }}
-            >
-              <LinearProgress />
-            </Paper>
-          </FormControl>
-        ) : (
-          <FormControl
-            sx={{ margin: (theme) => theme.spacing(1), width: "60ch" }}
-            variant="outlined"
-          >
-            <InputLabel htmlFor="deploy-public-key">Deploy Public Key</InputLabel>
-            <OutlinedInput
-              id="deploy-public-key"
-              type={showPassword ? "text" : "password"}
-              value={privData.deployPublicKey}
-              onChange={(e) => updateField({ deployPublicKey: e.target.value })}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle deploy key visibility"
-                    onClick={() => setShowPassword(!showPassword)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    edge="end"
-                    size="large"
-                  >
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-        )}
-
-        <Button
-          sx={{
-            margin: (theme) => theme.spacing(1),
-            marginTop: (theme) => theme.spacing(2),
-          }}
-          disabled={isGeneratingKeyPair !== false}
-          onClick={copyToClipboard}
-          variant="contained"
-        >
-          Copy
-        </Button>
-
-        <Button
-          sx={{
-            margin: (theme) => theme.spacing(1),
-            marginTop: (theme) => theme.spacing(2),
-          }}
-          onClick={generateKeyPair}
-          disabled={isGeneratingKeyPair !== false}
-          color="secondary"
-          variant="contained"
-        >
-          Re-generate
-        </Button>
       </Box>
     </>
   );

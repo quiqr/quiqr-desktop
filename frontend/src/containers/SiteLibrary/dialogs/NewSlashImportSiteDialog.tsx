@@ -21,6 +21,7 @@ import {
 } from "./newSiteDialogTypes";
 import SourceTypeStep from "./steps/SourceTypeStep";
 import ConfigureSourceStep from "./steps/ConfigureSourceStep";
+import DeployKeyStep from "./steps/DeployKeyStep";
 import SuccessStep from "./steps/SuccessStep";
 
 interface NewSiteDialogProps {
@@ -34,6 +35,7 @@ interface NewSiteDialogProps {
 
 const STEPS_NEW = ["Choose Method", "Configure Site", "Done"];
 const STEPS_IMPORT = ["Choose Source", "Configure Import", "Done"];
+const STEPS_IMPORT_PRIVATE_GIT = ["Choose Source", "Configure Import", "Configure Deploy Key", "Done"];
 
 const NewSiteDialog = ({
   open,
@@ -45,7 +47,19 @@ const NewSiteDialog = ({
 }: NewSiteDialogProps) => {
   const [state, dispatch] = useReducer(dialogReducer, initialDialogState);
 
-  const steps = newOrImport === "new" ? STEPS_NEW : STEPS_IMPORT;
+  // Determine if we need the extra deploy key step
+  const needsDeployKeyStep = state.sourceType === "git" && state.gitPrivateRepo;
+
+  // Calculate the steps array based on source type
+  const steps = useMemo(() => {
+    if (newOrImport === "new") {
+      return STEPS_NEW;
+    }
+    return needsDeployKeyStep ? STEPS_IMPORT_PRIVATE_GIT : STEPS_IMPORT;
+  }, [newOrImport, needsDeployKeyStep]);
+
+  // Calculate the final step index (Done step)
+  const finalStepIndex = steps.length - 1;
 
   // Handle importSiteURL prop - auto-select git and move to step 1
   useEffect(() => {
@@ -68,6 +82,11 @@ const NewSiteDialog = ({
       return "Site Created";
     }
 
+    // Show deploy key title on step 2 for private git
+    if (needsDeployKeyStep && state.activeStep === 2) {
+      return "Configure Deploy Key";
+    }
+
     const titles: Record<SourceType, string> = {
       scratch: "New Quiqr Site from Scratch",
       hugotheme: "New Quiqr Site from Hugo Theme",
@@ -77,7 +96,7 @@ const NewSiteDialog = ({
     };
 
     return titles[state.sourceType];
-  }, [state.sourceType, state.createdSiteKey, newOrImport]);
+  }, [state.sourceType, state.createdSiteKey, state.activeStep, needsDeployKeyStep, newOrImport]);
 
   const handleSourceSelect = (sourceType: SourceType) => {
     dispatch({ type: "SET_SOURCE_TYPE", payload: sourceType });
@@ -93,6 +112,8 @@ const NewSiteDialog = ({
   const handleBack = () => {
     if (state.activeStep === 1) {
       dispatch({ type: "RESET_TO_SOURCE_SELECTION" });
+    } else if (state.activeStep === 2 && needsDeployKeyStep) {
+      dispatch({ type: "SET_ACTIVE_STEP", payload: 1 });
     }
   };
 
@@ -106,6 +127,23 @@ const NewSiteDialog = ({
       onSuccess();
       mountSite(state.createdSiteKey);
       onClose();
+    }
+  };
+
+  const handleNextToDeployKey = () => {
+    dispatch({ type: "SET_ACTIVE_STEP", payload: 2 });
+  };
+
+  const handleDeployKeyGenerated = (privateKey: string, publicKey: string) => {
+    if (state.privateRepoData) {
+      dispatch({
+        type: "SET_PRIVATE_REPO_DATA",
+        payload: {
+          ...state.privateRepoData,
+          deployPrivateKey: privateKey,
+          deployPublicKey: publicKey,
+        },
+      });
     }
   };
 
@@ -170,7 +208,7 @@ const NewSiteDialog = ({
 
       if (siteKey) {
         dispatch({ type: "SET_CREATED_SITE_KEY", payload: siteKey });
-        dispatch({ type: "SET_ACTIVE_STEP", payload: 2 });
+        dispatch({ type: "SET_ACTIVE_STEP", payload: finalStepIndex });
       }
     } catch {
       dispatch({ type: "SET_CREATING", payload: false });
@@ -228,7 +266,22 @@ const NewSiteDialog = ({
     state.isCreating ||
     !state.siteName;
 
+  // For private git on step 2 (deploy key step), also check if deploy key exists
+  const isImportDisabledPrivateGit =
+    isCreateDisabled ||
+    !state.privateRepoData?.deployPrivateKey;
+
   const renderStepContent = () => {
+    // Handle the "Done" step (which varies in index)
+    if (state.activeStep === finalStepIndex && state.createdSiteKey) {
+      return (
+        <SuccessStep
+          siteName={state.siteName}
+          onOpenSite={handleOpenSite}
+        />
+      );
+    }
+
     switch (state.activeStep) {
       case 0:
         return (
@@ -256,12 +309,17 @@ const NewSiteDialog = ({
         );
 
       case 2:
-        return (
-          <SuccessStep
-            siteName={state.siteName}
-            onOpenSite={handleOpenSite}
-          />
-        );
+        // For private git, show deploy key step
+        if (needsDeployKeyStep) {
+          return (
+            <DeployKeyStep
+              deployPublicKey={state.privateRepoData?.deployPublicKey || ""}
+              onKeyGenerated={handleDeployKeyGenerated}
+            />
+          );
+        }
+        // For other types, this shouldn't happen but fallback to success
+        return null;
 
       default:
         return null;
@@ -271,8 +329,14 @@ const NewSiteDialog = ({
   const renderActions = () => {
     const actions: React.ReactNode[] = [];
 
-    // Back button (only on step 1, and not when using importSiteURL)
+    // Back button
     if (state.activeStep === 1 && !importSiteURL) {
+      actions.push(
+        <Button key="back" color="primary" onClick={handleBack}>
+          Back
+        </Button>
+      );
+    } else if (state.activeStep === 2 && needsDeployKeyStep) {
       actions.push(
         <Button key="back" color="primary" onClick={handleBack}>
           Back
@@ -283,28 +347,59 @@ const NewSiteDialog = ({
     // Cancel/Close button
     actions.push(
       <Button key="close" color="primary" onClick={handleClose}>
-        {state.activeStep === 2 ? "Close" : "Cancel"}
+        {state.activeStep === finalStepIndex ? "Close" : "Cancel"}
       </Button>
     );
 
-    // Create button (only on step 1)
+    // Step 1: "Configure Deploy Key" button for private git, "Create/Import" for others
     if (state.activeStep === 1) {
-      const buttonText = newOrImport === "new" ? "Create Site" : "Import Site";
+      if (needsDeployKeyStep) {
+        // Private git: show "Configure Deploy Key" button
+        actions.push(
+          <Button
+            key="next"
+            variant="contained"
+            disabled={!state.isFormValid || !state.isNameValid || !state.siteName}
+            onClick={handleNextToDeployKey}
+            color="primary"
+          >
+            Configure Deploy Key
+          </Button>
+        );
+      } else {
+        // Other types: show "Create/Import" button
+        const buttonText = newOrImport === "new" ? "Create Site" : "Import Site";
+        actions.push(
+          <Button
+            key="create"
+            variant="contained"
+            disabled={isCreateDisabled}
+            onClick={handleCreateSite}
+            color="primary"
+          >
+            {state.isCreating ? "Creating..." : buttonText}
+          </Button>
+        );
+      }
+    }
+
+    // Step 2 (Deploy Key step for private git): show "Import Site" button
+    if (state.activeStep === 2 && needsDeployKeyStep) {
       actions.push(
         <Button
           key="create"
           variant="contained"
-          disabled={isCreateDisabled}
+          disabled={isImportDisabledPrivateGit}
           onClick={handleCreateSite}
           color="primary"
         >
-          {state.isCreating ? "Creating..." : buttonText}
+          {state.isCreating ? "Importing..." : "Import Site"}
         </Button>
       );
     }
 
-    // Open button (only on step 2)
-    if (state.activeStep === 2) {
+    // Final step: Open button
+    if (state.activeStep === finalStepIndex && state.createdSiteKey) {
       actions.push(
         <Button
           key="open"
