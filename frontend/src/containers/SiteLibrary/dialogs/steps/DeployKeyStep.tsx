@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
@@ -24,16 +24,12 @@ const DeployKeyStep = ({
   deployPublicKey,
   onKeyGenerated,
 }: DeployKeyStepProps) => {
-  const [isGeneratingKeyPair, setIsGeneratingKeyPair] = useState<boolean>(false);
+  // Use undefined to track if we've done initial generation check
+  const [isGeneratingKeyPair, setIsGeneratingKeyPair] = useState<boolean | undefined>(
+    deployPublicKey ? false : undefined
+  );
   const [showKey, setShowKey] = useState(false);
   const [localPublicKey, setLocalPublicKey] = useState(deployPublicKey);
-
-  // Generate key pair on mount if not already present
-  useEffect(() => {
-    if (!deployPublicKey) {
-      generateKeyPair();
-    }
-  }, []);
 
   const generateKeyPair = async () => {
     setIsGeneratingKeyPair(true);
@@ -52,6 +48,11 @@ const DeployKeyStep = ({
     const { clipboard } = window.require("electron");
     clipboard.writeText(localPublicKey);
   };
+
+  // Generate key pair on first render if not already present
+  if (isGeneratingKeyPair === undefined) {
+    generateKeyPair();
+  }
 
   return (
     <>
@@ -80,7 +81,7 @@ const DeployKeyStep = ({
       </Box>
 
       <Box my={2}>
-        {isGeneratingKeyPair ? (
+        {isGeneratingKeyPair !== false ? (
           <FormControl sx={{ width: "100%" }}>
             <InputLabel
               shrink
@@ -97,11 +98,14 @@ const DeployKeyStep = ({
               id="progress"
               elevation={1}
               sx={{
-                height: "120px",
-                padding: "40px",
+                paddingTop: "19.5px",
+                paddingRight: '14px',
+                paddingBottom: "19.5px",
+                paddingLeft: '14px',
                 backgroundColor: "#eee",
               }}
             >
+              {/* sx={{paddingTop: '0.5em', paddingBottom: '0.5em'}} */}
               <LinearProgress />
             </Paper>
           </FormControl>
@@ -136,7 +140,7 @@ const DeployKeyStep = ({
 
       <Box my={2} display="flex" gap={1}>
         <Button
-          disabled={isGeneratingKeyPair || !localPublicKey}
+          disabled={isGeneratingKeyPair !== false || !localPublicKey}
           onClick={copyToClipboard}
           variant="contained"
           color="primary"
@@ -146,7 +150,7 @@ const DeployKeyStep = ({
 
         <Button
           onClick={generateKeyPair}
-          disabled={isGeneratingKeyPair}
+          disabled={isGeneratingKeyPair !== false}
           variant="outlined"
         >
           Re-generate Key
