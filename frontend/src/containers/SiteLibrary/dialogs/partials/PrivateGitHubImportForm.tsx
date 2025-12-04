@@ -12,9 +12,15 @@ import InputAdornment from "@mui/material/InputAdornment";
 import LinearProgress from "@mui/material/LinearProgress";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormHelperText from "@mui/material/FormHelperText";
 
 type PrivData = {
   type: string;
+  gitBaseUrl: string;
+  gitProtocol: 'ssh' | 'https';
+  sshPort: number;
   username: string;
   email: string;
   repository: string;
@@ -38,7 +44,10 @@ const PrivateGitHubImportForm = ({
   onSetName,
 }: PrivateGitHubImportFormProps) => {
   const [privData, setPrivData] = useState<PrivData>({
-    type: "github",
+    type: "git",
+    gitBaseUrl: "github.com",
+    gitProtocol: "ssh",
+    sshPort: 22,
     username: "",
     email: "",
     repository: "",
@@ -51,10 +60,11 @@ const PrivateGitHubImportForm = ({
 
   const notifyIfValid = (data: PrivData) => {
     // Check if all required fields are filled, including the private key
-    if (data.username && data.repository && data.branch && data.email && data.deployPrivateKey) {
+    if (data.gitBaseUrl && data.username && data.repository && data.branch && data.email && data.deployPrivateKey) {
       onSetName(data.repository);
-      // Construct the GitHub URL from username and repository
-      const gitUrl = `https://github.com/${data.username}/${data.repository}.git`;
+      // Construct the Git URL from base URL, username and repository
+      const scheme = data.gitBaseUrl.startsWith('localhost') ? 'http' : 'https';
+      const gitUrl = `${scheme}://${data.gitBaseUrl}/${data.username}/${data.repository}.git`;
       onValidationDone({
         newReadyForNaming: true,
         importTypeGitLastValidatedUrl: gitUrl,
@@ -107,9 +117,50 @@ const PrivateGitHubImportForm = ({
     <>
       <Box my={1}>
         <TextField
+          id="git-base-url"
+          label="Git Host"
+          helperText={privData.gitProtocol === 'https'
+            ? "Include port if needed (e.g., localhost:3000)"
+            : "Git server hostname (e.g., github.com, localhost)"}
+          variant="outlined"
+          sx={{ margin: (theme) => theme.spacing(1), width: '25ch' }}
+          value={privData.gitBaseUrl}
+          onChange={(e) => updateField({ gitBaseUrl: e.target.value })}
+        />
+        <FormControl sx={{ margin: (theme) => theme.spacing(1), minWidth: '12ch' }} variant="outlined">
+          <InputLabel id="git-protocol-label">Protocol</InputLabel>
+          <Select
+            labelId="git-protocol-label"
+            id="git-protocol"
+            value={privData.gitProtocol}
+            onChange={(e) => updateField({ gitProtocol: e.target.value as 'ssh' | 'https' })}
+            label="Protocol"
+          >
+            <MenuItem value="ssh">SSH</MenuItem>
+            <MenuItem value="https">HTTPS</MenuItem>
+          </Select>
+          <FormHelperText>Connection protocol</FormHelperText>
+        </FormControl>
+        {privData.gitProtocol === 'ssh' && (
+          <TextField
+            id="ssh-port"
+            label="SSH Port"
+            helperText="SSH port (default: 22)"
+            variant="outlined"
+            type="number"
+            sx={{ margin: (theme) => theme.spacing(1), width: '12ch' }}
+            value={privData.sshPort}
+            onChange={(e) => updateField({ sshPort: parseInt(e.target.value, 10) || 22 })}
+            slotProps={{ htmlInput: { min: 1, max: 65535 } }}
+          />
+        )}
+      </Box>
+
+      <Box my={1}>
+        <TextField
           id="username-organization"
           label="Username / Organization"
-          helperText="GitHub username or organization containing the target repository"
+          helperText="Username or organization containing the target repository"
           variant="outlined"
           sx={{ margin: (theme) => theme.spacing(1) }}
           value={privData.username}

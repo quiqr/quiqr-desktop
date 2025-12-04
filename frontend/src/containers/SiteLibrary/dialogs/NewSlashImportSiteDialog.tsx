@@ -145,14 +145,17 @@ const NewSiteDialog = ({
 
         case "git":
           if (state.gitPrivateRepo && state.privateRepoData) {
-            const { username, repository, deployPrivateKey, email } = state.privateRepoData;
+            const { gitBaseUrl, gitProtocol, sshPort, username, repository, deployPrivateKey, email } = state.privateRepoData;
             siteKey = await service.api.importSiteFromPrivateGitRepo(
+              gitBaseUrl,
               username,
               repository,
               deployPrivateKey,
               email,
               true,
-              state.siteName
+              state.siteName,
+              gitProtocol,
+              sshPort
             );
           } else {
             siteKey = await service.api.importSiteFromPublicGitUrl(

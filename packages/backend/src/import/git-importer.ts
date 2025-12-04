@@ -43,18 +43,66 @@ export class GitImporter {
   }
 
   /**
+   * Build a Git URL from components
+   * @param baseUrl - The Git host, may include port for HTTPS (e.g., 'github.com', 'localhost:3000')
+   * @param org - The organization or username
+   * @param repo - The repository name
+   * @param protocol - 'ssh' or 'https' (defaults to 'ssh')
+   * @param sshPort - SSH port (defaults to 22, only used for SSH protocol)
+   */
+  private buildGitUrl(
+    baseUrl: string,
+    org: string,
+    repo: string,
+    protocol: 'ssh' | 'https' = 'ssh',
+    sshPort: number = 22
+  ): string {
+    // Ensure repo ends with .git
+    const repoWithGit = repo.endsWith('.git') ? repo : `${repo}.git`;
+
+    if (protocol === 'ssh') {
+      // Extract host without port for SSH (port is specified separately)
+      const host = baseUrl.split(':')[0];
+      if (sshPort === 22) {
+        // Standard SSH format: git@host:org/repo.git
+        return `git@${host}:${org}/${repoWithGit}`;
+      } else {
+        // Non-standard port SSH format: ssh://git@host:port/org/repo.git
+        return `ssh://git@${host}:${sshPort}/${org}/${repoWithGit}`;
+      }
+    } else {
+      // HTTPS format: https://host:port/org/repo.git
+      // Use http for localhost, https otherwise
+      const isLocalhost = baseUrl.startsWith('localhost') || baseUrl.startsWith('127.0.0.1');
+      const scheme = isLocalhost ? 'http' : 'https';
+      return `${scheme}://${baseUrl}/${org}/${repoWithGit}`;
+    }
+  }
+
+  /**
    * Import a site from a private git repository
+   * @param gitBaseUrl - The Git host, may include port for HTTPS (e.g., 'github.com', 'localhost:3000')
+   * @param gitOrg - The organization or username
+   * @param gitRepo - The repository name
+   * @param privKey - SSH private key for authentication
+   * @param gitEmail - Email for Git commits
+   * @param saveSyncTarget - Whether to save the sync configuration
+   * @param siteName - Name for the imported site
+   * @param protocol - 'ssh' or 'https' (defaults to 'ssh')
+   * @param sshPort - SSH port (defaults to 22, only used for SSH protocol)
    */
   async importSiteFromPrivateGitRepo(
+    gitBaseUrl: string,
     gitOrg: string,
     gitRepo: string,
     privKey: string,
     gitEmail: string,
     saveSyncTarget: boolean,
-    siteName: string
+    siteName: string,
+    protocol: 'ssh' | 'https' = 'ssh',
+    sshPort: number = 22
   ): Promise<string> {
-    // TODO: Currently only supports GitHub
-    const url = `git@github.com:${gitOrg}/${gitRepo}.git`;
+    const url = this.buildGitUrl(gitBaseUrl, gitOrg, gitRepo, protocol, sshPort);
     console.log('Importing from private repo:', url);
 
     const siteKey = await this.libraryService.createSiteKeyFromName(siteName);
@@ -79,7 +127,10 @@ export class GitImporter {
         const deployPublicKey = this.embgit.derivePublicKeyFromPrivate(privKey);
 
         const publConf = {
-          type: 'github' as const,
+          type: 'git' as const,
+          gitBaseUrl: gitBaseUrl,
+          gitProtocol: protocol,
+          sshPort: sshPort,
           username: gitOrg,
           email: gitEmail,
           repository: gitRepo,
@@ -87,7 +138,6 @@ export class GitImporter {
           deployPrivateKey: privKey,
           deployPublicKey,
           publishScope: 'source' as const,
-          setGitHubActions: false,
           keyPairBusy: false,
           overrideBaseURLSwitch: false,
           overrideBaseURL: '',

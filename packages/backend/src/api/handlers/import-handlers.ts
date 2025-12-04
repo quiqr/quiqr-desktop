@@ -10,27 +10,36 @@ import type { HugoConfigFormat } from '../../hugo/hugo-utils.js';
 
 export function createImportSiteFromPrivateGitRepoHandler(container: AppContainer) {
   return async ({
+    gitBaseUrl,
     gitOrg,
     gitRepo,
     privKey,
     gitEmail,
     saveSyncTarget,
     siteName,
+    protocol = 'ssh',
+    sshPort = 22,
   }: {
+    gitBaseUrl: string;
     gitOrg: string;
     gitRepo: string;
     privKey: string;
     gitEmail: string;
     saveSyncTarget: boolean;
     siteName: string;
+    protocol?: 'ssh' | 'https';
+    sshPort?: number;
   }) => {
     const siteKey = await container.gitImporter.importSiteFromPrivateGitRepo(
+      gitBaseUrl,
       gitOrg,
       gitRepo,
       privKey,
       gitEmail,
       saveSyncTarget,
-      siteName
+      siteName,
+      protocol,
+      sshPort
     );
     // Invalidate cache so the new site appears in the list
     container.configurationProvider.invalidateCache();

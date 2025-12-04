@@ -140,11 +140,34 @@ export const sysgitPublishConfSchema = z.object({
   CNAME: z.string().optional()
 })
 
+// Generic Git publish configuration (supports GitHub, GitLab, Forgejo, etc.)
+export const gitPublishConfSchema = z.object({
+  type: z.literal('git'),
+  title: z.string().optional(),
+  gitBaseUrl: z.string(), // e.g., 'github.com', 'gitlab.com', 'localhost:3000'
+  gitProtocol: z.enum(['ssh', 'https']),
+  sshPort: z.number().optional(), // SSH port, defaults to 22 (only used for SSH protocol)
+  username: z.string(),
+  email: z.string(),
+  repository: z.string(),
+  branch: z.string(),
+  deployPrivateKey: z.string(),
+  deployPublicKey: z.string(),
+  publishScope: z.string(),
+  keyPairBusy: z.boolean().optional(),
+  overrideBaseURLSwitch: z.boolean(),
+  overrideBaseURL: z.string(),
+  pullOnly: z.boolean().optional(),
+  backupAtPull: z.boolean().optional(),
+  syncSelection: z.string().optional(),
+})
+
 // Union of all publish config types
 export const publConfSchema = z.discriminatedUnion('type', [
   folderPublishConfSchema,
   githubPublishConfSchema,
-  sysgitPublishConfSchema
+  sysgitPublishConfSchema,
+  gitPublishConfSchema
 ])
 
 export const siteConfigSchema = z.object({
@@ -280,6 +303,7 @@ export type MenuConfig = z.infer<typeof menuSchema>
 export type FolderPublishConf = z.infer<typeof folderPublishConfSchema>
 export type GithubPublishConf = z.infer<typeof githubPublishConfSchema>
 export type SysgitPublishConf = z.infer<typeof sysgitPublishConfSchema>
+export type GitPublishConf = z.infer<typeof gitPublishConfSchema>
 export type PublConf = z.infer<typeof publConfSchema>
 export type SiteConfig = z.infer<typeof siteConfigSchema>
 export type ServeConfig = z.infer<typeof serveConfigSchema>

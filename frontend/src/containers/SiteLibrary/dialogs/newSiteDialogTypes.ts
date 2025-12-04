@@ -4,6 +4,9 @@ export type SourceType = "scratch" | "hugotheme" | "folder" | "git" | "";
 export type DialogMode = "new" | "import";
 
 export interface PrivateRepoData {
+  gitBaseUrl: string;
+  gitProtocol: 'ssh' | 'https';
+  sshPort: number;
   username: string;
   repository: string;
   deployPrivateKey: string;
