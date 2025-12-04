@@ -41,7 +41,7 @@ const DeleteSiteDialog = ({ open, siteconf, onClose, onSuccess }: DeleteSiteDial
     <Dialog open={open} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description' fullWidth={true} maxWidth={"sm"}>
       <DialogTitle id='alert-dialog-title'>Delete site: {siteconf.name}</DialogTitle>
       <DialogContent>
-        <DialogContentText id='alert-dialog-description'>
+        <DialogContentText id='alert-dialog-description' component={'div'}>
           <Box>
             <div>Are you sure you want to delete {siteconf.name}?</div>
             <div>This cannot be undone.</div>
