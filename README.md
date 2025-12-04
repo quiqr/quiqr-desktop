@@ -14,9 +14,10 @@ This `ng`-branch will replace the current `main` which we will rename to `legacy
 
 1. Clone the repository
 2. Run `npm install` to install the dependencies
-3. You may need to run `npm run build` in the `frontend` folder to build the frontend.
-4. Run `npm run dev` to start the development server and the Electron app
-5. React app will be running on [http://localhost:4002](http://localhost:5173)
+3. Run `npm run _pack_embgit` to get the lightweight embedded git client
+4. You may or may not need to run `npm run build` in the `frontend` folder to build the frontend.
+5. Run `npm run dev` to start the development server and the Electron app
+6. React app will be running on [http://localhost:4002](http://localhost:5173)
 
 > [!TIP]
 > You can also run the backend without electron. It will just start the API:  
