@@ -16,10 +16,10 @@ import type { ConfigurationDataProvider } from '../services/configuration/index.
 import { recurForceRemove } from '../utils/file-dir-utils.js';
 
 /**
- * Base configuration shared by GitHub and Sysgit sync
+ * Base configuration shared by GitHub, Sysgit, and Git sync
  */
 export interface BaseSyncConfig {
-  type: 'github' | 'sysgit';
+  type: 'github' | 'sysgit' | 'git';
   email?: string;
   username?: string;
   branch?: string;
@@ -28,6 +28,7 @@ export interface BaseSyncConfig {
   deployPublicKey?: string;
   publishScope?: 'build' | 'source';
   setGitHubActions?: boolean;
+  setCIWorkflow?: boolean;
   CNAMESwitch?: boolean;
   CNAME?: string;
   overrideBaseURLSwitch?: boolean;

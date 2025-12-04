@@ -19,6 +19,7 @@ export function createImportSiteFromPrivateGitRepoHandler(container: AppContaine
     siteName,
     protocol = 'ssh',
     sshPort = 22,
+    gitProvider = 'generic',
   }: {
     gitBaseUrl: string;
     gitOrg: string;
@@ -29,6 +30,7 @@ export function createImportSiteFromPrivateGitRepoHandler(container: AppContaine
     siteName: string;
     protocol?: 'ssh' | 'https';
     sshPort?: number;
+    gitProvider?: 'github' | 'gitlab' | 'forgejo' | 'generic';
   }) => {
     const siteKey = await container.gitImporter.importSiteFromPrivateGitRepo(
       gitBaseUrl,
@@ -39,7 +41,8 @@ export function createImportSiteFromPrivateGitRepoHandler(container: AppContaine
       saveSyncTarget,
       siteName,
       protocol,
-      sshPort
+      sshPort,
+      gitProvider
     );
     // Invalidate cache so the new site appears in the list
     container.configurationProvider.invalidateCache();

@@ -13,6 +13,7 @@ import type { Embgit } from '../embgit/embgit.js';
 import { FolderSync } from './folder/folder-sync.js';
 import { GithubSync } from './github/github-sync.js';
 import { SysgitSync } from './sysgit/sysgit-sync.js';
+import { GitSync } from './git/git-sync.js';
 
 /**
  * Generic sync service interface
@@ -79,6 +80,9 @@ export class SyncFactory {
 
       case 'sysgit':
         return new SysgitSync(publisherConfig, siteKey, this.dependencies);
+
+      case 'git':
+        return new GitSync(publisherConfig, siteKey, this.dependencies);
 
       default:
         throw new Error(`Unknown sync type: ${type}`);

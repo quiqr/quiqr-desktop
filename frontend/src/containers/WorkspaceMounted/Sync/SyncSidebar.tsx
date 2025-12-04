@@ -152,7 +152,8 @@ export const SyncSidebar = ({
     if (publ.config && publ.config.type === 'github') {
       label = GitHubMeta.sidebarLabel(publ.config);
       icon = GitHubMeta.icon();
-    } else if (publ.config && publ.config.type === 'sysgit') {
+    } else if (publ.config && (publ.config.type === 'sysgit' || publ.config.type === 'git')) {
+      // Use SysGitMeta for both sysgit and the new universal git type
       label = SysGitMeta.sidebarLabel(publ.config);
       icon = SysGitMeta.icon();
     } else if (publ.config && publ.config.type === 'folder') {

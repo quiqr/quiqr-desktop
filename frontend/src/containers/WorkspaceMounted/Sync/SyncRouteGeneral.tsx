@@ -136,7 +136,8 @@ const SyncRouteGeneral = ({
           }}
         />
       );
-    } else if (config.type === "sysgit") {
+    } else if (config.type === "sysgit" || config.type === "git") {
+      // Use SysGitDashboard for both sysgit and the new universal git type
       return (
         <SysGitDashboard
           siteKey={siteKey}

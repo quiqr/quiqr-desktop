@@ -14,6 +14,7 @@ import { snackMessageService } from "../../../services/ui-service";
 import {
   DialogMode,
   SourceType,
+  GitProvider,
   dialogReducer,
   initialDialogState,
   PrivateRepoData,
@@ -22,6 +23,7 @@ import {
 import SourceTypeStep from "./steps/SourceTypeStep";
 import ConfigureSourceStep from "./steps/ConfigureSourceStep";
 import DeployKeyStep from "./steps/DeployKeyStep";
+import SyncConfigStep, { detectGitProvider } from "./steps/SyncConfigStep";
 import SuccessStep from "./steps/SuccessStep";
 
 interface NewSiteDialogProps {
@@ -35,7 +37,7 @@ interface NewSiteDialogProps {
 
 const STEPS_NEW = ["Choose Method", "Configure Site", "Done"];
 const STEPS_IMPORT = ["Choose Source", "Configure Import", "Done"];
-const STEPS_IMPORT_PRIVATE_GIT = ["Choose Source", "Configure Import", "Configure Deploy Key", "Done"];
+const STEPS_IMPORT_PRIVATE_GIT = ["Choose Source", "Configure Import", "Deploy Key", "Sync Settings", "Done"];
 
 const NewSiteDialog = ({
   open,
@@ -77,6 +79,14 @@ const NewSiteDialog = ({
     }
   }, [open]);
 
+  // Calculate suggested git provider from URL
+  const suggestedGitProvider = useMemo(() => {
+    if (state.privateRepoData?.gitBaseUrl) {
+      return detectGitProvider(state.privateRepoData.gitBaseUrl);
+    }
+    return "generic" as GitProvider;
+  }, [state.privateRepoData?.gitBaseUrl]);
+
   const dialogTitle = useMemo(() => {
     if (state.createdSiteKey) {
       return "Site Created";
@@ -85,6 +95,11 @@ const NewSiteDialog = ({
     // Show deploy key title on step 2 for private git
     if (needsDeployKeyStep && state.activeStep === 2) {
       return "Configure Deploy Key";
+    }
+
+    // Show sync config title on step 3 for private git
+    if (needsDeployKeyStep && state.activeStep === 3) {
+      return "Configure Sync Settings";
     }
 
     const titles: Record<SourceType, string> = {
@@ -114,6 +129,8 @@ const NewSiteDialog = ({
       dispatch({ type: "RESET_TO_SOURCE_SELECTION" });
     } else if (state.activeStep === 2 && needsDeployKeyStep) {
       dispatch({ type: "SET_ACTIVE_STEP", payload: 1 });
+    } else if (state.activeStep === 3 && needsDeployKeyStep) {
+      dispatch({ type: "SET_ACTIVE_STEP", payload: 2 });
     }
   };
 
@@ -132,6 +149,20 @@ const NewSiteDialog = ({
 
   const handleNextToDeployKey = () => {
     dispatch({ type: "SET_ACTIVE_STEP", payload: 2 });
+  };
+
+  const handleNextToSyncConfig = () => {
+    // Auto-detect git provider when moving to sync config step
+    dispatch({ type: "SET_GIT_PROVIDER", payload: suggestedGitProvider });
+    dispatch({ type: "SET_ACTIVE_STEP", payload: 3 });
+  };
+
+  const handleEnableSyncChange = (enabled: boolean) => {
+    dispatch({ type: "SET_ENABLE_SYNC", payload: enabled });
+  };
+
+  const handleGitProviderChange = (provider: GitProvider) => {
+    dispatch({ type: "SET_GIT_PROVIDER", payload: provider });
   };
 
   const handleDeployKeyGenerated = (privateKey: string, publicKey: string) => {
@@ -190,10 +221,11 @@ const NewSiteDialog = ({
               repository,
               deployPrivateKey,
               email,
-              true,
+              state.enableSync, // Only save sync target if sync is enabled
               state.siteName,
               gitProtocol,
-              sshPort
+              sshPort,
+              state.gitProvider
             );
           } else {
             siteKey = await service.api.importSiteFromPublicGitUrl(
@@ -321,6 +353,21 @@ const NewSiteDialog = ({
         // For other types, this shouldn't happen but fallback to success
         return null;
 
+      case 3:
+        // For private git, show sync config step
+        if (needsDeployKeyStep) {
+          return (
+            <SyncConfigStep
+              enableSync={state.enableSync}
+              gitProvider={state.gitProvider}
+              suggestedProvider={suggestedGitProvider}
+              onEnableSyncChange={handleEnableSyncChange}
+              onGitProviderChange={handleGitProviderChange}
+            />
+          );
+        }
+        return null;
+
       default:
         return null;
     }
@@ -336,7 +383,7 @@ const NewSiteDialog = ({
           Back
         </Button>
       );
-    } else if (state.activeStep === 2 && needsDeployKeyStep) {
+    } else if ((state.activeStep === 2 || state.activeStep === 3) && needsDeployKeyStep) {
       actions.push(
         <Button key="back" color="primary" onClick={handleBack}>
           Back
@@ -383,8 +430,23 @@ const NewSiteDialog = ({
       }
     }
 
-    // Step 2 (Deploy Key step for private git): show "Import Site" button
+    // Step 2 (Deploy Key step for private git): show "Next" button to go to sync config
     if (state.activeStep === 2 && needsDeployKeyStep) {
+      actions.push(
+        <Button
+          key="next"
+          variant="contained"
+          disabled={!state.privateRepoData?.deployPrivateKey}
+          onClick={handleNextToSyncConfig}
+          color="primary"
+        >
+          Next
+        </Button>
+      );
+    }
+
+    // Step 3 (Sync Config step for private git): show "Import Site" button
+    if (state.activeStep === 3 && needsDeployKeyStep) {
       actions.push(
         <Button
           key="create"

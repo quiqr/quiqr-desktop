@@ -140,10 +140,14 @@ export const sysgitPublishConfSchema = z.object({
   CNAME: z.string().optional()
 })
 
+// Git provider enum for CI configuration
+export const gitProviderSchema = z.enum(['github', 'gitlab', 'forgejo', 'generic']);
+
 // Generic Git publish configuration (supports GitHub, GitLab, Forgejo, etc.)
 export const gitPublishConfSchema = z.object({
   type: z.literal('git'),
   title: z.string().optional(),
+  gitProvider: gitProviderSchema, // Determines CI configuration
   gitBaseUrl: z.string(), // e.g., 'github.com', 'gitlab.com', 'localhost:3000'
   gitProtocol: z.enum(['ssh', 'https']),
   sshPort: z.number().optional(), // SSH port, defaults to 22 (only used for SSH protocol)
@@ -160,6 +164,10 @@ export const gitPublishConfSchema = z.object({
   pullOnly: z.boolean().optional(),
   backupAtPull: z.boolean().optional(),
   syncSelection: z.string().optional(),
+  // CI-related settings
+  setCIWorkflow: z.boolean().optional(), // Whether to generate CI workflow files
+  CNAMESwitch: z.boolean().optional(),
+  CNAME: z.string().optional(),
 })
 
 // Union of all publish config types
@@ -303,6 +311,7 @@ export type MenuConfig = z.infer<typeof menuSchema>
 export type FolderPublishConf = z.infer<typeof folderPublishConfSchema>
 export type GithubPublishConf = z.infer<typeof githubPublishConfSchema>
 export type SysgitPublishConf = z.infer<typeof sysgitPublishConfSchema>
+export type GitProvider = z.infer<typeof gitProviderSchema>
 export type GitPublishConf = z.infer<typeof gitPublishConfSchema>
 export type PublConf = z.infer<typeof publConfSchema>
 export type SiteConfig = z.infer<typeof siteConfigSchema>

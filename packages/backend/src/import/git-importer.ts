@@ -90,6 +90,7 @@ export class GitImporter {
    * @param siteName - Name for the imported site
    * @param protocol - 'ssh' or 'https' (defaults to 'ssh')
    * @param sshPort - SSH port (defaults to 22, only used for SSH protocol)
+   * @param gitProvider - The git provider type for CI configuration (defaults to 'generic')
    */
   async importSiteFromPrivateGitRepo(
     gitBaseUrl: string,
@@ -100,7 +101,8 @@ export class GitImporter {
     saveSyncTarget: boolean,
     siteName: string,
     protocol: 'ssh' | 'https' = 'ssh',
-    sshPort: number = 22
+    sshPort: number = 22,
+    gitProvider: 'github' | 'gitlab' | 'forgejo' | 'generic' = 'generic'
   ): Promise<string> {
     const url = this.buildGitUrl(gitBaseUrl, gitOrg, gitRepo, protocol, sshPort);
     console.log('Importing from private repo:', url);
@@ -128,6 +130,7 @@ export class GitImporter {
 
         const publConf = {
           type: 'git' as const,
+          gitProvider: gitProvider,
           gitBaseUrl: gitBaseUrl,
           gitProtocol: protocol,
           sshPort: sshPort,
@@ -141,6 +144,7 @@ export class GitImporter {
           keyPairBusy: false,
           overrideBaseURLSwitch: false,
           overrideBaseURL: '',
+          setCIWorkflow: false,
         };
 
         if (!siteConf.publish) {

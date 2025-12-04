@@ -2,6 +2,7 @@
 
 export type SourceType = "scratch" | "hugotheme" | "folder" | "git" | "";
 export type DialogMode = "new" | "import";
+export type GitProvider = "github" | "gitlab" | "forgejo" | "generic";
 
 export interface PrivateRepoData {
   gitBaseUrl: string;
@@ -13,6 +14,7 @@ export interface PrivateRepoData {
   deployPublicKey?: string;
   email: string;
   branch?: string;
+  gitProvider?: GitProvider;
 }
 
 export interface HugoThemeInfo {
@@ -73,6 +75,10 @@ export interface DialogState {
 
   // Scratch
   scratchConfigFormat: string;
+
+  // Sync configuration (for private git imports)
+  enableSync: boolean;
+  gitProvider: GitProvider;
 }
 
 export const initialDialogState: DialogState = {
@@ -97,6 +103,8 @@ export const initialDialogState: DialogState = {
   privateRepoData: null,
   folderPath: "",
   scratchConfigFormat: "toml",
+  enableSync: false,
+  gitProvider: "generic",
 };
 
 export type DialogAction =
@@ -122,6 +130,8 @@ export type DialogAction =
   | { type: "SET_FOLDER_PATH"; payload: string }
   | { type: "SET_SCRATCH_CONFIG_FORMAT"; payload: string }
   | { type: "SET_HUGO_CONFIG"; payload: { version: string; extended: boolean; disabled: boolean; extendedEnabled: boolean; generateModel: boolean } }
+  | { type: "SET_ENABLE_SYNC"; payload: boolean }
+  | { type: "SET_GIT_PROVIDER"; payload: GitProvider }
   | { type: "RESET_TO_SOURCE_SELECTION" }
   | { type: "RESET_ALL" };
 
@@ -178,6 +188,10 @@ export function dialogReducer(state: DialogState, action: DialogAction): DialogS
         hugoExtendedEnabled: action.payload.extendedEnabled,
         generateQuiqrModel: action.payload.generateModel,
       };
+    case "SET_ENABLE_SYNC":
+      return { ...state, enableSync: action.payload };
+    case "SET_GIT_PROVIDER":
+      return { ...state, gitProvider: action.payload };
     case "RESET_TO_SOURCE_SELECTION":
       return {
         ...initialDialogState,

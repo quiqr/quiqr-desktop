@@ -64,9 +64,10 @@ export class API {
     saveSyncTarget: boolean,
     siteName: string,
     protocol: 'ssh' | 'https' = 'ssh',
-    sshPort: number = 22
+    sshPort: number = 22,
+    gitProvider: 'github' | 'gitlab' | 'forgejo' | 'generic' = 'generic'
   ){
-    return mainProcessBridge.request('importSiteFromPrivateGitRepo', {gitBaseUrl, gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget, siteName, protocol, sshPort}, {timeout: 1000000});
+    return mainProcessBridge.request('importSiteFromPrivateGitRepo', {gitBaseUrl, gitOrg, gitRepo, privKey, gitEmail, saveSyncTarget, siteName, protocol, sshPort, gitProvider}, {timeout: 1000000});
   }
 
   importSiteFromPublicGitUrl(siteName: string, url: string){
