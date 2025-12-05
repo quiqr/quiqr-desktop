@@ -4,10 +4,11 @@ import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import PublicGitImportForm from "./PublicGitImportForm";
 import PrivateGitHubImportForm from "./PrivateGitHubImportForm";
+import { GitValidationResult } from "../newSiteDialogTypes";
 
 type FormPartialImportFromGitProps = {
   importSiteURL?: string;
-  onValidationDone: (data: unknown) => void;
+  onValidationDone: (data: GitValidationResult) => void;
   onSetName: (name: string) => void;
   onSetVersion: (version?: string) => void;
 };
