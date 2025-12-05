@@ -31,6 +31,15 @@ export interface HugoThemeInfo {
   AuthorHomepage?: string;
 }
 
+// Validation result types for form partials
+export interface GitValidationResult {
+  newReadyForNaming: boolean;
+  importTypeGitLastValidatedUrl?: string;
+  importTypeGitInfoDict?: unknown;
+  gitPrivateRepo?: boolean;
+  privData?: PrivateRepoData;
+}
+
 export interface DialogState {
   // Step tracking
   activeStep: number;
