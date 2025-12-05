@@ -12,15 +12,13 @@ interface CardNewProps {
   };
 }
 
-export class CardNew extends React.Component<CardNewProps>{
-
-  render(){
+const CardNew = ({handleClick, classes} : CardNewProps) => {
     return (
       <Paper
         onClick={()=>{
-          this.props.handleClick();
+          handleClick();
         }}
-        className={this.props.classes?.paper}
+        className={classes?.paper}
         sx={{ cursor: 'pointer', padding: 2 }}
         elevation={5}
       >
@@ -36,9 +34,7 @@ export class CardNew extends React.Component<CardNewProps>{
 
 
       </Paper>
-    )
-  }
-
+    )  
 }
 
 export default CardNew;
