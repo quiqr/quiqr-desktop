@@ -1,19 +1,8 @@
 /**
- * Placeholder for EasyMdeField
- * TODO: Implement in Phase 2-4 migration
+ * EasyMdeField - now uses MDXEditor (same as MarkdownField).
+ * The legacy react-simplemde-editor has been replaced with MDXEditor
+ * for React 19 compatibility.
  */
 
-interface Props {
-  compositeKey: string;
-}
-
-function EasyMdeField({ compositeKey }: Props) {
-  // Placeholder - will be implemented during migration
-  return (
-    <div data-field-placeholder="EasyMdeField" data-composite-key={compositeKey}>
-      [EasyMdeField placeholder]
-    </div>
-  );
-}
-
-export default EasyMdeField;
+// Re-export MarkdownField since both now use MDXEditor
+export { default } from './MarkdownField';

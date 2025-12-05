@@ -1,18 +1,136 @@
-/**
- * Placeholder for MarkdownField
- * TODO: Implement in Phase 2-4 migration
- */
+import { useRef, useEffect } from 'react';
+import '@mdxeditor/editor/style.css';
+import {
+  MDXEditor,
+  MDXEditorMethods,
+  UndoRedo,
+  BoldItalicUnderlineToggles,
+  BlockTypeSelect,
+  CreateLink,
+  InsertImage,
+  ListsToggle,
+  Separator,
+  toolbarPlugin,
+  headingsPlugin,
+  listsPlugin,
+  linkPlugin,
+  quotePlugin,
+  markdownShortcutPlugin,
+  imagePlugin,
+} from '@mdxeditor/editor';
+import FormItemWrapper from '../components/shared/FormItemWrapper';
+import Tip from '../../Tip';
+import AiAssist from '../../AiAssist';
+import { useField } from '../useField';
+import type { MarkdownField as MarkdownFieldConfig } from '@quiqr/types';
+import type { MarkdownDynamicField } from '../components/MarkdownDynamic';
 
 interface Props {
   compositeKey: string;
 }
 
+/**
+ * MarkdownField - rich markdown editor using MDXEditor.
+ * Replaces the legacy react-simplemde-editor and plain textarea implementations.
+ */
 function MarkdownField({ compositeKey }: Props) {
-  // Placeholder - will be implemented during migration
+  const { field, value, setValue, meta } = useField<string>(compositeKey);
+  const config = field as MarkdownFieldConfig;
+  const editorRef = useRef<MDXEditorMethods>(null);
+
+  // Sync editor content when external value changes
+  useEffect(() => {
+    if (editorRef.current && value !== undefined) {
+      const currentMarkdown = editorRef.current.getMarkdown();
+      if (currentMarkdown !== value) {
+        editorRef.current.setMarkdown(value);
+      }
+    }
+  }, [value]);
+
+  const handleChange = (markdown: string) => {
+    setValue(markdown, 250);
+  };
+
+  const iconButtons: React.ReactNode[] = [];
+
+  if (config.tip) {
+    iconButtons.push(<Tip key="tip" markdown={config.tip} />);
+  }
+
+  if (meta.enableAiAssist) {
+    iconButtons.push(
+      <AiAssist
+        key="ai-assist"
+        handleSetAiText={(text: string) => {
+          editorRef.current?.setMarkdown(text);
+          setValue(text);
+        }}
+        inField={field as unknown as MarkdownDynamicField}
+        inValue={value ?? ''}
+        pageUrl={meta.pageUrl}
+      />
+    );
+  }
+
   return (
-    <div data-field-placeholder="MarkdownField" data-composite-key={compositeKey}>
-      [MarkdownField placeholder]
-    </div>
+    <FormItemWrapper
+      control={
+        <div style={{ width: '100%' }}>
+          {config.title && (
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '12px',
+                color: 'rgba(0, 0, 0, 0.6)',
+              }}
+            >
+              {config.title}
+            </label>
+          )}
+          <div
+            style={{
+              border: '1px solid rgba(0, 0, 0, 0.23)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <MDXEditor
+              ref={editorRef}
+              markdown={value ?? config.default ?? ''}
+              onChange={handleChange}
+              plugins={[
+                headingsPlugin(),
+                listsPlugin(),
+                linkPlugin(),
+                quotePlugin(),
+                imagePlugin(),
+                markdownShortcutPlugin(),
+                toolbarPlugin({
+                  toolbarContents: () => (
+                    <>
+                      <UndoRedo />
+                      <Separator />
+                      <BoldItalicUnderlineToggles />
+                      <Separator />
+                      <BlockTypeSelect />
+                      <Separator />
+                      <ListsToggle />
+                      <Separator />
+                      <CreateLink />
+                      <InsertImage />
+                    </>
+                  ),
+                }),
+              ]}
+              contentEditableClassName="prose max-w-full min-h-[200px] p-3"
+            />
+          </div>
+        </div>
+      }
+      iconButtons={iconButtons}
+    />
   );
 }
 
