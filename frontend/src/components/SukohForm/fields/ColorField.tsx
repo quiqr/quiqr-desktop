@@ -36,7 +36,6 @@ function ColorField({ compositeKey }: Props) {
   return (
     <FormItemWrapper
       control={
-        <>
           <DefaultWrapper>
             <label
               style={{
@@ -64,7 +63,7 @@ function ColorField({ compositeKey }: Props) {
               }}
             />
           </DefaultWrapper>
-        </>
+
       }
       iconButtons={iconButtons}
     />
