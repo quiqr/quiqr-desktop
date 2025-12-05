@@ -49,7 +49,7 @@ export default class FolderPicker extends React.Component<FolderPickerProps, Fol
           value={selectedFolder||''}
           label={label}
           onClick={this.handleTextFieldClick.bind(this)}
-          InputProps={{ readOnly: true }}
+          slotProps={{input: { readOnly: true }}}
           style={{flex:'1 0 500px',  flexDirection: 'row'}} />
         <Button
           variant="contained"
