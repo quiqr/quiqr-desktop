@@ -37,7 +37,6 @@ function SliderField({ compositeKey }: Props) {
   return (
     <FormItemWrapper
       control={
-        <>
           <DefaultWrapper>
             <Typography id={`slider-${compositeKey}`} gutterBottom>
               {config.title ?? config.key}
@@ -56,7 +55,6 @@ function SliderField({ compositeKey }: Props) {
               max={config.max}
             />
           </DefaultWrapper>
-        </>
       }
       iconButtons={iconButtons}
     />
