@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useMemo, ReactNode } from 'react';
 import { FormContext, FormContextValue, FieldConfig, FileReference, FormMeta } from './FormContext';
 import { FieldRenderer } from './FieldRenderer';
 import type { Field } from '@quiqr/types';
+import Box from '@mui/material/Box';
 
 /**
  * Get a value from a nested object using dot notation with array support.
@@ -330,7 +331,9 @@ export function FormProvider({
 
   return (
     <FormContext.Provider value={contextValue}>
-      {children}
+      <Box sx={{display: 'flex', flexDirection: 'column', gap: '1rem', padding: '2rem'}}>
+        {children}
+      </Box>
     </FormContext.Provider>
   );
 }
