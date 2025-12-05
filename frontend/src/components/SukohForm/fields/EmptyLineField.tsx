@@ -1,19 +1,26 @@
-/**
- * Placeholder for EmptyLineField
- * TODO: Implement in Phase 2-4 migration
- */
+import { useMemo } from 'react';
+import { useField } from '../useField';
+import type { EmptyLineField as EmptyLineFieldConfig } from '@quiqr/types';
 
 interface Props {
   compositeKey: string;
 }
 
+/**
+ * EmptyLineField - renders visual spacing (line breaks).
+ * The `amount` property controls how many <br/> elements to render.
+ */
 function EmptyLineField({ compositeKey }: Props) {
-  // Placeholder - will be implemented during migration
-  return (
-    <div data-field-placeholder="EmptyLineField" data-composite-key={compositeKey}>
-      [EmptyLineField placeholder]
-    </div>
-  );
+  const { field } = useField(compositeKey);
+  const config = field as EmptyLineFieldConfig;
+
+  const amount = config.amount ?? 1;
+
+  const lines = useMemo(() => {
+    return Array.from({ length: amount }, (_, idx) => <br key={idx} />);
+  }, [amount]);
+
+  return <div>{lines}</div>;
 }
 
 export default EmptyLineField;
