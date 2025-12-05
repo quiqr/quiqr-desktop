@@ -6,27 +6,10 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormHelperText from "@mui/material/FormHelperText";
-
-type PrivData = {
-  type: string;
-  gitBaseUrl: string;
-  gitProtocol: 'ssh' | 'https';
-  sshPort: number;
-  username: string;
-  email: string;
-  repository: string;
-  branch: string;
-  deployPrivateKey: string;
-  deployPublicKey: string;
-};
+import { GitValidationResult, PrivateRepoData } from "../newSiteDialogTypes";
 
 type PrivateGitHubImportFormProps = {
-  onValidationDone: (data: {
-    newReadyForNaming: boolean;
-    importTypeGitLastValidatedUrl: string;
-    gitPrivateRepo: boolean;
-    privData: PrivData;
-  }) => void;
+  onValidationDone: (data: GitValidationResult) => void;
   onSetName: (name: string) => void;
 };
 
@@ -34,8 +17,7 @@ const PrivateGitHubImportForm = ({
   onValidationDone,
   onSetName,
 }: PrivateGitHubImportFormProps) => {
-  const [privData, setPrivData] = useState<PrivData>({
-    type: "git",
+  const [privData, setPrivData] = useState<PrivateRepoData>({
     gitBaseUrl: "github.com",
     gitProtocol: "ssh",
     sshPort: 22,
@@ -47,7 +29,7 @@ const PrivateGitHubImportForm = ({
     deployPublicKey: "",
   });
 
-  const notifyParent = (data: PrivData) => {
+  const notifyParent = (data: PrivateRepoData) => {
     // Check if all required fields are filled (deploy key will be added in step 3)
     const isValid = !!(data.gitBaseUrl && data.username && data.repository && data.email);
 
@@ -67,7 +49,7 @@ const PrivateGitHubImportForm = ({
     });
   };
 
-  const updateField = (field: Partial<PrivData>) => {
+  const updateField = (field: Partial<PrivateRepoData>) => {
     setPrivData((prev) => {
       const updated = { ...prev, ...field };
       notifyParent(updated);

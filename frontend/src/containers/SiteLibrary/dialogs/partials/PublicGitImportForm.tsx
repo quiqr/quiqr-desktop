@@ -4,6 +4,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import RepositoryInfoCard from "./RepositoryInfoCard";
+import { GitValidationResult } from "../newSiteDialogTypes";
 
 const REGEXP_HTTP = /^http(s?):\/\//i;
 const REGEXP_GITHUB = /^https:\/\/github\.com\//i;
@@ -18,13 +19,9 @@ type RepoInfo = {
   quiqrForms: string;
 };
 
-type PublicGitImportFormProps = {
+export type PublicGitImportFormProps = {
   importSiteURL?: string;
-  onValidationDone: (data: {
-    newReadyForNaming: boolean;
-    importTypeGitLastValidatedUrl: string;
-    importTypeGitInfoDict: unknown;
-  }) => void;
+  onValidationDone: (data: GitValidationResult) => void;
   onSetName: (name: string) => void;
   onSetVersion: (version?: string) => void;
 };
