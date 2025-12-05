@@ -32,7 +32,8 @@
     "dist": "electron-builder",
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
-    "_hugo_versions": "node scripts/getHugoVersions.js"
+    "_hugo_versions": "node scripts/getHugoVersions.js",
+    "scaffold:field": "node scripts/scaffold-field.js"
   },
   "keywords": [],
   "dependencies": {
