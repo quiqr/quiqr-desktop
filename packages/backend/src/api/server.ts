@@ -41,9 +41,10 @@ export function createServer(
     app.use(cors());
   }
 
-  // We need to raise this limit because we import theme screenshots.
-  // The screenshots are base64 encoded images and can get quite large. 
-  app.use(express.json({ limit: '5mb' }));
+  // We need to raise this limit because we import theme screenshots and bundle files.
+  // The files are base64 encoded and can get quite large (base64 adds ~33% overhead).
+  // For a local Electron app, 100mb is a reasonable limit.
+  app.use(express.json({ limit: '100mb' }));
 
   /**
    * Create handler registry
