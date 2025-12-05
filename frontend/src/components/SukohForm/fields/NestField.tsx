@@ -1,10 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderIcon from '@mui/icons-material/Folder';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import Collapse from '@mui/material/Collapse';
 import { useField, useRenderFields } from '../useField';
 import type { NestField as NestFieldConfig, Field } from '@quiqr/types';
 
@@ -13,14 +16,15 @@ interface Props {
 }
 
 /**
- * NestField - nested field container.
- * In the new form system, renders child fields inline (no navigation).
- * TODO: Implement navigation/drill-down behavior if needed.
+ * NestField - nested field container with expand/collapse.
+ * Click the header to toggle visibility of child fields.
  */
 function NestField({ compositeKey }: Props) {
   const { field } = useField(compositeKey);
   const renderFields = useRenderFields();
   const config = field as NestFieldConfig;
+
+  const [expanded, setExpanded] = useState(false);
 
   // Build summary of child field labels
   const childLabels = useMemo(() => {
@@ -33,39 +37,43 @@ function NestField({ compositeKey }: Props) {
   const groupdata = config.groupdata !== false; // Default to true
   const parentPath = groupdata ? childPath : childPath.split('.').slice(0, -1).join('.') || '';
 
-  // For now, render inline with a visual container
-  // TODO: Implement drill-down navigation if needed
+  const handleToggle = () => {
+    setExpanded(!expanded);
+  };
+
   return (
     <>
-      <List style={{ marginBottom: 16, padding: 0 }}>
+      <List style={{ marginBottom: expanded ? 0 : 16, padding: 0 }}>
         <ListItemButton
+          onClick={handleToggle}
           style={{
             padding: '20px 16px',
             border: 'solid 1px #d8d8d8',
-            borderRadius: '7px',
+            borderRadius: expanded ? '7px 7px 0 0' : '7px',
           }}
         >
           <ListItemIcon>
-            <FolderIcon />
+            {expanded ? <FolderOpenIcon /> : <FolderIcon />}
           </ListItemIcon>
           <ListItemText
             primary={config.title ?? config.key}
-            secondary={childLabels}
+            secondary={expanded ? undefined : childLabels}
           />
-          <ChevronRightIcon />
+          {expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
         </ListItemButton>
       </List>
 
-      {/* Render child fields inline */}
-      <div
-        style={{
-          padding: '16px 0px 0px 16px',
-          marginBottom: '16px',
-          borderLeft: 'solid 10px #eee',
-        }}
-      >
-        {renderFields(parentPath, config.fields as Field[])}
-      </div>
+      <Collapse in={expanded}>
+        <div
+          style={{
+            padding: '16px 0px 0px 16px',
+            marginBottom: '16px',
+            borderLeft: 'solid 10px #eee',
+          }}
+        >
+          {renderFields(parentPath, config.fields as Field[])}
+        </div>
+      </Collapse>
     </>
   );
 }
