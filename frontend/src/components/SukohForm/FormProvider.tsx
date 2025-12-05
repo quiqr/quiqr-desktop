@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useMemo, ReactNode } from 'react';
 import { FormContext, FormContextValue, FieldConfig, FileReference, FormMeta } from './FormContext';
+import { FieldRenderer } from './FieldRenderer';
 import type { Field } from '@quiqr/types';
 
 /**
@@ -250,13 +251,24 @@ export function FormProvider({
     return cacheRef.current[compositeKey];
   }, []);
 
-  // TODO: Implement with FieldRenderer in Phase 2
   const renderFields = useCallback(
     (parentPath: string, fieldsToRender: Field[]): ReactNode => {
-      console.warn('renderFields not yet implemented', parentPath, fieldsToRender);
-      return null;
+      // Process fields to get their compositeKeys
+      const basePath = parentPath || 'root';
+
+      return fieldsToRender.map((field) => {
+        const compositeKey = `${basePath}.${field.key}`;
+
+        // Ensure field config exists in the map (for dynamically rendered fields)
+        if (!fieldConfigs.has(compositeKey)) {
+          const config: FieldConfig = { ...field, compositeKey };
+          fieldConfigs.set(compositeKey, config);
+        }
+
+        return <FieldRenderer key={compositeKey} compositeKey={compositeKey} />;
+      });
     },
-    []
+    [fieldConfigs]
   );
 
   const saveForm = useCallback(async () => {

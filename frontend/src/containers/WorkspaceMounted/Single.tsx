@@ -138,6 +138,7 @@ class Single extends React.Component<SingleProps, SingleState>{
     var { siteKey, workspaceKey, singleKey } = this.props;
 
     return(<SukohForm
+      useNewFormSystem={true}  // Enable new system
     debug={false}
     rootName={single.title}
     singleKey={this.props.singleKey}

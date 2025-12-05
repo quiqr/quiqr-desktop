@@ -133,6 +133,8 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
     let pageUrl = this.generatePageUrl(collection);
 
     return(<SukohForm
+      useNewFormSystem={true}  // Enable new system
+
     debug={false}
     rootName={collection.title}
     pageUrl={pageUrl}

@@ -5,6 +5,10 @@ import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
 import dynamicFormComponents from './components/all';
 import service from './../../services/service';
+import { FormProvider } from './FormProvider';
+import { FieldRenderer } from './FieldRenderer';
+import type { Field } from '@quiqr/types';
+import type { FormMeta } from './FormContext';
 
 const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
@@ -33,6 +37,8 @@ type SukohFormProps = {
   hideSaveButton?: boolean;
   refreshed?: boolean;
   debug: boolean;
+  /** Enable the new functional form system (default: false) */
+  useNewFormSystem?: boolean;
 };
 
 export const SukohForm = ({
@@ -52,6 +58,7 @@ export const SukohForm = ({
   onSave,
   hideSaveButton,
   refreshed,
+  useNewFormSystem = false,
 }: SukohFormProps) => {
   const navigate = useNavigate();
   const [actionButtonRightPos] = useState(380);
@@ -59,6 +66,9 @@ export const SukohForm = ({
   const [error, setError] = useState<string | null>(null);
   const [savedOnce, setSavedOnce] = useState(false);
   const valueFactoryRef = useRef<(() => any) | null>(null);
+
+  // For new form system - track document state
+  const newFormDocRef = useRef<Record<string, unknown>>(values || {});
 
   const saveContent = useCallback(() => {
     if (onSave) {
@@ -70,7 +80,9 @@ export const SukohForm = ({
         reject: (msg?: string) => {
           setError(msg || 'Error');
         },
-        data: Object.assign({}, valueFactoryRef.current?.()),
+        data: useNewFormSystem
+          ? Object.assign({}, newFormDocRef.current)
+          : Object.assign({}, valueFactoryRef.current?.()),
       };
 
       onSave(context);
@@ -78,7 +90,7 @@ export const SukohForm = ({
     } else {
       setError('Save not implemented');
     }
-  }, [onSave]);
+  }, [onSave, useNewFormSystem]);
 
   useEffect(() => {
     service.api.shouldReloadForm(null);
@@ -106,6 +118,26 @@ export const SukohForm = ({
     }
   };
 
+  // Handler for new form system
+  const handleNewFormChange = useCallback(
+    (document: Record<string, unknown>, isDirty: boolean) => {
+      newFormDocRef.current = document;
+      if (isDirty && !changed) {
+        setChanged(true);
+      }
+    },
+    [changed]
+  );
+
+  const handleNewFormSave = useCallback(
+    async (document: Record<string, unknown>, _resources: Record<string, unknown[]>) => {
+      newFormDocRef.current = document;
+      // Trigger save through existing mechanism
+      saveContent();
+    },
+    [saveContent]
+  );
+
   let floatingActionButtonClass = 'animated';
   if (!savedOnce) floatingActionButtonClass += ' zoomIn';
   if (changed) floatingActionButtonClass += ' rubberBand';
@@ -128,6 +160,39 @@ export const SukohForm = ({
     </Fab>
   );
 
+  // New form system
+  if (useNewFormSystem) {
+    const meta: FormMeta = {
+      siteKey,
+      workspaceKey,
+      collectionKey: collectionKey || '',
+      collectionItemKey: collectionItemKey || singleKey || '',
+      enableAiAssist: false, // TODO: Get from user prefs
+      pageUrl: pageUrl || '',
+    };
+
+    const typedFields = fields as Field[];
+
+    return (
+      <>
+        <FormProvider
+          fields={typedFields}
+          initialValues={values || {}}
+          meta={meta}
+          onSave={handleNewFormSave}
+          onChange={handleNewFormChange}
+        >
+          {typedFields.map((field) => (
+            <FieldRenderer key={field.key} compositeKey={`root.${field.key}`} />
+          ))}
+        </FormProvider>
+        {hideSaveButton ? null : fabButton}
+        <div style={{ height: '70px' }}></div>
+      </>
+    );
+  }
+
+  // Legacy form system
   return (
     <>
       <Form
