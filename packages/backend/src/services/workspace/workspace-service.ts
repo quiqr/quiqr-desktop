@@ -947,6 +947,56 @@ export class WorkspaceService {
   }
 
   /**
+   * Upload a file to a bundle path with base64 content.
+   * Used by native browser file pickers.
+   */
+  async uploadFileToBundlePath(
+    collectionKey: string,
+    collectionItemKey: string,
+    targetPath: string,
+    filename: string,
+    base64Content: string
+  ): Promise<string> {
+    const config = await this.getConfigurationsData();
+
+    let filesBasePath = '';
+    // When path starts with / use the root of the site directory
+    if (targetPath.charAt(0) === '/' || targetPath.charAt(0) === '\\') {
+      filesBasePath = path.join(this.workspacePath, targetPath);
+    } else {
+      if (collectionKey === '') {
+        filesBasePath = path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+      } else {
+        const collection = config.collections.find((x) => x.key === collectionKey);
+        if (collection == null) throw new Error('Could not find collection.');
+
+        const pathFromItemRoot = path.join(
+          collectionItemKey.replace(/\/[^/]+$/, ''),
+          targetPath
+        );
+        filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
+      }
+    }
+
+    // Ensure the target directory exists
+    await fs.ensureDir(filesBasePath);
+
+    const filePath = path.join(filesBasePath, filename);
+
+    // If file exists, remove it first
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Decode base64 and write file
+    const buffer = Buffer.from(base64Content, 'base64');
+    await fs.writeFile(filePath, buffer);
+
+    // Return the relative path from targetPath
+    return path.join(targetPath, filename).replace(/\\/g, '/');
+  }
+
+  /**
    * Check if path exists (promisified)
    */
   private existsPromise(src: string): Promise<boolean> {

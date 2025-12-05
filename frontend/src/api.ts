@@ -278,6 +278,26 @@ export class API {
     return mainProcessBridge.request('getFilesInBundle', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName});
   }
 
+  uploadFileToBundlePath(
+    siteKey: string,
+    workspaceKey: string,
+    collectionKey: string,
+    collectionItemKey: string,
+    targetPath: string,
+    filename: string,
+    base64Content: string
+  ) {
+    return mainProcessBridge.request('uploadFileToBundlePath', {
+      siteKey,
+      workspaceKey,
+      collectionKey,
+      collectionItemKey,
+      targetPath,
+      filename,
+      base64Content
+    }) as Promise<string>;
+  }
+
   getFilesFromAbsolutePath(path: string){
     return mainProcessBridge.request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
   }
