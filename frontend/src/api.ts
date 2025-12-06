@@ -298,6 +298,24 @@ export class API {
     }) as Promise<string>;
   }
 
+  deleteFileFromBundle(
+    siteKey: string,
+    workspaceKey: string,
+    collectionKey: string,
+    collectionItemKey: string,
+    targetPath: string,
+    filename: string
+  ) {
+    return mainProcessBridge.request('deleteFileFromBundle', {
+      siteKey,
+      workspaceKey,
+      collectionKey,
+      collectionItemKey,
+      targetPath,
+      filename
+    });
+  }
+
   getFilesFromAbsolutePath(path: string){
     return mainProcessBridge.request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
   }

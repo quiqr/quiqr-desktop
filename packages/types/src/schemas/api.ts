@@ -41,6 +41,10 @@ export const folderDialogResponseSchema = z.object({
   selectedFolder: z.string().nullable()
 })
 
+export const deleteFileFromBundleResponseSchema = z.object({
+  deleted: z.boolean()
+})
+
 export const communityTemplateSchema = z.object({
   HugoVersion: z.string(),
   HugoTheme: z.string(),
@@ -168,6 +172,7 @@ export const apiSchemas = {
   getFilesFromAbsolutePath: z.array(fileReferenceSchema),
   getThumbnailForPath: z.string().optional(),
   getThumbnailForCollectionOrSingleItemImage: z.string().optional(),
+  deleteFileFromBundle: deleteFileFromBundleResponseSchema,
 
   // Site management
   getSiteConfig: siteConfigSchema,

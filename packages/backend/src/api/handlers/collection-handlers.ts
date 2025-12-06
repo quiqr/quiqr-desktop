@@ -267,6 +267,33 @@ export function createUploadFileToBundlePathHandler(container: AppContainer) {
   };
 }
 
+export function createDeleteFileFromBundleHandler(container: AppContainer) {
+  return async ({
+    siteKey,
+    workspaceKey,
+    collectionKey,
+    collectionItemKey,
+    targetPath,
+    filename,
+  }: {
+    siteKey: string;
+    workspaceKey: string;
+    collectionKey: string;
+    collectionItemKey: string;
+    targetPath: string;
+    filename: string;
+  }) => {
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    const deleted = await workspaceService.deleteFileFromBundle(
+      collectionKey,
+      collectionItemKey,
+      targetPath,
+      filename
+    );
+    return { deleted };
+  };
+}
+
 export function createGetFilesInBundleHandler(container: AppContainer) {
   return async ({
     siteKey,
@@ -367,6 +394,7 @@ export function createCollectionHandlers(container: AppContainer) {
     makePageBundleCollectionItem: createMakePageBundleCollectionItemHandler(container),
     copyFilesIntoCollectionItem: createCopyFilesIntoCollectionItemHandler(container),
     uploadFileToBundlePath: createUploadFileToBundlePathHandler(container),
+    deleteFileFromBundle: createDeleteFileFromBundleHandler(container),
     getFilesInBundle: createGetFilesInBundleHandler(container),
     getThumbnailForPath: createGetThumbnailForPathHandler(container),
     getThumbnailForCollectionOrSingleItemImage: createGetThumbnailForCollectionOrSingleItemImageHandler(container),

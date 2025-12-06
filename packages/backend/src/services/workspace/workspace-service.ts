@@ -947,6 +947,47 @@ export class WorkspaceService {
   }
 
   /**
+   * Delete a file from a bundle path.
+   * Used when removing files from bundle manager.
+   */
+  async deleteFileFromBundle(
+    collectionKey: string,
+    collectionItemKey: string,
+    targetPath: string,
+    filename: string
+  ): Promise<boolean> {
+    const config = await this.getConfigurationsData();
+
+    let filesBasePath = '';
+    // When path starts with / use the root of the site directory
+    if (targetPath.charAt(0) === '/' || targetPath.charAt(0) === '\\') {
+      filesBasePath = path.join(this.workspacePath, targetPath);
+    } else {
+      if (collectionKey === '') {
+        filesBasePath = path.join(await this.getSingleFolder(collectionItemKey), targetPath);
+      } else {
+        const collection = config.collections.find((x) => x.key === collectionKey);
+        if (collection == null) throw new Error('Could not find collection.');
+
+        const pathFromItemRoot = path.join(
+          collectionItemKey.replace(/\/[^/]+$/, ''),
+          targetPath
+        );
+        filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
+      }
+    }
+
+    const filePath = path.join(filesBasePath, filename);
+
+    if (fs.existsSync(filePath)) {
+      await recurForceRemove(filePath);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Upload a file to a bundle path with base64 content.
    * Used by native browser file pickers.
    */

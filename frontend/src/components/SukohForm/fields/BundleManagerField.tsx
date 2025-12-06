@@ -168,14 +168,38 @@ function BundleManagerField({ compositeKey }: Props) {
     return config.extensions.map(ext => `.${ext}`).join(',');
   }, [config.extensions]);
 
-  // Remove file handler (soft delete)
-  const handleRemoveFile = useCallback((fileToRemove: FileReferenceWithDeleted) => {
-    const updatedFiles = absFiles.map(f =>
-      f.src === fileToRemove.src ? { ...f, __deleted: true } : f
-    );
-    setAbsFiles(updatedFiles);
-    setResources(compositeKey, updatedFiles.filter(f => !f.__deleted));
-  }, [absFiles, compositeKey, setResources]);
+  // Remove file handler - deletes from disk and updates state
+  const handleRemoveFile = useCallback(async (fileToRemove: FileReferenceWithDeleted) => {
+    // Extract filename from the src path
+    const filename = fileToRemove.src.split('/').pop() || '';
+
+    try {
+      // Call API to delete file from disk
+      await service.api.deleteFileFromBundle(
+        meta.siteKey,
+        meta.workspaceKey,
+        meta.collectionKey,
+        meta.collectionItemKey,
+        config.path,
+        filename
+      );
+
+      // Update local state after successful deletion
+      const updatedFiles = absFiles.map(f =>
+        f.src === fileToRemove.src ? { ...f, __deleted: true } : f
+      );
+      setAbsFiles(updatedFiles);
+      setResources(compositeKey, updatedFiles.filter(f => !f.__deleted));
+    } catch (error) {
+      console.error('Error deleting file from bundle:', error);
+      // Still update local state to allow user to continue working
+      const updatedFiles = absFiles.map(f =>
+        f.src === fileToRemove.src ? { ...f, __deleted: true } : f
+      );
+      setAbsFiles(updatedFiles);
+      setResources(compositeKey, updatedFiles.filter(f => !f.__deleted));
+    }
+  }, [absFiles, compositeKey, setResources, meta, config.path]);
 
   // Filter visible items (not deleted, matching extensions)
   const visibleItems = useMemo(() => {
