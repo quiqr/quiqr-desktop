@@ -51,7 +51,7 @@ export interface FormContextValue {
   // Keyed by compositeKey
   resources: Record<string, FileReference[]>;
   getResources: (key: string) => FileReference[];
-  setResources: (key: string, files: FileReference[]) => void;
+  setResources: (key: string, files: FileReference[], markDirty?: boolean) => void;
 
   // Field configs indexed by compositeKey (preprocessed once at init)
   fieldConfigs: Map<string, FieldConfig>;

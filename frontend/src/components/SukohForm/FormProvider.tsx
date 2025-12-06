@@ -158,7 +158,7 @@ interface FormProviderProps {
   initialResources?: Record<string, FileReference[]>;
   meta: FormMeta;
   onSave: (document: Record<string, unknown>, resources: Record<string, FileReference[]>) => Promise<void>;
-  onChange?: (document: Record<string, unknown>, isDirty: boolean) => void;
+  onChange?: (document: Record<string, unknown>, isDirty: boolean, resources?: Record<string, FileReference[]>) => void;
 }
 
 export function FormProvider({
@@ -233,11 +233,19 @@ export function FormProvider({
   );
 
   const setResourcesHandler = useCallback(
-    (key: string, files: FileReference[]) => {
-      setResourcesState((prev) => ({ ...prev, [key]: files }));
-      setIsDirty(true);
+    (key: string, files: FileReference[], markDirty = true) => {
+      setResourcesState((prev) => {
+        const newResources = { ...prev, [key]: files };
+        if (markDirty) {
+          setIsDirty(true);
+          // Notify parent that form has changed (for save button state)
+          // Include resources so they can be tracked for saving
+          onChange?.(document, true, newResources);
+        }
+        return newResources;
+      });
     },
-    []
+    [document, onChange]
   );
 
   const getFieldConfig = useCallback(

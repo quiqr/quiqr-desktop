@@ -55,11 +55,13 @@ function BundleManagerField({ compositeKey }: Props) {
       const fieldPath = config.path;
 
       try {
+        let mappedFiles: FileReferenceWithDeleted[] = [];
+
         if (fieldPath.charAt(0) === '/' || fieldPath.charAt(0) === '\\') {
           // Absolute path - load from filesystem
           const files = await service.api.getFilesFromAbsolutePath(fieldPath);
           if (absFiles.length === 0) {
-            const mappedFiles = files.map((item: { src: string }) => ({
+            mappedFiles = files.map((item: { src: string }) => ({
               ...item,
               src: pathJoin(fieldPath, item.src)
             }));
@@ -77,12 +79,18 @@ function BundleManagerField({ compositeKey }: Props) {
             config.forceFileName || ''
           );
           if (absFiles.length === 0) {
-            const mappedFiles = files.map((item: { src: string }) => ({
+            mappedFiles = files.map((item: { src: string }) => ({
               ...item,
               src: pathJoin(item.src)
             }));
             setAbsFiles(mappedFiles);
           }
+        }
+
+        // Sync resources for nested fields (like BundleImgThumbField)
+        // Pass false to avoid marking form dirty on initial load
+        if (mappedFiles.length > 0) {
+          setResources(compositeKey, mappedFiles, false);
         }
       } catch (error) {
         console.error('Error loading bundle files:', error);
@@ -90,7 +98,7 @@ function BundleManagerField({ compositeKey }: Props) {
     };
 
     loadFiles();
-  }, [config.path, config.extensions, config.forceFileName, meta.siteKey, meta.workspaceKey, meta.collectionKey, meta.collectionItemKey]);
+  }, [config.path, config.extensions, config.forceFileName, meta.siteKey, meta.workspaceKey, meta.collectionKey, meta.collectionItemKey, compositeKey, setResources]);
 
   // Trigger native file picker
   const handleAddFile = useCallback(() => {

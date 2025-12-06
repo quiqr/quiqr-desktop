@@ -67,11 +67,27 @@ export const SukohForm = ({
   const [savedOnce, setSavedOnce] = useState(false);
   const valueFactoryRef = useRef<(() => any) | null>(null);
 
-  // For new form system - track document state
+  // For new form system - track document state and resources
   const newFormDocRef = useRef<Record<string, unknown>>(values || {});
+  const newFormResourcesRef = useRef<Record<string, unknown[]>>({});
 
   const saveContent = useCallback(() => {
     if (onSave) {
+      let data: Record<string, unknown>;
+
+      if (useNewFormSystem) {
+        // Merge resources into document for saving
+        const mergedDocument = { ...newFormDocRef.current };
+        for (const [compositeKey, files] of Object.entries(newFormResourcesRef.current)) {
+          // Extract field key from compositeKey (e.g., "root.image" -> "image")
+          const fieldKey = compositeKey.replace(/^root\./, '');
+          mergedDocument[fieldKey] = files;
+        }
+        data = mergedDocument;
+      } else {
+        data = Object.assign({}, valueFactoryRef.current?.());
+      }
+
       const context: SaveContext = {
         accept: () => {
           setChanged(false);
@@ -80,9 +96,7 @@ export const SukohForm = ({
         reject: (msg?: string) => {
           setError(msg || 'Error');
         },
-        data: useNewFormSystem
-          ? Object.assign({}, newFormDocRef.current)
-          : Object.assign({}, valueFactoryRef.current?.()),
+        data,
       };
 
       onSave(context);
@@ -118,10 +132,13 @@ export const SukohForm = ({
     }
   };
 
-  // Handler for new form system
+  // Handler for new form system - tracks both document and resource changes
   const handleNewFormChange = useCallback(
-    (document: Record<string, unknown>, isDirty: boolean) => {
+    (document: Record<string, unknown>, isDirty: boolean, resources?: Record<string, unknown[]>) => {
       newFormDocRef.current = document;
+      if (resources) {
+        newFormResourcesRef.current = resources;
+      }
       if (isDirty && !changed) {
         setChanged(true);
       }
@@ -130,8 +147,17 @@ export const SukohForm = ({
   );
 
   const handleNewFormSave = useCallback(
-    async (document: Record<string, unknown>, _resources: Record<string, unknown[]>) => {
-      newFormDocRef.current = document;
+    async (document: Record<string, unknown>, resources: Record<string, unknown[]>) => {
+      // Merge resources into document for saving
+      // Resources are keyed by compositeKey (e.g., "root.image"), extract field key for merging
+      const mergedDocument = { ...document };
+      for (const [compositeKey, files] of Object.entries(resources)) {
+        // Extract field key from compositeKey (e.g., "root.image" -> "image")
+        const fieldKey = compositeKey.replace(/^root\./, '');
+        // Only include non-deleted files
+        mergedDocument[fieldKey] = files;
+      }
+      newFormDocRef.current = mergedDocument;
       // Trigger save through existing mechanism
       saveContent();
     },
