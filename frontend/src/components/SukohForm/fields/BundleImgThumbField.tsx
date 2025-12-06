@@ -84,14 +84,6 @@ function BundleImgThumbField({ compositeKey }: Props) {
 
   // Load thumbnail when source path changes
   useEffect(() => {
-    console.log('=== BundleImgThumbField Debug ===')
-    console.log('compositeKey', compositeKey)
-    console.log('bundleKey', bundleKey)
-    console.log('itemIndex', itemIndex)
-    console.log('resources', resources)
-    console.log('fileItem', fileItem)
-    console.log('sourceFieldKey', sourceFieldKey)
-    console.log('sourceFilePath', sourceFilePath)
     
     // Skip if no source path or not an image
     if (!sourceFilePath || !isImage(sourceFilePath)) {
