@@ -1,16 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router';
-import { Form, ComponentRegistry } from '../HoForm';
 import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
-import dynamicFormComponents from './components/all';
 import service from './../../services/service';
 import { FormProvider } from './FormProvider';
 import { FieldRenderer } from './FieldRenderer';
 import type { Field } from '@quiqr/types';
 import type { FormMeta } from './FormContext';
 
-const componentRegistry = new ComponentRegistry(dynamicFormComponents);
 
 interface SaveContext {
   accept: (updatedValues: any) => void;
@@ -38,7 +34,6 @@ type SukohFormProps = {
   refreshed?: boolean;
   debug: boolean;
   /** Enable the new functional form system (default: false) */
-  useNewFormSystem?: boolean;
 };
 
 export const SukohForm = ({
@@ -48,19 +43,11 @@ export const SukohForm = ({
   singleKey,
   collectionItemKey,
   fields,
-  buildActions,
-  plugins,
-  rootName,
   pageUrl,
-  hideExternalEditIcon,
   values,
-  onOpenInEditor,
   onSave,
   hideSaveButton,
-  refreshed,
-  useNewFormSystem = false,
 }: SukohFormProps) => {
-  const navigate = useNavigate();
   const [actionButtonRightPos] = useState(380);
   const [changed, setChanged] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,20 +60,15 @@ export const SukohForm = ({
 
   const saveContent = useCallback(() => {
     if (onSave) {
-      let data: Record<string, unknown>;
 
-      if (useNewFormSystem) {
-        // Merge resources into document for saving
-        const mergedDocument = { ...newFormDocRef.current };
-        for (const [compositeKey, files] of Object.entries(newFormResourcesRef.current)) {
-          // Extract field key from compositeKey (e.g., "root.image" -> "image")
-          const fieldKey = compositeKey.replace(/^root\./, '');
-          mergedDocument[fieldKey] = files;
-        }
-        data = mergedDocument;
-      } else {
-        data = Object.assign({}, valueFactoryRef.current?.());
+      // Merge resources into document for saving
+      const mergedDocument = { ...newFormDocRef.current };
+      for (const [compositeKey, files] of Object.entries(newFormResourcesRef.current)) {
+        // Extract field key from compositeKey (e.g., "root.image" -> "image")
+        const fieldKey = compositeKey.replace(/^root\./, '');
+        mergedDocument[fieldKey] = files;
       }
+      const data: Record<string, unknown> = mergedDocument;
 
       const context: SaveContext = {
         accept: () => {
@@ -104,7 +86,7 @@ export const SukohForm = ({
     } else {
       setError('Save not implemented');
     }
-  }, [onSave, useNewFormSystem]);
+  }, [onSave]);
 
   useEffect(() => {
     service.api.shouldReloadForm(null);
@@ -125,12 +107,6 @@ export const SukohForm = ({
     };
   }, [changed, saveContent]);
 
-  const handleFormChange = (valueFactory: () => any) => {
-    valueFactoryRef.current = valueFactory;
-    if (!changed) {
-      setChanged(true);
-    }
-  };
 
   // Handler for new form system - tracks both document and resource changes
   const handleNewFormChange = useCallback(
@@ -186,8 +162,6 @@ export const SukohForm = ({
     </Fab>
   );
 
-  // New form system
-  if (useNewFormSystem) {
     const meta: FormMeta = {
       siteKey,
       workspaceKey,
@@ -216,34 +190,4 @@ export const SukohForm = ({
         <div style={{ height: '70px' }}></div>
       </>
     );
-  }
-
-  // Legacy form system
-  return (
-    <>
-      <Form
-        plugins={plugins}
-        debug={false}
-        componentRegistry={componentRegistry}
-        siteKey={siteKey}
-        workspaceKey={workspaceKey}
-        collectionKey={collectionKey}
-        singleKey={singleKey}
-        refreshed={refreshed || false}
-        collectionItemKey={collectionItemKey}
-        fields={fields}
-        buildActions={buildActions}
-        rootName={rootName}
-        saveFormHandler={() => saveContent()}
-        pageUrl={pageUrl}
-        hideExternalEditIcon={hideExternalEditIcon}
-        values={values}
-        onChange={handleFormChange}
-        onOpenInEditor={onOpenInEditor || (() => {})}
-        navigate={navigate}
-      />
-      {hideSaveButton ? null : fabButton}
-      <div style={{ height: '70px' }}></div>
-    </>
-  );
 };
