@@ -39,7 +39,7 @@ class DeleteItemKeyDialog extends React.Component<DeleteItemKeyDialogProps, Dele
   }
 
   render(){
-    let { busy, itemLabel } = this.props;
+    const { busy, itemLabel } = this.props;
 
     return (
       <Dialog fullWidth={true} maxWidth='sm' open={true} onClose={this.handleClose}>

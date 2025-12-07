@@ -65,7 +65,7 @@ class SiteConfRouteEtalage extends React.Component<SiteConfRouteEtalageProps, Si
 
   checkSiteInProps(){
 
-    var { siteKey, workspaceKey } = this.props;
+    const { siteKey, workspaceKey } = this.props;
 
     this.setState({
       siteKey: this.props.siteKey
@@ -98,7 +98,7 @@ class SiteConfRouteEtalage extends React.Component<SiteConfRouteEtalageProps, Si
       fileOverride = this.props.fileOverride;
     }
 
-    let single = <Single
+    const single = <Single
         key={ this.props.singleKey }
         siteKey={ this.props.siteKey }
         refreshed={ false }
@@ -107,7 +107,7 @@ class SiteConfRouteEtalage extends React.Component<SiteConfRouteEtalageProps, Si
         fileOverride={ fileOverride }
         /> ;
 
-    let complete = (
+    const complete = (
       <Box sx={{ padding: '20px', height: '100%' }}>
         <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
         <Typography variant="h5">{this.props.title}</Typography>

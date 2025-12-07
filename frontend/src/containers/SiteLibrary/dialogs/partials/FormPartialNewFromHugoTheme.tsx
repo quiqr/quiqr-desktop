@@ -121,8 +121,8 @@ class FormPartialNewFromHugoTheme extends React.Component<FormPartialNewFromHugo
       this.setState({newTypeHugoThemeProvider: 'SourceHut'});
     }
 
-    var urlparts = url.split('/');
-    var siteNameFromUrl = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
+    const urlparts = url.split('/');
+    let siteNameFromUrl = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
     if(siteNameFromUrl.includes(".")) siteNameFromUrl = siteNameFromUrl.split(".").pop();
 
     if(siteNameFromUrl !== ""){

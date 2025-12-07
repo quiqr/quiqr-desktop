@@ -74,7 +74,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
       keyPairBusy: true
     });
 
-    let promise = service.api.createKeyPairGithub();
+    const promise = service.api.createKeyPairGithub();
 
     promise.then((resp)=>{
       this.updatePubData({deployPrivateKey: resp.keyPair[0], deployPublicKey: resp.keyPair[1] },
@@ -107,7 +107,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
   }
 
   updatePubData(newData: Partial<SysgitPublishConf>, callback: (() => void) | null = null){
-    let pubData = {...this.state.pubData, ...newData};
+    const pubData = {...this.state.pubData, ...newData};
     this.setState({pubData: pubData}, ()=>{
       this.props.setData(pubData);
 

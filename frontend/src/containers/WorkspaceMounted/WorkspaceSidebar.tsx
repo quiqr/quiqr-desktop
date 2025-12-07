@@ -106,7 +106,7 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
   }
 
   refresh = ()=>{
-    let {siteKey, workspaceKey } = this.props;
+    const {siteKey, workspaceKey } = this.props;
     if(siteKey && workspaceKey){
       service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
         if(this._ismounted){
@@ -245,9 +245,9 @@ class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceS
         menusCollapsed={this.state.menusCollapsed}
         onMenuExpandToggle={(menuKey)=>{
 
-          let collapseList = this.state.menusCollapsed || [];
+          const collapseList = this.state.menusCollapsed || [];
           if(collapseList.includes(menuKey)){
-            let index = collapseList.indexOf(menuKey);
+            const index = collapseList.indexOf(menuKey);
             if (index !== -1) {
               collapseList.splice(index, 1);
             }

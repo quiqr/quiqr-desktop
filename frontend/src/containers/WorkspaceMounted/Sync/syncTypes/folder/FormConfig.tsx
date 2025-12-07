@@ -44,7 +44,7 @@ class FormConfig extends React.Component<FormConfigProps, FormConfigState> {
   }
 
   updatePubData(newData: Partial<FolderPublishConf>, callback: (() => void) | null = null) {
-    let pubData = { ...this.state.pubData, ...newData };
+    const pubData = { ...this.state.pubData, ...newData };
     this.setState({ pubData: pubData }, () => {
       this.props.setData(pubData);
 

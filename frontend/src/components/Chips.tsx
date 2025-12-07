@@ -115,7 +115,7 @@ const Chips = ({ field, fullWidth, items, onPushItem, onRequestDelete, onSwap, s
           }
 
           if(index === dragToIndex){
-            let movedChip = renderDecoyChip(index, items[dragFromIndex], 1);
+            const movedChip = renderDecoyChip(index, items[dragFromIndex], 1);
             let beforeChip, afterChip;
             if(dragFromIndex < dragToIndex)
               afterChip = movedChip;

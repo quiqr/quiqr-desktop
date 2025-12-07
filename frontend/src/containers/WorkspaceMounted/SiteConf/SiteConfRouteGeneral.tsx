@@ -68,7 +68,7 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
 
   checkSiteInProps(){
 
-    var { siteKey, workspaceKey } = this.props;
+    const { siteKey, workspaceKey } = this.props;
 
     this.setState({
       siteKey: this.props.siteKey

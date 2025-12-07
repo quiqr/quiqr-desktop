@@ -63,7 +63,7 @@ class CopyItemKeyDialog extends React.Component<CopyItemKeyDialogProps, CopyItem
   }
 
   validate(){
-    let value = this.state.value||'';
+    const value = this.state.value||'';
 
     if(this.props.viewKey === 'createItem'){
       return value.length>0;
@@ -74,7 +74,7 @@ class CopyItemKeyDialog extends React.Component<CopyItemKeyDialogProps, CopyItem
   }
 
   handleChange(e){
-    let key  = e.target.value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const key  = e.target.value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     this.setState({
       value: e.target.value,
       titleToKey: key
@@ -82,8 +82,8 @@ class CopyItemKeyDialog extends React.Component<CopyItemKeyDialogProps, CopyItem
   }
 
   render(){
-    let { busy, confirmLabel } = this.props;
-    let valid = this.validate();
+    const { busy, confirmLabel } = this.props;
+    const valid = this.validate();
     let errorText;
     errorText = 'Allowed characters: alphanumeric, dash, underline and slash.';
     return (

@@ -51,7 +51,7 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
 
     service.registerListener(this);
 
-    var { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
     Promise.all([
       service.api.getWorkspaceDetails(siteKey, workspaceKey),
@@ -67,13 +67,13 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
   }
 
   handleOpenInEditor(){
-    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
     service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
   }
 
   handleSave(context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }){
-    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-    let promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
+    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+    const promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
     promise.then(function(updatedValues){
       context.accept(updatedValues);
     }, function(){
@@ -87,8 +87,8 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
       return '';
     }
 
-    let ItemPathElements = this.props.collectionItemKey.split("/");
-    let pageItem = ItemPathElements.pop();
+    const ItemPathElements = this.props.collectionItemKey.split("/");
+    const pageItem = ItemPathElements.pop();
     let path;
     if(pageItem !=='index.md'){
       ItemPathElements.push(pageItem.split('.').slice(0, -1).join('.'));
@@ -98,7 +98,7 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
       path = collection.previewUrlBase + "/" + ItemPathElements.join("/");
     }
     else{
-      let CollectionPath = collection.folder.split("/")
+      const CollectionPath = collection.folder.split("/")
       CollectionPath.shift();
       path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
     }
@@ -108,7 +108,7 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
     if(Array.from(finalpath)[0]!=="/"){
       finalpath = "/"+finalpath;
     }
-    let url = 'http://localhost:13131'+finalpath;
+    const url = 'http://localhost:13131'+finalpath;
 
     return url;
   }
@@ -119,18 +119,18 @@ class CollectionItem extends React.Component<CollectionItemProps, CollectionItem
       return <Spinner />;
     }
 
-    let { selectedWorkspaceDetails} = this.state;
-    let { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+    const { selectedWorkspaceDetails} = this.state;
+    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
 
-    let collection = selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
+    const collection = selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
     if(collection==null)return null;
 
-    let fields = collection.fields.slice(0);
+    const fields = collection.fields.slice(0);
     if(!collection.build_actions) collection.build_actions = [];
-    let buildActions = collection.build_actions.slice(0);
-    let values =  Object.assign({}, this.state.collectionItemValues)
+    const buildActions = collection.build_actions.slice(0);
+    const values =  Object.assign({}, this.state.collectionItemValues)
 
-    let pageUrl = this.generatePageUrl(collection);
+    const pageUrl = this.generatePageUrl(collection);
 
     return(<SukohForm
     debug={false}

@@ -59,7 +59,7 @@ class Single extends React.Component<SingleProps, SingleState>{
     service.registerListener(this);
 
     //fileOverride is used for some dynamic dogFood editors
-    var { siteKey, workspaceKey, singleKey, fileOverride } = this.props;
+    const { siteKey, workspaceKey, singleKey, fileOverride } = this.props;
 
     Promise.all([
       service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride),
@@ -82,9 +82,9 @@ class Single extends React.Component<SingleProps, SingleState>{
   }
 
   handleOpenInEditor(context: { reject: (message: string) => void }){
-    var { siteKey, workspaceKey, singleKey } = this.props;
+    const { siteKey, workspaceKey, singleKey } = this.props;
 
-    let promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
+    const promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
     promise.then(function(){
       // TODO should watch file for changes and if so reload
     }, function(){
@@ -94,9 +94,9 @@ class Single extends React.Component<SingleProps, SingleState>{
 
   handleSave(context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }){
 
-    var { siteKey, workspaceKey, singleKey } = this.props;
+    const { siteKey, workspaceKey, singleKey } = this.props;
 
-    let promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
+    const promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
     promise.then(function(updatedValues){
       context.accept(updatedValues);
     }, function(){
@@ -108,7 +108,7 @@ class Single extends React.Component<SingleProps, SingleState>{
     if(this.state.showSpinner || this.state.singleValues===undefined || this.state.selectedWorkspaceDetails==null){
       return <Spinner />;
     }
-    let single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
+    const single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
     if(single==null) return null;
 
     let buildActions = []
@@ -135,7 +135,7 @@ class Single extends React.Component<SingleProps, SingleState>{
       previewUrl = 'http://localhost:13131'+finalpath;
     }
 
-    var { siteKey, workspaceKey, singleKey } = this.props;
+    const { siteKey, workspaceKey, singleKey } = this.props;
 
     return(<SukohForm
     debug={false}

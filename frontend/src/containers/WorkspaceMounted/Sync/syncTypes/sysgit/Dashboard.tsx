@@ -69,7 +69,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
 
   checkSiteInProps(){
 
-    var { siteKey, workspaceKey } = this.props;
+    const { siteKey, workspaceKey } = this.props;
 
     this.setState({
       siteKey: this.props.siteKey
@@ -80,7 +80,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
     });
 
     service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      var stateUpdate  = {};
+      const stateUpdate  = {};
       stateUpdate.siteconf = bundle.site;
 
       if(bundle.site.source){
@@ -261,10 +261,10 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
   }
 
   render(){
-    let lastStatusCheck = this.state.lastRefresh;
-    let unpushedChanges = false;
-    let remoteDiffers = true;
-    let historyArr = this.state.historyArr;
+    const lastStatusCheck = this.state.lastRefresh;
+    const unpushedChanges = false;
+    const remoteDiffers = true;
+    const historyArr = this.state.historyArr;
 
     return (
       <React.Fragment>
@@ -300,7 +300,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
             </Button>
             <Button
               onClick={()=>{
-                let filename = this.state.source.path + "/quiqr/sync_ignore.txt"
+                const filename = this.state.source.path + "/quiqr/sync_ignore.txt"
                 service.api.openFileInEditor(filename, true);
               }}
               size="small"
@@ -462,7 +462,7 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
 
           {historyArr.slice(0,this.state.resultsShowing).map((item, index)=>{
 
-            let content = (
+            const content = (
               <Paper elevation={3} key={"commit-"+index}>
                 <Box p={2}>
                   <Typography variant="h6" component="h1">

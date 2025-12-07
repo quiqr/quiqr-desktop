@@ -69,7 +69,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
   }
 
   savePublishData(inkey,data){
-    let site= this.props.site;
+    const site= this.props.site;
 
     if(!inkey){
       inkey = `publ-${Math.random()}`;
@@ -144,7 +144,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
   }
 
   render(){
-    let { open, modAction, closeText } = this.props;
+    const { open, modAction, closeText } = this.props;
     let content, serverFormLogo = null;
     let saveButtonHidden = true;
     let configDialogTitle = '';

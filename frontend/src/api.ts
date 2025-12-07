@@ -217,9 +217,9 @@ export class API {
       properties = ['multiSelections', 'openFile'];
     }
 
-    let remote= window.require('@electron/remote');
+    const remote= window.require('@electron/remote');
 
-    let openDialogOptions = {
+    const openDialogOptions = {
       title: title || 'Select Files',
       properties: properties,
       filters: [ {name:'Allowed Extensions', extensions: extensions }]
@@ -234,7 +234,7 @@ export class API {
           openDialogOptions,
         ).then((result)=>{
           if(result.filePaths){
-            let files = result.filePaths;
+            const files = result.filePaths;
             resolve(
               mainProcessBridge.request('copyFilesIntoCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files, forceFileName })
             );

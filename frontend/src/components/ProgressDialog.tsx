@@ -44,7 +44,7 @@ export default class ProgressDialog extends React.Component<ProgressDialogProps,
   }
 
   handleClose() {
-    let confObj = {
+    const confObj = {
       title: "",
       message: "",
       percent: 0,

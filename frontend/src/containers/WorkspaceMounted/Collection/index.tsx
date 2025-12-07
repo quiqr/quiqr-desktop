@@ -467,9 +467,9 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
 
   const resolveFilteredItems = React.useCallback((items: any[], filter: string) => {
     let trunked = false;
-    let dirs: Record<string, boolean> = { '': true };
+    const dirs: Record<string, boolean> = { '': true };
     let filteredItems: any[] = (items || []).filter((item) => {
-      let parts = item.label.split('/');
+      const parts = item.label.split('/');
       let c = '';
       for (let i = 0; i < parts.length - 1; i++) {
         c = c + parts[i] + '/';
@@ -483,7 +483,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
       trunked = true;
     }
     
-    let dirsArr: string[] = Object.keys(dirs);
+    const dirsArr: string[] = Object.keys(dirs);
     return { filteredItems, trunked, dirs: dirsArr };
   }, []);
 
@@ -533,11 +533,11 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
 
   const generatePageUrl = (collection) => {
 
-    let CollectionPath = collection.folder.split("/")
+    const CollectionPath = collection.folder.split("/")
     CollectionPath.shift();
 
-    let path = CollectionPath.join("/");
-    let url = 'http://localhost:13131/'+path.toLowerCase();
+    const path = CollectionPath.join("/");
+    const url = 'http://localhost:13131/'+path.toLowerCase();
 
     return url;
   }

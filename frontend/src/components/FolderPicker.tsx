@@ -32,7 +32,7 @@ export default class FolderPicker extends React.Component<FolderPickerProps, Fol
   }
 
   render(){
-    let { selectedFolder, label, outlined } = this.props;
+    const { selectedFolder, label, outlined } = this.props;
 
     if(outlined){
 

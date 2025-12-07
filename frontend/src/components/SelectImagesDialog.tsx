@@ -116,7 +116,7 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
 
           <Button startIcon={<FolderOpen />} variant="contained"  onClick={()=>{
 
-            let {formProps} = this.props;
+            const {formProps} = this.props;
 
             service.api.openFileDialogForSingleAndCollectionItem(
               formProps.siteKey,
@@ -137,8 +137,8 @@ export default class SelectImagesDialog extends React.Component<SelectImagesDial
                 this.props.imageItems.map((item, index)=>{
 
                   let filename = item.filename;
-                  let fExtention = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
-                  let fBase = filename.slice(0,(filename.lastIndexOf(".") ));
+                  const fExtention = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+                  const fBase = filename.slice(0,(filename.lastIndexOf(".") ));
 
                   if(fBase.length > 15){
                     filename = fBase.substr(0,7) + "..." + fBase.substr(-5) + "." +fExtention;

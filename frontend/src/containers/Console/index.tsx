@@ -55,7 +55,7 @@ class ConsoleOutput extends React.Component<{}, ConsoleOutputState>{
 
   render(){
 
-    let preStyle = Object.assign({}, consoleStyle.pre);
+    const preStyle = Object.assign({}, consoleStyle.pre);
 
     if(this.preElement){
       //this.preElement.scrollTop = 5000;

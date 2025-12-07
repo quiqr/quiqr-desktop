@@ -49,7 +49,7 @@ class MainProcessBridge{
     this.ipcRenderer.on('messageAsyncResponse', (event, arg) => {
 
       const { token, response } = arg;
-      let callback = this._getCallback(token);
+      const callback = this._getCallback(token);
       if(callback){
         callback(response);
       }
@@ -57,7 +57,7 @@ class MainProcessBridge{
 
     this.ipcRenderer.on('message', (sender, message) => {
       if(message.type){
-        let handlers = this._messageHandlers[message.type];
+        const handlers = this._messageHandlers[message.type];
         if(handlers){
           for(let i = 0; i < handlers.length; i++){
             handlers[i](message.data);
@@ -80,7 +80,7 @@ class MainProcessBridge{
   }
 
   removeMessageHandler(type /* : string */, handler/* : MessageHandler */){
-    let handlers = this._messageHandlers[type];
+    const handlers = this._messageHandlers[type];
     if(handlers===undefined){
       return;
     }
@@ -96,7 +96,7 @@ class MainProcessBridge{
 
   _getCallback(token /* : string */) /*: ?MessageHandler */ {
     for(let i = 0; i < this.pendingCallbacks.length;i ++){
-      let callback = this.pendingCallbacks[i];
+      const callback = this.pendingCallbacks[i];
       if(callback.token===token)
         return callback.handler;
     }
@@ -105,7 +105,7 @@ class MainProcessBridge{
 
   _eraseCallback(token /* : string */){
     for(let i = 0; i < this.pendingCallbacks.length;i ++){
-      let callback = this.pendingCallbacks[i];
+      const callback = this.pendingCallbacks[i];
       if(callback.token===token){
         this.pendingCallbacks.splice(i, 1);
         return true;
@@ -120,7 +120,7 @@ class MainProcessBridge{
 
   request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
     //console.log(method);
-    let promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
+    const promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
       axios
         .post("http://localhost:5150/api/"+method, {
           data: data,
@@ -155,11 +155,11 @@ class MainProcessBridge{
   requestOLD( method, data, opts = {timeout:10000}
   ){
     let _reject;
-    let token = this._createToken();
-    let promise = new Promise(function(resolve, reject){
+    const token = this._createToken();
+    const promise = new Promise(function(resolve, reject){
       _reject = reject;
       this.ipcRenderer.send('message', {data, token, handler:method});
-      let timeoutId = setTimeout(function(){
+      const timeoutId = setTimeout(function(){
         if(this._eraseCallback(token)){
           reject('timeout:'+method);
         }

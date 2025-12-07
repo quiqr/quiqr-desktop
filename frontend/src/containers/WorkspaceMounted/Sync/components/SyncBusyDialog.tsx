@@ -40,7 +40,7 @@ class SyncBusyDialog extends React.Component<SyncBusyDialogProps, SyncBusyDialog
   }
 
   render(){
-    let { open } = this.props;
+    const { open } = this.props;
 
     return (
       <Dialog

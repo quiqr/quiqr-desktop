@@ -50,8 +50,8 @@ const BundleManagerHeader: React.FC<BundleManagerHeaderProps> = React.memo(
       label = label.substr(7, label.length - 7);
     }
     let filename = label;
-    let fExtention = filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-    let fBase = filename.slice(0, filename.lastIndexOf("."));
+    const fExtention = filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
+    const fBase = filename.slice(0, filename.lastIndexOf("."));
 
     if (fBase.length > 15) {
       filename = fBase.substr(0, 7) + "..." + fBase.substr(-5) + "." + fExtention;

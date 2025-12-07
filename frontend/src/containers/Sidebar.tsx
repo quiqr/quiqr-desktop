@@ -122,7 +122,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
 
   renderNestedItems(item: SidebarMenuItem, index: number){
     let initOpen: boolean | undefined;
-    let childItems = item.childItems!.map((itemChild, childIndex)=>{
+    const childItems = item.childItems!.map((itemChild, childIndex)=>{
 
       if(itemChild.selected){
         initOpen = true;
@@ -201,7 +201,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState>{
     if(!menusCollapsed){
       menusCollapsed = [];
     }
-    let menusNodes = menus.map((menu,i)=>{
+    const menusNodes = menus.map((menu,i)=>{
       return (
         <React.Fragment key={i+menu.key||i+menu.title}>
           { menu.items ? (

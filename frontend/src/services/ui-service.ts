@@ -24,7 +24,7 @@ class SnackMessageService extends BaseService<typeof uiServiceSchemas> {
         if(this._currentSnackMessage!==undefined) //well have to wait until someone clear the _currentSnackMessage
             return false;
 
-        let snackMessage = this._snackMessageQueue.shift();
+        const snackMessage = this._snackMessageQueue.shift();
         if(snackMessage){
             this._currentSnackMessage = snackMessage;
             return true;
@@ -98,7 +98,7 @@ class ConsoleService extends BaseService<typeof uiServiceSchemas> {
             clearTimeout(this._consoleTimeout);
 
         this._consoleTimeout = setTimeout(()=>{
-            let max = 100;
+            const max = 100;
             this._consoleMessages = this._consoleMessages.concat(this._consoleBuffer);
             this._consoleBuffer = [];
             if(this._consoleMessages.length>max){
@@ -119,7 +119,7 @@ class ConsoleService extends BaseService<typeof uiServiceSchemas> {
             clearTimeout(this._consoleTimeout);
 
         this._consoleTimeout = setTimeout(()=>{
-            let max = 100;
+            const max = 100;
             this._consoleMessages = this._consoleMessages.concat(this._consoleBuffer);
             this._consoleBuffer = [];
             if(this._consoleMessages.length>max){
@@ -146,8 +146,8 @@ class ConsoleService extends BaseService<typeof uiServiceSchemas> {
     */
 }
 
-let consoleService = new ConsoleService();
-let snackMessageService = new SnackMessageService();
+const consoleService = new ConsoleService();
+const snackMessageService = new SnackMessageService();
 
 export {
     consoleService,
