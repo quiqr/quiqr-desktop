@@ -1,5 +1,14 @@
-import { FieldBase, HugoConfigParsed, PreviewConfig, QuiqrModelParsed } from "../components/HoForm";
-import { AccordionField } from "../components/SukohForm/components/AccordionDynamic";
+import type { AccordionField } from "@quiqr/types";
+
+// Types previously defined in HoForm/types.ts
+export type PreviewConfig = { enable: boolean; preview_url: string };
+export interface HugoConfigParsed {
+  theme?: string;
+  title?: string;
+}
+export interface QuiqrModelParsed {
+  hugover?: string;
+}
 
 export const hasOpenAiApiKey = (config: unknown): config is { openAiApiKey: string } => {
   return Boolean(typeof config === "object" && "openAiApiKey" in config && typeof config.openAiApiKey === "string");

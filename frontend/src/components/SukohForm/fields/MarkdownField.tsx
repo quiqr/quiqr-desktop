@@ -23,7 +23,6 @@ import Tip from '../../Tip';
 import AiAssist from '../../AiAssist';
 import { useField } from '../useField';
 import type { MarkdownField as MarkdownFieldConfig } from '@quiqr/types';
-import type { MarkdownDynamicField } from '../components/MarkdownDynamic';
 
 interface Props {
   compositeKey: string;
@@ -66,7 +65,7 @@ function MarkdownField({ compositeKey }: Props) {
           editorRef.current?.setMarkdown(text);
           setValue(text);
         }}
-        inField={field as unknown as MarkdownDynamicField}
+        inField={config}
         inValue={value ?? ''}
         pageUrl={meta.pageUrl}
       />

@@ -17,13 +17,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import OpenAI from "openai";
 import { hasOpenAiApiKey } from "../utils/type-guards";
-import { EasyMarkdownDynamicField } from "./SukohForm/components/EasyMarkDownDynamic";
-import { TextFieldDynamicField } from "./SukohForm/components/TextFieldDynamic";
-import MarkdownDynamic, { MarkdownDynamicField } from "./SukohForm/components/MarkdownDynamic";
+import type { StringField, EasymdeField, MarkdownField } from "@quiqr/types";
+
+// Field type that can be used with AI assist - all have title property
+type AiAssistField = StringField | EasymdeField | MarkdownField;
 
 interface AiAssistProps {
   inValue: string;
-  inField: TextFieldDynamicField | EasyMarkdownDynamicField | MarkdownDynamicField;
+  inField: AiAssistField;
   pageUrl: string;
   handleSetAiText: (text: string) => void;
 }
@@ -165,7 +166,7 @@ class AiAssist extends React.Component<AiAssistProps, AiAssistState> {
                       })
                       .catch((response) => {
                         this.setState({ webpage: "" });
-                        //console.log(response);
+                        console.log(response);
                       });
                   }
                 }}

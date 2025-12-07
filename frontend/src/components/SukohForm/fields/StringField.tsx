@@ -5,7 +5,6 @@ import Tip from '../../Tip';
 import AiAssist from '../../AiAssist';
 import { useField } from '../useField';
 import type { StringField as StringFieldConfig } from '@quiqr/types';
-import type { TextFieldDynamicField } from '../components/TextFieldDynamic';
 
 interface Props {
   compositeKey: string;
@@ -59,7 +58,7 @@ function StringField({ compositeKey }: Props) {
           setLocalValue(text);
           setValue(text);
         }}
-        inField={field as unknown as TextFieldDynamicField}
+        inField={config}
         inValue={localValue}
         pageUrl={meta.pageUrl}
       />
