@@ -7,7 +7,6 @@ import {
   BoldItalicUnderlineToggles,
   BlockTypeSelect,
   CreateLink,
-  InsertImage,
   ListsToggle,
   Separator,
   toolbarPlugin,
@@ -16,7 +15,6 @@ import {
   linkPlugin,
   quotePlugin,
   markdownShortcutPlugin,
-  imagePlugin,
 } from '@mdxeditor/editor';
 import FormItemWrapper from '../components/shared/FormItemWrapper';
 import Tip from '../../Tip';
@@ -104,7 +102,6 @@ function MarkdownField({ compositeKey }: Props) {
                 listsPlugin(),
                 linkPlugin(),
                 quotePlugin(),
-                imagePlugin(),
                 markdownShortcutPlugin(),
                 toolbarPlugin({
                   toolbarContents: () => (
@@ -118,7 +115,6 @@ function MarkdownField({ compositeKey }: Props) {
                       <ListsToggle />
                       <Separator />
                       <CreateLink />
-                      <InsertImage />
                     </>
                   ),
                 }),
