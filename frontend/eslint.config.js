@@ -4,6 +4,9 @@ import reactYouMightNotNeedAnEffect from 'eslint-plugin-react-you-might-not-need
 import globals from 'globals';
 
 export default [
+  {
+    ignores: ['**/node_modules', '**/dist', '**/build'],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
