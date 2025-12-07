@@ -271,7 +271,7 @@ function BundleManagerField({ compositeKey }: Props) {
       {/* Add button (top position) */}
       {showAddButton && config.addButtonLocationTop && (
         <Button
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, display: 'inline-flex', width: 'fit-content' }}
           startIcon={<FolderOpen />}
           variant="contained"
           onClick={handleAddFile}
@@ -310,7 +310,7 @@ function BundleManagerField({ compositeKey }: Props) {
       {/* Add button (bottom position) */}
       {showAddButton && !config.addButtonLocationTop && (
         <Button
-          sx={{ mb: 2, mt: visibleItems.length ? 0 : undefined }}
+          sx={{ mb: 2, mt: visibleItems.length ? 0 : undefined, display: 'inline-flex', width: 'fit-content' }}
           startIcon={<FolderOpen />}
           variant="contained"
           onClick={handleAddFile}
