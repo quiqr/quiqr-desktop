@@ -199,7 +199,7 @@ export const apiSchemas = {
   hugosite_dir_show: siteInventorySchema,
 
   // Form state
-  getDynFormFields: dynFormFieldsSchema,
+  getDynFormFields: dynFormFieldsSchema.nullable().or(z.string()),
   shouldReloadForm: z.boolean(),
   getCurrentFormAccordionIndex: z.string(),
   setCurrentFormAccordionIndex: z.boolean(),

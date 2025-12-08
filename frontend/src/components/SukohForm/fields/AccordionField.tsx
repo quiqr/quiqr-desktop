@@ -132,9 +132,9 @@ function AccordionField({ compositeKey }: Props) {
         const dynFormObjectRoot = config.dynFormObjectRoot ?? 'dynamics';
 
         try {
-          const extraFields = await service.api.getDynFormFields(dynFormObjectRoot, { key: searchKey, val: searchVal }) as DynFormFields;
+          const extraFields = await service.api.getDynFormFields(dynFormObjectRoot, { key: searchKey, val: searchVal }) as DynFormFields | string | null;
 
-          if (extraFields.fields && extraFields.fields.length > 0) {
+          if (extraFields && typeof extraFields === 'object' && extraFields.fields && extraFields.fields.length > 0) {
             setShouldSaveAccordionState(true);
 
             // Cast fields to ExtendedField[] for processing
