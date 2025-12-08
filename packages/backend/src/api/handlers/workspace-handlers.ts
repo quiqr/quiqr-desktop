@@ -280,18 +280,25 @@ export function createGetPreviewCheckConfigurationHandler(container: AppContaine
 }
 
 /**
- * Parse a file to an object
+ * Parse a file to an object (file path is relative to current workspace)
  */
 export function createParseFileToObjectHandler(container: AppContainer) {
   return async ({ file }: { file: string }) => {
+    const { state } = container;
+
+    // Resolve file path relative to current workspace if not absolute
+    const filePath = path.isAbsolute(file)
+      ? file
+      : path.join(state.currentSitePath || process.cwd(), file);
+
     // Read the file contents
-    const fileContent = await fs.readFile(file, 'utf-8');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
 
     // Resolve the format provider based on file extension
-    const formatProvider = container.formatResolver.resolveForFilePath(file);
+    const formatProvider = container.formatResolver.resolveForFilePath(filePath);
 
     if (!formatProvider) {
-      throw new Error(`Unsupported file format for file: ${file}`);
+      throw new Error(`Unsupported file format for file: ${filePath}`);
     }
 
     // Parse the file content
@@ -302,7 +309,7 @@ export function createParseFileToObjectHandler(container: AppContainer) {
 }
 
 /**
- * Run a glob pattern sync
+ * Run a glob pattern sync relative to the current workspace
  */
 export function createGlobSyncHandler(container: AppContainer) {
   return async ({
@@ -312,8 +319,13 @@ export function createGlobSyncHandler(container: AppContainer) {
     pattern: string;
     options?: any;
   }) => {
-    // Run glob pattern synchronously
-    const matches = globSync(pattern, options || {});
+    const { state } = container;
+
+    // Use the current workspace path as the cwd if available
+    const cwd = state.currentSitePath || process.cwd();
+
+    // Run glob pattern with workspace as cwd
+    const matches = globSync(pattern, { ...options, cwd });
 
     return matches;
   };
