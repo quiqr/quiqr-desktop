@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import { ChangeEvent, useEffect, useState } from "react";
+import { openExternal } from "../utils/platform";
 
 interface SplashDialogProps {
   showSplashAtStartup: boolean;
@@ -46,8 +47,8 @@ const SplashDialog = ({ showSplashAtStartup, open, onClose, onChangeSplashCheck 
             style={{ margin: "5px" }}
             color='primary'
             variant='contained'
-            onClick={() => {
-              window.require("electron").shell.openExternal("https://book.quiqr.org/docs/10-getting-started/10.quick-start-video/");
+            onClick={async () => {
+              await openExternal("https://book.quiqr.org/docs/10-getting-started/10.quick-start-video/");
             }}>
             Quickstart Movie
           </Button>
@@ -56,9 +57,9 @@ const SplashDialog = ({ showSplashAtStartup, open, onClose, onChangeSplashCheck 
             style={{ margin: "5px" }}
             color='primary'
             variant='contained'
-            onClick={() => {
+            onClick={async () => {
               onClose();
-              window.require("electron").shell.openExternal("https://book.quiqr.org/docs/10-getting-started/");
+              await openExternal("https://book.quiqr.org/docs/10-getting-started/");
             }}>
             Quickstart Guide
           </Button>

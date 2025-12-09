@@ -26,6 +26,7 @@ import Meta                    from './Meta'
 import {snackMessageService}   from '../../../../../services/ui-service';
 import service                 from '../../../../../services/service';
 import { GithubPublishConf }   from '../../../../../../types';
+import { openExternal } from '../../../../../utils/platform';
 
 interface HistoryItem {
   message: string;
@@ -295,8 +296,8 @@ export class Dashboard extends React.Component<DashboardProps, DashboardState>{
             <Typography>{Meta.sidebarLabel(this.props.publishConf)}</Typography>
 
             <Link component="button" variant="body2"
-              onClick={()=>{
-                window.require('electron').shell.openExternal(Meta.repoAdminUrl(this.props.publishConf));
+              onClick={async ()=>{
+                await openExternal(Meta.repoAdminUrl(this.props.publishConf));
               }}
             >
             {Meta.repoAdminUrl(this.props.publishConf)}

@@ -21,6 +21,7 @@ import Box from '@mui/material/Box';
 import { SiteConfig } from '../../../types';
 import { useHugoDownload } from '../../hooks/useHugoDownload';
 import ProgressDialog from '../../components/ProgressDialog';
+import { openExternal } from '../../utils/platform';
 
 interface WorkspaceConfig {
   serve?: Array<{
@@ -154,12 +155,11 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     setForceShowMenu(!forceShowMenu);
   };
 
-  const openPreviewInBrowser = () => {
-    service.api.getCurrentBaseUrl().then((path) => {
-      if (typeof path === 'string') {
-        window.require('electron').shell.openExternal('http://localhost:13131' + path);
-      }
-    });
+  const openPreviewInBrowser = async () => {
+    const path = await service.api.getCurrentBaseUrl();
+    if (typeof path === 'string') {
+      await openExternal('http://localhost:13131' + path);
+    }
   };
 
   const showPreviewSiteButton = () => {

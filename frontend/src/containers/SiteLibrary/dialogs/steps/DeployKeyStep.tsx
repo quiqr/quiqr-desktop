@@ -14,6 +14,7 @@ import Alert from "@mui/material/Alert";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import service from "../../../../services/service";
+import { copyToClipboard as copy } from "../../../../utils/platform";
 
 interface DeployKeyStepProps {
   deployPublicKey: string;
@@ -44,9 +45,8 @@ const DeployKeyStep = ({
     }
   };
 
-  const copyToClipboard = () => {
-    const { clipboard } = window.require("electron");
-    clipboard.writeText(localPublicKey);
+  const copyToClipboard = async () => {
+    await copy(localPublicKey);
   };
 
   // Generate key pair on first render if not already present

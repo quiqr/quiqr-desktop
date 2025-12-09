@@ -17,6 +17,7 @@ import LinearProgress      from '@mui/material/LinearProgress';
 import Select              from '@mui/material/Select';
 import Paper               from '@mui/material/Paper';
 import { GithubPublishConf } from '../../../../../../types';
+import { copyToClipboard } from '../../../../../utils/platform';
 
 interface PublishConfig {
   key: string;
@@ -412,11 +413,8 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
               </FormControl>
             </React.Fragment>
           )}
-          <Button sx={{ m: 1, mt: 2 }} disabled={this.state.keyPairBusy} onClick={()=>{
-
-            const {clipboard} = window.require('electron')
-            clipboard.writeText(this.state.pubData.deployPublicKey)
-
+          <Button sx={{ m: 1, mt: 2 }} disabled={this.state.keyPairBusy} onClick={async ()=>{
+            await copyToClipboard(this.state.pubData.deployPublicKey);
           }} variant="contained">Copy</Button>
           <Button sx={{ m: 1, mt: 2 }} onClick={()=>{this.getKeyPair()}} disabled={this.state.keyPairBusy} color="secondary" variant="contained">Re-generate</Button>
 
