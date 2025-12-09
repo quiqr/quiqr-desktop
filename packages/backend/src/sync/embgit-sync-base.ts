@@ -8,7 +8,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import type { PublConf } from '@quiqr/types';
-import type { SyncService, SyncServiceDependencies } from './sync-factory.js';
+import type { SyncService, SyncServiceDependencies, SyncProgressCallback } from './sync-factory.js';
 import type { Embgit } from '../embgit/embgit.js';
 import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
@@ -64,6 +64,7 @@ export abstract class EmbgitSyncBase implements SyncService {
   protected outputConsole: OutputConsole;
   protected windowAdapter: WindowAdapter;
   protected configurationProvider: ConfigurationDataProvider;
+  protected progressCallback?: SyncProgressCallback;
   protected config: BaseSyncConfig;
   protected siteKey: string;
   protected fromPath: string | undefined;
@@ -80,6 +81,7 @@ export abstract class EmbgitSyncBase implements SyncService {
     this.outputConsole = dependencies.outputConsole;
     this.windowAdapter = dependencies.windowAdapter;
     this.configurationProvider = dependencies.configurationProvider;
+    this.progressCallback = dependencies.progressCallback;
     this.fromPath = this.pathHelper.getLastBuildDir();
   }
 
@@ -621,9 +623,13 @@ jobs:
   }
 
   /**
-   * Send progress update to renderer
+   * Send progress update via SSE callback or fall back to window adapter
    */
   protected sendProgress(message: string, progress: number): void {
-    this.windowAdapter.sendToRenderer('updateProgress', { message, progress });
+    if (this.progressCallback) {
+      this.progressCallback(message, progress);
+    } else {
+      this.windowAdapter.sendToRenderer('updateProgress', { message, progress });
+    }
   }
 }

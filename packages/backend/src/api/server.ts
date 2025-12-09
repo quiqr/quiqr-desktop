@@ -115,6 +115,112 @@ export function createServer(
     }
   );
 
+  // SSE route for sync publish progress streaming
+  app.post(
+    '/api/sync/publish/stream',
+    async (req: Request, res: Response) => {
+      const { siteKey, publishConf } = req.body;
+
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+
+      try {
+        // Create progress callback that writes to SSE stream
+        const progressCallback = (message: string, progress: number) => {
+          res.write(`data: ${JSON.stringify({ message, progress, complete: false })}\n\n`);
+        };
+
+        // Get publisher with progress callback
+        const action = publishConf.type === 'folder' ? 'pushToRemote' : 'pushWithSoftMerge';
+        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, progressCallback);
+
+        // Execute sync operation
+        const result = await publisher.actionDispatcher(action);
+
+        // Send completion
+        res.write(`data: ${JSON.stringify({ message: 'Sync complete', progress: 100, complete: true, result })}\n\n`);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        res.write(`data: ${JSON.stringify({ message: errorMessage, progress: 0, complete: false, error: errorMessage })}\n\n`);
+      }
+
+      res.end();
+    }
+  );
+
+  // SSE route for sync merge/pull progress streaming
+  app.post(
+    '/api/sync/merge/stream',
+    async (req: Request, res: Response) => {
+      const { siteKey, publishConf } = req.body;
+
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+
+      try {
+        // Create progress callback that writes to SSE stream
+        const progressCallback = (message: string, progress: number) => {
+          res.write(`data: ${JSON.stringify({ message, progress, complete: false })}\n\n`);
+        };
+
+        // Get publisher with progress callback
+        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, progressCallback);
+
+        // Execute sync operation
+        const result = await publisher.actionDispatcher('pullFromRemote');
+
+        // Send completion
+        res.write(`data: ${JSON.stringify({ message: 'Merge complete', progress: 100, complete: true, result })}\n\n`);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        res.write(`data: ${JSON.stringify({ message: errorMessage, progress: 0, complete: false, error: errorMessage })}\n\n`);
+      }
+
+      res.end();
+    }
+  );
+
+  // SSE route for generic sync action progress streaming
+  app.post(
+    '/api/sync/action/stream',
+    async (req: Request, res: Response) => {
+      const { siteKey, publishConf, action, actionParameters } = req.body;
+
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+
+      try {
+        // Create progress callback that writes to SSE stream
+        const progressCallback = (message: string, progress: number) => {
+          res.write(`data: ${JSON.stringify({ message, progress, complete: false })}\n\n`);
+        };
+
+        // Get publisher with progress callback
+        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, progressCallback);
+
+        // Execute sync operation
+        const result = await publisher.actionDispatcher(action, actionParameters);
+
+        // Send completion
+        res.write(`data: ${JSON.stringify({ message: 'Action complete', progress: 100, complete: true, result })}\n\n`);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        res.write(`data: ${JSON.stringify({ message: errorMessage, progress: 0, complete: false, error: errorMessage })}\n\n`);
+      }
+
+      res.end();
+    }
+  );
+
   // Error handling middleware (must be last)
   app.use(errorHandler);
 

@@ -14,6 +14,7 @@ import TableContainer        from '@mui/material/TableContainer';
 import Card                  from '@mui/material/Card';
 import CardContent           from '@mui/material/CardContent';
 import CardMedia             from '@mui/material/CardMedia';
+import { openExternal } from '../../../../utils/platform';
 
 const regexpHttp      = new RegExp('^http(s?)://', 'i')
 
@@ -274,8 +275,8 @@ class FormPartialNewFromHugoTheme extends React.Component<FormPartialNewFromHugo
                           </Typography>
                         </TableCell>
                         <TableCell align="left">{(this.state.newTypeHugoThemeBusy ? <CircularProgress size={20} /> : null)} {this.state.newHugoThemeName}
-                          {(this.state.newHugoThemeHomepage? <Button onClick={()=>{window.require('electron').shell.openExternal(this.state.newHugoThemeHomepage)}}>Homepage</Button> : null) }
-                          {(this.state.newHugoThemeDemopage? <Button onClick={()=>{window.require('electron').shell.openExternal(this.state.newHugoThemeDemopage)}}>Demo</Button> : null) }
+                          {(this.state.newHugoThemeHomepage? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeHomepage!)}}>Homepage</Button> : null) }
+                          {(this.state.newHugoThemeDemopage? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeDemopage!)}}>Demo</Button> : null) }
                         </TableCell>
                       </TableRow>
 
@@ -294,7 +295,7 @@ class FormPartialNewFromHugoTheme extends React.Component<FormPartialNewFromHugo
                             Author
                           </Typography>
                         </TableCell>
-                        <TableCell align="left">{(this.state.newHugoThemeAuthorHomepage? <Button onClick={()=>{window.require('electron').shell.openExternal(this.state.newHugoThemeAuthorHomepage)}}>{this.state.newHugoThemeAuthor}</Button> : this.state.newHugoThemeAuthor) }</TableCell>
+                        <TableCell align="left">{(this.state.newHugoThemeAuthorHomepage? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeAuthorHomepage!)}}>{this.state.newHugoThemeAuthor}</Button> : this.state.newHugoThemeAuthor) }</TableCell>
                       </TableRow>
 
                       <TableRow>
@@ -303,7 +304,7 @@ class FormPartialNewFromHugoTheme extends React.Component<FormPartialNewFromHugo
                             Licence
                           </Typography>
                         </TableCell>
-                        <TableCell align="left">{(this.state.newHugoThemeLicenseLink? <Button onClick={()=>{window.require('electron').shell.openExternal(this.state.newHugoThemeLicenseLink)}}>{this.state.newHugoThemeLicense}</Button> : this.state.newHugoThemeLicense) }</TableCell>
+                        <TableCell align="left">{(this.state.newHugoThemeLicenseLink? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeLicenseLink!)}}>{this.state.newHugoThemeLicense}</Button> : this.state.newHugoThemeLicense) }</TableCell>
                       </TableRow>
 
                       <TableRow>

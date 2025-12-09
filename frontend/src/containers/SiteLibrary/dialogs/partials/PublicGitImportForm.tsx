@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useForm } from "react-hook-form";
 import service from "../../../../services/service";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -19,11 +20,53 @@ type RepoInfo = {
   quiqrForms: string;
 };
 
+const emptyRepoInfo: RepoInfo = {
+  provider: "",
+  screenshot: null,
+  hugoTheme: "",
+  quiqrModel: "",
+  quiqrForms: "",
+};
+
+type FormValues = {
+  gitUrl: string;
+};
+
 export type PublicGitImportFormProps = {
   importSiteURL?: string;
   onValidationDone: (data: GitValidationResult) => void;
   onSetName: (name: string) => void;
   onSetVersion: (version?: string) => void;
+};
+
+const detectProvider = (url: string): string => {
+  if (REGEXP_GITHUB.test(url)) return "GitHub";
+  if (REGEXP_GITLAB.test(url)) return "GitLab";
+  if (REGEXP_SOURCEHUT.test(url)) return "SourceHut";
+  return "Unknown";
+};
+
+const extractSiteName = (url: string): string => {
+  const urlParts = url.split("/");
+  let siteName = urlParts.pop() || urlParts.pop() || "";
+  if (siteName.includes(".")) {
+    siteName = siteName.split(".").pop() || siteName;
+  }
+  return siteName;
+};
+
+type ValidationState = {
+  isValidating: boolean;
+  apiError: string;
+  validatedUrl: string;
+  repoInfo: RepoInfo;
+};
+
+const initialValidationState: ValidationState = {
+  isValidating: false,
+  apiError: "",
+  validatedUrl: "",
+  repoInfo: emptyRepoInfo,
 };
 
 const PublicGitImportForm = ({
@@ -32,65 +75,58 @@ const PublicGitImportForm = ({
   onSetName,
   onSetVersion,
 }: PublicGitImportFormProps) => {
-  const [gitUrl, setGitUrl] = useState(importSiteURL ?? "");
-  const [isValidating, setIsValidating] = useState(false);
-  const [validationError, setValidationError] = useState("");
-  // Initialize based on whether we have a valid initial URL
-  const [isReadyForValidation, setIsReadyForValidation] = useState(
-    () => !!importSiteURL && REGEXP_HTTP.test(importSiteURL)
-  );
-  const [validatedUrl, setValidatedUrl] = useState("");
-  const [repoInfo, setRepoInfo] = useState<RepoInfo>({
-    provider: "",
-    screenshot: null,
-    hugoTheme: "",
-    quiqrModel: "",
-    quiqrForms: "",
+  // Store callbacks in ref to avoid dependency issues
+  const callbacksRef = useRef({ onValidationDone, onSetName, onSetVersion });
+  useEffect(() => {
+    callbacksRef.current = { onValidationDone, onSetName, onSetVersion };
   });
 
-  const preValidateUrl = (url: string): boolean => {
-    if (!REGEXP_HTTP.test(url)) {
-      setValidationError("URL is invalid. Currently only http:// or https:// are supported.");
-      setIsReadyForValidation(false);
-      return false;
+  const { register, watch, reset } = useForm<FormValues>({
+    defaultValues: {
+      gitUrl: importSiteURL ?? "",
+    },
+  });
+
+  const gitUrl = watch("gitUrl");
+
+  // Combined validation state - async data from API
+  const [validation, setValidation] = useState<ValidationState>(initialValidationState);
+
+  // Track if initial URL was already validated to avoid duplicate validation
+  const initialUrlValidatedRef = useRef(false);
+  const prevImportUrlRef = useRef(importSiteURL);
+
+  // Derive pre-validation error (computed, not stored)
+  const preValidationError = useMemo(() => {
+    if (!gitUrl) return "";
+    if (!REGEXP_HTTP.test(gitUrl)) {
+      return "URL is invalid. Currently only http:// or https:// are supported.";
     }
-    setValidationError("");
-    setIsReadyForValidation(true);
-    return true;
-  };
+    return "";
+  }, [gitUrl]);
 
-  const detectProvider = (url: string): string => {
-    if (REGEXP_GITHUB.test(url)) return "GitHub";
-    if (REGEXP_GITLAB.test(url)) return "GitLab";
-    if (REGEXP_SOURCEHUT.test(url)) return "SourceHut";
-    return "Unknown";
-  };
+  // Combined error for display - API error takes precedence if URL hasn't changed
+  const displayError = gitUrl === validation.validatedUrl
+    ? validation.apiError
+    : (validation.apiError || preValidationError);
 
-  const extractSiteName = (url: string): string => {
-    const urlParts = url.split("/");
-    let siteName = urlParts.pop() || urlParts.pop() || "";
-    if (siteName.includes(".")) {
-      siteName = siteName.split(".").pop() || siteName;
-    }
-    return siteName;
-  };
+  // Derive if ready for validation (computed, not stored)
+  const isReadyForValidation = useMemo(() => {
+    return !!gitUrl && !preValidationError && gitUrl !== validation.validatedUrl;
+  }, [gitUrl, preValidationError, validation.validatedUrl]);
 
-  const validateUrl = (url: string) => {
+  const validateUrl = useCallback((url: string) => {
+    const { onSetVersion, onSetName, onValidationDone } = callbacksRef.current;
+
     onSetVersion();
-    setRepoInfo({
-      provider: "",
-      screenshot: null,
-      hugoTheme: "",
-      quiqrModel: "",
-      quiqrForms: "",
+    setValidation({
+      isValidating: true,
+      apiError: "",
+      validatedUrl: "",
+      repoInfo: emptyRepoInfo,
     });
-    setValidationError("");
-    setValidatedUrl("");
-    setIsReadyForValidation(false);
-    setIsValidating(true);
 
     const provider = detectProvider(url);
-    setRepoInfo((prev) => ({ ...prev, provider }));
 
     const siteName = extractSiteName(url);
     if (siteName) {
@@ -101,15 +137,18 @@ const PublicGitImportForm = ({
       .quiqr_git_repo_show(url)
       .then((response) => {
         if (response) {
-          setRepoInfo({
-            provider,
-            screenshot: response.Screenshot ?? null,
-            hugoTheme: response.HugoTheme ?? "",
-            quiqrModel: response.QuiqrModel ?? "",
-            quiqrForms: response.QuiqrFormsEndPoints ?? "",
+          setValidation({
+            isValidating: false,
+            apiError: "",
+            validatedUrl: url,
+            repoInfo: {
+              provider,
+              screenshot: response.Screenshot ?? null,
+              hugoTheme: response.HugoTheme ?? "",
+              quiqrModel: response.QuiqrModel ?? "",
+              quiqrForms: response.QuiqrFormsEndPoints ?? "",
+            },
           });
-          setIsValidating(false);
-          setValidatedUrl(url);
 
           if (response.HugoVersion) {
             onSetVersion(response.HugoVersion);
@@ -123,51 +162,55 @@ const PublicGitImportForm = ({
         }
       })
       .catch(() => {
-        setValidationError("It seems that the URL does not point to a valid git repository");
-        setIsValidating(false);
+        setValidation((prev) => ({
+          ...prev,
+          isValidating: false,
+          apiError: "It seems that the URL does not point to a valid git repository",
+        }));
       });
-  };
+  }, []);
 
-  const handleUrlChange = (value: string) => {
-    setGitUrl(value);
-    if (value) {
-      if (validatedUrl !== value) {
-        preValidateUrl(value);
-      } else {
-        setValidationError("");
-        setIsReadyForValidation(false);
-      }
-    }
-  };
-
-  // Handle initial URL from props
+  // Handle initial URL from props - validate on mount if valid
   useEffect(() => {
-    if (importSiteURL && importSiteURL !== gitUrl) {
-      setGitUrl(importSiteURL);
-      if (preValidateUrl(importSiteURL)) {
-        validateUrl(importSiteURL);
+    if (importSiteURL && !initialUrlValidatedRef.current && REGEXP_HTTP.test(importSiteURL)) {
+      initialUrlValidatedRef.current = true;
+      validateUrl(importSiteURL);
+    }
+  }, [importSiteURL, validateUrl]);
+
+  // Reset form if importSiteURL changes after initial mount
+  useEffect(() => {
+    if (importSiteURL !== prevImportUrlRef.current) {
+      prevImportUrlRef.current = importSiteURL;
+      if (importSiteURL) {
+        reset({ gitUrl: importSiteURL });
+        setValidation(initialValidationState);
+        if (REGEXP_HTTP.test(importSiteURL)) {
+          validateUrl(importSiteURL);
+        }
       }
     }
-    // Only run when importSiteURL prop changes
-  }, [importSiteURL]);
+  }, [importSiteURL, reset, validateUrl]);
+
+  const { ref, ...inputProps } = register("gitUrl");
 
   return (
     <>
       <Box my={2}>Enter a public git URL with a quiqr website or template to import.</Box>
       <Box my={2} sx={{ display: "flex" }}>
         <TextField
+          {...inputProps}
+          inputRef={ref}
           fullWidth
           autoFocus
           label="Git URL"
-          value={gitUrl}
           variant="outlined"
-          onChange={(e) => handleUrlChange(e.target.value)}
-          error={!!validationError}
-          helperText={validationError}
+          error={!!displayError}
+          helperText={displayError}
         />
         <Button
           variant="contained"
-          disabled={isValidating || !isReadyForValidation}
+          disabled={validation.isValidating || !isReadyForValidation}
           sx={{
             marginLeft: (theme) => theme.spacing(1),
             width: 400,
@@ -181,13 +224,13 @@ const PublicGitImportForm = ({
       </Box>
 
       <RepositoryInfoCard
-        isLoading={isValidating}
-        validatedUrl={validatedUrl}
-        provider={repoInfo.provider}
-        screenshot={repoInfo.screenshot}
-        hugoTheme={repoInfo.hugoTheme}
-        quiqrModel={repoInfo.quiqrModel}
-        quiqrForms={repoInfo.quiqrForms}
+        isLoading={validation.isValidating}
+        validatedUrl={validation.validatedUrl}
+        provider={validation.repoInfo.provider}
+        screenshot={validation.repoInfo.screenshot}
+        hugoTheme={validation.repoInfo.hugoTheme}
+        quiqrModel={validation.repoInfo.quiqrModel}
+        quiqrForms={validation.repoInfo.quiqrForms}
       />
     </>
   );

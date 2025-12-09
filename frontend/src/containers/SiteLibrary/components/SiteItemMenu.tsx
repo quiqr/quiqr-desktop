@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { SiteConfig } from '../../../../types';
+import { openExternal } from '../../../utils/platform';
 
 interface SiteItemMenuProps {
   site: SiteConfig;
@@ -49,9 +50,9 @@ const SiteItemMenu = ({ site, onMenuAction } : SiteItemMenuProps) => {
 
       <MenuItem
         key='visit'
-        onClick={() => {
+        onClick={async () => {
           handleClose();
-          window.require('electron').shell.openExternal(site.homepageURL);
+          await openExternal(site.homepageURL);
         }}>
         Open Homepage
       </MenuItem>

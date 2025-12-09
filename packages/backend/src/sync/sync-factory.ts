@@ -24,6 +24,11 @@ export interface SyncService {
 }
 
 /**
+ * Progress callback for streaming sync progress via SSE
+ */
+export type SyncProgressCallback = (message: string, progress: number) => void;
+
+/**
  * Dependencies required by sync services
  */
 export interface SyncServiceDependencies {
@@ -32,6 +37,8 @@ export interface SyncServiceDependencies {
   windowAdapter: WindowAdapter;
   configurationProvider: ConfigurationDataProvider;
   embgit: Embgit;
+  /** Optional callback for streaming progress updates (used by SSE endpoints) */
+  progressCallback?: SyncProgressCallback;
 }
 
 /**
@@ -53,36 +60,39 @@ export class SyncFactory {
    *
    * @param publisherConfig - The publisher configuration (folder, github, or sysgit)
    * @param siteKey - The site key
+   * @param progressCallback - Optional callback for streaming progress (overrides default)
    * @returns A sync service instance
    * @throws Error if the sync type is not implemented or dependencies not set
    */
-  getPublisher(publisherConfig: PublConf, siteKey: string): SyncService {
+  getPublisher(
+    publisherConfig: PublConf,
+    siteKey: string,
+    progressCallback?: SyncProgressCallback
+  ): SyncService {
     if (!this.dependencies) {
       throw new Error('SyncFactory dependencies not set. Call setDependencies() first.');
     }
 
-    const { pathHelper, outputConsole, windowAdapter, configurationProvider } = this.dependencies;
+    // Create dependencies with optional progress callback override
+    const deps: SyncServiceDependencies = {
+      ...this.dependencies,
+      progressCallback: progressCallback ?? this.dependencies.progressCallback,
+    };
+
     const type = publisherConfig.type;
 
     switch (type) {
       case 'folder':
-        return new FolderSync(
-          publisherConfig,
-          siteKey,
-          pathHelper,
-          outputConsole,
-          windowAdapter,
-          configurationProvider
-        );
+        return new FolderSync(publisherConfig, siteKey, deps);
 
       case 'github':
-        return new GithubSync(publisherConfig, siteKey, this.dependencies);
+        return new GithubSync(publisherConfig, siteKey, deps);
 
       case 'sysgit':
-        return new SysgitSync(publisherConfig, siteKey, this.dependencies);
+        return new SysgitSync(publisherConfig, siteKey, deps);
 
       case 'git':
-        return new GitSync(publisherConfig, siteKey, this.dependencies);
+        return new GitSync(publisherConfig, siteKey, deps);
 
       default:
         throw new Error(`Unknown sync type: ${type}`);

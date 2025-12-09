@@ -22,10 +22,18 @@ interface ServerDialog {
   publishConf?: PublishConfig;
 }
 
+interface SyncProgress {
+  message: string;
+  progress: number;
+  complete?: boolean;
+  error?: string;
+}
+
 interface ServerBusyDialog {
   open?: boolean;
   serverTitle?: string;
   icon?: React.ReactNode;
+  progress?: SyncProgress | null;
 }
 
 interface SyncRouteGeneralProps {
@@ -94,12 +102,25 @@ const SyncRouteGeneral = ({
     });
   };
 
-  const syncDialogControl = (open: boolean, title: string = "", icon: React.ReactNode = null) => {
+  const syncDialogControl = (
+    open: boolean,
+    title: string = "",
+    icon: React.ReactNode = null,
+    progress: SyncProgress | null = null
+  ) => {
     setServerBusyDialog({
       open: open,
       serverTitle: title,
       icon: icon,
+      progress: progress,
     });
+  };
+
+  const updateSyncProgress = (progress: SyncProgress | null) => {
+    setServerBusyDialog((prev) => ({
+      ...prev,
+      progress: progress,
+    }));
   };
 
   const renderMainCard = (publishConf: PublishConfig) => {
@@ -131,6 +152,7 @@ const SyncRouteGeneral = ({
           onSyncDialogControl={(open, text, icon) => {
             syncDialogControl(open, text, icon);
           }}
+          onSyncProgress={updateSyncProgress}
           onConfigure={() => {
             onConfigure(publishConf);
           }}
@@ -148,6 +170,7 @@ const SyncRouteGeneral = ({
           onSyncDialogControl={(open, text, icon) => {
             syncDialogControl(open, text, icon);
           }}
+          onSyncProgress={updateSyncProgress}
           onConfigure={() => {
             onConfigure(publishConf);
           }}
@@ -164,6 +187,7 @@ const SyncRouteGeneral = ({
           onSyncDialogControl={(open, text, icon) => {
             syncDialogControl(open, text, icon);
           }}
+          onSyncProgress={updateSyncProgress}
           onConfigure={() => {
             onConfigure(publishConf);
           }}
@@ -218,9 +242,12 @@ const SyncRouteGeneral = ({
       <Box sx={{ height: '100%' }}>{content}</Box>
 
       <SyncBusyDialog
-        {...serverBusyDialog}
+        open={serverBusyDialog.open}
+        serverTitle={serverBusyDialog.serverTitle}
+        icon={serverBusyDialog.icon}
+        progress={serverBusyDialog.progress}
         onClose={() => {
-          setServerBusyDialog({ open: false });
+          setServerBusyDialog({ open: false, progress: null });
         }}
       />
 

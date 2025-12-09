@@ -292,6 +292,10 @@ const NewSiteDialog = ({
     dispatch({ type: "SET_SCRATCH_CONFIG_FORMAT", payload: format });
   };
 
+  const handlePrivDataChange = (data: PrivateRepoData) => {
+    dispatch({ type: "SET_PRIVATE_REPO_DATA", payload: data });
+  };
+
   const isCreateDisabled =
     !state.hugoVersion ||
     !state.isNameValid ||
@@ -337,6 +341,7 @@ const NewSiteDialog = ({
             onGitValidation={handleGitValidation}
             onFolderValidation={handleFolderValidation}
             onScratchConfigChange={handleScratchConfigChange}
+            onPrivDataChange={handlePrivDataChange}
           />
         );
 

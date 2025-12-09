@@ -113,10 +113,6 @@ export class API {
     return mainProcessBridge.request('saveSingle', {siteKey, workspaceKey, singleKey, document});
   }
 
-  hasPendingRequests(){
-    return mainProcessBridge.pendingCallbacks.length;
-  }
-
   getSingle(siteKey: string, workspaceKey: string, singleKey: string, fileOverride: string){
     return mainProcessBridge.request('getSingle', {siteKey, workspaceKey, singleKey, fileOverride});
   }
@@ -195,13 +191,25 @@ export class API {
   }
 
   openFileInEditor(filepath: string, create: boolean = false, relativeToRoot: boolean = false){
-    mainProcessBridge.requestVoid('openFileInEditor', {filepath, create, relativeToRoot});
+    return mainProcessBridge.request('openFileInEditor', {filepath, create, relativeToRoot});
   }
 
-  openFileExplorer(filepath: string, relativeToRoot: false){
-    mainProcessBridge.requestVoid('openFileExplorer', {filepath, relativeToRoot});
+  openFileExplorer(filepath: string, relativeToRoot: boolean = false){
+    return mainProcessBridge.request('openFileExplorer', {filepath, relativeToRoot});
   }
 
+  /**
+   * Opens a file dialog and copies selected files into a collection item.
+   *
+   * TODO: Refactor to use HTML5 <input type="file"> per NEXTSTEPS.md
+   * This currently requires @electron/remote which breaks with contextIsolation.
+   * The proper fix is to use HTML5 file inputs in the calling components:
+   * - SelectImagesDialog.tsx
+   * - CollectionItem.tsx
+   * - Single.tsx
+   *
+   * @deprecated Use HTML5 file inputs instead
+   */
   openFileDialogForSingleAndCollectionItem(
     siteKey: string,
     workspaceKey: string,
@@ -217,7 +225,8 @@ export class API {
       properties = ['multiSelections', 'openFile'];
     }
 
-    const remote= window.require('@electron/remote');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const remote = (window as any).require('@electron/remote');
 
     const openDialogOptions = {
       title: title || 'Select Files',
@@ -248,7 +257,7 @@ export class API {
     );
   }
   quiqr_git_repo_show(url: string){
-    return mainProcessBridge.request('quiqr_git_repo_show', {url}, {timeout: 30000});
+    return mainProcessBridge.request('quiqr_git_repo_show', {url}, {timeout: 300000});
   }
 
   hugotheme_git_repo_show(url: string){

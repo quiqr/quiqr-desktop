@@ -280,12 +280,6 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
   };
 
   React.useEffect(() => {
-    /* PORTQUIQR
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      setState(prev => ({ ...prev, showSpinner: true }));
-    });
-    */
-
     const componentRef = {
       forceUpdate: () => {
         setState(prev => ({ ...prev }));

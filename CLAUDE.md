@@ -91,7 +91,7 @@ When adding methods that read/write config values, use generic typing with a typ
 
 ## Key Directories
 
-### Backend (`/backend/src-main/`)
+### Backend (`/packages/backend/src-main/`)
 - `bridge/` - API endpoints exposed to frontend
 - `services/` - Core business logic (site, workspace, library services)
 - `sync/` - Git synchronization (GitHub, system git, folder sync)
@@ -119,58 +119,98 @@ Platform-specific binaries and assets packaged with the application (Hugo binari
 
 ## Dynamic Form System
 
-The SukohForm system (`/frontend/src/components/SukohForm/`) is a schema-driven form builder:
+The SukohForm system (`/frontend/src/components/SukohForm/`) is a schema-driven form builder using React Context and lazy-loaded components:
 
-- **Field Types**: 25+ field types defined in `/frontend/types.ts` (string, markdown, accordion, bundle-manager, etc.)
-- **Field Components**: Each field type has a corresponding `*Dynamic.tsx` component in `/components/SukohForm/components/`
-- **Schema Validation**: All field schemas use Zod with discriminated unions
-- **Extensibility**: Custom field types supported via `customFieldSchema`
+### Architecture
 
-When adding new field types:
-1. Define the schema in `/frontend/types.ts`
-2. Add to `coreFieldSchemas` array
-3. Create the component in `/components/SukohForm/components/`
-4. Register in the form field router
-
-### TypeScript Pattern for Dynamic Components
-
-All SukohForm Dynamic components should follow this pattern for proper TypeScript typing:
-
-**Define a component-specific field interface that extends `FieldBase`:**
-```typescript
-import { BaseDynamic, BaseDynamicProps, BaseDynamicState, FieldBase } from '../../HoForm';
-
-// Define field interface with all properties used by the component
-export interface MyComponentDynamicField extends FieldBase {
-  title?: string;
-  path: string;
-  customProperty?: string;
-  // ... other properties
-}
-
-// Use the field interface as a generic parameter
-type MyComponentDynamicProps = BaseDynamicProps<MyComponentDynamicField>;
-
-type MyComponentDynamicState = BaseDynamicState & {
-  // ... component-specific state properties
-};
-
-class MyComponentDynamic extends BaseDynamic<MyComponentDynamicProps, MyComponentDynamicState> {
-  // Now this.props.context.node.field is properly typed as MyComponentDynamicField
-  // No type assertions needed!
-}
+```
+FormProvider (holds state, provides context)
+  → FormContext (exposes getValueAtPath, setValueAtPath, getFieldConfig, meta)
+    → FieldRenderer (lazy-loads components via FieldRegistry)
+      → Field Component (uses useField hook)
 ```
 
-**Key points:**
-- Define a field interface that extends `FieldBase` from HoForm (provides `key`, `compositeKey`, `type`)
-- Add all component-specific properties to this interface
-- Pass the field interface as a generic to `BaseDynamicProps<T>`
-- Use `&` to extend `BaseDynamicState` for component state
-- Avoid type assertions (`as unknown as`); the field should be properly typed throughout
+- **Field Types**: Defined as Zod schemas in `packages/types/src/schemas/fields.ts`
+- **Field Components**: Each type has a component in `/components/SukohForm/fields/`
+- **FieldRegistry**: Maps type strings to lazy imports for code-splitting
+- **compositeKey**: Unique identifier for each field (e.g., `root.author.name`, `root.tags[0]`)
 
-**Example references:**
-- See `EasyMarkDownDynamic.tsx` for a complete working example
-- See `BundleManagerDynamic.tsx` and `BundleImgThumbDynamic.tsx` for recent implementations
+### Adding New Field Types
+
+1. Define Zod schema in `packages/types/src/schemas/fields.ts`
+2. Add to `CoreFields` object and `coreFieldSchemas` array
+3. Export type with `z.infer<typeof schema>`
+4. Rebuild types: `npm run build -w @quiqr/types`
+5. Create component in `/components/SukohForm/fields/`
+6. Register in `FieldRegistry.ts`
+
+### Field Component Pattern
+
+```typescript
+import { useField, useFormState } from '../useField';
+import FormItemWrapper from '../components/shared/FormItemWrapper';
+import DefaultWrapper from '../components/shared/DefaultWrapper';
+import Tip from '../../Tip';
+import type { MyFieldType as MyFieldConfig } from '@quiqr/types';
+
+interface Props {
+  compositeKey: string;
+}
+
+function MyField({ compositeKey }: Props) {
+  // 1. Get field utilities
+  const { field, value, setValue } = useField<ValueType>(compositeKey);
+  const { saveForm } = useFormState();  // Only if you need autoSave
+  const config = field as MyFieldConfig;
+
+  // 2. Build icon buttons (tip, etc.)
+  const iconButtons: React.ReactNode[] = [];
+  if (config.tip) {
+    iconButtons.push(<Tip key="tip" markdown={config.tip} />);
+  }
+
+  // 3. Handle changes
+  const handleChange = (newValue: ValueType) => {
+    setValue(newValue, 250);  // 250ms debounce (0 for immediate)
+    if (config.autoSave === true) {
+      saveForm();
+    }
+  };
+
+  // 4. Render
+  return (
+    <FormItemWrapper
+      control={
+        <DefaultWrapper>
+          {/* Your field UI */}
+        </DefaultWrapper>
+      }
+      iconButtons={iconButtons}
+    />
+  );
+}
+
+export default MyField;
+```
+
+### Useful Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `useField<T>(compositeKey)` | Get field config, value, setValue |
+| `useFormState()` | Get isDirty, isSubmitting, saveForm, document, meta |
+| `useRenderFields()` | Get renderFields function for container fields |
+| `useResources(compositeKey)` | Manage file resources for bundle fields |
+
+### setValue Debounce Values
+
+| Value | Use Case |
+|-------|----------|
+| `0` | Immediate update (clicks, selects) |
+| `250` | Text input while typing |
+| `500` | Expensive operations |
+
+See `FIELD_DEVELOPMENT_GUIDE.md` in the SukohForm directory for detailed documentation.
 
 ## Important Patterns
 
@@ -183,7 +223,31 @@ class MyComponentDynamic extends BaseDynamic<MyComponentDynamicProps, MyComponen
 
 ### Working with User Preferences
 
-User preferences are stored in `global.pogoconf` (backend) and accessed via:
+**New Backend Pattern (packages/backend):**
+
+The backend uses dependency injection with a container holding all dependencies:
+
+```typescript
+// Creating the container
+import { createContainer, createDevAdapters } from '@quiqr/backend';
+
+const container = createContainer({
+  userDataPath: '/path/to/user/data',
+  rootPath: '/path/to/app/root',
+  adapters: createDevAdapters(),  // or createElectronAdapters() for production
+});
+
+// AppConfig - replaces global.pogoconf
+container.config.setLastOpenedSite(siteKey, workspaceKey, sitePath);
+const prefs = container.config.prefs;
+
+// AppState - replaces global.currentSiteKey, global.currentSitePath, etc.
+container.state.setCurrentSite('my-site', 'main', '/path/to/site');
+```
+
+**Legacy Pattern (still in use in some places):**
+
+User preferences stored in `global.pogoconf` (backend) and accessed via:
 - Backend: `global.pogoconf` (QuiqrAppConfig instance)
 - Frontend: `service.api.readConfKey("prefs")` returns typed `UserPreferences`
 
@@ -218,6 +282,6 @@ Projects use NPM workspaces with `/frontend` as a workspace. Install dependencie
 - TypeScript for all new frontend code
 - Use Zod schemas for validation and type inference
 - Prefer generic typing over union types with manual type guards
-- Frontend components use Material-UI (MUI) v6 with Emotion styling
+- Frontend components use Material-UI (MUI) v7 with Emotion styling
 - Backend remains JavaScript (Node.js)
 - Do not use React.FC, just create a const and type the props. Do not use props.somevar, but destructure them in the args of the functional component.

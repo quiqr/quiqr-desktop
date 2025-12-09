@@ -49,13 +49,6 @@ class Single extends React.Component<SingleProps, SingleState>{
   }
 
   componentDidMount(){
-
-    /* PORTQUIQR
-    window.require('electron').ipcRenderer.on('frontEndBusy', ()=>{
-      this.setState({showSpinner: true});
-    });
-    */
-
     service.registerListener(this);
 
     //fileOverride is used for some dynamic dogFood editors

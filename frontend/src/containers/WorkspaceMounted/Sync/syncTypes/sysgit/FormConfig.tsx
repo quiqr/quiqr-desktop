@@ -18,6 +18,7 @@ import LinearProgress      from '@mui/material/LinearProgress';
 import Select              from '@mui/material/Select';
 import Paper               from '@mui/material/Paper';
 import { SysgitPublishConf } from '../../../../../../types';
+import { copyToClipboard } from '../../../../../utils/platform';
 
 interface PublishConfig {
   key: string;
@@ -77,7 +78,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
     const promise = service.api.createKeyPairGithub();
 
     promise.then((resp)=>{
-      this.updatePubData({deployPrivateKey: resp.keyPair[0], deployPublicKey: resp.keyPair[1] },
+      this.updatePubData({deployPrivateKey: resp.privateKey, deployPublicKey: resp.publicKey },
         ()=>{
           this.setState({ keyPairBusy: false })
         }
@@ -322,11 +323,8 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
               </FormControl>
             </React.Fragment>
           )}
-          <Button sx={{ m: 1, mt: 2 }} disabled={this.state.keyPairBusy} onClick={()=>{
-
-            const {clipboard} = window.require('electron')
-            clipboard.writeText(this.state.pubData.deployPublicKey)
-
+          <Button sx={{ m: 1, mt: 2 }} disabled={this.state.keyPairBusy} onClick={async ()=>{
+            await copyToClipboard(this.state.pubData.deployPublicKey);
           }} variant="contained">Copy</Button>
           <Button sx={{ m: 1, mt: 2 }} onClick={()=>{this.getKeyPair()}} disabled={this.state.keyPairBusy} color="secondary" variant="contained">Re-generate</Button>
 

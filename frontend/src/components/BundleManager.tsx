@@ -6,6 +6,7 @@ import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import { snackMessageService } from "../services/ui-service";
+import { copyToClipboard } from "../utils/platform";
 
 //import service         from '../services/service';
 
@@ -72,9 +73,8 @@ const BundleManagerHeader: React.FC<BundleManagerHeaderProps> = React.memo(
           <IconButton
             size='small'
             aria-label='Expand'
-            onClick={() => {
-              const { clipboard } = window.require("electron");
-              clipboard.writeText(encodeURI(originalLabel));
+            onClick={async () => {
+              await copyToClipboard(encodeURI(originalLabel));
               snackMessageService.addSnackMessage("File path copied to clipboard", {severity: 'success'});
             }}>
             <FileCopyIcon />

@@ -76,10 +76,9 @@ class ConsoleService extends BaseService<typeof uiServiceSchemas> {
         this._consoleTimeout = undefined;
         this.consoleMessageLastId = 0;
 
-        //PORTQUIQR
+        // Register handlers for push notifications (future WebSocket integration)
+        // See NEXTSTEPS.md for the planned push notification system
         mainProcessBridge.addMessageHandler('console', this._onConsole.bind(this));
-
-        // Listen for Hugo server output from new backend
         mainProcessBridge.addMessageHandler('hugo-output-line', this._onHugoOutput.bind(this));
     }
 

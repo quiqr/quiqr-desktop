@@ -1,17 +1,18 @@
-import * as React              from 'react';
-import Box                     from '@mui/material/Box';
-import Typography              from '@mui/material/Typography';
+import { useEffect, useCallback } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
-import Divider                 from '@mui/material/Divider';
-import Button                  from '@mui/material/Button';
-import ArrowUpwardIcon         from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon       from '@mui/icons-material/ArrowDownward';
-import Meta                    from './Meta'
-import {snackMessageService}   from '../../../../../services/ui-service';
-import service                 from '../../../../../services/service';
-import { FolderPublishConf }   from '../../../../../../types';
+import Divider from '@mui/material/Divider';
+import Button from '@mui/material/Button';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import Meta from './Meta';
+import { snackMessageService } from '../../../../../services/ui-service';
+import service from '../../../../../services/service';
+import { useSyncProgress, SyncProgress } from '../../../../../hooks/useSyncProgress';
+import { FolderPublishConf } from '../../../../../../types';
 
 interface DashboardProps {
   siteKey: string;
@@ -20,128 +21,134 @@ interface DashboardProps {
   enableSyncTo: boolean;
   publishConf: FolderPublishConf;
   onSyncDialogControl: (open: boolean, text: string, icon: React.ReactNode) => void;
+  onSyncProgress: (progress: SyncProgress | null) => void;
   onConfigure: () => void;
 }
 
-export class Dashboard extends React.Component<DashboardProps>{
+export function Dashboard({
+  siteKey,
+  workspaceKey,
+  enableSyncFrom,
+  enableSyncTo,
+  publishConf,
+  onSyncDialogControl,
+  onSyncProgress,
+  onConfigure,
+}: DashboardProps) {
+  const { progress, dispatchAction } = useSyncProgress();
 
-  pullFromRemote(){
-    this.props.onSyncDialogControl(
-      true,
-      Meta.syncingText, Meta.icon());
+  // Update parent with progress changes
+  useEffect(() => {
+    onSyncProgress(progress);
+  }, [progress, onSyncProgress]);
 
-    service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'pullFromRemote',{},90000).then(()=>{
+  const pullFromRemote = useCallback(async () => {
+    onSyncDialogControl(true, Meta.syncingText, Meta.icon());
 
-      this.props.onSyncDialogControl(
-        false,
-        Meta.syncingText, Meta.icon());
+    try {
+      await dispatchAction(siteKey, publishConf, 'pullFromRemote', {});
+      onSyncDialogControl(false, Meta.syncingText, Meta.icon());
+      snackMessageService.addSnackMessage('Sync: sync from folder finished.', { severity: 'success' });
+    } catch {
+      snackMessageService.addSnackMessage('Sync: sync from folder failed.', { severity: 'warning' });
+      onSyncDialogControl(false, Meta.syncingText, Meta.icon());
+    }
+  }, [siteKey, publishConf, dispatchAction, onSyncDialogControl]);
 
-      snackMessageService.addSnackMessage("Sync: sync from folder finished.", { severity: "success" });
+  const pushToRemote = useCallback(async () => {
+    onSyncDialogControl(true, Meta.syncingText, Meta.icon());
 
-    }).catch((e)=>{
-      snackMessageService.addSnackMessage('Sync: sync from folder failed.', {severity: 'warning'});
-      this.props.onSyncDialogControl(
-        false,
-        Meta.syncingText, Meta.icon());
-    });
-  }
+    try {
+      // Build first
+      await service.api.buildWorkspace(siteKey, workspaceKey, null, publishConf);
 
-  pushToRemote(){
-    this.props.onSyncDialogControl(
-      true,
-      Meta.syncingText, Meta.icon());
+      // Then push
+      await dispatchAction(siteKey, publishConf, 'pushToRemote', {});
+      onSyncDialogControl(false, Meta.syncingText, Meta.icon());
+      snackMessageService.addSnackMessage('Sync: Sync to folder finished.', { severity: 'success' });
+    } catch {
+      onSyncDialogControl(false, Meta.syncingText, Meta.icon());
+      snackMessageService.addSnackMessage('Sync: Sync to folder failed.', { severity: 'warning' });
+    }
+  }, [siteKey, workspaceKey, publishConf, dispatchAction, onSyncDialogControl]);
 
-    service.api.buildWorkspace(this.props.siteKey, this.props.workspaceKey, null, this.props.publishConf).then(()=>{
+  return (
+    <>
+      <Box
+        component="div"
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+        }}
+        m={2}
+      >
+        <Box component="span" m={1}>
+          <FolderIcon fontSize="large" />
+        </Box>
 
-      service.api.publisherDispatchAction(this.props.siteKey, this.props.publishConf, 'pushToRemote',{},90000).then(()=>{
+        <Box component="span" style={{ flexGrow: 1 }}>
+          <Typography>{Meta.sidebarLabel(publishConf)}</Typography>
 
-        this.props.onSyncDialogControl(
-          false,
-          Meta.syncingText, Meta.icon());
-        //this.refreshRemoteStatus();
-
-        snackMessageService.addSnackMessage('Sync: Sync to folder finished.', {severity: 'success'});
-      }).catch(()=>{
-        this.props.onSyncDialogControl(
-          false,
-          Meta.syncingText, Meta.icon());
-        snackMessageService.addSnackMessage('Sync: Sync to folder failed.', {severity: 'warning'});
-      });
-    });
-  }
-
-  render(){
-
-    return (
-      <React.Fragment>
-        <Box component="div" style={{
-          display:'flex',
-          alignItems: 'flex-start'
-          }} m={2}>
-
-          <Box component="span" m={1}>
-            <FolderIcon fontSize="large"/>
-          </Box>
-
-          <Box component="span" style={{flexGrow:1}}>
-            <Typography>{Meta.sidebarLabel(this.props.publishConf)}</Typography>
-
-            <Link component="button" variant="body2"
-              onClick={()=>{
-                service.api.openFileInEditor(this.props.publishConf.path);
-              }}
-            >
+          <Link
+            component="button"
+            variant="body2"
+            onClick={() => {
+              service.api.openFileInEditor(publishConf.path);
+            }}
+          >
             Open in File Manager
-            </Link>
-          </Box>
-
-          <Box component="span">
-            <Button
-              onClick={()=>{this.props.onConfigure()}}
-              size="small"
-              variant="contained"
-              startIcon={<SettingsIcon />}>
-              Configure
-            </Button>
-          </Box>
+          </Link>
         </Box>
-        <Box component="div" style={{
-          display:'flex',
-          alignItems: 'flex-start'
-        }} m={2}>
 
-          { this.props.enableSyncTo ?
-            <Button
-              onClick={()=>{this.pushToRemote()}}
-              style={{marginRight:'5px'}}
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<ArrowUpwardIcon />}
-            >
-              Sync to folder
-            </Button>
-            :null
-          }
-
-          { this.props.enableSyncFrom ?
-            <Button
-              onClick={()=>{this.pullFromRemote()}}
-              size="small"
-              variant="contained"
-              color="primary"
-              startIcon={<ArrowDownwardIcon />}
-            >
-              Sync from Folder
-            </Button>
-            :null
-          }
+        <Box component="span">
+          <Button
+            onClick={onConfigure}
+            size="small"
+            variant="contained"
+            startIcon={<SettingsIcon />}
+          >
+            Configure
+          </Button>
         </Box>
-        <Divider/>
-      </React.Fragment>
-    );
-  }
+      </Box>
 
+      <Box
+        component="div"
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+        }}
+        m={2}
+      >
+        {enableSyncTo ? (
+          <Button
+            onClick={pushToRemote}
+            style={{ marginRight: '5px' }}
+            size="small"
+            variant="contained"
+            color="primary"
+            startIcon={<ArrowUpwardIcon />}
+          >
+            Sync to folder
+          </Button>
+        ) : null}
+
+        {enableSyncFrom ? (
+          <Button
+            onClick={pullFromRemote}
+            size="small"
+            variant="contained"
+            color="primary"
+            startIcon={<ArrowDownwardIcon />}
+          >
+            Sync from Folder
+          </Button>
+        ) : null}
+      </Box>
+
+      <Divider />
+    </>
+  );
 }
 
 export default Dashboard;
