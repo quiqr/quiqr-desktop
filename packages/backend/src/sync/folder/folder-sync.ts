@@ -8,7 +8,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import type { PublConf } from '@quiqr/types';
-import type { SyncService } from '../sync-factory.js';
+import type { SyncService, SyncServiceDependencies, SyncProgressCallback } from '../sync-factory.js';
 import type { PathHelper } from '../../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../../adapters/types.js';
 import type { ConfigurationDataProvider } from '../../services/configuration/index.js';
@@ -35,21 +35,20 @@ export class FolderSync implements SyncService {
   private outputConsole: OutputConsole;
   private windowAdapter: WindowAdapter;
   private configurationProvider: ConfigurationDataProvider;
+  private progressCallback?: SyncProgressCallback;
 
   constructor(
     config: PublConf,
     siteKey: string,
-    pathHelper: PathHelper,
-    outputConsole: OutputConsole,
-    windowAdapter: WindowAdapter,
-    configurationProvider: ConfigurationDataProvider
+    dependencies: SyncServiceDependencies
   ) {
     this.config = config as FolderSyncConfig;
     this.siteKey = siteKey;
-    this.pathHelper = pathHelper;
-    this.outputConsole = outputConsole;
-    this.windowAdapter = windowAdapter;
-    this.configurationProvider = configurationProvider;
+    this.pathHelper = dependencies.pathHelper;
+    this.outputConsole = dependencies.outputConsole;
+    this.windowAdapter = dependencies.windowAdapter;
+    this.configurationProvider = dependencies.configurationProvider;
+    this.progressCallback = dependencies.progressCallback;
   }
 
   /**
@@ -112,10 +111,7 @@ export class FolderSync implements SyncService {
     this.outputConsole.appendLine('-----------------');
     this.outputConsole.appendLine('');
 
-    this.windowAdapter.sendToRenderer('updateProgress', {
-      message: 'Prepare files before uploading..',
-      progress: 30,
-    });
+    this.sendProgress('Prepare files before uploading..', 30);
 
     if (this.config.publishScope === 'build') {
       await this.publishBuild(destPath, from);
@@ -184,5 +180,16 @@ export class FolderSync implements SyncService {
     await fs.emptyDir(dir);
     await fs.ensureDir(dir);
     return dir;
+  }
+
+  /**
+   * Send progress update via SSE callback or fall back to window adapter
+   */
+  private sendProgress(message: string, progress: number): void {
+    if (this.progressCallback) {
+      this.progressCallback(message, progress);
+    } else {
+      this.windowAdapter.sendToRenderer('updateProgress', { message, progress });
+    }
   }
 }
