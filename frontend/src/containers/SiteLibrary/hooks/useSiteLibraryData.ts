@@ -36,7 +36,7 @@ export function useSiteLibraryData() {
 
   useEffect(() => {
     updateLocalSites();
-    // updateCommunityTemplates();
+    updateCommunityTemplates();
     service.api.stopHugoServer();
 
     service.api.readConfPrefKey('sitesListingView').then((view) => {
