@@ -248,7 +248,7 @@ export class API {
     );
   }
   quiqr_git_repo_show(url: string){
-    return mainProcessBridge.request('quiqr_git_repo_show', {url}, {timeout: 30000});
+    return mainProcessBridge.request('quiqr_git_repo_show', {url}, {timeout: 300000});
   }
 
   hugotheme_git_repo_show(url: string){
