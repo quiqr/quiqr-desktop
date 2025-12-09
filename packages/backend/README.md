@@ -17,8 +17,8 @@ This package provides the core business logic for Quiqr Desktop, decoupled from 
 @quiqr/backend
 ├── adapters/       # Platform adapter interfaces
 ├── config/         # Configuration and state management
-├── services/       # Business logic (TODO: to be migrated)
-├── api/            # API handlers (TODO: to be migrated)
+├── services/       # Business logic
+├── api/            # API handlers
 └── utils/          # Utility functions
 ```
 
@@ -117,23 +117,6 @@ For production use with Electron:
 import { createElectronAdapters } from '@quiqr/adapter-electron';
 const adapters = createElectronAdapters();
 ```
-
-## Migration Status
-
-✅ **Completed:**
-- Package structure
-- Adapter interfaces
-- Core utilities (format providers, path helper, file utils)
-- Configuration management (AppConfig, AppState, Container)
-
-🚧 **In Progress:**
-- Services layer migration
-- API handlers migration
-
-📋 **TODO:**
-- Electron adapter implementation package
-- Wire up in Electron main process
-- Remove old backend code
 
 ## Development
 

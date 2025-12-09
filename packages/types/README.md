@@ -108,4 +108,4 @@ npm run dev
 - `@quiqr/frontend` - React application
 - `@quiqr/backend` - API server
 - `@quiqr/adapter-electron` - Electron adapter
-- `@quiqr/adapter-standalone` - Standalone server adapter (future)
+- `@quiqr/adapter-standalone` - Standalone server adapter
