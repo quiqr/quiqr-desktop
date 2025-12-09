@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
@@ -33,6 +33,7 @@ interface ConfigureSourceStepProps {
   onGitValidation: (url: string, isPrivate: boolean, privData?: PrivateRepoData) => void;
   onFolderValidation: (path: string) => void;
   onScratchConfigChange: (format: string) => void;
+  onPrivDataChange: (data: PrivateRepoData) => void;
 }
 
 const ConfigureSourceStep = ({
@@ -47,6 +48,7 @@ const ConfigureSourceStep = ({
   onGitValidation,
   onFolderValidation,
   onScratchConfigChange,
+  onPrivDataChange,
 }: ConfigureSourceStepProps) => {
   const [filteredHugoVersions, setFilteredHugoVersions] = useState<string[]>([]);
   // Track latest site name to avoid stale state in callbacks
@@ -149,6 +151,8 @@ const ConfigureSourceStep = ({
         return (
           <FormPartialImportFromGit
             importSiteURL={importSiteURL}
+            privData={state.privateRepoData}
+            onPrivDataChange={onPrivDataChange}
             onSetName={(name) => {
               latestNameRef.current = name;
               onSiteNameChange(name);

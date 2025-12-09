@@ -1,3 +1,10 @@
+// Must be imported before React
+import { scan } from "react-scan";
+
+scan({
+  enabled: false,
+});
+
 import { createRoot }    from 'react-dom/client';
 import { BrowserRouter } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

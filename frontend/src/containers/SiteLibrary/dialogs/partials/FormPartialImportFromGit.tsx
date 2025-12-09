@@ -4,10 +4,12 @@ import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import PublicGitImportForm from "./PublicGitImportForm";
 import PrivateGitHubImportForm from "./PrivateGitHubImportForm";
-import { GitValidationResult } from "../newSiteDialogTypes";
+import { GitValidationResult, PrivateRepoData } from "../newSiteDialogTypes";
 
 type FormPartialImportFromGitProps = {
   importSiteURL?: string;
+  privData: PrivateRepoData;
+  onPrivDataChange: (data: PrivateRepoData) => void;
   onValidationDone: (data: GitValidationResult) => void;
   onSetName: (name: string) => void;
   onSetVersion: (version?: string) => void;
@@ -15,6 +17,8 @@ type FormPartialImportFromGitProps = {
 
 const FormPartialImportFromGit = ({
   importSiteURL,
+  privData,
+  onPrivDataChange,
   onValidationDone,
   onSetName,
   onSetVersion,
@@ -50,6 +54,8 @@ const FormPartialImportFromGit = ({
 
       {usePrivateRepo ? (
         <PrivateGitHubImportForm
+          privData={privData}
+          onPrivDataChange={onPrivDataChange}
           onValidationDone={onValidationDone}
           onSetName={onSetName}
         />

@@ -17,6 +17,18 @@ export interface PrivateRepoData {
   gitProvider?: GitProvider;
 }
 
+export const defaultPrivateRepoData: PrivateRepoData = {
+  gitBaseUrl: "github.com",
+  gitProtocol: "ssh",
+  sshPort: 22,
+  username: "",
+  email: "",
+  repository: "",
+  branch: "main",
+  deployPrivateKey: "",
+  deployPublicKey: "",
+};
+
 export interface HugoThemeInfo {
   Screenshot?: string;
   MinHugoVersion?: string;
@@ -77,7 +89,7 @@ export interface DialogState {
   // Git import
   gitUrl: string;
   gitPrivateRepo: boolean;
-  privateRepoData: PrivateRepoData | null;
+  privateRepoData: PrivateRepoData;
 
   // Folder import
   folderPath: string;
@@ -109,7 +121,7 @@ export const initialDialogState: DialogState = {
   hugoThemeInfo: null,
   gitUrl: "",
   gitPrivateRepo: false,
-  privateRepoData: null,
+  privateRepoData: defaultPrivateRepoData,
   folderPath: "",
   scratchConfigFormat: "toml",
   enableSync: false,
@@ -135,7 +147,7 @@ export type DialogAction =
   | { type: "SET_HUGO_THEME_INFO"; payload: HugoThemeInfo | null }
   | { type: "SET_GIT_URL"; payload: string }
   | { type: "SET_GIT_PRIVATE_REPO"; payload: boolean }
-  | { type: "SET_PRIVATE_REPO_DATA"; payload: PrivateRepoData | null }
+  | { type: "SET_PRIVATE_REPO_DATA"; payload: PrivateRepoData }
   | { type: "SET_FOLDER_PATH"; payload: string }
   | { type: "SET_SCRATCH_CONFIG_FORMAT"; payload: string }
   | { type: "SET_HUGO_CONFIG"; payload: { version: string; extended: boolean; disabled: boolean; extendedEnabled: boolean; generateModel: boolean } }
