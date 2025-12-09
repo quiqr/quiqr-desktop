@@ -31,12 +31,8 @@ class SyncBusyDialog extends React.Component<SyncBusyDialogProps, SyncBusyDialog
   }
 
   componentDidMount(){
-    //PORTQUIQR
-    /*
-    window.require('electron').ipcRenderer.on('updateProgress',(event, infoTxt, percent)=>{
-      this.setState({infoTxt: infoTxt});
-    });
-    */
+    // TODO: Implement WebSocket listener for 'updateProgress' events
+    // See NEXTSTEPS.md for the planned push notification system
   }
 
   render(){
