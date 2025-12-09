@@ -2,6 +2,21 @@
 
 ## NEXT RELEASE
 
+## 0.21.5 (2025-12-09)
+- fix: default message at API root url
+- chore: convert workspaces to functional. track progress
+- chore: add SSE endpoints to server
+- chore: actually display progress in SyncBusyDialog
+- chore: add optional callback to track progress
+- chore: add reusable sync progress hook
+- chore: remove dead code, add todo comments
+- feat: make openExternal and copyToClipboard platform agnostic
+- feat: re-enable updateCommunityTemplates
+- fix: slow form renders in public git import form
+- fix: slow form renders in private import form
+- chore: update readme
+- chore: remove unneccesary json parse
+
 ## 0.21.4 (2025-12-09)
 - fix: run glob relative to workspace
 - chore: convert select from query to typescript
