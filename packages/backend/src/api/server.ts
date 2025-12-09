@@ -49,11 +49,15 @@ export function createServer(
   /**
    * Create handler registry
    * The handlers are platform specific and implemented in adapters
-   * 
+   *
    * For example: the electron adapter defines handlers to open a file in an editor
    * The standalone adapter does not, and just console.log a no-op.
    */
   const apiHandlers = createApiHandlers(container);
+
+  app.get("/", (req, res) => {
+    res.send("Hello from Quiqr API Server!");
+  });
 
   // API route - handles all POST /api/:method requests
   app.post(
