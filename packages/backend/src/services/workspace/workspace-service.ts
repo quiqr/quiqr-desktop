@@ -1345,7 +1345,7 @@ export class WorkspaceService {
       this.setCurrentBaseUrl(hugoServerConfig);
 
       this.currentHugoServer = new HugoServer(
-        JSON.parse(JSON.stringify(hugoServerConfig)),
+        hugoServerConfig,
         this.pathHelper,
         this.appConfig,
         this.windowAdapter,
