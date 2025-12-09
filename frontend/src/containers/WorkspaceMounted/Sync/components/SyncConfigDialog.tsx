@@ -167,7 +167,7 @@ class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfig
         saveButtonHidden = false;
       }
 
-      else if (this.state.serverType === 'sysgit'){
+      else if (this.state.serverType === 'sysgit' || this.state.serverType === 'git'){
         configDialogTitle = SysGitMeta.configDialogTitle;
         serverFormLogo = SysGitMeta.icon();
         content = <SysGitForm

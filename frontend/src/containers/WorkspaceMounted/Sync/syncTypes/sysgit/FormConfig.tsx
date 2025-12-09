@@ -78,7 +78,7 @@ export class FormConfig extends React.Component<FormConfigProps, FormConfigState
     const promise = service.api.createKeyPairGithub();
 
     promise.then((resp)=>{
-      this.updatePubData({deployPrivateKey: resp.keyPair[0], deployPublicKey: resp.keyPair[1] },
+      this.updatePubData({deployPrivateKey: resp.privateKey, deployPublicKey: resp.publicKey },
         ()=>{
           this.setState({ keyPairBusy: false })
         }
