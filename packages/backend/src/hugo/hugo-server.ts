@@ -100,7 +100,7 @@ export class HugoServer {
       throw new Error('Could not find hugo executable for version ' + hugover);
     }
 
-    const hugoArgs = ['server', '--port', '13131', '--disableFastRender'];
+    const hugoArgs = ['server', '--bind','0.0.0.0', '--port', '13131', '--disableFastRender'];
 
     if (this.appConfig.hugoServeDraftMode) {
       this.outputConsole.appendLine('Server Draft Mode Enabled...');
