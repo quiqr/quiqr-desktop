@@ -10,9 +10,9 @@ import Workspace from "./containers/WorkspaceMounted/Workspace";
 import Console from "./containers/Console";
 import { PrefsSidebar, PrefsRouted } from "./containers/Prefs";
 import SplashDialog from "./dialogs/SplashDialog";
-import { SiteLibrarySidebar, SiteLibraryRouted, SiteLibraryToolbarRight } from "./containers/SiteLibrary";
-import { TopToolbarRight, ToolbarButton } from "./containers/TopToolbarRight";
-import { MainLayout } from "./layouts";
+import { SiteLibrarySidebar, SiteLibraryRouted, useSiteLibraryToolbarItems } from "./containers/SiteLibrary";
+import { ToolbarButton } from "./containers/TopToolbarRight";
+import { AppLayout } from "./layouts/AppLayout";
 import service from "./services/service";
 import { getThemeByName } from "./theme";
 import { UserPreferences } from "../types";
@@ -37,45 +37,6 @@ const WorkspaceRoute = ({ applicationRole, welcomeScreen, theme }: { application
   );
 };
 
-// Prefs toolbar with navigation
-const PrefsToolbar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const sp = new URLSearchParams(location.search);
-  let backurl = "/sites/last";
-  if (sp.has("siteKey")) {
-    const siteKey = sp.get("siteKey");
-    backurl = `/sites/${siteKey}/workspaces/source`;
-  }
-
-  const leftButtons = [
-    <ToolbarButton
-      key="back"
-      action={() => navigate(backurl)}
-      title="Back"
-      icon={ArrowBackIcon}
-    />,
-  ];
-
-  const rightButtons = [
-    <ToolbarButton
-      key="toolbarbutton-library"
-      to="/sites/last"
-      title="Site Library"
-      icon={AppsIcon}
-    />,
-    <ToolbarButton
-      key="buttonPrefs"
-      active={true}
-      to="/prefs"
-      title="Preferences"
-      icon={SettingsApplicationsIcon}
-    />,
-  ];
-
-  return <TopToolbarRight itemsLeft={leftButtons} itemsCenter={[]} itemsRight={rightButtons} />;
-};
-
 // Console redirect handler
 const ConsoleRedirectHandler = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -96,9 +57,6 @@ const App = () => {
   const [applicationRole, setApplicationRole] = useState(defaultApplicationRole);
   const [libraryView, setLibraryView] = useState("cards");
   const [theme, setTheme] = useState<Theme>(getThemeByName('light'));
-  const [menuIsLocked, setMenuIsLocked] = useState(true);
-  const [forceShowMenu, setForceShowMenu] = useState(false);
-  const [skipMenuTransition, setSkipMenuTransition] = useState(false);
   const [newSiteDialogOpen, setNewSiteDialogOpen] = useState(false);
   const [importSiteDialogOpen, setImportSiteDialogOpen] = useState(false);
 
@@ -137,24 +95,6 @@ const App = () => {
     });
   }, []);
 
-  // Reset skipMenuTransition after it's used
-  useEffect(() => {
-    if (skipMenuTransition) {
-      setSkipMenuTransition(false);
-    }
-  }, [skipMenuTransition]);
-
-  const toggleMenuIsLocked = () => {
-    setMenuIsLocked(!menuIsLocked);
-    setForceShowMenu(true);
-    setSkipMenuTransition(true);
-    window.dispatchEvent(new Event("resize"));
-  };
-
-  const toggleForceShowMenu = () => {
-    setForceShowMenu(!forceShowMenu);
-  };
-
   const handleLibraryDialogCloseClick = () => {
     setNewSiteDialogOpen(false);
     setImportSiteDialogOpen(false);
@@ -188,52 +128,23 @@ const App = () => {
     <SiteLibraryRouted
       handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
       activeLibraryView={libraryView}
-      key="selectSite"
       newSite={newSiteDialogOpen}
       importSite={importSiteDialogOpen || !!importSiteURL}
       importSiteURL={importSiteURL}
     />
   );
 
-  // Toolbar right content
-  const renderToolbarRight = () => (
-    <Routes>
-      <Route path="/prefs/*" element={<PrefsToolbar />} />
-      <Route
-        path="*"
-        element={
-          <SiteLibraryToolbarRight
-            handleChange={handleLibraryViewChange}
-            handleLibraryDialogClick={handleLibraryDialogClick}
-            activeLibraryView={libraryView}
-          />
-        }
-      />
-    </Routes>
-  );
-
-  // Sidebar content
+  // Sidebar content based on route
   const renderSidebar = () => (
     <Routes>
-      <Route
-        path="/prefs/*"
-        element={
-          <PrefsSidebar
-            menus={[]}
-            hideItems={!forceShowMenu && !menuIsLocked}
-            menuIsLocked={menuIsLocked}
-            onToggleItemVisibility={toggleForceShowMenu}
-            onLockMenuClicked={toggleMenuIsLocked}
-          />
-        }
-      />
+      <Route path="/prefs/*" element={<PrefsSidebar menus={[]} />} />
       <Route path="/create-new" element={null} />
       <Route path="/welcome" element={null} />
       <Route path="*" element={<SiteLibrarySidebar />} />
     </Routes>
   );
 
-  // Main content
+  // Main content based on route
   const renderContent = () => (
     <Routes>
       <Route path="/prefs/*" element={<PrefsRouted />} />
@@ -242,25 +153,96 @@ const App = () => {
     </Routes>
   );
 
-  // Main layout wrapper
+  // Prefs toolbar items
+  const PrefsToolbarItems = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const sp = new URLSearchParams(location.search);
+    let backurl = "/sites/last";
+    if (sp.has("siteKey")) {
+      const siteKey = sp.get("siteKey");
+      backurl = `/sites/${siteKey}/workspaces/source`;
+    }
+
+    return {
+      leftItems: [
+        <ToolbarButton
+          key="back"
+          action={() => navigate(backurl)}
+          title="Back"
+          icon={ArrowBackIcon}
+        />,
+      ],
+      rightItems: [
+        <ToolbarButton
+          key="toolbarbutton-library"
+          to="/sites/last"
+          title="Site Library"
+          icon={AppsIcon}
+        />,
+        <ToolbarButton
+          key="buttonPrefs"
+          active={true}
+          to="/prefs"
+          title="Preferences"
+          icon={SettingsApplicationsIcon}
+        />,
+      ],
+    };
+  };
+
+  // Site Library layout
+  const SiteLibraryLayout = () => {
+    const toolbarItems = useSiteLibraryToolbarItems({
+      handleLibraryDialogClick,
+      activeLibraryView: libraryView,
+      handleChange: handleLibraryViewChange,
+    });
+
+    return (
+      <AppLayout
+        title="Site Library"
+        sidebar={<SiteLibrarySidebar />}
+        toolbar={{
+          leftItems: toolbarItems.leftItems,
+          centerItems: toolbarItems.centerItems,
+          rightItems: toolbarItems.rightItems,
+        }}
+      >
+        {renderSiteLibraryRouted()}
+      </AppLayout>
+    );
+  };
+
+  // Prefs layout
+  const PrefsLayout = () => {
+    const toolbarItems = PrefsToolbarItems();
+    return (
+      <AppLayout
+        title="Preferences"
+        sidebar={<PrefsSidebar menus={[]} />}
+        toolbar={{
+          leftItems: toolbarItems.leftItems,
+          rightItems: toolbarItems.rightItems,
+        }}
+      >
+        <PrefsRouted />
+      </AppLayout>
+    );
+  };
+
+  // Main layout wrapper using new AppLayout
   const MainLayoutWrapper = () => (
     <ConsoleRedirectHandler>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           {welcomeScreen}
-          <MainLayout
-            toolbarRight={renderToolbarRight()}
-            sidebar={renderSidebar()}
-            menuIsLocked={menuIsLocked}
-            forceShowMenu={forceShowMenu}
-            skipMenuTransition={skipMenuTransition}
-            onContentClick={() => {
-              if (forceShowMenu) toggleForceShowMenu();
-            }}
-          >
-            {renderContent()}
-          </MainLayout>
+          <Routes>
+            <Route path="/prefs/*" element={<PrefsLayout />} />
+            <Route path="/sites/*" element={<SiteLibraryLayout />} />
+            <Route path="*" element={<SiteLibraryLayout />} />
+          </Routes>
         </ThemeProvider>
       </StyledEngineProvider>
     </ConsoleRedirectHandler>
@@ -309,7 +291,7 @@ const App = () => {
         }
       />
 
-      {/* All other routes use MainLayout */}
+      {/* All other routes use AppLayout */}
       <Route path="*" element={<MainLayoutWrapper />} />
     </Routes>
   );

@@ -7,20 +7,24 @@ import AddIcon from "@mui/icons-material/Add";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 
-interface SiteLibraryToolbarRightProps {
+interface SiteLibraryToolbarItemsProps {
   handleLibraryDialogClick: (dialogName: string) => void;
   activeLibraryView: string;
   handleChange: (viewName: string) => void;
 }
 
-export const SiteLibraryToolbarRight = ({
+/**
+ * Hook that returns the toolbar button arrays for the Site Library view.
+ * Use this with the new AppLayout toolbar prop.
+ */
+export const useSiteLibraryToolbarItems = ({
   handleLibraryDialogClick,
   activeLibraryView,
   handleChange,
-}: SiteLibraryToolbarRightProps) => {
+}: SiteLibraryToolbarItemsProps) => {
   const navigate = useNavigate();
 
-  const leftButtons = [
+  const leftItems = [
     <ToolbarButton
       key='buttonNewSite'
       action={() => handleLibraryDialogClick("newSiteDialog")}
@@ -35,7 +39,7 @@ export const SiteLibraryToolbarRight = ({
     />,
   ];
 
-  const centerButtons = [
+  const centerItems = [
     <ToolbarToggleButtonGroup
       key='buttonViewGroup'
       activeOption={activeLibraryView}
@@ -53,7 +57,7 @@ export const SiteLibraryToolbarRight = ({
     />,
   ];
 
-  const rightButtons = [
+  const rightItems = [
     <ToolbarButton
       key={"toolbarbutton-library"}
       active={true}
@@ -69,12 +73,35 @@ export const SiteLibraryToolbarRight = ({
     />,
   ];
 
+  return { leftItems, centerItems, rightItems };
+};
+
+interface SiteLibraryToolbarRightProps {
+  handleLibraryDialogClick: (dialogName: string) => void;
+  activeLibraryView: string;
+  handleChange: (viewName: string) => void;
+}
+
+/**
+ * @deprecated Use useSiteLibraryToolbarItems hook with the new AppLayout instead
+ */
+export const SiteLibraryToolbarRight = ({
+  handleLibraryDialogClick,
+  activeLibraryView,
+  handleChange,
+}: SiteLibraryToolbarRightProps) => {
+  const { leftItems, centerItems, rightItems } = useSiteLibraryToolbarItems({
+    handleLibraryDialogClick,
+    activeLibraryView,
+    handleChange,
+  });
+
   return (
     <TopToolbarRight
       key='toolbar-right-new-site'
-      itemsLeft={leftButtons}
-      itemsCenter={centerButtons}
-      itemsRight={rightButtons}
+      itemsLeft={leftItems}
+      itemsCenter={centerItems}
+      itemsRight={rightItems}
     />
   );
 };
