@@ -25,6 +25,7 @@ interface HomeProps {
   siteKey: string;
   workspaceKey: string;
   applicationRole?: string;
+  hugoReady?: boolean;
 }
 
 interface ContentCard {
@@ -40,8 +41,8 @@ interface CardSection {
   cards: ContentCard[];
 }
 
-function Home({ siteKey, workspaceKey }: HomeProps) {
-  const [contentItemCardsSections, setContentItemCardsSections] = useState<CardSection[]>([]);
+function Home({ siteKey, workspaceKey, hugoReady = true }: HomeProps) {
+  const [contentItemCardsSections, _setContentItemCardsSections] = useState<CardSection[]>([]);
   const [siteCreatorMessage, setSiteCreatorMessage] = useState<string | null>(null);
   const [configurations, setConfigurations] = useState<unknown>(null);
   const [selectedSite, setSelectedSite] = useState<{ key: string } | null>(null);
@@ -49,6 +50,7 @@ function Home({ siteKey, workspaceKey }: HomeProps) {
   const [error, setError] = useState<unknown>(null);
   const previousSiteKeyRef = useRef<string | null>(null);
   const isMountedRef = useRef(true);
+  const hugoServeStartedRef = useRef(false);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -57,18 +59,46 @@ function Home({ siteKey, workspaceKey }: HomeProps) {
     };
   }, []);
 
+  // Start Hugo server only when hugoReady is true
+  // This prevents the race condition where serve() is called before Hugo is downloaded
+  useEffect(() => {
+    const startHugoServe = async () => {
+      // Only start Hugo serve when:
+      // 1. Hugo is ready (downloaded)
+      // 2. We have site and workspace keys
+      // 3. The site has changed (or first load)
+      // 4. We haven't already started the serve for this site
+      if (
+        hugoReady &&
+        siteKey &&
+        workspaceKey &&
+        previousSiteKeyRef.current !== siteKey &&
+        !hugoServeStartedRef.current
+      ) {
+        hugoServeStartedRef.current = true;
+        const devDisableAutoHugoServe = await service.api.readConfKey('devDisableAutoHugoServe');
+        if (!devDisableAutoHugoServe) {
+          console.log('[HomeSimple] Hugo is ready, starting serve');
+          service.api.serveWorkspace(siteKey, workspaceKey, 'Start Hugo from Home');
+        }
+        previousSiteKeyRef.current = siteKey;
+      }
+    };
+
+    startHugoServe();
+  }, [hugoReady, siteKey, workspaceKey]);
+
+  // Reset hugoServeStartedRef when site changes
+  useEffect(() => {
+    if (previousSiteKeyRef.current !== siteKey) {
+      hugoServeStartedRef.current = false;
+    }
+  }, [siteKey]);
+
+  // Load other data (independent of Hugo serve)
   useEffect(() => {
     const loadData = async () => {
       if (siteKey && workspaceKey) {
-        if (previousSiteKeyRef.current !== siteKey) {
-          const devDisableAutoHugoServe = await service.api.readConfKey('devDisableAutoHugoServe');
-          if (!devDisableAutoHugoServe) {
-            service.api.serveWorkspace(siteKey, workspaceKey, 'Start Hugo from Home');
-          }
-        }
-
-        previousSiteKeyRef.current = siteKey;
-
         const message = await service.getSiteCreatorMessage(siteKey, workspaceKey);
         if (isMountedRef.current) {
           setSiteCreatorMessage(md.render(message));

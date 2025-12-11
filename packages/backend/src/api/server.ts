@@ -97,12 +97,26 @@ export function createServer(
       res.setHeader('Connection', 'keep-alive');
       res.setHeader('Access-Control-Allow-Origin', '*');
 
+      // Track if connection was closed by client
+      let connectionClosed = false;
+
+      // Handle client disconnect - cancel the download and clean up
+      req.on('close', () => {
+        connectionClosed = true;
+        // Cancel the download if client disconnects (e.g., user closes dialog)
+        container.hugoDownloader.cancel();
+      });
+
       try {
         // Stream progress updates from the async generator
         // the for..of syntax is basically a nice way to do something like
         // const generator = container.hugoDownloader.download(version);
         // generator.next(); (repeat untill the SSE stream closes)
         for await (const progress of container.hugoDownloader.download(version)) {
+          // Stop if client disconnected
+          if (connectionClosed) {
+            break;
+          }
 
           // the data: prefix is required
           // the \n\n is the way the browser knows it's the end of the message
@@ -114,11 +128,15 @@ export function createServer(
           }
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        res.write(`data: ${JSON.stringify({ percent: 0, message: errorMessage, complete: false, error: errorMessage })}\n\n`);
+        if (!connectionClosed) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          res.write(`data: ${JSON.stringify({ percent: 0, message: errorMessage, complete: false, error: errorMessage })}\n\n`);
+        }
       }
 
-      res.end();
+      if (!connectionClosed) {
+        res.end();
+      }
     }
   );
 

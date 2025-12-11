@@ -50,6 +50,7 @@ export const useWorkspaceToolbarItems = ({
   applicationRole,
   activeSection,
   showPreviewButton,
+  previewButtonDisabled,
   onPreviewClick,
 }: {
   siteKey: string;
@@ -57,6 +58,7 @@ export const useWorkspaceToolbarItems = ({
   applicationRole?: string;
   activeSection: 'content' | 'sync' | 'tools';
   showPreviewButton: boolean;
+  previewButtonDisabled: boolean;
   onPreviewClick: () => void;
 }): ToolbarItemsResult => {
   const navigate = useNavigate();
@@ -98,6 +100,7 @@ export const useWorkspaceToolbarItems = ({
         action={onPreviewClick}
         title="Preview Site"
         icon={OpenInBrowserIcon}
+        disabled={previewButtonDisabled}
       />
     );
   }
@@ -186,9 +189,15 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   const [site, setSite] = useState<SiteConfig | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceConfig | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [hugoReady, setHugoReady] = useState(false);
 
-  const { progress: hugoProgress, downloadHugo, cancelDownload } = useHugoDownload();
+  const {
+    progress: hugoProgress,
+    isDownloading,
+    hugoReady,
+    downloadHugo,
+    cancelDownload,
+    setHugoReady,
+  } = useHugoDownload();
 
   const refresh = useCallback(() => {
     if (siteKey && workspaceKey) {
@@ -220,26 +229,45 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
           if (result.installed) {
             setHugoReady(true);
           } else {
-            await downloadHugo(workspace.hugover!);
-            setHugoReady(true);
+            const success = await downloadHugo(workspace.hugover!);
+            // hugoReady is set by the hook on success
+            if (!success) {
+              console.error('Hugo download failed or was cancelled');
+            }
           }
         } catch (err) {
           console.error('Failed to check/download Hugo:', err);
+          // Still allow UI to render even if Hugo check fails
           setHugoReady(true);
         }
       };
       checkAndDownloadHugo();
     } else {
+      // No Hugo version specified, mark as ready
       setHugoReady(true);
     }
-  }, [workspace?.hugover, downloadHugo]);
+  }, [workspace?.hugover, downloadHugo, setHugoReady]);
 
-  const openPreviewInBrowser = async () => {
+  /**
+   * Open preview in browser, ensuring Hugo is downloaded first.
+   * If Hugo is not ready (download failed/cancelled), trigger a new download.
+   */
+  const openPreviewInBrowser = useCallback(async () => {
+    // If Hugo is not ready, try to download it first
+    if (!hugoReady && workspace?.hugover) {
+      console.log('[Workspace] Hugo not ready, triggering download before preview');
+      const success = await downloadHugo(workspace.hugover);
+      if (!success) {
+        console.log('[Workspace] Hugo download failed, cannot open preview');
+        return;
+      }
+    }
+
     const path = await service.api.getCurrentBaseUrl();
     if (typeof path === 'string') {
       await openExternal('http://localhost:13131' + path);
     }
-  };
+  }, [hugoReady, workspace?.hugover, downloadHugo]);
 
   // Determine active section based on path
   const path = location.pathname;
@@ -250,12 +278,16 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   // Show preview button unless explicitly hidden or in siteconf
   const showPreviewButton = !isSiteConf && !workspace?.serve?.[0]?.hugoHidePreviewSite;
 
+  // Disable preview button while downloading
+  const previewButtonDisabled = isDownloading;
+
   const toolbarItems = useWorkspaceToolbarItems({
     siteKey,
     workspaceKey,
     applicationRole,
     activeSection: activeSection as 'content' | 'sync' | 'tools',
     showPreviewButton,
+    previewButtonDisabled,
     onPreviewClick: openPreviewInBrowser,
   });
 
@@ -290,8 +322,14 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
 
   const renderContent = () => (
     <Routes>
-      <Route path="/" element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} />} />
-      <Route path="home/:refresh" element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route
+        path="/"
+        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={hugoReady} />}
+      />
+      <Route
+        path="home/:refresh"
+        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={hugoReady} />}
+      />
       <Route
         path="sync/*"
         element={<SyncRouted site={site} workspace={workspace} siteKey={siteKey} workspaceKey={workspaceKey} />}

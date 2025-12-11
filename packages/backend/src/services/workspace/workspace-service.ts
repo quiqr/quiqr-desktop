@@ -1323,12 +1323,20 @@ export class WorkspaceService {
 
   /**
    * Start Hugo development server
+   * Note: Hugo must be pre-downloaded by the frontend before calling this method.
+   * The frontend coordinates Hugo downloads via SSE to show progress to the user.
    */
   async serve(): Promise<void> {
     const workspaceDetails = await this.getConfigurationsData();
 
-    // Ensure Hugo is installed before trying to serve
-    await this.hugoDownloader.ensureAvailable(workspaceDetails.hugover);
+    // Verify Hugo is installed - frontend is responsible for downloading it first
+    const hugoBin = this.pathHelper.getHugoBinForVer(workspaceDetails.hugover);
+    if (!fs.existsSync(hugoBin)) {
+      throw new Error(
+        `Hugo version ${workspaceDetails.hugover} is not installed. ` +
+          `Please wait for the download to complete before starting the server.`
+      );
+    }
 
     return new Promise((resolve, reject) => {
       let serveConfig: any;
