@@ -1,5 +1,261 @@
 # Quiqr App CHANGELOG
 
+## NEXT RELEASE
+
+- chore: convert layouts and sidebars to functional components
+- fix: new network addresses for the server version
+
+## 0.21.5 (2025-12-09)
+- fix: default message at API root url
+- chore: convert workspaces to functional. track progress
+- chore: add SSE endpoints to server
+- chore: actually display progress in SyncBusyDialog
+- chore: add optional callback to track progress
+- chore: add reusable sync progress hook
+- chore: remove dead code, add todo comments
+- feat: make openExternal and copyToClipboard platform agnostic
+- feat: re-enable updateCommunityTemplates
+- fix: slow form renders in public git import form
+- fix: slow form renders in private import form
+- chore: update readme
+- chore: remove unneccesary json parse
+
+## 0.21.4 (2025-12-09)
+- fix: run glob relative to workspace
+- chore: convert select from query to typescript
+- fix: make dynamic form fields optional
+- chore: delete unused electron file from frontend
+- chore(lint): autofix replace let and var with const
+- chore: ignore build, dist and node_modules in eslint config
+- chore: remove image plugin from markdown editor
+- fix: replace references to old component system
+- chore: update chartjs and fix colors
+- feat: remove old component system
+- convert Eisenhouwer field to functional component
+- chore: cleanup debugging logs
+- fix: actually delete bundle-manager items from disk instead of soft-deleting
+- fix: implement BundleImgThumbField and save resources to singles config
+- feat: add scaffold field command
+- feat: add dev tutorial explaining the new field registry
+- fix: bundle image upload size in express. TODO: convert to formdata
+- wip: rewrite bundlemanager to functional component. use api and native filepickers instead of electron windows
+- fix: convert image select field to new system
+- wip: fontpickerfield
+- wip: FontIconPicker
+- chore: convert leafarray to functional component
+- chore: convert accordion to functional component
+- chore: replace react-simplemde-editor with mdxeditor
+- feature: make nest a dropdown for quick validation
+- fix: remove unneeded fragment causing a warning
+- fix: remove unneeded fragment causing a warning
+- refactor: implement SelectField
+- refactor: implement SectionField
+- refactor: implement NumberField
+- refactor: implement NestField
+- refactor: implement DateField
+- refactor: implement ChipsField
+- refactor: implement UniqField
+- refactor: implement StringField
+- fix: temporarily improve layout
+- wip: opt in to new form system
+- refactor: implement ToggleField
+- refactor: implement SliderField
+- refactor: implement ReadonlyField
+- refactor: implement PullField
+- refactor: implement InfoField
+- refactor: implement HiddenField
+- refactor: implement EmptyLineField
+- refactor: implement ColorField
+- wip: create foundation for refactored functional form field component
+- fix: move deprecated prop to slotProps
+- chore: convert CardNew to functional
+- chore: add GitValidationResult in private and public import forms
+- chore: type onValidationDone with GitValidationResult type
+- chore: add GitValidationResult type
+- feat: support multiple git providers, like github, gitlab, forgea/codeberg, for both import and sync.
+- feat: When a user imports a private repository, they get instructions to add a
+    deploykey. If they enable write access, a sync target is also created
+    automatically.
+- refactor: remove unneccesary effect
+- feat: move deploy key to separate step, include instructions
+- feat: rewrite git importer to accept generic git base URL, port, protocol.
+- fix: add embgit instructions
+- chore: upgrade electron-builder to latest
+- fix: invalid dom nesting in DeleteSiteDialog
+- chore: add clarifying comment to SSE
+- fix: add apischema for derived public key
+- fix: derive public key from priv key
+- fix: handle local history errors by logging
+- fix: refresh commit history after push
+- refactor: split import form into separate components
+- fix: add missing prop to DangerButton
+- fix: make sure hugo is downloaded before serving the webpage
+- fix: stop each hugo versions server when switching to a new workspace
+- chore: remove debug logs
+- fix: icons in hugo build
+- fix: use a ref instead of useState to avoid triggering rerenders, for example on error
+- fix: unpack 7zip from deps
+- fix: remove chained state update with useEffect
+- fix: convert HugoDownloader to typescript and implement SSE for progress
+- fix: implement setting the current baseUrl in the app state
+- feat: add api schema for hugo version check
+- fix: raise express body size limit to account for large base64 encoded screenshots
+- Minor layout fixes
+- refactor: move multi step form to reducer and mui stepper
+- fix: properly closing new and import dialogs
+- fix: replace backslashes on windows with forward slashes for usage in glob
+- fix windows navigation by serving frontend from express
+- fix: circular dependency
+- chore: update react-router-dom to v7. no breaking changes
+- feat: convert git sync to ts
+- fix: run key gen in temp dir and fix properties
+- fix types
+- chore: remove unused scripts from frontend package.json
+- fix: various mui 7 syntax fixes
+- chore: upgrade to react 19 and mui 7. update Grid component syntax
+- fix: change ReactDOM.render to createRoot
+- chore: Migrate react-router-dom from v5 to v6. Convert class to functional components.
+- wip: upgrade to react-router-dom v6. Disable easymde and EasyMarkDownDynamic in prep of react 19 upgrade
+- fix: replace most of the weird routing patterns with NavLink from react-router-dom
+- wip: themeing
+- fix: add missing api response schemas
+- fix: invalid domnesting
+- wip: theme
+- refactor: co-locate css with markup. delete css files
+- fix warning
+- refactor: replace bootstrap grid with mui grid
+- wip: move all appstyles to mui theme
+- chore: fix linting issues in App.tsx
+- fix: add keys to Dialogs to remount every time
+- refactor: unneccesary useEffect
+- feat: simplify EditSiteTagsDialog
+- feat: simplify CopySiteDialog
+- wip: initial cleanup of Dialogs
+- fix: CopySiteDialog
+- fix build
+- refactor: separate site library routing from views
+- fix: remove unused prop from SiteItemMenu
+- refactor: split SiteLibraryRouted into components
+- chore: code style instructions
+- refactor: move actions to hooks (open dialogs, delete sites, etc)
+- chore: make eslint ignore unused variables starting with an underscore
+- chore:convert DeleteSiteDialog to functional component
+- wip: convert dialogs to functional components (broken for now)
+- fix: avoid duplicating the pathname when copying if the path is an absolute path
+- chore: add eslint plugin for useEffect rules
+- chore: add example sites to gitignore
+- fix: light theme value in select
+- chore: remove unused/replaced code
+- fix: restore MIT License
+- add dockerfile for standalone version
+- chore: remove unused packages from root package.json. Replaced node-fetch with regular fetch
+- nuke /backend and /electron
+- chore: update hugo versions
+- fix: add collections to inital workspace config builder
+- fix: replace commonjs require with esm import in shell-handler
+- fix: resolve root so standalone adapter knows about resources/embgit.
+- temp: disable background worker logging
+- fix: formatting
+- fix: update readme
+- feat: add standalone version with dev adapters (server runs and only console.logs)
+- add refined plan for next steps: web adapter, remove menu-manager and use MUI dialogs instead of browserwindows
+- feat: remove last electron part to handler
+- fix: implement sync-to-folder. Stub git sync for now
+- fix: illegal h6 nesting in h2
+- fix: illegal dom nesting of paragraph elements
+- fix: set first workspace as default if source is not set
+- fix: remove leading slashes to ensure path.join works correctly
+- fix: implement listWorkspaces
+- fix: connect menu-manager to backend handlers
+- fix: convert pogozipper to typescript
+- wip: port emgit to ts. still uses a lot of .js
+- fix: checkFreeSiteName
+- chore: migrate git import to ts
+- chore: implement remaining handlers. Todo: filewatching and hugo download
+- chore: implement globSyncHandler and createWorkspaceServiceForParams
+- chore: implement parseFileToObject
+- chore: implement copySiteHandler
+- fix: fix build, update glob to esm
+- chore: implement window handlers
+- chore: convert window managers to typescript
+- chore: migrates jobs to packages/backend and typescript
+- chore: update todo with build command
+- chore: migrate build-actions to typescript
+- chore: update electron to latest in adapter
+- chore: update dev command to include file watching in /packages
+- chore: implement remaining methods in handlers
+- feat: create very minimal viable electron product
+- wip: migrate workspace-service to typescript.
+- chore: partially convert hugo builder, config and server
+- chore: migrate folder importer to TypeScript
+- chore: migrate SiteService and factories to TypeScript
+- chore: implement site-handlers and import-handlers related to SiteLibrary
+- chore: convert the rest of library-service.ts to typescript
+- chore: convert getSiteConf to typescript
+- chore: convert hugo-utils to typescript
+- chore: add temporary 'test'. Todo: create proper tests with vitest
+- chore: implement migrated configuration-data-provider in typescript
+- wip: incremental api migration with stubs
+- chore: convert workspace-config-provider to typescript
+- chore: add quiqr docs to gitignore
+- chore: convert initial-workspace-config-builder to typescript
+- chore: convert file-cache-token to typescript
+- chore: convert workspace-config-validator to typescript. add types from @quiqr/types
+- chore: convert folder-helper to packages/backend
+- chore: replace global.pogoconf with DI configuration class
+- chore: move utilities like format providers to packages/backend/src/utils
+- chore: create adapter structure for @quiqr/backend/adapters
+- chore: create monorepo structure for @quiqr/backend
+- chore: update TODO.md with phase once completion
+- chore: Move types from frontend to @quiqr/types monorepo package
+- chore: add claude TODO.md
+- fix: replace deprecated/removed button prop on ListItem with ListItemButton
+- fix: add 'as const' to style
+- fix: typo in Sidebar method name
+- chore: add state and proptypes to ToggleDynamic
+- fix: typing in SelectDynamic by using built-in MUI types
+- chore: add state and proptypes to SliderDynamic
+- chore: add state and proptypes to NestDynamic
+- chore: add state and proptypes to LeafArrayDynamic
+- chore: add prop and statetypes to ImageSelectDynamic
+- chore: add prop and statetypes to FontIconPickerDynamic
+- chore: add prop and statetypes to EisenhouwerDynamic
+- chore: add prop and statetypes to DateDynamic
+- fix: set parseFileToObject type to any because we dont know the shape of select-from-query files
+- chore: add prop and statetypes to ColorToolDynamic
+- chore: add prop and statetypes to ChipsDynamic
+- fix: disable custom fields for now to catch schema errors in core fields
+- chore: Add state and proptypes to TextFieldNumberDynamic
+- chore: update SukohForm component instructions
+- chore: Add state and proptypes to BundleImgThumbDynamic and BundleMangerDynamic
+- fix: replace inline defined UserPreferences type with the one from types.ts
+- fix: remove AIclient beta property
+- chore: regenerate package-lock.json after rebase
+- chore: remove openai from backend, update frontend package to latest version
+- chore: add rpm build command
+- temp: disable notarizing for now
+- chore: uninstall react-scripts
+- fix: build
+- chore: update outdated packages
+- fix: button prop warning in ListItem
+- wip: (needs tests) replace request with node-fetch, remove unused npm scripts +
+    dependencies. npm audit in root is clean now
+    delete old react-codemod
+- chore: update local run instructions
+- chore: many npm updates (npm audit)
+- fix: fix npm build
+- fix: sync route dialogs not showing up
+- fix: add name to synced folders. Automatically transform existing synced
+    projects to include the name property. Without this, the broken configs from
+    previous versions didn't show up in the site library.
+- fix: sync to folder folderpicker dialog
+- fix: replace local type declarations with types.ts
+- chore: add windows target build command, disable x32
+- fix: remove AIclient beta property
+- fix: add typed response to readConfKey
+- fix: replace inline defined UserPreferences type with the one from types.ts
+- chore: add claude.md
+
 ## 0.21.3 (2025-11-21)
 - chore: Start using npm workspaces
 - chore: Added tons of zod schemas and types.
@@ -11,7 +267,7 @@
 ## 0.21.2 (2025-11-20)
 - chore: react 19
 - chore: electron 39
-- WIP: migrate to TS 
+- WIP: migrate to TS
 - WIP: migrate to MUI 6
 
 ## 0.21.1 (2025-02-24)
@@ -124,7 +380,7 @@
 -  new Single property: pullOuterRootKey: [key] #502
   - this make files with outer arrays possible
 - feature: dogfood edit menu.yml #501
-- fix: accordion items look bad in darkmode #504 
+- fix: accordion items look bad in darkmode #504
 - feature: scaffolding of singles (see experimental)
 - feature: scaffolding of collections (see experimental)
 
