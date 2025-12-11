@@ -1,66 +1,42 @@
-import * as React            from 'react';
-import InputLabel            from '@mui/material/InputLabel';
-import FormControl           from '@mui/material/FormControl';
-import Select                from '@mui/material/Select';
-import MenuItem              from '@mui/material/MenuItem';
+import { useState } from 'react';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 interface FormPartialNewFromScratchProps {
   onChange: (newState: { newTypeScratchConfigFormat: string }) => void;
 }
 
-interface FormPartialNewFromScratchState {
-  configFormat: string;
-}
+function FormPartialNewFromScratch({ onChange }: FormPartialNewFromScratchProps) {
+  const [configFormat, setConfigFormat] = useState('toml');
 
-class FormPartialNewFromScratch extends React.Component<FormPartialNewFromScratchProps, FormPartialNewFromScratchState>{
+  const handleChange = (value: string) => {
+    onChange({
+      newTypeScratchConfigFormat: value,
+    });
+    setConfigFormat(value);
+  };
 
-  constructor(props){
-    super(props);
-
-    this.state = {
-      configFormat: 'toml',
-    }
-  }
-
-  componentDidMount(){
-    this.props.onChange({
-      newTypeScratchConfigFormat: 'toml',
-    })
-  }
-
-  render(){
-    return (
-      <React.Fragment>
-          <FormControl variant="outlined" sx={{ minWidth: 300 }}>
-            <InputLabel id="demo-simple-select-outlined-label">Config Format</InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              value={this.state.configFormat}
-              style={{width:"150px"}}
-              onChange={(e)=>{
-
-                this.props.onChange({
-                  newTypeScratchConfigFormat: e.target.value,
-                })
-
-                this.setState({
-                  configFormat: e.target.value,
-                })
-              }}
-              label="Config Format"
-            >
-              <MenuItem value={"toml"}>{"toml"}</MenuItem>
-              <MenuItem value={"json"}>{"json"}</MenuItem>
-              <MenuItem value={"yaml"}>{"yaml"}</MenuItem>
-            </Select>
-          </FormControl>
-
-      </React.Fragment>
-    )
-
-  }
-
+  return (
+    <>
+      <FormControl variant="outlined" sx={{ minWidth: 300 }}>
+        <InputLabel id="demo-simple-select-outlined-label">Config Format</InputLabel>
+        <Select
+          labelId="demo-simple-select-outlined-label"
+          id="demo-simple-select-outlined"
+          value={configFormat}
+          style={{ width: '150px' }}
+          onChange={(e) => handleChange(e.target.value)}
+          label="Config Format"
+        >
+          <MenuItem value="toml">toml</MenuItem>
+          <MenuItem value="json">json</MenuItem>
+          <MenuItem value="yaml">yaml</MenuItem>
+        </Select>
+      </FormControl>
+    </>
+  );
 }
 
 export default FormPartialNewFromScratch;

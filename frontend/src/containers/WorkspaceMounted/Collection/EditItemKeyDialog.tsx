@@ -1,11 +1,11 @@
-import * as React        from 'react';
-import Spinner           from './../../../components/Spinner'
-import TextField         from '@mui/material/TextField';
-import Button            from '@mui/material/Button';
-import DialogTitle       from '@mui/material/DialogTitle';
-import Dialog            from '@mui/material/Dialog';
-import DialogActions     from '@mui/material/DialogActions';
-import DialogContent     from '@mui/material/DialogContent';
+import { useState } from 'react';
+import Spinner from './../../../components/Spinner';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
 interface EditItemKeyDialogProps {
@@ -19,126 +19,93 @@ interface EditItemKeyDialogProps {
   handleConfirm?: (titleToKey?: string, value?: string) => void;
 }
 
-interface EditItemKeyDialogState {
-  value: string;
-  initialValue: string;
-  valid: boolean | null;
-  titleToKey?: string;
+function getInitialValue(propValue: string) {
+  if (propValue.indexOf('.') > -1) {
+    return propValue.slice(0, propValue.lastIndexOf('.'));
+  }
+  return propValue || '';
 }
 
-class EditItemKeyDialog extends React.Component<EditItemKeyDialogProps, EditItemKeyDialogState>{
+function EditItemKeyDialog({
+  value: propValue,
+  viewKey,
+  busy,
+  confirmLabel,
+  title,
+  textfieldlabel,
+  handleClose,
+  handleConfirm,
+}: EditItemKeyDialogProps) {
+  const initialValue = propValue || '';
+  const [value, setValue] = useState(getInitialValue(propValue));
+  const [titleToKey, setTitleToKey] = useState<string | undefined>();
 
-  constructor(props ){
-    super(props);
-
-    let valueBase = props.value
-    if (valueBase.indexOf('.') > -1)
-    {
-      valueBase = props.value.slice(0,(props.value.lastIndexOf(".") ));
+  const validate = () => {
+    const v = value || '';
+    if (viewKey === 'createItem') {
+      return v.length > 0;
     }
+    return /^[a-zA-Z0-9_-]+([/][a-zA-Z0-9_-]+)*$/.test(v) && v.length > 0;
+  };
 
-    this.state = {
-      value:valueBase||'',
-      initialValue:props.value||'',
-      valid: null
-    };
-  }
+  const valid = validate();
+  const isCreateItem = viewKey === 'createItem';
+  const errorText = isCreateItem ? '' : 'Allowed characters: alphanumeric, dash, underline and slash.';
 
-  handleClose(){
-    if(this.props.handleClose && !this.props.busy)
-      this.props.handleClose();
-  }
-
-  handleConfirm(){
-
-    if(this.props.viewKey === 'createItem'){
-      if(this.validate() && this.props.handleConfirm) {
-        this.props.handleConfirm(this.state.titleToKey, this.state.value);
-      }
+  const onClose = () => {
+    if (handleClose && !busy) {
+      handleClose();
     }
-    else{
-      if(this.validate() && this.props.handleConfirm) {
-        this.props.handleConfirm(this.state.value, this.state.initialValue);
-      }
+  };
 
+  const onConfirm = () => {
+    if (!valid || !handleConfirm) return;
+
+    if (isCreateItem) {
+      handleConfirm(titleToKey, value);
+    } else {
+      handleConfirm(value, initialValue);
     }
-  }
+  };
 
-  validate(){
-    const value = this.state.value||'';
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const key = e.target.value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    setValue(e.target.value);
+    setTitleToKey(key);
+  };
 
-    if(this.props.viewKey === 'createItem'){
-      return value.length>0;
-    }
-    else{
-      return /^[a-zA-Z0-9_-]+([/][a-zA-Z0-9_-]+)*$/.test(value) && value.length>0;
-    }
-  }
-
-  handleChange(e){
-    const key  = e.target.value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    this.setState({
-      value: e.target.value,
-      titleToKey: key
-    });
-  }
-
-  render(){
-    const { busy, confirmLabel } = this.props;
-    const valid = this.validate();
-    let errorText;
-    let keyField = undefined;
-    if(this.props.viewKey === 'createItem'){
-      errorText = '';
-      keyField = (
-        <TextField
-          helperText="item key"
-          value={this.state.titleToKey}
-          fullWidth={true}
-          disabled={true}
-        />
-      )
-    }
-    else{
-      errorText = 'Allowed characters: alphanumeric, dash, underline and slash.';
-    }
-
-    return (
-
-      <Dialog
-        fullWidth={true}
-        maxWidth="sm"
-        open={true}
-        onClose={this.handleClose}
-      >
-        <DialogTitle>{this.props.title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-
-        <TextField
-          label={this.props.textfieldlabel}
-          value={this.state.value}
-          error={valid ? false : true}
-          helperText={valid? undefined : errorText}
-          disabled={busy}
-          onChange={this.handleChange.bind(this)}
-          fullWidth={true}
-        />
-        <br/>
-        <br/>
-        {keyField}
-
-        { busy? <Spinner /> : undefined }
-
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button disabled={busy} onClick={this.handleClose.bind(this)} color="primary">Cancel</Button>
-          <Button disabled={busy||!valid} onClick={this.handleConfirm.bind(this)} color="primary">{confirmLabel}</Button>
-        </DialogActions>
-
-      </Dialog>
-    );
-  }
+  return (
+    <Dialog fullWidth={true} maxWidth="sm" open={true} onClose={onClose}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          <TextField
+            label={textfieldlabel}
+            value={value}
+            error={!valid}
+            helperText={valid ? undefined : errorText}
+            disabled={busy}
+            onChange={onChange}
+            fullWidth={true}
+          />
+          <br />
+          <br />
+          {isCreateItem && (
+            <TextField helperText="item key" value={titleToKey} fullWidth={true} disabled={true} />
+          )}
+          {busy && <Spinner />}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button disabled={busy} onClick={onClose} color="primary">
+          Cancel
+        </Button>
+        <Button disabled={busy || !valid} onClick={onConfirm} color="primary">
+          {confirmLabel}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 }
-export default EditItemKeyDialog
+
+export default EditItemKeyDialog;

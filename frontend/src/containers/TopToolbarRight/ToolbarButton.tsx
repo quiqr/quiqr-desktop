@@ -4,15 +4,16 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { SvgIconComponent } from "@mui/icons-material";
 
-interface ToolbarButtonProps {
+export interface ToolbarButtonProps {
   title: string;
   action?: () => void;
   to?: string;
   icon: SvgIconComponent;
   active?: boolean;
+  disabled?: boolean;
 }
 
-const ToolbarButton = ({ title, action, to, icon, active }: ToolbarButtonProps) => {
+const ToolbarButton = ({ title, action, to, icon, active, disabled }: ToolbarButtonProps) => {
   const UseIcon = icon;
 
   const buttonSx = {
@@ -22,6 +23,10 @@ const ToolbarButton = ({ title, action, to, icon, active }: ToolbarButtonProps) 
     p: 0,
     ...(active && {
       color: "#757575",
+    }),
+    ...(disabled && {
+      opacity: 0.5,
+      pointerEvents: "none" as const,
     }),
   };
 
@@ -35,6 +40,7 @@ const ToolbarButton = ({ title, action, to, icon, active }: ToolbarButtonProps) 
           className='toolbar-button'
           startIcon={<UseIcon style={{ padding: 0 }} />}
           sx={buttonSx}
+          disabled={disabled}
         >
           {title}
         </Button>
@@ -50,6 +56,7 @@ const ToolbarButton = ({ title, action, to, icon, active }: ToolbarButtonProps) 
         className='toolbar-button'
         startIcon={<UseIcon style={{ padding: 0 }} />}
         sx={buttonSx}
+        disabled={disabled}
       >
         {title}
       </Button>

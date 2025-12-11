@@ -1,337 +1,274 @@
-import * as React            from 'react';
-import service               from '../../../../services/service';
+import { useState } from 'react';
+import service from '../../../../services/service';
 import ScreenShotPlaceholder from '../../../../img-assets/screenshot-placeholder.png';
-import TextField             from '@mui/material/TextField';
-import Button                from '@mui/material/Button';
-import Typography            from '@mui/material/Typography';
-import Box                   from '@mui/material/Box';
-import CircularProgress      from '@mui/material/CircularProgress';
-import Table                 from '@mui/material/Table';
-import TableRow              from '@mui/material/TableRow';
-import TableCell             from '@mui/material/TableCell';
-import TableBody             from '@mui/material/TableBody';
-import TableContainer        from '@mui/material/TableContainer';
-import Card                  from '@mui/material/Card';
-import CardContent           from '@mui/material/CardContent';
-import CardMedia             from '@mui/material/CardMedia';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import Table from '@mui/material/Table';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import TableBody from '@mui/material/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
 import { openExternal } from '../../../../utils/platform';
 
-const regexpHttp      = new RegExp('^http(s?)://', 'i')
+const regexpHttp = new RegExp('^http(s?)://', 'i');
+
+interface HugoThemeInfo {
+  Screenshot?: string;
+  MinHugoVersion?: string;
+  Name?: string;
+  License?: string;
+  LicenseLink?: string;
+  Homepage?: string;
+  Demosite?: string;
+  Description?: string;
+  ExampleSite?: boolean;
+  Author?: string;
+  AuthorHomepage?: string;
+}
 
 interface FormPartialNewFromHugoThemeProps {
   onSetName: (name: string) => void;
   onValidationDone: (newState: {
     newReadyForNaming: boolean;
     newTypeHugoThemeLastValidatedUrl: string;
-    newHugoThemeInfoDict: any;
+    newHugoThemeInfoDict: HugoThemeInfo;
   }) => void;
 }
 
-interface FormPartialNewFromHugoThemeState {
-  newNameErrorText: string;
-  newType: string;
-  newTypeHugoThemeUrl: string;
-  newTypeHugoThemeBusy: boolean;
-  newTypeHugoThemeReadyForValidation: boolean;
-  newTypeHugoThemeLastValidatedUrl: string;
-  newTypeHugoThemeReadyForNew: boolean;
-  newTypeHugoThemeProvider: string;
-  newTypeHugoThemeErrorText: string;
-  newTypeHugoThemeScreenshot: string | null;
-  newHugoThemeInfoDict?: any;
-  newHugoThemeMinVersion?: string | null;
-  newHugoThemeName?: string | null;
-  newHugoThemeLicense?: string | null;
-  newHugoThemeLicenseLink?: string | null;
-  newHugoThemeHomepage?: string | null;
-  newHugoThemeDemopage?: string | null;
-  newHugoThemeDescription?: string | null;
-  newHugoThemeExampleSite?: boolean | null;
-  newHugoThemeAuthor?: string | null;
-  newHugoThemeAuthorHomepage?: string | null;
-}
+function FormPartialNewFromHugoTheme({ onSetName, onValidationDone }: FormPartialNewFromHugoThemeProps) {
+  const [url, setUrl] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [readyForValidation, setReadyForValidation] = useState(false);
+  const [lastValidatedUrl, setLastValidatedUrl] = useState('');
+  const [provider, setProvider] = useState('');
+  const [errorText, setErrorText] = useState('');
+  const [themeInfo, setThemeInfo] = useState<HugoThemeInfo>({});
 
-class FormPartialNewFromHugoTheme extends React.Component<FormPartialNewFromHugoThemeProps, FormPartialNewFromHugoThemeState>{
+  const resetState = () => {
+    setProvider('');
+    setErrorText('');
+    setBusy(false);
+    setLastValidatedUrl('');
+    setReadyForValidation(false);
+    setThemeInfo({});
+  };
 
-  constructor(props){
-    super(props);
+  const validateURL = async (urlToValidate: string) => {
+    resetState();
 
-    this.state = {
-      newNameErrorText: '',
+    const regexpGitHub = new RegExp('^https://github.com/', 'i');
+    const regexpGitLab = new RegExp('^https://gitlab.com/', 'i');
+    const regexpSourceHut = new RegExp('^https://git.sr.ht/', 'i');
 
-      newType: '',
-      newTypeHugoThemeUrl: '',
-      newTypeHugoThemeBusy: false,
-      newTypeHugoThemeReadyForValidation: false,
-      newTypeHugoThemeLastValidatedUrl: '',
-      newTypeHugoThemeReadyForNew: false,
-      newTypeHugoThemeProvider: '',
-      newTypeHugoThemeErrorText: '',
-      newTypeHugoThemeScreenshot: null,
+    setBusy(true);
 
-
-    }
-  }
-
-  resetNewTypeHugoThemeState(){
-    this.setState({
-      newTypeHugoThemeProvider: '',
-      newTypeHugoThemeErrorText: '',
-      newTypeHugoThemeBusy: false,
-      newTypeHugoThemeLastValidatedUrl: '',
-      newTypeHugoThemeReadyForValidation: false,
-      newTypeHugoThemeReadyForNew: false,
-      newTypeHugoThemeScreenshot: null,
-
-      newHugoThemeMinVersion: null,
-      newHugoThemeName: null,
-      newHugoThemeLicense: null,
-      newHugoThemeLicenseLink: null,
-      newHugoThemeHomepage: null,
-      newHugoThemeDemopage: null,
-      newHugoThemeDescription: null,
-      newHugoThemeExampleSite: null,
-      newHugoThemeAuthor: null,
-      newHugoThemeAuthorHomepage: null,
-
-      newNameErrorText: "",
-
-    })
-
-  }
-
-  validateURL(url){
-
-    this.resetNewTypeHugoThemeState();
-
-    const regexpGitHub    = new RegExp('^https://github.com/', 'i')
-    const regexpGitLab    = new RegExp('^https://gitlab.com/', 'i')
-    const regexpSourceHut = new RegExp('^https://git.sr.ht/', 'i')
-
-    //who is the provider?
-
-    this.setState({newTypeHugoThemeBusy: true});
-
-    if(regexpGitHub.test(url)){
-      this.setState({newTypeHugoThemeProvider: 'GitHub'});
-    }
-    else if(regexpGitLab.test(url)){
-      this.setState({newTypeHugoThemeProvider: 'GitLab'});
-    }
-    else if(regexpSourceHut.test(url)){
-      this.setState({newTypeHugoThemeProvider: 'SourceHut'});
+    if (regexpGitHub.test(urlToValidate)) {
+      setProvider('GitHub');
+    } else if (regexpGitLab.test(urlToValidate)) {
+      setProvider('GitLab');
+    } else if (regexpSourceHut.test(urlToValidate)) {
+      setProvider('SourceHut');
     }
 
-    const urlparts = url.split('/');
-    let siteNameFromUrl = urlparts.pop() || urlparts.pop();  // handle potential trailing slash
-    if(siteNameFromUrl.includes(".")) siteNameFromUrl = siteNameFromUrl.split(".").pop();
-
-    if(siteNameFromUrl !== ""){
-      this.props.onSetName(siteNameFromUrl)
+    const urlparts = urlToValidate.split('/');
+    let siteNameFromUrl = urlparts.pop() || urlparts.pop();
+    if (siteNameFromUrl?.includes('.')) {
+      siteNameFromUrl = siteNameFromUrl.split('.').pop();
     }
 
-    service.api.hugotheme_git_repo_show(url)
-      .then((response)=>{
-        if(response){
-          this.setState({
-            newTypeHugoThemeScreenshot: (response.Screenshot ? response.Screenshot:null),
+    if (siteNameFromUrl && siteNameFromUrl !== '') {
+      onSetName(siteNameFromUrl);
+    }
 
-            newHugoThemeInfoDict: response,
+    try {
+      const response = await service.api.hugotheme_git_repo_show(urlToValidate);
+      if (response) {
+        setThemeInfo(response);
+        setBusy(false);
+        setLastValidatedUrl(urlToValidate);
 
-            newHugoThemeMinVersion: (response.MinHugoVersion ? response.MinHugoVersion:null),
-            newHugoThemeName: (response.Name ? response.Name : null),
-            newHugoThemeLicense: (response.License ? response.License : null),
-            newHugoThemeLicenseLink: (response.LicenseLink ? response.LicenseLink : null),
-            newHugoThemeHomepage: (response.Homepage ? response.Homepage : null),
-            newHugoThemeDemopage: (response.Demosite ? response.Demosite : null),
-            newHugoThemeDescription: (response.Description ? response.Description : null),
-            newHugoThemeExampleSite: (response.ExampleSite ? response.ExampleSite : false),
-            newHugoThemeAuthor: (response.Author ? response.Author:null),
-            newHugoThemeAuthorHomepage: (response.AuthorHomepage ? response.AuthorHomepage:null),
-
-            newTypeHugoThemeBusy: false,
-            newTypeHugoThemeLastValidatedUrl: url,
-          })
-
-          this.props.onValidationDone({
-            newReadyForNaming:true,
-            newTypeHugoThemeLastValidatedUrl: url,
-            newHugoThemeInfoDict: response,
-          })
-
-        }
-      })
-      .catch((e)=>{
-        service.api.logToConsole(e);
-        this.setState({
-          newTypeHugoThemeErrorText: "It seems that the URL does not point to a valid git repository",
-          newTypeHugoThemeBusy: false
+        onValidationDone({
+          newReadyForNaming: true,
+          newTypeHugoThemeLastValidatedUrl: urlToValidate,
+          newHugoThemeInfoDict: response,
         });
-      });
-  }
+      }
+    } catch (e) {
+      service.api.logToConsole(e);
+      setErrorText('It seems that the URL does not point to a valid git repository');
+      setBusy(false);
+    }
+  };
 
-  render(){
-    return (
-      <React.Fragment>
-        <Box my={3}>
-          <p>
-            Enter a public git URL with a Hugo theme.
-          </p>
-        </Box>
-        <Box my={3} sx={{display:'flex'}}>
-          <TextField
-            fullWidth
-            id="standard-full-width"
-            autoFocus
-            label="Hugo Theme Git URL"
-            value={this.state.newTypeHugoThemeUrl}
-            variant="outlined"
-            onChange={(e)=>{
-              this.setState({newTypeHugoThemeUrl: e.target.value});
+  const handleUrlChange = (value: string) => {
+    setUrl(value);
 
-              if(e.target.value && e.target.value !== ''){
-                if(this.state.newTypeHugoThemeLastValidatedUrl !== e.target.value){
+    if (value && value !== '') {
+      if (lastValidatedUrl !== value) {
+        if (!regexpHttp.test(value)) {
+          setErrorText('URL is invalid. Currently only http:// or https:// are supported.');
+          setReadyForValidation(false);
+        } else {
+          setErrorText('');
+          setReadyForValidation(true);
+        }
+      } else {
+        setErrorText('');
+        setReadyForValidation(false);
+      }
+    }
+  };
 
-                  //is this a valid public git url
-                  if(!regexpHttp.test(e.target.value)){
-                    this.setState({
-                      newTypeHugoThemeErrorText: 'URL is invalid. Currently only http:// or https:// are supported.',
-                      newTypeHugoThemeReadyForValidation: false,
-                    });
-                  }
-                  else{
-                    this.setState({
-                      newTypeHugoThemeErrorText: '',
-                      newTypeHugoThemeReadyForValidation: true,
-                    });
-                  }
+  return (
+    <>
+      <Box my={3}>
+        <p>Enter a public git URL with a Hugo theme.</p>
+      </Box>
+      <Box my={3} sx={{ display: 'flex' }}>
+        <TextField
+          fullWidth
+          id="standard-full-width"
+          autoFocus
+          label="Hugo Theme Git URL"
+          value={url}
+          variant="outlined"
+          onChange={(e) => handleUrlChange(e.target.value)}
+          error={errorText !== ''}
+          helperText={errorText}
+        />
+        <Button
+          variant="contained"
+          disabled={busy || !readyForValidation}
+          sx={{ ml: 1, width: 400, height: 55 }}
+          color="primary"
+          onClick={() => validateURL(url)}
+        >
+          Validate Remote Repository
+        </Button>
+      </Box>
 
-                }
-                else{
-                  this.setState({
-                    newTypeHugoThemeErrorText: '',
-                    newTypeHugoThemeReadyForValidation: false,
-                  });
-                }
-
-              }
-
-
-            }}
-            error={(this.state.newTypeHugoThemeErrorText === '' ? false : true)}
-            helperText={this.state.newTypeHugoThemeErrorText}
+      <Box my={3}>
+        <Card sx={{ margin: 0, display: 'flex' }} variant="outlined">
+          <CardMedia
+            sx={{ width: 351 }}
+            image={themeInfo.Screenshot ?? ScreenShotPlaceholder}
+            title="site screenshot"
           />
-          <Button variant="contained" disabled={(this.state.newTypeHugoThemeBusy || !this.state.newTypeHugoThemeReadyForValidation ? true : false)} sx={{ ml: 1, width: 400, height: 55 }} color="primary" onClick={()=>{
-            this.validateURL(this.state.newTypeHugoThemeUrl);
-          }}>Validate Remote Repository</Button>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flex: '1 0 auto' }}>
+              <TableContainer>
+                <Table size="small" aria-label="a dense table">
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Hugo Theme Git URL
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">{lastValidatedUrl}</TableCell>
+                    </TableRow>
 
-        </Box>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Git Provider
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">{provider}</TableCell>
+                    </TableRow>
 
-        <Box my={3}>
-          <Card sx={{ margin: 0, display: 'flex' }} variant="outlined">
-            <CardMedia
-              sx={{ width: 351 }}
-              image={(this.state.newTypeHugoThemeScreenshot?this.state.newTypeHugoThemeScreenshot:ScreenShotPlaceholder)}
-              title="site screenshot"
-            />
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flex: '1 0 auto' }}>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Example Content
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">{themeInfo.ExampleSite ? 'Present' : ''}</TableCell>
+                    </TableRow>
 
-                <TableContainer>
-                  <Table size="small" aria-label="a dense table">
-                    <TableBody>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Name
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">
+                        {busy && <CircularProgress size={20} />} {themeInfo.Name}
+                        {themeInfo.Homepage && (
+                          <Button onClick={async () => await openExternal(themeInfo.Homepage!)}>Homepage</Button>
+                        )}
+                        {themeInfo.Demosite && (
+                          <Button onClick={async () => await openExternal(themeInfo.Demosite!)}>Demo</Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
 
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Hugo Theme Git URL
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{this.state.newTypeHugoThemeLastValidatedUrl}</TableCell>
-                      </TableRow>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Description
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">{themeInfo.Description}</TableCell>
+                    </TableRow>
 
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Git Provider
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{this.state.newTypeHugoThemeProvider}</TableCell>
-                      </TableRow>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Author
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">
+                        {themeInfo.AuthorHomepage ? (
+                          <Button onClick={async () => await openExternal(themeInfo.AuthorHomepage!)}>
+                            {themeInfo.Author}
+                          </Button>
+                        ) : (
+                          themeInfo.Author
+                        )}
+                      </TableCell>
+                    </TableRow>
 
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Example Content
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{(this.state.newHugoThemeExampleSite ? "Present" : "")}</TableCell>
-                      </TableRow>
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Licence
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">
+                        {themeInfo.LicenseLink ? (
+                          <Button onClick={async () => await openExternal(themeInfo.LicenseLink!)}>
+                            {themeInfo.License}
+                          </Button>
+                        ) : (
+                          themeInfo.License
+                        )}
+                      </TableCell>
+                    </TableRow>
 
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Name
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{(this.state.newTypeHugoThemeBusy ? <CircularProgress size={20} /> : null)} {this.state.newHugoThemeName}
-                          {(this.state.newHugoThemeHomepage? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeHomepage!)}}>Homepage</Button> : null) }
-                          {(this.state.newHugoThemeDemopage? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeDemopage!)}}>Demo</Button> : null) }
-                        </TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Description
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{this.state.newHugoThemeDescription}</TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Author
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{(this.state.newHugoThemeAuthorHomepage? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeAuthorHomepage!)}}>{this.state.newHugoThemeAuthor}</Button> : this.state.newHugoThemeAuthor) }</TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Licence
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{(this.state.newHugoThemeLicenseLink? <Button onClick={async ()=>{await openExternal(this.state.newHugoThemeLicenseLink!)}}>{this.state.newHugoThemeLicense}</Button> : this.state.newHugoThemeLicense) }</TableCell>
-                      </TableRow>
-
-                      <TableRow>
-                        <TableCell align="right">
-                          <Typography variant="subtitle2"  display="inline"  className="specValue" color="textSecondary">
-                            Minimal Hugo version
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="left">{this.state.newHugoThemeMinVersion}</TableCell>
-                      </TableRow>
-
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-              </CardContent>
-            </Box>
-
-          </Card>
-        </Box>
-
-      </React.Fragment>
-    )
-
-  }
-
+                    <TableRow>
+                      <TableCell align="right">
+                        <Typography variant="subtitle2" display="inline" className="specValue" color="textSecondary">
+                          Minimal Hugo version
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="left">{themeInfo.MinHugoVersion}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Box>
+        </Card>
+      </Box>
+    </>
+  );
 }
 
 export default FormPartialNewFromHugoTheme;
-

@@ -173,6 +173,8 @@ export class HugoDownloader {
   private environmentInfo: EnvironmentInfo;
   private urlBuilder: OfficialHugoSourceUrlBuilder;
   private unpacker: OfficialHugoUnpacker;
+  private abortController: AbortController | null = null;
+  private currentDownloadPath: string | null = null;
 
   constructor(dependencies: HugoDownloaderDependencies) {
     this.pathHelper = dependencies.pathHelper;
@@ -202,12 +204,13 @@ export class HugoDownloader {
 
   /**
    * Download file from URL to destination
+   * Supports cancellation via AbortController
    */
-  private async downloadToFile(url: string, dest: string): Promise<void> {
+  private async downloadToFile(url: string, dest: string, signal?: AbortSignal): Promise<void> {
     const dir = path.dirname(dest);
     await fs.ensureDir(dir);
 
-    const response = await fetch(url, { method: 'GET' });
+    const response = await fetch(url, { method: 'GET', signal });
 
     if (!response.ok) {
       throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
@@ -223,6 +226,10 @@ export class HugoDownloader {
 
     try {
       while (true) {
+        // Check if cancelled before each read
+        if (signal?.aborted) {
+          throw new Error('Download cancelled');
+        }
         const { done, value } = await reader.read();
         if (done) break;
         fileStream.write(Buffer.from(value));
@@ -255,15 +262,23 @@ export class HugoDownloader {
     }
 
     this.isRunning = true;
+    this.abortController = new AbortController();
 
     try {
       const environment = this.getHugoEnvironment();
       const url = this.urlBuilder.build(environment, version);
       const tempDest = path.join(this.pathHelper.getHugoBinDirForVer(version), 'download.partial');
+      this.currentDownloadPath = tempDest;
 
       // Clean up any existing partial download
       if (fs.existsSync(tempDest)) {
         await fs.unlink(tempDest);
+      }
+
+      // Check if cancelled
+      if (this.abortController.signal.aborted) {
+        yield { percent: 0, message: 'Download cancelled', complete: false, error: 'Download cancelled' };
+        return;
       }
 
       // Progress: Starting
@@ -273,9 +288,21 @@ export class HugoDownloader {
       // Progress: Preparing
       yield { percent: 20, message: 'Preparing download...', complete: false };
 
+      // Check if cancelled
+      if (this.abortController.signal.aborted) {
+        yield { percent: 0, message: 'Download cancelled', complete: false, error: 'Download cancelled' };
+        return;
+      }
+
       // Progress: Downloading
       yield { percent: 30, message: 'Downloading Hugo...', complete: false };
-      await this.downloadToFile(url, tempDest);
+      await this.downloadToFile(url, tempDest, this.abortController.signal);
+
+      // Check if cancelled
+      if (this.abortController.signal.aborted) {
+        yield { percent: 0, message: 'Download cancelled', complete: false, error: 'Download cancelled' };
+        return;
+      }
 
       // Progress: Unpacking
       yield { percent: 70, message: 'Unpacking Hugo...', complete: false };
@@ -283,18 +310,59 @@ export class HugoDownloader {
       await this.unpacker.unpack(tempDest, environment);
 
       // Clean up temp file
-      await fs.unlink(tempDest);
+      if (fs.existsSync(tempDest)) {
+        await fs.unlink(tempDest);
+      }
 
       // Progress: Complete
       yield { percent: 100, message: 'Hugo installation completed', complete: true };
       this.outputConsole.appendLine('Hugo installation completed.');
 
     } catch (error) {
+      // Clean up partial download on error
+      await this.cleanupPartialDownload();
+
       const errorMessage = error instanceof Error ? error.message : String(error);
-      this.outputConsole.appendLine(`Hugo installation failed: ${errorMessage}`);
+      // Don't log cancellation as an error
+      if (errorMessage !== 'Download cancelled' && !errorMessage.includes('aborted')) {
+        this.outputConsole.appendLine(`Hugo installation failed: ${errorMessage}`);
+      }
       yield { percent: 0, message: `Installation failed: ${errorMessage}`, complete: false, error: errorMessage };
     } finally {
       this.isRunning = false;
+      this.abortController = null;
+      this.currentDownloadPath = null;
+    }
+  }
+
+  /**
+   * Cancel the current download and clean up partial files
+   */
+  async cancel(): Promise<void> {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+
+    await this.cleanupPartialDownload();
+
+    this.isRunning = false;
+    this.abortController = null;
+    this.currentDownloadPath = null;
+
+    this.outputConsole.appendLine('Hugo download cancelled.');
+  }
+
+  /**
+   * Clean up any partial download files
+   */
+  private async cleanupPartialDownload(): Promise<void> {
+    if (this.currentDownloadPath && fs.existsSync(this.currentDownloadPath)) {
+      try {
+        await fs.unlink(this.currentDownloadPath);
+        this.outputConsole.appendLine('Cleaned up partial download file.');
+      } catch (e) {
+        // Ignore cleanup errors
+      }
     }
   }
 
