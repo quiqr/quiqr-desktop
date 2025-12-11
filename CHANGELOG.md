@@ -2,6 +2,9 @@
 
 ## NEXT RELEASE
 
+- chore: convert layouts and sidebars to functional components
+- fix: new network addresses for the server version
+
 ## 0.21.5 (2025-12-09)
 - fix: default message at API root url
 - chore: convert workspaces to functional. track progress
