@@ -74,9 +74,13 @@ class MainProcessBridge{
   }
 
   request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
+
+    const host = window.location.hostname;
+    console.log("DEBUG: using backend on hostname: "+host)
+
     const promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
       axios
-        .post("http://localhost:5150/api/"+method, {
+        .post("http://"+host+":5150/api/"+method, {
           data: data,
         }, {
           timeout: opts.timeout

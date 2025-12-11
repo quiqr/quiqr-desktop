@@ -55,9 +55,12 @@ export function createServer(
    */
   const apiHandlers = createApiHandlers(container);
 
+  // this does not work well when express also serves frontend
+  /*
   app.get("/", (req, res) => {
     res.send("Hello from Quiqr API Server!");
   });
+  */
 
   // API route - handles all POST /api/:method requests
   app.post(
