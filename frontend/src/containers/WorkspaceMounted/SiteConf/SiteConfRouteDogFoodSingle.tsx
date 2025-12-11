@@ -20,6 +20,7 @@ interface SiteConfRouteDogFoodSingleProps {
   singleKey: string;
   fileOverride?: string;
   title?: string;
+  modelRefreshKey?: number;
 }
 
 function SiteConfRouteDogFoodSingle({
@@ -28,6 +29,7 @@ function SiteConfRouteDogFoodSingle({
   singleKey,
   fileOverride,
   title,
+  modelRefreshKey,
 }: SiteConfRouteDogFoodSingleProps) {
   const [siteconf, setSiteconf] = useState<SiteConfig>({});
   const isMountedRef = useRef(true);
@@ -48,7 +50,7 @@ function SiteConfRouteDogFoodSingle({
     };
 
     loadData();
-  }, [siteKey, workspaceKey]);
+  }, [siteKey, workspaceKey, modelRefreshKey]);
 
   return (
     <Box sx={{ padding: '20px', height: '100%' }}>
@@ -61,6 +63,7 @@ function SiteConfRouteDogFoodSingle({
         workspaceKey={workspaceKey}
         singleKey={singleKey}
         fileOverride={typeof fileOverride === 'string' ? fileOverride : null}
+        modelRefreshKey={modelRefreshKey}
       />
     </Box>
   );

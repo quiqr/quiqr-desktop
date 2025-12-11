@@ -345,6 +345,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
         applicationRole={applicationRole}
         siteKey={siteKey}
         workspaceKey={workspaceKey}
+        modelRefreshKey={modelRefreshKey}
       />
     );
   };
@@ -361,9 +362,9 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
       />
       <Route
         path="sync/*"
-        element={<SyncRouted site={site} workspace={workspace} siteKey={siteKey} workspaceKey={workspaceKey} />}
+        element={<SyncRouted site={site} workspace={workspace} siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />}
       />
-      <Route path="siteconf/*" element={<SiteConfRouted siteKey={siteKey} workspaceKey={workspaceKey} />} />
+      <Route path="siteconf/*" element={<SiteConfRouted siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />} />
       <Route path="collections/:collection" element={<CollectionRoute siteKey={siteKey} workspaceKey={workspaceKey} />} />
       <Route
         path="collections/:collection/:item/:refresh"
