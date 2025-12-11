@@ -35,7 +35,7 @@ export function useModelCacheEvents(
       return;
     }
 
-    const url = `http://localhost:5150/api/workspace/${encodeURIComponent(siteKey)}/${encodeURIComponent(workspaceKey)}/model-events`;
+    const url = `http://${window.location.hostname}:5150/api/workspace/${encodeURIComponent(siteKey)}/${encodeURIComponent(workspaceKey)}/model-events`;
 
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;

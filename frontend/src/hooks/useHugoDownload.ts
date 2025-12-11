@@ -69,7 +69,7 @@ export function useHugoDownload(): HugoDownloadState {
         visible: true,
       });
 
-      const sseUrl = `http://localhost:5150/api/hugo/download/${encodeURIComponent(version)}`;
+      const sseUrl = `http://${window.location.hostname}:5150/api/hugo/download/${encodeURIComponent(version)}`;
       console.log('[useHugoDownload] Opening SSE connection to:', sseUrl);
 
       const eventSource = new EventSource(sseUrl);
