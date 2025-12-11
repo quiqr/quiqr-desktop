@@ -28,6 +28,7 @@ export interface FormMeta {
   workspaceKey: string;
   collectionKey: string;
   collectionItemKey: string;
+  prompt_templates: array;
   enableAiAssist: boolean;
   pageUrl: string;
 }
