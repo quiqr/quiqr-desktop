@@ -1,1 +1,2 @@
-export { default as MainLayout } from './MainLayout';
+export { AppLayout, SidebarHeader, MainToolbar } from './AppLayout';
+export type { AppLayoutProps, ToolbarConfig, SidebarHeaderProps, MainToolbarProps } from './AppLayout';

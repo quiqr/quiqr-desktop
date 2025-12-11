@@ -1,5 +1,5 @@
-import React     from 'react';
-import service   from './../../services/service'
+import { useState, useEffect, useCallback, useRef } from 'react';
+import service from './../../services/service';
 import Sidebar, { SidebarMenu } from '../Sidebar';
 import { UserPreferences } from '../../../types';
 
@@ -10,13 +10,13 @@ interface SiteConfig {
 
 interface WorkspaceCollection {
   key: string;
-  title: string;
+  title?: string;
   [key: string]: unknown;
 }
 
 interface WorkspaceSingle {
   key: string;
-  title: string;
+  title?: string;
   [key: string]: unknown;
 }
 
@@ -49,229 +49,199 @@ interface WorkspaceSidebarProps {
   applicationRole?: string;
 }
 
-interface WorkspaceSidebarState {
-  site: SiteConfig | null;
-  draftMode: boolean;
-  workspace: WorkspaceDetails | null;
-  menusCollapsed: string[];
-  error: string | null;
-  prefs?: Record<string, unknown>;
-  showEmpty?: boolean;
-}
+const WorkspaceSidebar = ({
+  siteKey,
+  workspaceKey,
+  hideItems,
+  applicationRole,
+}: WorkspaceSidebarProps) => {
+  const [site, setSite] = useState<SiteConfig | null>(null);
+  const [workspace, setWorkspace] = useState<WorkspaceDetails | null>(null);
+  const [menusCollapsed, setMenusCollapsed] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [showEmpty, setShowEmpty] = useState(false);
+  const isMountedRef = useRef(true);
 
-class WorkspaceSidebar extends React.Component<WorkspaceSidebarProps, WorkspaceSidebarState>{
+  const refresh = useCallback(() => {
+    if (siteKey && workspaceKey) {
+      service
+        .getSiteAndWorkspaceData(siteKey, workspaceKey)
+        .then((bundle) => {
+          if (isMountedRef.current) {
+            setSite(bundle.site);
+            setWorkspace(bundle.workspaceDetails);
+            setError(null);
+          }
+        })
+        .catch((e: Error | string) => {
+          if (isMountedRef.current) {
+            const errorMessage = typeof e === 'string' ? e : e.message;
+            setSite(null);
+            setWorkspace(null);
+            setError(errorMessage);
+          }
+        });
+    }
+  }, [siteKey, workspaceKey]);
 
-  _ismounted: boolean = false;
+  useEffect(() => {
+    isMountedRef.current = true;
+    refresh();
 
-  constructor(props: WorkspaceSidebarProps){
-    super(props);
-
-    this.state = {
-      site: null,
-      draftMode: false,
-      workspace: null,
-      menusCollapsed: [],
-      error: null
-    };
-
-  }
-
-  componentDidMount(){
-    this._ismounted = true;
-    this.refresh();
-
-    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
-
-      this.setState({prefs: value});
-
-      const collapsedMenusKey = this.props.siteKey+':collapsedMenus';
-      if(collapsedMenusKey in value && Array.isArray(value[collapsedMenusKey])){
-        this.setState({menusCollapsed: value[collapsedMenusKey] as string[] });
+    service.api.readConfKey('prefs').then((value: UserPreferences) => {
+      const collapsedMenusKey = siteKey + ':collapsedMenus';
+      if (collapsedMenusKey in value && Array.isArray(value[collapsedMenusKey])) {
+        setMenusCollapsed(value[collapsedMenusKey] as string[]);
       } else {
-        this.setState({menusCollapsed: []});
+        setMenusCollapsed([]);
       }
-
     });
-  }
 
-  componentDidUpdate(preProps: WorkspaceSidebarProps){
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [siteKey, workspaceKey, refresh]);
 
-    if(preProps.siteKey){
-
-      if(!this.state.site)
-      {
-        this.refresh();
-      }
+  // Refresh if site becomes null after initial load
+  useEffect(() => {
+    if (siteKey && !site) {
+      refresh();
     }
-  }
+  }, [siteKey, site, refresh]);
 
-  refresh = ()=>{
-    const {siteKey, workspaceKey } = this.props;
-    if(siteKey && workspaceKey){
-      service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-        if(this._ismounted){
-          this.setState({
-            site: bundle.site,
-            workspace: bundle.workspaceDetails,
-            error: null
-          });
-        }
-      }).catch((e: Error | string)=>{
-        if(this._ismounted){
-          const errorMessage = typeof e === 'string' ? e : e.message;
-          this.setState({site: null, workspace: null, error: errorMessage});
-        }
-      });
-    }
-  }
-
-  componentWillUnmount(){
-    service.unregisterListener(this);
-    this._ismounted = false;
-  }
-
-  matchRole(menuslot: WorkspaceMenu){
-    if(typeof menuslot.matchRole === 'undefined' || menuslot.matchRole === '' || menuslot.matchRole === 'all' || this.props.applicationRole === menuslot.matchRole){
+  const matchRole = (menuslot: WorkspaceMenu) => {
+    if (
+      typeof menuslot.matchRole === 'undefined' ||
+      menuslot.matchRole === '' ||
+      menuslot.matchRole === 'all' ||
+      applicationRole === menuslot.matchRole
+    ) {
       return true;
     }
     return false;
-  }
+  };
 
-  render(){
-    if(this.state.showEmpty){
-      return (<div />);
+  const handleMenuExpandToggle = (menuKey: string) => {
+    const collapseList = [...menusCollapsed];
+    if (collapseList.includes(menuKey)) {
+      const index = collapseList.indexOf(menuKey);
+      if (index !== -1) {
+        collapseList.splice(index, 1);
+      }
+    } else {
+      collapseList.push(menuKey);
     }
 
-    const encodedSiteKey = this.props.siteKey ? encodeURIComponent(this.props.siteKey) : '';
-    const encodedWorkspaceKey = this.props.workspaceKey ? encodeURIComponent(this.props.workspaceKey) : '';
-    const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
+    service.api.saveConfPrefKey(siteKey + ':collapsedMenus', collapseList);
+    setMenusCollapsed(collapseList);
+  };
 
-    const menus: SidebarMenu[] = [];
+  if (showEmpty) {
+    return <div />;
+  }
 
-    if(this.state.workspace){
+  const encodedSiteKey = siteKey ? encodeURIComponent(siteKey) : '';
+  const encodedWorkspaceKey = workspaceKey ? encodeURIComponent(workspaceKey) : '';
+  const basePath = `/sites/${encodedSiteKey}/workspaces/${encodedWorkspaceKey}`;
 
-      if("menu" in this.state.workspace){
-        this.state.workspace.menu.map((menuslot) => {
+  const menus: SidebarMenu[] = [];
 
-          if(this.matchRole(menuslot) && menuslot.disabled !== true){
-
-            menus.push({
-              title: menuslot.title,
-              expandable: true,
-              items: menuslot.menuItems.filter( (item)=> item.disabled !== true ).map((menuitem) => {
+  if (workspace) {
+    if (workspace.menu) {
+      workspace.menu.forEach((menuslot) => {
+        if (matchRole(menuslot) && menuslot.disabled !== true) {
+          menus.push({
+            title: menuslot.title,
+            expandable: true,
+            items: menuslot.menuItems
+              .filter((item) => item.disabled !== true)
+              .map((menuitem) => {
                 let item = null;
                 let itemType = null;
 
-                if(this.state.workspace?.collections?.some(e => e.key === menuitem.key)) {
-                  item = this.state.workspace.collections.find(e => e.key === menuitem.key);
-                  itemType = "collections";
-                }
-                else if(this.state.workspace?.singles?.some(e => e.key === menuitem.key)) {
-                  item = this.state.workspace.singles.find(e => e.key === menuitem.key);
-                  itemType = "singles";
+                if (workspace?.collections?.some((e) => e.key === menuitem.key)) {
+                  item = workspace.collections.find((e) => e.key === menuitem.key);
+                  itemType = 'collections';
+                } else if (workspace?.singles?.some((e) => e.key === menuitem.key)) {
+                  item = workspace.singles.find((e) => e.key === menuitem.key);
+                  itemType = 'singles';
                 }
 
-                if(item){
+                if (item) {
                   return {
-                    label: item.title,
+                    label: item.title || item.key,
                     to: `${basePath}/${itemType}/${encodeURIComponent(item.key)}`,
                     onClick: () => {
-                      this.refresh();
+                      refresh();
                     },
-                    active: false
-                  }
+                    active: false,
+                  };
                 }
-                else{
-                  return {
-                    label: menuitem.key +' (missing)',
-                    active: false
-                  }
-                }
-
-              })
-            });
-          }
-          return null;
-
+                return {
+                  label: menuitem.key + ' (missing)',
+                  active: false,
+                };
+              }),
+          });
+        }
+      });
+    } else {
+      // COLLECTIONS MENU
+      if (workspace.collections.length > 0) {
+        menus.push({
+          title: 'Collections',
+          items: workspace.collections.map((collection) => ({
+            label: collection.title || collection.key,
+            to: `${basePath}/collections/${encodeURIComponent(collection.key)}`,
+            onClick: () => {
+              refresh();
+            },
+            active: false,
+          })),
         });
-
       }
-      else{
 
-        //COLLECTIONS MENU
-        if(this.state.workspace.collections.length > 0){
-          menus.push({
-            title: 'Collections',
-            items: this.state.workspace.collections.map((collection) => {
-              return {
-                label: collection.title,
-                to: `${basePath}/collections/${encodeURIComponent(collection.key)}`,
-                onClick: () => {
-                  this.refresh();
-                },
-                active: false
-              }
-            })
-          });
-        }
-
-        //SINGLES MENU
-        if(this.state.workspace.singles.length > 0){
-          menus.push({
-            title: 'Singles',
-            items: this.state.workspace.singles.map((single) => {
-              return {
-                label: single.title,
-                to: `${basePath}/singles/${encodeURIComponent(single.key)}`,
-                onClick: () => {
-                  this.refresh();
-                },
-                active: false
-              }
-            })
-          });
-        }
-
+      // SINGLES MENU
+      if (workspace.singles.length > 0) {
+        menus.push({
+          title: 'Singles',
+          items: workspace.singles.map((single) => ({
+            label: single.title || single.key,
+            to: `${basePath}/singles/${encodeURIComponent(single.key)}`,
+            onClick: () => {
+              refresh();
+            },
+            active: false,
+          })),
+        });
       }
     }
-
-    const statusPanel = null;
-
-    return (<React.Fragment>
-      <Sidebar
-        hideItems={this.props.hideItems}
-        statusPanel={statusPanel}
-        menus={menus}
-        menusCollapsed={this.state.menusCollapsed}
-        onMenuExpandToggle={(menuKey)=>{
-
-          const collapseList = this.state.menusCollapsed || [];
-          if(collapseList.includes(menuKey)){
-            const index = collapseList.indexOf(menuKey);
-            if (index !== -1) {
-              collapseList.splice(index, 1);
-            }
-          }
-          else{
-            collapseList.push(menuKey);
-          }
-
-          service.api.saveConfPrefKey(this.props.siteKey+':collapsedMenus',collapseList);
-          this.setState({menusCollapsed: collapseList});
-
-        }}
-      />
-      { this.state.error && (
-        <p style={{
-          color: '#EC407A', padding: '10px', margin: '16px',
-          fontSize:'14px', border: 'solid 1px #EC407A',
-          borderRadius:3
-        }}>{this.state.error}</p>)
-      }
-
-    </React.Fragment>
-    )
   }
-}
+
+  return (
+    <>
+      <Sidebar
+        hideItems={hideItems}
+        menus={menus}
+        menusCollapsed={menusCollapsed}
+        onMenuExpandToggle={handleMenuExpandToggle}
+      />
+      {error && (
+        <p
+          style={{
+            color: '#EC407A',
+            padding: '10px',
+            margin: '16px',
+            fontSize: '14px',
+            border: 'solid 1px #EC407A',
+            borderRadius: 3,
+          }}
+        >
+          {error}
+        </p>
+      )}
+    </>
+  );
+};
 
 export default WorkspaceSidebar;
