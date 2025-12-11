@@ -222,7 +222,12 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
 
   // Check Hugo version when workspace is loaded
   useEffect(() => {
-    if (workspace?.hugover) {
+    // Wait for workspace data to load before deciding on Hugo status
+    if (workspace === null) {
+      return;
+    }
+
+    if (workspace.hugover) {
       const checkAndDownloadHugo = async () => {
         try {
           const result = await service.api.checkHugoVersion(workspace.hugover!);
@@ -246,7 +251,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
       // No Hugo version specified, mark as ready
       setHugoReady(true);
     }
-  }, [workspace?.hugover, downloadHugo, setHugoReady]);
+  }, [workspace, downloadHugo, setHugoReady]);
 
   /**
    * Open preview in browser, ensuring Hugo is downloaded first.
