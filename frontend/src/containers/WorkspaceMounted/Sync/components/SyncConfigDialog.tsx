@@ -1,30 +1,37 @@
-import * as React                       from 'react';
-import Button                           from '@mui/material/Button';
-import MuiDialogTitle                   from '@mui/material/DialogTitle';
-import Grid                             from '@mui/material/Grid';
-import Box                              from '@mui/material/Box';
-import Typography                       from '@mui/material/Typography';
-import Dialog                           from '@mui/material/Dialog';
-import DialogActions                    from '@mui/material/DialogActions';
-import DialogContent                    from '@mui/material/DialogContent';
-import DialogContentText                from '@mui/material/DialogContentText';
-import service                          from './../../../../services/service';
+import { useState, useEffect } from 'react';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import service from './../../../../services/service';
 
 //GitHub Target
-import {FormConfig as GitHubPagesForm}  from '../syncTypes/github'
-import {Meta as GitHubMeta}             from '../syncTypes/github'
-import {CardNew as CardNewGitHub}       from '../syncTypes/github'
+import { FormConfig as GitHubPagesForm } from '../syncTypes/github';
+import { Meta as GitHubMeta } from '../syncTypes/github';
+import { CardNew as CardNewGitHub } from '../syncTypes/github';
 
 //System Git Target
-import {FormConfig as SysGitForm}       from '../syncTypes/sysgit'
-import {CardNew as CardNewSysGit}       from '../syncTypes/sysgit'
-import {Meta as SysGitMeta}             from '../syncTypes/sysgit'
+import { FormConfig as SysGitForm } from '../syncTypes/sysgit';
+import { CardNew as CardNewSysGit } from '../syncTypes/sysgit';
+import { Meta as SysGitMeta } from '../syncTypes/sysgit';
 
 //Folder Target
-import {Meta as FolderMeta}             from '../syncTypes/folder'
-import {FormConfig as FolderExportForm} from '../syncTypes/folder'
-import {CardNew as CardNewFolder}       from '../syncTypes/folder'
-import DialogTitle from "@mui/material/DialogTitle";
+import { Meta as FolderMeta } from '../syncTypes/folder';
+import { FormConfig as FolderExportForm } from '../syncTypes/folder';
+import { CardNew as CardNewFolder } from '../syncTypes/folder';
+
+interface PublishConfBase {
+  key: string;
+  config: {
+    type: string;
+    [key: string]: unknown;
+  };
+}
 
 interface SyncConfigDialogProps {
   open?: boolean;
@@ -35,210 +42,159 @@ interface SyncConfigDialogProps {
       config: unknown;
     }>;
   };
-  publishConf?: {
-    key: string;
-    config: {
-      type: string;
-    };
-  };
+  publishConf?: PublishConfBase;
   modAction?: string;
   closeText?: string;
   onClose: () => void;
   onSave: (inkey: string) => void;
 }
 
-interface SyncConfigDialogState {
-  serverType: string | null;
-  saveEnabled: boolean;
-  pubData: any;
-  dialogSize: "xs" | "sm" | "md" | "lg" | "xl";
-  publishKey?: string;
-}
+type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-class SyncConfigDialog extends React.Component<SyncConfigDialogProps, SyncConfigDialogState>{
+function SyncConfigDialog({
+  open,
+  site,
+  publishConf,
+  modAction,
+  closeText,
+  onClose,
+  onSave,
+}: SyncConfigDialogProps) {
+  const [serverType, setServerType] = useState<string | null>(null);
+  const [saveEnabled, setSaveEnabled] = useState(false);
+  const [pubData, setPubData] = useState<unknown>({});
+  const [dialogSize, setDialogSize] = useState<DialogSize>('sm');
+  const [publishKey, setPublishKey] = useState<string | undefined>();
 
-  constructor(props){
-    super(props);
-
-    this.state = {
-      serverType: null,
-      saveEnabled: false,
-      pubData: {},
-      dialogSize: "sm",
+  useEffect(() => {
+    if (publishConf) {
+      setServerType(publishConf.config.type);
+      setPublishKey(publishConf.key);
+      setDialogSize('md');
     }
-  }
+  }, [publishConf]);
 
-  savePublishData(inkey,data){
-    const site= this.props.site;
-
-    if(!inkey){
-      inkey = `publ-${Math.random()}`;
-    }
-
-    const publConfIndex = site.publish.findIndex( ({ key }) => key === inkey );
-    if(publConfIndex !== -1){
-      site.publish[publConfIndex] = {key:inkey, config: data};
-    }
-    else{
-      site.publish.push({key:inkey, config: data});
+  const savePublishData = async (inkey: string | undefined, data: unknown) => {
+    let key = inkey;
+    if (!key) {
+      key = `publ-${Math.random()}`;
     }
 
-    service.api.saveSiteConf(site.key, site).then(()=>{
-      this.props.onSave(inkey);
-    });
-  }
-
-
-  componentDidUpdate(preProps){
-    if(this.props.publishConf && preProps.publishConf !== this.props.publishConf) {
-      this.setState({
-        serverType: this.props.publishConf.config.type,
-        publishKey: this.props.publishConf.key,
-        dialogSize: "md",
-      });
+    const publConfIndex = site.publish.findIndex(({ key: k }) => k === key);
+    if (publConfIndex !== -1) {
+      site.publish[publConfIndex] = { key, config: data };
+    } else {
+      site.publish.push({ key, config: data });
     }
-  }
 
-  renderServerCards(){
+    await service.api.saveSiteConf(site.key, site);
+    onSave(key);
+  };
+
+  const selectServerType = (type: string) => {
+    setServerType(type);
+    setDialogSize('md');
+  };
+
+  const renderServerCards = () => {
     const sysGitBinAvailable = true;
     return (
-
-      <React.Fragment>
-        <Grid container  spacing={2}>
-
-          { (sysGitBinAvailable ?
+      <Grid container spacing={2}>
+        {sysGitBinAvailable && (
           <Grid size={6}>
-            <CardNewSysGit
-              handleClick={()=>{
-                this.setState({serverType: 'sysgit',
-                  dialogSize: "md",
-                });
-              }} />
+            <CardNewSysGit handleClick={() => selectServerType('sysgit')} />
           </Grid>
-          : null) }
+        )}
 
-          <Grid size={6}>
-
-            <CardNewGitHub
-              handleClick={()=>{
-                this.setState({serverType: 'github',
-                  dialogSize: "md",
-                });
-              }} />
-
-          </Grid>
-
-          <Grid size={6}>
-            <CardNewFolder
-              handleClick={()=>{
-                this.setState({serverType: 'folder',
-                  dialogSize: "md",
-                });
-              }} />
-
-          </Grid>
-
+        <Grid size={6}>
+          <CardNewGitHub handleClick={() => selectServerType('github')} />
         </Grid>
-      </React.Fragment>
-    )
-  }
 
-  render(){
-    const { open, modAction, closeText } = this.props;
-    let content, serverFormLogo = null;
-    let saveButtonHidden = true;
-    let configDialogTitle = '';
-
-    if(this.state.serverType){
-      if (this.state.serverType === 'github'){
-
-        configDialogTitle = GitHubMeta.configDialogTitle;
-        serverFormLogo = GitHubMeta.icon();
-        content = <GitHubPagesForm
-            publishConf={this.props.publishConf}
-            modAction={this.props.modAction}
-            setSaveEnabled={(enabled)=>{
-              this.setState({saveEnabled:enabled});
-            }}
-            setData={(pubData)=>{
-              this.setState({pubData:pubData});
-          }} />
-
-        saveButtonHidden = false;
-      }
-
-      else if (this.state.serverType === 'sysgit' || this.state.serverType === 'git'){
-        configDialogTitle = SysGitMeta.configDialogTitle;
-        serverFormLogo = SysGitMeta.icon();
-        content = <SysGitForm
-            publishConf={this.props.publishConf}
-            modAction={this.props.modAction}
-            setSaveEnabled={(enabled)=>{
-              this.setState({saveEnabled:enabled});
-            }}
-            setData={(pubData)=>{
-              this.setState({pubData:pubData});
-          }} />
-
-        saveButtonHidden = false;
-      }
-
-      else if (this.state.serverType === 'folder'){
-
-
-        configDialogTitle = FolderMeta.configDialogTitle;
-        serverFormLogo = FolderMeta.icon();
-        content = <FolderExportForm
-            publishConf={this.props.publishConf}
-            modAction={this.props.modAction}
-            setSaveEnabled={(enabled)=>{
-              this.setState({saveEnabled:enabled});
-            }}
-            setData={(pubData)=>{
-              this.setState({pubData:pubData});
-          }} />
-
-        saveButtonHidden = false;
-      }
-
-    }
-    else if(modAction === 'Add'){
-      content = this.renderServerCards();
-    }
-
-    const actions = [
-      <Button key="action1" color="primary" onClick={this.props.onClose}>
-        {closeText}
-      </Button>,
-      (saveButtonHidden?null:
-        <Button  key="action2" color="primary" hidden={saveButtonHidden} disabled={!this.state.saveEnabled} onClick={()=>{
-          this.savePublishData(this.state.publishKey, this.state.pubData);
-          //this.props.onSave(this.state.publishKey, this.state.pubData);
-        }}>
-          {"save"}
-        </Button>),
-    ];
-
-    return (
-      <Dialog
-        open={open || false}
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
-        fullWidth={true}
-        maxWidth={this.state.dialogSize}>
-        <DialogTitle sx={{ margin: 0, p: 2 }} component={'div'}>
-          <Box sx={{ position: "absolute", right: "24px", top: "24px" }}>{serverFormLogo}</Box>
-          <Typography variant='h6'>{modAction + " " + configDialogTitle}</Typography>
-        </DialogTitle>
-
-        <DialogContent>
-          {content}
-          <DialogContentText id='alert-dialog-description'></DialogContentText>
-        </DialogContent>
-        <DialogActions>{actions}</DialogActions>
-      </Dialog>
+        <Grid size={6}>
+          <CardNewFolder handleClick={() => selectServerType('folder')} />
+        </Grid>
+      </Grid>
     );
+  };
+
+  let content: React.ReactNode = null;
+  let serverFormLogo: React.ReactNode = null;
+  let saveButtonHidden = true;
+  let configDialogTitle = '';
+
+  if (serverType) {
+    if (serverType === 'github') {
+      configDialogTitle = GitHubMeta.configDialogTitle;
+      serverFormLogo = GitHubMeta.icon();
+      content = (
+        <GitHubPagesForm
+          publishConf={publishConf as Parameters<typeof GitHubPagesForm>[0]['publishConf']}
+          setSaveEnabled={setSaveEnabled}
+          setData={setPubData}
+        />
+      );
+      saveButtonHidden = false;
+    } else if (serverType === 'sysgit' || serverType === 'git') {
+      configDialogTitle = SysGitMeta.configDialogTitle;
+      serverFormLogo = SysGitMeta.icon();
+      content = (
+        <SysGitForm
+          publishConf={publishConf as Parameters<typeof SysGitForm>[0]['publishConf']}
+          setSaveEnabled={setSaveEnabled}
+          setData={setPubData}
+        />
+      );
+      saveButtonHidden = false;
+    } else if (serverType === 'folder') {
+      configDialogTitle = FolderMeta.configDialogTitle;
+      serverFormLogo = FolderMeta.icon();
+      content = (
+        <FolderExportForm
+          publishConf={publishConf as Parameters<typeof FolderExportForm>[0]['publishConf']}
+          setSaveEnabled={setSaveEnabled}
+          setData={setPubData}
+        />
+      );
+      saveButtonHidden = false;
+    }
+  } else if (modAction === 'Add') {
+    content = renderServerCards();
   }
+
+  return (
+    <Dialog
+      open={open || false}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      fullWidth={true}
+      maxWidth={dialogSize}
+    >
+      <DialogTitle sx={{ margin: 0, p: 2 }} component={'div'}>
+        <Box sx={{ position: 'absolute', right: '24px', top: '24px' }}>{serverFormLogo}</Box>
+        <Typography variant="h6">{modAction + ' ' + configDialogTitle}</Typography>
+      </DialogTitle>
+
+      <DialogContent>
+        {content}
+        <DialogContentText id="alert-dialog-description"></DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button key="action1" color="primary" onClick={onClose}>
+          {closeText}
+        </Button>
+        {!saveButtonHidden && (
+          <Button
+            key="action2"
+            color="primary"
+            disabled={!saveEnabled}
+            onClick={() => savePublishData(publishKey, pubData)}
+          >
+            save
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
 }
 
 export default SyncConfigDialog;
