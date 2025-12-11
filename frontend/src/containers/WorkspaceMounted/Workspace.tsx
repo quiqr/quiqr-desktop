@@ -188,7 +188,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   const [error, setError] = useState<string | null>(null);
   const [hugoReady, setHugoReady] = useState(false);
 
-  const { progress: hugoProgress, downloadHugo } = useHugoDownload();
+  const { progress: hugoProgress, downloadHugo, cancelDownload } = useHugoDownload();
 
   const refresh = useCallback(() => {
     if (siteKey && workspaceKey) {
@@ -347,7 +347,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
         {hugoReady && renderContent()}
       </AppLayout>
 
-      {hugoProgress && <ProgressDialog conf={hugoProgress} />}
+      {hugoProgress && <ProgressDialog conf={hugoProgress} onClose={cancelDownload} />}
     </>
   );
 };
