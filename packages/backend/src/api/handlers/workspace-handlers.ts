@@ -37,38 +37,24 @@ export function createListWorkspacesHandler(container: AppContainer) {
  */
 export function createGetWorkspaceDetailsHandler(container: AppContainer) {
   return async ({ siteKey, workspaceKey }: { siteKey: string; workspaceKey: string }) => {
-    // 1. Get workspace path from mounted workspace
-    const siteConfig = await container.libraryService.getSiteConf(siteKey);
-    const siteService = new SiteService(siteConfig, container.siteSourceFactory, container.syncFactory);
-    const workspace = await siteService.getWorkspaceHead(workspaceKey);
+    // Use the container's getWorkspaceService which handles caching and model watcher setup
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
 
-    if (!workspace) throw new Error('Workspace not found');
-
-    // 2. Create WorkspaceService for this workspace
-    const workspaceService = container.createWorkspaceService(
-      workspace.path,
-      workspaceKey,
-      siteKey
-    );
-
-    // 3. Get configuration - delegates to WorkspaceService
+    // Get configuration - delegates to WorkspaceService
     const config = await workspaceService.getConfigurationsData();
 
-    // 4. Update state - delegates to AppState
-    container.state.setCurrentSite(siteKey, workspaceKey, workspace.path);
+    // Get workspace path for state update
+    const workspacePath = workspaceService.getWorkspacePath();
 
-    // 5. Save last opened - delegates to AppConfig
-    container.config.setLastOpenedSite(siteKey, workspaceKey, workspace.path);
+    // Update state - delegates to AppState
+    container.state.setCurrentSite(siteKey, workspaceKey, workspacePath);
+
+    // Save last opened - delegates to AppConfig
+    container.config.setLastOpenedSite(siteKey, workspaceKey, workspacePath);
     await container.config.save();
 
-    // 6. Update menu to reflect that a site is now selected
+    // Update menu to reflect that a site is now selected
     container.adapters.menu.createMainMenu();
-
-    // 7. Set up file watcher - NEW helper method needed
-    // setupModelWatcher(container, workspace.path);
-
-    // 8. Hugo download - STUB for MVP (or skip entirely)
-    // await ensureHugoAvailable(config.hugover);
 
     return config;
   };

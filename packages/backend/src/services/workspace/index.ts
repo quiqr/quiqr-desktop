@@ -10,3 +10,4 @@ export * from './workspace-config-validator.js';
 export * from './workspace-config-provider.js';
 export * from './initial-workspace-config-builder.js';
 export * from './workspace-service.js';
+export * from './model-watcher.js';

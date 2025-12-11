@@ -9,6 +9,7 @@ interface SingleProps {
   singleKey: string;
   fileOverride?: string | null;
   refreshed?: boolean;
+  modelRefreshKey?: number;
 }
 
 interface WorkspaceSingle {
@@ -28,7 +29,7 @@ interface WorkspaceDetails {
   [key: string]: unknown;
 }
 
-function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed }: SingleProps) {
+function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey }: SingleProps) {
   const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
   const [singleValues, setSingleValues] = useState<unknown>(null);
   const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
@@ -60,7 +61,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed }: S
     return () => {
       isMountedRef.current = false;
     };
-  }, [siteKey, workspaceKey, singleKey, fileOverride]);
+  }, [siteKey, workspaceKey, singleKey, fileOverride, modelRefreshKey]);
 
   const handleOpenInEditor = useCallback(
     (context: { reject: (message: string) => void }) => {
@@ -158,6 +159,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed }: S
 
   return (
     <SukohForm
+      key={`${singleKey}-${modelRefreshKey}`}
       debug={false}
       rootName={single.title}
       singleKey={singleKey}

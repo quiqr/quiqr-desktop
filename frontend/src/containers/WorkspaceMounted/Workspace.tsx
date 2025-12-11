@@ -19,6 +19,7 @@ import service from '../../services/service';
 import { AppLayout } from '../../layouts/AppLayout';
 import { SiteConfig } from '../../../types';
 import { useHugoDownload } from '../../hooks/useHugoDownload';
+import { useModelCacheEvents } from '../../hooks/useModelCacheEvents';
 import ProgressDialog from '../../components/ProgressDialog';
 import { openExternal } from '../../utils/platform';
 
@@ -147,7 +148,15 @@ const CollectionRoute = ({ siteKey, workspaceKey }: { siteKey: string; workspace
   );
 };
 
-const CollectionItemRoute = ({ siteKey, workspaceKey }: { siteKey: string; workspaceKey: string }) => {
+const CollectionItemRoute = ({
+  siteKey,
+  workspaceKey,
+  modelRefreshKey,
+}: {
+  siteKey: string;
+  workspaceKey: string;
+  modelRefreshKey: number;
+}) => {
   const { collection, item } = useParams();
   const location = useLocation();
   return (
@@ -157,6 +166,7 @@ const CollectionItemRoute = ({ siteKey, workspaceKey }: { siteKey: string; works
       workspaceKey={workspaceKey}
       collectionKey={decodeURIComponent(collection || '')}
       collectionItemKey={decodeURIComponent(item || '')}
+      modelRefreshKey={modelRefreshKey}
     />
   );
 };
@@ -165,10 +175,12 @@ const SingleRoute = ({
   siteKey,
   workspaceKey,
   refreshed,
+  modelRefreshKey,
 }: {
   siteKey: string;
   workspaceKey: string;
   refreshed: boolean;
+  modelRefreshKey: number;
 }) => {
   const { single } = useParams();
   const location = useLocation();
@@ -179,6 +191,7 @@ const SingleRoute = ({
       refreshed={refreshed}
       workspaceKey={workspaceKey}
       singleKey={decodeURIComponent(single || '')}
+      modelRefreshKey={modelRefreshKey}
     />
   );
 };
@@ -189,6 +202,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   const [site, setSite] = useState<SiteConfig | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceConfig | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [modelRefreshKey, setModelRefreshKey] = useState(0);
 
   const {
     progress: hugoProgress,
@@ -219,6 +233,16 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // Callback for model cache events - clear frontend cache then refresh
+  const handleModelCacheCleared = useCallback(() => {
+    service.clearCache();
+    setModelRefreshKey((k) => k + 1);
+    refresh();
+  }, [refresh]);
+
+  // Subscribe to model cache events - refresh workspace data when model files change
+  useModelCacheEvents(siteKey, workspaceKey, handleModelCacheCleared);
 
   // Check Hugo version when workspace is loaded
   useEffect(() => {
@@ -343,19 +367,19 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
       <Route path="collections/:collection" element={<CollectionRoute siteKey={siteKey} workspaceKey={workspaceKey} />} />
       <Route
         path="collections/:collection/:item/:refresh"
-        element={<CollectionItemRoute siteKey={siteKey} workspaceKey={workspaceKey} />}
+        element={<CollectionItemRoute siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />}
       />
       <Route
         path="collections/:collection/:item"
-        element={<CollectionItemRoute siteKey={siteKey} workspaceKey={workspaceKey} />}
+        element={<CollectionItemRoute siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />}
       />
       <Route
         path="singles/:single/:refresh"
-        element={<SingleRoute siteKey={siteKey} workspaceKey={workspaceKey} refreshed={true} />}
+        element={<SingleRoute siteKey={siteKey} workspaceKey={workspaceKey} refreshed={true} modelRefreshKey={modelRefreshKey} />}
       />
       <Route
         path="singles/:single"
-        element={<SingleRoute siteKey={siteKey} workspaceKey={workspaceKey} refreshed={false} />}
+        element={<SingleRoute siteKey={siteKey} workspaceKey={workspaceKey} refreshed={false} modelRefreshKey={modelRefreshKey} />}
       />
     </Routes>
   );
