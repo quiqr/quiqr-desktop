@@ -116,12 +116,12 @@ const SyncRouteGeneral = ({
     });
   };
 
-  const updateSyncProgress = (progress: SyncProgress | null) => {
+  const updateSyncProgress = useCallback((progress: SyncProgress | null) => {
     setServerBusyDialog((prev) => ({
       ...prev,
       progress: progress,
     }));
-  };
+  }, []);
 
   const renderMainCard = (publishConf: PublishConfig) => {
     let enableSyncFrom = false;
