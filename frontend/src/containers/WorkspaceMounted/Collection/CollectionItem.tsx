@@ -1,7 +1,7 @@
-import React                         from 'react';
-import service                       from './../../../services/service'
-import { SukohForm }                 from './../../../components/SukohForm';
-import Spinner                       from './../../../components/Spinner'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import service from './../../../services/service';
+import { SukohForm } from './../../../components/SukohForm';
+import Spinner from './../../../components/Spinner';
 
 interface WorkspaceCollection {
   key: string;
@@ -27,140 +27,139 @@ interface CollectionItemProps {
   collectionItemKey: string;
 }
 
-interface CollectionItemState {
-  selectedWorkspaceDetails: WorkspaceDetails | null;
-  collectionItemValues: unknown;
-  currentBaseUrlPath?: string;
-  showSpinner?: boolean;
-}
+function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey }: CollectionItemProps) {
+  const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
+  const [collectionItemValues, setCollectionItemValues] = useState<unknown>(null);
+  const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
+  const isMountedRef = useRef(true);
 
-class CollectionItem extends React.Component<CollectionItemProps, CollectionItemState>{
-  constructor(props: CollectionItemProps){
-    super(props);
-    this.state = {
-      selectedWorkspaceDetails: null,
-      collectionItemValues: null,
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    const loadData = async () => {
+      const [workspaceDetails, itemValues, baseUrlPath] = await Promise.all([
+        service.api.getWorkspaceDetails(siteKey, workspaceKey),
+        service.api.getCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey),
+        service.api.getCurrentBaseUrl(),
+      ]);
+
+      if (isMountedRef.current) {
+        setSelectedWorkspaceDetails(workspaceDetails as WorkspaceDetails);
+        setCollectionItemValues(itemValues);
+        setCurrentBaseUrlPath(typeof baseUrlPath === 'string' ? baseUrlPath : undefined);
+      }
     };
-  }
 
-  componentWillUnmount(){
-    service.unregisterListener(this);
-  }
+    loadData();
 
-  componentDidMount(){
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [siteKey, workspaceKey, collectionKey, collectionItemKey]);
 
-    service.registerListener(this);
-
-    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-
-    Promise.all([
-      service.api.getWorkspaceDetails(siteKey, workspaceKey),
-      service.api.getCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey),
-      service.api.getCurrentBaseUrl()
-    ]).then(([workspaceDetails, collectionItemValues, currentBaseUrlPath])=>{
-      this.setState({
-        selectedWorkspaceDetails: workspaceDetails as WorkspaceDetails,
-        collectionItemValues: collectionItemValues,
-        currentBaseUrlPath: typeof currentBaseUrlPath === 'string' ? currentBaseUrlPath : undefined
-      });
-    });
-  }
-
-  handleOpenInEditor(){
-    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
+  const handleOpenInEditor = useCallback(() => {
     service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
-  }
+  }, [siteKey, workspaceKey, collectionKey, collectionItemKey]);
 
-  handleSave(context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }){
-    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-    const promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
-    promise.then(function(updatedValues){
-      context.accept(updatedValues);
-    }, function(){
-      context.reject('Something went wrong.');
-    })
-  }
+  const handleSave = useCallback(
+    (context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }) => {
+      const promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
+      promise.then(
+        function (updatedValues) {
+          context.accept(updatedValues);
+        },
+        function () {
+          context.reject('Something went wrong.');
+        }
+      );
+    },
+    [siteKey, workspaceKey, collectionKey, collectionItemKey]
+  );
 
-  generatePageUrl(collection: WorkspaceCollection){
+  const collection = selectedWorkspaceDetails?.collections.find((x) => x.key === collectionKey);
 
-    if(collection.hidePreviewIcon){
+  const pageUrl = useMemo(() => {
+    if (!collection || collection.hidePreviewIcon) {
       return '';
     }
 
-    const ItemPathElements = this.props.collectionItemKey.split("/");
+    const ItemPathElements = collectionItemKey.split('/');
     const pageItem = ItemPathElements.pop();
+    if (pageItem !== 'index.md') {
+      ItemPathElements.push(pageItem!.split('.').slice(0, -1).join('.'));
+    }
+
     let path;
-    if(pageItem !=='index.md'){
-      ItemPathElements.push(pageItem.split('.').slice(0, -1).join('.'));
-    }
-
-    if(collection.previewUrlBase){
-      path = collection.previewUrlBase + "/" + ItemPathElements.join("/");
-    }
-    else{
-      const CollectionPath = collection.folder.split("/")
+    if (collection.previewUrlBase) {
+      path = collection.previewUrlBase + '/' + ItemPathElements.join('/');
+    } else {
+      const CollectionPath = collection.folder.split('/');
       CollectionPath.shift();
-      path = CollectionPath.join("/") + "/" + ItemPathElements.join("/");
+      path = CollectionPath.join('/') + '/' + ItemPathElements.join('/');
     }
 
-    let finalpath = this.state.currentBaseUrlPath+path.toLowerCase();
-    finalpath = finalpath.replace("//","/").replace("//","/");
-    if(Array.from(finalpath)[0]!=="/"){
-      finalpath = "/"+finalpath;
+    let finalpath = (currentBaseUrlPath || '') + path.toLowerCase();
+    finalpath = finalpath.replace('//', '/').replace('//', '/');
+    if (Array.from(finalpath)[0] !== '/') {
+      finalpath = '/' + finalpath;
     }
-    const url = 'http://localhost:13131'+finalpath;
+    return 'http://localhost:13131' + finalpath;
+  }, [collection, collectionItemKey, currentBaseUrlPath]);
 
-    return url;
-  }
-
-
-  render(){
-    if(this.state.showSpinner || this.state.collectionItemValues===undefined||this.state.selectedWorkspaceDetails==null){
-      return <Spinner />;
-    }
-
-    const { selectedWorkspaceDetails} = this.state;
-    const { siteKey, workspaceKey, collectionKey, collectionItemKey } = this.props;
-
-    const collection = selectedWorkspaceDetails.collections.find(x => x.key === collectionKey);
-    if(collection==null)return null;
-
-    const fields = collection.fields.slice(0);
-    if(!collection.build_actions) collection.build_actions = [];
-    const buildActions = collection.build_actions.slice(0);
-    const values =  Object.assign({}, this.state.collectionItemValues)
-
-    const pageUrl = this.generatePageUrl(collection);
-
-    return(<SukohForm
-    debug={false}
-    rootName={collection.title}
-    pageUrl={pageUrl}
-    hideExternalEditIcon={collection.hideExternalEditIcon}
-    fields={fields}
-    siteKey={siteKey}
-    workspaceKey={workspaceKey}
-    collectionKey={collectionKey}
-    collectionItemKey={collectionItemKey}
-    values={values}
-    buildActions={buildActions}
-    plugins={{
-
-      openBundleFileDialog: function({title, extensions, targetPath}, onFilesReady){
-        return service.api.openFileDialogForSingleAndCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, {title, extensions});
+  const plugins = useMemo(
+    () => ({
+      openBundleFileDialog: function (
+        { title, extensions, targetPath }: { title: string; extensions: string[]; targetPath: string },
+        onFilesReady: unknown
+      ) {
+        return service.api.openFileDialogForSingleAndCollectionItem(
+          siteKey,
+          workspaceKey,
+          collectionKey,
+          collectionItemKey,
+          targetPath,
+          { title, extensions }
+        );
       },
-      getFilesInBundle: function(extensions, targetPath, forceFileName){
+      getFilesInBundle: function (extensions: string[], targetPath: string, forceFileName: string) {
         return service.api.getFilesInBundle(siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName);
       },
-      getBundleThumbnailSrc: function(targetPath){
-        return service.api.getThumbnailForCollectionOrSingleItemImage(siteKey,workspaceKey,collectionKey,collectionItemKey, targetPath);
-      }
-    }}
-    onSave={this.handleSave.bind(this)}
-    onOpenInEditor={this.handleOpenInEditor.bind(this)}
+      getBundleThumbnailSrc: function (targetPath: string) {
+        return service.api.getThumbnailForCollectionOrSingleItemImage(siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath);
+      },
+    }),
+    [siteKey, workspaceKey, collectionKey, collectionItemKey]
+  );
 
-  />);
+  if (collectionItemValues === undefined || selectedWorkspaceDetails == null) {
+    return <Spinner />;
   }
+
+  if (collection == null) return null;
+
+  const fields = collection.fields.slice(0);
+  if (!collection.build_actions) collection.build_actions = [];
+  const buildActions = collection.build_actions.slice(0);
+  const values = Object.assign({}, collectionItemValues);
+
+  return (
+    <SukohForm
+      debug={false}
+      rootName={collection.title}
+      pageUrl={pageUrl}
+      hideExternalEditIcon={collection.hideExternalEditIcon}
+      fields={fields}
+      siteKey={siteKey}
+      workspaceKey={workspaceKey}
+      collectionKey={collectionKey}
+      collectionItemKey={collectionItemKey}
+      values={values}
+      buildActions={buildActions}
+      plugins={plugins}
+      onSave={handleSave}
+      onOpenInEditor={handleOpenInEditor}
+    />
+  );
 }
 
 export default CollectionItem;

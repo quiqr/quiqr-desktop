@@ -1,8 +1,8 @@
 import { Link } from 'react-router';
-import { Component } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import service from './../../../services/service';
 import Spinner from './../../../components/Spinner';
-import MarkdownIt from 'markdown-it'
+import MarkdownIt from 'markdown-it';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -11,15 +11,15 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 
-const md = new MarkdownIt({html:true});
+const md = new MarkdownIt({ html: true });
 
 const styles = {
   creatorMessage: {
     borderBottom: 'solid 1px transparent',
     padding: '0 20px ',
-    fontSize: '90%'
-  }
-}
+    fontSize: '90%',
+  },
+};
 
 interface HomeProps {
   siteKey: string;
@@ -40,173 +40,127 @@ interface CardSection {
   cards: ContentCard[];
 }
 
-interface HomeState {
-  blockingOperation: string | null;
-  currentSiteKey: string | null;
-  currentWorkspaceKey?: string;
-  buttonPressed: string;
-  contentItemCardsSections: CardSection[];
-  siteCreatorMessage: string | null;
-  configurations: unknown;
-  selectedSite: { key: string } | null;
-  basePath: string;
-  error: unknown;
-  showSpinner?: boolean;
-}
+function Home({ siteKey, workspaceKey }: HomeProps) {
+  const [contentItemCardsSections, setContentItemCardsSections] = useState<CardSection[]>([]);
+  const [siteCreatorMessage, setSiteCreatorMessage] = useState<string | null>(null);
+  const [configurations, setConfigurations] = useState<unknown>(null);
+  const [selectedSite, setSelectedSite] = useState<{ key: string } | null>(null);
+  const [basePath, setBasePath] = useState('');
+  const [error, setError] = useState<unknown>(null);
+  const previousSiteKeyRef = useRef<string | null>(null);
+  const isMountedRef = useRef(true);
 
-class Home extends Component<HomeProps, HomeState> {
-  _ismounted: boolean = false;
-
-  constructor(props: HomeProps) {
-    super(props);
-    this.state = {
-      blockingOperation: null,
-      currentSiteKey: null,
-      buttonPressed: "",
-      contentItemCardsSections: [],
-      siteCreatorMessage: null,
-      configurations: null,
-      selectedSite: null,
-      basePath: "",
-      error: null
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
     };
-  }
+  }, []);
 
-  componentDidUpdate(preProps: HomeProps) {
-    if (this._ismounted && preProps.siteKey !== this.props.siteKey) {
-      this.checkSiteInProps();
-    }
-  }
-
-  componentDidMount() {
-    this.checkSiteInProps();
-    this._ismounted = true;
-  }
-
-  componentWillUnmount() {
-    this._ismounted = false;
-  }
-
-  checkSiteInProps() {
-    const { siteKey, workspaceKey } = this.props;
-
-    if (siteKey && workspaceKey) {
-      if (this.state.currentSiteKey !== siteKey) {
-        service.api.readConfKey('devDisableAutoHugoServe').then((devDisableAutoHugoServe) => {
+  useEffect(() => {
+    const loadData = async () => {
+      if (siteKey && workspaceKey) {
+        if (previousSiteKeyRef.current !== siteKey) {
+          const devDisableAutoHugoServe = await service.api.readConfKey('devDisableAutoHugoServe');
           if (!devDisableAutoHugoServe) {
-            service.api.serveWorkspace(siteKey, workspaceKey, "Start Hugo from Home");
+            service.api.serveWorkspace(siteKey, workspaceKey, 'Start Hugo from Home');
           }
-        });
+        }
+
+        previousSiteKeyRef.current = siteKey;
+
+        const message = await service.getSiteCreatorMessage(siteKey, workspaceKey);
+        if (isMountedRef.current) {
+          setSiteCreatorMessage(md.render(message));
+        }
+
+        try {
+          const bundle = await service.getSiteAndWorkspaceData(siteKey, workspaceKey);
+          if (isMountedRef.current) {
+            setConfigurations(bundle.configurations);
+            setSelectedSite(bundle.site as { key: string });
+            setBasePath(`/sites/${(bundle.site as { key: string }).key}/workspaces/${(bundle.workspace as { key: string }).key}`);
+          }
+        } catch (e) {
+          if (isMountedRef.current) {
+            setSelectedSite(null);
+            setError(e);
+          }
+        }
+      } else {
+        const c = await service.getConfigurations(true);
+        if (isMountedRef.current) {
+          setConfigurations(c);
+        }
       }
+    };
 
-      this.setState({ currentSiteKey: siteKey });
-      this.setState({ currentWorkspaceKey: workspaceKey });
+    loadData();
+  }, [siteKey, workspaceKey]);
 
-      service.getSiteCreatorMessage(siteKey, workspaceKey).then((message) => {
-        const siteCreatorMessage = md.render(message);
-        this.setState({ siteCreatorMessage });
-      });
-
-      service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle) => {
-        const stateUpdate: Partial<HomeState> = {};
-        stateUpdate.configurations = bundle.configurations;
-        stateUpdate.selectedSite = bundle.site as { key: string };
-        stateUpdate.basePath = `/sites/${(bundle.site as { key: string }).key}/workspaces/${(bundle.workspace as { key: string }).key}`;
-
-        this.setState(stateUpdate as HomeState);
-      }).catch((e) => {
-        this.setState({ selectedSite: null, error: e });
-      });
-    } else {
-      service.getConfigurations(true).then((c) => {
-        this.setState({ configurations: c });
-      });
-    }
-  }
-
-  renderCard(contentItem: ContentCard) {
+  const renderCard = (contentItem: ContentCard) => {
     const { title, type, description, key } = contentItem;
 
     return (
-      <Card style={{ width: "250px" }} elevation={3}>
-        <CardContent style={{ height: "110px" }}>
-          <Typography variant="body2">
-            {type}
-          </Typography>
+      <Card style={{ width: '250px' }} elevation={3}>
+        <CardContent style={{ height: '110px' }}>
+          <Typography variant="body2">{type}</Typography>
           <Typography variant="h5" component="div" gutterBottom>
             {title}
           </Typography>
-          <Typography variant="body1">
-            {description}
-          </Typography>
+          <Typography variant="body1">{description}</Typography>
         </CardContent>
         <CardActions>
           {type === 'collection' ? null : (
-            <Button
-              size="small"
-              color="primary"
-              component={Link}
-              to={`${this.state.basePath}/singles/${encodeURIComponent(key)}`}
-            >
+            <Button size="small" color="primary" component={Link} to={`${basePath}/singles/${encodeURIComponent(key)}`}>
               Open
             </Button>
           )}
           {type === 'collection' ? (
-            <Button
-              size="small"
-              color="primary"
-              component={Link}
-              to={`${this.state.basePath}/collections/${encodeURIComponent(key)}`}
-            >
+            <Button size="small" color="primary" component={Link} to={`${basePath}/collections/${encodeURIComponent(key)}`}>
               List
             </Button>
           ) : null}
         </CardActions>
       </Card>
     );
-  }
+  };
 
-  render() {
-    const { configurations, contentItemCardsSections } = this.state;
-
-    const sections = contentItemCardsSections.map((section, index) => {
-      return (
-        <Grid container spacing={3} key={"section" + index}>
-          {section.cards.map((card, cardIndex) => {
-            return (
-              <Grid key={"siteCardA" + cardIndex}>
-                <Typography>
-                  {cardIndex === 0 ? section.title : <span>&nbsp;</span>}
-                </Typography>
-                {this.renderCard(card)}
-              </Grid>
-            );
-          })}
-        </Grid>
-      );
-    });
-
-    if (this.state.error) {
-      return null;
-    } else if (this.state.showSpinner || configurations == null || this.state.selectedSite == null) {
-      return <Spinner />;
-    }
-
+  const sections = contentItemCardsSections.map((section, index) => {
     return (
-      <div>
-        <Box m={3}>
-          <Grid container spacing={3}>
-            {sections}
-          </Grid>
-        </Box>
-        <div
-          className="markdown site-home-text"
-          style={styles.creatorMessage}
-          dangerouslySetInnerHTML={{ __html: this.state.siteCreatorMessage || '' }}
-        />
-      </div>
+      <Grid container spacing={3} key={'section' + index}>
+        {section.cards.map((card, cardIndex) => {
+          return (
+            <Grid key={'siteCardA' + cardIndex}>
+              <Typography>{cardIndex === 0 ? section.title : <span>&nbsp;</span>}</Typography>
+              {renderCard(card)}
+            </Grid>
+          );
+        })}
+      </Grid>
     );
+  });
+
+  if (error) {
+    return null;
+  } else if (configurations == null || selectedSite == null) {
+    return <Spinner />;
   }
+
+  return (
+    <div>
+      <Box m={3}>
+        <Grid container spacing={3}>
+          {sections}
+        </Grid>
+      </Box>
+      <div
+        className="markdown site-home-text"
+        style={styles.creatorMessage}
+        dangerouslySetInnerHTML={{ __html: siteCreatorMessage || '' }}
+      />
+    </div>
+  );
 }
 
 export default Home;
