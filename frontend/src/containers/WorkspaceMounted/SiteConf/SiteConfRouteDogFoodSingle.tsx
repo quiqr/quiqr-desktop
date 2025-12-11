@@ -1,9 +1,8 @@
-import React          from 'react';
-import Typography     from '@mui/material/Typography';
-import Box            from '@mui/material/Box';
-import Single         from '../Single';
-import service        from './../../../services/service';
-import { UserPreferences } from '../../../../types';
+import { useState, useEffect, useRef } from 'react';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Single from '../Single';
+import service from './../../../services/service';
 
 interface SiteConfig {
   key?: string;
@@ -15,7 +14,7 @@ interface SiteConfig {
   [key: string]: unknown;
 }
 
-interface SiteConfRouteEtalageProps {
+interface SiteConfRouteDogFoodSingleProps {
   siteKey: string;
   workspaceKey: string;
   singleKey: string;
@@ -23,99 +22,48 @@ interface SiteConfRouteEtalageProps {
   title?: string;
 }
 
-interface SiteConfRouteEtalageState {
-  siteconf: SiteConfig;
-  source: {
-    path?: string;
-    [key: string]: unknown;
-  };
-  parseInfo: Record<string, unknown>;
-  siteKey?: string;
-  prefs?: unknown;
-  customOpenInCommand?: string;
-}
+function SiteConfRouteDogFoodSingle({
+  siteKey,
+  workspaceKey,
+  singleKey,
+  fileOverride,
+  title,
+}: SiteConfRouteDogFoodSingleProps) {
+  const [siteconf, setSiteconf] = useState<SiteConfig>({});
+  const isMountedRef = useRef(true);
 
-class SiteConfRouteEtalage extends React.Component<SiteConfRouteEtalageProps, SiteConfRouteEtalageState> {
-
-  _ismounted: boolean = false;
-
-  constructor(props: SiteConfRouteEtalageProps){
-    super(props);
-    this.state = {
-      siteconf : {},
-      source : {},
-      parseInfo : {},
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
     };
-  }
+  }, []);
 
-  componentDidUpdate(preProps: SiteConfRouteEtalageProps){
-    if(this._ismounted && preProps.siteKey !== this.props.siteKey){
-      this.checkSiteInProps();
-    }
-  }
-
-  componentDidMount(){
-    this.checkSiteInProps();
-    this._ismounted = true;
-  }
-  componentWillUnmount(){
-    this._ismounted = false;
-    service.unregisterListener(this);
-  }
-
-  checkSiteInProps(){
-
-    const { siteKey, workspaceKey } = this.props;
-
-    this.setState({
-      siteKey: this.props.siteKey
-    })
-
-    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
-      this.setState({prefs: value });
-
-      const customOpenInCommand = value.customOpenInCommand || '';
-      this.setState({ customOpenInCommand });
-
-    });
-
-    service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      this.setState({
-        siteconf: bundle.site as SiteConfig
-      });
-
-      if(bundle.site.source){
-        this.setState({source: bundle.site.source as { path?: string; [key: string]: unknown }});
+  useEffect(() => {
+    const loadData = async () => {
+      const bundle = await service.getSiteAndWorkspaceData(siteKey, workspaceKey);
+      if (isMountedRef.current) {
+        setSiteconf(bundle.site as SiteConfig);
       }
-    })
-  }
+    };
 
+    loadData();
+  }, [siteKey, workspaceKey]);
 
-  render(){
-
-    let fileOverride = null;
-    if(typeof this.props.fileOverride === "string"){
-      fileOverride = this.props.fileOverride;
-    }
-
-    const single = <Single
-        key={ this.props.singleKey }
-        siteKey={ this.props.siteKey }
-        refreshed={ false }
-        workspaceKey={ this.props.workspaceKey }
-        singleKey={ this.props.singleKey }
-        fileOverride={ fileOverride }
-        /> ;
-
-    const complete = (
-      <Box sx={{ padding: '20px', height: '100%' }}>
-        <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
-        <Typography variant="h5">{this.props.title}</Typography>
-        { single }
-      </Box>);
-
-    return complete;
-  }
+  return (
+    <Box sx={{ padding: '20px', height: '100%' }}>
+      <Typography variant="h4">Site: {siteconf.name}</Typography>
+      <Typography variant="h5">{title}</Typography>
+      <Single
+        key={singleKey}
+        siteKey={siteKey}
+        refreshed={false}
+        workspaceKey={workspaceKey}
+        singleKey={singleKey}
+        fileOverride={typeof fileOverride === 'string' ? fileOverride : null}
+      />
+    </Box>
+  );
 }
 
-export default SiteConfRouteEtalage;
+export default SiteConfRouteDogFoodSingle;

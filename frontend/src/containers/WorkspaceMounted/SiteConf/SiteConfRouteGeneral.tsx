@@ -1,12 +1,12 @@
-import React          from 'react';
-import service        from './../../../services/service';
-import Typography     from '@mui/material/Typography';
-import TextField      from '@mui/material/TextField';
-import IconButton     from '@mui/material/IconButton';
-import Grid           from '@mui/material/Grid';
-import Box            from '@mui/material/Box';
-import FolderIcon     from '@mui/icons-material/Folder';
-import LaunchIcon   from '@mui/icons-material/Launch';
+import { useState, useEffect, useRef } from 'react';
+import service from './../../../services/service';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import FolderIcon from '@mui/icons-material/Folder';
+import LaunchIcon from '@mui/icons-material/Launch';
 import { UserPreferences } from '../../../../types';
 
 interface SiteConfig {
@@ -22,106 +22,62 @@ interface SiteConfig {
 interface SiteConfRouteGeneralProps {
   siteKey: string;
   workspaceKey: string;
-  classes?: unknown;
 }
 
-interface SiteConfRouteGeneralState {
-  siteconf: SiteConfig;
-  source: {
-    path?: string;
-    [key: string]: unknown;
-  };
-  parseInfo: Record<string, unknown>;
-  siteKey?: string;
-  prefs?: unknown;
-  customOpenInCommand?: string;
-}
+function SiteConfRouteGeneral({ siteKey, workspaceKey }: SiteConfRouteGeneralProps) {
+  const [siteconf, setSiteconf] = useState<SiteConfig>({});
+  const [source, setSource] = useState<{ path?: string; [key: string]: unknown }>({});
+  const [customOpenInCommand, setCustomOpenInCommand] = useState('');
+  const isMountedRef = useRef(true);
 
-class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, SiteConfRouteGeneralState> {
-
-  _ismounted: boolean = false;
-
-  constructor(props: SiteConfRouteGeneralProps){
-    super(props);
-    this.state = {
-      siteconf : {},
-      source : {},
-      parseInfo : {},
-      customOpenInCommand: ""
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
     };
-  }
+  }, []);
 
-  componentDidUpdate(preProps: SiteConfRouteGeneralProps){
-    if(this._ismounted && preProps.siteKey !== this.props.siteKey){
-      this.checkSiteInProps();
-    }
-  }
-
-  componentDidMount(){
-    this.checkSiteInProps();
-    this._ismounted = true;
-  }
-  componentWillUnmount(){
-    this._ismounted = false;
-    service.unregisterListener(this);
-  }
-
-  checkSiteInProps(){
-
-    const { siteKey, workspaceKey } = this.props;
-
-    this.setState({
-      siteKey: this.props.siteKey
-    })
-
-    service.api.readConfKey('prefs').then((value: UserPreferences)=>{
-      this.setState({prefs: value });
-
-      const customOpenInCommand = value.customOpenInCommand || ""
-      this.setState({ customOpenInCommand });
-
-    });
-
-    service.getSiteAndWorkspaceData(siteKey, workspaceKey).then((bundle)=>{
-      this.setState({
-        siteconf: bundle.site as SiteConfig
-      });
-
-      if(bundle.site.source){
-        this.setState({source: bundle.site.source as { path?: string; [key: string]: unknown }});
+  useEffect(() => {
+    const loadData = async () => {
+      const prefs = await service.api.readConfKey('prefs') as UserPreferences;
+      if (isMountedRef.current) {
+        setCustomOpenInCommand(prefs.customOpenInCommand || '');
       }
-    })
-  }
 
-  render(){
-    const { classes } = this.props;
-    let sitekey='';
+      const bundle = await service.getSiteAndWorkspaceData(siteKey, workspaceKey);
+      if (isMountedRef.current) {
+        setSiteconf(bundle.site as SiteConfig);
+        if (bundle.site.source) {
+          setSource(bundle.site.source as { path?: string; [key: string]: unknown });
+        }
+      }
+    };
 
-    if(this.state.siteconf.key){
-      sitekey=this.state.siteconf.key;
-    }
+    loadData();
+  }, [siteKey, workspaceKey]);
 
+  const sitekey = siteconf.key || '';
 
-    return (
-      <Box sx={{ padding: '20px', height: '100%' }}>
-        <Typography variant="h4">Site: {this.state.siteconf.name}</Typography>
-        <Typography variant="h5">General Configuration</Typography>
-        <Grid container  spacing={1} alignItems="flex-end">
-          <Grid size={12}>
-            <TextField
-              id="standard-full-width"
-              label="Site key"
-              style={{ margin: 8 }}
-              value={sitekey}
-              fullWidth
-              disabled
-              margin="normal"
-              InputLabelProps={{
-                shrink: true,
-              }} />
-
-          </Grid>
-          <Grid size={12}>
+  return (
+    <Box sx={{ padding: '20px', height: '100%' }}>
+      <Typography variant="h4">Site: {siteconf.name}</Typography>
+      <Typography variant="h5">General Configuration</Typography>
+      <Grid container spacing={1} alignItems="flex-end">
+        <Grid size={12}>
+          <TextField
+            id="standard-full-width"
+            label="Site key"
+            style={{ margin: 8 }}
+            value={sitekey}
+            fullWidth
+            disabled
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+        <Grid size={12}>
           <TextField
             id="standard-full-width"
             label="Site Name"
@@ -132,56 +88,56 @@ class SiteConfRouteGeneral extends React.Component<SiteConfRouteGeneralProps, Si
             margin="normal"
             InputLabelProps={{
               shrink: true,
-            }} />
+            }}
+          />
+        </Grid>
 
-          </Grid>
-
-          <Grid size={10}>
-
+        <Grid size={10}>
           <TextField
             id="standard-full-width"
             label="Source Directory"
             style={{ margin: 8 }}
-            value={this.state.source.path}
+            value={source.path}
             fullWidth
             disabled
             margin="normal"
             InputLabelProps={{
               shrink: true,
-            }} />
+            }}
+          />
+        </Grid>
 
-          </Grid>
-
-          <Grid size={2}>
+        <Grid size={2}>
+          <IconButton
+            color="primary"
+            sx={{ padding: '10px' }}
+            aria-label="directions"
+            onClick={() => {
+              service.api.openFileInEditor(source.path);
+            }}
+            size="large"
+          >
+            <FolderIcon />
+          </IconButton>
+          {customOpenInCommand && customOpenInCommand.trim() && (
             <IconButton
               color="primary"
               sx={{ padding: '10px' }}
               aria-label="directions"
-              onClick={()=>{
-                service.api.openFileInEditor(this.state.source.path);
+              onClick={() => {
+                service.api.openCustomCommand(
+                  customOpenInCommand.replace('%site_path', source.path ?? '').replace('%site_name', siteconf.name ?? '')
+                );
               }}
-              size="large">
-              <FolderIcon />
-            </IconButton>
-            { this.state.customOpenInCommand && this.state.customOpenInCommand !== "" && this.state.customOpenInCommand.trim() &&
-
-            <IconButton
-              color="primary"
-              sx={{ padding: '10px' }}
-              aria-label="directions"
-              onClick={()=>{
-                service.api.openCustomCommand(this.state.customOpenInCommand.replace('%site_path', this.state.source.path).replace('%site_name', this.state.siteconf.name))
-              }}
-              size="large">
+              size="large"
+            >
               <LaunchIcon />
             </IconButton>
-            }
-          </Grid>
-
+          )}
         </Grid>
-      </Box>
-    );
-  }
+      </Grid>
+    </Box>
+  );
 }
 
 export default SiteConfRouteGeneral;

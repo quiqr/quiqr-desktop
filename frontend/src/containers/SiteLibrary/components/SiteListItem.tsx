@@ -1,12 +1,12 @@
-import React from 'react';
-import ListItem                from '@mui/material/ListItem';
-import ListItemButton          from '@mui/material/ListItemButton';
-import ListItemText            from '@mui/material/ListItemText';
+import { useState, useEffect, useRef } from 'react';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import ListItemAvatar          from '@mui/material/ListItemAvatar';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import { red } from '@mui/material/colors';
-import service              from '../../../services/service';
+import service from '../../../services/service';
 import { SiteConfig } from '../../../../types';
 
 interface SiteListItemProps {
@@ -16,84 +16,60 @@ interface SiteListItemProps {
   itemMenuItems?: React.ReactNode;
 }
 
-interface SiteListItemState {
-  favicon: string;
-}
+function SiteListItem({ site, siteClick, itemMenuButton, itemMenuItems }: SiteListItemProps) {
+  const [favicon, setFavicon] = useState('');
+  const isMountedRef = useRef(true);
 
-class SiteListItem extends React.Component<SiteListItemProps, SiteListItemState> {
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-  _ismounted: boolean = false;
-
-  constructor(props: SiteListItemProps){
-    super(props);
-    this.state = {
-      favicon: ""
-    }
-    this._ismounted = false;
-  }
-
-  componentDidMount(){
-    this._ismounted = true;
-    this.getFavicon();
-  }
-
-  componentWillUnmount(){
-    this._ismounted = false;
-  }
-
-  getFavicon(){
-      if(this.props.site.etalage && this.props.site.etalage.favicons && this.props.site.etalage.favicons.length > 0){
-        service.api.getThumbnailForPath(this.props.site.key, 'source', this.props.site.etalage.favicons[0]).then((img)=>{
-        this._ismounted && this.setState({favicon:img});
-        })
+  useEffect(() => {
+    const fetchFavicon = async () => {
+      if (site.etalage?.favicons && site.etalage.favicons.length > 0) {
+        const img = await service.api.getThumbnailForPath(site.key, 'source', site.etalage.favicons[0]);
+        if (isMountedRef.current) {
+          setFavicon(img);
+        }
+      } else {
+        if (isMountedRef.current) {
+          setFavicon('');
+        }
       }
-      else{
-        this._ismounted && this.setState({favicon:""});
-      }
-  }
+    };
+    fetchFavicon();
+  }, [site.key, site.etalage?.favicons]);
 
-  componentDidUpdate(preProps: SiteListItemProps){
-    if(this._ismounted && preProps.site.key !== this.props.site.key){
-      this.getFavicon();
-    }
-  }
-
-  render(){
-    let siteAvatar = ( <Avatar aria-label="recipe"  variant="rounded" sx={{ backgroundColor: red[500] }}>
-      {this.props.site.name.charAt(0)}
-    </Avatar>
-    )
-
-    if(this.state.favicon !== ""){
-      siteAvatar = <Avatar aria-label="recipe" variant="rounded" src={this.state.favicon} />
-    }
-    return (
-
-      <React.Fragment>
-        <ListItem
-          id={"list-siteselectable-"+this.props.site.name}
-          key={"sitelistitem-"+this.props.site.key}
-          disablePadding
-          secondaryAction={
-            this.props.site.remote ? null : (
-              <ListItemSecondaryAction>
-                {this.props.itemMenuButton}
-              </ListItemSecondaryAction>
-            )
-          }>
-          <ListItemButton onClick={ this.props.siteClick }>
-            <ListItemAvatar>
-              {siteAvatar}
-            </ListItemAvatar>
-
-            <ListItemText primary={this.props.site.name} />
-          </ListItemButton>
-        </ListItem>
-        {this.props.itemMenuItems}
-      </React.Fragment>
+  const siteAvatar =
+    favicon !== '' ? (
+      <Avatar aria-label="recipe" variant="rounded" src={favicon} />
+    ) : (
+      <Avatar aria-label="recipe" variant="rounded" sx={{ backgroundColor: red[500] }}>
+        {site.name.charAt(0)}
+      </Avatar>
     );
-  }
 
+  return (
+    <>
+      <ListItem
+        id={'list-siteselectable-' + site.name}
+        key={'sitelistitem-' + site.key}
+        disablePadding
+        secondaryAction={
+          site.remote ? null : <ListItemSecondaryAction>{itemMenuButton}</ListItemSecondaryAction>
+        }
+      >
+        <ListItemButton onClick={siteClick}>
+          <ListItemAvatar>{siteAvatar}</ListItemAvatar>
+          <ListItemText primary={site.name} />
+        </ListItemButton>
+      </ListItem>
+      {itemMenuItems}
+    </>
+  );
 }
 
 export default SiteListItem;

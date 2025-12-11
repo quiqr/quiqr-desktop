@@ -1,85 +1,65 @@
-import React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { consoleService } from '../../services/ui-service';
 
-const consoleStyle ={
+const consoleStyle = {
   pre: {
-    position:'fixed' as const,
-    right:'0',
-    padding:'10px 10px 100px 10px',
-    overflow:'auto' as const,
-    margin:'0',
-    width:'100%',
-    lineHeight:'1.4',
-    height:'calc(100% - 0px)',
-    fontFamily:'monospace',
-    fontWeight:'bold' as const,
-    background:'#1E1729',
-    color:'#d4d4d4',
+    position: 'fixed' as const,
+    right: '0',
+    padding: '10px 10px 100px 10px',
+    overflow: 'auto' as const,
+    margin: '0',
+    width: '100%',
+    lineHeight: '1.4',
+    height: 'calc(100% - 0px)',
+    fontFamily: 'monospace',
+    fontWeight: 'bold' as const,
+    background: '#1E1729',
+    color: '#d4d4d4',
     whiteSpace: 'pre-wrap' as const,
     wordWrap: 'break-word' as const,
-    zIndex:3
-  }
-}
-
-type ConsoleOutputState = {
-  autoscroll: boolean;
+    zIndex: 3,
+  },
 };
 
-class ConsoleOutput extends React.Component<{}, ConsoleOutputState>{
-  closeTimeout: any;
-  preElement: HTMLPreElement | null = null;
-  scrollRef: React.RefObject<HTMLDivElement>;
-
-  constructor(props: {}){
-    super(props);
-    this.closeTimeout = undefined;
-    this.scrollRef = React.createRef();
-    this.state = {
-      autoscroll: true
-    }
-  }
-
-  componentDidMount(){
-    consoleService.registerListener(this);
-  }
-
-  componentWillUnmount(){
-    consoleService.unregisterListener(this);
-  }
-
-  componentDidUpdate(preProps: {}){
-    if (this.scrollRef.current) {
-      this.scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
-  render(){
-
-    const preStyle = Object.assign({}, consoleStyle.pre);
-
-    if(this.preElement){
-      //this.preElement.scrollTop = 5000;
-    }
-
-    return <React.Fragment>
-      <pre
-        style={preStyle}
-        ref={ (pre) => { this.preElement = pre; } }
-      >
-        { consoleService.getConsoleMessages().map((msg) => msg.line).join('\n') }
-        <div ref={this.scrollRef} />
-      </pre>
-    </React.Fragment>;
-  }
+function useForceUpdate() {
+  const [, setTick] = useState(0);
+  return () => setTick((tick) => tick + 1);
 }
 
-class Console extends React.Component<{}, {}>{
+function ConsoleOutput() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const forceUpdate = useForceUpdate();
 
-  render(){
-    return (<React.Fragment>
+  useEffect(() => {
+    const listener = { forceUpdate };
+    consoleService.registerListener(listener);
+    return () => {
+      consoleService.unregisterListener(listener);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  return (
+    <>
+      <pre style={consoleStyle.pre}>
+        {consoleService.getConsoleMessages().map((msg) => msg.line).join('\n')}
+        <div ref={scrollRef} />
+      </pre>
+    </>
+  );
+}
+
+function Console() {
+  return (
+    <>
       <ConsoleOutput />
-    </React.Fragment>);
-  }
+    </>
+  );
 }
 
 export default Console;

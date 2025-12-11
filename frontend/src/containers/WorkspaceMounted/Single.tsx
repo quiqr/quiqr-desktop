@@ -1,13 +1,13 @@
-import React         from 'react';
-import service       from './../../services/service'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import service from './../../services/service';
 import { SukohForm } from './../../components/SukohForm';
-import Spinner       from './../../components/Spinner';
+import Spinner from './../../components/Spinner';
 
 interface SingleProps {
   siteKey: string;
   workspaceKey: string;
   singleKey: string;
-  fileOverride?: string;
+  fileOverride?: string | null;
   refreshed?: boolean;
 }
 
@@ -28,140 +28,153 @@ interface WorkspaceDetails {
   [key: string]: unknown;
 }
 
-interface SingleState {
-  selectedWorkspaceDetails: WorkspaceDetails | null;
-  single: WorkspaceSingle | null;
-  previewUrl: string | null;
-  singleValues: unknown;
-  showSpinner?: boolean;
-  currentBaseUrlPath?: string;
-}
+function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed }: SingleProps) {
+  const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
+  const [singleValues, setSingleValues] = useState<unknown>(null);
+  const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
+  const isMountedRef = useRef(true);
 
-class Single extends React.Component<SingleProps, SingleState>{
-  constructor(props: SingleProps){
-    super(props);
-    this.state = {
-      selectedWorkspaceDetails: null,
-      single: null,
-      previewUrl: null,
-      singleValues: null
+  useEffect(() => {
+    isMountedRef.current = true;
+
+    const loadData = async () => {
+      try {
+        const [single, workspaceDetails, baseUrlPath] = await Promise.all([
+          service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride),
+          service.api.getWorkspaceDetails(siteKey, workspaceKey),
+          service.api.getCurrentBaseUrl(),
+        ]);
+
+        if (isMountedRef.current) {
+          setSingleValues(single);
+          setSelectedWorkspaceDetails(workspaceDetails as WorkspaceDetails);
+          setCurrentBaseUrlPath(typeof baseUrlPath === 'string' ? baseUrlPath : undefined);
+        }
+      } catch (e) {
+        service.api.logToConsole(e, 'error');
+      }
     };
-  }
 
-  componentDidMount(){
-    service.registerListener(this);
+    loadData();
 
-    //fileOverride is used for some dynamic dogFood editors
-    const { siteKey, workspaceKey, singleKey, fileOverride } = this.props;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [siteKey, workspaceKey, singleKey, fileOverride]);
 
-    Promise.all([
-      service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride),
-      service.api.getWorkspaceDetails(siteKey, workspaceKey),
-      service.api.getCurrentBaseUrl()
-    ]).then(([single, workspaceDetails, currentBaseUrlPath])=>{
-      this.setState({
-        singleValues: single,
-        selectedWorkspaceDetails: workspaceDetails as WorkspaceDetails,
-        currentBaseUrlPath: typeof currentBaseUrlPath === 'string' ? currentBaseUrlPath : undefined
-      });
-    }).catch((e)=>{
-        service.api.logToConsole(e, 'error')
-    });
+  const handleOpenInEditor = useCallback(
+    (context: { reject: (message: string) => void }) => {
+      const promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
+      promise.then(
+        function () {
+          // TODO should watch file for changes and if so reload
+        },
+        function () {
+          context.reject('Something went wrong.');
+        }
+      );
+    },
+    [siteKey, workspaceKey, singleKey]
+  );
 
-  }
+  const handleSave = useCallback(
+    (context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }) => {
+      const promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
+      promise.then(
+        function (updatedValues) {
+          context.accept(updatedValues);
+        },
+        function () {
+          context.reject('Something went wrong.');
+        }
+      );
+    },
+    [siteKey, workspaceKey, singleKey]
+  );
 
-  componentWillUnmount(){
-    service.unregisterListener(this);
-  }
+  const single = selectedWorkspaceDetails?.singles.find((x) => x.key === singleKey);
 
-  handleOpenInEditor(context: { reject: (message: string) => void }){
-    const { siteKey, workspaceKey, singleKey } = this.props;
+  const previewUrl = useMemo(() => {
+    if (!single) return null;
 
-    const promise = service.api.openSingleInEditor(siteKey, workspaceKey, singleKey);
-    promise.then(function(){
-      // TODO should watch file for changes and if so reload
-    }, function(){
-      context.reject('Something went wrong.');
-    })
-  }
-
-  handleSave(context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }){
-
-    const { siteKey, workspaceKey, singleKey } = this.props;
-
-    const promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
-    promise.then(function(updatedValues){
-      context.accept(updatedValues);
-    }, function(){
-      context.reject('Something went wrong.');
-    });
-  }
-
-  render(){
-    if(this.state.showSpinner || this.state.singleValues===undefined || this.state.selectedWorkspaceDetails==null){
-      return <Spinner />;
-    }
-    const single = this.state.selectedWorkspaceDetails.singles.find(x => x.key === this.props.singleKey);
-    if(single==null) return null;
-
-    let buildActions = []
-    if('build_actions' in single){
-      buildActions = single.build_actions.slice(0);
+    if (single.hidePreviewIcon) {
+      return '';
     }
 
-    let previewUrl = null;
-    if(single.hidePreviewIcon){
-      previewUrl = '';
+    let finalpath = currentBaseUrlPath || '';
+
+    if (single.previewUrl) {
+      finalpath = (currentBaseUrlPath || '') + single.previewUrl;
     }
-    else{
-      let finalpath = this.state.currentBaseUrlPath;
+    finalpath = finalpath.replace('//', '/').replace('//', '/');
 
-      if(single.previewUrl){
-        finalpath = this.state.currentBaseUrlPath + single.previewUrl
-      }
-      finalpath = finalpath.replace("//","/").replace("//","/");
-
-      if(Array.from(finalpath)[0]!=="/"){
-        finalpath = "/"+finalpath;
-      }
-
-      previewUrl = 'http://localhost:13131'+finalpath;
+    if (Array.from(finalpath)[0] !== '/') {
+      finalpath = '/' + finalpath;
     }
 
-    const { siteKey, workspaceKey, singleKey } = this.props;
+    return 'http://localhost:13131' + finalpath;
+  }, [single, currentBaseUrlPath]);
 
-    return(<SukohForm
-    debug={false}
-    rootName={single.title}
-    singleKey={this.props.singleKey}
-    refreshed={this.props.refreshed}
-    fields={single.fields}
-    values={this.state.singleValues}
-    siteKey={siteKey}
-    workspaceKey={workspaceKey}
-    pageUrl={previewUrl}
-    onSave={this.handleSave.bind(this)}
-    onOpenInEditor={this.handleOpenInEditor.bind(this)}
-    hideExternalEditIcon={single.hideExternalEditIcon}
-    hideSaveButton={single.hideSaveButton}
-    buildActions={buildActions}
-    plugins={{
-
-      openBundleFileDialog: function({title, extensions, targetPath, forceFileName}, onFilesReady){
-        return service.api.openFileDialogForSingleAndCollectionItem(siteKey, workspaceKey, "", singleKey, targetPath, {title, extensions}, forceFileName);
+  const plugins = useMemo(
+    () => ({
+      openBundleFileDialog: function (
+        {
+          title,
+          extensions,
+          targetPath,
+          forceFileName,
+        }: { title: string; extensions: string[]; targetPath: string; forceFileName?: string },
+        onFilesReady: unknown
+      ) {
+        return service.api.openFileDialogForSingleAndCollectionItem(
+          siteKey,
+          workspaceKey,
+          '',
+          singleKey,
+          targetPath,
+          { title, extensions },
+          forceFileName
+        );
       },
 
-      getFilesInBundle: function(extensions, targetPath, forceFileName){
-        return service.api.getFilesInBundle(siteKey, workspaceKey, "", singleKey, targetPath, extensions, forceFileName);
+      getFilesInBundle: function (extensions: string[], targetPath: string, forceFileName: string) {
+        return service.api.getFilesInBundle(siteKey, workspaceKey, '', singleKey, targetPath, extensions, forceFileName);
       },
 
-      getBundleThumbnailSrc: function(targetPath){
-        return service.api.getThumbnailForCollectionOrSingleItemImage(siteKey,workspaceKey,"",singleKey, targetPath);
-      }
-    }}
-  />
-    );
+      getBundleThumbnailSrc: function (targetPath: string) {
+        return service.api.getThumbnailForCollectionOrSingleItemImage(siteKey, workspaceKey, '', singleKey, targetPath);
+      },
+    }),
+    [siteKey, workspaceKey, singleKey]
+  );
+
+  if (singleValues === undefined || selectedWorkspaceDetails == null) {
+    return <Spinner />;
   }
+
+  if (single == null) return null;
+
+  const buildActions = single.build_actions ? single.build_actions.slice(0) : [];
+
+  return (
+    <SukohForm
+      debug={false}
+      rootName={single.title}
+      singleKey={singleKey}
+      refreshed={refreshed}
+      fields={single.fields}
+      values={singleValues}
+      siteKey={siteKey}
+      workspaceKey={workspaceKey}
+      pageUrl={previewUrl}
+      onSave={handleSave}
+      onOpenInEditor={handleOpenInEditor}
+      hideExternalEditIcon={single.hideExternalEditIcon}
+      hideSaveButton={single.hideSaveButton}
+      buildActions={buildActions}
+      plugins={plugins}
+    />
+  );
 }
 
 export default Single;

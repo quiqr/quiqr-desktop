@@ -1,14 +1,14 @@
-import * as React        from 'react';
-import Spinner           from './../../../components/Spinner'
-import TextField         from '@mui/material/TextField';
-import Button            from '@mui/material/Button';
-import DialogTitle       from '@mui/material/DialogTitle';
-import Dialog            from '@mui/material/Dialog';
-import DialogActions     from '@mui/material/DialogActions';
-import DialogContent     from '@mui/material/DialogContent';
-import Select            from '@mui/material/Select';
-import MenuItem          from '@mui/material/MenuItem';
-import Box               from '@mui/material/Box';
+import { useState } from 'react';
+import Spinner from './../../../components/Spinner';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
 
 interface Language {
   lang: string;
@@ -27,123 +27,93 @@ interface CopyItemToLanguageDialogProps {
   languages: Language[];
 }
 
-interface CopyItemToLanguageDialogState {
-  value: string;
-  initialValue: string;
-  destLang: string;
-  valid: boolean | null;
-  titleToKey?: string;
+function getInitialValue(propValue: string) {
+  if (propValue.indexOf('.') > -1) {
+    return propValue.slice(0, propValue.lastIndexOf('.'));
+  }
+  return propValue || '';
 }
 
-class CopyItemToLanguageDialog extends React.Component<CopyItemToLanguageDialogProps, CopyItemToLanguageDialogState>{
+function CopyItemToLanguageDialog({
+  value: propValue,
+  viewKey,
+  handleClose,
+  handleConfirm,
+  busy,
+  confirmLabel,
+  title,
+  textfieldlabel,
+  languages,
+}: CopyItemToLanguageDialogProps) {
+  const initialValue = propValue || '';
+  const [value] = useState(getInitialValue(propValue));
+  const [destLang, setDestLang] = useState('');
 
-  constructor(props: CopyItemToLanguageDialogProps){
-    super(props);
-
-    let valueBase = props.value
-    if (valueBase.indexOf('.') > -1)
-    {
-      valueBase = props.value.slice(0,(props.value.lastIndexOf(".") ));
+  const validate = () => {
+    const v = value || '';
+    if (viewKey === 'createItem') {
+      return v.length > 0;
     }
-    this.state = {
-      value:valueBase||'',
-      initialValue:props.value||'',
-      destLang: '',
-      valid: null
-    };
-  }
+    return /^[a-zA-Z0-9_-]+([/][a-zA-Z0-9_-]+)*$/.test(v) && v.length > 0;
+  };
 
-  handleClose(){
-    if(this.props.handleClose && !this.props.busy)
-      this.props.handleClose();
-  }
+  const valid = validate();
+  const errorText = 'Allowed characters: alphanumeric, dash, underline and slash.';
 
-  handleConfirm(){
-    if(this.validate() && this.props.handleConfirm) {
-      this.props.handleConfirm(this.state.value, this.state.initialValue, this.state.destLang);
+  const onClose = () => {
+    if (handleClose && !busy) {
+      handleClose();
     }
-  }
+  };
 
-  validate(){
-    const value = this.state.value||'';
-
-    if(this.props.viewKey === 'createItem'){
-      return value.length>0;
+  const onConfirm = () => {
+    if (valid && handleConfirm) {
+      handleConfirm(value, initialValue, destLang);
     }
-    else{
-      return /^[a-zA-Z0-9_-]+([/][a-zA-Z0-9_-]+)*$/.test(value) && value.length>0;
-    }
-  }
+  };
 
-  handleChange(e: React.ChangeEvent<HTMLInputElement>){
-    const key  = e.target.value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    this.setState({
-      value: e.target.value,
-      titleToKey: key
-    });
-  }
-
-  render(){
-    const { busy, confirmLabel } = this.props;
-    const valid = this.validate();
-    let errorText;
-    errorText = 'Allowed characters: alphanumeric, dash, underline and slash.';
-    return (
-
-      <Dialog
-        fullWidth={true}
-        maxWidth="sm"
-        open={true}
-        onClose={this.handleClose}
-      >
-        <DialogTitle>{this.props.title}</DialogTitle>
-        <DialogContent>
-        <Box my={3} sx={{display:'flex'}}>
-
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="destLang"
-              value={this.state.destLang}
-              onChange={(e)=>{
-
-                this.setState({destLang: e.target.value})
-
-              }}
-              label="Destination Language"
-            >
-              {
-                this.props.languages.map((lang)=>{
-                  return (<MenuItem key={"key"+lang.lang} value={lang.lang}>{lang.lang}</MenuItem>)
-                })
-              }
-            </Select>
-        { busy? <Spinner /> : undefined }
-
+  return (
+    <Dialog fullWidth={true} maxWidth="sm" open={true} onClose={onClose}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <Box my={3} sx={{ display: 'flex' }}>
+          <Select
+            labelId="demo-simple-select-outlined-label"
+            id="destLang"
+            value={destLang}
+            onChange={(e) => setDestLang(e.target.value)}
+            label="Destination Language"
+          >
+            {languages.map((lang) => (
+              <MenuItem key={'key' + lang.lang} value={lang.lang}>
+                {lang.lang}
+              </MenuItem>
+            ))}
+          </Select>
+          {busy && <Spinner />}
         </Box>
 
-
-        <Box my={3} sx={{display:'flex'}}>
-        <TextField
-          label={this.props.textfieldlabel}
-          value={this.state.value}
-          error={valid ? false : true}
-          helperText={valid? undefined : errorText}
-          disabled={busy}
-          fullWidth={true}
-        />
+        <Box my={3} sx={{ display: 'flex' }}>
+          <TextField
+            label={textfieldlabel}
+            value={value}
+            error={!valid}
+            helperText={valid ? undefined : errorText}
+            disabled={busy}
+            fullWidth={true}
+          />
         </Box>
-
-
-
-        </DialogContent>
-        <DialogActions>
-          <Button disabled={busy} onClick={this.handleClose.bind(this)} color="primary">Cancel</Button>
-          <Button disabled={busy||!valid} onClick={this.handleConfirm.bind(this)} color="primary">{confirmLabel}</Button>
-        </DialogActions>
-
-      </Dialog>
-
-    );
-  }
+      </DialogContent>
+      <DialogActions>
+        <Button disabled={busy} onClick={onClose} color="primary">
+          Cancel
+        </Button>
+        <Button disabled={busy || !valid} onClick={onConfirm} color="primary">
+          {confirmLabel}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 }
-export default CopyItemToLanguageDialog
+
+export default CopyItemToLanguageDialog;
