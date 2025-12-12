@@ -191,7 +191,12 @@ export const SukohForm = ({
               variant="contained"
               startIcon={<AutoAwesomeIcon />}
               onClick={() => setAiAssistOpen(true)}
-              sx={{ mb: 2 }}
+              sx={{
+                position: 'absolute',
+                top: 66,
+                right: 16,
+                zIndex: 10,
+              }}
             >
               AI Assist
             </Button>
