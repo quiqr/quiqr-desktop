@@ -2,6 +2,40 @@
 
 ## NEXT RELEASE
 
+## 0.21.6 (2025-12-12)
+- fix: improve position of AI Assist Button
+- fix: in Funding a todo is set for the new idea of having a Quiqr Stichting
+- feature: AI Assist Button with Prompt templates for Page objects
+- feature: new fresh AI Assist Button with Prompt templates for Page objects 🕺
+- docs: add docs book and new docs. This will be the future for Quiqr's official documentation
+- feature: rerender based on chokidar change
+- fix: replace localhost with windows.location.hostname
+- feature: add chokidar file watcher to model
+- fix: correct type definition for prompt_templates to string array
+- feature: add prompt_templates field to FormMeta interface
+- chore: more informative Zod/schema errors. When a site model is incorrect, we
+    need to identify the configuration error using this message
+- chore: hide/remove noise console.logs
+- wip: fix hugo download race condition
+- fix: concurrent hugo download
+- chore: convert import from hugo theme to functional
+- chore: convert import from folder to functional
+- chore: convert site view (home, single, collection) to functional
+- chore: convert SiteConfRoute to functional
+- chore: convert sync dialogs to functional
+- chore: convert site library cards/rows to functional
+- chore: convert preferences to functional
+- chore: convert collection action dialogs to functional
+- chore: convert ProgressDialog to functional
+- chore: Convert SelectImagesDialog to functional
+- chore: convert console output to functional
+- chore: convert FormPartialNewFromScratch to functional
+- chore: convert ToolbarToggleButtonGroup to functional
+- chore: convert FolderPicker to functional
+- chore: convert CardNew to functional
+- fix: wrap setState in callback
+- chore: convert CardNew to functional
+- feature: let hugo listen to 0.0.0.0
 - chore: convert layouts and sidebars to functional components
 - fix: new network addresses for the server version
 

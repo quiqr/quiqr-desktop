@@ -11,7 +11,7 @@
     "url": "https://github.com/quiqr/quiqr-desktop-ng.git"
   },
   "description": "Local-first CMS for static files and engines like Quarto or Hugo SSG",
-  "version": "0.21.5",
+  "version": "0.21.6",
   "main": "packages/adapters/electron/dist/main.js",
   "scripts": {
     "clean": "rm -rf node_modules dist build frontend/node_modules frontend/dist frontend/build packages/types/node_modules packages/types/dist packages/types/build packages/backend/node_modules packages/backend/dist packages/backend/build packages/adapters/electron/node_modules packages/adapters/electron/dist packages/adapters/electron/build packages/adapters/standalone/node_modules packages/adapters/standalone/dist packages/adapters/standalone/build",
