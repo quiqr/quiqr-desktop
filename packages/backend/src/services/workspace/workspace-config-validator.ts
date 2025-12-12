@@ -76,7 +76,10 @@ export class WorkspaceConfigValidator {
       workspaceConfigSchema.parse(config);
     } catch (err) {
       if (err instanceof z.ZodError) {
-        return err.errors[0].message;
+        // TODO
+        // we need to output clear schema error to the log
+        // model-developers need this when creating new sites
+        return String(err);
       }
       return String(err);
     }

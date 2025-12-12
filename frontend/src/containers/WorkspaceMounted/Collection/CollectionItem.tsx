@@ -9,6 +9,7 @@ interface WorkspaceCollection {
   folder: string;
   fields: unknown[];
   build_actions?: unknown[];
+  prompt_templates?: unknown[];
   hidePreviewIcon?: boolean;
   hideExternalEditIcon?: boolean;
   previewUrlBase?: string;
@@ -139,8 +140,13 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
   if (collection == null) return null;
 
   const fields = collection.fields.slice(0);
+
+  if (!collection.prompt_templates) collection.prompt_templates = [];
+  const prompt_templates = collection.prompt_templates.slice(0);
+
   if (!collection.build_actions) collection.build_actions = [];
   const buildActions = collection.build_actions.slice(0);
+
   const values = Object.assign({}, collectionItemValues);
 
   return (
@@ -157,6 +163,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
       collectionItemKey={collectionItemKey}
       values={values}
       buildActions={buildActions}
+      prompt_templates={prompt_templates}
       plugins={plugins}
       onSave={handleSave}
       onOpenInEditor={handleOpenInEditor}

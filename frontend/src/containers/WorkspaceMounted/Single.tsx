@@ -17,6 +17,7 @@ interface WorkspaceSingle {
   title: string;
   fields: unknown[];
   build_actions?: unknown[];
+  prompt_templates?: unknown[];
   hidePreviewIcon?: boolean;
   previewUrl?: string;
   hideExternalEditIcon?: boolean;
@@ -156,6 +157,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
   if (single == null) return null;
 
   const buildActions = single.build_actions ? single.build_actions.slice(0) : [];
+  const prompt_templates = single.prompt_templates ? single.prompt_templates.slice(0) : [];
 
   return (
     <SukohForm
@@ -173,6 +175,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
       onOpenInEditor={handleOpenInEditor}
       hideExternalEditIcon={single.hideExternalEditIcon}
       hideSaveButton={single.hideSaveButton}
+      prompt_templates={prompt_templates}
       buildActions={buildActions}
       plugins={plugins}
     />

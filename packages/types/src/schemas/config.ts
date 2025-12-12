@@ -44,6 +44,24 @@ export const buildActionSchema = z.object({
   execute: buildActionExecuteSchema
 })
 
+export const llmSettingsSchema = z.object({
+  model: z.string(),
+  temperature: z.number().optional()
+})
+
+
+export const promptItemConfigSchema = z.object({
+  key: z.string(),
+  title: z.string().optional(),
+  llm_settings: llmSettingsSchema,
+  savePromptHistory: z.boolean().optional(),
+  saveResultHistory: z.boolean().optional(),
+  showPreviewButton: z.boolean().optional(),
+  description: z.string().optional(),
+  _mergePartial: z.string().optional(),
+  fields: z.array(fieldSchema).optional(),
+})
+
 export const singleConfigSchema = z.object({
   key: z.string(),
   title: z.string().optional(),
@@ -56,6 +74,7 @@ export const singleConfigSchema = z.object({
   hideSaveButton: z.boolean().optional(),
   pullOuterRootKey: z.string().optional(),
   fields: z.array(fieldSchema).optional(),
+  prompt_templates: z.array(z.string()).optional(),
   build_actions: z.array(buildActionSchema).optional()
 })
 
@@ -72,6 +91,7 @@ export const collectionConfigSchema = z.object({
   sortkey: z.string().optional(),
   hidePreviewIcon: z.boolean().optional(),
   fields: z.array(fieldSchema),
+  prompt_templates: z.array(z.string()).optional(),
   build_actions: z.array(buildActionSchema).optional()
 })
 
@@ -303,6 +323,8 @@ export type BuildActionPathReplace = z.infer<typeof buildActionPathReplaceSchema
 export type BuildActionCommand = z.infer<typeof buildActionCommandSchema>
 export type BuildActionExecute = z.infer<typeof buildActionExecuteSchema>
 export type BuildAction = z.infer<typeof buildActionSchema>
+export type LlmSettings = z.infer<typeof llmSettingsSchema>
+export type PromptItemConfig = z.infer<typeof promptItemConfigSchema>
 export type SingleConfig = z.infer<typeof singleConfigSchema>
 export type CollectionConfig = z.infer<typeof collectionConfigSchema>
 export type MenuItem = z.infer<typeof menuItemSchema>

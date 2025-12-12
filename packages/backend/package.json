@@ -24,7 +24,10 @@
     "js-yaml": "^4.x.x",
     "front-matter": "^4.x.x",
     "toml": "^3.x.x",
-    "jimp": "^1.6.0"
+    "jimp": "^1.6.0",
+    "ai": "^3.4.0",
+    "@ai-sdk/anthropic": "^0.0.50",
+    "@ai-sdk/openai": "^0.0.60"
   },
   "devDependencies": {
     "typescript": "^5.x.x",

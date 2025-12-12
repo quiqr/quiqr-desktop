@@ -19,6 +19,48 @@ export class API {
     return mainProcessBridge.request('getWorkspaceDetails', {siteKey, workspaceKey});
   }
 
+  getPromptTemplateConfig(siteKey: string, workspaceKey: string, templateKey: string) {
+    return mainProcessBridge.request('getPromptTemplateConfig', {siteKey, workspaceKey, templateKey});
+  }
+
+  processAiPrompt(
+    siteKey: string,
+    workspaceKey: string,
+    templateKey: string,
+    formValues: Record<string, unknown>,
+    context: {
+      collectionKey?: string;
+      collectionItemKey?: string;
+      singleKey?: string;
+    }
+  ) {
+    return mainProcessBridge.request('processAiPrompt', {
+      siteKey,
+      workspaceKey,
+      templateKey,
+      formValues,
+      context
+    });
+  }
+
+  updatePageFromAiResponse(
+    siteKey: string,
+    workspaceKey: string,
+    aiResponse: string,
+    context: {
+      collectionKey?: string;
+      collectionItemKey?: string;
+      singleKey?: string;
+    }
+  ) {
+    return mainProcessBridge.request('updatePageFromAiResponse', {
+      siteKey,
+      workspaceKey,
+      aiResponse,
+      context
+    });
+  }
+
   getPreviewCheckConfiguration() {
     return mainProcessBridge.request('getPreviewCheckConfiguration', {});
   }

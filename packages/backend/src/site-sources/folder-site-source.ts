@@ -30,7 +30,7 @@ export class FolderSiteSource implements SiteSource {
   constructor(config: SourceConfig, pathHelper: PathHelper) {
     this.config = config;
     this.pathHelper = pathHelper;
-    console.log('[FolderSiteSource] Created for:', config.key, config.path);
+    // console.log('[FolderSiteSource] Created for:', config.key, config.path);
   }
 
   /**
@@ -100,7 +100,7 @@ export class FolderSiteSource implements SiteSource {
    * List all workspaces in the site root directory
    */
   async listWorkspaces(): Promise<Workspace[]> {
-    console.log('[FolderSiteSource] Discovering workspaces for site:', this.config.key);
+    //console.log('[FolderSiteSource] Discovering workspaces for site:', this.config.key);
 
     try {
       const siteRoot = this.getSiteRootPath();
@@ -152,10 +152,10 @@ export class FolderSiteSource implements SiteSource {
         }
       }
 
-      console.log('[FolderSiteSource] Found', workspaces.length, 'workspace(s)');
+      //console.log('[FolderSiteSource] Found', workspaces.length, 'workspace(s)');
       return workspaces;
     } catch (error) {
-      console.error('[FolderSiteSource] Error discovering workspaces:', error);
+      //console.error('[FolderSiteSource] Error discovering workspaces:', error);
       return [];
     }
   }
