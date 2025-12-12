@@ -64,7 +64,9 @@ function SelectFromQueryField({ compositeKey }: Props) {
     for (const filepath of files) {
       const parts = filepath.split('/').reverse();
 
-      if (queryString === '#parent_dir[]') {
+      if (queryString === '#file_path[]') {
+        opts.push(filepath);
+      } else if (queryString === '#parent_dir[]') {
         opts.push(parts[1]);
       } else if (queryString === '#file_name[]') {
         opts.push(parts[0]);
