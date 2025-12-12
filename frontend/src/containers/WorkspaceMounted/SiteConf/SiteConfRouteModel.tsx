@@ -38,9 +38,10 @@ interface ParseInfo {
 interface SiteConfRouteModelProps {
   siteKey: string;
   workspaceKey: string;
+  modelRefreshKey?: number;
 }
 
-const SiteConfRouteModel = ({ siteKey, workspaceKey }: SiteConfRouteModelProps) => {
+const SiteConfRouteModel = ({ siteKey, workspaceKey, modelRefreshKey }: SiteConfRouteModelProps) => {
   const navigate = useNavigate();
   const isMountedRef = useRef(false);
 
@@ -73,7 +74,7 @@ const SiteConfRouteModel = ({ siteKey, workspaceKey }: SiteConfRouteModelProps) 
     return () => {
       isMountedRef.current = false;
     };
-  }, [siteKey, workspaceKey]);
+  }, [siteKey, workspaceKey, modelRefreshKey]);
 
   const basePath = `/sites/${siteKey}/workspaces/${workspaceKey}/siteconf`;
 

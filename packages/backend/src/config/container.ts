@@ -21,9 +21,19 @@ import { GitImporter } from '../import/git-importer.js';
 import { Pogozipper } from '../import/pogozipper.js';
 import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
+import { ModelWatcher, createModelWatcher } from '../services/workspace/model-watcher.js';
 import { BuildActionService } from '../build-actions/index.js';
 import { HugoDownloader } from '../hugo/hugo-downloader.js';
 import type { EnvironmentInfo } from '../utils/path-helper.js';
+
+/**
+ * Event emitted when the model cache is cleared
+ */
+export interface ModelChangeEvent {
+  type: 'model-cache-cleared';
+  siteKey: string;
+  workspaceKey: string;
+}
 
 /**
  * Main application container with all dependencies
@@ -138,6 +148,15 @@ export interface AppContainer {
    * Returns undefined if no workspace is currently cached
    */
   getCurrentWorkspaceService: () => WorkspaceService | undefined;
+
+  /**
+   * Event broadcaster for model change notifications (SSE)
+   * Used to notify frontend when model files change
+   */
+  modelChangeEventBroadcaster: {
+    emit: (event: ModelChangeEvent) => void;
+    subscribe: (callback: (event: ModelChangeEvent) => void) => () => void;
+  };
 }
 
 /**
@@ -230,6 +249,20 @@ export function createContainer(options: ContainerOptions): AppContainer {
     environmentInfo
   );
 
+  // Create model change event broadcaster for SSE notifications
+  const modelChangeSubscribers = new Set<(event: ModelChangeEvent) => void>();
+  const modelChangeEventBroadcaster = {
+    emit: (event: ModelChangeEvent) => {
+      modelChangeSubscribers.forEach((cb) => cb(event));
+    },
+    subscribe: (callback: (event: ModelChangeEvent) => void) => {
+      modelChangeSubscribers.add(callback);
+      return () => {
+        modelChangeSubscribers.delete(callback);
+      };
+    },
+  };
+
   // Create the container object first (needed for circular dependency)
   const container: AppContainer = {
     config,
@@ -244,6 +277,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
     workspaceConfigProvider,
     hugoDownloader,
     environmentInfo,
+    modelChangeEventBroadcaster,
   } as AppContainer;
 
   // Create library service with container dependency
@@ -327,6 +361,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
   let cachedWorkspaceService: WorkspaceService | undefined;
   let cachedWorkspaceKey: string | undefined;
   let cachedSiteKey: string | undefined;
+  let currentModelWatcher: ModelWatcher | undefined;
 
   // Helper to get WorkspaceService (common pattern used across handlers)
   container.getWorkspaceService = async (
@@ -366,9 +401,13 @@ export function createContainer(options: ContainerOptions): AppContainer {
       return cachedWorkspaceService;
     }
 
-    // Stop Hugo server from the old workspace before switching
+    // Stop Hugo server and model watcher from the old workspace before switching
     if (cachedWorkspaceService) {
       cachedWorkspaceService.stopHugoServer();
+    }
+    if (currentModelWatcher) {
+      currentModelWatcher.stop();
+      currentModelWatcher = undefined;
     }
 
     // Get workspace head to find the path
@@ -388,6 +427,19 @@ export function createContainer(options: ContainerOptions): AppContainer {
     cachedWorkspaceService = workspaceService;
     cachedSiteKey = siteKey;
     cachedWorkspaceKey = resolvedWorkspaceKey;
+
+    // Start model watcher for the new workspace
+    currentModelWatcher = createModelWatcher({
+      workspacePath: workspaceHead.path,
+      workspaceConfigProvider,
+      onCacheCleared: () => {
+        container.modelChangeEventBroadcaster.emit({
+          type: 'model-cache-cleared',
+          siteKey,
+          workspaceKey: resolvedWorkspaceKey,
+        });
+      },
+    });
 
     return workspaceService;
   };

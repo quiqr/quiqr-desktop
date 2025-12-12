@@ -11,6 +11,7 @@ interface SyncRoutedProps {
   workspace: WorkspaceConfig | null;
   siteKey: string;
   workspaceKey: string;
+  modelRefreshKey?: number;
 }
 
 // Wrapper for add/:refresh route

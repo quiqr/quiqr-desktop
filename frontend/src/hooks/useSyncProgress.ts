@@ -64,7 +64,7 @@ export function useSyncProgress() {
     abortControllerRef.current = new AbortController();
 
     try {
-      const response = await fetch(`http://localhost:5150${endpoint}`, {
+      const response = await fetch(`http://${window.location.hostname}:5150${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

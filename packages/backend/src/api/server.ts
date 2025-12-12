@@ -140,6 +140,38 @@ export function createServer(
     }
   );
 
+  // SSE route for model change events (workspace config invalidation)
+  app.get(
+    '/api/workspace/:siteKey/:workspaceKey/model-events',
+    (req: Request, res: Response) => {
+      const { siteKey, workspaceKey } = req.params;
+
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+
+      let connectionClosed = false;
+
+      // Subscribe to model change events for this workspace
+      const unsubscribe = container.modelChangeEventBroadcaster.subscribe((event) => {
+        if (!connectionClosed && event.siteKey === siteKey && event.workspaceKey === workspaceKey) {
+          res.write(`data: ${JSON.stringify(event)}\n\n`);
+        }
+      });
+
+      // Handle client disconnect
+      req.on('close', () => {
+        connectionClosed = true;
+        unsubscribe();
+      });
+
+      // Send initial connection confirmation
+      res.write(`data: ${JSON.stringify({ type: 'connected', siteKey, workspaceKey })}\n\n`);
+    }
+  );
+
   // SSE route for sync publish progress streaming
   app.post(
     '/api/sync/publish/stream',

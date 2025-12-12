@@ -21,6 +21,15 @@ class Service extends BaseService<typeof serviceSchemas> {
         this._siteAndWorkspaceDataPromise = undefined;
     }
 
+    /**
+     * Clear all cached data - used when backend notifies us of model changes
+     */
+    clearCache(): void {
+        this._configurations = undefined;
+        this._configurationsPromise = undefined;
+        this._siteAndWorkspaceDataPromise = undefined;
+    }
+
     protected _getSchemas() {
         return serviceSchemas;
     }

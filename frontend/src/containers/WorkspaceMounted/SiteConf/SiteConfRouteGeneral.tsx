@@ -22,9 +22,10 @@ interface SiteConfig {
 interface SiteConfRouteGeneralProps {
   siteKey: string;
   workspaceKey: string;
+  modelRefreshKey?: number;
 }
 
-function SiteConfRouteGeneral({ siteKey, workspaceKey }: SiteConfRouteGeneralProps) {
+function SiteConfRouteGeneral({ siteKey, workspaceKey, modelRefreshKey }: SiteConfRouteGeneralProps) {
   const [siteconf, setSiteconf] = useState<SiteConfig>({});
   const [source, setSource] = useState<{ path?: string; [key: string]: unknown }>({});
   const [customOpenInCommand, setCustomOpenInCommand] = useState('');
@@ -54,7 +55,7 @@ function SiteConfRouteGeneral({ siteKey, workspaceKey }: SiteConfRouteGeneralPro
     };
 
     loadData();
-  }, [siteKey, workspaceKey]);
+  }, [siteKey, workspaceKey, modelRefreshKey]);
 
   const sitekey = siteconf.key || '';
 

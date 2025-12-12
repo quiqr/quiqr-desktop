@@ -26,9 +26,10 @@ interface CollectionItemProps {
   workspaceKey: string;
   collectionKey: string;
   collectionItemKey: string;
+  modelRefreshKey?: number;
 }
 
-function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey }: CollectionItemProps) {
+function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey }: CollectionItemProps) {
   const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
   const [collectionItemValues, setCollectionItemValues] = useState<unknown>(null);
   const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
@@ -56,7 +57,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
     return () => {
       isMountedRef.current = false;
     };
-  }, [siteKey, workspaceKey, collectionKey, collectionItemKey]);
+  }, [siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey]);
 
   const handleOpenInEditor = useCallback(() => {
     service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
@@ -150,6 +151,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
 
   return (
     <SukohForm
+      key={`${collectionKey}-${collectionItemKey}-${modelRefreshKey}`}
       debug={false}
       rootName={collection.title}
       pageUrl={pageUrl}

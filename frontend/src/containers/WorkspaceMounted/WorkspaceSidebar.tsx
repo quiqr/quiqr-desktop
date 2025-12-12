@@ -47,6 +47,7 @@ interface WorkspaceSidebarProps {
   onLockMenuClicked?: () => void;
   onToggleItemVisibility?: () => void;
   applicationRole?: string;
+  modelRefreshKey?: number;
 }
 
 const WorkspaceSidebar = ({
@@ -54,6 +55,7 @@ const WorkspaceSidebar = ({
   workspaceKey,
   hideItems,
   applicationRole,
+  modelRefreshKey,
 }: WorkspaceSidebarProps) => {
   const [site, setSite] = useState<SiteConfig | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceDetails | null>(null);
@@ -100,7 +102,7 @@ const WorkspaceSidebar = ({
     return () => {
       isMountedRef.current = false;
     };
-  }, [siteKey, workspaceKey, refresh]);
+  }, [siteKey, workspaceKey, refresh, modelRefreshKey]);
 
   // Refresh if site becomes null after initial load
   useEffect(() => {
