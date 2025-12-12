@@ -339,7 +339,7 @@ export function FormProvider({
 
   return (
     <FormContext.Provider value={contextValue}>
-      <Box sx={{display: 'flex', flexDirection: 'column', gap: '1rem', padding: '2rem'}}>
+      <Box sx={{display: 'flex', flexDirection: 'column', gap: '1rem', padding: '3rem 2rem'}}>
         {children}
       </Box>
     </FormContext.Provider>
