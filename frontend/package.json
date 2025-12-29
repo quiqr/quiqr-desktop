@@ -33,6 +33,9 @@
   "devDependencies": {
     "@babel/plugin-transform-flow-strip-types": "^7.27.1",
     "@eslint/js": "^9.39.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.7.0",
@@ -41,6 +44,8 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-you-might-not-need-an-effect": "^0.7.0",
     "globals": "^16.5.0",
+    "jsdom": "^27.3.0",
+    "msw": "^2.12.4",
     "path-browserify": "^1.0.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
@@ -49,7 +54,10 @@
   "scripts": {
     "clean": "rm -Rf dist && rm -Rf build",
     "dev": "cross-env APP_ENV=development vite",
-    "build": "cross-env APP_ENV=development vite build"
+    "build": "cross-env APP_ENV=development vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "browserslist": [
     ">0.2%",

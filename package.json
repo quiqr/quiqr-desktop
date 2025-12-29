@@ -33,7 +33,14 @@
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
     "_hugo_versions": "node scripts/getHugoVersions.js",
-    "scaffold:field": "node scripts/scaffold-field.js"
+    "scaffold:field": "node scripts/scaffold-field.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:frontend": "vitest run --project frontend",
+    "test:backend": "vitest run --project backend",
+    "test:types": "vitest run --project types"
   },
   "keywords": [],
   "dependencies": {
@@ -63,10 +70,13 @@
     "@alcalzone/release-script": "^3.5.6",
     "@electron/notarize": "^3.1.1",
     "@types/adm-zip": "^0.5.7",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^39.2.3",
     "electron-builder": "^26.3.3",
+    "vitest": "^4.0.15",
     "wait-on": "^8.0.4"
   },
   "disabledDeps": {
