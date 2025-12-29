@@ -3,6 +3,7 @@
  *
  * Default handlers for common API endpoints.
  * These can be overridden in individual tests using server.use().
+ *
  */
 
 import { http, HttpResponse } from 'msw';
@@ -54,6 +55,39 @@ export const handlers = [
     }
 
     return HttpResponse.json(null);
+  }),
+
+  // List workspaces
+  http.post(`${API_BASE}/listWorkspaces`, async () => {
+    // Default mock workspaces - tests should override for specific scenarios
+    return HttpResponse.json([
+      { key: 'main', path: '/test/sites/main', state: 'ready' },
+      { key: 'staging', path: '/test/sites/staging', state: 'ready' },
+    ]);
+  }),
+
+  // Mount workspace
+  http.post(`${API_BASE}/mountWorkspace`, async () => {
+    // Return a default workspace path - tests should override for specific workspaces
+    return HttpResponse.json('/test/sites/main');
+  }),
+
+  // Get collection item
+  http.post(`${API_BASE}/getCollectionItem`, async () => {
+    // Default mock response - tests should override with specific data
+    return HttpResponse.json({
+      title: 'Test Page',
+      mainContent: 'Test content',
+    });
+  }),
+
+  // Update collection item
+  http.post(`${API_BASE}/updateCollectionItem`, async () => {
+    // Return the updated document (tests should override with specific expectations)
+    return HttpResponse.json({
+      title: 'Updated Page',
+      mainContent: 'Updated content',
+    });
   }),
 
   // Default handler for unhandled API calls (returns empty success)

@@ -9,6 +9,18 @@ import '@testing-library/jest-dom/vitest';
 import { beforeAll, afterAll, afterEach } from 'vitest';
 import { server } from './mocks/server';
 
+// Mock window.location for main-process-bridge
+Object.defineProperty(window, 'location', {
+  value: {
+    hostname: 'localhost',
+    href: 'http://localhost:4002',
+    origin: 'http://localhost:4002',
+    protocol: 'http:',
+    host: 'localhost:4002',
+  },
+  writable: true,
+});
+
 // Start MSW server before all tests
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'warn' });
