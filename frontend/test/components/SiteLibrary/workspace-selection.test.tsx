@@ -49,14 +49,6 @@ describe('SelectWorkspaceDialog', () => {
     expect(screen.getByText('/test/sites/staging')).toBeInTheDocument();
   });
 
-  it('test-a-div', async () => {
-    render(
-      <div>Test</div>
-    );
-
-    expect(true).toBeTruthy()
-  })
-
   it('allows selecting a workspace and confirming', async () => {
     const user = userEvent.setup();
 
