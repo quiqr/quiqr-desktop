@@ -1,6 +1,12 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
+- feature: workspace selection and initial vitest
+- chore: adjust padding and border in workspace select dialog
+- chore: remove debug test
+- feature: add tests and coverage
+- chore: add workspace test fixtures
+- feature: implement workspace selection
 
 ## 0.21.6 (2025-12-12)
 - fix: improve position of AI Assist Button
