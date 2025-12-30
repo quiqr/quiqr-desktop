@@ -6,10 +6,9 @@
 - [x] Run old React code base
 - [x] combine with new server
 - [x] get static routing working
-
-- crippled main-process-bridge
-- removed require.electron for net object (template browser)
-- removed electron stuff in App.js
+- [x] crippled main-process-bridge
+- [x] removed require.electron for net object (template browser)
+- [x] removed electron stuff in App.js
 
 to run old react code base:
 
@@ -28,28 +27,33 @@ open url: http://localhost:4002/sites
 
 - [x] mount sites and get forms working
 
+## Cleanups/Refactors
+
+- [x] package.json upgrade old npms
+- [x] backend remove unused js files
+- [x] backend/electron upgrade to TS
+- [x] frontend upgrade to TS
+- [x] frontend upgrade to latest React
+- [x] package.json remove unused 
+
 ## Long list of small and large todo's
 
 - [x] top iconbar actions not working
 - [x] collections not working
 - [x] ugly red warning at electron startup
-- [ ] log Window not working
-
-- [ ] performance is slow (maybe swith with ipc and express)
+- [x] repo should be renamed (merged in ng-branch)
+- [x] performance is slow (maybe swith with ipc and express)
 - [x] after a while axios or express is not working anymore. Complete application Crash
     - [x] seems to be causes by not able to stop hugo server
     - [x] axios timeout settings seems to fix this a bit
-
-axios.defaults.timeout = 30000
-axios.defaults.timeoutErrorMessage='timeout'
-
+- [x] templates gallery not working
 - [x] background jobs not working (thumbnail not ported yet)
-    - [ ] large image collections cause Worker error: Error: Error: maxMemoryUsageInMB limit exceeded by at least 39MB
+
+- [ ] large image collections cause Worker error: Error: Error: maxMemoryUsageInMB limit exceeded by at least 39MB
+- [ ] log Window not working
 - [ ] electron progress popup not correctly visible
-- [ ] templates gallery not working
 - [ ] pipeline build failing
 - [ ] menu-> File->select sites not working
-- [x] repo should be renamed (merged in ng-branch)
 
 ## Webserver alternative/extra functions
 
@@ -57,13 +61,3 @@ axios.defaults.timeoutErrorMessage='timeout'
 - [ ] login screen
 - [ ] disable stuff like preferences
 
-## Cleanups/Refactors
-
-- [ ] package.json remove unused 
-- [ ] package.json upgrade old npms
-- [ ] backend remove unused js files
-- [ ] backend/electron upgrade to TS
-- [ ] frontend upgrade to TS
-- [ ] frontend upgrade to latest React
-- [ ] move frontend files up
-- [ ] move backend files up
