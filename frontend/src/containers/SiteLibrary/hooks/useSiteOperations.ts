@@ -2,9 +2,15 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import service from '../../../services/service';
 import { SiteConfig, Workspace } from '../../../../types';
+import { DialogType } from './useSiteDialogs';
 
-export function useSiteOperations() {
+interface UseSiteOperationsOptions {
+  openDialog?: (type: DialogType, siteconf?: SiteConfig, importURL?: string, workspaces?: Workspace[]) => void;
+}
+
+export function useSiteOperations(options: UseSiteOperationsOptions = {}) {
   const navigate = useNavigate();
+  const { openDialog } = options;
 
   const selectWorkspace = useCallback(async (siteKey: string, workspace: Workspace) => {
     await service.api.mountWorkspace(siteKey, workspace.key);
@@ -17,9 +23,12 @@ export function useSiteOperations() {
     service.api.listWorkspaces(site.key).then((workspaces) => {
       if (workspaces.length === 1) {
         selectWorkspace(site.key, workspaces[0]);
+      } else if (workspaces.length > 1 && openDialog) {
+        // Show workspace selection dialog when multiple workspaces exist
+        openDialog('selectWorkspace', site, undefined, workspaces);
       }
     });
-  }, [selectWorkspace]);
+  }, [selectWorkspace, openDialog]);
 
   const mountSiteByKey = useCallback((siteKey: string) => {
     service.getConfigurations(true).then((c) => {

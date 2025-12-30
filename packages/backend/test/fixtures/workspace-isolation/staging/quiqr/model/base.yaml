@@ -1,0 +1,3 @@
+include:
+  - includes/collections.yaml
+  - includes/menu.yml

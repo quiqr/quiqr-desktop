@@ -32,7 +32,7 @@ const SiteLibraryContent = ({
 
   const { dialogState, openDialog, closeDialog } = useSiteDialogs({ newSite, importSite, importSiteURL });
 
-  const { mountSiteByKey, mountSite } = useSiteOperations();
+  const { mountSiteByKey, selectWorkspace, mountSite } = useSiteOperations({ openDialog });
 
   const [showSpinner] = useState(false);
 
@@ -82,6 +82,7 @@ const SiteLibraryContent = ({
         onSuccess={updateLocalSites}
         onLibraryDialogClose={handleLibraryDialogCloseClick}
         mountSiteByKey={mountSiteByKey}
+        selectWorkspace={selectWorkspace}
       />
     </>
   );
