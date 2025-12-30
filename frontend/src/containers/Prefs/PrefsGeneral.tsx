@@ -8,10 +8,12 @@ import FormControl from '@mui/material/FormControl';
 import service from './../../services/service';
 import FolderPicker from '../../components/FolderPicker';
 import { UserPreferences } from '../../../types';
+import { useAppTheme } from '../../contexts/ThemeContext';
 
 function PrefsGeneral() {
   const [dataFolder, setDataFolder] = useState('');
   const [interfaceStyle, setInterfaceStyle] = useState('');
+  const { updateTheme } = useAppTheme();
 
   useEffect(() => {
     service.api.readConfKey('prefs').then((value: UserPreferences) => {
@@ -28,9 +30,11 @@ function PrefsGeneral() {
   };
 
   const handleInterfaceStyleChange = (value: string) => {
-    service.api.reloadThemeStyle();
-    service.api.saveConfPrefKey('interfaceStyle', value);
+    // Optimistically update the theme immediately
+    updateTheme(value);
     setInterfaceStyle(value);
+    // Save to backend
+    service.api.saveConfPrefKey('interfaceStyle', value);
   };
 
   return (

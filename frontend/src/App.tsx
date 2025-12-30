@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Routes, Route, useParams, useNavigate, useLocation } from "react-router";
 import AppsIcon from "@mui/icons-material/Apps";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -16,6 +16,7 @@ import { AppLayout } from "./layouts/AppLayout";
 import service from "./services/service";
 import { getThemeByName } from "./theme";
 import { UserPreferences } from "../types";
+import { ThemeContext } from "./contexts/ThemeContext";
 
 const defaultApplicationRole = "contentEditor";
 
@@ -60,12 +61,17 @@ const App = () => {
   const [newSiteDialogOpen, setNewSiteDialogOpen] = useState(false);
   const [importSiteDialogOpen, setImportSiteDialogOpen] = useState(false);
 
+  // Function to update theme based on interface style
+  const updateTheme = useCallback((interfaceStyle: string) => {
+    const themeMode = interfaceStyle === "quiqr10-dark" ? "dark" : "light";
+    setTheme(getThemeByName(themeMode));
+  }, []);
+
   useEffect(() => {
     // Set theme from prefs
     service.api.readConfKey("prefs").then((value: UserPreferences) => {
       if (value.interfaceStyle) {
-        const themeMode = value.interfaceStyle === "quiqr10-dark" ? "dark" : "light";
-        setTheme(getThemeByName(themeMode));
+        updateTheme(value.interfaceStyle);
       }
     });
 
@@ -249,51 +255,53 @@ const App = () => {
   );
 
   return (
-    <Routes>
-      {/* Console - standalone layout */}
-      <Route
-        path="/console"
-        element={
-          <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <Box
-                key="main-content"
-                sx={{
-                  flex: 'auto',
-                  userSelect: 'none',
-                  overflow: 'auto',
-                  overflowX: 'hidden',
-                }}
-              >
-                <Console />
-              </Box>
-            </ThemeProvider>
-          </StyledEngineProvider>
-        }
-      />
+    <ThemeContext.Provider value={{ updateTheme }}>
+      <Routes>
+        {/* Console - standalone layout */}
+        <Route
+          path="/console"
+          element={
+            <StyledEngineProvider injectFirst>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Box
+                  key="main-content"
+                  sx={{
+                    flex: 'auto',
+                    userSelect: 'none',
+                    overflow: 'auto',
+                    overflowX: 'hidden',
+                  }}
+                >
+                  <Console />
+                </Box>
+              </ThemeProvider>
+            </StyledEngineProvider>
+          }
+        />
 
-      {/* Workspace - standalone layout */}
-      <Route
-        path="/sites/:site/workspaces/:workspace/*"
-        element={<WorkspaceRoute applicationRole={applicationRole} welcomeScreen={welcomeScreen} theme={theme} />}
-      />
+        {/* Workspace - standalone layout */}
+        <Route
+          path="/sites/:site/workspaces/:workspace/*"
+          element={<WorkspaceRoute applicationRole={applicationRole} welcomeScreen={welcomeScreen} theme={theme} />}
+        />
 
-      {/* Refresh route - empty */}
-      <Route
-        path="/refresh"
-        element={
-          <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
-              <div />
-            </ThemeProvider>
-          </StyledEngineProvider>
-        }
-      />
+        {/* Refresh route - empty */}
+        <Route
+          path="/refresh"
+          element={
+            <StyledEngineProvider injectFirst>
+              <ThemeProvider theme={theme}>
+                <div />
+              </ThemeProvider>
+            </StyledEngineProvider>
+          }
+        />
 
-      {/* All other routes use AppLayout */}
-      <Route path="*" element={<MainLayoutWrapper />} />
-    </Routes>
+        {/* All other routes use AppLayout */}
+        <Route path="*" element={<MainLayoutWrapper />} />
+      </Routes>
+    </ThemeContext.Provider>
   );
 };
 
