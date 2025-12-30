@@ -1,0 +1,8 @@
+{
+  "key": "test-workspace-isolation-site",
+  "name": "Workspace Isolation Test Site",
+  "source": {
+    "type": "folder",
+    "path": "main"
+  }
+}
