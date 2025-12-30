@@ -3,7 +3,9 @@ import RenameSiteDialog from './RenameSiteDialog';
 import CopySiteDialog from './CopySiteDialog';
 import EditSiteTagsDialogs from './EditSiteTagsDialogs';
 import NewSlashImportSiteDialog from './NewSlashImportSiteDialog';
+import SelectWorkspaceDialog from './SelectWorkspaceDialog';
 import { DialogState } from '../hooks/useSiteDialogs';
+import { Workspace } from '../../../../types';
 
 interface SiteDialogsContainerProps {
   dialogState: DialogState;
@@ -11,6 +13,7 @@ interface SiteDialogsContainerProps {
   onSuccess: () => void;
   onLibraryDialogClose: () => void;
   mountSiteByKey: (siteKey: string) => void;
+  selectWorkspace: (siteKey: string, workspace: Workspace) => void;
 }
 
 const SiteDialogsContainer = ({
@@ -19,6 +22,7 @@ const SiteDialogsContainer = ({
   onSuccess,
   onLibraryDialogClose,
   mountSiteByKey,
+  selectWorkspace,
 }: SiteDialogsContainerProps) => {
   return (
     <>
@@ -61,6 +65,16 @@ const SiteDialogsContainer = ({
           onLibraryDialogClose();
           onClose();
         }}
+      />
+
+      <SelectWorkspaceDialog
+        open={dialogState.activeDialog === "selectWorkspace"}
+        workspaces={dialogState.workspaces || []}
+        onSelect={(workspace) => {
+          selectWorkspace(dialogState.siteconf.key, workspace);
+          onClose();
+        }}
+        onClose={onClose}
       />
     </>
   );

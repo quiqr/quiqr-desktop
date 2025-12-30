@@ -1,0 +1,11 @@
+- key: pages
+  title: Pages
+  folder: content/pages/
+  extension: md
+  dataformat: yaml
+  itemtitle: Page
+  fields:
+    - key: title
+      type: string
+    - key: mainContent
+      type: markdown

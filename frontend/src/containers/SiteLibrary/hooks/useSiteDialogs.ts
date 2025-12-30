@@ -1,13 +1,14 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
-import { SiteConfig } from '../../../../types';
+import { SiteConfig, Workspace } from '../../../../types';
 
-export type DialogType = 'rename' | 'copy' | 'editTags' | 'delete' | 'newSlashImport';
+export type DialogType = 'rename' | 'copy' | 'editTags' | 'delete' | 'newSlashImport' | 'selectWorkspace';
 
 export interface DialogState {
   activeDialog: DialogType | null;
   siteconf: SiteConfig;
   newOrImport?: 'new' | 'import';
   importURL?: string;
+  workspaces?: Workspace[];
 }
 
 interface UseSiteDialogsProps {
@@ -66,12 +67,13 @@ export function useSiteDialogs({ newSite, importSite, importSiteURL }: UseSiteDi
     };
   }, [manualDialogState, newSite, importSite, importSiteURL]);
 
-  const openDialog = useCallback((type: DialogType, siteconf?: SiteConfig, importURL?: string) => {
+  const openDialog = useCallback((type: DialogType, siteconf?: SiteConfig, importURL?: string, workspaces?: Workspace[]) => {
     setManualDialogState({
       activeDialog: type,
       siteconf: siteconf || { key: '', name: '' },
       newOrImport: type === 'newSlashImport' ? 'import' : undefined,
-      importURL
+      importURL,
+      workspaces
     });
   }, []);
 
