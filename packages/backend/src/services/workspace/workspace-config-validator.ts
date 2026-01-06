@@ -8,7 +8,7 @@
 import path from 'path';
 import { z } from 'zod';
 import {
-  workspaceDetailsSchema,
+  workspaceDetailsBaseSchema,
   singleConfigSchema,
   collectionConfigSchema,
   type SingleConfig,
@@ -67,8 +67,8 @@ export class WorkspaceConfigValidator {
   validate(config: Partial<WorkspaceConfig>): string | null {
     this.normalizeConfig(config);
 
-    // Extend workspaceDetailsSchema to include dynamics (not in base schema yet)
-    const workspaceConfigSchema = workspaceDetailsSchema.extend({
+    // Extend workspaceDetailsBaseSchema to include dynamics (not in base schema yet)
+    const workspaceConfigSchema = workspaceDetailsBaseSchema.extend({
       dynamics: z.array(z.any()).optional(),
     });
 

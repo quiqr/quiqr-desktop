@@ -263,6 +263,18 @@ export const workspaceSchema = z.object({
   state: z.string()
 })
 
+// Base workspace details schema (for extending)
+export const workspaceDetailsBaseSchema = z.object({
+  ssgType: z.string().default('hugo'),
+  ssgVersion: z.string(),
+  serve: z.array(serveConfigSchema).optional(),
+  build: z.array(buildConfigSchema).optional(),
+  menu: menuSchema.optional(),
+  collections: z.array(collectionConfigSchema),
+  singles: z.array(singleConfigSchema),
+  providerConfig: z.record(z.any()).optional()
+});
+
 // Workspace details with auto-migration from old Hugo-specific format
 // Using preprocess to handle both old (hugover) and new (ssgType + ssgVersion) formats
 export const workspaceDetailsSchema = z.preprocess(
@@ -285,16 +297,7 @@ export const workspaceDetailsSchema = z.preprocess(
     }
     return data;
   },
-  z.object({
-    ssgType: z.string().default('hugo'),
-    ssgVersion: z.string(),
-    serve: z.array(serveConfigSchema).optional(),
-    build: z.array(buildConfigSchema).optional(),
-    menu: menuSchema.optional(),
-    collections: z.array(collectionConfigSchema),
-    singles: z.array(singleConfigSchema),
-    providerConfig: z.record(z.any()).optional()
-  })
+  workspaceDetailsBaseSchema
 )
 
 export const configurationsSchema = z.object({
