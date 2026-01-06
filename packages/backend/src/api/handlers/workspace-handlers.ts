@@ -323,11 +323,30 @@ export function createGlobSyncHandler(container: AppContainer) {
 
 /**
  * Check if a Hugo version is installed
+ * @deprecated Use createCheckSSGVersionHandler instead
  */
 export function createCheckHugoVersionHandler(container: AppContainer) {
   return async ({ version }: { version: string }) => {
     const installed = container.hugoDownloader.isVersionInstalled(version);
     return { installed, version };
+  };
+}
+
+/**
+ * Check if an SSG version is installed
+ */
+export function createCheckSSGVersionHandler(container: AppContainer) {
+  return async ({ ssgType, version }: { ssgType: string; version: string }) => {
+    const provider = await container.providerFactory.getProvider(ssgType);
+    const binaryManager = provider.getBinaryManager();
+
+    if (!binaryManager) {
+      // If no binary manager, consider it "installed" (doesn't require installation)
+      return { installed: true, version, ssgType };
+    }
+
+    const installed = binaryManager.isVersionInstalled(version);
+    return { installed, version, ssgType };
   };
 }
 
@@ -640,6 +659,7 @@ export function createWorkspaceHandlers(container: AppContainer) {
     parseFileToObject: createParseFileToObjectHandler(container),
     globSync: createGlobSyncHandler(container),
     checkHugoVersion: createCheckHugoVersionHandler(container),
+    checkSSGVersion: createCheckSSGVersionHandler(container),
     getPromptTemplateConfig: createGetPromptTemplateConfigHandler(container),
     processAiPrompt: createProcessAiPromptHandler(container),
     updatePageFromAiResponse: createUpdatePageFromAiResponseHandler(container),
