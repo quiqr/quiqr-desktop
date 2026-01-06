@@ -48,6 +48,16 @@ export class ProviderRegistry {
         `Failed to register Hugo provider: ${error instanceof Error ? error.message : String(error)}`
       );
     }
+
+    try {
+      // Dynamically import Eleventy provider
+      const { EleventyProvider } = await import('./eleventy/eleventy-provider.js');
+      this.registerProvider(EleventyProvider, true);
+    } catch (error) {
+      this.dependencies.outputConsole.appendLine(
+        `Failed to register Eleventy provider: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   /**

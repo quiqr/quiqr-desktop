@@ -67,8 +67,11 @@ export class WorkspaceConfigValidator {
   private applyConfigMigration(config: any): any {
     if (!config) return config;
 
+    console.log('[CONFIG MIGRATION] Input config:', JSON.stringify({ ssgType: config.ssgType, ssgVersion: config.ssgVersion, hugover: config.hugover }, null, 2));
+
     // If old format with hugover, convert to new format
     if ('hugover' in config) {
+      console.log('[CONFIG MIGRATION] Has hugover, converting to new format');
       return {
         ...config,
         ssgType: config.ssgType || 'hugo',
@@ -79,6 +82,7 @@ export class WorkspaceConfigValidator {
 
     // If missing both hugover and ssgVersion, add defaults (very old configs)
     if (!('ssgVersion' in config) && !('hugover' in config)) {
+      console.log('[CONFIG MIGRATION] Missing both hugover and ssgVersion, adding defaults');
       return {
         ...config,
         ssgType: config.ssgType || 'hugo',
@@ -88,12 +92,14 @@ export class WorkspaceConfigValidator {
 
     // If has ssgVersion but missing ssgType, default to hugo
     if ('ssgVersion' in config && !('ssgType' in config)) {
+      console.log('[CONFIG MIGRATION] Has ssgVersion but no ssgType, defaulting to hugo');
       return {
         ...config,
         ssgType: 'hugo'
       };
     }
 
+    console.log('[CONFIG MIGRATION] No migration needed, returning config as-is');
     return config;
   }
 
