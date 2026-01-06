@@ -28,9 +28,8 @@ import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
 import type { ProviderFactory } from '../../ssg-providers/provider-factory.js';
-import type { SSGDevServer } from '../../ssg-providers/types.js';
+import type { SSGDevServer, SSGBuilder, SSGConfigQuerier, SSGServerConfig, SSGBuildConfig } from '../../ssg-providers/types.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
-import { QSiteConfig } from '../../ssg-providers/hugo/hugo-config.js';
 
 /**
  * Dependencies required by WorkspaceService
@@ -1245,19 +1244,23 @@ export class WorkspaceService {
   }
 
   /**
-   * Set current base URL from Hugo config
+   * Set current base URL from SSG config
    */
-  setCurrentBaseUrl(hugoServerConfig: QSiteConfig): void {
+  async setCurrentBaseUrl(ssgType: string, ssgVersion: string, configFile?: string): Promise<void> {
     // Reset currentBaseUrl
     this.appState.currentBaseUrl = undefined;
 
-    const hugoConfService = new HugoConfig(
-      JSON.parse(JSON.stringify(hugoServerConfig)),
-      this.pathHelper
-    );
-    hugoConfService.configLines().then((lines) => {
+    try {
+      const provider = await this.providerFactory.getProvider(ssgType);
+      const configQuerier = provider.createConfigQuerier(this.workspacePath, ssgVersion, configFile);
+
+      if (!configQuerier) {
+        return; // Provider doesn't support config querying
+      }
+
+      const lines = await configQuerier.getConfigLines();
       const key = 'baseurl';
-      const item = lines.find((element) => {
+      const item = lines.find((element: string) => {
         return element.startsWith(key);
       });
 
@@ -1281,148 +1284,166 @@ export class WorkspaceService {
           }
         }
       }
-    });
+    } catch (error) {
+      // If config querying fails, just leave currentBaseUrl as undefined
+      console.warn('Failed to query SSG config for baseURL:', error);
+    }
   }
 
   /**
-   * Get Hugo config languages
+   * Get SSG config languages (Hugo-specific feature)
    */
   async getHugoConfigLanguages(): Promise<HugoLanguage[]> {
     const workspaceDetails = await this.getConfigurationsData();
 
-    return new Promise((resolve, reject) => {
+    try {
       let serveConfig: any;
       if (workspaceDetails.serve && workspaceDetails.serve.length) {
         serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
-      } else serveConfig = { config: '' };
+      } else {
+        serveConfig = { config: '' };
+      }
 
-      const hugoServerConfig: QSiteConfig = {
-        config: serveConfig.config,
-        workspacePath: this.workspacePath,
-        hugover: workspaceDetails.hugover,
-      };
-
-      const hugoConfService = new HugoConfig(
-        JSON.parse(JSON.stringify(hugoServerConfig)),
-        this.pathHelper
+      const provider = await this.providerFactory.getProvider(workspaceDetails.ssgType);
+      const configQuerier = provider.createConfigQuerier(
+        this.workspacePath,
+        workspaceDetails.ssgVersion,
+        serveConfig.config
       );
-      hugoConfService
-        .configMountsAsObject()
-        .then((confObj) => {
-          const filteredArray = confObj.mounts.filter(function (mount: any) {
-            return 'lang' in mount;
-          });
 
-          resolve(filteredArray);
-        })
-        .catch((e) => {
-          reject(e);
-        });
-    });
+      if (!configQuerier) {
+        return []; // Provider doesn't support config querying
+      }
+
+      const config = await configQuerier.getConfig();
+
+      if (!config.mounts) {
+        return [];
+      }
+
+      const filteredArray = config.mounts.filter((mount: any) => {
+        return 'lang' in mount;
+      }) as HugoLanguage[];
+
+      return filteredArray;
+    } catch (error) {
+      console.warn('Failed to query SSG config languages:', error);
+      return [];
+    }
   }
 
   /**
-   * Start Hugo development server
-   * Note: Hugo must be pre-downloaded by the frontend before calling this method.
-   * The frontend coordinates Hugo downloads via SSE to show progress to the user.
+   * Start SSG development server
+   * Note: SSG binary must be pre-downloaded by the frontend before calling this method.
+   * The frontend coordinates downloads via SSE to show progress to the user.
    */
   async serve(): Promise<void> {
     const workspaceDetails = await this.getConfigurationsData();
+    const { ssgType, ssgVersion } = workspaceDetails;
 
-    // Verify Hugo is installed - frontend is responsible for downloading it first
-    const hugoBin = this.pathHelper.getHugoBinForVer(workspaceDetails.hugover);
-    if (!fs.existsSync(hugoBin)) {
-      throw new Error(
-        `Hugo version ${workspaceDetails.hugover} is not installed. ` +
-          `Please wait for the download to complete before starting the server.`
-      );
+    // Verify SSG binary is installed (if required) - frontend is responsible for downloading it first
+    const provider = await this.providerFactory.getProvider(ssgType);
+    const metadata = provider.getMetadata();
+
+    if (metadata.requiresBinary) {
+      const ssgBin = this.pathHelper.getSSGBinForVer(ssgType, ssgVersion);
+      if (!fs.existsSync(ssgBin)) {
+        throw new Error(
+          `${metadata.name} version ${ssgVersion} is not installed. ` +
+            `Please wait for the download to complete before starting the server.`
+        );
+      }
     }
 
-    return new Promise((resolve, reject) => {
-      let serveConfig: any;
-      if (workspaceDetails.serve && workspaceDetails.serve.length) {
-        serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
-      } else serveConfig = { config: '' };
+    // Get serve configuration
+    let serveConfig: any;
+    if (workspaceDetails.serve && workspaceDetails.serve.length) {
+      serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
+    } else {
+      serveConfig = { config: '' };
+    }
 
-      const hugoServerConfig: HugoServerConfig = {
-        config: serveConfig.config,
-        workspacePath: this.workspacePath,
-        hugover: workspaceDetails.hugover,
-      };
+    // Set current base URL
+    await this.setCurrentBaseUrl(ssgType, ssgVersion, serveConfig.config);
 
-      this.setCurrentBaseUrl(hugoServerConfig);
+    // Create dev server config
+    const serverConfig: SSGServerConfig = {
+      workspacePath: this.workspacePath,
+      version: ssgVersion,
+      configFile: serveConfig.config,
+    };
 
-      this.currentHugoServer = new HugoServer(
-        hugoServerConfig,
-        this.pathHelper,
-        this.appConfig,
-        this.windowAdapter,
-        this.outputConsole
+    // Create and start dev server
+    this.currentDevServer = provider.createDevServer(serverConfig);
+    this.currentSSGType = ssgType;
+
+    try {
+      await this.currentDevServer.serve();
+
+      // Make screenshot if no screenshots are made already
+      const screenshotDir = path.join(
+        this.workspacePath,
+        'quiqr',
+        'etalage',
+        'screenshots'
       );
-
-      this.currentHugoServer
-        .serve()
-        .then(() => {
-          // make screenshot if no screenshots are made already
-          const screenshotDir = path.join(
-            this.workspacePath,
-            'quiqr',
-            'etalage',
-            'screenshots'
-          );
-          if (!fs.existsSync(screenshotDir)) {
-            console.log('autocreate screenshots');
-            this.genereateEtalageImages();
-          }
-
-          resolve();
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
+      if (!fs.existsSync(screenshotDir)) {
+        console.log('autocreate screenshots');
+        this.genereateEtalageImages();
+      }
+    } catch (error) {
+      // Clean up on error
+      this.currentDevServer = undefined;
+      this.currentSSGType = undefined;
+      throw error;
+    }
   }
 
   /**
-   * Stop the Hugo server if running
+   * Stop the dev server if running
    */
   stopHugoServer(): void {
-    if (this.currentHugoServer) {
-      this.currentHugoServer.stopIfRunning();
-      this.currentHugoServer = undefined;
+    if (this.currentDevServer) {
+      this.currentDevServer.stopIfRunning();
+      this.currentDevServer = undefined;
+      this.currentSSGType = undefined;
     }
   }
 
   /**
-   * Build the Hugo site
+   * Build the SSG site
    */
   async build(buildKey?: string, extraConfig: ExtraBuildConfig = {}): Promise<void> {
     const workspaceDetails = await this.getConfigurationsData();
-    return new Promise((resolve, reject) => {
-      let buildConfig: any;
-      if (workspaceDetails.build && workspaceDetails.build.length) {
-        buildConfig = this._findFirstMatchOrDefault(workspaceDetails.build, buildKey || '');
-      } else buildConfig = { config: '' };
+    const { ssgType, ssgVersion } = workspaceDetails;
 
-      const destination = path.join(this.pathHelper.getBuildDir(this.workspacePath), 'public');
+    // Get build configuration
+    let buildConfig: any;
+    if (workspaceDetails.build && workspaceDetails.build.length) {
+      buildConfig = this._findFirstMatchOrDefault(workspaceDetails.build, buildKey || '');
+    } else {
+      buildConfig = { config: '' };
+    }
 
-      const hugoBuilderConfig: HugoBuildConfig = {
-        config: buildConfig.config,
-        workspacePath: this.workspacePath,
-        hugover: workspaceDetails.hugover,
-        destination: destination,
-      };
-      if (extraConfig.overrideBaseURLSwitch) {
-        hugoBuilderConfig.baseUrl = extraConfig.overrideBaseURL;
-      }
+    const destination = path.join(this.pathHelper.getBuildDir(this.workspacePath), 'public');
 
-      const hugoBuilder = new HugoBuilder(hugoBuilderConfig, this.pathHelper);
+    // Create build config
+    const builderConfig: SSGBuildConfig = {
+      workspacePath: this.workspacePath,
+      version: ssgVersion,
+      configFile: buildConfig.config,
+      destination: destination,
+    };
 
-      hugoBuilder.build().then(
-        () => resolve(),
-        (err) => reject(err)
-      );
-    });
+    if (extraConfig.overrideBaseURLSwitch) {
+      builderConfig.baseUrl = extraConfig.overrideBaseURL;
+    }
+
+    // Create and execute builder
+    const provider = await this.providerFactory.getProvider(ssgType);
+    const builder = provider.createBuilder(builderConfig);
+
+    await builder.build();
   }
 
   /**
@@ -1447,9 +1468,9 @@ export class WorkspaceService {
   }
 
   /**
-   * Get the current Hugo server instance
+   * Get the current dev server instance
    */
-  getCurrentHugoServer(): HugoServer | undefined {
-    return this.currentHugoServer;
+  getCurrentHugoServer(): SSGDevServer | undefined {
+    return this.currentDevServer;
   }
 }
