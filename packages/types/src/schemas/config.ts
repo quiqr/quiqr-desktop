@@ -279,22 +279,39 @@ export const workspaceDetailsBaseSchema = z.object({
 // Using preprocess to handle both old (hugover) and new (ssgType + ssgVersion) formats
 export const workspaceDetailsSchema = z.preprocess(
   (data: any) => {
+
+    if (!data) return data;
+
     // If old format with hugover, convert to new format
-    if (data && 'hugover' in data && !('ssgType' in data)) {
-      return {
+    if ('hugover' in data) {
+      const transformed = {
         ...data,
-        ssgType: 'hugo',
+        ssgType: data.ssgType || 'hugo',
         ssgVersion: data.hugover,
         hugover: undefined // Remove old field
       };
+      return transformed;
     }
-    // If new format without ssgType, default to hugo
-    if (data && !('ssgType' in data) && 'ssgVersion' in data) {
-      return {
+
+    // If missing both hugover and ssgVersion, add defaults (very old configs)
+    if (!('ssgVersion' in data) && !('hugover' in data)) {
+      const transformed = {
+        ...data,
+        ssgType: data.ssgType || 'hugo',
+        ssgVersion: 'v0.100.2' // Default version for old configs without version info
+      };
+      return transformed;
+    }
+
+    // If has ssgVersion but missing ssgType, default to hugo
+    if ('ssgVersion' in data && !('ssgType' in data)) {
+      const transformed = {
         ...data,
         ssgType: 'hugo'
       };
+      return transformed;
     }
+
     return data;
   },
   workspaceDetailsBaseSchema

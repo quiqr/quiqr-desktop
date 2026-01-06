@@ -61,11 +61,57 @@ export class WorkspaceConfigValidator {
   }
 
   /**
+   * Apply config migration from old format to new format
+   * Handles hugover → ssgType + ssgVersion migration
+   */
+  private applyConfigMigration(config: any): any {
+    if (!config) return config;
+
+    // If old format with hugover, convert to new format
+    if ('hugover' in config) {
+      return {
+        ...config,
+        ssgType: config.ssgType || 'hugo',
+        ssgVersion: config.hugover,
+        hugover: undefined // Remove old field
+      };
+    }
+
+    // If missing both hugover and ssgVersion, add defaults (very old configs)
+    if (!('ssgVersion' in config) && !('hugover' in config)) {
+      return {
+        ...config,
+        ssgType: config.ssgType || 'hugo',
+        ssgVersion: 'v0.100.2' // Default version for old configs without version info
+      };
+    }
+
+    // If has ssgVersion but missing ssgType, default to hugo
+    if ('ssgVersion' in config && !('ssgType' in config)) {
+      return {
+        ...config,
+        ssgType: 'hugo'
+      };
+    }
+
+    return config;
+  }
+
+  /**
    * Validate the entire workspace configuration
    * @returns null if valid, error message string if invalid
    */
   validate(config: Partial<WorkspaceConfig>): string | null {
     this.normalizeConfig(config);
+
+    // First apply the preprocessing from workspaceDetailsSchema to handle migrations
+    // (hugover → ssgVersion, etc.)
+    const preprocessed = this.applyConfigMigration(config);
+
+    // Update the original config object with migrated values
+    if (preprocessed !== config) {
+      Object.assign(config, preprocessed);
+    }
 
     // Extend workspaceDetailsBaseSchema to include dynamics (not in base schema yet)
     const workspaceConfigSchema = workspaceDetailsBaseSchema.extend({
@@ -73,7 +119,7 @@ export class WorkspaceConfigValidator {
     });
 
     try {
-      workspaceConfigSchema.parse(config);
+      workspaceConfigSchema.parse(preprocessed);
     } catch (err) {
       if (err instanceof z.ZodError) {
         // TODO

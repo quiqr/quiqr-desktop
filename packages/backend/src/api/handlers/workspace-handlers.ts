@@ -59,7 +59,7 @@ export function createGetWorkspaceDetailsHandler(container: AppContainer) {
 
     // Update menu to reflect that a site is now selected
     container.adapters.menu.createMainMenu();
-
+    
     return config;
   };
 }
