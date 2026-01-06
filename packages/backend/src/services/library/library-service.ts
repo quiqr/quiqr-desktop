@@ -8,8 +8,12 @@ import type { SiteConfig } from '@quiqr/types';
 import fs from 'fs-extra';
 import path from 'path';
 import type { AppContainer } from '../../config/index.js';
-import type { HugoConfigFormat } from '../../ssg-providers/hugo/hugo-utils.js';
 import { InitialWorkspaceConfigBuilder } from '../workspace/initial-workspace-config-builder.js';
+
+/**
+ * SSG configuration format
+ */
+export type SSGConfigFormat = 'toml' | 'yaml' | 'json';
 
 /**
  * Site configuration that can be written to disk (subset of SiteConfig)
@@ -81,17 +85,19 @@ export class LibraryService {
   }
 
   /**
-   * Create a new Hugo site with Quiqr configuration
+   * Create a new SSG-based Quiqr site
    *
    * @param siteName - The display name for the site
-   * @param hugoVersion - The Hugo version to use
+   * @param ssgType - The SSG type (e.g., 'hugo', 'eleventy')
+   * @param ssgVersion - The SSG version to use
    * @param configFormat - The configuration file format (toml, yaml, json)
    * @returns The generated site key
    */
-  async createNewHugoQuiqrSite(
+  async createNewSite(
     siteName: string,
-    hugoVersion: string,
-    configFormat: HugoConfigFormat
+    ssgType: string,
+    ssgVersion: string,
+    configFormat: SSGConfigFormat
   ): Promise<string> {
     const siteKey = await this.createSiteKeyFromName(siteName);
 
@@ -102,14 +108,21 @@ export class LibraryService {
     await fs.ensureDir(pathSite);
 
     const pathSource = path.join(pathSite, 'main');
-    await this.appContainer.hugoUtils.createSiteDir(pathSource, siteName, configFormat);
+
+    // Create site using provider
+    const provider = await this.appContainer.providerFactory.getProvider(ssgType);
+    await provider.createSite({
+      directory: pathSource,
+      title: siteName,
+      configFormat
+    });
 
     const configBuilder = new InitialWorkspaceConfigBuilder(
       pathSource,
       this.appContainer.formatResolver,
       this.appContainer.pathHelper
     );
-    configBuilder.buildAll(hugoVersion);
+    configBuilder.buildAll(ssgType, ssgVersion);
 
     const newConf = this.createMountConfUnmanaged(siteKey, siteKey, pathSource);
     await fs.writeFile(
@@ -119,6 +132,18 @@ export class LibraryService {
     );
 
     return siteKey;
+  }
+
+  /**
+   * @deprecated Use createNewSite instead
+   * Create a new Hugo-based Quiqr site (backward compatibility)
+   */
+  async createNewHugoQuiqrSite(
+    siteName: string,
+    hugoVersion: string,
+    configFormat: SSGConfigFormat
+  ): Promise<string> {
+    return this.createNewSite(siteName, 'hugo', hugoVersion, configFormat);
   }
 
   /**
