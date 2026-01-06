@@ -8,7 +8,7 @@ import type { SiteConfig } from '@quiqr/types';
 import fs from 'fs-extra';
 import path from 'path';
 import type { AppContainer } from '../../config/index.js';
-import type { HugoConfigFormat } from '../../hugo/hugo-utils.js';
+import type { HugoConfigFormat } from '../../ssg-providers/hugo/hugo-utils.js';
 import { InitialWorkspaceConfigBuilder } from '../workspace/initial-workspace-config-builder.js';
 
 /**

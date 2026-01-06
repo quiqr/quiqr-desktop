@@ -7,7 +7,7 @@
 import fs from 'fs-extra';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import type { PathHelper } from '../utils/path-helper.js';
+import type { PathHelper } from '../../utils/path-helper.js';
 
 const execFileAsync = promisify(execFile);
 

@@ -6,7 +6,7 @@
  */
 
 import type { AppContainer } from '../../config/container.js';
-import type { HugoConfigFormat } from '../../hugo/hugo-utils.js';
+import type { HugoConfigFormat } from '../../ssg-providers/hugo/hugo-utils.js';
 
 export function createImportSiteFromPrivateGitRepoHandler(container: AppContainer) {
   return async ({

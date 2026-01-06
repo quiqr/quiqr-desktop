@@ -10,8 +10,8 @@ import { promisify } from 'util';
 import fs from 'fs-extra';
 import path from 'path';
 import { globSync } from 'glob';
-import type { PathHelper, EnvironmentInfo } from '../utils/path-helper.js';
-import type { OutputConsole } from '../adapters/types.js';
+import type { PathHelper, EnvironmentInfo } from '../../utils/path-helper.js';
+import type { OutputConsole } from '../../adapters/types.js';
 
 const execFileAsync = promisify(execFile);
 
