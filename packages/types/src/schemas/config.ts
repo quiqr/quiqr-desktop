@@ -263,14 +263,39 @@ export const workspaceSchema = z.object({
   state: z.string()
 })
 
-export const workspaceDetailsSchema = z.object({
-  hugover: z.string(),
-  serve: z.array(serveConfigSchema).optional(),
-  build: z.array(buildConfigSchema).optional(),
-  menu: menuSchema.optional(),
-  collections: z.array(collectionConfigSchema),
-  singles: z.array(singleConfigSchema)
-})
+// Workspace details with auto-migration from old Hugo-specific format
+// Using preprocess to handle both old (hugover) and new (ssgType + ssgVersion) formats
+export const workspaceDetailsSchema = z.preprocess(
+  (data: any) => {
+    // If old format with hugover, convert to new format
+    if (data && 'hugover' in data && !('ssgType' in data)) {
+      return {
+        ...data,
+        ssgType: 'hugo',
+        ssgVersion: data.hugover,
+        hugover: undefined // Remove old field
+      };
+    }
+    // If new format without ssgType, default to hugo
+    if (data && !('ssgType' in data) && 'ssgVersion' in data) {
+      return {
+        ...data,
+        ssgType: 'hugo'
+      };
+    }
+    return data;
+  },
+  z.object({
+    ssgType: z.string().default('hugo'),
+    ssgVersion: z.string(),
+    serve: z.array(serveConfigSchema).optional(),
+    build: z.array(buildConfigSchema).optional(),
+    menu: menuSchema.optional(),
+    collections: z.array(collectionConfigSchema),
+    singles: z.array(singleConfigSchema),
+    providerConfig: z.record(z.any()).optional()
+  })
+)
 
 export const configurationsSchema = z.object({
   sites: z.array(siteConfigSchema)
