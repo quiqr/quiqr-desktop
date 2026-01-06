@@ -31,13 +31,14 @@ export class InitialWorkspaceConfigBuilder {
 
   /**
    * Build all initial configuration files
-   * @param hugoVersion - Hugo version to use
+   * @param ssgType - SSG type (e.g., 'hugo', 'eleventy')
+   * @param ssgVersion - SSG version to use
    * @returns Path to the created base config file
    */
-  buildAll(hugoVersion: string = '0.88.1'): string {
+  buildAll(ssgType: string = 'hugo', ssgVersion: string = '0.88.1'): string {
     this.buildHomeReadme();
 
-    const { dataBase, formatProvider } = this.buildBase(hugoVersion);
+    const { dataBase, formatProvider } = this.buildBase(ssgType, ssgVersion);
 
     fs.ensureDirSync(path.join(this.workspacePath, 'quiqr', 'model'));
     fs.ensureDirSync(path.join(this.workspacePath, 'quiqr', 'model', 'includes'));
@@ -59,7 +60,8 @@ export class InitialWorkspaceConfigBuilder {
    * Get the default configuration object
    */
   private getConfig(opts: {
-    hugover: string;
+    ssgType: string;
+    ssgVersion: string;
     configFile: string;
     ext: string;
     hugoConfigData: any;
@@ -74,7 +76,8 @@ export class InitialWorkspaceConfigBuilder {
     };
 
     return {
-      hugover: opts.hugover || '',
+      ssgType: opts.ssgType || 'hugo',
+      ssgVersion: opts.ssgVersion || '',
       serve: [{ key: 'default', config: opts.configFile }],
       build: [{ key: 'default', config: opts.configFile }],
       menu: [
@@ -158,7 +161,7 @@ export class InitialWorkspaceConfigBuilder {
   /**
    * Build base configuration
    */
-  private buildBase(hugoVersion: string): {
+  private buildBase(ssgType: string, ssgVersion: string): {
     formatProvider: FormatProvider;
     dataBase: any;
   } {
@@ -190,7 +193,8 @@ export class InitialWorkspaceConfigBuilder {
     const dataBase = this.getConfig({
       configFile: relHugoConfigPath,
       ext: formatProvider.defaultExt(),
-      hugover: hugoVersion,
+      ssgType,
+      ssgVersion,
       hugoConfigData,
     });
 
