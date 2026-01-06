@@ -33,6 +33,17 @@ export const hugoVersionCheckResponseSchema = z.object({
   version: z.string()
 })
 
+export const ssgVersionCheckResponseSchema = z.object({
+  installed: z.boolean(),
+  version: z.string(),
+  ssgType: z.string()
+})
+
+export const ssgVersionsResponseSchema = z.object({
+  ssgType: z.string(),
+  versions: z.array(z.string())
+})
+
 export const collectionItemKeyResponseSchema = z.object({
   key: z.string()
 })
@@ -229,6 +240,10 @@ export const apiSchemas = {
   getFilteredHugoVersions: z.array(z.string()),
   getHugoTemplates: z.any(), // Not implemented in backend
   checkHugoVersion: hugoVersionCheckResponseSchema,
+
+  // SSG operations
+  checkSSGVersion: ssgVersionCheckResponseSchema,
+  getFilteredSSGVersions: ssgVersionsResponseSchema,
 
   // Window management
   showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),

@@ -28,7 +28,9 @@ interface WorkspaceConfig {
     hugoHidePreviewSite?: boolean;
     [key: string]: unknown;
   }>;
-  hugover?: string;
+  ssgType?: string;
+  ssgVersion?: string;
+  hugover?: string; // Deprecated, for backward compatibility
   [key: string]: unknown;
 }
 
@@ -246,48 +248,55 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
 
   // Check Hugo version when workspace is loaded
   useEffect(() => {
-    // Wait for workspace data to load before deciding on Hugo status
+    // Wait for workspace data to load before deciding on SSG status
     if (workspace === null) {
       return;
     }
 
-    if (workspace.hugover) {
-      const checkAndDownloadHugo = async () => {
+    // Get SSG type and version (with backward compatibility for old hugover field)
+    const ssgType = workspace.ssgType || 'hugo';
+    const ssgVersion = workspace.ssgVersion || workspace.hugover;
+
+    if (ssgVersion) {
+      const checkAndDownloadSSG = async () => {
         try {
-          const result = await service.api.checkHugoVersion(workspace.hugover!);
+          const result = await service.api.checkSSGVersion(ssgType, ssgVersion);
           if (result.installed) {
             setHugoReady(true);
           } else {
-            const success = await downloadHugo(workspace.hugover!);
+            const success = await downloadHugo(ssgVersion);
             // hugoReady is set by the hook on success
             if (!success) {
-              console.error('Hugo download failed or was cancelled');
+              console.error(`${ssgType} download failed or was cancelled`);
             }
           }
         } catch (err) {
-          console.error('Failed to check/download Hugo:', err);
-          // Still allow UI to render even if Hugo check fails
+          console.error(`Failed to check/download ${ssgType}:`, err);
+          // Still allow UI to render even if SSG check fails
           setHugoReady(true);
         }
       };
-      checkAndDownloadHugo();
+      checkAndDownloadSSG();
     } else {
-      // No Hugo version specified, mark as ready
+      // No SSG version specified, mark as ready
       setHugoReady(true);
     }
   }, [workspace, downloadHugo, setHugoReady]);
 
   /**
-   * Open preview in browser, ensuring Hugo is downloaded first.
-   * If Hugo is not ready (download failed/cancelled), trigger a new download.
+   * Open preview in browser, ensuring SSG is downloaded first.
+   * If SSG is not ready (download failed/cancelled), trigger a new download.
    */
   const openPreviewInBrowser = useCallback(async () => {
-    // If Hugo is not ready, try to download it first
-    if (!hugoReady && workspace?.hugover) {
-      console.log('[Workspace] Hugo not ready, triggering download before preview');
-      const success = await downloadHugo(workspace.hugover);
+    // Get SSG version with backward compatibility
+    const ssgVersion = workspace?.ssgVersion || workspace?.hugover;
+
+    // If SSG is not ready, try to download it first
+    if (!hugoReady && ssgVersion) {
+      console.log('[Workspace] SSG not ready, triggering download before preview');
+      const success = await downloadHugo(ssgVersion);
       if (!success) {
-        console.log('[Workspace] Hugo download failed, cannot open preview');
+        console.log('[Workspace] SSG download failed, cannot open preview');
         return;
       }
     }
@@ -296,7 +305,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     if (typeof path === 'string') {
       await openExternal('http://localhost:13131' + path);
     }
-  }, [hugoReady, workspace?.hugover, downloadHugo]);
+  }, [hugoReady, workspace?.ssgVersion, workspace?.hugover, downloadHugo]);
 
   // Determine active section based on path
   const path = location.pathname;

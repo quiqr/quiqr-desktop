@@ -89,12 +89,32 @@ export class API {
     return mainProcessBridge.request('importSiteAction', {});
   }
 
+  /**
+   * @deprecated Use getFilteredSSGVersions instead
+   */
   getFilteredHugoVersions(){
     return mainProcessBridge.request('getFilteredHugoVersions', {});
   }
 
+  /**
+   * Get filtered versions for a specific SSG type
+   */
+  getFilteredSSGVersions(ssgType: string) {
+    return mainProcessBridge.request('getFilteredSSGVersions', { ssgType });
+  }
+
+  /**
+   * @deprecated Use checkSSGVersion instead
+   */
   checkHugoVersion(version: string) {
     return mainProcessBridge.request('checkHugoVersion', { version });
+  }
+
+  /**
+   * Check if an SSG version is installed
+   */
+  checkSSGVersion(ssgType: string, version: string) {
+    return mainProcessBridge.request('checkSSGVersion', { ssgType, version });
   }
 
   importSiteFromPrivateGitRepo(
