@@ -22,16 +22,15 @@ import { isContentFile, SUPPORTED_CONTENT_EXTENSIONS } from '../../utils/content
 import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
-import { HugoBuilder, type HugoBuildConfig } from '../../hugo/hugo-builder.js';
-import { HugoServer, type HugoServerConfig } from '../../hugo/hugo-server.js';
-import { HugoConfig, type QSiteConfig } from '../../hugo/hugo-config.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
 import type { SingleConfig, CollectionConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
-import type { HugoDownloader } from '../../hugo/hugo-downloader.js';
+import type { ProviderFactory } from '../../ssg-providers/provider-factory.js';
+import type { SSGDevServer } from '../../ssg-providers/types.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
+import { QSiteConfig } from '../../ssg-providers/hugo/hugo-config.js';
 
 /**
  * Dependencies required by WorkspaceService
@@ -42,7 +41,7 @@ export interface WorkspaceServiceDependencies {
   pathHelper: PathHelper;
   appConfig: AppConfig;
   appState: AppState;
-  hugoDownloader: HugoDownloader;
+  providerFactory: ProviderFactory;
   windowAdapter: WindowAdapter;
   shellAdapter: ShellAdapter;
   outputConsole: OutputConsole;
@@ -127,13 +126,14 @@ export class WorkspaceService {
   private pathHelper: PathHelper;
   private appConfig: AppConfig;
   private appState: AppState;
-  private hugoDownloader: HugoDownloader;
+  private providerFactory: ProviderFactory;
   private windowAdapter: WindowAdapter;
   private shellAdapter: ShellAdapter;
   private outputConsole: OutputConsole;
   private screenshotWindowManager: ScreenshotWindowManager;
   private buildActionService: BuildActionService;
-  private currentHugoServer?: HugoServer;
+  private currentDevServer?: SSGDevServer;
+  private currentSSGType?: string;
 
   constructor(
     workspacePath: string,
@@ -149,7 +149,7 @@ export class WorkspaceService {
     this.pathHelper = dependencies.pathHelper;
     this.appConfig = dependencies.appConfig;
     this.appState = dependencies.appState;
-    this.hugoDownloader = dependencies.hugoDownloader;
+    this.providerFactory = dependencies.providerFactory;
     this.windowAdapter = dependencies.windowAdapter;
     this.shellAdapter = dependencies.shellAdapter;
     this.outputConsole = dependencies.outputConsole;
