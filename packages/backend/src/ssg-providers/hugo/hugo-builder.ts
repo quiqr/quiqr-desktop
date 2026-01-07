@@ -48,7 +48,7 @@ export class HugoBuilder {
       hugoArgs.push('--baseURL', this.config.baseUrl);
     }
 
-    const exec = this.pathHelper.getHugoBinForVer(this.config.hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', this.config.hugover);
 
     if (!fs.existsSync(exec)) {
       throw new Error(`Could not find hugo executable for version ${this.config.hugover}.`);

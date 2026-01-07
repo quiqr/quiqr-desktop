@@ -94,7 +94,7 @@ export class HugoServer {
 
     this.stopIfRunning();
 
-    const exec = this.pathHelper.getHugoBinForVer(hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
       throw new Error('Could not find hugo executable for version ' + hugover);
