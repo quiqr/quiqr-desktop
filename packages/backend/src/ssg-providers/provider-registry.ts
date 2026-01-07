@@ -58,6 +58,16 @@ export class ProviderRegistry {
         `Failed to register Eleventy provider: ${error instanceof Error ? error.message : String(error)}`
       );
     }
+
+    try {
+      // Dynamically import Jekyll provider
+      const { JekyllProvider } = await import('./jekyll/jekyll-provider.js');
+      this.registerProvider(JekyllProvider, true);
+    } catch (error) {
+      this.dependencies.outputConsole.appendLine(
+        `Failed to register Jekyll provider: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   /**

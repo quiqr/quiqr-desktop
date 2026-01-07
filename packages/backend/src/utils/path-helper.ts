@@ -144,6 +144,14 @@ export class PathHelper {
       return npmBinPath;
     }
 
+    // For gem-based SSGs (like Jekyll), use wrapper scripts
+    if (ssgType.toLowerCase() === 'jekyll') {
+      if (platform.startsWith('win')) {
+        return path.join(binDir, 'jekyll.cmd');
+      }
+      return path.join(binDir, 'jekyll.sh');
+    }
+
     // For standalone binaries (like Hugo)
     if (platform.startsWith('win')) {
       return path.join(binDir, `${binaryName}.exe`);
