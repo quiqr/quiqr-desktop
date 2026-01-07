@@ -39,6 +39,8 @@ describe('HugoServer', () => {
 
   beforeEach(async () => {
     mockDeps = createMockSSGProviderDependencies();
+    // Add hugoServeDraftMode as a writable property
+    (mockDeps.appConfig as any).hugoServeDraftMode = false;
     mockProcess = createMockProcess();
     vi.mocked(spawn).mockReturnValue(mockProcess);
     vi.clearAllMocks();
@@ -80,8 +82,29 @@ describe('HugoServer', () => {
       expect(spawnCall[2]).toEqual({ cwd: '/test/workspace' });
     });
 
+    it('handles error when sendToRenderer fails on initial serverDown', async () => {
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      vi.mocked(mockDeps.windowAdapter.sendToRenderer).mockImplementationOnce(() => {
+        throw new Error('IPC failed');
+      });
+
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await server.serve();
+
+      expect(consoleLogSpy).toHaveBeenCalledWith('Failed to send serverDown message:', expect.any(Error));
+      expect(server.getCurrentProcess()).toBeDefined();
+      consoleLogSpy.mockRestore();
+    });
+
     it('includes --buildDrafts when draft mode is enabled', async () => {
-      mockDeps.appConfig.hugoServeDraftMode = true;
+      (mockDeps.appConfig as any).hugoServeDraftMode = true;
 
       const server = new HugoServer(
         { workspacePath: '/test', hugover: '0.120.0' },
@@ -156,6 +179,63 @@ describe('HugoServer', () => {
       }
     });
 
+    it('handles error when sendToRenderer fails on serverLive', async () => {
+      vi.mocked(mockDeps.windowAdapter.sendToRenderer)
+        .mockImplementationOnce(() => {}) // First call for serverDown succeeds
+        .mockImplementationOnce(() => {
+          throw new Error('IPC failed on serverLive');
+        });
+
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await server.serve();
+
+      // Simulate first line of output to trigger serverLive
+      const stdoutOnLine = vi.mocked(mockProcess.stdout!.on);
+      const lineHandler = stdoutOnLine.mock.calls.find((call) => call[0] === 'line')?.[1] as any;
+
+      if (lineHandler) {
+        lineHandler('Hugo server started');
+        expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
+          'Failed to send serverLive message.'
+        );
+      }
+    });
+
+    it('logs subsequent output lines after the first', async () => {
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await server.serve();
+
+      const stdoutOnLine = vi.mocked(mockProcess.stdout!.on);
+      const lineHandler = stdoutOnLine.mock.calls.find((call) => call[0] === 'line')?.[1] as any;
+
+      if (lineHandler) {
+        // First line triggers serverLive
+        lineHandler('Hugo server started');
+        // Second and subsequent lines should be logged
+        lineHandler('Web Server is available at http://localhost:13131/');
+        lineHandler('Press Ctrl+C to stop');
+
+        expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
+          'Web Server is available at http://localhost:13131/'
+        );
+        expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith('Press Ctrl+C to stop');
+      }
+    });
+
     it('attaches stderr listener for errors', async () => {
       const server = new HugoServer(
         { workspacePath: '/test', hugover: '0.120.0' },
@@ -196,7 +276,7 @@ describe('HugoServer', () => {
 
       // Simulate process close
       const processOn = vi.mocked(mockProcess.on);
-      const closeHandler = processOn.mock.calls.find((call) => call[0] === 'close')?.[1] as any;
+      const closeHandler = processOn.mock.calls.find((call: any) => call[0] === 'close')?.[1] as any;
 
       if (closeHandler) {
         closeHandler(0);
@@ -237,6 +317,147 @@ describe('HugoServer', () => {
       await server.serve();
 
       expect(server.getCurrentProcess()).toBe(mockProcess);
+    });
+
+    it('throws error when process has no stdout/stderr', async () => {
+      const processWithoutStreams: Partial<ChildProcess> = {
+        stdout: null,
+        stderr: null,
+        on: vi.fn(),
+        kill: vi.fn(),
+      };
+      vi.mocked(spawn).mockReturnValue(processWithoutStreams as ChildProcess);
+
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await expect(server.serve()).rejects.toThrow(
+        'Failed to get stdout/stderr from Hugo process'
+      );
+      expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
+        'Hugo Server failed to start.'
+      );
+      expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
+        'Failed to get stdout/stderr from Hugo process'
+      );
+    });
+
+    it('handles spawn error and sends serverDown', async () => {
+      const spawnError = new Error('spawn ENOENT');
+      vi.mocked(spawn).mockImplementation(() => {
+        throw spawnError;
+      });
+
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await expect(server.serve()).rejects.toThrow('spawn ENOENT');
+
+      expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith('Hugo Server failed to start.');
+      expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith('spawn ENOENT');
+      expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith('Sending serverDown.');
+      expect(mockDeps.windowAdapter.sendToRenderer).toHaveBeenCalledWith('serverDown', {});
+    });
+
+    it('handles spawn error and failure to send serverDown', async () => {
+      const spawnError = new Error('spawn ENOENT');
+      vi.mocked(spawn).mockImplementation(() => {
+        throw spawnError;
+      });
+      vi.mocked(mockDeps.windowAdapter.sendToRenderer)
+        .mockImplementationOnce(() => {}) // First call for initial serverDown succeeds
+        .mockImplementationOnce(() => {
+          throw new Error('IPC failed');
+        });
+
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await expect(server.serve()).rejects.toThrow('spawn ENOENT');
+
+      expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
+        'Failed to send serverDown message.'
+      );
+    });
+
+    it('handles emitLines with multiple lines in data chunk', async () => {
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await server.serve();
+
+      // Get the data handler attached to stdout
+      const stdoutOnData = vi.mocked(mockProcess.stdout!.on);
+      const dataHandler = stdoutOnData.mock.calls.find((call) => call[0] === 'data')?.[1] as any;
+
+      expect(dataHandler).toBeDefined();
+
+      if (dataHandler) {
+        // Simulate data with multiple newlines
+        dataHandler('Line 1\nLine 2\nLine 3\n');
+
+        // Verify that 'line' event was emitted for each line
+        const emitCalls = vi.mocked(mockProcess.stdout!.emit).mock.calls;
+        const lineCalls = emitCalls.filter((call) => call[0] === 'line');
+
+        expect(lineCalls.length).toBeGreaterThanOrEqual(3);
+        expect(lineCalls[0][1]).toBe('Line 1');
+        expect(lineCalls[1][1]).toBe('Line 2');
+        expect(lineCalls[2][1]).toBe('Line 3');
+      }
+    });
+
+    it('handles emitLines with partial lines and end event', async () => {
+      const server = new HugoServer(
+        { workspacePath: '/test', hugover: '0.120.0' },
+        mockDeps.pathHelper,
+        mockDeps.appConfig,
+        mockDeps.windowAdapter,
+        mockDeps.outputConsole
+      );
+
+      await server.serve();
+
+      const stdoutOnData = vi.mocked(mockProcess.stdout!.on);
+      const dataHandler = stdoutOnData.mock.calls.find((call) => call[0] === 'data')?.[1] as any;
+      const endHandler = stdoutOnData.mock.calls.find((call) => call[0] === 'end')?.[1] as any;
+
+      expect(dataHandler).toBeDefined();
+      expect(endHandler).toBeDefined();
+
+      if (dataHandler && endHandler) {
+        // Simulate data without trailing newline
+        dataHandler('Partial line without newline');
+
+        // Simulate end event - should emit the remaining backlog
+        endHandler();
+
+        const emitCalls = vi.mocked(mockProcess.stdout!.emit).mock.calls;
+        const lineCalls = emitCalls.filter((call) => call[0] === 'line');
+
+        // Should have emitted the partial line on end
+        expect(lineCalls.some((call) => call[1] === 'Partial line without newline')).toBe(true);
+      }
     });
   });
 
