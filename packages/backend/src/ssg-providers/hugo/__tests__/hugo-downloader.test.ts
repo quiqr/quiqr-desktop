@@ -5,11 +5,12 @@
  * Focuses on unit testing logic flow without actual downloads.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { HugoDownloader, OfficialHugoSourceUrlBuilder, OfficialHugoUnpacker } from '../hugo-downloader.js';
 import { createMockSSGProviderDependencies } from '../../../../test/mocks/ssg-dependencies.js';
 import fs from 'fs-extra';
 import * as childProcess from 'child_process';
+import { globSync } from 'glob';
 
 // Mock fs-extra
 vi.mock('fs-extra');
@@ -29,7 +30,8 @@ describe('HugoDownloader', () => {
   let mockDeps: ReturnType<typeof createMockSSGProviderDependencies>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Clear only call history, not implementations
+    mockFetch.mockClear();
 
     mockDeps = createMockSSGProviderDependencies();
     mockDeps.environmentInfo = {
@@ -43,14 +45,14 @@ describe('HugoDownloader', () => {
     mockDeps.pathHelper.get7zaBin = vi.fn(() => '/mock/7za');
 
     // Setup fs-extra mocks
-    vi.mocked(fs.existsSync).mockReturnValue(false);
+    // Note: Don't set a default for existsSync - let tests configure it as needed
     vi.mocked(fs.unlink).mockResolvedValue();
     vi.mocked(fs.ensureDir).mockResolvedValue();
     vi.mocked(fs.chmod).mockResolvedValue();
     vi.mocked(fs.createWriteStream).mockReturnValue({
       write: vi.fn(),
       end: vi.fn(),
-      on: vi.fn((event: string, callback: Function) => {
+      on: vi.fn().mockImplementation(function(this: any, event: string, callback: Function) {
         if (event === 'finish') {
           setTimeout(() => callback(), 0);
         }
@@ -58,12 +60,24 @@ describe('HugoDownloader', () => {
       }),
     } as any);
 
+    // Setup glob mocks - return a tar file path for the unpacker
+    vi.mocked(globSync).mockReturnValue(['/mock/hugo-0.120.0/download']);
+
     // Setup child_process mocks
-    vi.mocked(childProcess.execFile).mockImplementation((_cmd: any, _args: any, _opts: any, callback: any) => {
-      if (typeof callback === 'function') {
-        callback(null, '', '');
+    // Note: The implementation uses promisify(execFile), so we need to mock it to work with both
+    // callback style and promise style
+    vi.mocked(childProcess.execFile).mockImplementation((...args: any[]) => {
+      // Find the callback (last function argument)
+      const callback = args.find((arg: any) => typeof arg === 'function');
+      if (callback) {
+        // Callback style
+        setTimeout(() => callback(null, { stdout: '', stderr: '' }), 0);
       }
-      return {} as any;
+      // Return a ChildProcess-like object that promisify can work with
+      return {
+        on: vi.fn(),
+        removeListener: vi.fn(),
+      } as any;
     });
 
     downloader = new HugoDownloader({
@@ -71,10 +85,6 @@ describe('HugoDownloader', () => {
       outputConsole: mockDeps.outputConsole,
       environmentInfo: mockDeps.environmentInfo,
     });
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
   });
 
   describe('isVersionInstalled', () => {
@@ -198,14 +208,17 @@ describe('HugoDownloader', () => {
   describe('download flow', () => {
     beforeEach(() => {
       // Mock fetch with a successful response
+      // Create a stable reader mock that can be called multiple times
+      const mockRead = vi.fn()
+        .mockResolvedValueOnce({ done: false, value: new Uint8Array([1, 2, 3]) })
+        .mockResolvedValueOnce({ done: true, value: undefined });
+
       const mockResponse = {
         ok: true,
         status: 200,
         body: {
           getReader: () => ({
-            read: vi.fn()
-              .mockResolvedValueOnce({ done: false, value: new Uint8Array([1, 2, 3]) })
-              .mockResolvedValueOnce({ done: true, value: undefined }),
+            read: mockRead,
           }),
         },
       };
@@ -230,7 +243,13 @@ describe('HugoDownloader', () => {
     });
 
     it('yields progress updates during download', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
+      // First call: check if version installed (returns false)
+      // Second call: check if temp file exists for cleanup (returns false)
+      // Third call: check if temp file exists after download (returns true for cleanup)
+      vi.mocked(fs.existsSync)
+        .mockReturnValueOnce(false) // isVersionInstalled check
+        .mockReturnValueOnce(false) // initial cleanup check
+        .mockReturnValueOnce(true);  // final cleanup check
 
       const progressUpdates: any[] = [];
       for await (const progress of downloader.download('0.120.0', true)) {
@@ -284,7 +303,12 @@ describe('HugoDownloader', () => {
     });
 
     it('cleans up partial download on error', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
+      // Setup existsSync to return false for isVersionInstalled, then true for cleanup check
+      vi.mocked(fs.existsSync)
+        .mockReturnValueOnce(false) // isVersionInstalled check
+        .mockReturnValueOnce(false) // initial cleanup check
+        .mockReturnValueOnce(true);  // cleanup check in catch block
+
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const progressUpdates: any[] = [];
@@ -379,24 +403,9 @@ describe('HugoDownloader', () => {
   });
 
   describe('ensureAvailable', () => {
-    beforeEach(() => {
-      // Mock successful download
-      const mockResponse = {
-        ok: true,
-        status: 200,
-        body: {
-          getReader: () => ({
-            read: vi.fn()
-              .mockResolvedValueOnce({ done: false, value: new Uint8Array([1, 2, 3]) })
-              .mockResolvedValueOnce({ done: true, value: undefined }),
-          }),
-        },
-      };
-      mockFetch.mockResolvedValue(mockResponse);
-    });
-
     it('skips download if already installed', async () => {
-      vi.mocked(fs.existsSync).mockReturnValueOnce(true);
+      // Spy on isVersionInstalled to return true
+      vi.spyOn(downloader, 'isVersionInstalled').mockReturnValue(true);
 
       await downloader.ensureAvailable('0.120.0');
 
@@ -404,7 +413,25 @@ describe('HugoDownloader', () => {
     });
 
     it('downloads if not installed', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
+      // Setup successful download
+      const mockRead = vi.fn()
+        .mockResolvedValueOnce({ done: false, value: new Uint8Array([1, 2, 3]) })
+        .mockResolvedValueOnce({ done: true, value: undefined });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        body: {
+          getReader: () => ({
+            read: mockRead,
+          }),
+        },
+      });
+
+      vi.mocked(fs.existsSync)
+        .mockReturnValueOnce(false) // isVersionInstalled check
+        .mockReturnValueOnce(false) // initial cleanup check
+        .mockReturnValueOnce(true);  // final cleanup check
 
       await downloader.ensureAvailable('0.120.0');
 
@@ -412,7 +439,11 @@ describe('HugoDownloader', () => {
     });
 
     it('throws error if download fails', async () => {
-      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.existsSync)
+        .mockReturnValueOnce(false) // isVersionInstalled check
+        .mockReturnValueOnce(false) // initial cleanup check
+        .mockReturnValueOnce(true);  // cleanup check in catch block
+
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(downloader.ensureAvailable('0.120.0')).rejects.toThrow('Network error');

@@ -50,7 +50,7 @@ describe('HugoBuilder', () => {
 
       await builder.build();
 
-      expect(mockPathHelper.getHugoBinForVer).toHaveBeenCalledWith('0.120.0');
+      expect(mockPathHelper.getSSGBinForVer).toHaveBeenCalledWith('hugo', '0.120.0');
       expect(execFile).toHaveBeenCalled();
     });
 
@@ -243,7 +243,7 @@ describe('HugoBuilder', () => {
 
       await builder.build();
 
-      expect(mockPathHelper.getHugoBinForVer).toHaveBeenCalledWith('extended_0.120.0');
+      expect(mockPathHelper.getSSGBinForVer).toHaveBeenCalledWith('hugo', 'extended_0.120.0');
     });
 
     it('handles paths with spaces', async () => {

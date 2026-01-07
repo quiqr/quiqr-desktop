@@ -74,7 +74,7 @@ describe('HugoServer', () => {
 
       await server.serve();
 
-      expect(mockDeps.pathHelper.getHugoBinForVer).toHaveBeenCalledWith('0.120.0');
+      expect(mockDeps.pathHelper.getSSGBinForVer).toHaveBeenCalledWith('hugo', '0.120.0');
       const spawnCall = vi.mocked(spawn).mock.calls[0];
       expect(spawnCall[1]).toEqual(['server', '--bind', '0.0.0.0', '--port', '13131', '--disableFastRender']);
       expect(spawnCall[2]).toEqual({ cwd: '/test/workspace' });
