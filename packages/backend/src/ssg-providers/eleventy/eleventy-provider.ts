@@ -65,7 +65,7 @@ export class EleventyProvider implements SSGProvider {
         workspacePath: config.workspacePath,
         version: config.version,
         config: config.configFile,
-        port: config.port || 8080,
+        port: config.port || 13131, // Use same port as Hugo for consistency
       },
       this.dependencies.pathHelper,
       this.dependencies.appConfig,

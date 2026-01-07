@@ -133,11 +133,22 @@ export class PathHelper {
 
     const platform = process.platform.toLowerCase();
     const binaryName = ssgType.toLowerCase();
+    const binDir = this.getSSGBinDirForVer(ssgType, version);
 
+    // For npm-based SSGs (like Eleventy), use node_modules/.bin/
+    if (ssgType.toLowerCase() === 'eleventy') {
+      const npmBinPath = path.join(binDir, 'node_modules', '.bin', binaryName);
+      if (platform.startsWith('win')) {
+        return npmBinPath + '.cmd';
+      }
+      return npmBinPath;
+    }
+
+    // For standalone binaries (like Hugo)
     if (platform.startsWith('win')) {
-      return path.join(this.getSSGBinDirForVer(ssgType, version), `${binaryName}.exe`);
+      return path.join(binDir, `${binaryName}.exe`);
     } else {
-      return path.join(this.getSSGBinDirForVer(ssgType, version), binaryName);
+      return path.join(binDir, binaryName);
     }
   }
 

@@ -265,7 +265,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
             setSSGReady(true);
           } else {
             const success = await downloadSSG(ssgType, ssgVersion);
-            // hugoReady is set by the hook on success
+            // ssgReady is set by the hook on success
             if (!success) {
               console.error(`${ssgType} download failed or was cancelled`);
             }
@@ -288,13 +288,14 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
    * If SSG is not ready (download failed/cancelled), trigger a new download.
    */
   const openPreviewInBrowser = useCallback(async () => {
-    // Get SSG version with backward compatibility
+    // Get SSG type and version with backward compatibility
+    const ssgType = workspace?.ssgType || 'hugo';
     const ssgVersion = workspace?.ssgVersion || workspace?.hugover;
 
     // If SSG is not ready, try to download it first
     if (!ssgReady && ssgVersion) {
       console.log('[Workspace] SSG not ready, triggering download before preview');
-      const success = await downloadSSG(workspace.ssgType, ssgVersion);
+      const success = await downloadSSG(ssgType, ssgVersion);
       if (!success) {
         console.log('[Workspace] SSG download failed, cannot open preview');
         return;
@@ -305,7 +306,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     if (typeof path === 'string') {
       await openExternal('http://localhost:13131' + path);
     }
-  }, [ssgReady, workspace?.ssgVersion, workspace?.hugover, downloadSSG]);
+  }, [ssgReady, workspace?.ssgType, workspace?.ssgVersion, workspace?.hugover, downloadSSG]);
 
   // Determine active section based on path
   const path = location.pathname;
