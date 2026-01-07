@@ -35,7 +35,7 @@ export class HugoConfig implements SSGConfigQuerier {
    */
   async configMountsAsObject(): Promise<any> {
     const { workspacePath, hugover } = this.qSiteConfig;
-    const exec = this.pathHelper.getHugoBinForVer(hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
       return [];
@@ -64,7 +64,7 @@ export class HugoConfig implements SSGConfigQuerier {
    */
   async configLines(): Promise<string[]> {
     const { workspacePath, hugover } = this.qSiteConfig;
-    const exec = this.pathHelper.getHugoBinForVer(hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
       return [];
