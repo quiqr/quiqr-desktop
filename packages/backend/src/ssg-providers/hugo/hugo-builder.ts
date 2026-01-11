@@ -7,7 +7,7 @@
 import fs from 'fs-extra';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import type { PathHelper } from '../utils/path-helper.js';
+import type { PathHelper } from '../../utils/path-helper.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -48,7 +48,7 @@ export class HugoBuilder {
       hugoArgs.push('--baseURL', this.config.baseUrl);
     }
 
-    const exec = this.pathHelper.getHugoBinForVer(this.config.hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', this.config.hugover);
 
     if (!fs.existsSync(exec)) {
       throw new Error(`Could not find hugo executable for version ${this.config.hugover}.`);

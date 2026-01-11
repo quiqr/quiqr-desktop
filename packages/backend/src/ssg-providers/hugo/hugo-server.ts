@@ -6,9 +6,9 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import fs from 'fs-extra';
-import type { PathHelper } from '../utils/path-helper.js';
-import type { AppConfig } from '../config/app-config.js';
-import type { WindowAdapter, OutputConsole } from '../adapters/types.js';
+import type { PathHelper } from '../../utils/path-helper.js';
+import type { AppConfig } from '../../config/app-config.js';
+import type { WindowAdapter, OutputConsole } from '../../adapters/types.js';
 
 /**
  * Hugo server configuration
@@ -94,7 +94,7 @@ export class HugoServer {
 
     this.stopIfRunning();
 
-    const exec = this.pathHelper.getHugoBinForVer(hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
       throw new Error('Could not find hugo executable for version ' + hugover);

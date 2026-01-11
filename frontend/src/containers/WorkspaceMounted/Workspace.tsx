@@ -18,7 +18,7 @@ import { SyncSidebar, SyncRouted } from './Sync';
 import service from '../../services/service';
 import { AppLayout } from '../../layouts/AppLayout';
 import { SiteConfig } from '../../../types';
-import { useHugoDownload } from '../../hooks/useHugoDownload';
+import { useSSGDownload } from '../../hooks/useSSGDownload';
 import { useModelCacheEvents } from '../../hooks/useModelCacheEvents';
 import ProgressDialog from '../../components/ProgressDialog';
 import { openExternal } from '../../utils/platform';
@@ -28,7 +28,9 @@ interface WorkspaceConfig {
     hugoHidePreviewSite?: boolean;
     [key: string]: unknown;
   }>;
-  hugover?: string;
+  ssgType?: string;
+  ssgVersion?: string;
+  hugover?: string; // Deprecated, for backward compatibility
   [key: string]: unknown;
 }
 
@@ -207,11 +209,11 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   const {
     progress: hugoProgress,
     isDownloading,
-    hugoReady,
-    downloadHugo,
+    ssgReady,
+    downloadSSG,
     cancelDownload,
-    setHugoReady,
-  } = useHugoDownload();
+    setSSGReady,
+  } = useSSGDownload();
 
   const refresh = useCallback(() => {
     if (siteKey && workspaceKey) {
@@ -246,48 +248,56 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
 
   // Check Hugo version when workspace is loaded
   useEffect(() => {
-    // Wait for workspace data to load before deciding on Hugo status
+    // Wait for workspace data to load before deciding on SSG status
     if (workspace === null) {
       return;
     }
 
-    if (workspace.hugover) {
-      const checkAndDownloadHugo = async () => {
+    // Get SSG type and version (with backward compatibility for old hugover field)
+    const ssgType = workspace.ssgType || 'hugo';
+    const ssgVersion = workspace.ssgVersion || workspace.hugover;
+
+    if (ssgVersion) {
+      const checkAndDownloadSSG = async () => {
         try {
-          const result = await service.api.checkHugoVersion(workspace.hugover!);
+          const result = await service.api.checkSSGVersion(ssgType, ssgVersion);
           if (result.installed) {
-            setHugoReady(true);
+            setSSGReady(true);
           } else {
-            const success = await downloadHugo(workspace.hugover!);
-            // hugoReady is set by the hook on success
+            const success = await downloadSSG(ssgType, ssgVersion);
+            // ssgReady is set by the hook on success
             if (!success) {
-              console.error('Hugo download failed or was cancelled');
+              console.error(`${ssgType} download failed or was cancelled`);
             }
           }
         } catch (err) {
-          console.error('Failed to check/download Hugo:', err);
-          // Still allow UI to render even if Hugo check fails
-          setHugoReady(true);
+          console.error(`Failed to check/download ${ssgType}:`, err);
+          // Still allow UI to render even if SSG check fails
+          setSSGReady(true);
         }
       };
-      checkAndDownloadHugo();
+      checkAndDownloadSSG();
     } else {
-      // No Hugo version specified, mark as ready
-      setHugoReady(true);
+      // No SSG version specified, mark as ready
+      setSSGReady(true);
     }
-  }, [workspace, downloadHugo, setHugoReady]);
+  }, [workspace, downloadSSG, setSSGReady]);
 
   /**
-   * Open preview in browser, ensuring Hugo is downloaded first.
-   * If Hugo is not ready (download failed/cancelled), trigger a new download.
+   * Open preview in browser, ensuring SSG is downloaded first.
+   * If SSG is not ready (download failed/cancelled), trigger a new download.
    */
   const openPreviewInBrowser = useCallback(async () => {
-    // If Hugo is not ready, try to download it first
-    if (!hugoReady && workspace?.hugover) {
-      console.log('[Workspace] Hugo not ready, triggering download before preview');
-      const success = await downloadHugo(workspace.hugover);
+    // Get SSG type and version with backward compatibility
+    const ssgType = workspace?.ssgType || 'hugo';
+    const ssgVersion = workspace?.ssgVersion || workspace?.hugover;
+
+    // If SSG is not ready, try to download it first
+    if (!ssgReady && ssgVersion) {
+      console.log('[Workspace] SSG not ready, triggering download before preview');
+      const success = await downloadSSG(ssgType, ssgVersion);
       if (!success) {
-        console.log('[Workspace] Hugo download failed, cannot open preview');
+        console.log('[Workspace] SSG download failed, cannot open preview');
         return;
       }
     }
@@ -296,7 +306,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     if (typeof path === 'string') {
       await openExternal('http://localhost:13131' + path);
     }
-  }, [hugoReady, workspace?.hugover, downloadHugo]);
+  }, [ssgReady, workspace?.ssgType, workspace?.ssgVersion, workspace?.hugover, downloadSSG]);
 
   // Determine active section based on path
   const path = location.pathname;
@@ -354,11 +364,11 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     <Routes>
       <Route
         path="/"
-        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={hugoReady} />}
+        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={ssgReady} />}
       />
       <Route
         path="home/:refresh"
-        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={hugoReady} />}
+        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={ssgReady} />}
       />
       <Route
         path="sync/*"
@@ -412,7 +422,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
             {error}
           </p>
         )}
-        {hugoReady && renderContent()}
+        {ssgReady && renderContent()}
       </AppLayout>
 
       {hugoProgress && <ProgressDialog conf={hugoProgress} onClose={cancelDownload} />}

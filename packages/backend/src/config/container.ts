@@ -11,7 +11,6 @@ import { AppState } from './app-state.js';
 import { PathHelper } from '../utils/path-helper.js';
 import { FormatProviderResolver } from '../utils/format-provider-resolver.js';
 import { ConfigurationDataProvider, ConsoleLogger } from '../services/configuration/index.js';
-import { HugoUtils } from '../hugo/hugo-utils.js';
 import { LibraryService } from '../services/library/library-service.js';
 import { SyncFactory } from '../sync/sync-factory.js';
 import { SiteSourceFactory } from '../site-sources/site-source-factory.js';
@@ -23,7 +22,7 @@ import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 import { ModelWatcher, createModelWatcher } from '../services/workspace/model-watcher.js';
 import { BuildActionService } from '../build-actions/index.js';
-import { HugoDownloader } from '../hugo/hugo-downloader.js';
+import { ProviderFactory } from '../ssg-providers/provider-factory.js';
 import type { EnvironmentInfo } from '../utils/path-helper.js';
 
 /**
@@ -70,9 +69,9 @@ export interface AppContainer {
   configurationProvider: ConfigurationDataProvider;
 
   /**
-   * Hugo utilities (site creation, config generation)
+   * SSG provider factory (creates SSG provider instances)
    */
-  hugoUtils: HugoUtils;
+  providerFactory: ProviderFactory;
 
   /**
    * Library service (site management and CRUD operations)
@@ -115,11 +114,6 @@ export interface AppContainer {
   pogozipper: Pogozipper;
 
   /**
-   * Hugo downloader (downloads and installs Hugo binaries)
-   */
-  hugoDownloader: HugoDownloader;
-
-  /**
    * Environment information (platform, packaging status)
    */
   environmentInfo: EnvironmentInfo;
@@ -157,6 +151,18 @@ export interface AppContainer {
     emit: (event: ModelChangeEvent) => void;
     subscribe: (callback: (event: ModelChangeEvent) => void) => () => void;
   };
+
+  /**
+   * @deprecated Use providerFactory.getProvider('hugo').getBinaryManager() instead
+   * Backward compatibility accessor for Hugo downloader
+   */
+  get hugoDownloader(): any;
+
+  /**
+   * @deprecated Use providerFactory.getProvider('hugo') for site creation instead
+   * Backward compatibility accessor for Hugo utils
+   */
+  get hugoUtils(): any;
 }
 
 /**
@@ -215,9 +221,6 @@ export function createContainer(options: ContainerOptions): AppContainer {
     logger
   );
 
-  // Create Hugo utilities
-  const hugoUtils = new HugoUtils();
-
   // Create factories
   const syncFactory = new SyncFactory();
   const siteSourceFactory = new SiteSourceFactory(pathHelper);
@@ -234,11 +237,14 @@ export function createContainer(options: ContainerOptions): AppContainer {
     isPackaged: adapters.appInfo.isPackaged(),
   };
 
-  // Create Hugo downloader
-  const hugoDownloader = new HugoDownloader({
+  // Create provider factory for SSG providers
+  const providerFactory = new ProviderFactory({
     pathHelper,
-    outputConsole: adapters.outputConsole,
     environmentInfo,
+    outputConsole: adapters.outputConsole,
+    windowAdapter: adapters.window,
+    shellAdapter: adapters.shell,
+    appConfig: config,
   });
 
   // Create workspace config provider
@@ -271,11 +277,10 @@ export function createContainer(options: ContainerOptions): AppContainer {
     pathHelper,
     formatResolver,
     configurationProvider,
-    hugoUtils,
+    providerFactory,
     syncFactory,
     siteSourceFactory,
     workspaceConfigProvider,
-    hugoDownloader,
     environmentInfo,
     modelChangeEventBroadcaster,
   } as AppContainer;
@@ -346,7 +351,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       pathHelper,
       appConfig: config,
       appState: state,
-      hugoDownloader,
+      providerFactory,
       windowAdapter: adapters.window,
       shellAdapter: adapters.shell,
       outputConsole: adapters.outputConsole,
@@ -448,6 +453,26 @@ export function createContainer(options: ContainerOptions): AppContainer {
   container.getCurrentWorkspaceService = () => {
     return cachedWorkspaceService;
   };
+
+  // Backward compatibility accessors (deprecated)
+  Object.defineProperty(container, 'hugoDownloader', {
+    get: async () => {
+      const provider = await providerFactory.getProvider('hugo');
+      return provider.getBinaryManager();
+    },
+    enumerable: false,
+  });
+
+  Object.defineProperty(container, 'hugoUtils', {
+    get: async () => {
+      const provider = await providerFactory.getProvider('hugo');
+      return {
+        createSiteDir: (directory: string, title: string, configFormat: string) =>
+          provider.createSite({ directory, title, configFormat }),
+      };
+    },
+    enumerable: false,
+  });
 
   return container;
 }

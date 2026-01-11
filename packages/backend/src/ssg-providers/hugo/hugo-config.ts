@@ -6,7 +6,8 @@
 
 import { spawn } from 'child_process';
 import fs from 'fs-extra';
-import type { PathHelper } from '../utils/path-helper.js';
+import type { PathHelper } from '../../utils/path-helper.js';
+import type { SSGConfigQuerier, SSGSiteConfig } from '../types.js';
 
 /**
  * Site configuration for Hugo operations
@@ -20,7 +21,7 @@ export interface QSiteConfig {
 /**
  * HugoConfig - Queries Hugo configuration
  */
-export class HugoConfig {
+export class HugoConfig implements SSGConfigQuerier {
   private qSiteConfig: QSiteConfig;
   private pathHelper: PathHelper;
 
@@ -34,7 +35,7 @@ export class HugoConfig {
    */
   async configMountsAsObject(): Promise<any> {
     const { workspacePath, hugover } = this.qSiteConfig;
-    const exec = this.pathHelper.getHugoBinForVer(hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
       return [];
@@ -63,7 +64,7 @@ export class HugoConfig {
    */
   async configLines(): Promise<string[]> {
     const { workspacePath, hugover } = this.qSiteConfig;
-    const exec = this.pathHelper.getHugoBinForVer(hugover);
+    const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
       return [];
@@ -76,6 +77,24 @@ export class HugoConfig {
     } catch (e) {
       return [];
     }
+  }
+
+  /**
+   * SSGConfigQuerier interface implementation: Get config as object
+   */
+  async getConfig(): Promise<SSGSiteConfig> {
+    const mounts = await this.configMountsAsObject();
+    return {
+      config: {},  // Hugo doesn't expose full config as JSON easily
+      mounts: mounts,
+    };
+  }
+
+  /**
+   * SSGConfigQuerier interface implementation: Get config as lines
+   */
+  async getConfigLines(): Promise<string[]> {
+    return this.configLines();
   }
 
   /**
