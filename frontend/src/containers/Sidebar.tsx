@@ -36,6 +36,7 @@ interface SidebarProps {
   menusCollapsed?: string[];
   onMenuExpandToggle?: (menuKey: string) => void;
   statusPanel?: ReactNode;
+  collapsed?: boolean;
 }
 
 const Sidebar = ({
@@ -44,6 +45,7 @@ const Sidebar = ({
   menusCollapsed = [],
   onMenuExpandToggle,
   statusPanel,
+  collapsed = false,
 }: SidebarProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -57,21 +59,23 @@ const Sidebar = ({
         {menu.items ? (
           <List
             subheader={
-              <ListSubheader component="div" id="nested-list-subheader" disableSticky={true}>
-                {menu.title}
-                {menu.expandable && (
-                  <IconButton
-                    edge="end"
-                    sx={{ position: 'absolute', top: '6px', right: '12px' }}
-                    onClick={() => {
-                      if (menu.title) toggleMenuExpand(menu.title);
-                    }}
-                    size="large"
-                  >
-                    {menusCollapsed.includes(menu.title || '') ? <ExpandMore /> : <ExpandLess />}
-                  </IconButton>
-                )}
-              </ListSubheader>
+              !collapsed ? (
+                <ListSubheader component="div" id="nested-list-subheader" disableSticky={true}>
+                  {menu.title}
+                  {menu.expandable && (
+                    <IconButton
+                      edge="end"
+                      sx={{ position: 'absolute', top: '6px', right: '12px' }}
+                      onClick={() => {
+                        if (menu.title) toggleMenuExpand(menu.title);
+                      }}
+                      size="large"
+                    >
+                      {menusCollapsed.includes(menu.title || '') ? <ExpandMore /> : <ExpandLess />}
+                    </IconButton>
+                  )}
+                </ListSubheader>
+              ) : undefined
             }
           >
             {menusCollapsed.includes(menu.title || '')
@@ -91,11 +95,12 @@ const Sidebar = ({
                         index={index}
                         openIndex={openIndex}
                         onToggle={setOpenIndex}
+                        collapsed={collapsed}
                       />
                     );
                   }
                   return (
-                    <SidebarFlatItem key={'itemFlat' + index} item={item} />
+                    <SidebarFlatItem key={'itemFlat' + index} item={item} collapsed={collapsed} />
                   );
                 })}
           </List>
@@ -108,7 +113,7 @@ const Sidebar = ({
     <>
       <Box
         sx={{
-          width: '280px',
+          width: '100%',
           transition: 'all .2s',
           ...(hideItems && { opacity: 0, pointerEvents: 'none' }),
         }}

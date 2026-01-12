@@ -401,6 +401,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
         title={siteName}
         siteKey={siteKey}
         workspaceKey={workspaceKey}
+        showSwitcher={true}
         sidebar={renderSidebar()}
         toolbar={{
           leftItems: toolbarItems.leftItems,

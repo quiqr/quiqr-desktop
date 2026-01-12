@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { LAYOUT_CONSTANTS } from '../../theme';
 import { SiteWorkspaceSwitcher } from '../../components/Sidebar';
 import type { SidebarHeaderProps } from './AppLayout.types';
 
@@ -10,14 +9,10 @@ import type { SidebarHeaderProps } from './AppLayout.types';
  * Height: 52px (default) or 110px (with switcher).
  */
 const SidebarHeader = ({ title, siteKey, workspaceKey, showSwitcher }: SidebarHeaderProps) => {
-  const { topBarHeight } = LAYOUT_CONSTANTS;
-  const headerHeight = showSwitcher ? 110 : topBarHeight;
 
   return (
     <Box
       sx={{
-        height: headerHeight,
-        minHeight: headerHeight,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

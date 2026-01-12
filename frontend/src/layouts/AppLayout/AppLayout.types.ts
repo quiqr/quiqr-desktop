@@ -56,6 +56,8 @@ export interface AppLayoutProps {
   siteKey?: string;
   /** Optional workspace key for context */
   workspaceKey?: string;
+  /** Whether to show the site/workspace switcher dropdown */
+  showSwitcher?: boolean;
   /** Content to render in the sidebar (menu items) */
   sidebar: ReactNode;
   /** Toolbar configuration for main area */

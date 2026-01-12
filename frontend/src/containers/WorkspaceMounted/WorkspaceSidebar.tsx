@@ -48,6 +48,7 @@ interface WorkspaceSidebarProps {
   onToggleItemVisibility?: () => void;
   applicationRole?: string;
   modelRefreshKey?: number;
+  collapsed?: boolean;
 }
 
 const WorkspaceSidebar = ({
@@ -56,6 +57,7 @@ const WorkspaceSidebar = ({
   hideItems,
   applicationRole,
   modelRefreshKey,
+  collapsed,
 }: WorkspaceSidebarProps) => {
   const [site, setSite] = useState<SiteConfig | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceDetails | null>(null);
@@ -227,6 +229,7 @@ const WorkspaceSidebar = ({
         menus={menus}
         menusCollapsed={menusCollapsed}
         onMenuExpandToggle={handleMenuExpandToggle}
+        collapsed={collapsed}
       />
       {error && (
         <p

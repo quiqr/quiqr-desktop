@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
-import { LAYOUT_CONSTANTS } from '../../theme';
-import SidebarHeader from './SidebarHeader';
+import CollapsibleSidebar from './CollapsibleSidebar';
 import MainToolbar from './MainToolbar';
+import { AppBreadcrumbs } from '../../components/Breadcrumbs';
 import type { AppLayoutProps } from './AppLayout.types';
 
 /**
@@ -26,44 +26,22 @@ const AppLayout = ({
   title,
   siteKey,
   workspaceKey,
+  showSwitcher = false,
   sidebar,
   toolbar,
   children,
 }: AppLayoutProps) => {
-  const { sidebarWidth } = LAYOUT_CONSTANTS;
-
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      {/* Sidebar - fixed width, full height */}
-      <Box
-        sx={{
-          width: sidebarWidth,
-          minWidth: sidebarWidth,
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: (theme) => theme.palette.sidebar.background,
-          borderRight: (theme) => `1px solid ${theme.palette.sidebar.border}`,
-        }}
+      {/* Collapsible Sidebar */}
+      <CollapsibleSidebar
+        title={title}
+        siteKey={siteKey}
+        workspaceKey={workspaceKey}
+        showSwitcher={showSwitcher}
       >
-        <SidebarHeader
-          title={title}
-          siteKey={siteKey}
-          workspaceKey={workspaceKey}
-        />
-        <Box
-          sx={{
-            flex: 1,
-            overflow: 'auto',
-            overflowX: 'hidden',
-            // Hide scrollbar
-            '&::-webkit-scrollbar': { display: 'none' },
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
-          }}
-        >
-          {sidebar}
-        </Box>
-      </Box>
+        {sidebar}
+      </CollapsibleSidebar>
 
       {/* Main Area - flex grow */}
       <Box
@@ -81,6 +59,18 @@ const AppLayout = ({
             rightItems={toolbar.rightItems}
           />
         )}
+
+        {/* Breadcrumbs */}
+        <Box
+          sx={{
+            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+            backgroundColor: (theme) => theme.palette.background.paper,
+          }}
+        >
+          <AppBreadcrumbs />
+        </Box>
+
+        {/* Main content */}
         <Box
           component="main"
           sx={{

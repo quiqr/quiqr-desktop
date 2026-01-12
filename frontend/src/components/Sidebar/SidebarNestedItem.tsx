@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
 import Collapse from '@mui/material/Collapse';
 import Tooltip from '@mui/material/Tooltip';
+import Box from '@mui/material/Box';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import type { SidebarMenuItem } from '../../containers/Sidebar';
@@ -16,6 +17,17 @@ interface SidebarNestedItemProps {
   openIndex: number | null;
   onToggle: (index: number | null) => void;
   collapsed?: boolean;
+}
+
+/**
+ * Get abbreviated text (first 1-2 characters) for collapsed state
+ */
+function getAbbreviation(label: string): string {
+  const trimmed = label.trim();
+  if (!trimmed) return '';
+
+  // Take first 2 characters, or 1 if it's a short word
+  return trimmed.length === 1 ? trimmed[0] : trimmed.substring(0, 2);
 }
 
 function SidebarNestedItem({
@@ -87,9 +99,31 @@ function SidebarNestedItem({
   const parentButton = (
     <Fragment key={'itemNestOut' + item.label}>
       <ListItem disablePadding>
-        <ListItemButton selected={item.selected} onClick={handleToggle}>
-          {!collapsed && <ListItemText primary={item.label} />}
-          {!collapsed && (isOpen ? <ExpandLess /> : <ExpandMore />)}
+        <ListItemButton
+          selected={item.selected}
+          onClick={handleToggle}
+          sx={{
+            px: collapsed ? 1 : 2,
+            justifyContent: collapsed ? 'center' : 'flex-start',
+          }}
+        >
+          {collapsed ? (
+            <Box
+              sx={{
+                fontSize: '0.75rem',
+                fontWeight: 500,
+                textTransform: 'uppercase',
+                color: 'text.secondary',
+              }}
+            >
+              {getAbbreviation(item.label)}
+            </Box>
+          ) : (
+            <>
+              <ListItemText primary={item.label} />
+              {isOpen ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
         </ListItemButton>
       </ListItem>
 
@@ -104,7 +138,7 @@ function SidebarNestedItem({
   // Wrap in Tooltip when collapsed
   if (collapsed) {
     return (
-      <Tooltip title={item.label} placement="right">
+      <Tooltip title={item.label} placement="right" arrow>
         {parentButton}
       </Tooltip>
     );
