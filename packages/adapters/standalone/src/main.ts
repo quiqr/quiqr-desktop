@@ -5,9 +5,9 @@
  * Useful for development, testing, and standalone server scenarios.
  */
 
-import { createDevAdapters } from '@quiqr/backend/adapters';
-import { createContainer } from '@quiqr/backend';
+import { createDevAdapters, createContainer } from '@quiqr/backend';
 import { startServer } from '@quiqr/backend/api';
+import { createWebAdapters } from './adapters/index.js';
 import { homedir } from 'os';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -58,10 +58,6 @@ async function startStandaloneBackend() {
   console.log('='.repeat(60));
 
   try {
-    // Create dev adapters (no-op implementations for UI operations)
-    const adapters = createDevAdapters();
-    console.log('Dev adapters created');
-
     // Get paths
     // For standalone mode, use a dedicated directory in user's home
     const userDataPath = join(homedir(), '.quiqr-standalone');
@@ -72,15 +68,21 @@ async function startStandaloneBackend() {
     console.log(`User Data: ${userDataPath}`);
     console.log(`Root Path: ${rootPath}`);
 
-    // Create container with all dependencies
+    // Create container first with dev adapters (temporary)
     const container = createContainer({
       userDataPath,
       rootPath,
-      adapters,
+      adapters: createDevAdapters(), // Temporary placeholder
       configFileName: 'quiqr-app-config.json'
     });
 
     console.log('Container created with dependency injection');
+
+    // Replace with web adapters (includes real menu adapter)
+    const webAdapters = createWebAdapters(container);
+    (container as any).adapters = webAdapters;
+
+    console.log('Web adapters initialized (menu, window)');
 
     // Get port from environment or use default
     const port = process.env.PORT ? parseInt(process.env.PORT) : 5150;

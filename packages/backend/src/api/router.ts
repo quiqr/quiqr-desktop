@@ -10,6 +10,7 @@ import { createConfigHandlers } from './handlers/config-handlers.js';
 import { createDialogHandlers } from './handlers/dialog-handlers.js';
 import { createShellHandlers } from './handlers/shell-handlers.js';
 import { createWindowHandlers } from './handlers/window-handlers.js';
+import { createMenuHandlers } from './handlers/menu-handlers.js';
 import { createWorkspaceHandlers } from './handlers/workspace-handlers.js';
 import { createSiteHandlers } from './handlers/site-handlers.js';
 import { createImportHandlers } from './handlers/import-handlers.js';
@@ -37,6 +38,7 @@ export function createApiHandlers(container: AppContainer): ApiHandlerMap {
   const dialogHandlers = createDialogHandlers(container);
   const shellHandlers = createShellHandlers(container);
   const windowHandlers = createWindowHandlers(container);
+  const menuHandlers = createMenuHandlers(container);
   const workspaceHandlers = createWorkspaceHandlers(container);
   const siteHandlers = createSiteHandlers(container);
   const importHandlers = createImportHandlers(container);
@@ -58,6 +60,9 @@ export function createApiHandlers(container: AppContainer): ApiHandlerMap {
 
     // Window management
     ...windowHandlers,
+
+    // Menu operations
+    ...menuHandlers,
 
     // Workspace operations
     ...workspaceHandlers,
