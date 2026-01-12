@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import service from '../services/service';
+import { snackMessageService } from '../services/ui-service';
 import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
 
 /**
  * Hook for managing menu state in standalone mode
  *
  * Fetches menu state from backend and provides action execution.
- * Polls every 5 seconds for menu state updates.
+ * Uses Server-Sent Events (SSE) for real-time menu state updates.
  */
 export function useMenuState() {
   const navigate = useNavigate();
@@ -40,6 +41,10 @@ export function useMenuState() {
         case 'openDialog':
           // TODO: Implement dialog opening logic
           console.log('[Menu] Open dialog:', result.dialog);
+          snackMessageService.addSnackMessage(
+            `Dialog: ${result.dialog}`,
+            { severity: 'info', autoHideDuration: 3000 }
+          );
           break;
 
         case 'openExternal':
@@ -49,18 +54,33 @@ export function useMenuState() {
           break;
 
         case 'info':
-          // TODO: Show info message (could use snackbar)
-          console.log('[Menu] Info:', result.message);
+          if (result.message) {
+            snackMessageService.addSnackMessage(
+              result.message,
+              { severity: 'info', autoHideDuration: 4000 }
+            );
+          }
           break;
 
         case 'error':
-          console.error('[Menu] Error:', result.message);
+          if (result.message) {
+            snackMessageService.addSnackMessage(
+              result.message,
+              { severity: 'error', autoHideDuration: 6000 }
+            );
+          }
           break;
 
         case 'success':
           if (result.refresh) {
             // Refresh menu state after successful action
             await fetchMenuState();
+          }
+          if (result.message) {
+            snackMessageService.addSnackMessage(
+              result.message,
+              { severity: 'success', autoHideDuration: 3000 }
+            );
           }
           break;
       }
@@ -73,10 +93,29 @@ export function useMenuState() {
     // Initial fetch
     fetchMenuState();
 
-    // Poll for updates every 5 seconds
-    const interval = setInterval(fetchMenuState, 5000);
+    // Connect to SSE for real-time menu updates
+    const eventSource = new EventSource('/api/menu/events');
 
-    return () => clearInterval(interval);
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'menu-changed') {
+          // Fetch updated menu state when notified
+          fetchMenuState();
+        }
+      } catch (error) {
+        console.error('Error parsing menu SSE event:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('Menu SSE connection error:', error);
+      // EventSource will automatically try to reconnect
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   return {
