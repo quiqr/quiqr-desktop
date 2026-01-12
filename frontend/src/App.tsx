@@ -1,18 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Routes, Route, useParams, useNavigate, useLocation } from "react-router";
-import AppsIcon from "@mui/icons-material/Apps";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
+import { Routes, Route, useParams, useNavigate } from "react-router";
 import { ThemeProvider, StyledEngineProvider, Theme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Workspace from "./containers/WorkspaceMounted/Workspace";
 import Console from "./containers/Console";
-import { PrefsSidebar, PrefsRouted } from "./containers/Prefs";
+import { PrefsLayout } from "./containers/Prefs";
 import SplashDialog from "./dialogs/SplashDialog";
-import { SiteLibrarySidebar, SiteLibraryRouted, useSiteLibraryToolbarItems } from "./containers/SiteLibrary";
-import { ToolbarButton } from "./containers/TopToolbarRight";
-import { AppLayout } from "./layouts/AppLayout";
+import { SiteLibraryLayout, SiteLibraryRouted } from "./containers/SiteLibrary";
 import service from "./services/service";
 import { getThemeByName } from "./theme";
 import { UserPreferences } from "../types";
@@ -130,112 +125,6 @@ const App = () => {
     />
   );
 
-  const renderSiteLibraryRouted = (importSiteURL?: string) => (
-    <SiteLibraryRouted
-      handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-      activeLibraryView={libraryView}
-      newSite={newSiteDialogOpen}
-      importSite={importSiteDialogOpen || !!importSiteURL}
-      importSiteURL={importSiteURL}
-    />
-  );
-
-  // Sidebar content based on route
-  const renderSidebar = () => (
-    <Routes>
-      <Route path="/prefs/*" element={<PrefsSidebar menus={[]} />} />
-      <Route path="/create-new" element={null} />
-      <Route path="/welcome" element={null} />
-      <Route path="*" element={<SiteLibrarySidebar />} />
-    </Routes>
-  );
-
-  // Main content based on route
-  const renderContent = () => (
-    <Routes>
-      <Route path="/prefs/*" element={<PrefsRouted />} />
-      <Route path="/sites/*" element={renderSiteLibraryRouted()} />
-      <Route path="*" element={renderSiteLibraryRouted()} />
-    </Routes>
-  );
-
-  // Prefs toolbar items
-  const PrefsToolbarItems = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const sp = new URLSearchParams(location.search);
-    let backurl = "/sites/last";
-    if (sp.has("siteKey")) {
-      const siteKey = sp.get("siteKey");
-      backurl = `/sites/${siteKey}/workspaces/source`;
-    }
-
-    return {
-      leftItems: [
-        <ToolbarButton
-          key="back"
-          action={() => navigate(backurl)}
-          title="Back"
-          icon={ArrowBackIcon}
-        />,
-      ],
-      rightItems: [
-        <ToolbarButton
-          key="toolbarbutton-library"
-          to="/sites/last"
-          title="Site Library"
-          icon={AppsIcon}
-        />,
-        <ToolbarButton
-          key="buttonPrefs"
-          active={true}
-          to="/prefs"
-          title="Preferences"
-          icon={SettingsApplicationsIcon}
-        />,
-      ],
-    };
-  };
-
-  // Site Library layout
-  const SiteLibraryLayout = () => {
-    const toolbarItems = useSiteLibraryToolbarItems({
-      handleLibraryDialogClick,
-      activeLibraryView: libraryView,
-      handleChange: handleLibraryViewChange,
-    });
-
-    return (
-      <AppLayout
-        title="Site Library"
-        sidebar={<SiteLibrarySidebar />}
-        toolbar={{
-          leftItems: toolbarItems.leftItems,
-          centerItems: toolbarItems.centerItems,
-          rightItems: toolbarItems.rightItems,
-        }}
-      >
-        {renderSiteLibraryRouted()}
-      </AppLayout>
-    );
-  };
-
-  // Prefs layout
-  const PrefsLayout = () => {
-    const toolbarItems = PrefsToolbarItems();
-    return (
-      <AppLayout
-        title="Preferences"
-        sidebar={<PrefsSidebar menus={[]} />}
-        toolbar={{
-          leftItems: toolbarItems.leftItems,
-          rightItems: toolbarItems.rightItems,
-        }}
-      >
-        <PrefsRouted />
-      </AppLayout>
-    );
-  };
 
   // Main layout wrapper using new AppLayout
   const MainLayoutWrapper = () => (
@@ -246,8 +135,34 @@ const App = () => {
           {welcomeScreen}
           <Routes>
             <Route path="/prefs/*" element={<PrefsLayout />} />
-            <Route path="/sites/*" element={<SiteLibraryLayout />} />
-            <Route path="*" element={<SiteLibraryLayout />} />
+            <Route path="/sites/*" element={
+              <SiteLibraryLayout
+                libraryView={libraryView}
+                onLibraryViewChange={handleLibraryViewChange}
+                onDialogOpen={handleLibraryDialogClick}
+              >
+                <SiteLibraryRouted
+                  handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
+                  activeLibraryView={libraryView}
+                  newSite={newSiteDialogOpen}
+                  importSite={importSiteDialogOpen}
+                />
+              </SiteLibraryLayout>
+            } />
+            <Route path="*" element={
+              <SiteLibraryLayout
+                libraryView={libraryView}
+                onLibraryViewChange={handleLibraryViewChange}
+                onDialogOpen={handleLibraryDialogClick}
+              >
+                <SiteLibraryRouted
+                  handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
+                  activeLibraryView={libraryView}
+                  newSite={newSiteDialogOpen}
+                  importSite={importSiteDialogOpen}
+                />
+              </SiteLibraryLayout>
+            } />
           </Routes>
         </ThemeProvider>
       </StyledEngineProvider>
