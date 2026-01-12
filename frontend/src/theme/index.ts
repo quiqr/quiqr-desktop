@@ -4,7 +4,8 @@ import { createTheme, alpha, PaletteMode, Shadows, ThemeOptions } from '@mui/mat
 export const LAYOUT_CONSTANTS = {
   topBarHeight: 52,
   sidebarWidth: 280,
-  sidebarCollapsedOffset: 214,
+  sidebarCollapsedWidth: 60,
+  sidebarCollapsedOffset: 220, // 280 - 60
   sidebarVisibleWidth: 66,
 } as const;
 

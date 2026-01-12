@@ -17,10 +17,14 @@ const ToolbarButton = ({ title, action, to, icon, active, disabled }: ToolbarBut
   const UseIcon = icon;
 
   const buttonSx = {
-    flexDirection: "column" as const,
+    flexDirection: "row" as const,
     textTransform: "none" as const,
+    alignItems: 'center' as const,
+    lineHeight: 1,
     m: 0,
     p: 0,
+    paddingY: 0.5,
+    paddingX: 1,
     ...(active && {
       color: "#757575",
     }),
@@ -38,7 +42,7 @@ const ToolbarButton = ({ title, action, to, icon, active, disabled }: ToolbarBut
           component={NavLink}
           to={to}
           className='toolbar-button'
-          startIcon={<UseIcon style={{ padding: 0 }} />}
+          startIcon={<UseIcon style={{ padding: 0, marginLeft: 0 }} />}
           sx={buttonSx}
           disabled={disabled}
         >
@@ -54,7 +58,7 @@ const ToolbarButton = ({ title, action, to, icon, active, disabled }: ToolbarBut
       <Button
         onClick={action}
         className='toolbar-button'
-        startIcon={<UseIcon style={{ padding: 0 }} />}
+        startIcon={<UseIcon style={{ padding: 0, marginLeft: 0 }} />}
         sx={buttonSx}
         disabled={disabled}
       >

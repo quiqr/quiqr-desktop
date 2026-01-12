@@ -1,23 +1,23 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { LAYOUT_CONSTANTS } from '../../theme';
+import { SiteWorkspaceSwitcher } from '../../components/Sidebar';
 import type { SidebarHeaderProps } from './AppLayout.types';
 
 /**
  * Sidebar header component displaying title/logo.
- * Fixed 52px height matching the main toolbar.
+ * Can optionally display a site/workspace switcher below the title.
+ * Height: 52px (default) or 110px (with switcher).
  */
-const SidebarHeader = ({ title }: SidebarHeaderProps) => {
-  const { topBarHeight } = LAYOUT_CONSTANTS;
+const SidebarHeader = ({ title, siteKey, workspaceKey, showSwitcher }: SidebarHeaderProps) => {
 
   return (
     <Box
       sx={{
-        height: topBarHeight,
-        minHeight: topBarHeight,
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'center',
         px: 2,
+        py: 1.5,
         borderBottom: (theme) => `1px solid ${theme.palette.sidebar.border}`,
       }}
     >
@@ -28,10 +28,18 @@ const SidebarHeader = ({ title }: SidebarHeaderProps) => {
           fontWeight: 500,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
+          mb: showSwitcher ? 1 : 0,
         }}
       >
         {title}
       </Typography>
+
+      {showSwitcher && siteKey && workspaceKey && (
+        <SiteWorkspaceSwitcher
+          currentSite={siteKey}
+          currentWorkspace={workspaceKey}
+        />
+      )}
     </Box>
   );
 };

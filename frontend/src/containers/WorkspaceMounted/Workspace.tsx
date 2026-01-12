@@ -1,20 +1,5 @@
-import { useEffect, useState, useCallback, ReactNode } from 'react';
-import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router';
-import AppsIcon from '@mui/icons-material/Apps';
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
-import BuildIcon from '@mui/icons-material/Build';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import SyncIcon from '@mui/icons-material/Sync';
-import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
-import Dashboard from './Dashboard';
-import { ToolbarButton } from '../TopToolbarRight';
-import Collection from './Collection';
-import CollectionItem from './Collection/CollectionItem';
-import Single from './Single';
-import WorkspaceSidebar from './WorkspaceSidebar';
-import { SiteConfSidebar, SiteConfRouted } from './SiteConf';
-import { SyncSidebar, SyncRouted } from './Sync';
+import { useEffect, useState, useCallback } from 'react';
+import { useLocation, Outlet } from 'react-router';
 import service from '../../services/service';
 import { AppLayout } from '../../layouts/AppLayout';
 import { SiteConfig } from '../../../types';
@@ -22,6 +7,8 @@ import { useSSGDownload } from '../../hooks/useSSGDownload';
 import { useModelCacheEvents } from '../../hooks/useModelCacheEvents';
 import ProgressDialog from '../../components/ProgressDialog';
 import { openExternal } from '../../utils/platform';
+import useWorkspaceToolbarItems from './hooks/useWorkspaceToolbarItems';
+import WorkspaceSidebarSelector from './components/WorkspaceSidebarSelector';
 
 interface WorkspaceConfig {
   serve?: Array<{
@@ -40,163 +27,15 @@ interface WorkspaceProps {
   applicationRole?: string;
 }
 
-interface ToolbarItemsResult {
-  leftItems: ReactNode[];
-  centerItems: ReactNode[];
-  rightItems: ReactNode[];
+// Context type passed to child routes via Outlet
+export interface WorkspaceOutletContext {
+  siteKey: string;
+  workspaceKey: string;
+  site: SiteConfig | null;
+  workspace: WorkspaceConfig | null;
+  modelRefreshKey: number;
+  ssgReady: boolean;
 }
-
-// Hook to generate toolbar items for workspace
-export const useWorkspaceToolbarItems = ({
-  siteKey,
-  workspaceKey,
-  applicationRole,
-  activeSection,
-  showPreviewButton,
-  previewButtonDisabled,
-  onPreviewClick,
-}: {
-  siteKey: string;
-  workspaceKey: string;
-  applicationRole?: string;
-  activeSection: 'content' | 'sync' | 'tools';
-  showPreviewButton: boolean;
-  previewButtonDisabled: boolean;
-  onPreviewClick: () => void;
-}): ToolbarItemsResult => {
-  const navigate = useNavigate();
-
-  const leftItems: ReactNode[] = [
-    <ToolbarButton
-      key="buttonContent"
-      active={activeSection === 'content'}
-      to={`/sites/${siteKey}/workspaces/${workspaceKey}`}
-      title="Content"
-      icon={LibraryBooksIcon}
-    />,
-    <ToolbarButton
-      key="buttonSync"
-      active={activeSection === 'sync'}
-      to={`/sites/${siteKey}/workspaces/${workspaceKey}/sync/`}
-      title="Sync"
-      icon={SyncIcon}
-    />,
-  ];
-
-  if (applicationRole === 'siteDeveloper') {
-    leftItems.push(
-      <ToolbarButton
-        key="buttonSiteConf"
-        active={activeSection === 'tools'}
-        to={`/sites/${siteKey}/workspaces/${workspaceKey}/siteconf/general`}
-        title="Tools"
-        icon={BuildIcon}
-      />
-    );
-  }
-
-  const centerItems: ReactNode[] = [];
-  if (showPreviewButton) {
-    centerItems.push(
-      <ToolbarButton
-        key="buttonPreview"
-        action={onPreviewClick}
-        title="Preview Site"
-        icon={OpenInBrowserIcon}
-        disabled={previewButtonDisabled}
-      />
-    );
-  }
-
-  const rightItems: ReactNode[] = [
-    <ToolbarButton
-      key="buttonLog"
-      action={() => service.api.showLogWindow()}
-      title="Log"
-      icon={DeveloperModeIcon}
-    />,
-    <ToolbarButton
-      key="buttonLibrary"
-      action={() => {
-        service.api.openSiteLibrary().then(() => {
-          navigate('/sites/last');
-        });
-      }}
-      title="Site Library"
-      icon={AppsIcon}
-    />,
-    <ToolbarButton
-      key="buttonPrefs"
-      to={`/prefs/?siteKey=${siteKey}`}
-      title="Preferences"
-      icon={SettingsApplicationsIcon}
-    />,
-  ];
-
-  return { leftItems, centerItems, rightItems };
-};
-
-// Wrapper components for routes that need useParams
-const CollectionRoute = ({ siteKey, workspaceKey }: { siteKey: string; workspaceKey: string }) => {
-  const { collection } = useParams();
-  const location = useLocation();
-  return (
-    <Collection
-      key={location.pathname}
-      siteKey={siteKey}
-      workspaceKey={workspaceKey}
-      collectionKey={decodeURIComponent(collection || '')}
-    />
-  );
-};
-
-const CollectionItemRoute = ({
-  siteKey,
-  workspaceKey,
-  modelRefreshKey,
-}: {
-  siteKey: string;
-  workspaceKey: string;
-  modelRefreshKey: number;
-}) => {
-  const { collection, item } = useParams();
-  const location = useLocation();
-  return (
-    <CollectionItem
-      key={location.pathname}
-      siteKey={siteKey}
-      workspaceKey={workspaceKey}
-      collectionKey={decodeURIComponent(collection || '')}
-      collectionItemKey={decodeURIComponent(item || '')}
-      modelRefreshKey={modelRefreshKey}
-    />
-  );
-};
-
-const SingleRoute = ({
-  siteKey,
-  workspaceKey,
-  refreshed,
-  modelRefreshKey,
-}: {
-  siteKey: string;
-  workspaceKey: string;
-  refreshed: boolean;
-  modelRefreshKey: number;
-}) => {
-  const { single } = useParams();
-  const location = useLocation();
-  return (
-    <Single
-      key={location.pathname}
-      siteKey={siteKey}
-      refreshed={refreshed}
-      workspaceKey={workspaceKey}
-      singleKey={decodeURIComponent(single || '')}
-      modelRefreshKey={modelRefreshKey}
-    />
-  );
-};
 
 const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) => {
   const location = useLocation();
@@ -332,76 +171,24 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
 
   const siteName = site?.name || '';
 
-  const renderSidebar = () => {
-    if (isSync) {
-      return (
-        <SyncSidebar
-          site={
-            site as SiteConfig & {
-              publish: Array<{ key: string; config?: { type?: string; [key: string]: unknown } }>;
-            }
-          }
-          siteKey={siteKey}
-          workspaceKey={workspaceKey}
-        />
-      );
-    }
-    if (isSiteConf) {
-      return <SiteConfSidebar siteKey={siteKey} workspaceKey={workspaceKey} />;
-    }
-    return (
-      <WorkspaceSidebar
-        key={location.pathname}
-        applicationRole={applicationRole}
-        siteKey={siteKey}
-        workspaceKey={workspaceKey}
-        modelRefreshKey={modelRefreshKey}
-      />
-    );
-  };
-
-  const renderContent = () => (
-    <Routes>
-      <Route
-        path="/"
-        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={ssgReady} />}
-      />
-      <Route
-        path="home/:refresh"
-        element={<Dashboard siteKey={siteKey} workspaceKey={workspaceKey} hugoReady={ssgReady} />}
-      />
-      <Route
-        path="sync/*"
-        element={<SyncRouted site={site} workspace={workspace} siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />}
-      />
-      <Route path="siteconf/*" element={<SiteConfRouted siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />} />
-      <Route path="collections/:collection" element={<CollectionRoute siteKey={siteKey} workspaceKey={workspaceKey} />} />
-      <Route
-        path="collections/:collection/:item/:refresh"
-        element={<CollectionItemRoute siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />}
-      />
-      <Route
-        path="collections/:collection/:item"
-        element={<CollectionItemRoute siteKey={siteKey} workspaceKey={workspaceKey} modelRefreshKey={modelRefreshKey} />}
-      />
-      <Route
-        path="singles/:single/:refresh"
-        element={<SingleRoute siteKey={siteKey} workspaceKey={workspaceKey} refreshed={true} modelRefreshKey={modelRefreshKey} />}
-      />
-      <Route
-        path="singles/:single"
-        element={<SingleRoute siteKey={siteKey} workspaceKey={workspaceKey} refreshed={false} modelRefreshKey={modelRefreshKey} />}
-      />
-    </Routes>
-  );
-
   return (
     <>
       <AppLayout
         title={siteName}
         siteKey={siteKey}
         workspaceKey={workspaceKey}
-        sidebar={renderSidebar()}
+        showSwitcher={true}
+        sidebar={
+          <WorkspaceSidebarSelector
+            siteKey={siteKey}
+            workspaceKey={workspaceKey}
+            applicationRole={applicationRole}
+            modelRefreshKey={modelRefreshKey}
+            activeSection={activeSection as 'content' | 'sync' | 'tools'}
+            site={site}
+            locationKey={location.pathname}
+          />
+        }
         toolbar={{
           leftItems: toolbarItems.leftItems,
           centerItems: toolbarItems.centerItems,
@@ -422,7 +209,19 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
             {error}
           </p>
         )}
-        {ssgReady && renderContent()}
+        {/* Outlet renders the nested child routes with context */}
+        {ssgReady ? (
+          <Outlet
+            context={{
+              siteKey,
+              workspaceKey,
+              site,
+              workspace,
+              modelRefreshKey,
+              ssgReady,
+            }}
+          />
+        ) : null}
       </AppLayout>
 
       {hugoProgress && <ProgressDialog conf={hugoProgress} onClose={cancelDownload} />}
