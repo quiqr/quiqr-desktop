@@ -133,7 +133,7 @@ function BundleManagerField({ compositeKey }: Props) {
 
       try {
         // Upload file to bundle
-        const uploadedPath = await service.api.uploadFileToBundlePath(
+        const result = await service.api.uploadFileToBundlePath(
           meta.siteKey,
           meta.workspaceKey,
           meta.collectionKey,
@@ -143,12 +143,19 @@ function BundleManagerField({ compositeKey }: Props) {
           base64Content
         );
 
+        // If item was converted to bundle, redirect to the new URL
+        if (result.newCollectionItemKey) {
+          const newUrl = `/workspace/${meta.siteKey}/${meta.workspaceKey}/collection/${meta.collectionKey}/item/${encodeURIComponent(result.newCollectionItemKey)}`;
+          window.location.href = newUrl;
+          return; // Exit early since we're redirecting
+        }
+
         // Check if file already exists in list
-        const match = currentFiles.find(x => x.src === uploadedPath);
+        const match = currentFiles.find(x => x.src === result.uploadedPath);
         if (match) {
           if (match.__deleted) delete match.__deleted;
         } else {
-          currentFiles.push({ src: uploadedPath });
+          currentFiles.push({ src: result.uploadedPath });
         }
       } catch (error) {
         console.error('Error uploading file:', error);

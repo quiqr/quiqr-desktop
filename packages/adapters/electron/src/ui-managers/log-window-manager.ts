@@ -64,8 +64,8 @@ function createWindow(): BrowserWindow {
     backgroundColor: '#ffffff',
     title: 'Quiqr Console',
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      nodeIntegration: false,
+      contextIsolation: true
     },
     x: logWindowState.x,
     y: logWindowState.y,
