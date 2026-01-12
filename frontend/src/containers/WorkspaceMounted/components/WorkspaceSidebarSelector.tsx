@@ -11,6 +11,7 @@ interface WorkspaceSidebarSelectorProps {
   activeSection: 'content' | 'sync' | 'tools';
   site: SiteConfig | null;
   locationKey: string;
+  collapsed?: boolean;
 }
 
 function WorkspaceSidebarSelector({
@@ -21,6 +22,7 @@ function WorkspaceSidebarSelector({
   activeSection,
   site,
   locationKey,
+  collapsed,
 }: WorkspaceSidebarSelectorProps) {
   if (activeSection === 'sync' && site) {
     return (
@@ -32,12 +34,13 @@ function WorkspaceSidebarSelector({
         }
         siteKey={siteKey}
         workspaceKey={workspaceKey}
+        collapsed={collapsed}
       />
     );
   }
 
   if (activeSection === 'tools') {
-    return <SiteConfSidebar siteKey={siteKey} workspaceKey={workspaceKey} />;
+    return <SiteConfSidebar siteKey={siteKey} workspaceKey={workspaceKey} collapsed={collapsed} />;
   }
 
   // Default: content section
@@ -48,6 +51,7 @@ function WorkspaceSidebarSelector({
       siteKey={siteKey}
       workspaceKey={workspaceKey}
       modelRefreshKey={modelRefreshKey}
+      collapsed={collapsed}
     />
   );
 }
