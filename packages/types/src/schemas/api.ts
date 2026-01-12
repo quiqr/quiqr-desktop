@@ -169,7 +169,7 @@ export const webMenuStateSchema = z.object({
 })
 
 export const webMenuActionResultSchema = z.object({
-  type: z.enum(['success', 'error', 'navigate', 'openDialog', 'info', 'openExternal']),
+  type: z.enum(['success', 'error', 'navigate', 'openDialog', 'info', 'openExternal', 'reload']),
   path: z.string().optional(),
   dialog: z.string().optional(),
   message: z.string().optional(),

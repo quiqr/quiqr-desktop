@@ -7,6 +7,7 @@ import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CheckIcon from '@mui/icons-material/Check';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import type { WebMenuState, WebMenuDefinition, WebMenuItemDefinition } from '@quiqr/types';
 
 interface MenuBarProps {
@@ -22,6 +23,7 @@ interface MenuBarProps {
  */
 const MenuBar = ({ menuState, onMenuAction }: MenuBarProps) => {
   const [anchorEl, setAnchorEl] = useState<{[key: string]: HTMLElement | null}>({});
+  const [submenuAnchorEl, setSubmenuAnchorEl] = useState<{[key: string]: HTMLElement | null}>({});
 
   const handleMenuClick = (menuId: string, event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl({ ...anchorEl, [menuId]: event.currentTarget });
@@ -29,6 +31,8 @@ const MenuBar = ({ menuState, onMenuAction }: MenuBarProps) => {
 
   const handleMenuClose = (menuId: string) => {
     setAnchorEl({ ...anchorEl, [menuId]: null });
+    // Close all submenus when main menu closes
+    setSubmenuAnchorEl({});
   };
 
   const handleItemClick = (menuId: string, item: WebMenuItemDefinition) => {
@@ -38,20 +42,55 @@ const MenuBar = ({ menuState, onMenuAction }: MenuBarProps) => {
     handleMenuClose(menuId);
   };
 
+  const handleSubmenuOpen = (itemId: string, event: React.MouseEvent<HTMLElement>) => {
+    setSubmenuAnchorEl({ ...submenuAnchorEl, [itemId]: event.currentTarget });
+  };
+
+  const handleSubmenuClose = (itemId: string) => {
+    setSubmenuAnchorEl({ ...submenuAnchorEl, [itemId]: null });
+  };
+
   const renderMenuItem = (menuId: string, item: WebMenuItemDefinition) => {
     if (item.type === 'separator') {
       return <Divider key={item.id} />;
     }
 
     if (item.type === 'submenu' && item.submenu) {
-      // TODO: Implement nested submenu support
+      const submenuId = `${menuId}-${item.id}`;
       return (
-        <MenuItem
-          key={item.id}
-          disabled
-        >
-          <ListItemText>{item.label} &raquo;</ListItemText>
-        </MenuItem>
+        <Box key={item.id}>
+          <MenuItem
+            onMouseEnter={(e) => handleSubmenuOpen(submenuId, e)}
+            disabled={item.enabled === false}
+            sx={{
+              minHeight: 32,
+              px: 2,
+            }}
+          >
+            <ListItemText>{item.label}</ListItemText>
+            <ChevronRightIcon fontSize="small" sx={{ ml: 1 }} />
+          </MenuItem>
+          <Menu
+            anchorEl={submenuAnchorEl[submenuId]}
+            open={Boolean(submenuAnchorEl[submenuId])}
+            onClose={() => handleSubmenuClose(submenuId)}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            slotProps={{
+              paper: {
+                onMouseLeave: () => handleSubmenuClose(submenuId),
+              },
+            }}
+          >
+            {item.submenu.map((subItem: WebMenuItemDefinition) => renderMenuItem(menuId, subItem))}
+          </Menu>
+        </Box>
       );
     }
 

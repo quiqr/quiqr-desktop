@@ -14,6 +14,11 @@ export function useMenuState() {
   const navigate = useNavigate();
   const [menuState, setMenuState] = useState<WebMenuState>({ menus: [], version: 0 });
   const [loading, setLoading] = useState(true);
+  const [infoDialog, setInfoDialog] = useState<{ open: boolean; title: string; message: string }>({
+    open: false,
+    title: '',
+    message: '',
+  });
 
   const fetchMenuState = async () => {
     try {
@@ -38,14 +43,6 @@ export function useMenuState() {
           }
           break;
 
-        case 'openDialog':
-          // TODO: Implement dialog opening logic
-          console.log('[Menu] Open dialog:', result.dialog);
-          snackMessageService.addSnackMessage(
-            `Dialog: ${result.dialog}`,
-            { severity: 'info', autoHideDuration: 3000 }
-          );
-          break;
 
         case 'openExternal':
           if (result.url) {
@@ -55,10 +52,19 @@ export function useMenuState() {
 
         case 'info':
           if (result.message) {
-            snackMessageService.addSnackMessage(
-              result.message,
-              { severity: 'info', autoHideDuration: 4000 }
-            );
+            // Use dialog for multi-line messages (like version info)
+            if (result.message.includes('\n')) {
+              // Extract title from first line (e.g., "Quiqr Desktop")
+              const lines = result.message.split('\n');
+              const title = lines[0] || 'Information';
+              const message = lines.slice(1).join('\n').trim();
+              setInfoDialog({ open: true, title, message });
+            } else {
+              snackMessageService.addSnackMessage(
+                result.message,
+                { severity: 'info', autoHideDuration: 4000 }
+              );
+            }
           }
           break;
 
@@ -82,6 +88,20 @@ export function useMenuState() {
               { severity: 'success', autoHideDuration: 3000 }
             );
           }
+          break;
+
+        case 'reload':
+          // Reload the page to refresh workspace view
+          if (result.message) {
+            snackMessageService.addSnackMessage(
+              result.message,
+              { severity: 'success', autoHideDuration: 2000 }
+            );
+          }
+          // Delay reload slightly to show the message
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
           break;
       }
     } catch (error) {
@@ -118,11 +138,17 @@ export function useMenuState() {
     };
   }, []);
 
+  const closeInfoDialog = () => {
+    setInfoDialog({ open: false, title: '', message: '' });
+  };
+
   return {
     menuState,
     loading,
     executeMenuAction,
     refresh: fetchMenuState,
+    infoDialog,
+    closeInfoDialog,
   };
 }
 

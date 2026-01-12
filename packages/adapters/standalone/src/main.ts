@@ -79,10 +79,10 @@ async function startStandaloneBackend() {
     console.log('Container created with dependency injection');
 
     // Replace with web adapters (includes real menu adapter)
-    const webAdapters = createWebAdapters(container);
+    const webAdapters = createWebAdapters(container, rootPath);
     (container as any).adapters = webAdapters;
 
-    console.log('Web adapters initialized (menu, window)');
+    console.log('Web adapters initialized (menu, window, appInfo)');
 
     // Get port from environment or use default
     const port = process.env.PORT ? parseInt(process.env.PORT) : 5150;

@@ -166,6 +166,33 @@ export class WebMenuAdapter implements MenuAdapter {
               enabled: true,
               action: 'toggleExperimental',
             },
+            // Show Experimental submenu when experimental features are enabled
+            ...(config.experimentalFeatures
+              ? [
+                  {
+                    id: 'experimental-submenu',
+                    type: 'submenu' as const,
+                    label: 'Experimental',
+                    submenu: [
+                      {
+                        id: 'disable-partials-cache',
+                        type: 'checkbox' as const,
+                        label: 'Disable CMS Partials Cache',
+                        checked: config.disablePartialCache,
+                        enabled: true,
+                        action: 'togglePartialCache',
+                      },
+                      {
+                        id: 'invalidate-cache',
+                        type: 'normal' as const,
+                        label: 'Invalidate Sites Cache',
+                        enabled: true,
+                        action: 'invalidateCache',
+                      },
+                    ],
+                  },
+                ]
+              : []),
           ],
         },
 
@@ -240,7 +267,7 @@ export class WebMenuAdapter implements MenuAdapter {
               type: 'normal',
               label: 'Release Notes',
               enabled: true,
-              action: 'openExternal:https://book.quiqr.org/docs/80-release-notes/01-quiqr-desktop/',
+              action: 'openExternal:https://github.com/quiqr/quiqr-desktop/blob/main/CHANGELOG.md',
             },
           ],
         },
