@@ -48,7 +48,7 @@ const InfoDialog = ({ open, title, message, onClose }: InfoDialogProps) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="contained">
-          OK
+          Close
         </Button>
       </DialogActions>
     </Dialog>
