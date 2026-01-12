@@ -1,18 +1,12 @@
 import { useState, ReactNode, Fragment } from 'react';
-import { NavLink } from 'react-router';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListSubheader from '@mui/material/ListSubheader';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import IconButton from '@mui/material/IconButton';
+import { SidebarFlatItem, SidebarNestedItem } from '../components/Sidebar';
 
 export interface SidebarMenuItem {
   label: string;
@@ -53,124 +47,6 @@ const Sidebar = ({
 }: SidebarProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const renderFlatItem = (item: SidebarMenuItem) => {
-    let icon: ReactNode = null;
-    let secondaryAction: ReactNode = null;
-    let secondaryActionMenu: ReactNode = null;
-
-    if (item.icon) {
-      icon = <ListItemIcon>{item.icon}</ListItemIcon>;
-    }
-
-    if (item.secondaryMenu) {
-      secondaryActionMenu = item.secondaryMenu;
-      secondaryAction = (
-        <ListItemSecondaryAction>{item.secondaryButton}</ListItemSecondaryAction>
-      );
-    }
-
-    if (item.to) {
-      return (
-        <ListItem
-          key={'itemFlat' + item.label}
-          disablePadding
-          secondaryAction={secondaryAction}
-        >
-          <NavLink
-            to={item.to}
-            end={item.exact}
-            style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
-          >
-            {({ isActive }) => (
-              <ListItemButton selected={isActive} onClick={item.onClick}>
-                {icon}
-                <ListItemText primary={item.label} />
-                {secondaryActionMenu}
-              </ListItemButton>
-            )}
-          </NavLink>
-        </ListItem>
-      );
-    }
-
-    return (
-      <ListItem
-        key={'itemFlat' + item.label}
-        disablePadding
-        secondaryAction={secondaryAction}
-      >
-        <ListItemButton selected={item.selected} onClick={item.onClick}>
-          {icon}
-          <ListItemText primary={item.label} />
-          {secondaryActionMenu}
-        </ListItemButton>
-      </ListItem>
-    );
-  };
-
-  const renderNestedItems = (item: SidebarMenuItem, index: number) => {
-    let initOpen: boolean | undefined;
-    const childItems = item.childItems!.map((itemChild) => {
-      if (itemChild.selected) {
-        initOpen = true;
-      }
-
-      if (itemChild.to) {
-        return (
-          <ListItem key={'itemNestChild' + itemChild.label} disablePadding>
-            <NavLink
-              to={itemChild.to}
-              end={itemChild.exact}
-              style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
-            >
-              {({ isActive }) => (
-                <ListItemButton selected={isActive} onClick={itemChild.onClick} sx={{ pl: 4 }}>
-                  <ListItemText primary={itemChild.label} />
-                </ListItemButton>
-              )}
-            </NavLink>
-          </ListItem>
-        );
-      }
-
-      return (
-        <ListItem key={'itemNestChild' + itemChild.label} disablePadding>
-          <ListItemButton onClick={itemChild.onClick} selected={itemChild.selected} sx={{ pl: 4 }}>
-            <ListItemText primary={itemChild.label} />
-          </ListItemButton>
-        </ListItem>
-      );
-    });
-
-    const isOpen = initOpen || openIndex === index;
-
-    return (
-      <Fragment key={'itemNestOut' + item.label}>
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={item.selected}
-            onClick={() => {
-              if (openIndex === index) {
-                setOpenIndex(null);
-              } else {
-                setOpenIndex(index);
-              }
-            }}
-          >
-            <ListItemText primary={item.label} />
-            {isOpen ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-        </ListItem>
-
-        <Collapse in={isOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {childItems}
-          </List>
-        </Collapse>
-      </Fragment>
-    );
-  };
-
   const toggleMenuExpand = (menuKey: string) => {
     onMenuExpandToggle?.(menuKey);
   };
@@ -208,9 +84,19 @@ const Sidebar = ({
                     return <Divider key={'menu' + index} />;
                   }
                   if (item.childItems) {
-                    return renderNestedItems(item, index);
+                    return (
+                      <SidebarNestedItem
+                        key={'itemNest' + index}
+                        item={item}
+                        index={index}
+                        openIndex={openIndex}
+                        onToggle={setOpenIndex}
+                      />
+                    );
                   }
-                  return renderFlatItem(item);
+                  return (
+                    <SidebarFlatItem key={'itemFlat' + index} item={item} />
+                  );
                 })}
           </List>
         ) : null}

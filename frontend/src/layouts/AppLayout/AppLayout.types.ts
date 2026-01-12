@@ -10,6 +10,8 @@ export interface SidebarHeaderProps {
   siteKey?: string;
   /** Optional workspace key for context */
   workspaceKey?: string;
+  /** Whether to show the site/workspace switcher dropdown */
+  showSwitcher?: boolean;
 }
 
 /**
