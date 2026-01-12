@@ -913,10 +913,38 @@ export class WorkspaceService {
         const collection = config.collections.find((x) => x.key === collectionKey);
         if (collection == null) throw new Error('Could not find collection.');
 
-        const pathFromItemRoot = path.join(
-          collectionItemKey.replace(/\/[^/]+$/, ''),
-          targetPath
-        );
+        // Check if item is already a bundle (has directory separator)
+        if (!collectionItemKey.includes('/')) {
+          const itemPath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+          const bundleDirPath = path.join(
+            this.workspacePath,
+            collection.folder,
+            collectionItemKey.replace(/\.[^.]+$/, '')
+          );
+
+          // Check if we need to convert to bundle
+          if (fs.existsSync(itemPath) && fs.statSync(itemPath).isFile()) {
+            // File exists as non-bundle - convert it
+            await this.makePageBundleCollectionItem(collectionKey, collectionItemKey);
+          }
+          // If bundle directory already exists (either just converted or already was converted), update the key
+          if (fs.existsSync(bundleDirPath) && fs.statSync(bundleDirPath).isDirectory()) {
+            collectionItemKey = collectionItemKey.replace(/\.[^.]+$/, '') + '/index.md';
+          }
+        }
+
+        // Extract the bundle directory from collectionItemKey
+        // For bundle items like "project1/index.md", extract "project1"
+        let bundleDir = collectionItemKey;
+        if (collectionItemKey.includes('/')) {
+          // Has directory separator - strip the filename part
+          bundleDir = collectionItemKey.replace(/\/[^/]+$/, '');
+        } else {
+          // No directory separator - strip the file extension (shouldn't happen after auto-convert)
+          bundleDir = collectionItemKey.replace(/\.[^.]+$/, '');
+        }
+
+        const pathFromItemRoot = path.join(bundleDir, targetPath);
         filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
       }
     }
@@ -989,6 +1017,7 @@ export class WorkspaceService {
   /**
    * Upload a file to a bundle path with base64 content.
    * Used by native browser file pickers.
+   * Returns the uploaded file path and optionally the new collection item key if converted to bundle.
    */
   async uploadFileToBundlePath(
     collectionKey: string,
@@ -996,8 +1025,10 @@ export class WorkspaceService {
     targetPath: string,
     filename: string,
     base64Content: string
-  ): Promise<string> {
+  ): Promise<{ uploadedPath: string; newCollectionItemKey?: string }> {
     const config = await this.getConfigurationsData();
+    const originalCollectionItemKey = collectionItemKey;
+    let wasConverted = false;
 
     let filesBasePath = '';
     // When path starts with / use the root of the site directory
@@ -1010,10 +1041,39 @@ export class WorkspaceService {
         const collection = config.collections.find((x) => x.key === collectionKey);
         if (collection == null) throw new Error('Could not find collection.');
 
-        const pathFromItemRoot = path.join(
-          collectionItemKey.replace(/\/[^/]+$/, ''),
-          targetPath
-        );
+        // Check if item is already a bundle (has directory separator)
+        if (!collectionItemKey.includes('/')) {
+          const itemPath = path.join(this.workspacePath, collection.folder, collectionItemKey);
+          const bundleDirPath = path.join(
+            this.workspacePath,
+            collection.folder,
+            collectionItemKey.replace(/\.[^.]+$/, '')
+          );
+
+          // Check if we need to convert to bundle
+          if (fs.existsSync(itemPath) && fs.statSync(itemPath).isFile()) {
+            // File exists as non-bundle - convert it
+            await this.makePageBundleCollectionItem(collectionKey, collectionItemKey);
+            wasConverted = true;
+          }
+          // If bundle directory already exists (either just converted or already was converted), update the key
+          if (fs.existsSync(bundleDirPath) && fs.statSync(bundleDirPath).isDirectory()) {
+            collectionItemKey = collectionItemKey.replace(/\.[^.]+$/, '') + '/index.md';
+          }
+        }
+
+        // Extract the bundle directory from collectionItemKey
+        // For bundle items like "project1/index.md", extract "project1"
+        let bundleDir = collectionItemKey;
+        if (collectionItemKey.includes('/')) {
+          // Has directory separator - strip the filename part
+          bundleDir = collectionItemKey.replace(/\/[^/]+$/, '');
+        } else {
+          // No directory separator - strip the file extension (shouldn't happen after auto-convert)
+          bundleDir = collectionItemKey.replace(/\.[^.]+$/, '');
+        }
+
+        const pathFromItemRoot = path.join(bundleDir, targetPath);
         filesBasePath = path.join(this.workspacePath, collection.folder, pathFromItemRoot);
       }
     }
@@ -1032,8 +1092,16 @@ export class WorkspaceService {
     const buffer = Buffer.from(base64Content, 'base64');
     await fs.writeFile(filePath, buffer);
 
-    // Return the relative path from targetPath
-    return path.join(targetPath, filename).replace(/\\/g, '/');
+    // Return the relative path from targetPath and new key if converted
+    const result: { uploadedPath: string; newCollectionItemKey?: string } = {
+      uploadedPath: path.join(targetPath, filename).replace(/\\/g, '/')
+    };
+
+    if (wasConverted && collectionItemKey !== originalCollectionItemKey) {
+      result.newCollectionItemKey = collectionItemKey;
+    }
+
+    return result;
   }
 
   /**

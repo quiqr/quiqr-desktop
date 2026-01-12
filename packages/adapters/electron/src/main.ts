@@ -10,7 +10,7 @@ import fs from 'fs-extra';
 import { createElectronAdapters } from './adapters/index.js';
 import { createContainer } from '@quiqr/backend';
 import { createServer } from '@quiqr/backend/api';
-import { getCurrentInstanceOrNew, initializeRemoteMain } from './ui-managers/main-window-manager.js';
+import { getCurrentInstanceOrNew } from './ui-managers/main-window-manager.js';
 import { menuManager } from './ui-managers/menu-manager.js';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -131,9 +131,6 @@ function createWindow(container?: any): BrowserWindow {
  */
 app.on('ready', async () => {
   console.log('Electron app ready!');
-
-  // Initialize @electron/remote
-  initializeRemoteMain();
 
   // Start backend first
   const { windowAdapter, container } = await startBackend();

@@ -3,7 +3,6 @@
  */
 
 import { BrowserWindow } from 'electron';
-import remoteMain from '@electron/remote/main/index.js';
 import windowStateKeeper from 'electron-window-state';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -40,9 +39,8 @@ function createWindow(): BrowserWindow {
     frame: true,
     backgroundColor: '#ffffff',
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-      // Note: enableRemoteModule is deprecated, use @electron/remote instead
+      nodeIntegration: false,
+      contextIsolation: true
     },
     x: mainWindowState.x,
     y: mainWindowState.y,
@@ -54,9 +52,6 @@ function createWindow(): BrowserWindow {
 
   // Let electron-window-state manage window position/size
   mainWindowState.manage(mainWindow);
-
-  // Enable @electron/remote for this window
-  remoteMain.enable(mainWindow.webContents);
 
   // Open DevTools if DEVTOOLS env var is set
   if (process.env.DEVTOOLS) {
@@ -118,12 +113,4 @@ export async function closeSiteAndShowSelectSites(): Promise<boolean> {
   mainWindow.setTitle('Quiqr: Select site');
 
   return true;
-}
-
-/**
- * Initialize remote main module
- * Call this before creating any windows
- */
-export function initializeRemoteMain(): void {
-  remoteMain.initialize();
 }
