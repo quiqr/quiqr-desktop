@@ -42,6 +42,12 @@ export function useMenuState() {
           console.log('[Menu] Open dialog:', result.dialog);
           break;
 
+        case 'openExternal':
+          if (result.url) {
+            window.open(result.url, '_blank', 'noopener,noreferrer');
+          }
+          break;
+
         case 'info':
           // TODO: Show info message (could use snackbar)
           console.log('[Menu] Info:', result.message);

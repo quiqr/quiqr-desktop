@@ -169,11 +169,12 @@ export const webMenuStateSchema = z.object({
 })
 
 export const webMenuActionResultSchema = z.object({
-  type: z.enum(['success', 'error', 'navigate', 'openDialog', 'info']),
+  type: z.enum(['success', 'error', 'navigate', 'openDialog', 'info', 'openExternal']),
   path: z.string().optional(),
   dialog: z.string().optional(),
   message: z.string().optional(),
-  refresh: z.boolean().optional()
+  refresh: z.boolean().optional(),
+  url: z.string().optional()
 })
 
 // API Schemas mapping - maps API method names to their response schemas

@@ -32,7 +32,10 @@ export function createGetMenuStateHandler(container: AppContainer) {
 export function createExecuteMenuActionHandler(container: AppContainer) {
   return async ({ action, data }: { action: string; data?: any }) => {
     // Parse action (format: "actionName" or "actionName:param")
-    const [actionName, actionParam] = action.split(':');
+    // Only split on the FIRST colon to preserve URLs like "https://..."
+    const colonIndex = action.indexOf(':');
+    const actionName = colonIndex >= 0 ? action.substring(0, colonIndex) : action;
+    const actionParam = colonIndex >= 0 ? action.substring(colonIndex + 1) : undefined;
 
     try {
       switch (actionName) {
@@ -118,8 +121,8 @@ export function createExecuteMenuActionHandler(container: AppContainer) {
         // ====================================================================
         case 'openExternal':
           if (actionParam) {
-            await container.adapters.shell.openExternal(actionParam);
-            return { type: 'success' };
+            // Return openExternal response to let frontend handle it (window.open)
+            return { type: 'openExternal', url: actionParam };
           }
           throw new Error('URL parameter required');
 

@@ -9,6 +9,7 @@ import { createDevAdapters } from '@quiqr/backend';
 import type { PlatformAdapters, AppContainer } from '@quiqr/backend';
 import { WebMenuAdapter } from './menu-adapter.js';
 import { WebWindowAdapter } from './window-adapter.js';
+import { WebShellAdapter } from './shell-adapter.js';
 
 /**
  * Create web adapters for standalone mode
@@ -22,12 +23,14 @@ export function createWebAdapters(container: AppContainer): PlatformAdapters {
   menuAdapter.setContainer(container);
 
   const windowAdapter = new WebWindowAdapter();
+  const shellAdapter = new WebShellAdapter();
 
   // Return combined adapters
   return {
     ...devAdapters,
     menu: menuAdapter,
     window: windowAdapter,
+    shell: shellAdapter,
   };
 }
 
