@@ -5,8 +5,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Workspace from "./containers/WorkspaceMounted/Workspace";
 import DashboardRoute from "./containers/WorkspaceMounted/components/DashboardRoute";
-import SyncRoutedWithContext from "./containers/WorkspaceMounted/components/SyncRoutedWithContext";
-import SiteConfRoutedWithContext from "./containers/WorkspaceMounted/components/SiteConfRoutedWithContext";
 import CollectionRoute from "./containers/WorkspaceMounted/components/CollectionRoute";
 import CollectionItemRoute from "./containers/WorkspaceMounted/components/CollectionItemRoute";
 import SingleRoute from "./containers/WorkspaceMounted/components/SingleRoute";
@@ -18,6 +16,8 @@ import service from "./services/service";
 import { getThemeByName } from "./theme";
 import { UserPreferences } from "../types";
 import { ThemeContext } from "./contexts/ThemeContext";
+import SyncRoutedWithContext from "./containers/WorkspaceMounted/components/SyncRoutedWithContext";
+import SiteConfRoutedWithContext from "./containers/WorkspaceMounted/components/SiteConfRoutedWithContext";
 
 const defaultApplicationRole = "contentEditor";
 
