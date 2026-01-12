@@ -6,12 +6,41 @@ export interface Breadcrumb {
 }
 
 /**
+ * Formats a breadcrumb label by converting underscores/hyphens to spaces
+ * and capitalizing each word.
+ *
+ * Examples:
+ * - "project_items" → "Project Items"
+ * - "blog-posts" → "Blog Posts"
+ * - "index.md" → "Index"
+ */
+function formatBreadcrumbLabel(raw: string): string {
+  // Remove file extension if present
+  let label = raw.replace(/\.(md|markdown|html)$/i, '');
+
+  // Remove trailing /index if present (for collection items like "project1/index.md")
+  label = label.replace(/\/index$/i, '');
+
+  // Replace underscores and hyphens with spaces
+  label = label.replace(/[_-]/g, ' ');
+
+  // Capitalize each word
+  label = label
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+  return label;
+}
+
+/**
  * Hook to generate breadcrumbs from current route.
  * Parses route segments and builds a breadcrumb trail.
  *
  * Examples:
  * - /sites/my-site/workspaces/main → ["Site Library", "My Site", "Main"]
- * - /sites/my-site/workspaces/main/collections/posts → ["My Site", "Main", "Collections", "Posts"]
+ * - /sites/my-site/workspaces/main/collections/posts/post1 → ["Site Library", "My Site", "Main", "Posts", "Post1"]
+ * - /sites/my-site/workspaces/main/singles/about → ["Site Library", "My Site", "Main", "About"]
  * - /prefs/general → ["Preferences", "General"]
  */
 function useBreadcrumbs(): Breadcrumb[] {
@@ -22,11 +51,12 @@ function useBreadcrumbs(): Breadcrumb[] {
 
   // Parse /sites/* routes
   if (location.pathname.startsWith('/sites/')) {
-    const { site, workspace, collection, single } = params as {
+    const { site, workspace, collection, single, item } = params as {
       site?: string;
       workspace?: string;
       collection?: string;
       single?: string;
+      item?: string;
     };
 
     // Add "Site Library" as root
@@ -56,28 +86,33 @@ function useBreadcrumbs(): Breadcrumb[] {
 
           // Add section-specific breadcrumbs
           if (collection) {
-            breadcrumbs.push({
-              label: 'Collections',
-              path: `/sites/${site}/workspaces/${workspace}`,
-            });
-            breadcrumbs.push({ label: decodeURIComponent(collection) });
+            const collectionName = decodeURIComponent(collection);
 
-            // Add item name if viewing specific item
-            const pathParts = location.pathname.split('/');
-            const collectionIndex = pathParts.indexOf(collection);
-            if (collectionIndex > 0 && pathParts[collectionIndex + 1]) {
-              const item = pathParts[collectionIndex + 1];
-              // Only add if it's not a refresh token
-              if (item !== 'refresh' && !item.startsWith(':')) {
-                breadcrumbs.push({ label: decodeURIComponent(item) });
-              }
+            if (item) {
+              // Viewing a specific item - make collection name clickable
+              const itemName = decodeURIComponent(item);
+
+              // Make collection name clickable (links to collection list)
+              breadcrumbs.push({
+                label: formatBreadcrumbLabel(collectionName),
+                path: `/sites/${site}/workspaces/${workspace}/collections/${collection}`,
+              });
+
+              // Add item as final breadcrumb
+              breadcrumbs.push({
+                label: formatBreadcrumbLabel(itemName)
+              });
+            } else {
+              // Collection list view, collection is the final breadcrumb
+              breadcrumbs.push({
+                label: formatBreadcrumbLabel(collectionName)
+              });
             }
           } else if (single) {
+            // Single page - add as final breadcrumb
             breadcrumbs.push({
-              label: 'Singles',
-              path: `/sites/${site}/workspaces/${workspace}`,
+              label: formatBreadcrumbLabel(decodeURIComponent(single))
             });
-            breadcrumbs.push({ label: decodeURIComponent(single) });
           } else if (location.pathname.includes('/sync')) {
             breadcrumbs.push({ label: 'Sync' });
           } else if (location.pathname.includes('/siteconf')) {

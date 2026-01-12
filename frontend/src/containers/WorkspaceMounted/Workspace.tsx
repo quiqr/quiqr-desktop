@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, Outlet } from 'react-router';
 import service from '../../services/service';
 import { AppLayout } from '../../layouts/AppLayout';
 import { SiteConfig } from '../../../types';
@@ -9,7 +9,6 @@ import ProgressDialog from '../../components/ProgressDialog';
 import { openExternal } from '../../utils/platform';
 import useWorkspaceToolbarItems from './hooks/useWorkspaceToolbarItems';
 import WorkspaceSidebarSelector from './components/WorkspaceSidebarSelector';
-import WorkspaceContentRouter from './components/WorkspaceContentRouter';
 
 interface WorkspaceConfig {
   serve?: Array<{
@@ -26,6 +25,16 @@ interface WorkspaceProps {
   siteKey: string;
   workspaceKey: string;
   applicationRole?: string;
+}
+
+// Context type passed to child routes via Outlet
+export interface WorkspaceOutletContext {
+  siteKey: string;
+  workspaceKey: string;
+  site: SiteConfig | null;
+  workspace: WorkspaceConfig | null;
+  modelRefreshKey: number;
+  ssgReady: boolean;
 }
 
 const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) => {
@@ -200,14 +209,19 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
             {error}
           </p>
         )}
-        <WorkspaceContentRouter
-          siteKey={siteKey}
-          workspaceKey={workspaceKey}
-          site={site}
-          workspace={workspace}
-          modelRefreshKey={modelRefreshKey}
-          ssgReady={ssgReady}
-        />
+        {/* Outlet renders the nested child routes with context */}
+        {ssgReady ? (
+          <Outlet
+            context={{
+              siteKey,
+              workspaceKey,
+              site,
+              workspace,
+              modelRefreshKey,
+              ssgReady,
+            }}
+          />
+        ) : null}
       </AppLayout>
 
       {hugoProgress && <ProgressDialog conf={hugoProgress} onClose={cancelDownload} />}

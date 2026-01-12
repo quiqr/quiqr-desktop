@@ -4,6 +4,12 @@ import { ThemeProvider, StyledEngineProvider, Theme } from "@mui/material/styles
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Workspace from "./containers/WorkspaceMounted/Workspace";
+import DashboardRoute from "./containers/WorkspaceMounted/components/DashboardRoute";
+import SyncRoutedWithContext from "./containers/WorkspaceMounted/components/SyncRoutedWithContext";
+import SiteConfRoutedWithContext from "./containers/WorkspaceMounted/components/SiteConfRoutedWithContext";
+import CollectionRoute from "./containers/WorkspaceMounted/components/CollectionRoute";
+import CollectionItemRoute from "./containers/WorkspaceMounted/components/CollectionItemRoute";
+import SingleRoute from "./containers/WorkspaceMounted/components/SingleRoute";
 import Console from "./containers/Console";
 import { PrefsLayout } from "./containers/Prefs";
 import SplashDialog from "./dialogs/SplashDialog";
@@ -195,11 +201,22 @@ const App = () => {
           }
         />
 
-        {/* Workspace - standalone layout */}
+        {/* Workspace - nested routes */}
         <Route
-          path="/sites/:site/workspaces/:workspace/*"
+          path="/sites/:site/workspaces/:workspace"
           element={<WorkspaceRoute applicationRole={applicationRole} welcomeScreen={welcomeScreen} theme={theme} />}
-        />
+        >
+          {/* Workspace child routes - all inherit site/workspace params */}
+          <Route index element={<DashboardRoute />} />
+          <Route path="home/:refresh" element={<DashboardRoute />} />
+          <Route path="collections/:collection" element={<CollectionRoute />} />
+          <Route path="collections/:collection/:item" element={<CollectionItemRoute />} />
+          <Route path="collections/:collection/:item/:refresh" element={<CollectionItemRoute />} />
+          <Route path="singles/:single" element={<SingleRoute refreshed={false} />} />
+          <Route path="singles/:single/:refresh" element={<SingleRoute refreshed={true} />} />
+          <Route path="sync/*" element={<SyncRoutedWithContext />} />
+          <Route path="siteconf/*" element={<SiteConfRoutedWithContext />} />
+        </Route>
 
         {/* Refresh route - empty */}
         <Route

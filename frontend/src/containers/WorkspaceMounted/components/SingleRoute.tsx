@@ -1,21 +1,15 @@
-import { useParams, useLocation } from 'react-router';
+import { useParams, useLocation, useOutletContext } from 'react-router';
 import Single from '../Single';
+import type { WorkspaceOutletContext } from '../Workspace';
 
 interface SingleRouteProps {
-  siteKey: string;
-  workspaceKey: string;
   refreshed: boolean;
-  modelRefreshKey: number;
 }
 
-function SingleRoute({
-  siteKey,
-  workspaceKey,
-  refreshed,
-  modelRefreshKey,
-}: SingleRouteProps) {
+function SingleRoute({ refreshed }: SingleRouteProps) {
   const { single } = useParams();
   const location = useLocation();
+  const { siteKey, workspaceKey, modelRefreshKey } = useOutletContext<WorkspaceOutletContext>();
 
   return (
     <Single

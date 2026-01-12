@@ -1,14 +1,11 @@
-import { useParams, useLocation } from 'react-router';
+import { useParams, useLocation, useOutletContext } from 'react-router';
 import Collection from '../Collection';
+import type { WorkspaceOutletContext } from '../Workspace';
 
-interface CollectionRouteProps {
-  siteKey: string;
-  workspaceKey: string;
-}
-
-function CollectionRoute({ siteKey, workspaceKey }: CollectionRouteProps) {
+function CollectionRoute() {
   const { collection } = useParams();
   const location = useLocation();
+  const { siteKey, workspaceKey } = useOutletContext<WorkspaceOutletContext>();
 
   return (
     <Collection
