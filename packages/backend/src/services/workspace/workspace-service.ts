@@ -1321,7 +1321,16 @@ export class WorkspaceService {
         return [];
       }
 
-      const filteredArray = config.mounts.filter((mount: any) => {
+      // config.mounts can be either an array or an object with a mounts property
+      const mountsArray = Array.isArray(config.mounts)
+        ? config.mounts
+        : (config.mounts as any).mounts;
+
+      if (!Array.isArray(mountsArray)) {
+        return [];
+      }
+
+      const filteredArray = mountsArray.filter((mount: any) => {
         return 'lang' in mount;
       }) as HugoLanguage[];
 
