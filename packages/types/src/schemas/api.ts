@@ -151,7 +151,7 @@ export const webMenuItemSchema: z.ZodType<any> = z.lazy(() =>
     type: z.enum(['normal', 'checkbox', 'separator', 'submenu']),
     label: z.string().optional(),
     checked: z.boolean().optional(),
-    enabled: z.boolean(),
+    enabled: z.boolean().optional(), // Optional for separator items
     action: z.string().optional(),
     submenu: z.array(webMenuItemSchema).optional()
   })
