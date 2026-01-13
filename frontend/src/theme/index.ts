@@ -403,6 +403,16 @@ export const shadows = defaultShadows;
 
 // App-specific component overrides
 const getComponentOverrides = (mode: PaletteMode): ThemeOptions['components'] => ({
+  MuiListSubheader: {
+    styleOverrides: {
+      root: {
+        textTransform: 'uppercase',
+        letterSpacing: '0.1rem',
+        fontWeight: 600,
+        fontSize: '0.6875rem'
+      },
+    },
+  },
   MuiCssBaseline: {
     styleOverrides: {
       body: {
