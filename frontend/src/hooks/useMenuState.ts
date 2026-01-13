@@ -9,12 +9,11 @@ import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
  * Hook for managing menu state in standalone mode
  *
  * Fetches menu state from backend and provides action execution.
- * Uses Server-Sent Events (SSE) for real-time menu state updates.
  */
 export function useMenuState() {
   const navigate = useNavigate();
   const { openDialog } = useDialog();
-  const [menuState, setMenuState] = useState<WebMenuState>({ menus: [], version: 0 });
+  const [menuState, setMenuState] = useState<WebMenuState | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   const fetchMenuState = async () => {
@@ -140,36 +139,11 @@ export function useMenuState() {
   };
 
   useEffect(() => {
-    // Initial fetch
     fetchMenuState();
-
-    // Connect to SSE for real-time menu updates
-    const eventSource = new EventSource('/api/menu/events');
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'menu-changed') {
-          // Fetch updated menu state when notified
-          fetchMenuState();
-        }
-      } catch (error) {
-        console.error('Error parsing menu SSE event:', error);
-      }
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('Menu SSE connection error:', error);
-      // EventSource will automatically try to reconnect
-    };
-
-    return () => {
-      eventSource.close();
-    };
   }, []);
 
   return {
-    menuState,
+    menuState: menuState || { menus: [], version: 0 },
     loading,
     executeMenuAction,
     refresh: fetchMenuState,
