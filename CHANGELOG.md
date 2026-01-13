@@ -1,13 +1,24 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
-- chore: upgrade glob package from v10 to v13 with comprehensive test coverage
+- feature: Add OpenSpec Workflow for Spec-Driven Development
+- feature: electron replacement main menu in the standalone web version
+- feature: add collapsible sidebar with workspace switcher
+- feature: add siteDeveloper settings to sidebar
+- feature: add missing new site and import site standalone menu actions
+- feature: implement openExternal in standalone mode
+- feature: use SSE for menu updates
 - feature: workspace selection and initial vitest
+- fix: reload theme automatically when toggling between light and dark theme
+- fix: config.mounts is sometimes config.mounts.mounts
+- chore: upgrade glob package from v10 to v13 with comprehensive test coverage
 - chore: adjust padding and border in workspace select dialog
 - chore: remove debug test
-- feature: add tests and coverage
+- chore: add tests and coverage
 - chore: add workspace test fixtures
-- feature: implement workspace selection
+- chore: refactor docs dir
+- chore: update copyright
+- security: remove dependency on @electron/remote. Enable nodeIntegration: false and contextIsolation: true
 
 ## 0.21.6 (2025-12-12)
 - fix: improve position of AI Assist Button
