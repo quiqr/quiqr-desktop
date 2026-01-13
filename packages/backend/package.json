@@ -28,8 +28,8 @@
     "fs-extra": "^11.x.x",
     "glob": "13.0.0",
     "gray-matter": "^4.0.3",
-    "jimp": "^1.6.0",
     "js-yaml": "^4.x.x",
+    "sharp": "^0.34.5",
     "toml": "^3.x.x",
     "zod": "^3.x.x"
   },

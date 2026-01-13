@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import { Jimp } from 'jimp'
+import sharp from 'sharp'
 import path from 'path'
 
 export interface CreateThumbnailParams {
@@ -29,10 +29,15 @@ export async function createThumbnailJob(params: CreateThumbnailParams): Promise
     return 'image copied'
   }
 
-  // For other image types, create a scaled thumbnail
+  // For other image types, create a scaled thumbnail using Sharp
+  // Sharp can handle very large images (200MP+) efficiently with low memory usage
   try {
-    const image = await Jimp.read(src)
-    await image.scaleToFit({ h: 400, w: 400 }).write(dest as `${string}.${string}`)
+    await sharp(src)
+      .resize(400, 400, {
+        fit: 'inside', // Maintain aspect ratio, fit within 400x400
+        withoutEnlargement: true // Don't upscale small images
+      })
+      .toFile(dest)
   } catch (e) {
     throw new Error(`Failed to create thumbnail: ${e}`)
   }
