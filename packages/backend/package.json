@@ -18,10 +18,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^0.0.50",
-    "@ai-sdk/openai": "^0.0.60",
+    "@ai-sdk/anthropic": "^3.0.12",
+    "@ai-sdk/openai": "^3.0.9",
     "@quiqr/types": "*",
-    "ai": "^3.4.0",
+    "ai": "^6.0.33",
     "cors": "^2.x.x",
     "express": "^4.x.x",
     "front-matter": "^4.x.x",
