@@ -188,6 +188,33 @@ export function createServer(
     }
   );
 
+  // SSE route for menu state change events
+  app.get('/api/menu/events', (req: Request, res: Response) => {
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let connectionClosed = false;
+
+    // Subscribe to menu state change events
+    const unsubscribe = container.menuStateEventBroadcaster.subscribe(() => {
+      if (!connectionClosed) {
+        res.write(`data: ${JSON.stringify({ type: 'menu-changed' })}\n\n`);
+      }
+    });
+
+    // Handle client disconnect
+    req.on('close', () => {
+      connectionClosed = true;
+      unsubscribe();
+    });
+
+    // Send initial connection confirmation
+    res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`);
+  });
+
   // SSE route for sync publish progress streaming
   app.post(
     '/api/sync/publish/stream',

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Routes, Route, useParams, useNavigate } from "react-router";
+import { Routes, Route, useParams, useNavigate, useLocation } from "react-router";
 import { ThemeProvider, StyledEngineProvider, Theme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
@@ -54,6 +54,8 @@ const ConsoleRedirectHandler = ({ children }: { children: React.ReactNode }) => 
 };
 
 const App = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [splashDialogOpen, setSplashDialogOpen] = useState(false);
   const [showSplashAtStartup, setShowSplashAtStartup] = useState(false);
   const [applicationRole, setApplicationRole] = useState(defaultApplicationRole);
@@ -101,6 +103,33 @@ const App = () => {
       }
     });
   }, []);
+
+  // Handle openDialog query parameter from menu actions
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const openDialog = params.get('openDialog');
+
+    if (openDialog) {
+      // Remove the query parameter from URL
+      params.delete('openDialog');
+      const newSearch = params.toString();
+      const newPath = location.pathname + (newSearch ? `?${newSearch}` : '');
+      navigate(newPath, { replace: true });
+
+      // Open the appropriate dialog
+      switch (openDialog) {
+        case 'newSite':
+          setNewSiteDialogOpen(true);
+          break;
+        case 'importSite':
+          setImportSiteDialogOpen(true);
+          break;
+        case 'welcome':
+          setSplashDialogOpen(true);
+          break;
+      }
+    }
+  }, [location, navigate]);
 
   const handleLibraryDialogCloseClick = () => {
     setNewSiteDialogOpen(false);

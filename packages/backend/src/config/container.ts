@@ -153,6 +153,15 @@ export interface AppContainer {
   };
 
   /**
+   * Event broadcaster for menu state change notifications (SSE)
+   * Used to notify frontend when menu state changes
+   */
+  menuStateEventBroadcaster: {
+    emit: () => void;
+    subscribe: (callback: () => void) => () => void;
+  };
+
+  /**
    * @deprecated Use providerFactory.getProvider('hugo').getBinaryManager() instead
    * Backward compatibility accessor for Hugo downloader
    */
@@ -269,6 +278,20 @@ export function createContainer(options: ContainerOptions): AppContainer {
     },
   };
 
+  // Create menu state event broadcaster for SSE notifications
+  const menuStateSubscribers = new Set<() => void>();
+  const menuStateEventBroadcaster = {
+    emit: () => {
+      menuStateSubscribers.forEach((cb) => cb());
+    },
+    subscribe: (callback: () => void) => {
+      menuStateSubscribers.add(callback);
+      return () => {
+        menuStateSubscribers.delete(callback);
+      };
+    },
+  };
+
   // Create the container object first (needed for circular dependency)
   const container: AppContainer = {
     config,
@@ -283,6 +306,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
     workspaceConfigProvider,
     environmentInfo,
     modelChangeEventBroadcaster,
+    menuStateEventBroadcaster,
   } as AppContainer;
 
   // Create library service with container dependency

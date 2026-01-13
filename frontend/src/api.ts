@@ -539,6 +539,20 @@ export class API {
     return mainProcessBridge.request('showOpenFolderDialog', {});
   }
 
+  /**
+   * Get current menu state (for web mode)
+   */
+  getMenuState() {
+    return mainProcessBridge.request('getMenuState', {});
+  }
+
+  /**
+   * Execute a menu action (for web mode)
+   */
+  executeMenuAction(params: { action: string; data?: unknown }) {
+    return mainProcessBridge.request('executeMenuAction', params);
+  }
+
 }
 
 export const instance = new API();
