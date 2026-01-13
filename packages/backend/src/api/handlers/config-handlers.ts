@@ -225,6 +225,19 @@ export function createChangeApplicationRoleHandler(container: AppContainer) {
 }
 
 /**
+ * Get environment information
+ * Returns platform and packaging status to help frontend determine UI mode
+ */
+export function createGetEnvironmentInfoHandler(container: AppContainer) {
+  return async () => {
+    return {
+      platform: container.environmentInfo.platform,
+      isPackaged: container.environmentInfo.isPackaged,
+    };
+  };
+}
+
+/**
  * Create all config-related handlers
  */
 export function createConfigHandlers(container: AppContainer) {
@@ -248,5 +261,6 @@ export function createConfigHandlers(container: AppContainer) {
     toggleDraftMode: createToggleDraftModeHandler(container),
     toggleAutoHugoServe: createToggleAutoHugoServeHandler(container),
     changeApplicationRole: createChangeApplicationRoleHandler(container),
+    getEnvironmentInfo: createGetEnvironmentInfoHandler(container),
   };
 }

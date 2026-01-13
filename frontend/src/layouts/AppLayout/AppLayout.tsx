@@ -1,9 +1,9 @@
+import { Suspense } from 'react';
 import Box from '@mui/material/Box';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MainToolbar from './MainToolbar';
 import { AppBreadcrumbs } from '../../components/Breadcrumbs';
 import MenuBar from '../../components/MenuBar';
-import { useMenuState } from '../../hooks/useMenuState';
 import type { AppLayoutProps } from './AppLayout.types';
 
 /**
@@ -35,15 +35,12 @@ const AppLayout = ({
   toolbar,
   children,
 }: AppLayoutProps) => {
-  const { menuState, executeMenuAction } = useMenuState();
-  const hasMenus = menuState.menus.length > 0;
-
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* Menu Bar - FULL WIDTH at top (only in standalone mode) */}
-      {hasMenus && (
-        <MenuBar menuState={menuState} onMenuAction={executeMenuAction} />
-      )}
+      {/* Menu Bar - FULL WIDTH at top (self-manages visibility based on environment) */}
+      <Suspense fallback={null}>
+        <MenuBar />
+      </Suspense>
 
       {/* Horizontal layout: Sidebar + Main Area */}
       <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>

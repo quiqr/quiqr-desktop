@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { TopToolbarRight, ToolbarButton, ToolbarToggleButtonGroup } from "../TopToolbarRight";
+import { ToolbarButton, ToolbarToggleButtonGroup } from "../TopToolbarRight";
 import AppsIcon from "@mui/icons-material/Apps";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import InputIcon from "@mui/icons-material/Input";
@@ -7,6 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import { useDialog } from "../../hooks/useDialog";
+import service from "../../services/service";
 
 interface SiteLibraryToolbarItemsProps {
   activeLibraryView: string;
@@ -29,7 +30,11 @@ export const useSiteLibraryToolbarItems = ({
       key='buttonNewSite'
       action={() => openDialog('NewSlashImportSiteDialog', {
         newOrImport: 'new',
-        mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+        mountSite: (siteKey: string) => {
+          // Clear cache to ensure new site is in configurations
+          service.clearCache();
+          navigate(`/sites/${siteKey}/workspaces/main`);
+        },
         onSuccess: () => {}
       })}
       title='New'
@@ -39,7 +44,11 @@ export const useSiteLibraryToolbarItems = ({
       key='buttonImportSite'
       action={() => openDialog('NewSlashImportSiteDialog', {
         newOrImport: 'import',
-        mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+        mountSite: (siteKey: string) => {
+          // Clear cache to ensure new site is in configurations
+          service.clearCache();
+          navigate(`/sites/${siteKey}/workspaces/main`);
+        },
         onSuccess: () => {}
       })}
       title='Import'
