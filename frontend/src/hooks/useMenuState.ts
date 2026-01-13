@@ -51,19 +51,24 @@ export function useMenuState() {
             // Open dialog using the dialog system
             switch (result.dialog) {
               case 'newSite':
-                // Navigate to ensure we're on site library page, then open dialog
-                navigate('/sites/last');
                 openDialog('NewSlashImportSiteDialog', {
                   newOrImport: 'new',
-                  mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+                  mountSite: (siteKey: string) => {
+                    // Clear cache to ensure new site is in configurations
+                    service.clearCache();
+                    navigate(`/sites/${siteKey}/workspaces/main`);
+                  },
                   onSuccess: () => {}
                 });
                 break;
               case 'importSite':
-                navigate('/sites/last');
                 openDialog('NewSlashImportSiteDialog', {
                   newOrImport: 'import',
-                  mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+                  mountSite: (siteKey: string) => {
+                    // Clear cache to ensure new site is in configurations
+                    service.clearCache();
+                    navigate(`/sites/${siteKey}/workspaces/main`);
+                  },
                   onSuccess: () => {}
                 });
                 break;
