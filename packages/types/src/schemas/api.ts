@@ -177,6 +177,11 @@ export const webMenuActionResultSchema = z.object({
   url: z.string().optional()
 })
 
+export const environmentInfoSchema = z.object({
+  platform: z.enum(['macOS', 'windows', 'linux']),
+  isPackaged: z.boolean()
+})
+
 // API Schemas mapping - maps API method names to their response schemas
 export const apiSchemas = {
   // Workspace operations
@@ -267,6 +272,7 @@ export const apiSchemas = {
   saveConfPrefKey: z.boolean(),
   matchRole: z.boolean(),
   invalidateCache: z.boolean(),
+  getEnvironmentInfo: environmentInfoSchema,
 
   // Hugo operations
   stopHugoServer: hugoServerResponseSchema,
@@ -329,6 +335,7 @@ export type WebMenuItemDefinition = z.infer<typeof webMenuItemSchema>
 export type WebMenuDefinition = z.infer<typeof webMenuDefinitionSchema>
 export type WebMenuState = z.infer<typeof webMenuStateSchema>
 export type WebMenuActionResult = z.infer<typeof webMenuActionResultSchema>
+export type EnvironmentInfo = z.infer<typeof environmentInfoSchema>
 
 // This type includes all the api method names
 export type ApiMethod = keyof typeof apiSchemas

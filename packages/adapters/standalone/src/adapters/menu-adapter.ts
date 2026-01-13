@@ -50,11 +50,6 @@ export class WebMenuAdapter implements MenuAdapter {
       if (item) {
         item.enabled = enabled;
         this.menuState.version = Date.now();
-
-        // Emit menu state change event for SSE listeners
-        if (this.container) {
-          this.container.menuStateEventBroadcaster.emit();
-        }
         return;
       }
     }
@@ -273,11 +268,6 @@ export class WebMenuAdapter implements MenuAdapter {
         },
       ],
     };
-
-    // Emit menu state change event for SSE listeners
-    if (this.container) {
-      this.container.menuStateEventBroadcaster.emit();
-    }
   }
 
   /**
