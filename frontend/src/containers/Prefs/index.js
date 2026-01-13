@@ -5,3 +5,5 @@ export {PrefsGeneral};
 export {PrefsAdvanced};
 export {PrefsRouted} from './PrefsRouted';
 export {PrefsSidebar} from './PrefsSidebar';
+export {default as PrefsLayout} from './PrefsLayout';
+export {default as usePrefsToolbarItems} from './hooks/usePrefsToolbarItems';

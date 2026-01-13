@@ -12,7 +12,7 @@ export const siteAndWorkspaceDataSchema = z.object({
 
 export const snackMessageSchema = z.object({
   message: z.string(),
-  severity: z.enum(['success', 'warning']),
+  severity: z.enum(['success', 'info', 'warning', 'error']),
   action: z.any().optional(),
   onActionClick: z.unknown().optional(),
   autoHideDuration: z.number().optional()

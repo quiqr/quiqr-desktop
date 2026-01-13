@@ -7,6 +7,7 @@ interface SiteConfSidebarProps {
   menuIsLocked?: boolean;
   onToggleItemVisibility?: () => void;
   onLockMenuClicked?: () => void;
+  collapsed?: boolean;
 }
 
 export const SiteConfSidebar = ({

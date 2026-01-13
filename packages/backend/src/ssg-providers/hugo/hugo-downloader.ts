@@ -10,8 +10,8 @@ import { promisify } from 'util';
 import fs from 'fs-extra';
 import path from 'path';
 import { globSync } from 'glob';
-import type { PathHelper, EnvironmentInfo } from '../utils/path-helper.js';
-import type { OutputConsole } from '../adapters/types.js';
+import type { PathHelper, EnvironmentInfo } from '../../utils/path-helper.js';
+import type { OutputConsole } from '../../adapters/types.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -188,7 +188,7 @@ export class HugoDownloader {
    * Check if a specific Hugo version is installed
    */
   isVersionInstalled(version: string): boolean {
-    const bin = this.pathHelper.getHugoBinForVer(version);
+    const bin = this.pathHelper.getSSGBinForVer('hugo', version);
     return fs.existsSync(bin);
   }
 
@@ -267,7 +267,7 @@ export class HugoDownloader {
     try {
       const environment = this.getHugoEnvironment();
       const url = this.urlBuilder.build(environment, version);
-      const tempDest = path.join(this.pathHelper.getHugoBinDirForVer(version), 'download.partial');
+      const tempDest = path.join(this.pathHelper.getSSGBinDirForVer('hugo', version), 'download.partial');
       this.currentDownloadPath = tempDest;
 
       // Clean up any existing partial download

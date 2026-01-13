@@ -8,7 +8,7 @@
 import path from 'path';
 import { z } from 'zod';
 import {
-  workspaceDetailsSchema,
+  workspaceDetailsBaseSchema,
   singleConfigSchema,
   collectionConfigSchema,
   type SingleConfig,
@@ -61,19 +61,71 @@ export class WorkspaceConfigValidator {
   }
 
   /**
+   * Apply config migration from old format to new format
+   * Handles hugover → ssgType + ssgVersion migration
+   */
+  private applyConfigMigration(config: any): any {
+    if (!config) return config;
+
+    console.log('[CONFIG MIGRATION] Input config:', JSON.stringify({ ssgType: config.ssgType, ssgVersion: config.ssgVersion, hugover: config.hugover }, null, 2));
+
+    // If old format with hugover, convert to new format
+    if ('hugover' in config) {
+      console.log('[CONFIG MIGRATION] Has hugover, converting to new format');
+      return {
+        ...config,
+        ssgType: config.ssgType || 'hugo',
+        ssgVersion: config.hugover,
+        hugover: undefined // Remove old field
+      };
+    }
+
+    // If missing both hugover and ssgVersion, add defaults (very old configs)
+    if (!('ssgVersion' in config) && !('hugover' in config)) {
+      console.log('[CONFIG MIGRATION] Missing both hugover and ssgVersion, adding defaults');
+      return {
+        ...config,
+        ssgType: config.ssgType || 'hugo',
+        ssgVersion: 'v0.100.2' // Default version for old configs without version info
+      };
+    }
+
+    // If has ssgVersion but missing ssgType, default to hugo
+    if ('ssgVersion' in config && !('ssgType' in config)) {
+      console.log('[CONFIG MIGRATION] Has ssgVersion but no ssgType, defaulting to hugo');
+      return {
+        ...config,
+        ssgType: 'hugo'
+      };
+    }
+
+    console.log('[CONFIG MIGRATION] No migration needed, returning config as-is');
+    return config;
+  }
+
+  /**
    * Validate the entire workspace configuration
    * @returns null if valid, error message string if invalid
    */
   validate(config: Partial<WorkspaceConfig>): string | null {
     this.normalizeConfig(config);
 
-    // Extend workspaceDetailsSchema to include dynamics (not in base schema yet)
-    const workspaceConfigSchema = workspaceDetailsSchema.extend({
+    // First apply the preprocessing from workspaceDetailsSchema to handle migrations
+    // (hugover → ssgVersion, etc.)
+    const preprocessed = this.applyConfigMigration(config);
+
+    // Update the original config object with migrated values
+    if (preprocessed !== config) {
+      Object.assign(config, preprocessed);
+    }
+
+    // Extend workspaceDetailsBaseSchema to include dynamics (not in base schema yet)
+    const workspaceConfigSchema = workspaceDetailsBaseSchema.extend({
       dynamics: z.array(z.any()).optional(),
     });
 
     try {
-      workspaceConfigSchema.parse(config);
+      workspaceConfigSchema.parse(preprocessed);
     } catch (err) {
       if (err instanceof z.ZodError) {
         // TODO

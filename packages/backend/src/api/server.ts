@@ -85,11 +85,11 @@ export function createServer(
     })
   );
 
-  // SSE route for Hugo download progress streaming
+  // SSE route for SSG binary download progress streaming
   app.get(
-    '/api/hugo/download/:version',
+    '/api/ssg/download/:ssgType/:version',
     async (req: Request, res: Response) => {
-      const { version } = req.params;
+      const { ssgType, version } = req.params;
 
       // Set SSE headers
       res.setHeader('Content-Type', 'text/event-stream');
@@ -100,19 +100,29 @@ export function createServer(
       // Track if connection was closed by client
       let connectionClosed = false;
 
-      // Handle client disconnect - cancel the download and clean up
-      req.on('close', () => {
-        connectionClosed = true;
-        // Cancel the download if client disconnects (e.g., user closes dialog)
-        container.hugoDownloader.cancel();
-      });
-
       try {
+        // Get the provider's binary manager
+        const provider = await container.providerFactory.getProvider(ssgType);
+        const binaryManager = provider.getBinaryManager();
+
+        if (!binaryManager) {
+          res.write(`data: ${JSON.stringify({ percent: 0, message: `${ssgType} does not require binary downloads`, complete: false, error: 'No binary manager available' })}\n\n`);
+          res.end();
+          return;
+        }
+
+        // Handle client disconnect - cancel the download and clean up
+        req.on('close', () => {
+          connectionClosed = true;
+          // Cancel the download if client disconnects (e.g., user closes dialog)
+          binaryManager.cancel();
+        });
+
         // Stream progress updates from the async generator
         // the for..of syntax is basically a nice way to do something like
         // const generator = container.hugoDownloader.download(version);
         // generator.next(); (repeat untill the SSE stream closes)
-        for await (const progress of container.hugoDownloader.download(version)) {
+        for await (const progress of binaryManager.download(version)) {
           // Stop if client disconnected
           if (connectionClosed) {
             break;
@@ -139,6 +149,12 @@ export function createServer(
       }
     }
   );
+
+  // Backward compatibility: redirect old Hugo endpoint to new SSG endpoint
+  app.get('/api/hugo/download/:version', (req: Request, res: Response) => {
+    const { version } = req.params;
+    res.redirect(307, `/api/ssg/download/hugo/${version}`);
+  });
 
   // SSE route for model change events (workspace config invalidation)
   app.get(
@@ -171,6 +187,33 @@ export function createServer(
       res.write(`data: ${JSON.stringify({ type: 'connected', siteKey, workspaceKey })}\n\n`);
     }
   );
+
+  // SSE route for menu state change events
+  app.get('/api/menu/events', (req: Request, res: Response) => {
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let connectionClosed = false;
+
+    // Subscribe to menu state change events
+    const unsubscribe = container.menuStateEventBroadcaster.subscribe(() => {
+      if (!connectionClosed) {
+        res.write(`data: ${JSON.stringify({ type: 'menu-changed' })}\n\n`);
+      }
+    });
+
+    // Handle client disconnect
+    req.on('close', () => {
+      connectionClosed = true;
+      unsubscribe();
+    });
+
+    // Send initial connection confirmation
+    res.write(`data: ${JSON.stringify({ type: 'connected' })}\n\n`);
+  });
 
   // SSE route for sync publish progress streaming
   app.post(

@@ -1,22 +1,23 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Routes, Route, useParams, useNavigate, useLocation } from "react-router";
-import AppsIcon from "@mui/icons-material/Apps";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import { ThemeProvider, StyledEngineProvider, Theme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Workspace from "./containers/WorkspaceMounted/Workspace";
+import DashboardRoute from "./containers/WorkspaceMounted/components/DashboardRoute";
+import CollectionRoute from "./containers/WorkspaceMounted/components/CollectionRoute";
+import CollectionItemRoute from "./containers/WorkspaceMounted/components/CollectionItemRoute";
+import SingleRoute from "./containers/WorkspaceMounted/components/SingleRoute";
 import Console from "./containers/Console";
-import { PrefsSidebar, PrefsRouted } from "./containers/Prefs";
+import { PrefsLayout } from "./containers/Prefs";
 import SplashDialog from "./dialogs/SplashDialog";
-import { SiteLibrarySidebar, SiteLibraryRouted, useSiteLibraryToolbarItems } from "./containers/SiteLibrary";
-import { ToolbarButton } from "./containers/TopToolbarRight";
-import { AppLayout } from "./layouts/AppLayout";
+import { SiteLibraryLayout, SiteLibraryRouted } from "./containers/SiteLibrary";
 import service from "./services/service";
 import { getThemeByName } from "./theme";
 import { UserPreferences } from "../types";
 import { ThemeContext } from "./contexts/ThemeContext";
+import SyncRoutedWithContext from "./containers/WorkspaceMounted/components/SyncRoutedWithContext";
+import SiteConfRoutedWithContext from "./containers/WorkspaceMounted/components/SiteConfRoutedWithContext";
 
 const defaultApplicationRole = "contentEditor";
 
@@ -53,6 +54,8 @@ const ConsoleRedirectHandler = ({ children }: { children: React.ReactNode }) => 
 };
 
 const App = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [splashDialogOpen, setSplashDialogOpen] = useState(false);
   const [showSplashAtStartup, setShowSplashAtStartup] = useState(false);
   const [applicationRole, setApplicationRole] = useState(defaultApplicationRole);
@@ -101,6 +104,33 @@ const App = () => {
     });
   }, []);
 
+  // Handle openDialog query parameter from menu actions
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const openDialog = params.get('openDialog');
+
+    if (openDialog) {
+      // Remove the query parameter from URL
+      params.delete('openDialog');
+      const newSearch = params.toString();
+      const newPath = location.pathname + (newSearch ? `?${newSearch}` : '');
+      navigate(newPath, { replace: true });
+
+      // Open the appropriate dialog
+      switch (openDialog) {
+        case 'newSite':
+          setNewSiteDialogOpen(true);
+          break;
+        case 'importSite':
+          setImportSiteDialogOpen(true);
+          break;
+        case 'welcome':
+          setSplashDialogOpen(true);
+          break;
+      }
+    }
+  }, [location, navigate]);
+
   const handleLibraryDialogCloseClick = () => {
     setNewSiteDialogOpen(false);
     setImportSiteDialogOpen(false);
@@ -130,112 +160,6 @@ const App = () => {
     />
   );
 
-  const renderSiteLibraryRouted = (importSiteURL?: string) => (
-    <SiteLibraryRouted
-      handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
-      activeLibraryView={libraryView}
-      newSite={newSiteDialogOpen}
-      importSite={importSiteDialogOpen || !!importSiteURL}
-      importSiteURL={importSiteURL}
-    />
-  );
-
-  // Sidebar content based on route
-  const renderSidebar = () => (
-    <Routes>
-      <Route path="/prefs/*" element={<PrefsSidebar menus={[]} />} />
-      <Route path="/create-new" element={null} />
-      <Route path="/welcome" element={null} />
-      <Route path="*" element={<SiteLibrarySidebar />} />
-    </Routes>
-  );
-
-  // Main content based on route
-  const renderContent = () => (
-    <Routes>
-      <Route path="/prefs/*" element={<PrefsRouted />} />
-      <Route path="/sites/*" element={renderSiteLibraryRouted()} />
-      <Route path="*" element={renderSiteLibraryRouted()} />
-    </Routes>
-  );
-
-  // Prefs toolbar items
-  const PrefsToolbarItems = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const sp = new URLSearchParams(location.search);
-    let backurl = "/sites/last";
-    if (sp.has("siteKey")) {
-      const siteKey = sp.get("siteKey");
-      backurl = `/sites/${siteKey}/workspaces/source`;
-    }
-
-    return {
-      leftItems: [
-        <ToolbarButton
-          key="back"
-          action={() => navigate(backurl)}
-          title="Back"
-          icon={ArrowBackIcon}
-        />,
-      ],
-      rightItems: [
-        <ToolbarButton
-          key="toolbarbutton-library"
-          to="/sites/last"
-          title="Site Library"
-          icon={AppsIcon}
-        />,
-        <ToolbarButton
-          key="buttonPrefs"
-          active={true}
-          to="/prefs"
-          title="Preferences"
-          icon={SettingsApplicationsIcon}
-        />,
-      ],
-    };
-  };
-
-  // Site Library layout
-  const SiteLibraryLayout = () => {
-    const toolbarItems = useSiteLibraryToolbarItems({
-      handleLibraryDialogClick,
-      activeLibraryView: libraryView,
-      handleChange: handleLibraryViewChange,
-    });
-
-    return (
-      <AppLayout
-        title="Site Library"
-        sidebar={<SiteLibrarySidebar />}
-        toolbar={{
-          leftItems: toolbarItems.leftItems,
-          centerItems: toolbarItems.centerItems,
-          rightItems: toolbarItems.rightItems,
-        }}
-      >
-        {renderSiteLibraryRouted()}
-      </AppLayout>
-    );
-  };
-
-  // Prefs layout
-  const PrefsLayout = () => {
-    const toolbarItems = PrefsToolbarItems();
-    return (
-      <AppLayout
-        title="Preferences"
-        sidebar={<PrefsSidebar menus={[]} />}
-        toolbar={{
-          leftItems: toolbarItems.leftItems,
-          rightItems: toolbarItems.rightItems,
-        }}
-      >
-        <PrefsRouted />
-      </AppLayout>
-    );
-  };
 
   // Main layout wrapper using new AppLayout
   const MainLayoutWrapper = () => (
@@ -246,8 +170,34 @@ const App = () => {
           {welcomeScreen}
           <Routes>
             <Route path="/prefs/*" element={<PrefsLayout />} />
-            <Route path="/sites/*" element={<SiteLibraryLayout />} />
-            <Route path="*" element={<SiteLibraryLayout />} />
+            <Route path="/sites/*" element={
+              <SiteLibraryLayout
+                libraryView={libraryView}
+                onLibraryViewChange={handleLibraryViewChange}
+                onDialogOpen={handleLibraryDialogClick}
+              >
+                <SiteLibraryRouted
+                  handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
+                  activeLibraryView={libraryView}
+                  newSite={newSiteDialogOpen}
+                  importSite={importSiteDialogOpen}
+                />
+              </SiteLibraryLayout>
+            } />
+            <Route path="*" element={
+              <SiteLibraryLayout
+                libraryView={libraryView}
+                onLibraryViewChange={handleLibraryViewChange}
+                onDialogOpen={handleLibraryDialogClick}
+              >
+                <SiteLibraryRouted
+                  handleLibraryDialogCloseClick={handleLibraryDialogCloseClick}
+                  activeLibraryView={libraryView}
+                  newSite={newSiteDialogOpen}
+                  importSite={importSiteDialogOpen}
+                />
+              </SiteLibraryLayout>
+            } />
           </Routes>
         </ThemeProvider>
       </StyledEngineProvider>
@@ -280,11 +230,22 @@ const App = () => {
           }
         />
 
-        {/* Workspace - standalone layout */}
+        {/* Workspace - nested routes */}
         <Route
-          path="/sites/:site/workspaces/:workspace/*"
+          path="/sites/:site/workspaces/:workspace"
           element={<WorkspaceRoute applicationRole={applicationRole} welcomeScreen={welcomeScreen} theme={theme} />}
-        />
+        >
+          {/* Workspace child routes - all inherit site/workspace params */}
+          <Route index element={<DashboardRoute />} />
+          <Route path="home/:refresh" element={<DashboardRoute />} />
+          <Route path="collections/:collection" element={<CollectionRoute />} />
+          <Route path="collections/:collection/:item" element={<CollectionItemRoute />} />
+          <Route path="collections/:collection/:item/:refresh" element={<CollectionItemRoute />} />
+          <Route path="singles/:single" element={<SingleRoute refreshed={false} />} />
+          <Route path="singles/:single/:refresh" element={<SingleRoute refreshed={true} />} />
+          <Route path="sync/*" element={<SyncRoutedWithContext />} />
+          <Route path="siteconf/*" element={<SiteConfRoutedWithContext />} />
+        </Route>
 
         {/* Refresh route - empty */}
         <Route

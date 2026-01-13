@@ -89,12 +89,32 @@ export class API {
     return mainProcessBridge.request('importSiteAction', {});
   }
 
+  /**
+   * @deprecated Use getFilteredSSGVersions instead
+   */
   getFilteredHugoVersions(){
     return mainProcessBridge.request('getFilteredHugoVersions', {});
   }
 
+  /**
+   * Get filtered versions for a specific SSG type
+   */
+  getFilteredSSGVersions(ssgType: string) {
+    return mainProcessBridge.request('getFilteredSSGVersions', { ssgType });
+  }
+
+  /**
+   * @deprecated Use checkSSGVersion instead
+   */
   checkHugoVersion(version: string) {
     return mainProcessBridge.request('checkHugoVersion', { version });
+  }
+
+  /**
+   * Check if an SSG version is installed
+   */
+  checkSSGVersion(ssgType: string, version: string) {
+    return mainProcessBridge.request('checkSSGVersion', { ssgType, version });
   }
 
   importSiteFromPrivateGitRepo(
@@ -241,16 +261,10 @@ export class API {
   }
 
   /**
-   * Opens a file dialog and copies selected files into a collection item.
+   * Opens a file dialog and uploads selected files into a collection item.
    *
-   * TODO: Refactor to use HTML5 <input type="file"> per NEXTSTEPS.md
-   * This currently requires @electron/remote which breaks with contextIsolation.
-   * The proper fix is to use HTML5 file inputs in the calling components:
-   * - SelectImagesDialog.tsx
-   * - CollectionItem.tsx
-   * - Single.tsx
-   *
-   * @deprecated Use HTML5 file inputs instead
+   * Uses HTML5 file inputs for cross-platform compatibility (works in both Electron and browser mode).
+   * Files are read as base64 and uploaded via the uploadFileToBundlePath API.
    */
   openFileDialogForSingleAndCollectionItem(
     siteKey: string,
@@ -258,45 +272,89 @@ export class API {
     collectionKey: string,
     collectionItemKey: string,
     targetPath: string,
-    { title, extensions }:{title: string, extensions: Array<string>},
+    { title: _title, extensions }:{title: string, extensions: Array<string>},
     forceFileName?: string
   ){
+    return new Promise<void>((resolve, reject) => {
+      // Create hidden file input
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = !forceFileName; // Single file if forceFileName is set
+      input.accept = extensions.map(ext => `.${ext}`).join(',');
 
-    let properties = ['openFile'];
-    if(!forceFileName){
-      properties = ['multiSelections', 'openFile'];
-    }
+      input.onchange = async (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (!files || files.length === 0) {
+          resolve();
+          return;
+        }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const remote = (window as any).require('@electron/remote');
+        try {
+          let newCollectionItemKey: string | undefined;
 
-    const openDialogOptions = {
-      title: title || 'Select Files',
-      properties: properties,
-      filters: [ {name:'Allowed Extensions', extensions: extensions }]
-    };
+          // Upload each selected file
+          for (const file of Array.from(files)) {
+            // Read file as base64
+            const base64Content = await new Promise<string>((res, rej) => {
+              const reader = new FileReader();
+              reader.onload = () => {
+                const result = reader.result as string;
+                // Remove data URL prefix (e.g., "data:image/png;base64,")
+                res(result.split(',')[1]);
+              };
+              reader.onerror = rej;
+              reader.readAsDataURL(file);
+            });
 
-    return (
+            // Determine filename
+            const filename = forceFileName
+              ? `${forceFileName}.${file.name.split('.').pop()}`
+              : file.name;
 
-      new Promise((resolve)=>{
-
-        remote.dialog.showOpenDialog(
-          remote.getCurrentWindow(),
-          openDialogOptions,
-        ).then((result)=>{
-          if(result.filePaths){
-            const files = result.filePaths;
-            resolve(
-              mainProcessBridge.request('copyFilesIntoCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, files, forceFileName })
+            // Upload to backend via base64
+            const result = await this.uploadFileToBundlePath(
+              siteKey,
+              workspaceKey,
+              collectionKey,
+              collectionItemKey,
+              targetPath,
+              filename,
+              base64Content
             );
+
+            // Track if item was converted to bundle
+            if (result.newCollectionItemKey) {
+              newCollectionItemKey = result.newCollectionItemKey;
+            }
           }
-        }).catch(err => {
-          this.logToConsole(err, 'copyFilesIntoCollectionItemFromDialog error');
-        });
 
-      })
+          // If item was converted to bundle, redirect to the new URL
+          if (newCollectionItemKey) {
+            const newUrl = `/workspace/${siteKey}/${workspaceKey}/collection/${collectionKey}/item/${encodeURIComponent(newCollectionItemKey)}`;
+            window.location.href = newUrl;
+          }
 
-    );
+          resolve();
+        } catch (error) {
+          console.error('Error uploading files:', error);
+          this.logToConsole(error, 'File upload error');
+          reject(error);
+        } finally {
+          // Cleanup
+          document.body.removeChild(input);
+        }
+      };
+
+      input.oncancel = () => {
+        document.body.removeChild(input);
+        resolve();
+      };
+
+      // Add to DOM (required for some browsers) and trigger
+      input.style.display = 'none';
+      document.body.appendChild(input);
+      input.click();
+    });
   }
   quiqr_git_repo_show(url: string){
     return mainProcessBridge.request('quiqr_git_repo_show', {url}, {timeout: 300000});
@@ -346,7 +404,7 @@ export class API {
       targetPath,
       filename,
       base64Content
-    }) as Promise<string>;
+    }) as Promise<{ uploadedPath: string; newCollectionItemKey?: string }>;
   }
 
   deleteFileFromBundle(
@@ -479,6 +537,20 @@ export class API {
 
   showOpenFolderDialog() {
     return mainProcessBridge.request('showOpenFolderDialog', {});
+  }
+
+  /**
+   * Get current menu state (for web mode)
+   */
+  getMenuState() {
+    return mainProcessBridge.request('getMenuState', {});
+  }
+
+  /**
+   * Execute a menu action (for web mode)
+   */
+  executeMenuAction(params: { action: string; data?: unknown }) {
+    return mainProcessBridge.request('executeMenuAction', params);
   }
 
 }

@@ -263,14 +263,59 @@ export const workspaceSchema = z.object({
   state: z.string()
 })
 
-export const workspaceDetailsSchema = z.object({
-  hugover: z.string(),
+// Base workspace details schema (for extending)
+export const workspaceDetailsBaseSchema = z.object({
+  ssgType: z.string().default('hugo'),
+  ssgVersion: z.string(),
   serve: z.array(serveConfigSchema).optional(),
   build: z.array(buildConfigSchema).optional(),
   menu: menuSchema.optional(),
   collections: z.array(collectionConfigSchema),
-  singles: z.array(singleConfigSchema)
-})
+  singles: z.array(singleConfigSchema),
+  providerConfig: z.record(z.any()).optional()
+});
+
+// Workspace details with auto-migration from old Hugo-specific format
+// Using preprocess to handle both old (hugover) and new (ssgType + ssgVersion) formats
+export const workspaceDetailsSchema = z.preprocess(
+  (data: any) => {
+
+    if (!data) return data;
+
+    // If old format with hugover, convert to new format
+    if ('hugover' in data) {
+      const transformed = {
+        ...data,
+        ssgType: data.ssgType || 'hugo',
+        ssgVersion: data.hugover,
+        hugover: undefined // Remove old field
+      };
+      return transformed;
+    }
+
+    // If missing both hugover and ssgVersion, add defaults (very old configs)
+    if (!('ssgVersion' in data) && !('hugover' in data)) {
+      const transformed = {
+        ...data,
+        ssgType: data.ssgType || 'hugo',
+        ssgVersion: 'v0.100.2' // Default version for old configs without version info
+      };
+      return transformed;
+    }
+
+    // If has ssgVersion but missing ssgType, default to hugo
+    if ('ssgVersion' in data && !('ssgType' in data)) {
+      const transformed = {
+        ...data,
+        ssgType: 'hugo'
+      };
+      return transformed;
+    }
+
+    return data;
+  },
+  workspaceDetailsBaseSchema
+)
 
 export const configurationsSchema = z.object({
   sites: z.array(siteConfigSchema)

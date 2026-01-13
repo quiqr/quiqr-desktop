@@ -105,6 +105,9 @@ export function createDeleteSiteHandler(container: AppContainer) {
   };
 }
 
+/**
+ * @deprecated Use createGetFilteredSSGVersionsHandler instead
+ */
 export function createGetFilteredHugoVersionsHandler(container: AppContainer) {
   return async () => {
     const environmentInfo = container.workspaceConfigProvider.getEnvironmentInfo();
@@ -118,6 +121,38 @@ export function createGetFilteredHugoVersionsHandler(container: AppContainer) {
     }
 
     return filteredVersions;
+  };
+}
+
+/**
+ * Get filtered SSG versions for a specific SSG type
+ */
+export function createGetFilteredSSGVersionsHandler(container: AppContainer) {
+  return async ({ ssgType }: { ssgType: string }) => {
+    const environmentInfo = container.workspaceConfigProvider.getEnvironmentInfo();
+
+    // Look for ssgType-specific version file (e.g., filteredHugoVersions.json, filteredEleventyVersions.json)
+    const ssgTypeCapitalized = ssgType.charAt(0).toUpperCase() + ssgType.slice(1);
+    const jsonFile = path.join(
+      container.pathHelper.getApplicationResourcesDir(environmentInfo),
+      "all",
+      `filtered${ssgTypeCapitalized}Versions.json`
+    );
+
+    // Default versions based on SSG type
+    const defaultVersions: Record<string, string[]> = {
+      hugo: ["v0.100.2"],
+      eleventy: ["2.0.1"],
+    };
+
+    let filteredVersions = defaultVersions[ssgType.toLowerCase()] || [];
+
+    if (fs.existsSync(jsonFile)) {
+      const jsonContent = fs.readFileSync(jsonFile, { encoding: 'utf8', flag: 'r' });
+      filteredVersions = JSON.parse(jsonContent);
+    }
+
+    return { ssgType, versions: filteredVersions };
   };
 }
 
@@ -272,6 +307,7 @@ export function createSiteHandlers(container: AppContainer) {
     copySite: createCopySiteHandler(container),
     deleteSite: createDeleteSiteHandler(container),
     getFilteredHugoVersions: createGetFilteredHugoVersionsHandler(container),
+    getFilteredSSGVersions: createGetFilteredSSGVersionsHandler(container),
     // ZIP import/export handlers
     importSiteAction: createImportSiteActionHandler(container),
     exportSite: createExportSiteHandler(container),

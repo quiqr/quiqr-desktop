@@ -145,7 +145,7 @@ export const SyncSidebar = ({
   }> = [];
 
   let index = 0;
-  site.publish.forEach((publ) => {
+  site.publish?.forEach((publ) => {
     let label = '';
     let icon: React.ReactNode = null;
 

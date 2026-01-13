@@ -33,6 +33,17 @@ export const hugoVersionCheckResponseSchema = z.object({
   version: z.string()
 })
 
+export const ssgVersionCheckResponseSchema = z.object({
+  installed: z.boolean(),
+  version: z.string(),
+  ssgType: z.string()
+})
+
+export const ssgVersionsResponseSchema = z.object({
+  ssgType: z.string(),
+  versions: z.array(z.string())
+})
+
 export const collectionItemKeyResponseSchema = z.object({
   key: z.string()
 })
@@ -133,6 +144,39 @@ export const siteInventorySchema = z.object({
   quiqrModelParsed: z.any().nullable() // WorkspaceConfig, but using any to avoid circular dependency
 })
 
+// Menu schemas - for web-based menu bar
+export const webMenuItemSchema: z.ZodType<any> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    type: z.enum(['normal', 'checkbox', 'separator', 'submenu']),
+    label: z.string().optional(),
+    checked: z.boolean().optional(),
+    enabled: z.boolean().optional(), // Optional for separator items
+    action: z.string().optional(),
+    submenu: z.array(webMenuItemSchema).optional()
+  })
+)
+
+export const webMenuDefinitionSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  items: z.array(webMenuItemSchema)
+})
+
+export const webMenuStateSchema = z.object({
+  menus: z.array(webMenuDefinitionSchema),
+  version: z.number()
+})
+
+export const webMenuActionResultSchema = z.object({
+  type: z.enum(['success', 'error', 'navigate', 'openDialog', 'info', 'openExternal', 'reload']),
+  path: z.string().optional(),
+  dialog: z.string().optional(),
+  message: z.string().optional(),
+  refresh: z.boolean().optional(),
+  url: z.string().optional()
+})
+
 // API Schemas mapping - maps API method names to their response schemas
 export const apiSchemas = {
   // Workspace operations
@@ -230,6 +274,10 @@ export const apiSchemas = {
   getHugoTemplates: z.any(), // Not implemented in backend
   checkHugoVersion: hugoVersionCheckResponseSchema,
 
+  // SSG operations
+  checkSSGVersion: ssgVersionCheckResponseSchema,
+  getFilteredSSGVersions: ssgVersionsResponseSchema,
+
   // Window management
   showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
   showMenuBar: z.boolean(),
@@ -251,7 +299,11 @@ export const apiSchemas = {
   // Site library
   openSiteLibrary: z.boolean(),
   updateCommunityTemplates: z.array(communityTemplateSchema),
-  showOpenFolderDialog: folderDialogResponseSchema
+  showOpenFolderDialog: folderDialogResponseSchema,
+
+  // Menu operations (web mode)
+  getMenuState: webMenuStateSchema,
+  executeMenuAction: webMenuActionResultSchema
 } as const
 
 // Type exports
@@ -273,6 +325,10 @@ export type CopyCollectionItemResponse = z.infer<typeof copyCollectionItemRespon
 export type KeyPairResponse = z.infer<typeof keyPairResponseSchema>
 export type PublicKeyResponse = z.infer<typeof publicKeyResponseSchema>
 export type SiteInventory = z.infer<typeof siteInventorySchema>
+export type WebMenuItemDefinition = z.infer<typeof webMenuItemSchema>
+export type WebMenuDefinition = z.infer<typeof webMenuDefinitionSchema>
+export type WebMenuState = z.infer<typeof webMenuStateSchema>
+export type WebMenuActionResult = z.infer<typeof webMenuActionResultSchema>
 
 // This type includes all the api method names
 export type ApiMethod = keyof typeof apiSchemas

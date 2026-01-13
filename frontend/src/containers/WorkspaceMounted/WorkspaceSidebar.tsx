@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Stack, Box } from '@mui/material';
+import SyncIcon from '@mui/icons-material/Sync';
+import BuildIcon from '@mui/icons-material/Build';
 import service from './../../services/service';
 import Sidebar, { SidebarMenu } from '../Sidebar';
 import { UserPreferences } from '../../../types';
@@ -48,6 +51,7 @@ interface WorkspaceSidebarProps {
   onToggleItemVisibility?: () => void;
   applicationRole?: string;
   modelRefreshKey?: number;
+  collapsed?: boolean;
 }
 
 const WorkspaceSidebar = ({
@@ -56,12 +60,13 @@ const WorkspaceSidebar = ({
   hideItems,
   applicationRole,
   modelRefreshKey,
+  collapsed,
 }: WorkspaceSidebarProps) => {
   const [site, setSite] = useState<SiteConfig | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceDetails | null>(null);
   const [menusCollapsed, setMenusCollapsed] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [showEmpty, setShowEmpty] = useState(false);
+  const [showEmpty, _setShowEmpty] = useState(false);
   const isMountedRef = useRef(true);
 
   const refresh = useCallback(() => {
@@ -220,14 +225,61 @@ const WorkspaceSidebar = ({
     }
   }
 
+  // Build secondary menu items for advanced features (role-based)
+  const secondaryMenus: SidebarMenu[] = [];
+
+  if (applicationRole === 'siteDeveloper') {
+    secondaryMenus.push({
+      title: 'Advanced',
+      items: [
+        {
+          label: 'Sync',
+          to: `${basePath}/sync/`,
+          icon: <SyncIcon />,
+          active: false,
+        },
+        {
+          label: 'Site Configuration',
+          to: `${basePath}/siteconf/general`,
+          icon: <BuildIcon />,
+          active: false,
+        },
+      ],
+    });
+  }
+
   return (
     <>
-      <Sidebar
-        hideItems={hideItems}
-        menus={menus}
-        menusCollapsed={menusCollapsed}
-        onMenuExpandToggle={handleMenuExpandToggle}
-      />
+      <Stack sx={{ height: '100%', justifyContent: 'space-between' }}>
+        {/* Primary menus (Collections, Singles, or custom menus) */}
+        <Box>
+          <Sidebar
+            hideItems={hideItems}
+            menus={menus}
+            menusCollapsed={menusCollapsed}
+            onMenuExpandToggle={handleMenuExpandToggle}
+            collapsed={collapsed}
+          />
+        </Box>
+
+        {/* Secondary menus (Advanced features - only for siteDeveloper) */}
+        {secondaryMenus.length > 0 && (
+          <Box
+            sx={{
+              borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+              pt: 1,
+            }}
+          >
+            <Sidebar
+              hideItems={hideItems}
+              menus={secondaryMenus}
+              menusCollapsed={menusCollapsed}
+              onMenuExpandToggle={handleMenuExpandToggle}
+              collapsed={collapsed}
+            />
+          </Box>
+        )}
+      </Stack>
       {error && (
         <p
           style={{

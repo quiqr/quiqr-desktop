@@ -2,6 +2,7 @@
 
 ## NEXT RELEASE
 - fix: reload theme automatically when toggling between light and dark theme
+- chore: upgrade glob package from v10 to v13 with comprehensive test coverage
 - feature: workspace selection and initial vitest
 - chore: adjust padding and border in workspace select dialog
 - chore: remove debug test

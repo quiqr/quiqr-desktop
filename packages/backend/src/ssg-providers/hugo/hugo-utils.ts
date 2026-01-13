@@ -6,7 +6,7 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import formatProviderResolver from '../utils/format-provider-resolver.js';
+import formatProviderResolver from '../../utils/format-provider-resolver.js';
 
 /**
  * Hugo configuration format (matches Hugo's supported formats)

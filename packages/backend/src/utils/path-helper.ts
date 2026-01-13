@@ -96,13 +96,6 @@ export class PathHelper {
   }
 
   /**
-   * Get the Hugo binary root directory
-   */
-  getHugoBinRoot(): string {
-    return path.join(this.getRoot(), 'tools', 'hugobin');
-  }
-
-  /**
    * Get the publish repositories root directory
    */
   getPublishReposRoot(): string {
@@ -110,10 +103,77 @@ export class PathHelper {
   }
 
   /**
+   * Get the binary root directory for a specific SSG type
+   * @param ssgType - The SSG type (e.g., 'hugo', 'eleventy')
+   */
+  getSSGBinRoot(ssgType: string): string {
+    return path.join(this.getRoot(), 'tools', `${ssgType}bin`);
+  }
+
+  /**
+   * Get the binary directory for a specific SSG version
+   * @param ssgType - The SSG type (e.g., 'hugo', 'eleventy')
+   * @param version - The version (e.g., 'v0.100.2', '2.0.1')
+   */
+  getSSGBinDirForVer(ssgType: string, version: string): string {
+    return path.join(this.getSSGBinRoot(ssgType), version);
+  }
+
+  /**
+   * Get the binary path for a specific SSG version
+   * @param ssgType - The SSG type (e.g., 'hugo', 'eleventy')
+   * @param version - The version (e.g., 'v0.100.2', '2.0.1')
+   */
+  getSSGBinForVer(ssgType: string, version: string): string {
+    // Check for custom environment variable (e.g., HUGO_PATH, ELEVENTY_PATH)
+    const envVarName = `${ssgType.toUpperCase()}_PATH`;
+    if (process.env[envVarName]) {
+      return process.env[envVarName]!;
+    }
+
+    const platform = process.platform.toLowerCase();
+    const binaryName = ssgType.toLowerCase();
+    const binDir = this.getSSGBinDirForVer(ssgType, version);
+
+    // For npm-based SSGs (like Eleventy), use node_modules/.bin/
+    if (ssgType.toLowerCase() === 'eleventy') {
+      const npmBinPath = path.join(binDir, 'node_modules', '.bin', binaryName);
+      if (platform.startsWith('win')) {
+        return npmBinPath + '.cmd';
+      }
+      return npmBinPath;
+    }
+
+    // For gem-based SSGs (like Jekyll), use wrapper scripts
+    if (ssgType.toLowerCase() === 'jekyll') {
+      if (platform.startsWith('win')) {
+        return path.join(binDir, 'jekyll.cmd');
+      }
+      return path.join(binDir, 'jekyll.sh');
+    }
+
+    // For standalone binaries (like Hugo)
+    if (platform.startsWith('win')) {
+      return path.join(binDir, `${binaryName}.exe`);
+    } else {
+      return path.join(binDir, binaryName);
+    }
+  }
+
+  /**
+   * @deprecated Use getSSGBinRoot('hugo') instead
+   * Get the Hugo binary root directory
+   */
+  getHugoBinRoot(): string {
+    return this.getSSGBinRoot('hugo');
+  }
+
+  /**
+   * @deprecated Use getSSGBinDirForVer('hugo', version) instead
    * Get the Hugo binary directory for a specific version
    */
   getHugoBinDirForVer(version: string): string {
-    return path.join(this.getHugoBinRoot(), version);
+    return this.getSSGBinDirForVer('hugo', version);
   }
 
   /**
@@ -210,20 +270,11 @@ export class PathHelper {
   }
 
   /**
+   * @deprecated Use getSSGBinForVer('hugo', version) instead
    * Get the Hugo binary path for a specific version
    */
   getHugoBinForVer(version: string): string {
-    // CUSTOM PATH TO HUGO E.G. for nix developments
-    if (process.env.HUGO_PATH) {
-      return process.env.HUGO_PATH;
-    }
-
-    const platform = process.platform.toLowerCase();
-    if (platform.startsWith('win')) {
-      return path.join(this.getHugoBinDirForVer(version), 'hugo.exe');
-    } else {
-      return path.join(this.getHugoBinDirForVer(version), 'hugo');
-    }
+    return this.getSSGBinForVer('hugo', version);
   }
 
   /* PATH STRING CREATORS */
