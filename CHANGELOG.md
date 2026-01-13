@@ -1,6 +1,7 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
+- fix: reload theme automatically when toggling between light and dark theme
 - feature: workspace selection and initial vitest
 - chore: adjust padding and border in workspace select dialog
 - chore: remove debug test
