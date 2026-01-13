@@ -69,12 +69,7 @@ export class BackgroundJobRunner {
     this.maxActiveWorkers = Math.max(this.maxActiveWorkers, this.activeWorkers)
     // console.log(`Starting background job (${this.activeWorkers}/${this.maxConcurrency} active):`, job.action)
 
-    // Resolve worker-wrapper path - handle both src and dist locations
-    // When running from dist: __dirname is dist/jobs, use './worker-wrapper.js'
-    // When running tests: __dirname is src/jobs, use '../../dist/jobs/worker-wrapper.js'
-    const workerWrapperPath = __dirname.includes('/dist/')
-      ? path.join(__dirname, 'worker-wrapper.js')
-      : path.join(__dirname, '../../dist/jobs/worker-wrapper.js')
+    const workerWrapperPath = path.join(__dirname, 'worker-wrapper.js')
 
     // Create a worker thread to run the job action
     const worker = new Worker(workerWrapperPath, {

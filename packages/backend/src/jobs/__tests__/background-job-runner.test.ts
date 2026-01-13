@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { BackgroundJobRunner } from '../background-job-runner.js'
+import { BackgroundJobRunner } from '../../../dist/jobs/background-job-runner.js'
 import path from 'path'
 import fs from 'fs-extra'
 import os from 'os'
