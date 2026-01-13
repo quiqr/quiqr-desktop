@@ -20,10 +20,25 @@ interface QueuedJob<T> {
 export class BackgroundJobRunner {
   private maxConcurrency: number
   private activeWorkers: number = 0
+  private maxActiveWorkers: number = 0 // Track peak concurrency for testing
   private jobQueue: QueuedJob<any>[] = []
 
   constructor(maxConcurrency: number = 4) {
     this.maxConcurrency = maxConcurrency
+  }
+
+  /**
+   * Get the current number of active workers (for testing)
+   */
+  getActiveWorkers(): number {
+    return this.activeWorkers
+  }
+
+  /**
+   * Get the maximum number of concurrent workers reached (for testing)
+   */
+  getMaxActiveWorkers(): number {
+    return this.maxActiveWorkers
   }
 
   /**
@@ -51,10 +66,18 @@ export class BackgroundJobRunner {
    */
   private executeJob<T>(job: QueuedJob<T>): void {
     this.activeWorkers++
-    console.log(`Starting background job (${this.activeWorkers}/${this.maxConcurrency} active):`, job.action)
+    this.maxActiveWorkers = Math.max(this.maxActiveWorkers, this.activeWorkers)
+    // console.log(`Starting background job (${this.activeWorkers}/${this.maxConcurrency} active):`, job.action)
+
+    // Resolve worker-wrapper path - handle both src and dist locations
+    // When running from dist: __dirname is dist/jobs, use './worker-wrapper.js'
+    // When running tests: __dirname is src/jobs, use '../../dist/jobs/worker-wrapper.js'
+    const workerWrapperPath = __dirname.includes('/dist/')
+      ? path.join(__dirname, 'worker-wrapper.js')
+      : path.join(__dirname, '../../dist/jobs/worker-wrapper.js')
 
     // Create a worker thread to run the job action
-    const worker = new Worker(path.join(__dirname, 'worker-wrapper.js'), {
+    const worker = new Worker(workerWrapperPath, {
       workerData: {
         actionPath: job.action,
         params: job.params
@@ -86,7 +109,7 @@ export class BackgroundJobRunner {
 
     worker.on('exit', (code) => {
       if (code !== 0) {
-        console.log(`Background job exited with code ${code}`)
+        // console.log(`Background job exited with code ${code}`)
         cleanup()
         job.reject(new Error(`Worker stopped with exit code ${code}`))
       }
