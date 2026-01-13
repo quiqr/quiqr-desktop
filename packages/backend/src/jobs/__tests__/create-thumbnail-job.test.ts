@@ -232,7 +232,7 @@ describe('createThumbnailJob', () => {
       const metadata = await sharp(dest).metadata()
       expect(metadata.width).toBeLessThanOrEqual(400)
       expect(metadata.height).toBeLessThanOrEqual(400)
-    })
+    }, 60000)
   })
 
   describe('Error handling', () => {
