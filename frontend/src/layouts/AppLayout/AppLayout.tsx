@@ -3,7 +3,6 @@ import CollapsibleSidebar from './CollapsibleSidebar';
 import MainToolbar from './MainToolbar';
 import { AppBreadcrumbs } from '../../components/Breadcrumbs';
 import MenuBar from '../../components/MenuBar';
-import InfoDialog from '../../components/InfoDialog';
 import { useMenuState } from '../../hooks/useMenuState';
 import type { AppLayoutProps } from './AppLayout.types';
 
@@ -36,7 +35,7 @@ const AppLayout = ({
   toolbar,
   children,
 }: AppLayoutProps) => {
-  const { menuState, executeMenuAction, infoDialog, closeInfoDialog } = useMenuState();
+  const { menuState, executeMenuAction } = useMenuState();
   const hasMenus = menuState.menus.length > 0;
 
   return (
@@ -99,14 +98,6 @@ const AppLayout = ({
           </Box>
         </Box>
       </Box>
-
-      {/* Info Dialog for menu actions (version info, etc.) */}
-      <InfoDialog
-        open={infoDialog.open}
-        title={infoDialog.title}
-        message={infoDialog.message}
-        onClose={closeInfoDialog}
-      />
     </Box>
   );
 };

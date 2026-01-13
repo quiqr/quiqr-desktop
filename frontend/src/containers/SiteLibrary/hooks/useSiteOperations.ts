@@ -2,15 +2,11 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import service from '../../../services/service';
 import { SiteConfig, Workspace } from '../../../../types';
-import { DialogType } from './useSiteDialogs';
+import { useDialog } from '../../../hooks/useDialog';
 
-interface UseSiteOperationsOptions {
-  openDialog?: (type: DialogType, siteconf?: SiteConfig, importURL?: string, workspaces?: Workspace[]) => void;
-}
-
-export function useSiteOperations(options: UseSiteOperationsOptions = {}) {
+export function useSiteOperations() {
   const navigate = useNavigate();
-  const { openDialog } = options;
+  const { openDialog } = useDialog();
 
   const selectWorkspace = useCallback(async (siteKey: string, workspace: Workspace) => {
     await service.api.mountWorkspace(siteKey, workspace.key);
@@ -23,9 +19,14 @@ export function useSiteOperations(options: UseSiteOperationsOptions = {}) {
     service.api.listWorkspaces(site.key).then((workspaces) => {
       if (workspaces.length === 1) {
         selectWorkspace(site.key, workspaces[0]);
-      } else if (workspaces.length > 1 && openDialog) {
+      } else if (workspaces.length > 1) {
         // Show workspace selection dialog when multiple workspaces exist
-        openDialog('selectWorkspace', site, undefined, workspaces);
+        openDialog('SelectWorkspaceDialog', {
+          workspaces,
+          onSelect: (workspace: Workspace) => {
+            selectWorkspace(site.key, workspace);
+          }
+        });
       }
     });
   }, [selectWorkspace, openDialog]);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import service from '../services/service';
 import { snackMessageService } from '../services/ui-service';
+import { useDialog } from './useDialog';
 import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
 
 /**
@@ -12,13 +13,9 @@ import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
  */
 export function useMenuState() {
   const navigate = useNavigate();
+  const { openDialog } = useDialog();
   const [menuState, setMenuState] = useState<WebMenuState>({ menus: [], version: 0 });
   const [loading, setLoading] = useState(true);
-  const [infoDialog, setInfoDialog] = useState<{ open: boolean; title: string; message: string }>({
-    open: false,
-    title: '',
-    message: '',
-  });
 
   const fetchMenuState = async () => {
     try {
@@ -52,8 +49,34 @@ export function useMenuState() {
 
         case 'openDialog':
           if (result.dialog) {
-            // Navigate to site library with dialog parameter
-            navigate(`/sites/last?openDialog=${result.dialog}`);
+            // Open dialog using the dialog system
+            switch (result.dialog) {
+              case 'newSite':
+                // Navigate to ensure we're on site library page, then open dialog
+                navigate('/sites/last');
+                openDialog('NewSlashImportSiteDialog', {
+                  newOrImport: 'new',
+                  mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+                  onSuccess: () => {}
+                });
+                break;
+              case 'importSite':
+                navigate('/sites/last');
+                openDialog('NewSlashImportSiteDialog', {
+                  newOrImport: 'import',
+                  mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+                  onSuccess: () => {}
+                });
+                break;
+              case 'welcome':
+                openDialog('SplashDialog', {
+                  showSplashAtStartup: false,
+                  onChangeSplashCheck: (checked: boolean) => {
+                    service.api.saveConfPrefKey("showSplashAtStartup", checked);
+                  }
+                });
+                break;
+            }
           }
           break;
 
@@ -65,7 +88,7 @@ export function useMenuState() {
               const lines = result.message.split('\n');
               const title = lines[0] || 'Information';
               const message = lines.slice(1).join('\n').trim();
-              setInfoDialog({ open: true, title, message });
+              openDialog('InfoDialog', { title, message });
             } else {
               snackMessageService.addSnackMessage(
                 result.message,
@@ -145,17 +168,11 @@ export function useMenuState() {
     };
   }, []);
 
-  const closeInfoDialog = () => {
-    setInfoDialog({ open: false, title: '', message: '' });
-  };
-
   return {
     menuState,
     loading,
     executeMenuAction,
     refresh: fetchMenuState,
-    infoDialog,
-    closeInfoDialog,
   };
 }
 

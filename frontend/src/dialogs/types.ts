@@ -33,38 +33,6 @@ export interface DialogPropsMap {
     onSelect: (workspace: Workspace) => void;
   };
 
-  // Collection dialogs
-  'DeleteItemKeyDialog': {
-    itemKey: string;
-    collectionKey: string;
-    onSuccess: () => void;
-  };
-  'EditItemKeyDialog': {
-    itemKey: string;
-    collectionKey: string;
-    onSuccess: () => void;
-  };
-  'CopyItemKeyDialog': {
-    itemKey: string;
-    collectionKey: string;
-    onSuccess: () => void;
-  };
-  'CopyItemToLanguageDialog': {
-    itemKey: string;
-    onSuccess: () => void;
-  };
-
-  // Sync dialogs
-  'SyncConfigDialog': {
-    publishConf?: SiteConfig['publish'];
-    modAction: 'Add' | 'Edit';
-    onSuccess: () => void;
-  };
-  'SyncBusyDialog': {
-    publishConf: SiteConfig['publish'];
-    closeText?: string;
-  };
-
   // Global dialogs
   'SplashDialog': {
     showSplashAtStartup: boolean;
@@ -74,20 +42,23 @@ export interface DialogPropsMap {
     title: string;
     message: string;
   };
-  'ProgressDialog': {
-    title: string;
-    message: string;
-  };
-  'BlockDialog': {
-    title: string;
-    message: string;
-  };
-  'SelectImagesDialog': {
-    onSelect: (images: string[]) => void;
-  };
-  'AIAssistDialog': {
-    compositeKey: string;
-  };
+
+  // TODO: Add these back when migrating Collection, Sync, and other dialogs
+  // Collection dialogs
+  // 'DeleteItemKeyDialog': { itemKey: string; collectionKey: string; onSuccess: () => void; };
+  // 'EditItemKeyDialog': { itemKey: string; collectionKey: string; onSuccess: () => void; };
+  // 'CopyItemKeyDialog': { itemKey: string; collectionKey: string; onSuccess: () => void; };
+  // 'CopyItemToLanguageDialog': { itemKey: string; onSuccess: () => void; };
+
+  // Sync dialogs
+  // 'SyncConfigDialog': { publishConf?: SiteConfig['publish']; modAction: 'Add' | 'Edit'; onSuccess: () => void; };
+  // 'SyncBusyDialog': { publishConf: SiteConfig['publish']; closeText?: string; };
+
+  // Utility dialogs
+  // 'ProgressDialog': { title: string; message: string; };
+  // 'BlockDialog': { title: string; message: string; };
+  // 'SelectImagesDialog': { onSelect: (images: string[]) => void; };
+  // 'AIAssistDialog': { compositeKey: string; };
 }
 
 /**

@@ -16,21 +16,24 @@ export const DialogRegistry: {
   NewSlashImportSiteDialog: lazy(() => import('../containers/SiteLibrary/dialogs/NewSlashImportSiteDialog')),
   SelectWorkspaceDialog: lazy(() => import('../containers/SiteLibrary/dialogs/SelectWorkspaceDialog')),
 
-  // Collection dialogs
-  DeleteItemKeyDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/DeleteItemKeyDialog')),
-  EditItemKeyDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/EditItemKeyDialog')),
-  CopyItemKeyDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/CopyItemKeyDialog')),
-  CopyItemToLanguageDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/CopyItemToLanguageDialog')),
-
-  // Sync dialogs
-  SyncConfigDialog: lazy(() => import('../containers/WorkspaceMounted/Sync/components/SyncConfigDialog')),
-  SyncBusyDialog: lazy(() => import('../containers/WorkspaceMounted/Sync/components/SyncBusyDialog')),
-
   // Global dialogs
   SplashDialog: lazy(() => import('../dialogs/SplashDialog')),
   InfoDialog: lazy(() => import('../components/InfoDialog/InfoDialog')),
-  ProgressDialog: lazy(() => import('../components/ProgressDialog')),
-  BlockDialog: lazy(() => import('../components/BlockDialog')),
-  SelectImagesDialog: lazy(() => import('../components/SelectImagesDialog')),
-  AIAssistDialog: lazy(() => import('../components/SukohForm/AIAssistDialog')),
+
+  // TODO: Migrate these dialogs to the new system
+  // Collection dialogs
+  // DeleteItemKeyDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/DeleteItemKeyDialog')),
+  // EditItemKeyDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/EditItemKeyDialog')),
+  // CopyItemKeyDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/CopyItemKeyDialog')),
+  // CopyItemToLanguageDialog: lazy(() => import('../containers/WorkspaceMounted/Collection/CopyItemToLanguageDialog')),
+
+  // Sync dialogs
+  // SyncConfigDialog: lazy(() => import('../containers/WorkspaceMounted/Sync/components/SyncConfigDialog')),
+  // SyncBusyDialog: lazy(() => import('../containers/WorkspaceMounted/Sync/components/SyncBusyDialog')),
+
+  // Utility dialogs
+  // ProgressDialog: lazy(() => import('../components/ProgressDialog')),
+  // BlockDialog: lazy(() => import('../components/BlockDialog')),
+  // SelectImagesDialog: lazy(() => import('../components/SelectImagesDialog')),
+  // AIAssistDialog: lazy(() => import('../components/SukohForm/AIAssistDialog')),
 };
