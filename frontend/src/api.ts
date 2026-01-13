@@ -540,6 +540,13 @@ export class API {
   }
 
   /**
+   * Get environment information (platform and packaging status)
+   */
+  getEnvironmentInfo() {
+    return mainProcessBridge.request('getEnvironmentInfo', {});
+  }
+
+  /**
    * Get current menu state (for web mode)
    */
   getMenuState() {

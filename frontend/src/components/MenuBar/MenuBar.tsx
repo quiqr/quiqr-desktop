@@ -8,20 +8,26 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CheckIcon from '@mui/icons-material/Check';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import type { WebMenuState, WebMenuDefinition, WebMenuItemDefinition } from '@quiqr/types';
-
-interface MenuBarProps {
-  menuState: WebMenuState;
-  onMenuAction: (action: string, data?: unknown) => void;
-}
+import { useEnvironment } from '../../hooks/useEnvironment';
+import { useMenuState } from '../../hooks/useMenuState';
+import type { WebMenuDefinition, WebMenuItemDefinition } from '@quiqr/types';
 
 /**
  * MenuBar - Full-width menu bar component for standalone mode
  *
  * Inspired by Google Sheets, provides a browser-based menu bar that replaces
  * Electron's native OS menus in client/server mode.
+ *
+ * Only renders in standalone mode - returns null when running in Electron.
  */
-const MenuBar = ({ menuState, onMenuAction }: MenuBarProps) => {
+const MenuBar = () => {
+  const { isStandalone } = useEnvironment();
+  const { menuState, executeMenuAction } = useMenuState();
+
+  // Don't render in packaged Electron mode
+  if (!isStandalone) {
+    return null;
+  }
   const [anchorEl, setAnchorEl] = useState<{[key: string]: HTMLElement | null}>({});
   const [submenuAnchorEl, setSubmenuAnchorEl] = useState<{[key: string]: HTMLElement | null}>({});
 
@@ -37,7 +43,7 @@ const MenuBar = ({ menuState, onMenuAction }: MenuBarProps) => {
 
   const handleItemClick = (menuId: string, item: WebMenuItemDefinition) => {
     if (item.action && item.enabled !== false) {
-      onMenuAction(item.action);
+      executeMenuAction(item.action);
     }
     handleMenuClose(menuId);
   };
