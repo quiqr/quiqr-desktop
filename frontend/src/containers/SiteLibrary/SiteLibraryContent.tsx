@@ -1,45 +1,42 @@
 import { useState } from "react";
-import SiteDialogsContainer from "./dialogs/SiteDialogsContainer";
 import SiteGridView from "./components/SiteGridView";
 import SiteListView from "./components/SiteListView";
 import Spinner from "./../../components/Spinner";
 import { SiteConfig } from "./../../../types";
 import { useSiteLibraryData } from "./hooks/useSiteLibraryData";
-import { useSiteDialogs } from "./hooks/useSiteDialogs";
 import { useSiteOperations } from "./hooks/useSiteOperations";
+import { useDialog } from "../../hooks/useDialog";
 import { filterAndSortSites } from "./utils/siteFiltering";
 
 interface SiteLibraryContentProps {
   source: string;
   sourceArgument?: string | null;
-  newSite?: boolean;
-  importSite?: boolean;
-  importSiteURL?: string;
   activeLibraryView?: string;
-  handleLibraryDialogCloseClick: () => void;
 }
 
 const SiteLibraryContent = ({
   source,
   sourceArgument,
-  newSite,
-  importSite,
-  importSiteURL,
   activeLibraryView,
-  handleLibraryDialogCloseClick,
 }: SiteLibraryContentProps) => {
   const { configurations, quiqrCommunityTemplates, sitesListingView, error: quiqrCommunityTemplatesError, updateLocalSites } = useSiteLibraryData();
+  const { openDialog } = useDialog();
 
-  const { dialogState, openDialog, closeDialog } = useSiteDialogs({ newSite, importSite, importSiteURL });
-
-  const { mountSiteByKey, selectWorkspace, mountSite } = useSiteOperations({ openDialog });
+  const { mountSiteByKey, mountSite } = useSiteOperations();
 
   const [showSpinner] = useState(false);
 
   const handleSiteClick = (site: SiteConfig) => {
     if (site.template) {
-      openDialog("newSlashImport", site, site.importSiteURL);
+      // Template site - open import dialog
+      openDialog('NewSlashImportSiteDialog', {
+        newOrImport: 'import',
+        importSiteURL: site.importSiteURL,
+        mountSite: mountSiteByKey,
+        onSuccess: () => updateLocalSites()
+      });
     } else {
+      // Regular site - mount it
       mountSite(site);
     }
   };
@@ -47,16 +44,28 @@ const SiteLibraryContent = ({
   const handleMenuAction = (action: string, site: SiteConfig) => {
     switch (action) {
       case "rename":
-        openDialog("rename", site);
+        openDialog('RenameSiteDialog', {
+          siteconf: site,
+          onSuccess: () => updateLocalSites()
+        });
         break;
       case "copy":
-        openDialog("copy", site);
+        openDialog('CopySiteDialog', {
+          siteconf: site,
+          onSuccess: () => updateLocalSites()
+        });
         break;
       case "editTags":
-        openDialog("editTags", site);
+        openDialog('EditSiteTagsDialogs', {
+          siteconf: site,
+          onSuccess: () => updateLocalSites()
+        });
         break;
       case "delete":
-        openDialog("delete", site);
+        openDialog('DeleteSiteDialog', {
+          siteconf: site,
+          onSuccess: () => updateLocalSites()
+        });
         break;
       case "import":
         handleSiteClick(site);
@@ -73,18 +82,13 @@ const SiteLibraryContent = ({
   const ViewComponent = activeLibraryView === "cards" ? SiteGridView : SiteListView;
 
   return (
-    <>
-      <ViewComponent sites={sites} listTitle={listTitle} error={quiqrCommunityTemplatesError} onSiteClick={handleSiteClick} onMenuAction={handleMenuAction} />
-
-      <SiteDialogsContainer
-        dialogState={dialogState}
-        onClose={closeDialog}
-        onSuccess={updateLocalSites}
-        onLibraryDialogClose={handleLibraryDialogCloseClick}
-        mountSiteByKey={mountSiteByKey}
-        selectWorkspace={selectWorkspace}
-      />
-    </>
+    <ViewComponent
+      sites={sites}
+      listTitle={listTitle}
+      error={quiqrCommunityTemplatesError}
+      onSiteClick={handleSiteClick}
+      onMenuAction={handleMenuAction}
+    />
   );
 };
 

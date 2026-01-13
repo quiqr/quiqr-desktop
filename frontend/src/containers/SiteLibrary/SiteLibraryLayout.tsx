@@ -6,18 +6,15 @@ import { useSiteLibraryToolbarItems } from './SiteLibraryToolbarRight';
 interface SiteLibraryLayoutProps {
   libraryView: string;
   onLibraryViewChange: (view: string) => void;
-  onDialogOpen: (type: string) => void;
   children: ReactNode;
 }
 
 function SiteLibraryLayout({
   libraryView,
   onLibraryViewChange,
-  onDialogOpen,
   children,
 }: SiteLibraryLayoutProps) {
   const toolbarItems = useSiteLibraryToolbarItems({
-    handleLibraryDialogClick: onDialogOpen,
     activeLibraryView: libraryView,
     handleChange: onLibraryViewChange,
   });

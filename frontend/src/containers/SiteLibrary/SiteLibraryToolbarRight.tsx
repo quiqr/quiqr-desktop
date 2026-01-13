@@ -6,9 +6,9 @@ import InputIcon from "@mui/icons-material/Input";
 import AddIcon from "@mui/icons-material/Add";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import { useDialog } from "../../hooks/useDialog";
 
 interface SiteLibraryToolbarItemsProps {
-  handleLibraryDialogClick: (dialogName: string) => void;
   activeLibraryView: string;
   handleChange: (viewName: string) => void;
 }
@@ -18,22 +18,30 @@ interface SiteLibraryToolbarItemsProps {
  * Use this with the new AppLayout toolbar prop.
  */
 export const useSiteLibraryToolbarItems = ({
-  handleLibraryDialogClick,
   activeLibraryView,
   handleChange,
 }: SiteLibraryToolbarItemsProps) => {
   const navigate = useNavigate();
+  const { openDialog } = useDialog();
 
   const leftItems = [
     <ToolbarButton
       key='buttonNewSite'
-      action={() => handleLibraryDialogClick("newSiteDialog")}
+      action={() => openDialog('NewSlashImportSiteDialog', {
+        newOrImport: 'new',
+        mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+        onSuccess: () => {}
+      })}
       title='New'
       icon={AddIcon}
     />,
     <ToolbarButton
       key='buttonImportSite'
-      action={() => handleLibraryDialogClick("importSiteDialog")}
+      action={() => openDialog('NewSlashImportSiteDialog', {
+        newOrImport: 'import',
+        mountSite: (siteKey: string) => navigate(`/sites/${siteKey}/workspaces/main`),
+        onSuccess: () => {}
+      })}
       title='Import'
       icon={InputIcon}
     />,
@@ -74,34 +82,4 @@ export const useSiteLibraryToolbarItems = ({
   ];
 
   return { leftItems, centerItems, rightItems };
-};
-
-interface SiteLibraryToolbarRightProps {
-  handleLibraryDialogClick: (dialogName: string) => void;
-  activeLibraryView: string;
-  handleChange: (viewName: string) => void;
-}
-
-/**
- * @deprecated Use useSiteLibraryToolbarItems hook with the new AppLayout instead
- */
-export const SiteLibraryToolbarRight = ({
-  handleLibraryDialogClick,
-  activeLibraryView,
-  handleChange,
-}: SiteLibraryToolbarRightProps) => {
-  const { leftItems, centerItems, rightItems } = useSiteLibraryToolbarItems({
-    handleLibraryDialogClick,
-    activeLibraryView,
-    handleChange,
-  });
-
-  return (
-    <TopToolbarRight
-      key='toolbar-right-new-site'
-      itemsLeft={leftItems}
-      itemsCenter={centerItems}
-      itemsRight={rightItems}
-    />
-  );
 };

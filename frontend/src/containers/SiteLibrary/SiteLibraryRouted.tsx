@@ -2,15 +2,11 @@ import { Routes, Route, useParams } from "react-router";
 import SiteLibraryContent from "./SiteLibraryContent";
 
 interface SiteLibraryRoutedProps {
-  newSite?: boolean;
-  importSite?: boolean;
-  importSiteURL?: string;
   activeLibraryView?: string;
-  handleLibraryDialogCloseClick: () => void;
 }
 
 // Wrapper for import-site-url/:url route
-const ImportSiteUrlRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+const ImportSiteUrlRoute = (props: SiteLibraryRoutedProps) => {
   const { url } = useParams();
   return (
     <SiteLibraryContent
@@ -22,7 +18,7 @@ const ImportSiteUrlRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDi
 };
 
 // Wrapper for import-site/:refresh route
-const ImportSiteRefreshRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+const ImportSiteRefreshRoute = (props: SiteLibraryRoutedProps) => {
   const { refresh } = useParams();
   return (
     <SiteLibraryContent
@@ -34,7 +30,7 @@ const ImportSiteRefreshRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibra
 };
 
 // Wrapper for /sites/:source route
-const SiteSourceRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+const SiteSourceRoute = (props: SiteLibraryRoutedProps) => {
   const { source } = useParams();
   return (
     <SiteLibraryContent
@@ -46,7 +42,7 @@ const SiteSourceRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialo
 };
 
 // Wrapper for /sites/:source/:args route
-const SiteSourceArgsRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryDialogCloseClick'> & { handleLibraryDialogCloseClick: () => void }) => {
+const SiteSourceArgsRoute = (props: SiteLibraryRoutedProps) => {
   const { source, args } = useParams();
   return (
     <SiteLibraryContent
@@ -57,8 +53,8 @@ const SiteSourceArgsRoute = (props: Omit<SiteLibraryRoutedProps, 'handleLibraryD
   );
 };
 
-const SiteLibraryRouted = ({ newSite, importSite, importSiteURL, activeLibraryView, handleLibraryDialogCloseClick }: SiteLibraryRoutedProps) => {
-  const commonProps = { newSite, importSite, importSiteURL, activeLibraryView, handleLibraryDialogCloseClick };
+const SiteLibraryRouted = ({ activeLibraryView }: SiteLibraryRoutedProps) => {
+  const commonProps = { activeLibraryView };
 
   return (
     <Routes>
