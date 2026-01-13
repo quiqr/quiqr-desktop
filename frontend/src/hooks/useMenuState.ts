@@ -1,9 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import service from '../services/service';
 import { snackMessageService } from '../services/ui-service';
 import { useDialog } from './useDialog';
 import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
+
+// Fetch once at module level
+let cachedMenuState: WebMenuState | undefined;
+
+const menuStatePromise = service.api
+  .getMenuState()
+  .catch((error): WebMenuState => {
+    console.error('Failed to fetch menu state:', error);
+    return { menus: [], version: 0 };
+  })
+  .then((state) => {
+    cachedMenuState = state;
+    return state;
+  });
 
 /**
  * Hook for managing menu state in standalone mode
@@ -13,17 +27,20 @@ import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
 export function useMenuState() {
   const navigate = useNavigate();
   const { openDialog } = useDialog();
-  const [menuState, setMenuState] = useState<WebMenuState | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const [menuState, setMenuState] = useState<WebMenuState | undefined>(cachedMenuState);
+
+  // If not cached yet, wait for the promise (only happens on first render)
+  if (!menuState && !cachedMenuState) {
+    menuStatePromise.then(setMenuState);
+  }
 
   const fetchMenuState = async () => {
     try {
       const state = await service.api.getMenuState();
+      cachedMenuState = state;
       setMenuState(state);
     } catch (error) {
       console.error('Failed to fetch menu state:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -38,7 +55,6 @@ export function useMenuState() {
             navigate(result.path);
           }
           break;
-
 
         case 'openExternal':
           if (result.url) {
@@ -143,13 +159,9 @@ export function useMenuState() {
     }
   };
 
-  useEffect(() => {
-    fetchMenuState();
-  }, []);
-
   return {
     menuState: menuState || { menus: [], version: 0 },
-    loading,
+    loading: menuState === undefined,
     executeMenuAction,
     refresh: fetchMenuState,
   };
