@@ -57,14 +57,13 @@ export function createExecuteMenuActionHandler(container: AppContainer) {
         // Dialog actions (via navigation)
         // ====================================================================
         case 'newSite':
-          return { type: 'navigate', path: '/sites/new-site' };
+          return { type: 'openDialog', dialog: 'newSite' };
 
         case 'importSite':
-          return { type: 'navigate', path: '/sites/import-site' };
+          return { type: 'openDialog', dialog: 'importSite' };
 
         case 'showWelcome':
-          // Navigate to site library which will show welcome screen
-          return { type: 'navigate', path: '/sites/last' };
+          return { type: 'openDialog', dialog: 'welcome' };
 
         // ====================================================================
         // Config actions

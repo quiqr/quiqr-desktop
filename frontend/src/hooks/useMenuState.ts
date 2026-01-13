@@ -50,6 +50,13 @@ export function useMenuState() {
           }
           break;
 
+        case 'openDialog':
+          if (result.dialog) {
+            // Navigate to site library with dialog parameter
+            navigate(`/sites/last?openDialog=${result.dialog}`);
+          }
+          break;
+
         case 'info':
           if (result.message) {
             // Use dialog for multi-line messages (like version info)
