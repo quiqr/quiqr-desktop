@@ -73,16 +73,6 @@ At a high level, we ask everyone be respectful and empathetic. We follow the [Gi
 
 Installers will be generated in the `dist` folder.
 
-### Release Runbook
+## Releasing
 
-- Make sure `npm run build` works and generates no warnings
-- Update the CHANGELOG
-    - set new version
-    - set release data
-    - add changes
-    - if public release
-        - add stats (new stars, npm costs, new community templates)
-- Update version in [project_root]/package.json
-- commit package.json and CHANGELOG.md with -m `release: prepare v[version]`
-- `git tag v[version]`
-- `git push --tags`
+For information about the release process, versioning policy, and release procedures, see [RELEASE.md](./RELEASE.md).
