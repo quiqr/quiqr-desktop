@@ -24,6 +24,9 @@ const workspacePackages = [
 
 module.exports = {
   packagerConfig: {
+    // Disable pruning - workspace dependencies are hoisted to root node_modules
+    // and we need them all included, not just root package.json dependencies
+    prune: false,
     asar: true,
     name: 'Quiqr',
     executableName: 'quiqr',
@@ -31,6 +34,8 @@ module.exports = {
     icon: 'frontend/public/icon',
 
     // Copy workspace packages to node_modules for proper module resolution
+    // With npm workspaces, node_modules/@quiqr/* are symlinks that don't work in asar
+    // We need to remove them and copy the actual files
     afterCopy: [
       (buildPath, electronVersion, platform, arch, callback) => {
         try {
@@ -40,7 +45,19 @@ module.exports = {
             const srcDir = path.resolve(__dirname, ws.src);
             const destDir = path.join(buildPath, 'node_modules', ws.name);
 
-            // Ensure destination exists
+            // Remove existing symlink or directory first
+            // Use lstatSync to detect symlinks (existsSync returns false for broken symlinks)
+            try {
+              const stat = fs.lstatSync(destDir);
+              if (stat.isSymbolicLink() || stat.isDirectory()) {
+                fs.removeSync(destDir);
+                console.log(`  Removed existing ${ws.name} (symlink or dir)`);
+              }
+            } catch {
+              // Path doesn't exist, which is fine
+            }
+
+            // Create fresh directory
             fs.ensureDirSync(destDir);
 
             // Copy dist folder
