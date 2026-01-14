@@ -47,7 +47,6 @@
     "make:deb": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-forge make --targets=@electron-forge/maker-deb"
   },
   "keywords": [],
-  "_comment_dependencies": "NOTE: Some dependencies below (glob, ai, @ai-sdk/*, gray-matter, sharp) are also declared in packages/backend/package.json. They must be duplicated here due to electron-builder limitation with npm workspaces - it only packages dependencies from root package.json, not workspace dependencies. See: https://github.com/electron-userland/electron-builder/issues/7103",
   "dependencies": {
     "await-spawn": "4.0.1",
     "cors": "^2.8.5",
