@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import Meta from './Meta';
+import * as Meta from './Meta';
 import { snackMessageService } from '../../../../../services/ui-service';
 import service from '../../../../../services/service';
 import { useSyncProgress, SyncProgress } from '../../../../../hooks/useSyncProgress';

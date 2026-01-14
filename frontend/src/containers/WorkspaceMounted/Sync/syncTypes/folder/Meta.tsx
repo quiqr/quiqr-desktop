@@ -1,14 +1,13 @@
-import * as React        from 'react';
+import React from 'react';
 import FolderIcon from '@mui/icons-material/Folder';
-export default class Meta {
 
-  static configDialogTitle = "Folder Export Target";
-  static syncingText = "Syncing to folder";
+export const configDialogTitle = "Folder Export Target";
+export const syncingText = "Syncing to folder";
 
-  static sidebarLabel(config){
-    return config.path;
-  }
-  static icon(){
-    return <FolderIcon />;
-  }
-}
+export const sidebarLabel = (config: { path?: string }): string => {
+  return config.path || '';
+};
+
+export const icon = (): React.ReactElement => {
+  return <FolderIcon />;
+};
