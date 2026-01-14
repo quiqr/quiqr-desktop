@@ -12,16 +12,16 @@ import service from './../../../../services/service';
 
 //GitHub Target
 import { FormConfig as GitHubPagesForm } from '../syncTypes/github';
-import { Meta as GitHubMeta } from '../syncTypes/github';
+import * as GitHubMeta from '../syncTypes/github/Meta';
 import { CardNew as CardNewGitHub } from '../syncTypes/github';
 
 //System Git Target
 import { FormConfig as SysGitForm } from '../syncTypes/sysgit';
 import { CardNew as CardNewSysGit } from '../syncTypes/sysgit';
-import { Meta as SysGitMeta } from '../syncTypes/sysgit';
+import * as SysGitMeta from '../syncTypes/sysgit/Meta';
 
 //Folder Target
-import { Meta as FolderMeta } from '../syncTypes/folder';
+import * as FolderMeta from '../syncTypes/folder/Meta';
 import { FormConfig as FolderExportForm } from '../syncTypes/folder';
 import { CardNew as CardNewFolder } from '../syncTypes/folder';
 

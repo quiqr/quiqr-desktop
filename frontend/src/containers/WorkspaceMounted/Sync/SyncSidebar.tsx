@@ -14,9 +14,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 //targets
-import { Meta as GitHubMeta } from './syncTypes/github';
-import { Meta as FolderMeta } from './syncTypes/folder';
-import { Meta as SysGitMeta } from './syncTypes/sysgit';
+import * as GitHubMeta from './syncTypes/github/Meta';
+import * as FolderMeta from './syncTypes/folder/Meta';
+import * as SysGitMeta from './syncTypes/sysgit/Meta';
 
 interface PublishConfig {
   key: string;
@@ -150,14 +150,14 @@ export const SyncSidebar = ({
     let icon: React.ReactNode = null;
 
     if (publ.config && publ.config.type === 'github') {
-      label = GitHubMeta.sidebarLabel(publ.config);
+      label = GitHubMeta.sidebarLabel(publ.config as any);
       icon = GitHubMeta.icon();
     } else if (publ.config && (publ.config.type === 'sysgit' || publ.config.type === 'git')) {
       // Use SysGitMeta for both sysgit and the new universal git type
-      label = SysGitMeta.sidebarLabel(publ.config);
+      label = SysGitMeta.sidebarLabel(publ.config as any);
       icon = SysGitMeta.icon();
     } else if (publ.config && publ.config.type === 'folder') {
-      label = FolderMeta.sidebarLabel(publ.config);
+      label = FolderMeta.sidebarLabel(publ.config as any);
       icon = FolderMeta.icon();
     }
 

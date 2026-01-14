@@ -1,6 +1,6 @@
 import FolderIcon from '@mui/icons-material/Folder';
 import FormConfig from './FormConfig';
-import Meta from './Meta';
+import * as Meta from './Meta';
 import CardNew from './CardNew';
 import Dashboard    from './Dashboard';
 

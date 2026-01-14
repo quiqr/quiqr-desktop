@@ -22,7 +22,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import BlockIcon from '@mui/icons-material/Block';
 import Link from '@mui/material/Link';
 import SettingsIcon from '@mui/icons-material/Settings';
-import Meta from './Meta';
+import * as Meta from './Meta';
 import { snackMessageService } from '../../../../../services/ui-service';
 import service from '../../../../../services/service';
 import { useSyncProgress, SyncProgress } from '../../../../../hooks/useSyncProgress';
