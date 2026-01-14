@@ -40,7 +40,10 @@
     "test:coverage": "vitest run --coverage",
     "test:frontend": "vitest run --project frontend",
     "test:backend": "vitest run --project backend",
-    "test:types": "vitest run --project types"
+    "test:types": "vitest run --project types",
+    "start": "electron-forge start",
+    "package": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-forge package",
+    "make": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-forge make"
   },
   "keywords": [],
   "_comment_dependencies": "NOTE: Some dependencies below (glob, ai, @ai-sdk/*, gray-matter, sharp) are also declared in packages/backend/package.json. They must be duplicated here due to electron-builder limitation with npm workspaces - it only packages dependencies from root package.json, not workspace dependencies. See: https://github.com/electron-userland/electron-builder/issues/7103",
@@ -55,6 +58,7 @@
     "cors": "^2.8.5",
     "deepmerge": "^4.3.1",
     "electron-progressbar": "^1.2.0",
+    "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
     "express": "^4.21.2",
     "front-matter": "^4.0.2",
@@ -73,6 +77,14 @@
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.6",
+    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-deb": "^7.11.1",
+    "@electron-forge/maker-rpm": "^7.11.1",
+    "@electron-forge/maker-squirrel": "^7.11.1",
+    "@electron-forge/maker-zip": "^7.11.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
+    "@electron-forge/plugin-fuses": "^7.11.1",
+    "@electron/fuses": "^1.8.0",
     "@electron/notarize": "^3.1.1",
     "@testing-library/dom": "^10.4.1",
     "@types/adm-zip": "^0.5.7",
@@ -81,7 +93,6 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^39.2.3",
-    "electron-builder": "^26.3.3",
     "vitest": "^4.0.15",
     "wait-on": "^8.0.4"
   },
