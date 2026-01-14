@@ -170,7 +170,6 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
       values={singleValues}
       siteKey={siteKey}
       workspaceKey={workspaceKey}
-      pageUrl={previewUrl}
       onSave={handleSave}
       onOpenInEditor={handleOpenInEditor}
       hideExternalEditIcon={single.hideExternalEditIcon}

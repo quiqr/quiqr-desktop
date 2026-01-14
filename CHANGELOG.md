@@ -1,6 +1,7 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
+- chore: semantic versioning policy in RELEASE.md
 - feature: Add OpenSpec Workflow for Spec-Driven Development
 - feature: electron replacement main menu in the standalone web version
 - feature: add collapsible sidebar with workspace switcher

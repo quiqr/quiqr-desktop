@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect, useCallback } from "react";
 import AiIcon from "@mui/icons-material/Memory";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
@@ -25,191 +25,136 @@ type AiAssistField = StringField | EasymdeField | MarkdownField;
 interface AiAssistProps {
   inValue: string;
   inField: AiAssistField;
-  pageUrl: string;
   handleSetAiText: (text: string) => void;
 }
 
-interface AiAssistState {
-  dialogOpen: boolean;
-  result: string;
-  runOn: string; // TODO: "none" | "infield" | "previewpage" | "";
-  commandPrompt: string;
-  webpage: string;
-  assistendNotReady: boolean;
-  aiBusy: boolean;
-  formNotReady: boolean;
-}
+const AiAssist = ({ inValue, inField, handleSetAiText }: AiAssistProps) => {
+  // State hooks
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [result, setResult] = useState("");
+  const [runOn, setRunOn] = useState("");
+  const [commandPrompt, setCommandPrompt] = useState("");
+  const [assistendNotReady, setAssistendNotReady] = useState(true);
+  const [aiBusy, setAiBusy] = useState(false);
 
-class AiAssist extends React.Component<AiAssistProps, AiAssistState> {
-  constructor(props: AiAssistProps) {
-    super(props);
-    this.state = {
-      dialogOpen: false,
-      result: "",
-      runOn: "",
-      commandPrompt: "",
-      webpage: "",
-      assistendNotReady: true,
-      aiBusy: false,
-      formNotReady: true,
-    };
-  }
-
-  checkAssistentReady() {
-    if (this.state.commandPrompt !== "") {
-      if (this.state.runOn === "previewpage" && this.state.webpage !== "") {
-        this.setState({ assistendNotReady: false });
-      } else if (this.state.runOn !== "previewpage") {
-        this.setState({ assistendNotReady: false });
-      } else {
-        this.setState({ assistendNotReady: true });
-      }
+  // Check assistant readiness whenever relevant state changes
+  useEffect(() => {
+    if (commandPrompt !== "") {
+      setAssistendNotReady(false);
     } else {
-      this.setState({ assistendNotReady: true });
+      setAssistendNotReady(true);
     }
-  }
+  }, [commandPrompt]);
 
-  genPrompt() {
-    if (this.state.commandPrompt === "") {
+  // Generate prompt based on mode
+  const genPrompt = useCallback(() => {
+    if (commandPrompt === "") {
       return "";
     }
-    if (this.state.runOn === "none") {
-      return this.state.commandPrompt;
-    } else if (this.state.runOn === "infield") {
-      return this.state.commandPrompt + "\nApply this on the following text...\n " + this.props.inValue;
-    } else if (this.state.runOn === "previewpage") {
-      return this.state.commandPrompt + "\nApply this on the following text extracted from a webpage...\n " + this.props.inValue;
+    if (runOn === "none") {
+      return commandPrompt;
+    } else if (runOn === "infield") {
+      return commandPrompt + "\nApply this on the following text...\n " + inValue;
     }
     return "";
-  }
+  }, [commandPrompt, runOn, inValue]);
 
-  sendToAssistent() {
-    service.api.readConfKey("prefs").then(async (value) => {
-      if (hasOpenAiApiKey(value)) {
-        const AIclient = new OpenAI({
-          apiKey: value.openAiApiKey,
-          dangerouslyAllowBrowser: true,
+  // Send prompt to OpenAI assistant
+  const sendToAssistent = useCallback(async () => {
+    const value = await service.api.readConfKey("prefs");
+    if (hasOpenAiApiKey(value)) {
+      const AIclient = new OpenAI({
+        apiKey: value.openAiApiKey,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const content = genPrompt();
+      if (content !== "") {
+        setAssistendNotReady(true);
+        setAiBusy(true);
+
+        const stream = AIclient.chat.completions.stream({
+          model: "gpt-4",
+          messages: [{ role: "user", content: content }],
+          stream: true,
         });
 
-        const content = this.genPrompt();
-        //service.api.logToConsole(content);
-        if (content !== "") {
-          this.setState({ assistendNotReady: true, aiBusy: true });
+        const chatCompletion = await stream.finalChatCompletion();
 
-          const stream = AIclient.chat.completions.stream({
-            model: "gpt-4",
-            messages: [{ role: "user", content: content }],
-            stream: true,
-          });
+        setAssistendNotReady(false);
+        setAiBusy(false);
 
-          const chatCompletion = await stream.finalChatCompletion();
-
-          this.setState({ assistendNotReady: false, aiBusy: false });
-
-          if (chatCompletion && chatCompletion.choices.length > 0) {
-            this.setState({ result: chatCompletion.choices[0].message.content });
-          } else {
-            service.api.logToConsole("error");
-          }
+        if (chatCompletion && chatCompletion.choices.length > 0) {
+          setResult(chatCompletion.choices[0].message.content || "");
+        } else {
+          service.api.logToConsole("error");
         }
       }
-    });
-  }
+    }
+  }, [genPrompt]);
 
-  renderDialog() {
-    return (
-      <Dialog open={this.state.dialogOpen} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-descriptio' fullWidth={true} maxWidth={"md"}>
-        <DialogTitle id='alert-dialog-title'>{"AI Assist on: " + this.props.inField.title}</DialogTitle>
+
+  return (
+    <span style={{ display: "inline-block", position: "relative", cursor: "default" }}>
+      <Dialog open={dialogOpen} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-descriptio" fullWidth={true} maxWidth={"md"}>
+        <DialogTitle id="alert-dialog-title">{"AI Assist on: " + inField.title}</DialogTitle>
         <DialogContent>
           <Box my={3} sx={{ display: "flex" }}>
             <TextField
               fullWidth
               sx={{ m: 1 }}
-              disabled={this.props.inValue === ""}
-              id='standard-full-width'
-              label='Current Text'
-              value={this.props.inValue !== "" ? this.props.inValue : "empty"}
-              variant='outlined'
+              disabled={inValue === ""}
+              id="standard-full-width"
+              label="Current Text"
+              value={inValue !== "" ? inValue : "empty"}
+              variant="outlined"
             />
           </Box>
 
           <Box my={0} sx={{ display: "flex" }}>
-            <FormControl variant='outlined' sx={{ m: 1, minWidth: 300 }}>
-              <InputLabel id='demo-simple-select-outlined-label'>Run AI Assist with text</InputLabel>
+            <FormControl variant="outlined" sx={{ m: 1, minWidth: 300 }}>
+              <InputLabel id="demo-simple-select-outlined-label">Run AI Assist with text</InputLabel>
               <Select
-                labelId='demo-simple-select-outlined-label'
-                id='runOn'
-                value={this.state.runOn}
-                onChange={(e) => {
-                  this.checkAssistentReady();
-                  this.setState({
-                    runOn: e.target.value,
-                  });
-
-                  if (e.target.value === "previewpage") {
-                    fetch(this.props.pageUrl)
-                      .then((response) => {
-                        switch (response.status) {
-                          case 200:
-                            return response.text();
-                          case 404:
-                            throw response;
-                          default:
-                            throw response;
-                        }
-                      })
-                      .then((template) => {
-                        this.setState({
-                          webpage: template,
-                        });
-                        //service.api.logToConsole(template);
-                      })
-                      .catch((response) => {
-                        this.setState({ webpage: "" });
-                        console.log(response);
-                      });
-                  }
-                }}
-                label='Run AI Assist with text'>
-                {this.props.inValue !== "" ? <MenuItem value='infield'>from input field</MenuItem> : null}
-                <MenuItem value='previewpage'>from preview page</MenuItem>
-                <MenuItem value='none'>command prompt only</MenuItem>
+                labelId="demo-simple-select-outlined-label"
+                id="runOn"
+                value={runOn}
+                onChange={(e) => setRunOn(e.target.value)}
+                label="Run AI Assist with text"
+              >
+                {inValue !== "" ? <MenuItem value="infield">from input field</MenuItem> : null}
+                <MenuItem value="none">command prompt only</MenuItem>
               </Select>
             </FormControl>
 
             <TextField
               sx={{ m: 1 }}
               fullWidth
-              id='standard-full-width'
-              label='Command Prompt'
-              value={this.state.commandPrompt}
+              id="standard-full-width"
+              label="Command Prompt"
+              value={commandPrompt}
               multiline
-              variant='outlined'
-              onChange={(e) => {
-                this.setState({ commandPrompt: e.target.value });
-                this.checkAssistentReady();
-              }}
+              variant="outlined"
+              onChange={(e) => setCommandPrompt(e.target.value)}
             />
           </Box>
 
           <Box my={0} sx={{ display: "flex" }}>
             <Button
               sx={{ marginLeft: "auto", m: 1 }}
-              onClick={() => {
-                this.sendToAssistent();
-              }}
-              disabled={this.state.assistendNotReady}
-              color='primary'
-              variant='contained'>
+              onClick={sendToAssistent}
+              disabled={assistendNotReady}
+              color="primary"
+              variant="contained"
+            >
               Send prompt to AI assistent
             </Button>
-            {this.state.aiBusy ? (
-              <React.Fragment>
+            {aiBusy && (
+              <>
                 &nbsp;
                 <CircularProgress size={24} />
                 &nbsp;
-              </React.Fragment>
-            ) : null}
+              </>
+            )}
           </Box>
 
           <Box my={3} sx={{ display: "flex" }}>
@@ -217,64 +162,42 @@ class AiAssist extends React.Component<AiAssistProps, AiAssistState> {
               fullWidth
               sx={{ m: 1 }}
               multiline
-              id='standard-full-width'
-              label='Result Text'
-              placeholder='result text'
-              value={this.state.result}
-              onChange={(e) => {
-                this.setState({ result: e.target.value });
-              }}
-              variant='outlined'
+              id="standard-full-width"
+              label="Result Text"
+              placeholder="result text"
+              value={result}
+              onChange={(e) => setResult(e.target.value)}
+              variant="outlined"
             />
           </Box>
         </DialogContent>
         <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button
+            disabled={result === ""}
             onClick={() => {
-              this.setState({ dialogOpen: false });
-            }}>
-            Cancel
-          </Button>
-          <Button
-            disabled={this.state.result === ""}
-            onClick={() => {
-              this.props.handleSetAiText(this.props.inValue + " \n" + this.state.result);
-              this.setState({ dialogOpen: false });
-            }}>
+              handleSetAiText(inValue + " \n" + result);
+              setDialogOpen(false);
+            }}
+          >
             Append text
           </Button>
           <Button
-            disabled={this.state.result === ""}
+            disabled={result === ""}
             onClick={() => {
-              this.props.handleSetAiText(this.state.result);
-              this.setState({ dialogOpen: false });
-            }}>
+              handleSetAiText(result);
+              setDialogOpen(false);
+            }}
+          >
             Replace text
           </Button>
         </DialogActions>
       </Dialog>
-    );
-  }
-
-  handleClick() {
-    this.setState({ dialogOpen: true });
-  }
-
-  render() {
-    return (
-      <span style={{ display: "inline-block", position: "relative", cursor: "default" }}>
-        {this.renderDialog()}
-        <IconButton
-          aria-label='AI-assist'
-          onClick={() => {
-            this.handleClick();
-          }}
-          size='large'>
-          <AiIcon />
-        </IconButton>
-      </span>
-    );
-  }
-}
+      <IconButton aria-label="AI-assist" onClick={() => setDialogOpen(true)} size="large">
+        <AiIcon />
+      </IconButton>
+    </span>
+  );
+};
 
 export default AiAssist;

@@ -65,7 +65,6 @@ function MarkdownField({ compositeKey }: Props) {
         }}
         inField={config}
         inValue={value ?? ''}
-        pageUrl={meta.pageUrl}
       />
     );
   }
