@@ -60,7 +60,6 @@ function StringField({ compositeKey }: Props) {
         }}
         inField={config}
         inValue={localValue}
-        pageUrl={meta.pageUrl}
       />
     );
   }

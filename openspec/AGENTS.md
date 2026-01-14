@@ -4,6 +4,7 @@ Instructions for AI coding assistants using OpenSpec for spec-driven development
 
 ## TL;DR Quick Checklist
 
+- **IMPORTANT**: Always run `openspec` commands from the project root directory
 - Search existing work: `openspec spec list --long`, `openspec list` (use `rg` only for full-text search)
 - Decide scope: new capability vs modify existing capability
 - Pick a unique `change-id`: kebab-case, verb-led (`add-`, `update-`, `remove-`, `refactor-`)
@@ -89,6 +90,8 @@ After deployment, create separate PR to:
 ## Quick Start
 
 ### CLI Commands
+
+**IMPORTANT**: All `openspec` commands must be run from the project root directory.
 
 ```bash
 # Essential commands
@@ -290,6 +293,11 @@ Example for RENAMED:
 
 ### Common Errors
 
+**"No OpenSpec changes directory found" or commands fail**
+- **Solution**: Always run `openspec` commands from the project root directory (e.g., `/home/user/project/`)
+- **Wrong**: Running from subdirectories like `frontend/` or `backend/`
+- **Correct**: `cd /path/to/project/root && openspec list`
+
 **"Change must have at least one delta"**
 - Check `changes/[name]/specs/` exists with .md files
 - Verify files have operation prefixes (## ADDED Requirements)
@@ -318,6 +326,9 @@ openspec show [spec] --json -r 1
 ## Happy Path Script
 
 ```bash
+# 0) Ensure you're in the project root directory
+cd /path/to/project/root  # Replace with actual project path
+
 # 1) Explore current state
 openspec spec list --long
 openspec list
@@ -447,10 +458,13 @@ Only add complexity with:
 
 ### CLI Essentials
 ```bash
+# Always run from project root directory!
 openspec list              # What's in progress?
 openspec show [item]       # View details
 openspec validate --strict # Is it correct?
 openspec archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
 ```
 
-Remember: Specs are truth. Changes are proposals. Keep them in sync.
+Remember:
+- Specs are truth. Changes are proposals. Keep them in sync.
+- **Always run `openspec` commands from the project root directory.**

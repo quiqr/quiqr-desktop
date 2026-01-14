@@ -154,7 +154,6 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
       key={`${collectionKey}-${collectionItemKey}-${modelRefreshKey}`}
       debug={false}
       rootName={collection.title}
-      pageUrl={pageUrl}
       hideExternalEditIcon={collection.hideExternalEditIcon}
       fields={fields}
       siteKey={siteKey}
