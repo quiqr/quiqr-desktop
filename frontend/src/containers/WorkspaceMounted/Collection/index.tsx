@@ -26,7 +26,7 @@ import EditItemKeyDialog             from './EditItemKeyDialog'
 import CopyItemKeyDialog             from './CopyItemKeyDialog'
 import CopyItemToLanguageDialog      from './CopyItemToLanguageDialog'
 import Spinner                       from './../../../components/Spinner'
-import { Debounce }                  from './../../../utils/debounce';
+import { createDebounce }            from './../../../utils/debounce';
 import {snackMessageService}         from './../../../services/ui-service';
 import service                       from './../../../services/service'
 
@@ -236,7 +236,7 @@ interface CollectionState {
 }
 
 const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collectionKey }) => {
-  const filterDebounce = React.useRef(new Debounce(200));
+  const filterDebounce = React.useRef(createDebounce(200));
   const navigate = useNavigate();
   
   const [state, setState] = React.useState<CollectionState>({
@@ -295,6 +295,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
 
     return () => {
       service.unregisterListener(componentRef);
+      filterDebounce.current.cancel();
     };
   }, [siteKey, workspaceKey, collectionKey]);
 
@@ -485,7 +486,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
     const newFilter = e.target.value;
     setState(prev => ({ ...prev, filter: newFilter }));
 
-    filterDebounce.current.run(() => {
+    filterDebounce.current.debounce(() => {
       const filteredData = resolveFilteredItems(state.items || [], newFilter);
       setState(prev => ({ ...prev, ...filteredData }));
     });
@@ -519,7 +520,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
   const handleDirClick = (e: React.MouseEvent<HTMLElement>) => {
     const newFilter = (e.currentTarget as HTMLElement).dataset.dir || '';
     setState(prev => ({ ...prev, filter: newFilter }));
-    filterDebounce.current.run(() => {
+    filterDebounce.current.debounce(() => {
       const filteredData = resolveFilteredItems(state.items || [], newFilter);
       setState(prev => ({ ...prev, ...filteredData }));
     });
