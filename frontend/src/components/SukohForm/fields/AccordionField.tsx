@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -17,6 +18,7 @@ import DangerButton from '../../DangerButton';
 import { useField, useRenderFields } from '../useField';
 import service from '../../../services/service';
 import { isValidAppThemeConfiguration } from '../../../utils/type-guards';
+import { buildNestUrl, getBasePath, parseNestPath } from '../../../utils/nestPath';
 import type { AccordionField as AccordionFieldConfig, Field, DynFormFields } from '@quiqr/types';
 import Box from '@mui/material/Box';
 
@@ -52,10 +54,17 @@ function AccordionField({ compositeKey }: Props) {
   const { field, value, setValue } = useField<Record<string, unknown>[] | Record<string, Record<string, unknown>>>(compositeKey);
   const renderFields = useRenderFields();
   const config = field as AccordionFieldConfig;
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // State for accordion expansion
+  // Check if this accordion is being navigated to directly
+  const nestPath = parseNestPath(location.pathname);
+  const fieldPath = compositeKey.replace(/^root\./, '');
+  const isDirectTarget = nestPath === fieldPath;
+
+  // State for accordion expansion - auto-expand if directly navigated to
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(isDirectTarget);
 
   // State for drag and drop (state for re-rendering, refs for event handlers)
   const [dragFromIndex, setDragFromIndex] = useState<number | null>(null);
@@ -298,13 +307,28 @@ function AccordionField({ compositeKey }: Props) {
     }
   }, [expandedIndex, shouldSaveAccordionState, compositeKey]);
 
-  // Toggle expanded view
+  // Navigate to this accordion field (for collapsed view)
+  const handleNavigateToAccordion = useCallback(() => {
+    const basePath = getBasePath(location.pathname);
+    const currentNestPath = parseNestPath(location.pathname);
+    const url = buildNestUrl(basePath, config.key, currentNestPath);
+    navigate(url);
+  }, [location.pathname, config.key, navigate]);
+
+  // Toggle expanded view (for expanded header - collapse back)
   const handleToggleExpand = useCallback(() => {
-    setIsExpanded(!isExpanded);
-    if (!isExpanded) {
-      setExpandedIndex(null);
+    // When collapsing from expanded view, navigate back
+    if (isExpanded && isDirectTarget) {
+      // Navigate back to parent
+      const basePath = getBasePath(location.pathname);
+      navigate(basePath);
+    } else {
+      setIsExpanded(!isExpanded);
+      if (!isExpanded) {
+        setExpandedIndex(null);
+      }
     }
-  }, [isExpanded]);
+  }, [isExpanded, isDirectTarget, location.pathname, navigate]);
 
   // Get fields for a specific item (with dynamic fields support)
   const getFieldsForItem = useCallback((componentKey: string): Field[] => {
@@ -317,7 +341,7 @@ function AccordionField({ compositeKey }: Props) {
   // Determine item count for display
   const itemCount = items.length;
 
-  // Collapsed view - just show item count
+  // Collapsed view - navigate to accordion view
   if (!isExpanded) {
     return (
       <List style={{ marginBottom: 16, padding: 0 }}>
@@ -328,7 +352,7 @@ function AccordionField({ compositeKey }: Props) {
               border: 'solid 1px #d8d8d8',
               borderRadius: '7px',
             }}
-            onClick={handleToggleExpand}
+            onClick={handleNavigateToAccordion}
           >
             <ListItemIcon>
               <FolderIcon />
