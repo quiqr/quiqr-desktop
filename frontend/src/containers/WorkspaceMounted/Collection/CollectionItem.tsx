@@ -27,9 +27,10 @@ interface CollectionItemProps {
   collectionKey: string;
   collectionItemKey: string;
   modelRefreshKey?: number;
+  nestPath?: string;
 }
 
-function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey }: CollectionItemProps) {
+function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey, nestPath }: CollectionItemProps) {
   const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
   const [collectionItemValues, setCollectionItemValues] = useState<unknown>(null);
   const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
@@ -166,6 +167,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
       plugins={plugins}
       onSave={handleSave}
       onOpenInEditor={handleOpenInEditor}
+      nestPath={nestPath}
     />
   );
 }

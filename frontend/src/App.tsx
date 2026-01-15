@@ -166,8 +166,10 @@ const AppContent = ({ theme }: { theme: Theme }) => {
         <Route path="home/:refresh" element={<DashboardRoute />} />
         <Route path="collections/:collection" element={<CollectionRoute />} />
         <Route path="collections/:collection/:item" element={<CollectionItemRoute />} />
+        <Route path="collections/:collection/:item/nest/*" element={<CollectionItemRoute />} />
         <Route path="collections/:collection/:item/:refresh" element={<CollectionItemRoute />} />
         <Route path="singles/:single" element={<SingleRoute refreshed={false} />} />
+        <Route path="singles/:single/nest/*" element={<SingleRoute refreshed={false} />} />
         <Route path="singles/:single/:refresh" element={<SingleRoute refreshed={true} />} />
         <Route path="sync/*" element={<SyncRoutedWithContext />} />
         <Route path="siteconf/*" element={<SiteConfRoutedWithContext />} />

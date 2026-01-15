@@ -1,4 +1,5 @@
 import { useLocation, useParams } from 'react-router';
+import { parseNestPath, getBasePath } from '../../utils/nestPath';
 
 export interface Breadcrumb {
   label: string;
@@ -31,6 +32,27 @@ function formatBreadcrumbLabel(raw: string): string {
     .join(' ');
 
   return label;
+}
+
+/**
+ * Add breadcrumb segments for a nested field path.
+ * @param breadcrumbs - Array to append to
+ * @param nestPath - Dot-separated nest path (e.g., "author.address")
+ * @param basePath - Base URL path without /nest/*
+ */
+function addNestBreadcrumbs(breadcrumbs: Breadcrumb[], nestPath: string, basePath: string): void {
+  const segments = nestPath.split('.');
+  let accumulatedPath = '';
+
+  segments.forEach((segment, index) => {
+    accumulatedPath = accumulatedPath ? `${accumulatedPath}.${segment}` : segment;
+    const isLast = index === segments.length - 1;
+
+    breadcrumbs.push({
+      label: formatBreadcrumbLabel(segment),
+      path: isLast ? undefined : `${basePath}/nest/${encodeURIComponent(accumulatedPath)}`,
+    });
+  });
 }
 
 /**
@@ -91,6 +113,8 @@ function useBreadcrumbs(): Breadcrumb[] {
             if (item) {
               // Viewing a specific item - make collection name clickable
               const itemName = decodeURIComponent(item);
+              const nestPath = parseNestPath(location.pathname);
+              const basePath = getBasePath(location.pathname);
 
               // Make collection name clickable (links to collection list)
               breadcrumbs.push({
@@ -98,10 +122,20 @@ function useBreadcrumbs(): Breadcrumb[] {
                 path: `/sites/${site}/workspaces/${workspace}/collections/${collection}`,
               });
 
-              // Add item as final breadcrumb
-              breadcrumbs.push({
-                label: formatBreadcrumbLabel(itemName)
-              });
+              if (nestPath) {
+                // Collection item with nested view - make item clickable
+                breadcrumbs.push({
+                  label: formatBreadcrumbLabel(itemName),
+                  path: basePath,
+                });
+                // Add nest path segments
+                addNestBreadcrumbs(breadcrumbs, nestPath, basePath);
+              } else {
+                // Add item as final breadcrumb
+                breadcrumbs.push({
+                  label: formatBreadcrumbLabel(itemName)
+                });
+              }
             } else {
               // Collection list view, collection is the final breadcrumb
               breadcrumbs.push({
@@ -109,10 +143,23 @@ function useBreadcrumbs(): Breadcrumb[] {
               });
             }
           } else if (single) {
-            // Single page - add as final breadcrumb
-            breadcrumbs.push({
-              label: formatBreadcrumbLabel(decodeURIComponent(single))
-            });
+            const nestPath = parseNestPath(location.pathname);
+            const basePath = getBasePath(location.pathname);
+
+            if (nestPath) {
+              // Single with nested view - make single clickable
+              breadcrumbs.push({
+                label: formatBreadcrumbLabel(decodeURIComponent(single)),
+                path: basePath,
+              });
+              // Add nest path segments
+              addNestBreadcrumbs(breadcrumbs, nestPath, basePath);
+            } else {
+              // Single page - add as final breadcrumb
+              breadcrumbs.push({
+                label: formatBreadcrumbLabel(decodeURIComponent(single))
+              });
+            }
           } else if (location.pathname.includes('/sync')) {
             breadcrumbs.push({ label: 'Sync' });
           } else if (location.pathname.includes('/siteconf')) {

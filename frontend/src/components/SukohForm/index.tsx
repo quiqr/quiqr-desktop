@@ -37,8 +37,31 @@ type SukohFormProps = {
   hideSaveButton?: boolean;
   refreshed?: boolean;
   debug: boolean;
-  /** Enable the new functional form system (default: false) */
+  /** Path to nested field to display (e.g., "author" or "author.address") */
+  nestPath?: string;
 };
+
+/**
+ * Find a field by its nested path (e.g., "author.address").
+ * Traverses the fields tree following the path segments.
+ */
+function findFieldByPath(fields: Field[], path: string): Field | undefined {
+  const segments = path.split('.');
+  let currentFields = fields;
+  let result: Field | undefined;
+
+  for (const segment of segments) {
+    result = currentFields.find((f) => f.key === segment);
+    if (!result) return undefined;
+
+    // If there are more segments, dive into this field's children
+    if ('fields' in result && Array.isArray(result.fields)) {
+      currentFields = result.fields as Field[];
+    }
+  }
+
+  return result;
+}
 
 export const SukohForm = ({
   siteKey,
@@ -52,6 +75,7 @@ export const SukohForm = ({
   values,
   onSave,
   hideSaveButton,
+  nestPath,
 }: SukohFormProps) => {
   const [actionButtonRightPos] = useState(380);
   const [changed, setChanged] = useState(false);
@@ -219,9 +243,36 @@ export const SukohForm = ({
           onSave={handleNewFormSave}
           onChange={handleNewFormChange}
         >
-          {typedFields.map((field) => (
-            <FieldRenderer key={field.key} compositeKey={`root.${field.key}`} />
-          ))}
+          {nestPath ? (
+            // Render nested field view
+            (() => {
+              const nestedField = findFieldByPath(typedFields, nestPath);
+              if (!nestedField) {
+                return <div>Nested field not found: {nestPath}</div>;
+              }
+
+              // For accordion fields, render the field itself (not its children)
+              // AccordionField will detect it's being navigated to and auto-expand
+              if (nestedField.type === 'accordion') {
+                return <FieldRenderer key={nestedField.key} compositeKey={`root.${nestPath}`} />;
+              }
+
+              // For nest fields, render the children
+              if ('fields' in nestedField && Array.isArray(nestedField.fields)) {
+                const childFields = nestedField.fields as Field[];
+                return childFields.map((field) => (
+                  <FieldRenderer key={field.key} compositeKey={`root.${nestPath}.${field.key}`} />
+                ));
+              }
+
+              return <div>Nested field not found: {nestPath}</div>;
+            })()
+          ) : (
+            // Render all top-level fields
+            typedFields.map((field) => (
+              <FieldRenderer key={field.key} compositeKey={`root.${field.key}`} />
+            ))
+          )}
         </FormProvider>
         {hideSaveButton ? null : fabButton}
         <div style={{ height: '70px' }}></div>
