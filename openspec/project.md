@@ -130,7 +130,77 @@ const { saveForm } = useFormState();
   ```
 
 ### Testing Strategy
-[To be documented - add your testing approach here]
+
+#### Frontend Testing
+- **Test Framework**: Vitest (v4.x) - Fast unit testing framework
+- **Test Location**: `frontend/test/` directory
+- **Test Organization**: Mirrors source structure
+  - `test/utils/` - Utility function tests
+  - `test/components/` - React component tests
+  - `test/containers/` - Page container tests
+  - `test/contexts/` - Context provider tests
+  - `test/integration/` - Integration tests
+
+#### Running Tests
+```bash
+# Run all tests
+cd frontend && npm test
+
+# Run specific test file
+cd frontend && npm test -- <filename>
+
+# Watch mode during development
+cd frontend && npm test -- --watch
+```
+
+#### Test Requirements
+- **Utility Functions**: MUST have comprehensive unit tests
+  - Cover all code paths and edge cases
+  - Use vitest fake timers for timing-based code
+  - Test error conditions and boundary cases
+- **React Components**: SHOULD have tests for critical functionality
+  - Test user interactions and state changes
+  - Verify prop handling and rendering
+- **Integration Tests**: For cross-cutting features (API, theming)
+
+#### Test Patterns
+- Use `describe()` blocks to group related tests
+- Use `beforeEach()` and `afterEach()` for setup/teardown
+- Use `vi.fn()` for mock functions
+- Use `vi.useFakeTimers()` for time-dependent tests
+- Clean up with `vi.restoreAllMocks()` in `afterEach()`
+
+#### Example Test Structure
+```typescript
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { myFunction } from '../../src/utils/myModule';
+
+describe('myFunction', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should handle normal case', () => {
+    const result = myFunction(input);
+    expect(result).toBe(expected);
+  });
+
+  it('should handle edge case', () => {
+    // Test implementation
+  });
+});
+```
+
+#### When to Write Tests
+- **MUST**: All new utility functions and modules
+- **MUST**: Changes to critical business logic
+- **SHOULD**: New React components with complex logic
+- **SHOULD**: Bug fixes to prevent regression
+- **MAY**: Simple presentational components
 
 ### Git Workflow
 - **Main branch**: `main` (used for PRs)
