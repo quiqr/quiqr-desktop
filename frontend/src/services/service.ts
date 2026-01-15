@@ -1,114 +1,105 @@
-import { BaseService } from './base-service';
-import { instance as api } from './../api';
-import {
-    serviceSchemas,
-    Configurations,
-    SiteAndWorkspaceData,
-    WorkspaceDetails
-} from '../../types';
+import * as apiService from './api-service';
+import { serviceSchemas, Configurations, SiteAndWorkspaceData, WorkspaceDetails } from '../../types';
+import { validateServiceResponse } from '../utils/validation';
 
-class Service extends BaseService<typeof serviceSchemas> {
+let configurationsCache: Configurations | undefined;
+let configurationsCachePromise: Promise<Configurations> | undefined;
+let siteAndWorkspaceDataPromise: Promise<SiteAndWorkspaceData> | undefined;
 
-    api = api;
-    _configurations: Configurations | undefined;
-    _configurationsPromise: Promise<Configurations> | undefined;
-    _siteAndWorkspaceDataPromise: Promise<SiteAndWorkspaceData> | undefined;
-
-    constructor() {
-        super();
-        this._configurations = undefined;
-        this._configurationsPromise = undefined;
-        this._siteAndWorkspaceDataPromise = undefined;
-    }
-
-    /**
-     * Clear all cached data - used when backend notifies us of model changes
-     */
-    clearCache(): void {
-        this._configurations = undefined;
-        this._configurationsPromise = undefined;
-        this._siteAndWorkspaceDataPromise = undefined;
-    }
-
-    protected _getSchemas() {
-        return serviceSchemas;
-    }
-
-    getConfigurations(refetch?: boolean): Promise<Configurations> {
-        if (this._configurations) {
-            if (refetch === true)
-                this._configurations = undefined;
-            else
-                return Promise.resolve(this._configurations);
-        }
-        if (!this._configurationsPromise) {
-            this._configurationsPromise = this.api.getConfigurations({ invalidateCache: refetch || false }).then((configurations) => {
-                // Validate the response - type is automatically inferred!
-                const validated = this._validateResponse('getConfigurations', configurations);
-                this._configurations = validated;
-                this._configurationsPromise = undefined;
-                return validated;
-            });
-        }
-        return this._configurationsPromise;
-    }
-
-    getSiteAndWorkspaceData(siteKey: string, workspaceKey: string): Promise<SiteAndWorkspaceData> {
-
-        if (this._siteAndWorkspaceDataPromise == null) {
-
-            const bundle: Partial<SiteAndWorkspaceData> = {};
-
-            this._siteAndWorkspaceDataPromise = this.getConfigurations()
-                .then((configurations) => {
-                    bundle.configurations = configurations;
-                    bundle.site = configurations.sites.find(site => { return site.key === siteKey });
-                    return this.api.listWorkspaces(siteKey);
-                }).then((workspaces) => {
-                    bundle.siteWorkspaces = workspaces;
-                    bundle.workspace = workspaces.find((workspace) => { return workspace.key === workspaceKey });
-                    return this.api.getWorkspaceDetails(siteKey, workspaceKey);
-                }).then((workspaceDetails) => {
-                    bundle.workspaceDetails = workspaceDetails;
-                    this._siteAndWorkspaceDataPromise = undefined;
-
-                    // Validate the complete bundle before returning - type is automatically inferred!
-                    const validated = this._validateResponse('getSiteAndWorkspaceData', bundle);
-
-                    return validated;
-                }).catch(error => {
-                    this._siteAndWorkspaceDataPromise = undefined;
-                    return Promise.reject(error);
-                });
-        }
-
-        return this._siteAndWorkspaceDataPromise;
-    }
-
-    getWorkspaceDetails(siteKey: string, workspaceKey: string): Promise<WorkspaceDetails> {
-        return this.api.getWorkspaceDetails(siteKey, workspaceKey).then((details) => {
-            // Validate the response - type is automatically inferred!
-            return this._validateResponse('getWorkspaceDetails', details);
-        });
-    }
-
-    getSiteCreatorMessage(siteKey: string, workspaceKey: string): Promise<string> {
-        return this.api.getCreatorMessage(siteKey, workspaceKey).then((message) => {
-            // Validate the response - type is automatically inferred!
-            return this._validateResponse('getSiteCreatorMessage', message);
-        });
-    }
-
-    serveWorkspace(siteKey: string, workspaceKey: string, serveKey: string): void {
-        this.api.serveWorkspace(siteKey, workspaceKey, serveKey);
-    }
-
-    openWorkspaceDir(siteKey: string, workspaceKey: string): void {
-        this.getSiteAndWorkspaceData(siteKey, workspaceKey)
-            .then((bundle) => {
-                this.api.openFileExplorer(bundle.workspace.path, false);
-            });
-    }
+function clearCache(): void {
+  configurationsCache = undefined;
+  configurationsCachePromise = undefined;
+  siteAndWorkspaceDataPromise = undefined;
 }
 
-export default new Service();
+function getConfigurations(refetch?: boolean): Promise<Configurations> {
+  if (configurationsCache) {
+    if (refetch === true) {
+      configurationsCache = undefined;
+    } else {
+      return Promise.resolve(configurationsCache);
+    }
+  }
+  if (!configurationsCachePromise) {
+    configurationsCachePromise = apiService.api
+      .getConfigurations({ invalidateCache: refetch || false })
+      .then((configurations) => {
+        const validated = validateServiceResponse(
+          'getConfigurations',
+          serviceSchemas.getConfigurations,
+          configurations
+        );
+        configurationsCache = validated;
+        configurationsCachePromise = undefined;
+        return validated;
+      });
+  }
+  return configurationsCachePromise;
+}
+
+function getSiteAndWorkspaceData(siteKey: string, workspaceKey: string): Promise<SiteAndWorkspaceData> {
+  if (siteAndWorkspaceDataPromise == null) {
+    const bundle: Partial<SiteAndWorkspaceData> = {};
+
+    siteAndWorkspaceDataPromise = getConfigurations()
+      .then((configurations) => {
+        bundle.configurations = configurations;
+        bundle.site = configurations.sites.find((site) => site.key === siteKey);
+        return apiService.api.listWorkspaces(siteKey);
+      })
+      .then((workspaces) => {
+        bundle.siteWorkspaces = workspaces;
+        bundle.workspace = workspaces.find((workspace) => workspace.key === workspaceKey);
+        return apiService.api.getWorkspaceDetails(siteKey, workspaceKey);
+      })
+      .then((workspaceDetails) => {
+        bundle.workspaceDetails = workspaceDetails;
+        siteAndWorkspaceDataPromise = undefined;
+
+        const validated = validateServiceResponse(
+          'getSiteAndWorkspaceData',
+          serviceSchemas.getSiteAndWorkspaceData,
+          bundle
+        );
+
+        return validated;
+      })
+      .catch((error) => {
+        siteAndWorkspaceDataPromise = undefined;
+        return Promise.reject(error);
+      });
+  }
+
+  return siteAndWorkspaceDataPromise;
+}
+
+function getWorkspaceDetails(siteKey: string, workspaceKey: string): Promise<WorkspaceDetails> {
+  return apiService.api.getWorkspaceDetails(siteKey, workspaceKey).then((details) => {
+    return validateServiceResponse('getWorkspaceDetails', serviceSchemas.getWorkspaceDetails, details);
+  });
+}
+
+function getSiteCreatorMessage(siteKey: string, workspaceKey: string): Promise<string> {
+  return apiService.getSiteCreatorMessage(siteKey, workspaceKey);
+}
+
+function serveWorkspace(siteKey: string, workspaceKey: string, serveKey: string): void {
+  apiService.serveWorkspace(siteKey, workspaceKey, serveKey);
+}
+
+function openWorkspaceDir(siteKey: string, workspaceKey: string): void {
+  apiService.openWorkspaceDir(siteKey, workspaceKey);
+}
+
+const service = {
+  api: apiService.api,
+  clearCache,
+  getConfigurations,
+  getSiteAndWorkspaceData,
+  getWorkspaceDetails,
+  getSiteCreatorMessage,
+  serveWorkspace,
+  openWorkspaceDir,
+};
+
+export default service;

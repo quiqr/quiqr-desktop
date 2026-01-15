@@ -27,8 +27,8 @@ import CopyItemKeyDialog             from './CopyItemKeyDialog'
 import CopyItemToLanguageDialog      from './CopyItemToLanguageDialog'
 import Spinner                       from './../../../components/Spinner'
 import { createDebounce }            from './../../../utils/debounce';
-import {snackMessageService}         from './../../../services/ui-service';
-import service                       from './../../../services/service'
+import { useSnackbar }               from './../../../contexts/SnackbarContext';
+import { api }                       from './../../../services/api-service'
 
 const Fragment = React.Fragment;
 
@@ -238,6 +238,7 @@ interface CollectionState {
 const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collectionKey }) => {
   const filterDebounce = React.useRef(createDebounce(200));
   const navigate = useNavigate();
+  const { addSnackMessage } = useSnackbar();
   
   const [state, setState] = React.useState<CollectionState>({
     selectedWorkspaceDetails: null,
@@ -280,21 +281,13 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
   };
 
   React.useEffect(() => {
-    const componentRef = {
-      forceUpdate: () => {
-        setState(prev => ({ ...prev }));
-      }
-    };
-    service.registerListener(componentRef);
-
-    service.api.getLanguages(siteKey, workspaceKey).then((langs) => {
+    api.getLanguages(siteKey, workspaceKey).then((langs) => {
       setState(prev => ({ ...prev, languages: langs }));
     });
 
     refreshItems();
 
     return () => {
-      service.unregisterListener(componentRef);
       filterDebounce.current.cancel();
     };
   }, [siteKey, workspaceKey, collectionKey]);
@@ -302,7 +295,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
   const refreshItems = React.useCallback(() => {
     if (siteKey && workspaceKey && collectionKey) {
       Promise.all([
-        service.api.listCollectionItems(siteKey, workspaceKey, collectionKey).then((items) => {
+        api.listCollectionItems(siteKey, workspaceKey, collectionKey).then((items) => {
           const filteredData = resolveFilteredItems(items, state.filter);
           setState(prev => ({ 
             ...prev, 
@@ -310,7 +303,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
             ...filteredData 
           }));
         }),
-        service.api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails) => {
+        api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails) => {
           setState(prev => ({ 
             ...prev, 
             selectedWorkspaceDetails: workspaceDetails 
@@ -327,7 +320,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
   const makePageBundleCollectionItem = () => {
     const view = state.view;
     if (view == null) return;
-    service.api.makePageBundleCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
+    api.makePageBundleCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
       .then(() => {
         setState(prev => {
           const itemsCopy = (prev.items || []).slice(0);
@@ -351,7 +344,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
     const view = state.view;
     if (view == null) return;
 
-    service.api.deleteCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
+    api.deleteCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
       .then(() => {
         setState(prev => {
           const itemsCopy = (prev.items || []).slice(0);
@@ -373,7 +366,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
 
   const renameCollectionItem = (itemKey: string, itemOldKey: string) => {
     if (state.view == null) return;
-    service.api.renameCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
+    api.renameCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
       .then((result) => {
         if (result.renamed) {
           setState(prev => {
@@ -402,7 +395,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
   const copyCollectionItem = (itemKey: string, itemOldKey: string) => {
     if (state.view == null) return;
 
-    service.api.copyCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
+    api.copyCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
       .then((result) => {
         if (result.copied) {
           setState(prev => {
@@ -429,12 +422,12 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
     console.log(destLang);
     if (state.view == null) return;
 
-    service.api.copyCollectionItemToLang(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey, destLang)
+    api.copyCollectionItemToLang(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey, destLang)
       .then((result) => {
         if (result.copied) {
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-          //service.api.logToConsole("copied to "+ destLang);
-          snackMessageService.addSnackMessage(`Copies ${itemKey} to ${destLang}.`, { severity: "success" });
+          //api.logToConsole("copied to "+ destLang);
+          addSnackMessage(`Copies ${itemKey} to ${destLang}.`, { severity: "success" });
         } else {
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
         }
@@ -445,7 +438,7 @@ const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collecti
 
   const createCollectionItemKey = (itemKey: string, itemTitle: string) => {
     setState(prev => ({ ...prev, modalBusy: true }));
-    service.api.createCollectionItemKey(siteKey, workspaceKey, collectionKey, itemKey, itemTitle)
+    api.createCollectionItemKey(siteKey, workspaceKey, collectionKey, itemKey, itemTitle)
       .then(({ unavailableReason, key }) => {
         if (unavailableReason) {
           setState(prev => ({ ...prev, modalBusy: false }));

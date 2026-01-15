@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { consoleService } from '../../services/ui-service';
+import { useEffect, useRef } from 'react';
+import { useConsole } from '../../contexts/ConsoleContext';
 
 const consoleStyle = {
   pre: {
@@ -21,22 +21,9 @@ const consoleStyle = {
   },
 };
 
-function useForceUpdate() {
-  const [, setTick] = useState(0);
-  return () => setTick((tick) => tick + 1);
-}
-
 function ConsoleOutput() {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const forceUpdate = useForceUpdate();
-
-  useEffect(() => {
-    const listener = { forceUpdate };
-    consoleService.registerListener(listener);
-    return () => {
-      consoleService.unregisterListener(listener);
-    };
-  }, []);
+  const { consoleMessages } = useConsole();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -47,7 +34,7 @@ function ConsoleOutput() {
   return (
     <>
       <pre style={consoleStyle.pre}>
-        {consoleService.getConsoleMessages().map((msg) => msg.line).join('\n')}
+        {consoleMessages.map((msg) => msg.line).join('\n')}
         <div ref={scrollRef} />
       </pre>
     </>

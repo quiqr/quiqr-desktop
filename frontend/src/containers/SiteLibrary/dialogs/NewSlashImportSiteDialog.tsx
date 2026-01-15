@@ -8,9 +8,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import SnackbarManager from "../../../components/SnackbarManager";
 import service from "../../../services/service";
-import { snackMessageService } from "../../../services/ui-service";
+import { useSnackbar } from "../../../contexts/SnackbarContext";
 import {
   DialogMode,
   SourceType,
@@ -48,6 +47,7 @@ const NewSiteDialog = ({
   onClose,
 }: NewSiteDialogProps) => {
   const [state, dispatch] = useReducer(dialogReducer, initialDialogState);
+  const { addSnackMessage } = useSnackbar();
 
   // Determine if we need the extra deploy key step
   const needsDeployKeyStep = state.sourceType === "git" && state.gitPrivateRepo;
@@ -244,7 +244,7 @@ const NewSiteDialog = ({
       }
     } catch {
       dispatch({ type: "SET_CREATING", payload: false });
-      snackMessageService.addSnackMessage("Failed to create site", { severity: "warning" });
+      addSnackMessage("Failed to create site", { severity: "warning" });
     }
   };
 
@@ -489,7 +489,6 @@ const NewSiteDialog = ({
       fullWidth
       maxWidth="md"
     >
-      <SnackbarManager />
 
       <DialogTitle id="new-site-dialog-title">{dialogTitle}</DialogTitle>
 

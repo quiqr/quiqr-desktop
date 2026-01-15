@@ -5,7 +5,7 @@ import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
-import { snackMessageService } from "../services/ui-service";
+import { useSnackbar } from "../contexts/SnackbarContext";
 import { copyToClipboard } from "../utils/platform";
 
 //import service         from '../services/service';
@@ -46,6 +46,7 @@ interface BundleManagerProps {
 
 const BundleManagerHeader: React.FC<BundleManagerHeaderProps> = React.memo(
   ({ active, headerLeftItems, headerRightItems, label: originalLabel, onClick, style, forceActive }) => {
+    const { addSnackMessage } = useSnackbar();
     let label = originalLabel;
     if (label.substr(0, 7) === "/static") {
       label = label.substr(7, label.length - 7);
@@ -75,7 +76,7 @@ const BundleManagerHeader: React.FC<BundleManagerHeaderProps> = React.memo(
             aria-label='Expand'
             onClick={async () => {
               await copyToClipboard(encodeURI(originalLabel));
-              snackMessageService.addSnackMessage("File path copied to clipboard", {severity: 'success'});
+              addSnackMessage("File path copied to clipboard", {severity: 'success'});
             }}>
             <FileCopyIcon />
           </IconButton>
