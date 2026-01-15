@@ -49,7 +49,7 @@ The test workflow SHALL use consistent Node.js versions and dependencies.
 #### Scenario: Use project Node.js version
 - **GIVEN** the test workflow is running
 - **WHEN** setting up the environment
-- **THEN** it MUST use Node.js version 18.x or higher
+- **THEN** it MUST use Node.js version 20.x or higher
 - **AND** it MUST cache npm dependencies for faster runs
 - **AND** it MUST install dependencies in the frontend workspace
 

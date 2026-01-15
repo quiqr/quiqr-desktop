@@ -215,6 +215,11 @@ describe('myFunction', () => {
   5. Runs `cd frontend && npx tsc --noEmit` (type checking, non-blocking)
 
 #### Local Workflow Testing with act
+
+**When to use act**: Only for testing GitHub Actions workflow configuration changes (`.github/workflows/*.yml` files).
+
+**When NOT to use act**: For testing code changes to Quiqr itself - always use local npm commands instead (see "Running Tests" section above). Local npm testing is much more efficient and faster than running workflows through act/Docker.
+
 Developers can test GitHub Actions workflows locally before pushing:
 
 ```bash
@@ -238,6 +243,7 @@ act pull_request
 - Some actions may behave differently in Docker
 - Useful for catching syntax errors and basic workflow issues
 - Always validate on actual GitHub before merging
+- Resource-intensive (requires Docker) - use local npm commands for testing code changes
 
 ### Git Workflow
 - **Main branch**: `main` (used for PRs)

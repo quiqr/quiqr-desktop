@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '20.x'
           cache: 'npm'
 
       # Step 3: Install root dependencies
@@ -37,14 +37,19 @@ jobs:
         working-directory: ./frontend
         run: npm install
 
-      # Step 5: Run frontend tests using vitest
+      # Step 5: Build workspace packages
+      # The frontend depends on @quiqr/types which must be built first
+      - name: Build workspace packages
+        run: npm run build -w @quiqr/types
+
+      # Step 6: Run frontend tests using vitest
       # This executes all tests in the frontend/test directory
       # See: https://vitest.dev/
       - name: Run frontend tests
         working-directory: ./frontend
         run: npm test
 
-      # Step 6: Run TypeScript type checking
+      # Step 7: Run TypeScript type checking
       # Note: Using continue-on-error because there are pre-existing type errors
       # Once all type errors are fixed, remove continue-on-error to make this blocking
       - name: TypeScript type check
