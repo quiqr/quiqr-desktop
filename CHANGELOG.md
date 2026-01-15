@@ -261,7 +261,6 @@
 - chore: create monorepo structure for @quiqr/backend
 - chore: update TODO.md with phase once completion
 - chore: Move types from frontend to @quiqr/types monorepo package
-- chore: add claude TODO.md
 - fix: replace deprecated/removed button prop on ListItem with ListItemButton
 - fix: add 'as const' to style
 - fix: typo in Sidebar method name
@@ -307,7 +306,6 @@
 - fix: remove AIclient beta property
 - fix: add typed response to readConfKey
 - fix: replace inline defined UserPreferences type with the one from types.ts
-- chore: add claude.md
 
 ## 0.21.3 (2025-11-21)
 - chore: Start using npm workspaces

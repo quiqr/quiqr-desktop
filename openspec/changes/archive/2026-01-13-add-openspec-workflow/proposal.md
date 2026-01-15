@@ -9,11 +9,11 @@ Quiqr Desktop needed a structured approach to planning, implementing, and tracki
 - Established directory structure for specs and changes
 - Added `project.md` for project conventions and context
 - Added `AGENTS.md` with detailed instructions for AI assistants
-- Integrated OpenSpec instructions into `CLAUDE.md` via managed block
+- Integrated OpenSpec instructions into `AGENTS.md` via managed block
 - Set up validation and archiving tooling support
 
 ## Impact
 - **Affected specs**: New capability `spec-driven-development`
-- **Affected code**: `CLAUDE.md` (added OpenSpec instructions)
+- **Affected code**: `AGENTS.md` (added OpenSpec instructions)
 - **Workflow changes**: All future significant changes should follow the OpenSpec workflow
 - **Documentation**: Centralized project context in `openspec/project.md`

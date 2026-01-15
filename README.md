@@ -25,6 +25,8 @@ This `ng`-branch will replace the current `main` which we will rename to `legacy
 
 Quiqr is open source and we appreciate contributions and positive feedback.
 
+For detailed information about contributing to this project, including PR requirements, testing guidelines, and the OpenSpec workflow, please see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Support and Questions
 
 Please don't hesitate to reach out via [Discord](https://discord.gg/nJ2JH7jvmV).
