@@ -130,7 +130,120 @@ const { saveForm } = useFormState();
   ```
 
 ### Testing Strategy
-[To be documented - add your testing approach here]
+
+#### Frontend Testing
+- **Test Framework**: Vitest (v4.x) - Fast unit testing framework
+- **Test Location**: `frontend/test/` directory
+- **Test Organization**: Mirrors source structure
+  - `test/utils/` - Utility function tests
+  - `test/components/` - React component tests
+  - `test/containers/` - Page container tests
+  - `test/contexts/` - Context provider tests
+  - `test/integration/` - Integration tests
+
+#### Running Tests
+```bash
+# Run all tests
+cd frontend && npm test
+
+# Run specific test file
+cd frontend && npm test -- <filename>
+
+# Watch mode during development
+cd frontend && npm test -- --watch
+```
+
+#### Test Requirements
+- **Utility Functions**: MUST have comprehensive unit tests
+  - Cover all code paths and edge cases
+  - Use vitest fake timers for timing-based code
+  - Test error conditions and boundary cases
+- **React Components**: SHOULD have tests for critical functionality
+  - Test user interactions and state changes
+  - Verify prop handling and rendering
+- **Integration Tests**: For cross-cutting features (API, theming)
+
+#### Test Patterns
+- Use `describe()` blocks to group related tests
+- Use `beforeEach()` and `afterEach()` for setup/teardown
+- Use `vi.fn()` for mock functions
+- Use `vi.useFakeTimers()` for time-dependent tests
+- Clean up with `vi.restoreAllMocks()` in `afterEach()`
+
+#### Example Test Structure
+```typescript
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { myFunction } from '../../src/utils/myModule';
+
+describe('myFunction', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should handle normal case', () => {
+    const result = myFunction(input);
+    expect(result).toBe(expected);
+  });
+
+  it('should handle edge case', () => {
+    // Test implementation
+  });
+});
+```
+
+#### When to Write Tests
+- **MUST**: All new utility functions and modules
+- **MUST**: Changes to critical business logic
+- **SHOULD**: New React components with complex logic
+- **SHOULD**: Bug fixes to prevent regression
+- **MAY**: Simple presentational components
+
+#### CI/CD Testing
+- **Automated PR Testing**: Pull requests to `main` or `ng` (Next Generation) branches automatically trigger tests
+- **Workflow File**: `.github/workflows/test.yml` runs frontend tests and type checking
+- **Test Results**: Visible in PR status checks within 5 minutes
+- **Viewing Results**: Click "Details" next to the test check in the PR to see logs
+- **Workflow Execution**:
+  1. Checks out code
+  2. Sets up Node.js 18.x with npm caching
+  3. Installs dependencies (root and frontend)
+  4. Runs `cd frontend && npm test` (vitest)
+  5. Runs `cd frontend && npx tsc --noEmit` (type checking, non-blocking)
+
+#### Local Workflow Testing with act
+
+**When to use act**: Only for testing GitHub Actions workflow configuration changes (`.github/workflows/*.yml` files).
+
+**When NOT to use act**: For testing code changes to Quiqr itself - always use local npm commands instead (see "Running Tests" section above). Local npm testing is much more efficient and faster than running workflows through act/Docker.
+
+Developers can test GitHub Actions workflows locally before pushing:
+
+```bash
+# Install act (if not already installed)
+# See: https://nektosact.com/installation/
+
+# List workflows that would run on pull_request event
+act pull_request --list
+
+# Test the PR workflow locally (dry run)
+act pull_request -n
+
+# Run the workflow locally (requires Docker)
+act pull_request
+```
+
+**Configuration**: The `.actrc` file configures act to use the medium-sized Docker image for compatibility.
+
+**Limitations of act**:
+- May not perfectly replicate GitHub Actions environment
+- Some actions may behave differently in Docker
+- Useful for catching syntax errors and basic workflow issues
+- Always validate on actual GitHub before merging
+- Resource-intensive (requires Docker) - use local npm commands for testing code changes
 
 ### Git Workflow
 - **Main branch**: `main` (used for PRs)
