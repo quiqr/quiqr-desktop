@@ -93,13 +93,6 @@ For information about the release process, versioning policy, and release proced
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/bert-janzwanepol">
-                    <img src="https://avatars.githubusercontent.com/u/49754171?v=4" width="100;" alt="bert-janzwanepol"/>
-                    <br />
-                    <sub><b>Bert-Jan</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/swanenberg">
                     <img src="https://avatars.githubusercontent.com/u/4381573?v=4" width="100;" alt="swanenberg"/>
                     <br />
@@ -127,8 +120,6 @@ For information about the release process, versioning policy, and release proced
                     <sub><b>Jose Diaz-Gonzalez</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/rpetit3">
                     <img src="https://avatars.githubusercontent.com/u/5334269?v=4" width="100;" alt="rpetit3"/>
@@ -136,6 +127,8 @@ For information about the release process, versioning policy, and release proced
                     <sub><b>Robert A. Petit III</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/vendhana">
                     <img src="https://avatars.githubusercontent.com/u/1776624?v=4" width="100;" alt="vendhana"/>
