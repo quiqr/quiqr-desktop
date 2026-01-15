@@ -202,6 +202,43 @@ describe('myFunction', () => {
 - **SHOULD**: Bug fixes to prevent regression
 - **MAY**: Simple presentational components
 
+#### CI/CD Testing
+- **Automated PR Testing**: Pull requests to `main` or `ng` (Next Generation) branches automatically trigger tests
+- **Workflow File**: `.github/workflows/test.yml` runs frontend tests and type checking
+- **Test Results**: Visible in PR status checks within 5 minutes
+- **Viewing Results**: Click "Details" next to the test check in the PR to see logs
+- **Workflow Execution**:
+  1. Checks out code
+  2. Sets up Node.js 18.x with npm caching
+  3. Installs dependencies (root and frontend)
+  4. Runs `cd frontend && npm test` (vitest)
+  5. Runs `cd frontend && npx tsc --noEmit` (type checking, non-blocking)
+
+#### Local Workflow Testing with act
+Developers can test GitHub Actions workflows locally before pushing:
+
+```bash
+# Install act (if not already installed)
+# See: https://nektosact.com/installation/
+
+# List workflows that would run on pull_request event
+act pull_request --list
+
+# Test the PR workflow locally (dry run)
+act pull_request -n
+
+# Run the workflow locally (requires Docker)
+act pull_request
+```
+
+**Configuration**: The `.actrc` file configures act to use the medium-sized Docker image for compatibility.
+
+**Limitations of act**:
+- May not perfectly replicate GitHub Actions environment
+- Some actions may behave differently in Docker
+- Useful for catching syntax errors and basic workflow issues
+- Always validate on actual GitHub before merging
+
 ### Git Workflow
 - **Main branch**: `main` (used for PRs)
 - **Feature branches**: `feature/*` naming convention

@@ -1,0 +1,53 @@
+name: Test Pull Request
+
+# Trigger this workflow on pull requests targeting main or ng (Next Generation) branches
+# Also allow manual triggering via workflow_dispatch for testing
+on:
+  pull_request:
+    branches:
+      - main
+      - ng
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment with caching for faster subsequent runs
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      # Step 3: Install root dependencies
+      # This includes the main package.json dependencies
+      - name: Install root dependencies
+        run: npm install
+
+      # Step 4: Install frontend dependencies
+      # The frontend is a workspace with its own package.json
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      # Step 5: Run frontend tests using vitest
+      # This executes all tests in the frontend/test directory
+      # See: https://vitest.dev/
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm test
+
+      # Step 6: Run TypeScript type checking
+      # Note: Using continue-on-error because there are pre-existing type errors
+      # Once all type errors are fixed, remove continue-on-error to make this blocking
+      - name: TypeScript type check
+        working-directory: ./frontend
+        run: npx tsc --noEmit
+        continue-on-error: true
