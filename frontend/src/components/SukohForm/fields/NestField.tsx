@@ -1,14 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderIcon from '@mui/icons-material/Folder';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import Collapse from '@mui/material/Collapse';
-import { useField, useRenderFields } from '../useField';
+import { useField } from '../useField';
+import { buildNestUrl, getBasePath, parseNestPath } from '../../../utils/nestPath';
 import type { NestField as NestFieldConfig, Field } from '@quiqr/types';
 
 interface Props {
@@ -16,15 +15,14 @@ interface Props {
 }
 
 /**
- * NestField - nested field container with expand/collapse.
- * Click the header to toggle visibility of child fields.
+ * NestField - nested field container that navigates to a nested view.
+ * Click to navigate to a dedicated view showing the nested fields.
  */
 function NestField({ compositeKey }: Props) {
   const { field } = useField(compositeKey);
-  const renderFields = useRenderFields();
+  const navigate = useNavigate();
+  const location = useLocation();
   const config = field as NestFieldConfig;
-
-  const [expanded, setExpanded] = useState(false);
 
   // Build summary of child field labels
   const childLabels = useMemo(() => {
@@ -32,49 +30,36 @@ function NestField({ compositeKey }: Props) {
     return `(${labels})`;
   }, [config.fields]);
 
-  // Determine the path for child fields based on groupdata setting
-  const childPath = compositeKey.replace(/^root\./, '');
-  const groupdata = config.groupdata !== false; // Default to true
-  const parentPath = groupdata ? childPath : childPath.split('.').slice(0, -1).join('.') || '';
-
-  const handleToggle = () => {
-    setExpanded(!expanded);
+  const handleClick = () => {
+    // Get the base path (without any /nest/* suffix)
+    const basePath = getBasePath(location.pathname);
+    // Get the current nest path (if already in a nested view)
+    const currentNestPath = parseNestPath(location.pathname);
+    // Build the URL to navigate to this nested field
+    const url = buildNestUrl(basePath, config.key, currentNestPath);
+    navigate(url);
   };
 
   return (
-    <>
-      <List style={{ marginBottom: expanded ? 0 : 16, padding: 0 }}>
-        <ListItemButton
-          onClick={handleToggle}
-          style={{
-            padding: '20px 16px',
-            border: 'solid 1px #d8d8d8',
-            borderRadius: expanded ? '7px 7px 0 0' : '7px',
-          }}
-        >
-          <ListItemIcon>
-            {expanded ? <FolderOpenIcon /> : <FolderIcon />}
-          </ListItemIcon>
-          <ListItemText
-            primary={config.title ?? config.key}
-            secondary={expanded ? undefined : childLabels}
-          />
-          {expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-        </ListItemButton>
-      </List>
-
-      <Collapse in={expanded}>
-        <div
-          style={{
-            padding: '16px 0px 0px 16px',
-            marginBottom: '16px',
-            borderLeft: 'solid 10px #eee',
-          }}
-        >
-          {renderFields(parentPath, config.fields as Field[])}
-        </div>
-      </Collapse>
-    </>
+    <List style={{ marginBottom: 16, padding: 0 }}>
+      <ListItemButton
+        onClick={handleClick}
+        style={{
+          padding: '20px 16px',
+          border: 'solid 1px #d8d8d8',
+          borderRadius: '7px',
+        }}
+      >
+        <ListItemIcon>
+          <FolderIcon />
+        </ListItemIcon>
+        <ListItemText
+          primary={config.title ?? config.key}
+          secondary={childLabels}
+        />
+        <ChevronRightIcon />
+      </ListItemButton>
+    </List>
   );
 }
 

@@ -10,6 +10,7 @@ interface SingleProps {
   fileOverride?: string | null;
   refreshed?: boolean;
   modelRefreshKey?: number;
+  nestPath?: string;
 }
 
 interface WorkspaceSingle {
@@ -30,7 +31,7 @@ interface WorkspaceDetails {
   [key: string]: unknown;
 }
 
-function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey }: SingleProps) {
+function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey, nestPath }: SingleProps) {
   const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
   const [singleValues, setSingleValues] = useState<unknown>(null);
   const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
@@ -177,6 +178,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
       prompt_templates={prompt_templates}
       buildActions={buildActions}
       plugins={plugins}
+      nestPath={nestPath}
     />
   );
 }
