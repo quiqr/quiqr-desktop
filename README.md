@@ -78,3 +78,8 @@ Installers will be generated in the `dist` folder.
 ## Releasing
 
 For information about the release process, versioning policy, and release procedures, see [RELEASE.md](./RELEASE.md).
+
+## Contributors
+
+<!-- readme: contributors -start -->
+<!-- readme: contributors -end -->

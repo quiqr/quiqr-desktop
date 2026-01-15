@@ -1,0 +1,27 @@
+name: Update Contributors
+
+on:
+  push:
+    branches:
+      - main
+      - ng
+  workflow_dispatch:
+
+jobs:
+  contrib-readme-job:
+    runs-on: ubuntu-latest
+    name: Update contributors in README
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Contribute List
+        uses: akhilmhdh/contributors-readme-action@v2.3.11
+        with:
+          image_size: 100
+          columns_per_row: 6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
