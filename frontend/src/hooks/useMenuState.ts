@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import service from '../services/service';
-import { snackMessageService } from '../services/ui-service';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import { useDialog } from './useDialog';
 import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
 
@@ -27,6 +27,7 @@ const menuStatePromise = service.api
 export function useMenuState() {
   const navigate = useNavigate();
   const { openDialog } = useDialog();
+  const { addSnackMessage } = useSnackbar();
   const [menuState, setMenuState] = useState<WebMenuState | undefined>(cachedMenuState);
 
   // If not cached yet, wait for the promise (only happens on first render)
@@ -110,7 +111,7 @@ export function useMenuState() {
               const message = lines.slice(1).join('\n').trim();
               openDialog('InfoDialog', { title, message });
             } else {
-              snackMessageService.addSnackMessage(
+              addSnackMessage(
                 result.message,
                 { severity: 'info', autoHideDuration: 4000 }
               );
@@ -120,7 +121,7 @@ export function useMenuState() {
 
         case 'error':
           if (result.message) {
-            snackMessageService.addSnackMessage(
+            addSnackMessage(
               result.message,
               { severity: 'error', autoHideDuration: 6000 }
             );
@@ -133,7 +134,7 @@ export function useMenuState() {
             await fetchMenuState();
           }
           if (result.message) {
-            snackMessageService.addSnackMessage(
+            addSnackMessage(
               result.message,
               { severity: 'success', autoHideDuration: 3000 }
             );
@@ -143,7 +144,7 @@ export function useMenuState() {
         case 'reload':
           // Reload the page to refresh workspace view
           if (result.message) {
-            snackMessageService.addSnackMessage(
+            addSnackMessage(
               result.message,
               { severity: 'success', autoHideDuration: 2000 }
             );

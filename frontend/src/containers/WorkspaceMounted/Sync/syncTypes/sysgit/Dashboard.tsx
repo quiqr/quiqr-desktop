@@ -23,7 +23,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import Link from '@mui/material/Link';
 import SettingsIcon from '@mui/icons-material/Settings';
 import * as Meta from './Meta';
-import { snackMessageService } from '../../../../../services/ui-service';
+import { useSnackbar } from '../../../../../contexts/SnackbarContext';
 import service from '../../../../../services/service';
 import { useSyncProgress, SyncProgress } from '../../../../../hooks/useSyncProgress';
 import { SysgitPublishConf } from '../../../../../../types';
@@ -65,6 +65,7 @@ export function Dashboard({
   onSyncProgress,
   onConfigure,
 }: DashboardProps) {
+  const { addSnackMessage } = useSnackbar();
   const [source, setSource] = useState<SourceInfo | null>(null);
   const [historyArr, setHistoryArr] = useState<HistoryItem[]>([]);
   const [lastRefresh, setLastRefresh] = useState('');
@@ -102,7 +103,7 @@ export function Dashboard({
       setResultsShowing(MORE_AMOUNT);
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
     } catch {
-      snackMessageService.addSnackMessage('Sync: read cached remote status failed.', { severity: 'warning' });
+      addSnackMessage('Sync: read cached remote status failed.', { severity: 'warning' });
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
     }
   }, [siteKey, publishConf, dispatchAction, onSyncDialogControl]);
@@ -119,10 +120,10 @@ export function Dashboard({
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
 
       if (showSnack) {
-        snackMessageService.addSnackMessage('Sync: Refreshing remote status finished.', { severity: 'success' });
+        addSnackMessage('Sync: Refreshing remote status finished.', { severity: 'success' });
       }
     } catch {
-      snackMessageService.addSnackMessage('Sync: Refreshing remote status failed.', { severity: 'warning' });
+      addSnackMessage('Sync: Refreshing remote status failed.', { severity: 'warning' });
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
     }
   }, [siteKey, publishConf, dispatchAction, onSyncDialogControl]);
@@ -134,9 +135,9 @@ export function Dashboard({
       await dispatchAction(siteKey, publishConf, 'checkoutRef', { ref: refHash });
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
       refreshRemoteStatus(false);
-      snackMessageService.addSnackMessage(`Sync: commit with ref ${refHash} has been checked out successfully.`, { severity: 'success' });
+      addSnackMessage(`Sync: commit with ref ${refHash} has been checked out successfully.`, { severity: 'success' });
     } catch {
-      snackMessageService.addSnackMessage(`Sync: Failed checking out ref: ${refHash}.`, { severity: 'warning' });
+      addSnackMessage(`Sync: Failed checking out ref: ${refHash}.`, { severity: 'warning' });
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
     }
   }, [siteKey, publishConf, dispatchAction, onSyncDialogControl, refreshRemoteStatus]);
@@ -150,9 +151,9 @@ export function Dashboard({
       await dispatchAction(siteKey, publishConf, dispatchCommand, {});
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
       refreshRemoteStatus(false);
-      snackMessageService.addSnackMessage(`Sync: ${mode} from remote finished.`, { severity: 'success' });
+      addSnackMessage(`Sync: ${mode} from remote finished.`, { severity: 'success' });
     } catch {
-      snackMessageService.addSnackMessage(`Sync: ${mode} from remote failed.`, { severity: 'warning' });
+      addSnackMessage(`Sync: ${mode} from remote failed.`, { severity: 'warning' });
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
     }
   }, [siteKey, publishConf, dispatchAction, onSyncDialogControl, refreshRemoteStatus]);
@@ -169,10 +170,10 @@ export function Dashboard({
       // Then push
       await dispatchAction(siteKey, publishConf, dispatchCommand, {});
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
-      snackMessageService.addSnackMessage('Sync: Push to remote finished.', { severity: 'success' });
+      addSnackMessage('Sync: Push to remote finished.', { severity: 'success' });
     } catch {
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
-      snackMessageService.addSnackMessage('Sync: Push to remote failed.', { severity: 'warning' });
+      addSnackMessage('Sync: Push to remote failed.', { severity: 'warning' });
     }
   }, [siteKey, workspaceKey, publishConf, dispatchAction, onSyncDialogControl]);
 

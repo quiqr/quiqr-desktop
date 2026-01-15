@@ -10,6 +10,8 @@ import { BrowserRouter } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App               from './App.jsx';
 import SnackbarManager   from './components/SnackbarManager.jsx';
+import { SnackbarProvider } from './contexts/SnackbarContext';
+import { ConsoleProvider } from './contexts/ConsoleContext';
 
 // Import theme CSS files
 import './theme/fonts.css';
@@ -34,11 +36,15 @@ const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <div>
-        <SnackbarManager />
-        <App />
-      </div>
-    </BrowserRouter>
+    <SnackbarProvider>
+      <ConsoleProvider>
+        <BrowserRouter>
+          <div>
+            <SnackbarManager />
+            <App />
+          </div>
+        </BrowserRouter>
+      </ConsoleProvider>
+    </SnackbarProvider>
   </QueryClientProvider>
 );

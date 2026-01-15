@@ -1,31 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { snackMessageService } from './../services/ui-service';
+import { useSnackbar } from '../contexts/SnackbarContext';
 
 const SnackbarManager = () => {
-  const [, forceUpdate] = useState({});
-  const listenerRef = useRef<{ forceUpdate: () => void } | null>(null);
+  const { currentSnackMessage, previousSnackMessage, reportSnackDismiss } = useSnackbar();
 
-  useEffect(() => {
-    // Create a listener object with forceUpdate method that triggers re-render
-    listenerRef.current = {
-      forceUpdate: () => {
-        forceUpdate({});
-      }
-    };
-
-    snackMessageService.registerListener(listenerRef.current);
-
-    return () => {
-      if (listenerRef.current) {
-        snackMessageService.unregisterListener(listenerRef.current);
-      }
-    };
-  }, []);
-
-  const snackMessage = snackMessageService.getCurrentSnackMessage();
-  const previousSnackMessage = snackMessageService.getPreviousSnackMessage();
+  const snackMessage = currentSnackMessage;
   let snackbar = undefined;
 
   if(snackMessage){
@@ -48,13 +29,13 @@ const SnackbarManager = () => {
         <Snackbar
           key="snack-message"
           open={ true }
-          onClose={()=>{ snackMessageService.reportSnackDismiss() }}
+          onClose={()=>{ reportSnackDismiss() }}
           anchorOrigin={{vertical:"bottom", horizontal: "left" }}
           autoHideDuration={ snackMessage.autoHideDuration }
         >
           <Alert
             elevation={6} variant="filled"
-            onClose={ ()=>{ snackMessageService.reportSnackDismiss() }}
+            onClose={ ()=>{ reportSnackDismiss() }}
             severity={snackMessage.severity}>
             {snackMessage.message}
           </Alert>

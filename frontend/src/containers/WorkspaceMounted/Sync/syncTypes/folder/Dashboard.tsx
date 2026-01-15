@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import * as Meta from './Meta';
-import { snackMessageService } from '../../../../../services/ui-service';
+import { useSnackbar } from '../../../../../contexts/SnackbarContext';
 import service from '../../../../../services/service';
 import { useSyncProgress, SyncProgress } from '../../../../../hooks/useSyncProgress';
 import { FolderPublishConf } from '../../../../../../types';
@@ -35,6 +35,7 @@ export function Dashboard({
   onSyncProgress,
   onConfigure,
 }: DashboardProps) {
+  const { addSnackMessage } = useSnackbar();
   const { progress, dispatchAction } = useSyncProgress();
 
   // Update parent with progress changes
@@ -48,9 +49,9 @@ export function Dashboard({
     try {
       await dispatchAction(siteKey, publishConf, 'pullFromRemote', {});
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
-      snackMessageService.addSnackMessage('Sync: sync from folder finished.', { severity: 'success' });
+      addSnackMessage('Sync: sync from folder finished.', { severity: 'success' });
     } catch {
-      snackMessageService.addSnackMessage('Sync: sync from folder failed.', { severity: 'warning' });
+      addSnackMessage('Sync: sync from folder failed.', { severity: 'warning' });
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
     }
   }, [siteKey, publishConf, dispatchAction, onSyncDialogControl]);
@@ -65,10 +66,10 @@ export function Dashboard({
       // Then push
       await dispatchAction(siteKey, publishConf, 'pushToRemote', {});
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
-      snackMessageService.addSnackMessage('Sync: Sync to folder finished.', { severity: 'success' });
+      addSnackMessage('Sync: Sync to folder finished.', { severity: 'success' });
     } catch {
       onSyncDialogControl(false, Meta.syncingText, Meta.icon());
-      snackMessageService.addSnackMessage('Sync: Sync to folder failed.', { severity: 'warning' });
+      addSnackMessage('Sync: Sync to folder failed.', { severity: 'warning' });
     }
   }, [siteKey, workspaceKey, publishConf, dispatchAction, onSyncDialogControl]);
 
