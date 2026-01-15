@@ -244,15 +244,27 @@ export const SukohForm = ({
           onChange={handleNewFormChange}
         >
           {nestPath ? (
-            // Render only the nested field's children
+            // Render nested field view
             (() => {
               const nestedField = findFieldByPath(typedFields, nestPath);
-              if (nestedField && 'fields' in nestedField && Array.isArray(nestedField.fields)) {
+              if (!nestedField) {
+                return <div>Nested field not found: {nestPath}</div>;
+              }
+
+              // For accordion fields, render the field itself (not its children)
+              // AccordionField will detect it's being navigated to and auto-expand
+              if (nestedField.type === 'accordion') {
+                return <FieldRenderer key={nestedField.key} compositeKey={`root.${nestPath}`} />;
+              }
+
+              // For nest fields, render the children
+              if ('fields' in nestedField && Array.isArray(nestedField.fields)) {
                 const childFields = nestedField.fields as Field[];
                 return childFields.map((field) => (
                   <FieldRenderer key={field.key} compositeKey={`root.${nestPath}.${field.key}`} />
                 ));
               }
+
               return <div>Nested field not found: {nestPath}</div>;
             })()
           ) : (
