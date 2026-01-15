@@ -24,7 +24,7 @@
 - [x] 3.6 Document decision tree for when to create proposals
 
 ## 4. Integration with Existing Workflow
-- [x] 4.1 Add OpenSpec instructions block to `CLAUDE.md`
+- [x] 4.1 Add OpenSpec instructions block to `AGENTS.md`
 - [x] 4.2 Use managed comment block for easy updates via `openspec update`
 - [x] 4.3 Include trigger conditions for opening `AGENTS.md`
 

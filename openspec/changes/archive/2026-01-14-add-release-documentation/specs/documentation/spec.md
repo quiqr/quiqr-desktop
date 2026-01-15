@@ -47,4 +47,4 @@ Project documentation SHALL be organized with clear separation between user-faci
   - README.md: Project overview, getting started, development setup
   - RELEASE.md: Release process, versioning policy, release procedures
   - CHANGELOG.md: Version history and changes
-  - CLAUDE.md: AI assistant instructions for working with the codebase
+  - AGENTS.md: AI assistant instructions for working with the codebase

@@ -111,7 +111,7 @@ The project SHALL maintain a standard directory structure with `openspec/specs/`
 - **THEN** it is moved to `openspec/changes/archive/YYYY-MM-DD-[change-id]/`
 
 ### Requirement: Integration with Existing Workflow
-OpenSpec instructions SHALL be integrated into the project's `CLAUDE.md` file via a managed comment block.
+OpenSpec instructions SHALL be integrated into the project's `AGENTS.md` file via a managed comment block.
 
 #### Scenario: AI assistant sees OpenSpec instructions
 - **WHEN** relevant requests are made (planning, proposals, specs)
@@ -119,7 +119,7 @@ OpenSpec instructions SHALL be integrated into the project's `CLAUDE.md` file vi
 
 #### Scenario: Instructions stay updated
 - **WHEN** OpenSpec updates its instruction template
-- **THEN** running `openspec update` updates the managed block in CLAUDE.md
+- **THEN** running `openspec update` updates the managed block in AGENTS.md
 
 ### Requirement: Validation Support
 The workflow SHALL support validation of proposals and specs to ensure correctness.

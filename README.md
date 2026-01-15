@@ -25,6 +25,8 @@ This `ng`-branch will replace the current `main` which we will rename to `legacy
 
 Quiqr is open source and we appreciate contributions and positive feedback.
 
+For detailed information about contributing to this project, including PR requirements, testing guidelines, and the OpenSpec workflow, please see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Support and Questions
 
 Please don't hesitate to reach out via [Discord](https://discord.gg/nJ2JH7jvmV).
@@ -76,3 +78,79 @@ Installers will be generated in the `dist` folder.
 ## Releasing
 
 For information about the release process, versioning policy, and release procedures, see [RELEASE.md](./RELEASE.md).
+
+## Contributors
+
+<!-- readme: contributors -start -->
+<table>
+	<tbody>
+		<tr>
+            <td align="center">
+                <a href="https://github.com/mipmip">
+                    <img src="https://avatars.githubusercontent.com/u/658612?v=4" width="100;" alt="mipmip"/>
+                    <br />
+                    <sub><b>Pim Snel</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/bert-janzwanepol">
+                    <img src="https://avatars.githubusercontent.com/u/49754171?v=4" width="100;" alt="bert-janzwanepol"/>
+                    <br />
+                    <sub><b>Bert-Jan</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/swanenberg">
+                    <img src="https://avatars.githubusercontent.com/u/4381573?v=4" width="100;" alt="swanenberg"/>
+                    <br />
+                    <sub><b>Brecht Swanenberg</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/julianoappelklein">
+                    <img src="https://avatars.githubusercontent.com/u/3170711?v=4" width="100;" alt="julianoappelklein"/>
+                    <br />
+                    <sub><b>Juliano Appel Klein</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/vsopvsop">
+                    <img src="https://avatars.githubusercontent.com/u/5552204?v=4" width="100;" alt="vsopvsop"/>
+                    <br />
+                    <sub><b>vsopvsop</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/josegonzalez">
+                    <img src="https://avatars.githubusercontent.com/u/65675?v=4" width="100;" alt="josegonzalez"/>
+                    <br />
+                    <sub><b>Jose Diaz-Gonzalez</b></sub>
+                </a>
+            </td>
+		</tr>
+		<tr>
+            <td align="center">
+                <a href="https://github.com/rpetit3">
+                    <img src="https://avatars.githubusercontent.com/u/5334269?v=4" width="100;" alt="rpetit3"/>
+                    <br />
+                    <sub><b>Robert A. Petit III</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/vendhana">
+                    <img src="https://avatars.githubusercontent.com/u/1776624?v=4" width="100;" alt="vendhana"/>
+                    <br />
+                    <sub><b>Vendhan Arumugam</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/gigot-don">
+                    <img src="https://avatars.githubusercontent.com/u/183019247?v=4" width="100;" alt="gigot-don"/>
+                    <br />
+                    <sub><b>gigot-don</b></sub>
+                </a>
+            </td>
+		</tr>
+	<tbody>
+</table>
+<!-- readme: contributors -end -->
