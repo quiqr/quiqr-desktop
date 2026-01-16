@@ -144,7 +144,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-frontend/build
+packages/frontend/build
 
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 

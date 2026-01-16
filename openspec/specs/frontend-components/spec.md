@@ -30,7 +30,7 @@ All React components in the frontend SHALL use the functional component pattern 
 
 #### Scenario: No class component remains in components directory
 - **GIVEN** the frontend codebase
-- **WHEN** searching for class components with `grep -r "extends React.Component" frontend/src/components`
+- **WHEN** searching for class components with `grep -r "extends React.Component" packages/frontend/src/components`
 - **THEN** no matches SHOULD be found
 - **AND** the AiAssist component MUST be the last class component converted
 

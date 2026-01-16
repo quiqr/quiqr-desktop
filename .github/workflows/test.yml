@@ -34,7 +34,7 @@ jobs:
       # Step 4: Install frontend dependencies
       # The frontend is a workspace with its own package.json
       - name: Install frontend dependencies
-        working-directory: ./frontend
+        working-directory: ./packages/frontend
         run: npm install
 
       # Step 5: Build workspace packages
@@ -43,16 +43,16 @@ jobs:
         run: npm run build -w @quiqr/types
 
       # Step 6: Run frontend tests using vitest
-      # This executes all tests in the frontend/test directory
+      # This executes all tests in the packages/frontend/test directory
       # See: https://vitest.dev/
       - name: Run frontend tests
-        working-directory: ./frontend
+        working-directory: ./packages/frontend
         run: npm test
 
       # Step 7: Run TypeScript type checking
       # Note: Using continue-on-error because there are pre-existing type errors
       # Once all type errors are fixed, remove continue-on-error to make this blocking
       - name: TypeScript type check
-        working-directory: ./frontend
+        working-directory: ./packages/frontend
         run: npx tsc --noEmit
         continue-on-error: true
