@@ -54,16 +54,21 @@ jobs:
         working-directory: ./packages/frontend
         run: npm run test:coverage
 
-      # Step 7: Update coverage badge (ng branch only)
+      # Step 7: Copy coverage to root for badge action (ng branch only)
+      # The badge action expects coverage files in the root directory
+      - name: Copy coverage to root
+        if: github.ref == 'refs/heads/ng'
+        run: cp -r ./packages/frontend/coverage ./coverage
+
+      # Step 8: Update coverage badge (ng branch only)
       # Requires: gh-pages branch exists and GitHub Pages is enabled
       # Requires: Workflow permissions set to "Read and write permissions"
       # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
       - name: Update Coverage Badge
         if: github.ref == 'refs/heads/ng'
-        working-directory: ./packages/frontend
         uses: we-cli/coverage-badge-action@main
 
-      # Step 8: Run TypeScript type checking
+      # Step 9: Run TypeScript type checking
       # Note: Using continue-on-error because there are pre-existing type errors
       # Once all type errors are fixed, remove continue-on-error to make this blocking
       - name: TypeScript type check
