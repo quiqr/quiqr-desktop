@@ -9,6 +9,12 @@
   <a href="https://discord.gg/nJ2JH7jvmV">Discord</a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/mipmip/quiqr-desktop/actions">
+    <img src="https://mipmip.github.io/quiqr-desktop/badges/coverage.svg" alt="Coverage">
+  </a>
+</p>
+
 # Quiqr Desktop NG (Next Generation)
 
 Quiqr Desktop NG is a major upgrade of the Quiqr source code including:
