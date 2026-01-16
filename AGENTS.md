@@ -34,7 +34,7 @@ npm run dev  # Starts both frontend dev server and Electron
 
 **Frontend only:**
 ```bash
-cd frontend && npm run dev  # Vite dev server on http://localhost:4002
+cd packages/frontend && npm run dev  # Vite dev server on http://localhost:4002
 ```
 
 **Build application:**
@@ -52,7 +52,7 @@ npm run build:rpm
 
 **Type checking:**
 ```bash
-cd frontend && npx tsc --noEmit
+cd packages/frontend && npx tsc --noEmit
 ```
 
 ## Architecture Overview
@@ -69,7 +69,7 @@ cd frontend && npx tsc --noEmit
    - Exposes REST API at `/api/*` endpoints
    - All backend logic is in `/backend/src-main/`
 
-3. **Frontend** (`/frontend/src/`)
+3. **Frontend** (`/packages/frontend/src/`)
    - React + TypeScript + Vite + Material-UI (MUI v6)
    - Communicates with backend via HTTP through `main-process-bridge.ts`
    - Runs on port 4002 in development
@@ -80,9 +80,9 @@ Frontend → Backend communication flow:
 ```
 React Component
   ↓
-service.api.methodName()  (/frontend/src/api.ts)
+service.api.methodName()  (/packages/frontend/src/api.ts)
   ↓
-mainProcessBridge.request()  (/frontend/src/utils/main-process-bridge.ts)
+mainProcessBridge.request()  (/packages/frontend/src/utils/main-process-bridge.ts)
   ↓
 HTTP POST to http://localhost:3030/api/methodName
   ↓
@@ -95,7 +95,7 @@ Backend services and business logic
 
 ### Type System
 
-**Centralized type definitions in `/frontend/types.ts`:**
+**Centralized type definitions in `/packages/frontend/types.ts`:**
 - All Zod schemas for data validation
 - Field schemas for the dynamic form system
 - API response schemas in `apiSchemas` object
@@ -120,7 +120,7 @@ When adding methods that read/write config values, use generic typing with a typ
 - `scaffold-model/` - Dynamic model scaffolding
 - `utils/` - Shared utilities
 
-### Frontend (`/frontend/src/`)
+### Frontend (`/packages/frontend/src/`)
 - `api.ts` - API client methods (one method per backend endpoint)
 - `services/` - Frontend service layer with validation
 - `components/` - Reusable UI components
@@ -138,7 +138,7 @@ Platform-specific binaries and assets packaged with the application (Hugo binari
 
 ## Dynamic Form System
 
-The SukohForm system (`/frontend/src/components/SukohForm/`) is a schema-driven form builder using React Context and lazy-loaded components:
+The SukohForm system (`/packages/frontend/src/components/SukohForm/`) is a schema-driven form builder using React Context and lazy-loaded components:
 
 ### Architecture
 
@@ -294,7 +294,7 @@ This is achieved through:
 
 ## Workspace Structure
 
-Projects use NPM workspaces with `/frontend` as a workspace. Install dependencies in the root first, then frontend-specific dependencies will be linked automatically.
+Projects use NPM workspaces with `/packages/frontend` as a workspace. Install dependencies in the root first, then frontend-specific dependencies will be linked automatically.
 
 ## Code Style
 

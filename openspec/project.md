@@ -42,7 +42,7 @@ Quiqr Desktop is an Electron-based desktop CMS for local-first management of sta
 - Use **Zod schemas** for validation and type inference via `z.infer<typeof schema>`
 - Prefer **generic typing** over union types with manual type guards
 - **No emojis** in code or comments unless explicitly requested
-- **Centralized types** in `/frontend/types.ts` for all Zod schemas
+- **Centralized types** in `/packages/frontend/types.ts` for all Zod schemas
 
 ### Naming Conventions
 - compositeKey for form fields: `root.author.name`, `root.tags[0]`
@@ -65,7 +65,7 @@ The project is a monorepo that supports two runtime modes with a shared codebase
   - Express server running inside Electron main process
   - REST API at `/api/*` endpoints
   - Business logic and file system operations
-- **Frontend** (`/frontend/src/`)
+- **Frontend** (`/packages/frontend/src/`)
   - React + TypeScript + Vite + MUI
   - Rendered in Electron window
   - HTTP communication to backend via `main-process-bridge.ts`
@@ -75,7 +75,7 @@ The project is a monorepo that supports two runtime modes with a shared codebase
   - Standalone Node.js process running Express server
   - REST API at `/api/*` endpoints
   - Same backend code as Electron mode
-- **Frontend** (`/frontend/src/`)
+- **Frontend** (`/packages/frontend/src/`)
   - React + TypeScript + Vite + MUI
   - Served to web browser
   - HTTP communication to backend via `main-process-bridge.ts`
@@ -84,8 +84,8 @@ The project is a monorepo that supports two runtime modes with a shared codebase
 #### Communication Pattern
 ```
 React Component
-  → service.api.methodName() (/frontend/src/api.ts)
-  → mainProcessBridge.request() (/frontend/src/utils/main-process-bridge.ts)
+  → service.api.methodName() (/packages/frontend/src/api.ts)
+  → mainProcessBridge.request() (/packages/frontend/src/utils/main-process-bridge.ts)
   → HTTP POST to http://localhost:3030/api/methodName
   → Express handler (/backend/server.js)
   → apiMain[methodName]() (/backend/src-main/bridge/api-main.js)
@@ -133,7 +133,7 @@ const { saveForm } = useFormState();
 
 #### Frontend Testing
 - **Test Framework**: Vitest (v4.x) - Fast unit testing framework
-- **Test Location**: `frontend/test/` directory
+- **Test Location**: `packages/frontend/test/` directory
 - **Test Organization**: Mirrors source structure
   - `test/utils/` - Utility function tests
   - `test/components/` - React component tests
@@ -144,13 +144,13 @@ const { saveForm } = useFormState();
 #### Running Tests
 ```bash
 # Run all tests
-cd frontend && npm test
+cd packages/frontend && npm test
 
 # Run specific test file
-cd frontend && npm test -- <filename>
+cd packages/frontend && npm test -- <filename>
 
 # Watch mode during development
-cd frontend && npm test -- --watch
+cd packages/frontend && npm test -- --watch
 ```
 
 #### Test Requirements
@@ -211,8 +211,8 @@ describe('myFunction', () => {
   1. Checks out code
   2. Sets up Node.js 18.x with npm caching
   3. Installs dependencies (root and frontend)
-  4. Runs `cd frontend && npm test` (vitest)
-  5. Runs `cd frontend && npx tsc --noEmit` (type checking, non-blocking)
+  4. Runs `cd packages/frontend && npm test` (vitest)
+  5. Runs `cd packages/frontend && npx tsc --noEmit` (type checking, non-blocking)
 
 #### Local Workflow Testing with act
 
@@ -271,7 +271,7 @@ act pull_request
 - `scaffold-model/` - Dynamic model scaffolding
 - `utils/` - Shared utilities
 
-#### Frontend (`/frontend/src/`)
+#### Frontend (`/packages/frontend/src/`)
 - `api.ts` - API client methods (one per backend endpoint)
 - `services/` - Frontend service layer with validation
 - `components/` - Reusable UI components

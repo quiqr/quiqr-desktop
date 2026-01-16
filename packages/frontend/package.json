@@ -1,4 +1,5 @@
 {
+  "name": "@quiqr/frontend",
   "homepage": "./",
   "private": true,
   "type": "module",

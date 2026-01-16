@@ -21,7 +21,7 @@ This guide will help you understand our contribution process and ensure your con
 
 3. **Run tests locally**
    ```bash
-   cd frontend && npm test
+   cd packages/frontend && npm test
    ```
 
 4. **Start development environment**
@@ -58,8 +58,8 @@ For features, include:
 
 ### 2. Passing CI Checks
 
-- Run tests locally: `cd frontend && npm test`
-- Check types: `cd frontend && npx tsc --noEmit`
+- Run tests locally: `cd packages/frontend && npm test`
+- Check types: `cd packages/frontend && npx tsc --noEmit`
 
 Before a PR can be merged:
 - All automated tests must pass
