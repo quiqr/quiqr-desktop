@@ -54,13 +54,40 @@ jobs:
         working-directory: ./packages/frontend
         run: npm run test:coverage
 
-      # Step 7: Copy coverage to root for badge action (ng branch only)
-      # The badge action expects coverage files in the root directory
-      - name: Copy coverage to root
-        if: github.ref == 'refs/heads/ng'
-        run: cp -r ./packages/frontend/coverage ./coverage
+      # Step 7: Run backend tests with coverage
+      # This executes all tests in the packages/backend directory
+      # Backend has 260+ tests covering SSG providers, jobs, and utilities
+      - name: Run backend tests with coverage
+        working-directory: ./packages/backend
+        run: npm run test:coverage
+        continue-on-error: true
 
-      # Step 8: Update coverage badge (ng branch only)
+      # Step 8: Combine coverage from frontend and backend (ng branch only)
+      # Calculate the combined coverage percentage from both packages
+      - name: Combine coverage reports
+        if: github.ref == 'refs/heads/ng'
+        run: |
+          # Extract coverage percentages from both packages
+          FRONTEND_COV=$(node -p 't=require("./packages/frontend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
+          BACKEND_COV=$(node -p 't=require("./packages/backend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
+          
+          # Calculate weighted average based on total statements
+          FRONTEND_STMTS=$(node -p 'require("./packages/frontend/coverage/coverage-summary.json").total.statements.total')
+          BACKEND_STMTS=$(node -p 'require("./packages/backend/coverage/coverage-summary.json").total.statements.total')
+          TOTAL_STMTS=$((FRONTEND_STMTS + BACKEND_STMTS))
+          
+          # Weighted average coverage
+          COMBINED_COV=$(node -p "((${FRONTEND_COV} * ${FRONTEND_STMTS} + ${BACKEND_COV} * ${BACKEND_STMTS}) / ${TOTAL_STMTS}).toFixed(2)")
+          
+          echo "Frontend coverage: ${FRONTEND_COV}%"
+          echo "Backend coverage: ${BACKEND_COV}%"
+          echo "Combined coverage: ${COMBINED_COV}%"
+          
+          # Create combined coverage summary for badge
+          mkdir -p ./coverage
+          node -p "JSON.stringify({total:{lines:{pct:${COMBINED_COV}},statements:{pct:${COMBINED_COV}},functions:{pct:${COMBINED_COV}},branches:{pct:${COMBINED_COV}}}})" > ./coverage/coverage-summary.json
+
+      # Step 9: Update coverage badge (ng branch only)
       # Requires: gh-pages branch exists and GitHub Pages is enabled
       # Requires: Workflow permissions set to "Read and write permissions"
       # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
@@ -68,7 +95,7 @@ jobs:
         if: github.ref == 'refs/heads/ng'
         uses: we-cli/coverage-badge-action@main
 
-      # Step 9: Run TypeScript type checking
+      # Step 10: Run TypeScript type checking
       # Note: Using continue-on-error because there are pre-existing type errors
       # Once all type errors are fixed, remove continue-on-error to make this blocking
       - name: TypeScript type check
