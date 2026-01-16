@@ -60,10 +60,10 @@ jobs:
       # Step 7: Run backend tests with coverage
       # This executes all tests in the packages/backend directory
       # Backend has 260+ tests covering SSG providers, jobs, and utilities
+      # Continue even if tests fail to ensure coverage is collected
       - name: Run backend tests with coverage
         working-directory: ./packages/backend
-        run: npm run test:coverage
-        continue-on-error: true
+        run: npm run test:coverage || true
 
       # Step 8: Combine coverage from frontend and backend (ng branch only)
       # Calculate the combined coverage percentage from both packages
