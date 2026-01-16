@@ -16,10 +16,37 @@ Quiqr Desktop NG is a major upgrade of the Quiqr source code including:
 - Electron updates
 - React updates
 - MUI updates
-- migrate to Vite
-- and many more updates
+- Migrate to Vite
+- Experimental standalone server mode
+- And many more updates
 
 This `ng`-branch will replace the current `main` which we will rename to `legacy` ASAP.
+
+## Quiqr Editions
+
+Though the repository still is named quiqr-desktop, The Quiqr application can
+run in two modes: Desktop Mode (Electron) or Server Mode (Standalone). 
+
+### Desktop Mode
+
+Quiqr Desktop runs on your computer. As a desktop application
+users gain all advantages of a local first application.
+
+- No latencies, blazingly fast;
+- All data is stored on your computer;
+- Perfect setup for Site developers as site code changes can be done on the same computer.
+
+### Server Mode 
+
+Quiqr Server allowes Quiqr to be installed as a web application. This allowed
+short user boarding times.
+
+- Ideal for sites or applications which have many users;
+- Users don't have install Quiqr on their computer, just use the web browser;
+- Users don't have to import sites, this can be pre-setup;
+- Users don't have to configure synchronizations, this can be pre-setup,
+
+In version 0.21, this setup is experimental and not production ready. 
 
 ## Open Source & Contributing
 
@@ -33,7 +60,8 @@ Please don't hesitate to reach out via [Discord](https://discord.gg/nJ2JH7jvmV).
 
 ## Community Guidelines
 
-At a high level, we ask everyone be respectful and empathetic. We follow the [Github Community Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
+At a high level, we ask everyone be respectful and empathetic. We follow the
+[Github Community Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
 
 * Be welcoming and open-minded
 * Respect each other
@@ -46,21 +74,50 @@ At a high level, we ask everyone be respectful and empathetic. We follow the [Gi
 
 ## Development
 
-### Running Locally
-
 1. Clone the repository
 2. Run `npm install` to install the dependencies
 3. Run `npm run _pack_embgit` to get the lightweight embedded git client
-4. You may or may not need to run `npm run build` in the `frontend` folder to build the frontend.
-5. Run `npm run dev` to start the development server and the Electron app
-6. React app will be running on [http://localhost:4002](http://localhost:5173)
 
-> [!TIP]
-> You can also run the backend without electron. It will just start the API:
-> `npm run dev:backend:standalone`
-> `npm run dev:frontend`
-> Visit http://localhost:4002 in your browser.
-> If you use Firefox you might run into CORS issues.
+### Running the Desktop Mode Application locally
+
+1. Run `npm run dev` to start the development server and the Electron app. The
+   app will start and open the frontend automatically.
+
+### Running the Standalone Server Mode Application locally
+
+1. Start a terminal to run the backend with the command: `npm run dev:backend:standalone`
+2. Start a terminal to run the frontend with the command: `npm run dev:frontend`
+3. Visit http://localhost:4002 in your browser.
+
+### Development on Nix
+
+We provide a local flake for development purposes. Use it like this:
+
+```bash
+nix develop
+npm install
+
+# Run desktop
+npm run dev
+```
+### Packaging for Nix
+
+Currently there is a WIP packaging fork available at
+[https://github.com/mipmip/nixpkgs/tree/quiqr-in-nixpkgs](https://github.com/mipmip/nixpkgs/tree/quiqr-in-nixpkgs). 
+
+You can build and run Quiqr using the following commands:
+
+```bash
+git clone https://github.com/mipmip/nixpkgs.git
+cd nixpkgs
+git checkout quiqr-in-nixpkgs
+
+# Run desktop
+nix run .#quiqr.desktop
+
+# Run server
+nix run .#quiqr.server
+```
 
 ### Building the Installers
 
@@ -77,7 +134,8 @@ Installers will be generated in the `dist` folder.
 
 ## Releasing
 
-For information about the release process, versioning policy, and release procedures, see [RELEASE.md](./RELEASE.md).
+For information about the release process, versioning policy, and release
+procedures, see [RELEASE.md](./RELEASE.md).
 
 ## Contributors
 
