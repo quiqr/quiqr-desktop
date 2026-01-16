@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { instance as api } from '../api';
+import { getConfigurations, listWorkspaces, getWorkspaceDetails } from '../api';
 import { serviceSchemas, Configurations, SiteAndWorkspaceData, WorkspaceDetails } from '../../types';
 import { validateServiceResponse } from '../utils/validation';
 
@@ -20,8 +20,7 @@ export function useConfigurations(refetch?: boolean) {
         setLoading(true);
         setError(undefined);
 
-        promiseRef.current = api
-          .getConfigurations({ invalidateCache: refetch || false })
+        promiseRef.current = getConfigurations({ invalidateCache: refetch || false })
           .then((configurations) => {
             const validated = validateServiceResponse(
               'getConfigurations',
@@ -70,8 +69,7 @@ export function useSiteAndWorkspaceData(siteKey: string, workspaceKey: string) {
 
       const bundle: Partial<SiteAndWorkspaceData> = {};
 
-      promiseRef.current = api
-        .getConfigurations({ invalidateCache: false })
+      promiseRef.current = getConfigurations({ invalidateCache: false })
         .then((configurations) => {
           const validatedConfigs = validateServiceResponse(
             'getConfigurations',
@@ -80,12 +78,12 @@ export function useSiteAndWorkspaceData(siteKey: string, workspaceKey: string) {
           );
           bundle.configurations = validatedConfigs;
           bundle.site = validatedConfigs.sites.find(site => site.key === siteKey);
-          return api.listWorkspaces(siteKey);
+          return listWorkspaces(siteKey);
         })
         .then((workspaces) => {
           bundle.siteWorkspaces = workspaces;
           bundle.workspace = workspaces.find((workspace) => workspace.key === workspaceKey);
-          return api.getWorkspaceDetails(siteKey, workspaceKey);
+          return getWorkspaceDetails(siteKey, workspaceKey);
         })
         .then((workspaceDetails) => {
           bundle.workspaceDetails = workspaceDetails;
@@ -122,8 +120,7 @@ export function useWorkspaceDetails(siteKey: string, workspaceKey: string) {
     setLoading(true);
     setError(undefined);
 
-    api
-      .getWorkspaceDetails(siteKey, workspaceKey)
+    getWorkspaceDetails(siteKey, workspaceKey)
       .then((details) => {
         const validated = validateServiceResponse(
           'getWorkspaceDetails',

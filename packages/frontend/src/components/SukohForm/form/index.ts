@@ -9,5 +9,16 @@ export type { UseFieldResult, UseResourcesResult } from '../useField';
 
 // Field Rendering
 export { FieldRenderer, FieldList, clearFieldComponentCache } from '../FieldRenderer';
-export { fieldRegistry } from '../FieldRegistry';
-export type { FieldComponentProps, FieldImporter } from '../FieldRegistry';
+
+// Field Registry - Re-export all functions and types
+export {
+  register,
+  getFieldComponent,
+  hasFieldComponent,
+  getRegisteredTypes,
+  setLegacyMode,
+  isLegacyMode,
+  fieldRegistry,
+} from '../FieldRegistry';
+export type { FieldComponentProps, FieldImporter, FieldRegistry } from '../FieldRegistry';
+

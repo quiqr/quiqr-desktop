@@ -44,8 +44,8 @@ interface BundleManagerProps {
   onChange?: (index: number) => void;
 }
 
-const BundleManagerHeader: React.FC<BundleManagerHeaderProps> = React.memo(
-  ({ active, headerLeftItems, headerRightItems, label: originalLabel, onClick, style, forceActive }) => {
+const BundleManagerHeader = React.memo(
+  ({ active, headerLeftItems, headerRightItems, label: originalLabel, onClick, style, forceActive }: BundleManagerHeaderProps) => {
     const { addSnackMessage } = useSnackbar();
     let label = originalLabel;
     if (label.substr(0, 7) === "/static") {
@@ -101,7 +101,7 @@ const BundleManagerHeader: React.FC<BundleManagerHeaderProps> = React.memo(
   }
 );
 
-const BundleManagerItem: React.FC<BundleManagerItemProps> = ({
+const BundleManagerItem = ({
   active,
   body,
   label,
@@ -114,7 +114,7 @@ const BundleManagerItem: React.FC<BundleManagerItemProps> = ({
   style,
   wrapperProps,
   forceActive,
-}) => {
+}: BundleManagerItemProps) => {
   const _style: React.CSSProperties = {
     minWidth: "250px",
     ...style,
@@ -166,7 +166,7 @@ const BundleManagerItem: React.FC<BundleManagerItemProps> = ({
   );
 };
 
-const BundleManager: React.FC<BundleManagerProps> = ({ style, children, forceActive, index, onChange }) => {
+const BundleManager = ({ style, children, forceActive, index, onChange }: BundleManagerProps) => {
   const [internalIndex, setInternalIndex] = React.useState(-1);
 
   const openedIndex = index !== undefined ? index : internalIndex;

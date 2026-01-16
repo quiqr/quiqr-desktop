@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
-import mainProcessBridge from '../utils/main-process-bridge';
+import { addMessageHandler } from '../utils/main-process-bridge';
 import { ConsoleMessage, uiServiceSchemas } from '../../types';
 import { validateServiceResponse } from '../utils/validation';
 
@@ -71,8 +71,8 @@ export function ConsoleProvider({ children }: ConsoleProviderProps) {
   }, [processBuffer]);
 
   useEffect(() => {
-    mainProcessBridge.addMessageHandler('console', onConsole);
-    mainProcessBridge.addMessageHandler('hugo-output-line', onHugoOutput);
+    addMessageHandler('console', onConsole);
+    addMessageHandler('hugo-output-line', onHugoOutput);
 
     return () => {
       if (timeoutRef.current) {

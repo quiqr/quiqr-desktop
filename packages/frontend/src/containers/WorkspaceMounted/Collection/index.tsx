@@ -41,12 +41,12 @@ interface MakePageBundleItemKeyDialogProps {
   handleConfirm?: (value: string) => void;
 }
 
-const MakePageBundleItemKeyDialog: React.FC<MakePageBundleItemKeyDialogProps> = ({
+const MakePageBundleItemKeyDialog = ({
   busy,
   itemLabel,
   handleClose,
   handleConfirm
-}) => {
+}: MakePageBundleItemKeyDialogProps) => {
   const [state, setState] = React.useState({
     value: '',
     valid: null
@@ -103,7 +103,7 @@ interface CollectionListItemsProps {
   languages: any[];
 }
 
-const CollectionListItems: React.FC<CollectionListItemsProps> = React.memo(({
+const CollectionListItems = React.memo(({
   collectionExtension,
   filteredItems,
   onItemClick,
@@ -115,7 +115,7 @@ const CollectionListItems: React.FC<CollectionListItemsProps> = React.memo(({
   sortDescending,
   showSortValue,
   languages
-}) => {
+}: CollectionListItemsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [currentItem, setCurrentItem] = React.useState<any>(null);
 
@@ -235,7 +235,7 @@ interface CollectionState {
   showSortValue?: boolean;
 }
 
-const Collection: React.FC<CollectionProps> = ({ siteKey, workspaceKey, collectionKey }) => {
+const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) => {
   const filterDebounce = React.useRef(createDebounce(200));
   const navigate = useNavigate();
   const { addSnackMessage } = useSnackbar();
