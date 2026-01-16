@@ -60,6 +60,7 @@ jobs:
       # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
       - name: Update Coverage Badge
         if: github.ref == 'refs/heads/ng'
+        working-directory: ./packages/frontend
         uses: we-cli/coverage-badge-action@main
 
       # Step 8: Run TypeScript type checking
