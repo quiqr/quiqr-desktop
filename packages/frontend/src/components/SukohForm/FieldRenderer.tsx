@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
-import { fieldRegistry, FieldComponentProps } from './FieldRegistry';
+import { getFieldComponent, FieldComponentProps } from './FieldRegistry';
 import { useFormContext } from './FormContext';
 
 function FieldErrorFallback({
@@ -60,7 +60,7 @@ const componentCache = new Map<string, ComponentType<FieldComponentProps>>();
 
 function getLazyComponent(fieldType: string): ComponentType<FieldComponentProps> {
   if (!componentCache.has(fieldType)) {
-    const importer = fieldRegistry.get(fieldType);
+    const importer = getFieldComponent(fieldType);
     const LazyComponent = lazy(importer);
     componentCache.set(fieldType, LazyComponent);
   }

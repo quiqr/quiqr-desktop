@@ -5,6 +5,9 @@ import { apiSchemas, ApiResponse } from '../../types'
 axios.defaults.timeout = 30000
 axios.defaults.timeoutErrorMessage='timeout'
 
+// Module-level state for message handlers (private to this module)
+const messageHandlers: { [key: string]: Array<(data: any) => void> } = {};
+
 function validateApiResponse(method: string, response: any): any {
 
   // Check if we have a schema for this method
@@ -30,80 +33,69 @@ function validateApiResponse(method: string, response: any): any {
   }
 }
 
-class MainProcessBridge{
-  // Message handlers for push notifications (future WebSocket integration)
-  private _messageHandlers: { [key: string]: any[] };
-
-  constructor(){
-    this._messageHandlers = {};
+/**
+ * Register a handler for push notifications from the backend.
+ * Currently a no-op until WebSocket integration is implemented.
+ * See NEXTSTEPS.md for the planned WebSocket push notification system.
+ */
+export function addMessageHandler(type: string, handler: (data: any) => void) {
+  let handlers = messageHandlers[type];
+  if (handlers === undefined) {
+    handlers = [];
+    messageHandlers[type] = handlers;
   }
+  handlers.push(handler);
+}
 
-  /**
-   * Register a handler for push notifications from the backend.
-   * Currently a no-op until WebSocket integration is implemented.
-   * See NEXTSTEPS.md for the planned WebSocket push notification system.
-   */
-  addMessageHandler(type: string, handler: (data: any) => void){
-    let handlers = this._messageHandlers[type];
-    if(handlers === undefined){
-      handlers = [];
-      this._messageHandlers[type] = handlers;
+export function removeMessageHandler(type: string, handler: (data: any) => void) {
+  const handlers = messageHandlers[type];
+  if (handlers === undefined) {
+    return;
+  }
+  handlers.splice(handlers.indexOf(handler), 1);
+}
+
+/**
+ * Dispatch a message to registered handlers.
+ * This will be called by the future WebSocket client.
+ */
+export function dispatchMessage(type: string, data: any) {
+  const handlers = messageHandlers[type];
+  if (handlers) {
+    for (const handler of handlers) {
+      handler(data);
     }
-    handlers.push(handler);
-  }
-
-  removeMessageHandler(type: string, handler: (data: any) => void){
-    const handlers = this._messageHandlers[type];
-    if(handlers === undefined){
-      return;
-    }
-    handlers.splice(handlers.indexOf(handler), 1);
-  }
-
-  /**
-   * Dispatch a message to registered handlers.
-   * This will be called by the future WebSocket client.
-   */
-  dispatchMessage(type: string, data: any) {
-    const handlers = this._messageHandlers[type];
-    if (handlers) {
-      for (const handler of handlers) {
-        handler(data);
-      }
-    }
-  }
-
-  request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
-
-    const host = window.location.hostname;
-
-    const promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
-      axios
-        .post("http://"+host+":5150/api/"+method, {
-          data: data,
-        }, {
-          timeout: opts.timeout
-        })
-        .then((response) => {
-          // Validate response with Zod schema
-          try {
-            const validatedData = validateApiResponse(method, response.data);
-
-            // this typecast is safe, because we just validated the data using zod
-            resolve(validatedData as ApiResponse<M>);
-          } catch (validationError) {
-            // Validation failed - reject the promise
-            reject(validationError);
-          }
-        })
-        .catch((error) => {
-          console.error("Error sending data:", error);
-          reject(error);
-        });
-    });
-
-    return promise;
   }
 }
 
-export default new MainProcessBridge();
+export function request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
+
+  const host = window.location.hostname;
+
+  const promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
+    axios
+      .post("http://"+host+":5150/api/"+method, {
+        data: data,
+      }, {
+        timeout: opts.timeout
+      })
+      .then((response) => {
+        // Validate response with Zod schema
+        try {
+          const validatedData = validateApiResponse(method, response.data);
+
+          // this typecast is safe, because we just validated the data using zod
+          resolve(validatedData as ApiResponse<M>);
+        } catch (validationError) {
+          // Validation failed - reject the promise
+          reject(validationError);
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending data:", error);
+        reject(error);
+      });
+  });
+
+  return promise;
+}

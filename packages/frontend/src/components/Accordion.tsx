@@ -28,7 +28,7 @@ interface AccordionItemProps {
   forceActive?: boolean;
 }
 
-const AccordionHeader: React.FC<AccordionHeaderProps> = React.memo(({ active, headerLeftItems, headerRightItems, label, onClick, style, forceActive }) => {
+const AccordionHeader = React.memo(({ active, headerLeftItems, headerRightItems, label, onClick, style, forceActive }: AccordionHeaderProps) => {
   return (
     <Box style={style} onClick={onClick}>
       <span style={{ display: "inline-block", margin: "-10px 0px -10px -5px" }}>
@@ -59,7 +59,7 @@ const AccordionHeader: React.FC<AccordionHeaderProps> = React.memo(({ active, he
   );
 });
 
-const AccordionItem: React.FC<AccordionItemProps> = ({
+const AccordionItem = ({
   active,
   body,
   label,
@@ -71,7 +71,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
   style,
   wrapperProps,
   forceActive,
-}) => {
+}: AccordionItemProps) => {
   const _headStyle: React.CSSProperties = {
     border: "solid 1px #d8d8d8",
     padding: "16px",
@@ -114,7 +114,7 @@ interface AccordionProps {
   children: React.ReactElement<AccordionItemProps>[];
 }
 
-const Accordion: React.FC<AccordionProps> = ({ index, onChange, style, forceActive, children }) => {
+const Accordion = ({ index, onChange, style, forceActive, children }: AccordionProps) => {
   const [internalIndex, setInternalIndex] = React.useState(-1);
 
   const openedIndex = index !== undefined ? index : internalIndex;
