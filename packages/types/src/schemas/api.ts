@@ -31,6 +31,12 @@ export const fileReferenceSchema = z.object({
   filename: z.string().optional()
 })
 
+export const frontMatterContentSchema = z.object({
+  attributes: z.record(z.unknown()),
+  body: z.string(),
+  frontmatter: z.string().optional()
+})
+
 export const hugoServerResponseSchema = z.object({
   stopped: z.boolean()
 })
@@ -391,6 +397,7 @@ export type WebMenuActionResult = z.infer<typeof webMenuActionResultSchema>
 export type EnvironmentInfo = z.infer<typeof environmentInfoSchema>
 export type UploadFileToBundlePathResponse = z.infer<typeof uploadFileToBundlePathResponseSchema>
 export type AiPromptResponse = z.infer<typeof aiPromptResponseSchema>
+export type FrontMatterContent = z.infer<typeof frontMatterContentSchema>
 
 // This type includes all the api method names
 export type ApiMethod = keyof typeof apiSchemas

@@ -24,6 +24,7 @@ import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
 import type { SingleConfig, CollectionConfig, ExtraBuildConfig, BuildConfig, ServeConfig } from '@quiqr/types';
+import { frontMatterContentSchema } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
@@ -538,9 +539,11 @@ export class WorkspaceService {
         let sortval: string | null = null;
         if ('sortkey' in collection && collection.sortkey) {
           const data = fssimple.readFileSync(item, 'utf8');
-          const content = fm(data) as any;
-          if (collection.sortkey in content['attributes']) {
-            sortval = content['attributes'][collection.sortkey];
+          const rawContent = fm(data);
+          const parseResult = frontMatterContentSchema.safeParse(rawContent);
+
+          if (parseResult.success && collection.sortkey in parseResult.data.attributes) {
+            sortval = String(parseResult.data.attributes[collection.sortkey]);
           }
         } else {
           sortval = label;

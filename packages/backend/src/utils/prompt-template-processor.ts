@@ -102,7 +102,7 @@ function funcToUpper(input: string): string {
 function resolveVariable(
   expression: string,
   context: VariableContext
-): any {
+): string | unknown {
   const trimmed = expression.trim();
 
   // Split by first dot to get object and property path
@@ -116,10 +116,12 @@ function resolveVariable(
 
   // Resolve based on object type
   if (objectName === 'self') {
-    if (!context.self) {
+    if (!context.self || !isKeyOfSelfObject(propertyPath, context)) {
       return '';
     }
-    return (context.self as any)[propertyPath];
+
+    return context.self[propertyPath];
+    
   } else if (objectName === 'field') {
     return context.field[propertyPath];
   }
@@ -127,14 +129,18 @@ function resolveVariable(
   return undefined;
 }
 
+function isKeyOfSelfObject(value: unknown, context: VariableContext): value is keyof SelfObject {
+  return typeof value === 'string' && context.self !== null && value in context.self;
+}
+
 /**
  * Apply a function to a value
  */
 async function applyFunction(
-  value: any,
+  value: unknown,
   funcExpression: string,
   context: VariableContext
-): Promise<any> {
+): Promise<unknown> {
   const trimmed = funcExpression.trim();
 
   // Parse function name (e.g., "func.readFile")
