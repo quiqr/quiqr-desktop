@@ -36,7 +36,7 @@ function findProjectRoot(): string {
         if (pkg.workspaces) {
           return currentDir;
         }
-      } catch (e) {
+      } catch {
         // Continue searching
       }
     }
