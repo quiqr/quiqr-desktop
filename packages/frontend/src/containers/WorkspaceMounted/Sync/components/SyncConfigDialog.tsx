@@ -9,6 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import service from './../../../../services/service';
+import { SiteConfig, PublConf } from '@quiqr/types';
 
 //GitHub Target
 import { FormConfig as GitHubPagesForm } from '../syncTypes/github';
@@ -25,24 +26,13 @@ import * as FolderMeta from '../syncTypes/folder/Meta';
 import { FormConfig as FolderExportForm } from '../syncTypes/folder';
 import { CardNew as CardNewFolder } from '../syncTypes/folder';
 
-interface PublishConfBase {
-  key: string;
-  config: {
-    type: string;
-    [key: string]: unknown;
-  };
-}
+// Extract the type of a single publish item from the array
+type PublishItem = NonNullable<SiteConfig['publish']>[number];
 
 interface SyncConfigDialogProps {
   open?: boolean;
-  site: {
-    key: string;
-    publish: Array<{
-      key: string;
-      config: unknown;
-    }>;
-  };
-  publishConf?: PublishConfBase;
+  site: SiteConfig;
+  publishConf?: PublishItem;
   modAction?: string;
   closeText?: string;
   onClose: () => void;
@@ -80,11 +70,16 @@ function SyncConfigDialog({
       key = `publ-${Math.random()}`;
     }
 
+    // Ensure publish array exists
+    if (!site.publish) {
+      site.publish = [];
+    }
+
     const publConfIndex = site.publish.findIndex(({ key: k }) => k === key);
     if (publConfIndex !== -1) {
-      site.publish[publConfIndex] = { key, config: data };
+      site.publish[publConfIndex] = { key, config: data as PublConf };
     } else {
-      site.publish.push({ key, config: data });
+      site.publish.push({ key, config: data as PublConf });
     }
 
     await service.api.saveSiteConf(site.key, site);

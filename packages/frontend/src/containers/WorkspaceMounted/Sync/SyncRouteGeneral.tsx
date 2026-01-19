@@ -5,7 +5,10 @@ import Box from "@mui/material/Box";
 import SyncConfigDialog from "./components/SyncConfigDialog";
 import SyncBusyDialog from "./components/SyncBusyDialog";
 import Button from "@mui/material/Button";
-import { SiteConfig } from "../../../../types";
+import {
+  SiteConfig,
+  FolderPublishConf
+} from "@quiqr/types";
 //targets
 import { Dashboard as GitHubDashboard } from "./syncTypes/github";
 import { Dashboard as SysGitDashboard } from "./syncTypes/sysgit";
@@ -127,17 +130,13 @@ const SyncRouteGeneral = ({
     let enableSyncFrom = false;
     let enableSyncTo = true;
 
-    const config = publishConf.config as {
-      type?: string;
-      publishScope?: string;
-      pullOnly?: boolean;
-      [key: string]: unknown;
-    };
+    const config = publishConf.config;
 
     if (config.publishScope === "source" || config.publishScope === "build_and_source") {
       enableSyncFrom = true;
     }
-    if (config.pullOnly === true) {
+    // pullOnly is only available on github and sysgit configs
+    if ('pullOnly' in config && config.pullOnly === true) {
       enableSyncTo = false;
     }
 
@@ -148,7 +147,7 @@ const SyncRouteGeneral = ({
           workspaceKey={workspaceKey}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
-          publishConf={config as any}
+          publishConf={config}
           onSyncDialogControl={(open, text, icon) => {
             syncDialogControl(open, text, icon);
           }}
@@ -166,7 +165,7 @@ const SyncRouteGeneral = ({
           workspaceKey={workspaceKey}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
-          publishConf={config as any}
+          publishConf={config}
           onSyncDialogControl={(open, text, icon) => {
             syncDialogControl(open, text, icon);
           }}
@@ -183,7 +182,7 @@ const SyncRouteGeneral = ({
           workspaceKey={workspaceKey}
           enableSyncFrom={enableSyncFrom}
           enableSyncTo={enableSyncTo}
-          publishConf={config as any}
+          publishConf={config as FolderPublishConf}
           onSyncDialogControl={(open, text, icon) => {
             syncDialogControl(open, text, icon);
           }}
@@ -255,6 +254,7 @@ const SyncRouteGeneral = ({
         {...serverDialog}
         site={{
           key: site?.key || '',
+          name: site?.name || site?.key || '',
           publish: site?.publish || []
         }}
         onSave={(publishKey: string) => {

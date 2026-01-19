@@ -17,33 +17,22 @@ import DialogContent from '@mui/material/DialogContent';
 import * as GitHubMeta from './syncTypes/github/Meta';
 import * as FolderMeta from './syncTypes/folder/Meta';
 import * as SysGitMeta from './syncTypes/sysgit/Meta';
+import { SiteConfig } from '@quiqr/types';
 
-interface PublishConfig {
-  key: string;
-  config?: {
-    type?: string;
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-}
-
-interface SiteWithPublish {
-  key: string;
-  publish: PublishConfig[];
-  [key: string]: unknown;
-}
+// Extract the type of a single publish item from the array
+type PublishItem = NonNullable<SiteConfig['publish']>[number];
 
 interface ServerDialogConfig {
   open?: boolean;
   modAction?: string;
   closeText?: string;
-  publishConf?: PublishConfig;
+  publishConf?: PublishItem;
 }
 
 interface SyncSidebarProps {
   siteKey: string;
   workspaceKey: string;
-  site: SiteWithPublish;
+  site: SiteConfig;
   [key: string]: unknown;
 }
 
@@ -54,7 +43,7 @@ export const SyncSidebar = ({
   ...restProps
 }: SyncSidebarProps) => {
   const navigate = useNavigate();
-  const [site, setSite] = useState<SiteWithPublish>({ key: '', publish: [] });
+  const [site, setSite] = useState<Partial<SiteConfig>>({ key: '', publish: [] });
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [menuOpen, setMenuOpen] = useState<number | null>(null);
   const [serverDialog, setServerDialog] = useState<ServerDialogConfig>({});
@@ -98,7 +87,7 @@ export const SyncSidebar = ({
     );
   };
 
-  const renderMenu = (index: number, publ: PublishConfig) => {
+  const renderMenu = (index: number, publ: PublishItem) => {
     return (
       <Menu
         anchorEl={anchorEl}
@@ -150,14 +139,14 @@ export const SyncSidebar = ({
     let icon: React.ReactNode = null;
 
     if (publ.config && publ.config.type === 'github') {
-      label = GitHubMeta.sidebarLabel(publ.config as any);
+      label = GitHubMeta.sidebarLabel(publ.config);
       icon = GitHubMeta.icon();
     } else if (publ.config && (publ.config.type === 'sysgit' || publ.config.type === 'git')) {
       // Use SysGitMeta for both sysgit and the new universal git type
-      label = SysGitMeta.sidebarLabel(publ.config as any);
+      label = SysGitMeta.sidebarLabel(publ.config);
       icon = SysGitMeta.icon();
     } else if (publ.config && publ.config.type === 'folder') {
-      label = FolderMeta.sidebarLabel(publ.config as any);
+      label = FolderMeta.sidebarLabel(publ.config);
       icon = FolderMeta.icon();
     }
 
@@ -202,8 +191,8 @@ export const SyncSidebar = ({
   return (
     <>
       <SyncConfigDialog
-        {...(serverDialog as Record<string, unknown>)}
-        site={propsSite as unknown as { key: string; publish: Array<{ key: string; config: unknown }> }}
+        {...serverDialog}
+        site={propsSite}
         onSave={(publishKey: string) => {
           navigate(`${basePath}/list/${publishKey}`);
           setServerDialog({ open: false });
