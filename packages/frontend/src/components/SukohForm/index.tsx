@@ -79,11 +79,10 @@ export const SukohForm = ({
 }: SukohFormProps) => {
   const [actionButtonRightPos] = useState(380);
   const [changed, setChanged] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [savedOnce, setSavedOnce] = useState(false);
   const [aiAssistOpen, setAiAssistOpen] = useState(false);
-  const valueFactoryRef = useRef<(() => any) | null>(null);
-
+  
   // For new form system - track document state and resources
   const newFormDocRef = useRef<Record<string, unknown>>(values || {});
   const newFormResourcesRef = useRef<Record<string, unknown[]>>({});

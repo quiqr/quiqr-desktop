@@ -5,7 +5,7 @@
  * Tests representative samples of API methods across different operation categories.
  */
 
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/server';
 import * as api from '../../src/api';

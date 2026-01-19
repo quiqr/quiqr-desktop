@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ModelChangeEvent {
   type: 'model-cache-cleared' | 'connected';

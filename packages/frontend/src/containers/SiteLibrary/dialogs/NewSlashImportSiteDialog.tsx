@@ -17,13 +17,13 @@ import {
   dialogReducer,
   initialDialogState,
   PrivateRepoData,
-  HugoThemeInfo,
 } from "./newSiteDialogTypes";
 import SourceTypeStep from "./steps/SourceTypeStep";
 import ConfigureSourceStep from "./steps/ConfigureSourceStep";
 import DeployKeyStep from "./steps/DeployKeyStep";
 import SyncConfigStep, { detectGitProvider } from "./steps/SyncConfigStep";
 import SuccessStep from "./steps/SuccessStep";
+import { HugoThemeInfo } from "@quiqr/types";
 
 interface NewSiteDialogProps {
   open: boolean;
@@ -313,7 +313,6 @@ const NewSiteDialog = ({
       return (
         <SuccessStep
           siteName={state.siteName}
-          onOpenSite={handleOpenSite}
         />
       );
     }

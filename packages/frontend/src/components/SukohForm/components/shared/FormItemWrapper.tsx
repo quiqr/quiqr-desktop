@@ -4,7 +4,7 @@ import IconButtonGroup from "../../../IconButtonGroup";
 
 interface FormItemWrapperProps {
   control: React.ReactElement<{ style?: React.CSSProperties }>;
-  iconButtons: React.ReactElement[];
+  iconButtons: React.ReactNode[];
   style?: React.CSSProperties;
 }
 

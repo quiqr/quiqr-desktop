@@ -3,7 +3,6 @@ import {
   useMutation,
   useQueryClient,
   UseQueryOptions,
-  UseMutationOptions,
   QueryClient,
 } from '@tanstack/react-query';
 import service from '../services/service';
