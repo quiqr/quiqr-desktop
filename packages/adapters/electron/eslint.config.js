@@ -4,12 +4,13 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['**/node_modules', '**/dist', '**/build', '**/*.test.ts', '**/*.test.tsx'],
+    ignores: ['**/node_modules', '**/dist', '**/build', '**/*.config.ts', '**/*.config.js'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['**/*.test.ts', '**/*.test.tsx', '**/test/**'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
@@ -20,6 +21,28 @@ export default [
       parserOptions: {
         project: './tsconfig.json',
         tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "no-console": 0,
+      "no-async-promise-executor": 0,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          varsIgnorePattern: "^_",
+          argsIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
+  {
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/test/**/*.ts', '**/test/**/*.tsx'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
       },
     },
     rules: {
