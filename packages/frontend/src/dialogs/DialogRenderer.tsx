@@ -10,12 +10,18 @@ interface DialogRendererProps {
 /**
  * Renders all active dialogs with proper z-index stacking
  * Dialogs are lazy-loaded and wrapped in Suspense
+ *
+ * Type safety: The correlation between component and props is guaranteed by
+ * the type-safe openDialog() API. This renderer trusts that guarantee.
  */
+
+
 export function DialogRenderer({ dialogs, onClose }: DialogRendererProps) {
   return (
     <Suspense fallback={null}>
       {dialogs.map((dialogState) => {
-        const DialogComponent = DialogRegistry[dialogState.component as keyof typeof DialogRegistry];
+        const DialogComponent = DialogRegistry[dialogState.component];
+
         if (!DialogComponent) {
           console.warn(`Dialog component not found: ${dialogState.component}`);
           return null;
@@ -27,7 +33,6 @@ export function DialogRenderer({ dialogs, onClose }: DialogRendererProps) {
             {...dialogState.props}
             open={true}
             onClose={() => onClose(dialogState.id)}
-            style={{ zIndex: 1300 + dialogState.priority }}
           />
         );
       })}

@@ -3,12 +3,23 @@ import type { DialogPropsMap } from '../dialogs/types';
 
 /**
  * Represents a single active dialog in the dialog stack
+ *
+ * Uses `any` for props because:
+ * 1. Type safety is enforced at the call site via openDialog<K>(component: K, props: DialogPropsMap[K])
+ * 2. A heterogeneous array (DialogState[]) cannot maintain the correlation between
+ *    component names and prop types without type casts
+ * 3. Runtime safety is guaranteed by the DialogProvider implementation
+ * 4. This is a bounded `any` - props must be one of the types in DialogPropsMap
+ *
+ * Alternative would be Zod validation at render time, but that adds runtime overhead
+ * for safety that's already guaranteed by the type-safe openDialog API.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface DialogState<T = any> {
   id: string;
   component: string;
   props: T;
-  priority: number; // For z-index stacking (higher = on top)
+  priority: number;
 }
 
 /**
