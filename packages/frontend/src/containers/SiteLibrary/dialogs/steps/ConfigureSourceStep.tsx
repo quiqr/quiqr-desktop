@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
@@ -9,11 +9,12 @@ import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import CircularProgress from "@mui/material/CircularProgress";
 import service from "../../../../services/service";
-import { SourceType, DialogState, PrivateRepoData, HugoThemeInfo } from "../newSiteDialogTypes";
+import { SourceType, DialogState, PrivateRepoData } from "../newSiteDialogTypes";
 import FormPartialNewFromHugoTheme from "../partials/FormPartialNewFromHugoTheme";
 import FormPartialNewFromScratch from "../partials/FormPartialNewFromScratch";
 import FormPartialNewFromFolder from "../partials/FormPartialNewFromFolder";
 import FormPartialImportFromGit from "../partials/FormPartialImportFromGit";
+import { HugoThemeInfo } from "@quiqr/types";
 
 interface ConfigureSourceStepProps {
   sourceType: SourceType;

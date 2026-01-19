@@ -7,7 +7,7 @@ interface TopToolbarLeftProps {
   workspaceKey?: string;
 }
 
-const TopToolbarLeft = ({ title, siteKey, workspaceKey }: TopToolbarLeftProps) => {
+const TopToolbarLeft = ({ title }: TopToolbarLeftProps) => {
   return (
     <Box
       textOverflow="ellipsis"

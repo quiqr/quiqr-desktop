@@ -113,7 +113,7 @@ export interface WindowAdapter {
   /**
    * Send data to the renderer process
    */
-  sendToRenderer(channel: string, data: any): void;
+  sendToRenderer(channel: string, data: string | object): void;
 
   /**
    * Close the current site and redirect to site library

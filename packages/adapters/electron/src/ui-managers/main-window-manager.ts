@@ -3,12 +3,12 @@
  */
 
 import { BrowserWindow } from 'electron';
-import windowStateKeeper from 'electron-window-state';
+import windowStateKeeper, { State } from 'electron-window-state';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
-let mainWindowState: any = null;
+let mainWindowState: State;
 
 /**
  * Determine the frontend location based on environment

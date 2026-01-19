@@ -5,7 +5,7 @@
  */
 
 export { createServer, startServer, type ServerOptions } from './server.js';
-export { createApiHandlers, getHandler, type ApiHandler, type ApiHandlerMap } from './router.js';
+export { createApiHandlers, getHandler, type ApiHandlers } from './router.js';
 export { errorHandler, asyncHandler, type ErrorResponse } from './middleware/error-handler.js';
 
 // Export individual handler creators for testing/customization

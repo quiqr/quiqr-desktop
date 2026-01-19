@@ -17,11 +17,11 @@ export class TomlFormatProvider implements FormatProvider {
     return line.startsWith('+++');
   }
 
-  parse(str: string): any {
+  parse(str: string): unknown {
     return toml.parse(str);
   }
 
-  dump(obj: any): string {
+  dump(obj: unknown): string {
     return tomlify.toToml(obj, { space: 2 });
   }
 
@@ -58,7 +58,7 @@ ${content}`;
       md = data.substr(tomlEnd + 3);
     }
 
-    let parsedData: ParsedContent = this.parse(tomlStr);
+    let parsedData = this.parse(tomlStr) as ParsedContent;
     if (parsedData === undefined) {
       return {};
     }

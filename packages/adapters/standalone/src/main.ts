@@ -80,7 +80,7 @@ async function startStandaloneBackend() {
 
     // Replace with web adapters (includes real menu adapter)
     const webAdapters = createWebAdapters(container, rootPath);
-    (container as any).adapters = webAdapters;
+    container.adapters = webAdapters;
 
     console.log('Web adapters initialized (menu, window, appInfo)');
 

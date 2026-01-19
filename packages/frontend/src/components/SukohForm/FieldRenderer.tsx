@@ -15,6 +15,7 @@ function FieldErrorFallback({
   compositeKey,
   fieldType,
 }: FallbackProps & { compositeKey: string; fieldType: string }) {
+  
   return (
     <Alert
       severity="error"
@@ -38,7 +39,7 @@ function FieldErrorFallback({
           component="pre"
           sx={{ mt: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
         >
-          {error.message}
+          {error instanceof Error ? error.message : String(error)}
         </Typography>
       )}
     </Alert>

@@ -36,6 +36,7 @@ function FontPickerField({ compositeKey }: Props) {
   }
 
   // Handle value change (for future use when font picker is re-enabled)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleChange = (newValue: string) => {
     setValue(newValue);
     if (config.autoSave === true) {

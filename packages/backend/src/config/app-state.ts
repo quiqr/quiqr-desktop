@@ -5,6 +5,8 @@
  * Manages runtime state that is not persisted to disk.
  */
 
+import { ChildProcess } from "child_process";
+
 /**
  * AppState manages runtime application state (non-persistent)
  * This is state that changes during runtime but is not saved to config
@@ -28,7 +30,7 @@ export class AppState {
   /**
    * Current Hugo server process (if running)
    */
-  currentServerProcess: any;
+  currentServerProcess: ChildProcess | undefined;
 
   /**
    * Whether a Hugo server is currently running
@@ -100,7 +102,7 @@ export class AppState {
   /**
    * Set the Hugo server process
    */
-  setServerProcess(process: any, port: number): void {
+  setServerProcess(process: ChildProcess, port: number): void {
     this.currentServerProcess = process;
     this.isServerRunning = true;
     this.serverPort = port;

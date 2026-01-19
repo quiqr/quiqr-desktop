@@ -214,7 +214,7 @@ export function createMockProgressSteps(complete: boolean = true): DownloadProgr
  * Returns a mock that can be customized for different test scenarios
  */
 export function createMockExecFile() {
-  return vi.fn((cmd: string, args: string[], opts: any, callback: Function) => {
+  return vi.fn((cmd: string, args: string[], opts: unknown, callback: Function) => {
     // Default: successful execution
     callback(null, { stdout: 'success', stderr: '' });
   });

@@ -1,4 +1,3 @@
-import { PhotoSizeSelectActual } from "@mui/icons-material";
 import React, { useState, useEffect, useRef } from "react";
 
 const Spinner = ({ time = 3000, spins = 3, color = "rgba(0, 0, 0, 0.2)", margin = "40em", size = 48 }) => {
@@ -23,7 +22,7 @@ const Spinner = ({ time = 3000, spins = 3, color = "rgba(0, 0, 0, 0.2)", margin 
         clearTimeout(timeoutRef.current);
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [spin]);
 
   const borderWidth = Math.max(1, size / 10);
   const borderStyle = `${borderWidth}em solid ${color}`;

@@ -5,9 +5,17 @@
  * (YAML, TOML, JSON) in markdown/content files.
  */
 
+/**
+ * Type guard to check if a value is a plain object (Record<string, unknown>).
+ * Use this to validate parse() results before spreading or merging.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 export interface ParsedContent {
   mainContent?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface FormatProvider {
@@ -22,14 +30,17 @@ export interface FormatProvider {
   matchContentFirstLine(line: string): boolean;
 
   /**
-   * Parse a string in this format to an object
+   * Parse a string in this format to an object.
+   * Returns unknown since the structure depends on the file content.
+   * Callers should validate the result with Zod or type guards.
    */
-  parse(str: string): any;
+  parse(str: string): unknown;
 
   /**
-   * Serialize an object to a string in this format
+   * Serialize an object to a string in this format.
+   * Accepts unknown since any serializable value can be converted.
    */
-  dump(obj: any): string;
+  dump(obj: unknown): string;
 
   /**
    * Serialize an object with mainContent to a full content file string

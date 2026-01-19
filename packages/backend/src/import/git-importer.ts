@@ -11,15 +11,7 @@ import type { FormatProviderResolver } from '../utils/format-provider-resolver.j
 import type { LibraryService } from '../services/library/library-service.js';
 import type { Embgit } from '../embgit/embgit.js';
 import { InitialWorkspaceConfigBuilder } from '../services/workspace/initial-workspace-config-builder.js';
-
-/**
- * Theme information from repository inspection
- */
-export interface ThemeInfo {
-  Name?: string;
-  ExampleSite?: boolean;
-  [key: string]: any;
-}
+import { HugoThemeInfo, hugoConfigSchema, type HugoConfig } from '@quiqr/types';
 
 /**
  * GitImporter - Imports sites from git repositories
@@ -191,7 +183,7 @@ export class GitImporter {
   async newSiteFromPublicHugoThemeUrl(
     url: string,
     siteName: string,
-    themeInfo: ThemeInfo,
+    themeInfo: HugoThemeInfo,
     hugoVersion: string
   ): Promise<string> {
     if (!themeInfo.Name) {
@@ -222,14 +214,18 @@ export class GitImporter {
 
       // Process Hugo config
       let formatProvider;
-      let hconfig: any = null;
+      let hconfig: HugoConfig | null = null;
       const hugoConfigFilePath = this.pathHelper.hugoConfigFilePath(tempDir);
 
       if (hugoConfigFilePath) {
         const strData = fs.readFileSync(hugoConfigFilePath, { encoding: 'utf-8' });
         formatProvider = this.formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
         if (formatProvider) {
-          hconfig = formatProvider.parse(strData);
+          const rawData = formatProvider.parse(strData);
+          const parseResult = hugoConfigSchema.safeParse(rawData);
+          if (parseResult.success) {
+            hconfig = parseResult.data;
+          }
         }
       }
 
@@ -251,7 +247,7 @@ export class GitImporter {
         this.formatProviderResolver,
         this.pathHelper
       );
-      configBuilder.buildAll(hugoVersion);
+      configBuilder.buildAll('hugo', hugoVersion);
 
       // Create the site
       await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempDir);

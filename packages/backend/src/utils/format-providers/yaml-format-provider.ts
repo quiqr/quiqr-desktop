@@ -16,11 +16,11 @@ export class YamlFormatProvider implements FormatProvider {
     return line.startsWith('---');
   }
 
-  parse(str: string): any {
+  parse(str: string): unknown {
     return jsYaml.load(str);
   }
 
-  dump(obj: any): string {
+  dump(obj: unknown): string {
     return jsYaml.dump(obj);
   }
 
@@ -70,7 +70,7 @@ ${content}`;
       md = data.substr(yamlEnd + 3);
     }
 
-    let parsedData: ParsedContent = this.parse(yamlStr);
+    let parsedData = this.parse(yamlStr) as ParsedContent;
     if (parsedData === undefined) {
       parsedData = {};
       hasFrontMatter = false;

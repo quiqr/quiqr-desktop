@@ -3,7 +3,6 @@ import { useLocation } from 'react-router';
 import { DialogContext } from './DialogContext';
 import { DialogRenderer } from '../dialogs/DialogRenderer';
 import type { DialogState, DialogContextValue } from './DialogContext';
-import type { DialogPropsMap } from '../dialogs/types';
 
 interface DialogProviderProps {
   children: ReactNode;

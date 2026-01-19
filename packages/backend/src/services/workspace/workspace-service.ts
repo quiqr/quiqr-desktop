@@ -17,13 +17,14 @@ import fm from 'front-matter';
 import { promisify } from 'util';
 import type { WorkspaceConfigProvider, ParseInfo } from './workspace-config-provider.js';
 import type { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
-import type { FormatProvider } from '../../utils/format-providers/types.js';
+import type { FormatProvider, ParsedContent } from '../../utils/format-providers/types.js';
 import { isContentFile, SUPPORTED_CONTENT_EXTENSIONS } from '../../utils/content-formats.js';
 import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
-import type { SingleConfig, CollectionConfig } from '@quiqr/types';
+import type { SingleConfig, CollectionConfig, ExtraBuildConfig, BuildConfig, ServeConfig } from '@quiqr/types';
+import { frontMatterContentSchema } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
@@ -103,14 +104,6 @@ export interface CollectionItemCopyResult {
 export interface HugoLanguage {
   lang: string;
   source: string;
-}
-
-/**
- * Extra build configuration
- */
-export interface ExtraBuildConfig {
-  overrideBaseURLSwitch?: boolean;
-  overrideBaseURL?: string;
 }
 
 /**
@@ -256,7 +249,7 @@ export class WorkspaceService {
   private async _smartDump(
     filePath: string,
     formatFallbacks: string[],
-    obj: any
+    obj: ParsedContent
   ): Promise<string> {
     let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
     if (formatProvider === undefined || formatProvider === null) {
@@ -326,7 +319,7 @@ export class WorkspaceService {
       );
 
       if (typeof single.pullOuterRootKey === 'string') {
-        const newObj: any = {};
+        const newObj: Record<string, unknown> = {};
         newObj[single.pullOuterRootKey] = obj;
         obj = newObj;
       }
@@ -371,7 +364,7 @@ export class WorkspaceService {
   /**
    * Update a single content item
    */
-  async updateSingle(singleKey: string, document: any): Promise<any> {
+  async updateSingle(singleKey: string, document: Record<string, unknown>): Promise<any> {
     const config = await this.getConfigurationsData();
     const single = config.singles.find((x) => x.key === singleKey);
     if (single == null) throw new Error('Could not find single.');
@@ -417,9 +410,8 @@ export class WorkspaceService {
     const pageOrSectionIndexReg = new RegExp(expression);
     const filtered = allFiles.filter((x) => !pageOrSectionIndexReg.test(x));
 
-    const merged = filtered.map((src) => {
-      return Object.assign({ src }, [].find((r: any) => r.src === src));
-    });
+    const merged = filtered.map((src) => ({ src }));
+
     return merged;
   }
 
@@ -547,9 +539,11 @@ export class WorkspaceService {
         let sortval: string | null = null;
         if ('sortkey' in collection && collection.sortkey) {
           const data = fssimple.readFileSync(item, 'utf8');
-          const content = fm(data) as any;
-          if (collection.sortkey in content['attributes']) {
-            sortval = content['attributes'][collection.sortkey];
+          const rawContent = fm(data);
+          const parseResult = frontMatterContentSchema.safeParse(rawContent);
+
+          if (parseResult.success && collection.sortkey in parseResult.data.attributes) {
+            sortval = String(parseResult.data.attributes[collection.sortkey]);
           }
         } else {
           sortval = label;
@@ -577,7 +571,7 @@ export class WorkspaceService {
   /**
    * Strip non-document data (internal fields starting with __)
    */
-  private _stripNonDocumentData(document: any): void {
+  private _stripNonDocumentData(document: Record<string, unknown>): void {
     for (const key in document) {
       if (key.startsWith('__')) {
         delete document[key];
@@ -872,7 +866,7 @@ export class WorkspaceService {
   async updateCollectionItem(
     collectionKey: string,
     collectionItemKey: string,
-    document: any
+    document: Record<string, unknown>
   ): Promise<any> {
     const config = await this.getConfigurationsData();
     const collection = config.collections.find((x) => x.key === collectionKey);
@@ -1289,7 +1283,7 @@ export class WorkspaceService {
   /**
    * Find first match or default in array
    */
-  private _findFirstMatchOrDefault(arr: any[] | undefined, key: string): any {
+  private _findFirstMatchOrDefault(arr: BuildConfig[] | ServeConfig[] | undefined, key: string): BuildConfig | ServeConfig {
     let result;
 
     if (key) {
@@ -1365,7 +1359,7 @@ export class WorkspaceService {
     const workspaceDetails = await this.getConfigurationsData();
 
     try {
-      let serveConfig: any;
+      let serveConfig: Partial<ServeConfig> | null = null;
       if (workspaceDetails.serve && workspaceDetails.serve.length) {
         serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
       } else {
@@ -1390,6 +1384,7 @@ export class WorkspaceService {
       }
 
       // config.mounts can be either an array or an object with a mounts property
+      // TODO: fix this weirdness with the mounts??
       const mountsArray = Array.isArray(config.mounts)
         ? config.mounts
         : (config.mounts as any).mounts;

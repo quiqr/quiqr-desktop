@@ -1,5 +1,5 @@
 export { FolderImporter, type SiteInventory } from './folder-importer.js';
-export { GitImporter, type ThemeInfo } from './git-importer.js';
+export { GitImporter } from './git-importer.js';
 export {
   Pogozipper,
   type ExportSiteOptions,

@@ -30,7 +30,7 @@ export class WebWindowAdapter implements WindowAdapter {
    * In web mode, this would use SSE or WebSocket
    * For now, just log the message
    */
-  sendToRenderer(channel: string, data: any): void {
+  sendToRenderer(channel: string, data: string | object): void {
     console.log('[TO_RENDERER]', channel, data);
     // Future: Could push via SSE/WebSocket to frontend
   }

@@ -107,3 +107,32 @@ export interface PageConfig extends SingleConfig {
 }
 
 export type SinglesConfig = SingleConfig[]
+
+/**
+ * Hugo theme info used when creating sites from themes.
+ * This is a loose type with optional fields for use in the frontend.
+ * For strict validation of embgit responses, use HugoThemeRepoInfo from schemas/embgit.
+ */
+export interface HugoThemeInfo {
+  Screenshot?: string;
+  MinHugoVersion?: string;
+  Name?: string;
+  License?: string;
+  LicenseLink?: string;
+  Homepage?: string;
+  Demosite?: string;
+  Description?: string;
+  ExampleSite?: boolean;
+  Author?: string;
+  AuthorHomepage?: string;
+  Features?: string[] | null;
+  Tags?: string[] | null;
+}
+
+/**
+ * Extra build configuration
+ */
+export interface ExtraBuildConfig {
+  overrideBaseURLSwitch?: boolean;
+  overrideBaseURL?: string;
+}

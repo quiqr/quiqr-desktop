@@ -98,7 +98,7 @@ export function createLogToConsoleHandler(container: AppContainer) {
     message,
     label,
   }: {
-    message: any;
+    message: unknown;
     label?: string;
   }) => {
     if (label) {

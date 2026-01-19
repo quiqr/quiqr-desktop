@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import service from './../../services/service';
 import { SukohForm } from './../../components/SukohForm';
 import Spinner from './../../components/Spinner';
+import type { Field, BuildAction, WorkspaceDetails } from '@quiqr/types';
 
 interface SingleProps {
   siteKey: string;
@@ -13,27 +14,9 @@ interface SingleProps {
   nestPath?: string;
 }
 
-interface WorkspaceSingle {
-  key: string;
-  title: string;
-  fields: unknown[];
-  build_actions?: unknown[];
-  prompt_templates?: unknown[];
-  hidePreviewIcon?: boolean;
-  previewUrl?: string;
-  hideExternalEditIcon?: boolean;
-  hideSaveButton?: boolean;
-  [key: string]: unknown;
-}
-
-interface WorkspaceDetails {
-  singles: WorkspaceSingle[];
-  [key: string]: unknown;
-}
-
 function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey, nestPath }: SingleProps) {
   const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
-  const [singleValues, setSingleValues] = useState<unknown>(null);
+  const [singleValues, setSingleValues] = useState<Record<string, unknown> | null>(null);
   const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
   const isMountedRef = useRef(true);
 
@@ -50,7 +33,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
 
         if (isMountedRef.current) {
           setSingleValues(single);
-          setSelectedWorkspaceDetails(workspaceDetails as WorkspaceDetails);
+          setSelectedWorkspaceDetails(workspaceDetails);
           setCurrentBaseUrlPath(typeof baseUrlPath === 'string' ? baseUrlPath : undefined);
         }
       } catch (e) {
@@ -81,7 +64,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
   );
 
   const handleSave = useCallback(
-    (context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }) => {
+    (context: { data: Record<string, unknown>; accept: (values: Record<string, unknown>) => void; reject: (message: string) => void }) => {
       const promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
       promise.then(
         function (updatedValues) {
@@ -97,6 +80,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
 
   const single = selectedWorkspaceDetails?.singles.find((x) => x.key === singleKey);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const previewUrl = useMemo(() => {
     if (!single) return null;
 
@@ -127,7 +111,6 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
           targetPath,
           forceFileName,
         }: { title: string; extensions: string[]; targetPath: string; forceFileName?: string },
-        onFilesReady: unknown
       ) {
         return service.api.openFileDialogForSingleAndCollectionItem(
           siteKey,
@@ -157,8 +140,10 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
 
   if (single == null) return null;
 
-  const buildActions = single.build_actions ? single.build_actions.slice(0) : [];
-  const prompt_templates = single.prompt_templates ? single.prompt_templates.slice(0) : [];
+  const buildActions: BuildAction[] = single.build_actions ? single.build_actions.slice(0) : [];
+  const prompt_templates: string[] = single.prompt_templates ? single.prompt_templates.slice(0) : [];
+  const fields: Field[] = single.fields;
+  const values: Record<string, unknown> = singleValues || {};
 
   return (
     <SukohForm
@@ -167,8 +152,8 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
       rootName={single.title}
       singleKey={singleKey}
       refreshed={refreshed}
-      fields={single.fields}
-      values={singleValues}
+      fields={fields}
+      values={values}
       siteKey={siteKey}
       workspaceKey={workspaceKey}
       onSave={handleSave}

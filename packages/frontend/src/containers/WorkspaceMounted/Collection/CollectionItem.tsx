@@ -2,24 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import service from './../../../services/service';
 import { SukohForm } from './../../../components/SukohForm';
 import Spinner from './../../../components/Spinner';
-
-interface WorkspaceCollection {
-  key: string;
-  title: string;
-  folder: string;
-  fields: unknown[];
-  build_actions?: unknown[];
-  prompt_templates?: unknown[];
-  hidePreviewIcon?: boolean;
-  hideExternalEditIcon?: boolean;
-  previewUrlBase?: string;
-  [key: string]: unknown;
-}
-
-interface WorkspaceDetails {
-  collections: WorkspaceCollection[];
-  [key: string]: unknown;
-}
+import type { Field, BuildAction, WorkspaceDetails } from '@quiqr/types';
 
 interface CollectionItemProps {
   siteKey: string;
@@ -32,7 +15,7 @@ interface CollectionItemProps {
 
 function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey, nestPath }: CollectionItemProps) {
   const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
-  const [collectionItemValues, setCollectionItemValues] = useState<unknown>(null);
+  const [collectionItemValues, setCollectionItemValues] = useState<Record<string, unknown> | null>(null);
   const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
   const isMountedRef = useRef(true);
 
@@ -47,7 +30,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
       ]);
 
       if (isMountedRef.current) {
-        setSelectedWorkspaceDetails(workspaceDetails as WorkspaceDetails);
+        setSelectedWorkspaceDetails(workspaceDetails);
         setCollectionItemValues(itemValues);
         setCurrentBaseUrlPath(typeof baseUrlPath === 'string' ? baseUrlPath : undefined);
       }
@@ -65,7 +48,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
   }, [siteKey, workspaceKey, collectionKey, collectionItemKey]);
 
   const handleSave = useCallback(
-    (context: { data: unknown; accept: (values: unknown) => void; reject: (message: string) => void }) => {
+    (context: { data: Record<string, unknown>; accept: (values: Record<string, unknown>) => void; reject: (message: string) => void }) => {
       const promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
       promise.then(
         function (updatedValues) {
@@ -81,6 +64,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
 
   const collection = selectedWorkspaceDetails?.collections.find((x) => x.key === collectionKey);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const pageUrl = useMemo(() => {
     if (!collection || collection.hidePreviewIcon) {
       return '';
@@ -112,8 +96,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
   const plugins = useMemo(
     () => ({
       openBundleFileDialog: function (
-        { title, extensions, targetPath }: { title: string; extensions: string[]; targetPath: string },
-        onFilesReady: unknown
+        { title, extensions, targetPath }: { title: string; extensions: string[]; targetPath: string }
       ) {
         return service.api.openFileDialogForSingleAndCollectionItem(
           siteKey,
@@ -140,22 +123,21 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
 
   if (collection == null) return null;
 
-  const fields = collection.fields.slice(0);
+  const fields: Field[] = collection.fields.slice(0);
 
   if (!collection.prompt_templates) collection.prompt_templates = [];
-  const prompt_templates = collection.prompt_templates.slice(0);
+  const prompt_templates: string[] = collection.prompt_templates.slice(0);
 
   if (!collection.build_actions) collection.build_actions = [];
-  const buildActions = collection.build_actions.slice(0);
+  const buildActions: BuildAction[] = collection.build_actions.slice(0);
 
-  const values = Object.assign({}, collectionItemValues);
+  const values: Record<string, unknown> = Object.assign({}, collectionItemValues);
 
   return (
     <SukohForm
       key={`${collectionKey}-${collectionItemKey}-${modelRefreshKey}`}
       debug={false}
       rootName={collection.title}
-      hideExternalEditIcon={collection.hideExternalEditIcon}
       fields={fields}
       siteKey={siteKey}
       workspaceKey={workspaceKey}

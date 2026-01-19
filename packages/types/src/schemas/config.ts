@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { object, z } from 'zod'
 import { fieldSchema } from './fields.js'
 
 export const baseConfigSchema = z.object({
@@ -66,6 +66,7 @@ export const singleConfigSchema = z.object({
   key: z.string(),
   title: z.string().optional(),
   file: z.string().optional(),
+  dataformat: z.string().optional(),
   previewUrl: z.string().optional(),
   description: z.string().optional(),
   _mergePartial: z.string().optional(),
@@ -270,23 +271,46 @@ export const workspaceDetailsBaseSchema = z.object({
   serve: z.array(serveConfigSchema).optional(),
   build: z.array(buildConfigSchema).optional(),
   menu: menuSchema.optional(),
-  collections: z.array(collectionConfigSchema),
-  singles: z.array(singleConfigSchema),
-  providerConfig: z.record(z.any()).optional()
+  // Collections and singles can be missing or empty - defaults to empty array
+  collections: z.array(collectionConfigSchema).optional().default([]),
+  singles: z.array(singleConfigSchema).optional().default([]),
+  providerConfig: z.record(z.unknown()).optional()
+});
+
+/**
+ * MergeableConfigItem - config item that supports partial merging
+ * Both SingleConfig and CollectionConfig can have _mergePartial during the build phase
+ */
+export const mergeableConfigItemSchema = z.object({
+  key: z.string(),
+  _mergePartial: z.string().optional(),
+}).passthrough();
+
+/**
+ * WorkspaceConfig - complete workspace configuration
+ * Extends WorkspaceDetails with dynamics, path, and key
+ * Note: dynamics uses a permissive schema since configs may have varied structures
+ */
+export const workspaceConfigSchema = workspaceDetailsBaseSchema.extend({
+  // Dynamics can have varied structures, use permissive validation
+  dynamics: z.array(mergeableConfigItemSchema).optional(),
+  path: z.string().optional(),
+  key: z.string().optional(),
 });
 
 // Workspace details with auto-migration from old Hugo-specific format
 // Using preprocess to handle both old (hugover) and new (ssgType + ssgVersion) formats
 export const workspaceDetailsSchema = z.preprocess(
-  (data: any) => {
+  (data: unknown) => {
 
-    if (!data) return data;
+    if (!data || !(data instanceof Object)) return data;
+      const ssgType = 'ssgType' in data ? data.ssgType : 'hugo';
 
     // If old format with hugover, convert to new format
     if ('hugover' in data) {
       const transformed = {
         ...data,
-        ssgType: data.ssgType || 'hugo',
+        ssgType: ssgType,
         ssgVersion: data.hugover,
         hugover: undefined // Remove old field
       };
@@ -297,7 +321,7 @@ export const workspaceDetailsSchema = z.preprocess(
     if (!('ssgVersion' in data) && !('hugover' in data)) {
       const transformed = {
         ...data,
-        ssgType: data.ssgType || 'hugo',
+        ssgType: ssgType,
         ssgVersion: 'v0.100.2' // Default version for old configs without version info
       };
       return transformed;
@@ -386,10 +410,24 @@ export type ServeConfig = z.infer<typeof serveConfigSchema>
 export type BuildConfig = z.infer<typeof buildConfigSchema>
 export type Workspace = z.infer<typeof workspaceSchema>
 export type WorkspaceDetails = z.infer<typeof workspaceDetailsSchema>
+export type MergeableConfigItem = z.infer<typeof mergeableConfigItemSchema>
+export type WorkspaceConfig = z.infer<typeof workspaceConfigSchema>
 export type Configurations = z.infer<typeof configurationsSchema>
 export type UserPreferences = z.infer<typeof userPreferencesSchema>
 export type AppConfig = z.infer<typeof appConfigSchema>
 export type GrayMatterParseResult = z.infer<typeof grayMatterParseResultSchema>
+
+/**
+ * PartialWorkspaceConfig - workspace config during the building/merging phase
+ * TypeScript-only interface since the schema would be too complex for inference
+ */
+export interface PartialWorkspaceConfig {
+  menu: MenuConfig;
+  collections: MergeableConfigItem[];
+  singles: MergeableConfigItem[];
+  dynamics: MergeableConfigItem[];
+  [key: string]: unknown;
+}
 
 // Type mapping for readConfKey - extracts types from appConfigSchema
 export type ReadConfKeyMap = z.infer<typeof appConfigSchema>

@@ -7,13 +7,14 @@
 
 import path from 'path';
 import fs from 'fs-extra';
-import type { PublConf } from '@quiqr/types';
+import type { CommitEntry, PublConf } from '@quiqr/types';
 import type { SyncService, SyncServiceDependencies, SyncProgressCallback } from './sync-factory.js';
 import type { Embgit } from '../embgit/embgit.js';
 import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
 import type { ConfigurationDataProvider } from '../services/configuration/index.js';
 import { recurForceRemove } from '../utils/file-dir-utils.js';
+import { object } from 'zod/v4';
 
 /**
  * Base configuration shared by GitHub, Sysgit, and Git sync
@@ -243,8 +244,16 @@ export abstract class EmbgitSyncBase implements SyncService {
 
       try {
         await this.embgit.pull(fullDestinationPath);
-      } catch (pullError: any) {
-        const errorOutput = pullError.stdout?.toString() || pullError.message || '';
+      } catch (pullError: unknown) {
+        let errorOutput = ""
+        if (typeof pullError === 'object' && pullError != null && 'stdout' in pullError && isValidToString(pullError.stdout)) {
+          errorOutput = pullError.stdout.toString()
+        }
+        
+        if (pullError instanceof Error) {
+          errorOutput = pullError.message
+        }
+
         if (errorOutput.includes('already up-to-date')) {
           // Not an error, just no changes
         } else {
@@ -265,8 +274,16 @@ export abstract class EmbgitSyncBase implements SyncService {
 
       await this.syncSourceToDestination(fullDestinationPath, site.source.path, syncSelection);
       return 'reset-and-pulled-from-remote';
-    } catch (err: any) {
-      const errorOutput = err.stdout?.toString() || err.message || '';
+    } catch (err: unknown) {
+        let errorOutput = ""
+        if (typeof err === 'object' && err != null && 'stdout' in err && isValidToString(err.stdout)) {
+          errorOutput = err.stdout.toString()
+        }
+        
+        if (err instanceof Error) {
+          errorOutput = err.message
+        }
+
       if (errorOutput.includes('already up-to-date')) {
         return 'no_changes';
       } else if (errorOutput.includes('non-fast-forward update')) {
@@ -326,7 +343,7 @@ export abstract class EmbgitSyncBase implements SyncService {
 
     const historyRemoteArr = await this.embgit.logRemote(this.getGitUrl(), tmpKeypathPrivate);
 
-    let historyLocalArr: any[] = [];
+    let historyLocalArr: CommitEntry[] = [];
     if (await fs.pathExists(this.fullDestinationPath())) {
       this.sendProgress('Comparing with local commit history', 80);
       try {
@@ -338,8 +355,8 @@ export abstract class EmbgitSyncBase implements SyncService {
       }
     }
 
-    const historyMergedArr: CommitInfo[] = historyRemoteArr.map((commit: any) => {
-      const localMatch = historyLocalArr.find((e: any) => e.ref === commit.ref);
+    const historyMergedArr: CommitInfo[] = historyRemoteArr.map((commit: CommitEntry) => {
+      const localMatch = historyLocalArr.find((e: CommitEntry) => e.ref === commit.ref);
       return {
         ...commit,
         local: !!localMatch,
@@ -632,4 +649,15 @@ jobs:
       this.windowAdapter.sendToRenderer('updateProgress', { message, progress });
     }
   }
+}
+
+// https://stackoverflow.com/questions/76970937/how-to-check-if-an-object-implements-the-tostring-method-at-compile-time
+export interface HasToString {
+    toString(): string;
+}
+
+export function isValidToString(obj: unknown): obj is HasToString {
+    return (
+        typeof obj === "object" && obj !== null && typeof obj.toString === "function" && obj.toString !== Object.prototype.toString
+    );
 }

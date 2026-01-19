@@ -1,5 +1,5 @@
 import { request } from './utils/main-process-bridge';
-import type { ReadConfKeyMap } from '../types';
+import type { ExtraBuildConfig, GitPublishConf, ReadConfKeyMap, SiteConfig, HugoThemeInfo } from '../types';
 
 
 export function getConfigurations(options?: {invalidateCache: boolean}) {
@@ -80,7 +80,7 @@ export function logToConsole( message, label = ""){
   return request('logToConsole', {message, label}, {timeout: 1000});
 }
 
-export function getDynFormFields(searchRootNode: string, searchLevelKeyVal: any){
+export function getDynFormFields(searchRootNode: string, searchLevelKeyVal: unknown){
   return request('getDynFormFields', {searchRootNode, searchLevelKeyVal});
 }
 
@@ -135,7 +135,7 @@ export function importSiteFromPublicGitUrl(siteName: string, url: string){
   return request('importSiteFromPublicGitUrl', {siteName, url}, {timeout: 1000000});
 }
 
-export function newSiteFromPublicHugoThemeUrl(siteName: string, url: string, themeInfo: any, hugoVersion){
+export function newSiteFromPublicHugoThemeUrl(siteName: string, url: string, themeInfo: HugoThemeInfo, hugoVersion: string){
   return request('newSiteFromPublicHugoThemeUrl', {siteName, url, themeInfo, hugoVersion});
 }
 
@@ -166,11 +166,11 @@ export function parseFileToObject(file){
   return request('parseFileToObject', {file});
 }
 
-export function buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: any){
+export function buildWorkspace(siteKey: string, workspaceKey: string, buildKey: string, extraConfig: ExtraBuildConfig){
   return request('buildWorkspace', {siteKey, workspaceKey, buildKey, extraConfig});
 }
 
-export function saveSingle(siteKey: string, workspaceKey: string, singleKey: string, document: string){
+export function saveSingle(siteKey: string, workspaceKey: string, singleKey: string, document: Record<string, unknown>){
   return request('saveSingle', {siteKey, workspaceKey, singleKey, document});
 }
 
@@ -181,7 +181,7 @@ export function getSingle(siteKey: string, workspaceKey: string, singleKey: stri
 export function openSingleInEditor(siteKey: string, workspaceKey: string, singleKey: string){
   return request('openSingleInEditor', {siteKey, workspaceKey, singleKey});
 }
-export function updateSingle(siteKey: string, workspaceKey: string, singleKey: string, document: any){
+export function updateSingle(siteKey: string, workspaceKey: string, singleKey: string, document: Record<string, unknown>){
   return request('updateSingle', {siteKey, workspaceKey, singleKey, document});
 }
 
@@ -204,7 +204,7 @@ export function buildSingle(siteKey: string, workspaceKey: string, singleKey: st
   return request('buildSingle', {siteKey, workspaceKey, singleKey, buildAction});
 }
 
-export function updateCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, document: any){
+export function updateCollectionItem(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, document: Record<string, unknown>){
   return request('updateCollectionItem', {siteKey, workspaceKey, collectionKey, collectionItemKey, document});
 }
 
@@ -271,7 +271,7 @@ export function openFileDialogForSingleAndCollectionItem(
   collectionKey: string,
   collectionItemKey: string,
   targetPath: string,
-  { title: _title, extensions }:{title: string, extensions: Array<string>},
+  { title: _title, extensions }:{title: string, extensions: string[]},
   forceFileName?: string
 ){
   return new Promise<void>((resolve, reject) => {
@@ -382,7 +382,7 @@ export function getThumbnailForCollectionOrSingleItemImage(siteKey: string, work
   return request('getThumbnailForCollectionOrSingleItemImage', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath}, {timeout: 30000});
 }
 
-export function getFilesInBundle(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string, extensions: any, forceFileName: string){
+export function getFilesInBundle(siteKey: string, workspaceKey: string, collectionKey: string, collectionItemKey: string, targetPath: string, extensions: string[], forceFileName: string){
   return request('getFilesInBundle', {siteKey, workspaceKey, collectionKey, collectionItemKey, targetPath, extensions, forceFileName});
 }
 
@@ -428,23 +428,13 @@ export function getFilesFromAbsolutePath(path: string){
   return request('getFilesFromAbsolutePath', {path}, {timeout: 30000});
 }
 
-export function saveSiteConf(siteKey: string, newConf: any){
+export function saveSiteConf(siteKey: string, newConf: SiteConfig){
   return request('saveSiteConf', {siteKey, newConf});
 }
 
-export function copySite(siteKey: string, newConf: any){
+export function copySite(siteKey: string, newConf: SiteConfig){
   return request('copySite', {siteKey, newConf});
 }
-
-/*
-export function mergeSiteWithRemote(siteKey: string, publishConf: any){
-  return request('mergeSiteWithRemote', {siteKey, publishConf}, {timeout: 130000});
-}
-
-export function publishSite(siteKey: string, publishConf: any){
-  return request('publishSite', {siteKey, publishConf}, {timeout: 130000});
-}
-*/
 
 export function getSiteConfig(siteKey: string){
   return request('getSiteConfig', {siteKey});
@@ -454,7 +444,7 @@ export function getLanguages(siteKey: string, workspaceKey: string){
   return request('getLanguages', {siteKey, workspaceKey});
 }
 
-export function publisherDispatchAction(siteKey: string, publishConf: any, action: string, actionParameters: any, timeout: any){
+export function publisherDispatchAction(siteKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
   if(!Number.isInteger(timeout)){
     timeout=130000;
   }
