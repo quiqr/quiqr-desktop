@@ -10,8 +10,22 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ['**/*.ts', '**/*.tsx'],
     plugins: {
       "react-you-might-not-need-an-effect": reactYouMightNotNeedAnEffect,
+    },
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021,
+      },
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       ...reactYouMightNotNeedAnEffect.configs.recommended.rules,
@@ -24,15 +38,6 @@ export default [
           argsIgnorePattern: "^_",
         },
       ],
-    },
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: "module",
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.es2021,
-      },
     },
   },
 ];

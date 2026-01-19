@@ -9,6 +9,19 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
+      },
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       "no-console": 0,
       "no-async-promise-executor": 0,
@@ -19,14 +32,6 @@ export default [
           argsIgnorePattern: "^_",
         },
       ],
-    },
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: "module",
-      globals: {
-        ...globals.node,
-        ...globals.es2021,
-      },
     },
   },
 ];
