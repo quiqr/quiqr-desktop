@@ -409,9 +409,8 @@ export class WorkspaceService {
     const pageOrSectionIndexReg = new RegExp(expression);
     const filtered = allFiles.filter((x) => !pageOrSectionIndexReg.test(x));
 
-    const merged = filtered.map((src) => {
-      return Object.assign({ src }, [].find((r: any) => r.src === src));
-    });
+    const merged = filtered.map((src) => ({ src }));
+
     return merged;
   }
 
