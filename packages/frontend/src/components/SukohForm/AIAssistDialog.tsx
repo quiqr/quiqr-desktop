@@ -14,7 +14,7 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import type { LlmSettings, PromptItemConfig } from '@quiqr/types';
+import type { PromptItemConfig } from '@quiqr/types';
 import type { Field } from '@quiqr/types';
 import service from './../../services/service';
 import { FormProvider } from './FormProvider';
@@ -53,9 +53,9 @@ export function AIAssistDialog({
   const [responseMetadata, setResponseMetadata] = useState<{
     provider?: string;
     usage?: {
-      promptTokens: number;
-      completionTokens: number;
-      totalTokens: number;
+      promptTokens?: number;
+      completionTokens?: number;
+      totalTokens?: number;
     };
   } | null>(null);
 
@@ -76,7 +76,7 @@ export function AIAssistDialog({
             workspaceKey,
             templateKey
           );
-          configs[templateKey] = config as PromptItemConfig;
+          configs[templateKey] = config;
         }
 
         setTemplateConfigs(configs);
@@ -149,17 +149,7 @@ export function AIAssistDialog({
           collectionItemKey,
           singleKey,
         }
-      ) as {
-        prompt: string;
-        response: string;
-        llm_settings: LlmSettings;
-        usage?: {
-          promptTokens: number;
-          completionTokens: number;
-          totalTokens: number;
-        };
-        provider?: string;
-      };
+      );
 
       console.log('AI Prompt processed successfully:', result);
 
@@ -392,7 +382,7 @@ export function AIAssistDialog({
                     )}
                     {responseMetadata.usage && (
                       <span>
-                        Tokens: {responseMetadata.usage.promptTokens} + {responseMetadata.usage.completionTokens} = {responseMetadata.usage.totalTokens}
+                        Tokens: {responseMetadata.usage.promptTokens ?? 0} + {responseMetadata.usage.completionTokens ?? 0} = {responseMetadata.usage.totalTokens ?? 0}
                       </span>
                     )}
                   </Box>

@@ -5,7 +5,8 @@ import {
   workspaceDetailsSchema,
   workspaceConfigSchema,
   siteConfigSchema,
-  userPreferencesSchema
+  userPreferencesSchema,
+  promptItemConfigSchema
 } from './config.js'
 import {
   quiqrSiteRepoInfoSchema,
@@ -61,6 +62,11 @@ export const folderDialogResponseSchema = z.object({
 
 export const deleteFileFromBundleResponseSchema = z.object({
   deleted: z.boolean()
+})
+
+export const uploadFileToBundlePathResponseSchema = z.object({
+  uploadedPath: z.string(),
+  newCollectionItemKey: z.string().optional()
 })
 
 export const communityTemplateSchema = z.object({
@@ -134,6 +140,17 @@ export const keyPairResponseSchema = z.object({
 export const publicKeyResponseSchema = z.object({
   publicKey: z.string()
 })
+
+// AI Prompt schemas
+export const aiPromptResponseSchema = z.object({
+  response: z.string(),
+  provider: z.string().optional(),
+  usage: z.object({
+    promptTokens: z.number().optional(),
+    completionTokens: z.number().optional(),
+    totalTokens: z.number().optional()
+  }).optional()
+}).passthrough()
 
 // Hugo configuration file schema (hugo.toml, config.toml, etc.)
 // Uses passthrough to allow any Hugo config properties while typing the ones we use
@@ -219,6 +236,9 @@ export const apiSchemas = {
   listWorkspaces: z.array(workspaceSchema),
   getWorkspaceDetails: workspaceDetailsSchema,
   getWorkspaceModelParseInfo: parseInfoSchema,
+  getPromptTemplateConfig: promptItemConfigSchema,
+  processAiPrompt: aiPromptResponseSchema,
+  updatePageFromAiResponse: z.record(z.unknown()),
   getPreviewCheckConfiguration: z.unknown().nullable(),
   mountWorkspace: z.string(),
   serveWorkspace: z.void(),
@@ -242,7 +262,7 @@ export const apiSchemas = {
   copyCollectionItemToLang: copyCollectionItemResponseSchema,
   makePageBundleCollectionItem: deleteCollectionItemResponseSchema, // Uses same shape: { deleted: boolean }
   buildCollectionItem: buildActionResultSchema,
-  openCollectionItemInEditor: z.void(),
+  openFileDialogForCollectionItem: z.void(),
 
   // File operations
   parseFileToObject: z.unknown(),
@@ -251,7 +271,10 @@ export const apiSchemas = {
   getFilesFromAbsolutePath: z.array(fileReferenceSchema),
   getThumbnailForPath: z.string().optional(),
   getThumbnailForCollectionOrSingleItemImage: z.string().optional(),
+  uploadFileToBundlePath: uploadFileToBundlePathResponseSchema,
   deleteFileFromBundle: deleteFileFromBundleResponseSchema,
+  openFileInEditor: z.void(),
+  openFileExplorer: z.void(),
 
   // Site management
   getSiteConfig: siteConfigSchema,
@@ -366,6 +389,8 @@ export type WebMenuDefinition = z.infer<typeof webMenuDefinitionSchema>
 export type WebMenuState = z.infer<typeof webMenuStateSchema>
 export type WebMenuActionResult = z.infer<typeof webMenuActionResultSchema>
 export type EnvironmentInfo = z.infer<typeof environmentInfoSchema>
+export type UploadFileToBundlePathResponse = z.infer<typeof uploadFileToBundlePathResponseSchema>
+export type AiPromptResponse = z.infer<typeof aiPromptResponseSchema>
 
 // This type includes all the api method names
 export type ApiMethod = keyof typeof apiSchemas
