@@ -637,13 +637,21 @@ export function createProcessAiPromptHandler(container: AppContainer) {
         usage: llmResponse.usage,
         provider: getProviderDisplayName(llmResponse.provider),
       };
-    } catch (error: any) {
-      console.error('\n--- LLM Error ---');
-      console.error(error.message);
-      console.log('\n======================\n');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('\n--- LLM Error ---');
+        console.error(error.message);
+        console.log('\n======================\n');
+        // Re-throw with context
+        throw new Error(`Failed to process AI prompt: ${error.message}`);
+      }
 
-      // Re-throw with context
-      throw new Error(`Failed to process AI prompt: ${error.message}`);
+      const msg =
+        typeof error === "string"
+          ? error
+          : "Failed to process AI prompt";
+
+      throw new Error(msg);
     }
   };
 }

@@ -17,7 +17,7 @@ import fm from 'front-matter';
 import { promisify } from 'util';
 import type { WorkspaceConfigProvider, ParseInfo } from './workspace-config-provider.js';
 import type { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
-import type { FormatProvider } from '../../utils/format-providers/types.js';
+import type { FormatProvider, ParsedContent } from '../../utils/format-providers/types.js';
 import { isContentFile, SUPPORTED_CONTENT_EXTENSIONS } from '../../utils/content-formats.js';
 import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
@@ -248,7 +248,7 @@ export class WorkspaceService {
   private async _smartDump(
     filePath: string,
     formatFallbacks: string[],
-    obj: any
+    obj: ParsedContent
   ): Promise<string> {
     let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
     if (formatProvider === undefined || formatProvider === null) {
@@ -318,7 +318,7 @@ export class WorkspaceService {
       );
 
       if (typeof single.pullOuterRootKey === 'string') {
-        const newObj: any = {};
+        const newObj: Record<string, unknown> = {};
         newObj[single.pullOuterRootKey] = obj;
         obj = newObj;
       }
