@@ -3,6 +3,7 @@ import {
   configurationsSchema,
   workspaceSchema,
   workspaceDetailsSchema,
+  workspaceConfigSchema,
   siteConfigSchema,
   userPreferencesSchema
 } from './config.js'
@@ -10,6 +11,7 @@ import {
   quiqrSiteRepoInfoSchema,
   hugoThemeRepoInfoSchema
 } from './embgit.js'
+import { fieldSchema } from './fields.js'
 
 export const collectionItemSchema = z.object({
   key: z.string(),
@@ -49,7 +51,8 @@ export const ssgVersionsResponseSchema = z.object({
 })
 
 export const collectionItemKeyResponseSchema = z.object({
-  key: z.string()
+  key: z.string().optional(),
+  unavailableReason: z.enum(['already-exists']).optional()
 })
 
 export const folderDialogResponseSchema = z.object({
@@ -81,7 +84,7 @@ export const communityTemplateSchema = z.object({
 
 export const dynFormFieldsSchema = z.object({
   title: z.union([z.string(), z.number()]).optional(),
-  fields: z.array(z.any()).nullable().optional(), // Using z.any() to avoid circular dependency with fieldSchema
+  fields: z.array(fieldSchema).nullable().optional(),
   key: z.string().optional(),
   content_type: z.string().optional(),
   form_field_type: z.string().optional()
@@ -158,17 +161,27 @@ export const siteInventorySchema = z.object({
   quiqrModelDirExists: z.boolean(),
   quiqrFormsDirExists: z.boolean(),
   quiqrDirExists: z.boolean(),
-  quiqrModelParsed: z.any().nullable() // WorkspaceConfig, but using any to avoid circular dependency
+  quiqrModelParsed: workspaceConfigSchema.nullable()
 })
 
 // Menu schemas - for web-based menu bar
-export const webMenuItemSchema: z.ZodType<any> = z.lazy(() =>
+type WebMenuItem = {
+  id: string
+  type: 'normal' | 'checkbox' | 'separator' | 'submenu'
+  label?: string
+  checked?: boolean
+  enabled?: boolean
+  action?: string
+  submenu?: WebMenuItem[]
+}
+
+export const webMenuItemSchema: z.ZodType<WebMenuItem> = z.lazy(() =>
   z.object({
     id: z.string(),
     type: z.enum(['normal', 'checkbox', 'separator', 'submenu']),
     label: z.string().optional(),
     checked: z.boolean().optional(),
-    enabled: z.boolean().optional(), // Optional for separator items
+    enabled: z.boolean().optional(),
     action: z.string().optional(),
     submenu: z.array(webMenuItemSchema).optional()
   })
@@ -206,22 +219,22 @@ export const apiSchemas = {
   listWorkspaces: z.array(workspaceSchema),
   getWorkspaceDetails: workspaceDetailsSchema,
   getWorkspaceModelParseInfo: parseInfoSchema,
-  getPreviewCheckConfiguration: z.any().nullable(), // Reads from JSON file, shape varies
+  getPreviewCheckConfiguration: z.unknown().nullable(),
   mountWorkspace: z.string(),
-  serveWorkspace: z.any(), // Returns void/undefined, server action
-  buildWorkspace: z.union([z.void(), z.string()]), // No return value
+  serveWorkspace: z.void(),
+  buildWorkspace: z.union([z.void(), z.string()]),
 
   // Single content operations
-  getSingle: z.record(z.any()), // Returns dynamic content based on the single's fields
-  updateSingle: z.record(z.any()), // Returns the updated document
-  saveSingle: z.record(z.any()), // Returns the saved document
+  getSingle: z.record(z.unknown()),
+  updateSingle: z.record(z.unknown()),
+  saveSingle: z.record(z.unknown()),
   openSingleInEditor: z.void(),
   buildSingle: buildActionResultSchema,
 
   // Collection operations
   listCollectionItems: z.array(collectionItemSchema),
-  getCollectionItem: z.record(z.any()), // Returns dynamic content based on collection's fields
-  updateCollectionItem: z.record(z.any()), // Returns the updated document
+  getCollectionItem: z.record(z.unknown()),
+  updateCollectionItem: z.record(z.unknown()),
   createCollectionItemKey: collectionItemKeyResponseSchema,
   deleteCollectionItem: deleteCollectionItemResponseSchema,
   renameCollectionItem: renameCollectionItemResponseSchema,
@@ -232,7 +245,7 @@ export const apiSchemas = {
   openCollectionItemInEditor: z.void(),
 
   // File operations
-  parseFileToObject: z.any(), // any is needed here because a select-from-query file could have any shape
+  parseFileToObject: z.unknown(),
   globSync: z.array(z.string()),
   getFilesInBundle: z.array(fileReferenceSchema),
   getFilesFromAbsolutePath: z.array(fileReferenceSchema),
@@ -294,7 +307,7 @@ export const apiSchemas = {
   // Hugo operations
   stopHugoServer: hugoServerResponseSchema,
   getFilteredHugoVersions: z.array(z.string()),
-  getHugoTemplates: z.any(), // Not implemented in backend
+  getHugoTemplates: z.never(),
   checkHugoVersion: hugoVersionCheckResponseSchema,
 
   // SSG operations
@@ -302,20 +315,20 @@ export const apiSchemas = {
   getFilteredSSGVersions: ssgVersionsResponseSchema,
 
   // Window management
-  showLogWindow: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
+  showLogWindow: z.object({ error: z.string(), stack: z.string() }).optional(),
   showMenuBar: z.boolean(),
   hideMenuBar: z.boolean(),
   redirectTo: z.boolean(),
   parentMountWorkspace: z.boolean(),
-  reloadThemeStyle: z.union([z.object({ error: z.string(), stack: z.string() }), z.any()]),
+  reloadThemeStyle: z.object({ error: z.string(), stack: z.string() }).optional(),
 
   // External/shell operations
   openExternal: z.boolean(),
-  openCustomCommand: z.any(), // Not implemented, throws error
+  openCustomCommand: z.never(),
   logToConsole: z.boolean(),
 
   // Sync/publish operations
-  publisherDispatchAction: z.any(), // Return type varies by action
+  publisherDispatchAction: z.unknown(),
   createKeyPairGithub: keyPairResponseSchema,
   derivePublicKey: publicKeyResponseSchema,
 
