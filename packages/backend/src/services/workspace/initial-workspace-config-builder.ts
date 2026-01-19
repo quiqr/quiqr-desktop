@@ -9,6 +9,85 @@ import fs from 'fs-extra';
 import type { FormatProvider } from '../../utils/format-providers/types.js';
 import { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
 import type { PathHelper } from '../../utils/path-helper.js';
+import { BuildConfig, MenuItem, ServeConfig } from '@quiqr/types';
+
+/**
+ * Represents parsed Hugo configuration data.
+ * We only need to access the keys, so this is a record with string keys.
+ */
+type HugoConfigData = Record<string, unknown>;
+
+/** Menu section in the initial config */
+interface InitialMenuSection {
+  key: string;
+  title: string;
+  menuItems: MenuItem[];
+}
+
+/** Field definition for initial singles */
+interface InitialSingleField {
+  key: string;
+  title: string;
+  type: string;
+  tip: string;
+}
+
+/** Single content item in initial config */
+interface InitialSingle {
+  key: string;
+  title: string;
+  file: string;
+  fields: InitialSingleField[];
+}
+
+/** The complete initial base configuration structure */
+interface InitialBaseConfig {
+  ssgType: string;
+  ssgVersion: string;
+  serve: ServeConfig[];
+  build: BuildConfig[];
+  menu: InitialMenuSection[];
+  collections: never[];
+  singles: InitialSingle[];
+}
+
+/** Field definition for partials config (simplified) */
+interface PartialsField {
+  key: string;
+  type: string;
+  content?: string;
+  title?: string;
+  default?: string;
+  path?: string;
+  extensions?: string[];
+  multiLine?: boolean;
+  fields?: PartialsField[];
+}
+
+/** Partials configuration structure */
+interface PartialsConfig {
+  dataformat: string;
+  fields: PartialsField[];
+}
+
+/** Include configuration item */
+interface IncludeConfigItem {
+  key: string;
+  title: string;
+  folder: string;
+  extension: string;
+  itemtitle: string;
+  _mergePartial: string;
+}
+
+/** Options for building the config */
+interface GetConfigOptions {
+  ssgType: string;
+  ssgVersion: string;
+  configFile: string;
+  ext: string;
+  hugoConfigData: HugoConfigData;
+}
 
 /**
  * InitialWorkspaceConfigBuilder creates default configuration files
@@ -59,13 +138,7 @@ export class InitialWorkspaceConfigBuilder {
   /**
    * Get the default configuration object
    */
-  private getConfig(opts: {
-    ssgType: string;
-    ssgVersion: string;
-    configFile: string;
-    ext: string;
-    hugoConfigData: any;
-  }): any {
+  private getConfig(opts: GetConfigOptions): InitialBaseConfig {
     const rootKeysLower: Record<string, string> = {};
     Object.keys(opts.hugoConfigData).forEach((key) => {
       rootKeysLower[key.toLowerCase()] = key;
@@ -115,7 +188,7 @@ export class InitialWorkspaceConfigBuilder {
   /**
    * Build default partials configuration
    */
-  buildPartials(): any {
+  buildPartials(): PartialsConfig {
     return {
       dataformat: 'yaml',
       fields: [
@@ -145,7 +218,7 @@ export class InitialWorkspaceConfigBuilder {
   /**
    * Build default includes configuration
    */
-  buildInclude(): any[] {
+  buildInclude(): IncludeConfigItem[] {
     return [
       {
         key: 'pages',
@@ -163,7 +236,7 @@ export class InitialWorkspaceConfigBuilder {
    */
   private buildBase(ssgType: string, ssgVersion: string): {
     formatProvider: FormatProvider;
-    dataBase: any;
+    dataBase: InitialBaseConfig;
   } {
     let hugoConfigPath = this.pathHelper.hugoConfigFilePath(this.workspacePath);
     let formatProvider: FormatProvider;
@@ -187,7 +260,7 @@ export class InitialWorkspaceConfigBuilder {
       formatProvider = resolved;
     }
 
-    const hugoConfigData = formatProvider.parse(fs.readFileSync(hugoConfigPath, 'utf-8'));
+    const hugoConfigData = formatProvider.parse(fs.readFileSync(hugoConfigPath, 'utf-8')) as HugoConfigData;
     const relHugoConfigPath = path.relative(this.workspacePath, hugoConfigPath);
 
     const dataBase = this.getConfig({
