@@ -5,7 +5,7 @@
  * Supports AWS Bedrock (Claude) and OpenAI using Vercel AI SDK.
  */
 
-import { generateText } from 'ai';
+import { generateText, LanguageModel } from 'ai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 
@@ -147,7 +147,7 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
   }
 
   // Initialize the appropriate provider and get model
-  let model: any;
+  let model: LanguageModel;
   if (provider === 'bedrock') {
     const bedrockProvider = createBedrockProvider();
     model = bedrockProvider(request.model);
@@ -169,19 +169,15 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
     // Call the LLM using generateText (non-streaming)
     // For OpenAI models, use maxCompletionTokens (newer parameter name)
     // For Bedrock/Anthropic models, use maxTokens
-    const generateOptions: any = {
+    const generateOptions: Parameters<typeof generateText>[0] = {
       model,
       prompt: request.prompt,
       temperature,
+      ...(provider === 'openai'
+        ? { maxCompletionTokens: maxTokens }
+        : { maxTokens }
+      )
     };
-
-    if (provider === 'openai') {
-      // OpenAI newer models (GPT-4o, GPT-5, etc.) use maxCompletionTokens
-      generateOptions.maxCompletionTokens = maxTokens;
-    } else {
-      // Bedrock and other providers use maxTokens
-      generateOptions.maxTokens = maxTokens;
-    }
 
     const result = await generateText(generateOptions);
 
@@ -203,21 +199,28 @@ export async function callLLM(request: LLMRequest): Promise<LLMResponse> {
     }
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('LLM call failed:', error);
 
+    if (!(error instanceof Error)) {
+      // Re-throw with provider context
+      throw new Error(
+        `Failed to call ${getProviderDisplayName(provider)}: ${error}`
+      );
+    }
+
     // Provide more helpful error messages
-    if (error.message?.includes('401') || error.message?.includes('authentication')) {
+    if (error.message.includes('401') || error.message?.includes('authentication')) {
       throw new Error(
         `Authentication failed for ${getProviderDisplayName(provider)}. ` +
         `Please check your API credentials.`
       );
-    } else if (error.message?.includes('rate limit')) {
+    } else if (error.message.includes('rate limit')) {
       throw new Error(
         `Rate limit exceeded for ${getProviderDisplayName(provider)}. ` +
         `Please try again later.`
       );
-    } else if (error.message?.includes('timeout')) {
+    } else if (error.message.includes('timeout')) {
       throw new Error(
         `Request timed out while calling ${getProviderDisplayName(provider)}. ` +
         `Please try again.`
