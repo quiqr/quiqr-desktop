@@ -33,7 +33,7 @@ export class HugoConfig implements SSGConfigQuerier {
   /**
    * Get Hugo config mounts as a parsed object
    */
-  async configMountsAsObject(): Promise<any> {
+  async configMountsAsObject(): Promise<unknown[]> {
     const { workspacePath, hugover } = this.qSiteConfig;
     const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
@@ -41,22 +41,18 @@ export class HugoConfig implements SSGConfigQuerier {
       return [];
     }
 
-    try {
-      const output = await this.spawnHugo(exec, ['config', 'mounts'], workspacePath);
-      const lines = output.split('\n');
+    const output = await this.spawnHugo(exec, ['config', 'mounts'], workspacePath);
+    const lines = output.split('\n');
 
-      const startIdx = lines.findIndex((element) => element.startsWith('{'));
-      const endIdx = lines.findIndex((element) => element.startsWith('}'));
+    const startIdx = lines.findIndex((element) => element.startsWith('{'));
+    const endIdx = lines.findIndex((element) => element.startsWith('}'));
 
-      if (startIdx === -1 || endIdx === -1) {
-        return [];
-      }
-
-      const retstring = lines.slice(startIdx, endIdx + 1).join('');
-      return JSON.parse(retstring);
-    } catch (e) {
-      throw e;
+    if (startIdx === -1 || endIdx === -1) {
+      return [];
     }
+
+    const retstring = lines.slice(startIdx, endIdx + 1).join('');
+    return JSON.parse(retstring);
   }
 
   /**
@@ -74,7 +70,7 @@ export class HugoConfig implements SSGConfigQuerier {
       const output = await this.spawnHugo(exec, ['config'], workspacePath);
       const lines = output.split('\n');
       return lines;
-    } catch (e) {
+    } catch {
       return [];
     }
   }

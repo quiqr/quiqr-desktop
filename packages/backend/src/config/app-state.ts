@@ -127,7 +127,7 @@ export class AppState {
   /**
    * Get a snapshot of current state (for debugging)
    */
-  getSnapshot(): Record<string, any> {
+  getSnapshot(): Record<string, unknown> {
     return {
       currentSiteKey: this.currentSiteKey,
       currentWorkspaceKey: this.currentWorkspaceKey,

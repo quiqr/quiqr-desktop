@@ -16,7 +16,7 @@ export interface FixtureOptions {
     folder: string;
     items: Array<{
       key: string;
-      frontmatter: Record<string, any>;
+      frontmatter: Record<string, unknown>;
       content?: string;
     }>;
   }>;

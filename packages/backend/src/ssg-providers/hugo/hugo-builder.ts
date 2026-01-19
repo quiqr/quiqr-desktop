@@ -54,14 +54,10 @@ export class HugoBuilder {
       throw new Error(`Could not find hugo executable for version ${this.config.hugover}.`);
     }
 
-    try {
-      await execFileAsync(exec, hugoArgs, {
-        cwd: this.config.workspacePath,
-        windowsHide: true,
-        timeout: 60000, // 1 minute
-      });
-    } catch (error) {
-      throw error;
-    }
+    await execFileAsync(exec, hugoArgs, {
+      cwd: this.config.workspacePath,
+      windowsHide: true,
+      timeout: 60000, // 1 minute
+    });
   }
 }

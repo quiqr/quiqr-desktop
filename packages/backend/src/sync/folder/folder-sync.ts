@@ -54,7 +54,7 @@ export class FolderSync implements SyncService {
   /**
    * Dispatch sync actions
    */
-  async actionDispatcher(action: string, parameters?: unknown): Promise<unknown> {
+  async actionDispatcher(action: string): Promise<unknown> {
     switch (action) {
       case 'pullFromRemote':
         return this.pullFastForwardMerge();

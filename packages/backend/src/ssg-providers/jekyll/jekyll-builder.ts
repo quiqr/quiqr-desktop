@@ -83,14 +83,10 @@ export class JekyllBuilder implements SSGBuilder {
       jekyllArgs.push('--baseurl', this.config.baseUrl);
     }
 
-    try {
-      await execFileAsync(jekyllCommand, jekyllArgs, {
-        cwd: this.config.workspacePath,
-        shell: true, // Use shell to properly execute the wrapper script
-        timeout: 180000, // 3 minutes (Jekyll builds can be slower)
-      });
-    } catch (error) {
-      throw error;
-    }
+    await execFileAsync(jekyllCommand, jekyllArgs, {
+      cwd: this.config.workspacePath,
+      shell: true, // Use shell to properly execute the wrapper script
+      timeout: 180000, // 3 minutes (Jekyll builds can be slower)
+    });
   }
 }

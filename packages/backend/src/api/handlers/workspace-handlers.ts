@@ -423,12 +423,6 @@ export function createGetPromptTemplateConfigHandler(container: AppContainer) {
     workspaceKey: string;
     templateKey: string;
   }) => {
-    const workspaceService = await createWorkspaceServiceForParams(
-      container,
-      siteKey,
-      workspaceKey
-    );
-
     // Get the workspace path
     const siteConfig = await container.libraryService.getSiteConf(siteKey);
     const siteService = new SiteService(

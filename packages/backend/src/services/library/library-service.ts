@@ -238,7 +238,7 @@ export class LibraryService {
    * @returns True on success
    */
   async writeSiteConf(newConf: Record<string, unknown>, siteKey: string): Promise<boolean> {
-    let cleanConf = this.deleteInvalidConfKeys(newConf);
+    const cleanConf = this.deleteInvalidConfKeys(newConf);
 
     // Ensure name field always exists - use key as fallback
     if (!cleanConf.name) {

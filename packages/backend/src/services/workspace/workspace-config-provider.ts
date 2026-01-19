@@ -101,7 +101,6 @@ export class WorkspaceConfigProvider {
 
     this.parseInfo.baseFile = filePath || '';
 
-    let config: WorkspaceConfig;
     let token: FileCacheToken;
 
     if (filePath != null) {
@@ -127,7 +126,7 @@ export class WorkspaceConfigProvider {
       token = await new FileCacheToken([filePath]).build();
     }
 
-    config = await this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
+    const config: WorkspaceConfig = await this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
     config.path = workspacePath;
     config.key = workspaceKey;
 

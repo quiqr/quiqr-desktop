@@ -68,7 +68,7 @@ export class FolderSiteSource implements SiteSource {
 
       // A valid workspace should have at least one of these
       return hugoConfigExists || quiqrDirExists || contentDirExists;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -154,7 +154,7 @@ export class FolderSiteSource implements SiteSource {
 
       //console.log('[FolderSiteSource] Found', workspaces.length, 'workspace(s)');
       return workspaces;
-    } catch (error) {
+    } catch {
       //console.error('[FolderSiteSource] Error discovering workspaces:', error);
       return [];
     }

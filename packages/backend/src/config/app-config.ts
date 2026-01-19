@@ -7,7 +7,6 @@
 
 import path from 'path';
 import fs from 'fs-extra';
-import { z } from 'zod';
 import { appConfigSchema, type AppConfig as AppConfigType } from '@quiqr/types';
 
 /**

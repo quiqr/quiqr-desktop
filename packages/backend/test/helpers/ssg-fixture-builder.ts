@@ -38,7 +38,7 @@ export interface SSGFixtureOptions {
   /**
    * Custom config content
    */
-  configContent?: Record<string, any>;
+  configContent?: Record<string, unknown>;
 }
 
 /**
@@ -118,7 +118,6 @@ export async function createEleventySite(
     configFormat = 'js',
     includeMarkerDirs = false,
     includePackageJson = false,
-    configContent = {},
   } = options;
 
   await fs.ensureDir(directory);
@@ -390,6 +389,7 @@ export async function createAmbiguousSite(directory: string): Promise<void> {
 /**
  * Simple TOML serializer (basic implementation)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toToml(obj: Record<string, any>): string {
   const lines: string[] = [];
 

@@ -4,8 +4,6 @@
  * This file runs before all tests and sets up the testing environment.
  */
 
-import { vi } from 'vitest';
-
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 

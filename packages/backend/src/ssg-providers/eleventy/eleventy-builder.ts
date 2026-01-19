@@ -60,14 +60,10 @@ export class EleventyBuilder implements SSGBuilder {
       throw new Error(`Could not find Eleventy executable for version ${this.config.version}.`);
     }
 
-    try {
-      await execFileAsync(exec, eleventyArgs, {
-        cwd: this.config.workspacePath,
-        windowsHide: true,
-        timeout: 120000, // 2 minutes (Eleventy can be slower than Hugo)
-      });
-    } catch (error) {
-      throw error;
-    }
+    await execFileAsync(exec, eleventyArgs, {
+      cwd: this.config.workspacePath,
+      windowsHide: true,
+      timeout: 120000, // 2 minutes (Eleventy can be slower than Hugo)
+    });
   }
 }

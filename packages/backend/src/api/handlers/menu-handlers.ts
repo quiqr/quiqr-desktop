@@ -32,7 +32,7 @@ export function createGetMenuStateHandler(container: AppContainer) {
  * Handles all menu item clicks from the frontend
  */
 export function createExecuteMenuActionHandler(container: AppContainer) {
-  return async ({ action, data }: { action: string; data?: unknown }) => {
+  return async ({ action }: { action: string; data?: unknown }) => {
     // Parse action (format: "actionName" or "actionName:param")
     // Only split on the FIRST colon to preserve URLs like "https://..."
     const colonIndex = action.indexOf(':');

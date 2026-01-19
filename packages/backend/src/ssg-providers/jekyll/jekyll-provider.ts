@@ -88,8 +88,11 @@ export class JekyllProvider implements SSGProvider {
   }
 
   createConfigQuerier(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     workspacePath: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     version: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     configFile?: string
   ): SSGConfigQuerier | null {
     // Jekyll uses YAML config files which could be parsed
@@ -142,7 +145,7 @@ export class JekyllProvider implements SSGProvider {
             metadata: { source: 'Gemfile' },
           };
         }
-      } catch (error) {
+      } catch {
         // Ignore read errors
       }
     }
@@ -179,7 +182,7 @@ export class JekyllProvider implements SSGProvider {
             metadata: { markers: markerCount, hasMdFiles: true },
           };
         }
-      } catch (error) {
+      } catch {
         // Ignore read errors
       }
     }
