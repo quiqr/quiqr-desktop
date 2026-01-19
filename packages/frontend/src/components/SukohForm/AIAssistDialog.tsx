@@ -8,18 +8,18 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
-import type { PromptItemConfig } from '@quiqr/types';
+import type { LlmSettings, PromptItemConfig } from '@quiqr/types';
 import type { Field } from '@quiqr/types';
 import service from './../../services/service';
 import { FormProvider } from './FormProvider';
 import { FieldRenderer } from './FieldRenderer';
-import type { FormMeta, FileReference } from './FormContext';
+import type { FormMeta } from './FormContext';
 
 interface AIAssistDialogProps {
   open: boolean;
@@ -47,7 +47,7 @@ export function AIAssistDialog({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
-  const [formDirty, setFormDirty] = useState(false);
+  const [,setFormDirty] = useState(false);
   const [sending, setSending] = useState(false);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [responseMetadata, setResponseMetadata] = useState<{
@@ -110,7 +110,7 @@ export function AIAssistDialog({
     return selectedTemplateKey ? templateConfigs[selectedTemplateKey] : null;
   }, [selectedTemplateKey, templateConfigs]);
 
-  const handleTemplateChange = useCallback((event: any) => {
+  const handleTemplateChange = useCallback((event: SelectChangeEvent) => {
     setSelectedTemplateKey(event.target.value);
   }, []);
 
@@ -123,7 +123,7 @@ export function AIAssistDialog({
   );
 
   const handleFormSave = useCallback(
-    async (document: Record<string, unknown>, resources: Record<string, FileReference[]>) => {
+    async (document: Record<string, unknown>) => {
       // Form save is not needed for AI Assist (no persistence)
       // Just update the local state
       setFormValues(document);
@@ -152,7 +152,7 @@ export function AIAssistDialog({
       ) as {
         prompt: string;
         response: string;
-        llm_settings: any;
+        llm_settings: LlmSettings;
         usage?: {
           promptTokens: number;
           completionTokens: number;
@@ -169,9 +169,11 @@ export function AIAssistDialog({
         provider: result.provider,
         usage: result.usage,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to process AI prompt:', err);
-      setError(err.message || 'Failed to process prompt. Please check the console for details.');
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to process prompt. Please check the console for details.');
+      }
       setAiResponse(null);
       setResponseMetadata(null);
     } finally {
@@ -239,9 +241,11 @@ export function AIAssistDialog({
 
       // Show success message
       alert('Page updated successfully!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to update page:', err);
-      setError(err.message || 'Failed to update page. Please check the console for details.');
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to update page. Please check the console for details.');
+      }
     } finally {
       setSending(false);
     }
