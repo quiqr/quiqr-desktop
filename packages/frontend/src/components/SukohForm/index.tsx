@@ -7,14 +7,29 @@ import service from './../../services/service';
 import { FormProvider } from './FormProvider';
 import { FieldRenderer } from './FieldRenderer';
 import { AIAssistDialog } from './AIAssistDialog';
-import type { Field } from '@quiqr/types';
+import type { Field, BuildAction } from '@quiqr/types';
 import type { FormMeta } from './FormContext';
 
+/**
+ * Plugins object providing file and bundle management functions
+ */
+interface FormPlugins {
+  openBundleFileDialog: (
+    options: { title: string; extensions: string[]; targetPath: string },
+    onFilesReady: unknown
+  ) => Promise<unknown>;
+  getFilesInBundle: (
+    extensions: string[],
+    targetPath: string,
+    forceFileName: string
+  ) => Promise<unknown>;
+  getBundleThumbnailSrc: (targetPath: string) => Promise<string>;
+}
 
 interface SaveContext {
-  accept: (updatedValues: any) => void;
+  accept: (updatedValues: Record<string, unknown>) => void;
   reject: (msg?: string) => void;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 type SukohFormProps = {
@@ -23,16 +38,16 @@ type SukohFormProps = {
   collectionKey?: string;
   singleKey?: string;
   collectionItemKey?: string;
-  fields: any;
-  buildActions?: any;
-  prompt_templates?: any;
-  plugins?: any;
+  fields: Field[];
+  buildActions?: BuildAction[];
+  prompt_templates?: string[];
+  plugins?: FormPlugins;
   rootName?: string;
   pageUrl?: string;
   hideExternalEditIcon?: boolean;
-  values: any;
-  onOpenInEditor?: any;
-  onDocBuild?: any;
+  values: Record<string, unknown>;
+  onOpenInEditor?: (context?: { reject: (message: string) => void }) => void;
+  onDocBuild?: (buildAction: BuildAction) => void;
   onSave?: (context: SaveContext) => void;
   hideSaveButton?: boolean;
   refreshed?: boolean;
@@ -201,8 +216,6 @@ export const SukohForm = ({
       pageUrl: pageUrl || '',
     };
 
-    const typedFields = fields as Field[];
-
     // Check if AI Assist should be shown
     const hasPromptTemplates = prompt_templates && Array.isArray(prompt_templates) && prompt_templates.length > 0;
 
@@ -236,7 +249,7 @@ export const SukohForm = ({
           </>
         )}
         <FormProvider
-          fields={typedFields}
+          fields={fields}
           initialValues={values || {}}
           meta={meta}
           onSave={handleNewFormSave}
@@ -245,7 +258,7 @@ export const SukohForm = ({
           {nestPath ? (
             // Render nested field view
             (() => {
-              const nestedField = findFieldByPath(typedFields, nestPath);
+              const nestedField = findFieldByPath(fields, nestPath);
               if (!nestedField) {
                 return <div>Nested field not found: {nestPath}</div>;
               }
@@ -268,7 +281,7 @@ export const SukohForm = ({
             })()
           ) : (
             // Render all top-level fields
-            typedFields.map((field) => (
+            fields.map((field) => (
               <FieldRenderer key={field.key} compositeKey={`root.${field.key}`} />
             ))
           )}
