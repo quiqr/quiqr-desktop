@@ -55,11 +55,10 @@ const ConsoleRedirectHandler = ({ children }: { children: React.ReactNode }) => 
 
 // Inner component that has access to useDialog
 const AppContent = ({ theme }: { theme: Theme }) => {
-  const navigate = useNavigate();
   const { openDialog } = useDialog();
   const [applicationRole, setApplicationRole] = useState(defaultApplicationRole);
   const [libraryView, setLibraryView] = useState("cards");
-  const [showSplashAtStartup, setShowSplashAtStartup] = useState(true);
+  const [, setShowSplashAtStartup] = useState(true);
 
   useEffect(() => {
     // Set library view from prefs

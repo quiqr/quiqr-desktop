@@ -68,7 +68,7 @@ const Chips = ({ field, fullWidth, items, onPushItem, onRequestDelete, onSwap, s
   }, [sortable, getDocumentMouseUpListener]);
 
   const getOnItemMouseEnter = useCallback((index) => {
-    return function(e) {
+    return function() {
       if (dragFromIndex !== undefined) {
         setDragToIndex(index);
       }
