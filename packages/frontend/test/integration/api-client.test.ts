@@ -164,8 +164,8 @@ describe('API Client - Single Content Operations', () => {
 
   it('should call saveSingle with document parameter', async () => {
     let receivedBody: any = null;
-    const document = '---\ntitle: My Page\n---\nContent here';
-    
+    const document = { title: 'My Page', content: 'Content here' };
+
     server.use(
       http.post('http://localhost:5150/api/saveSingle', async ({ request }) => {
         receivedBody = await request.json();
@@ -206,7 +206,7 @@ describe('API Client - Single Content Operations', () => {
 
     await api.getSingle('site', 'ws', 'single', '');
     await api.updateSingle('site', 'ws', 'single', {});
-    await api.saveSingle('site', 'ws', 'single', '');
+    await api.saveSingle('site', 'ws', 'single', {});
     
     expect(endpoints).toEqual([
       '/api/getSingle',

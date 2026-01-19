@@ -17,7 +17,7 @@ type RepoInfo = {
   screenshot: string | null;
   hugoTheme: string;
   quiqrModel: string;
-  quiqrForms: string;
+  quiqrForms: number;
 };
 
 const emptyRepoInfo: RepoInfo = {
@@ -25,7 +25,7 @@ const emptyRepoInfo: RepoInfo = {
   screenshot: null,
   hugoTheme: "",
   quiqrModel: "",
-  quiqrForms: "",
+  quiqrForms: 0,
 };
 
 type FormValues = {
@@ -146,7 +146,7 @@ const PublicGitImportForm = ({
               screenshot: response.Screenshot ?? null,
               hugoTheme: response.HugoTheme ?? "",
               quiqrModel: response.QuiqrModel ?? "",
-              quiqrForms: response.QuiqrFormsEndPoints ?? "",
+              quiqrForms: response.QuiqrFormsEndPoints ?? 0,
             },
           });
 
