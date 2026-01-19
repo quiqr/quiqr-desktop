@@ -11,7 +11,7 @@ import type { FormatProviderResolver } from '../utils/format-provider-resolver.j
 import type { LibraryService } from '../services/library/library-service.js';
 import type { Embgit } from '../embgit/embgit.js';
 import { InitialWorkspaceConfigBuilder } from '../services/workspace/initial-workspace-config-builder.js';
-import { HugoThemeInfo } from '@quiqr/types';
+import { HugoThemeInfo, hugoConfigSchema, type HugoConfig } from '@quiqr/types';
 
 /**
  * GitImporter - Imports sites from git repositories
@@ -214,18 +214,18 @@ export class GitImporter {
 
       // Process Hugo config
       let formatProvider;
-      let hconfig: any = null;
+      let hconfig: HugoConfig | null = null;
       const hugoConfigFilePath = this.pathHelper.hugoConfigFilePath(tempDir);
 
       if (hugoConfigFilePath) {
         const strData = fs.readFileSync(hugoConfigFilePath, { encoding: 'utf-8' });
         formatProvider = this.formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
-        console.log(strData)
         if (formatProvider) {
           const rawData = formatProvider.parse(strData);
-          console.log(rawData)
-          // const result = hugoconfig
-          hconfig = rawData;
+          const parseResult = hugoConfigSchema.safeParse(rawData);
+          if (parseResult.success) {
+            hconfig = parseResult.data;
+          }
         }
       }
 

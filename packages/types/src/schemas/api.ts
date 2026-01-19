@@ -6,6 +6,10 @@ import {
   siteConfigSchema,
   userPreferencesSchema
 } from './config.js'
+import {
+  quiqrSiteRepoInfoSchema,
+  hugoThemeRepoInfoSchema
+} from './embgit.js'
 
 export const collectionItemSchema = z.object({
   key: z.string(),
@@ -128,12 +132,25 @@ export const publicKeyResponseSchema = z.object({
   publicKey: z.string()
 })
 
+// Hugo configuration file schema (hugo.toml, config.toml, etc.)
+// Uses passthrough to allow any Hugo config properties while typing the ones we use
+export const hugoConfigSchema = z
+  .object({
+    baseURL: z.string().optional(),
+    theme: z.union([z.string(), z.array(z.string())]).optional(),
+    title: z.string().optional(),
+    languageCode: z.string().optional()
+  })
+  .passthrough()
+
+export type HugoConfig = z.infer<typeof hugoConfigSchema>
+
 // Site inventory - returned by hugosite_dir_show
 export const siteInventorySchema = z.object({
   dirExist: z.boolean(),
   dirName: z.string(),
   hugoConfigExists: z.boolean(),
-  hugoConfigParsed: z.any().nullable(),
+  hugoConfigParsed: hugoConfigSchema.nullable(),
   hugoThemesDirExists: z.boolean(),
   hugoContentDirExists: z.boolean(),
   hugoDataDirExists: z.boolean(),
@@ -243,8 +260,8 @@ export const apiSchemas = {
   newSiteFromScratch: z.string(), // Returns siteKey
 
   // Git repository inspection
-  quiqr_git_repo_show: z.record(z.any()), // RepoInfo - dynamic structure
-  hugotheme_git_repo_show: z.record(z.any()), // RepoInfo - dynamic structure
+  quiqr_git_repo_show: quiqrSiteRepoInfoSchema,
+  hugotheme_git_repo_show: hugoThemeRepoInfoSchema,
   hugosite_dir_show: siteInventorySchema,
 
   // Form state

@@ -10,6 +10,14 @@ import fs from 'fs-extra';
 import crypto from 'crypto';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import {
+  quiqrSiteRepoInfoSchema,
+  hugoThemeRepoInfoSchema,
+  commitLogSchema,
+  type QuiqrSiteRepoInfo,
+  type HugoThemeRepoInfo,
+  type CommitEntry
+} from '@quiqr/types';
 import type { PathHelper, EnvironmentInfo } from '../utils/path-helper.js';
 import type { OutputConsole, AppInfoAdapter } from '../adapters/types.js';
 
@@ -23,13 +31,6 @@ export interface EmbgitUserConfig {
   name: string;
   machine: string;
   privateKey: string | null;
-}
-
-/**
- * Repository information returned by repo_show commands
- */
-export interface RepoInfo {
-  [key: string]: any;
 }
 
 /**
@@ -183,13 +184,18 @@ export class Embgit {
   /**
    * Show repository information for a Quiqr site
    */
-  async repo_show_quiqrsite(url: string): Promise<RepoInfo> {
+  async repo_show_quiqrsite(url: string): Promise<QuiqrSiteRepoInfo> {
     try {
       const output = await this.executeEmbgit(
         ['repo_show_quiqrsite', url],
         `Checking Quiqr site repo: ${url}`
       );
-      return JSON.parse(output);
+      const parsed = quiqrSiteRepoInfoSchema.safeParse(JSON.parse(output));
+      if (!parsed.success) {
+        this.outputConsole.appendLine(`Invalid response from repo_show_quiqrsite: ${parsed.error.message}`);
+        throw new Error(`Invalid response from embgit repo_show_quiqrsite: ${parsed.error.message}`);
+      }
+      return parsed.data;
     } catch (error) {
       this.outputConsole.appendLine(`repo_show_quiqrsite failed: ${url}`);
       throw error;
@@ -199,13 +205,18 @@ export class Embgit {
   /**
    * Show repository information for a Hugo theme
    */
-  async repo_show_hugotheme(url: string): Promise<RepoInfo> {
+  async repo_show_hugotheme(url: string): Promise<HugoThemeRepoInfo> {
     try {
       const output = await this.executeEmbgit(
         ['repo_show_hugotheme', url],
         `Checking Hugo theme repo: ${url}`
       );
-      return JSON.parse(output);
+      const parsed = hugoThemeRepoInfoSchema.safeParse(JSON.parse(output));
+      if (!parsed.success) {
+        this.outputConsole.appendLine(`Invalid response from repo_show_hugotheme: ${parsed.error.message}`);
+        throw new Error(`Invalid response from embgit repo_show_hugotheme: ${parsed.error.message}`);
+      }
+      return parsed.data;
     } catch (error) {
       this.outputConsole.appendLine(`repo_show_hugotheme failed: ${url}`);
       throw error;
@@ -360,7 +371,7 @@ export class Embgit {
   /**
    * Get remote commit history
    */
-  async logRemote(url: string, privateKeyPath?: string): Promise<any[]> {
+  async logRemote(url: string, privateKeyPath?: string): Promise<CommitEntry[]> {
     const keyPath = privateKeyPath || this.userconf.privateKey;
     if (!keyPath) {
       throw new Error('Private key not set for git log remote');
@@ -371,7 +382,12 @@ export class Embgit {
         ['log_remote', '-s', '-i', keyPath, url],
         `Getting remote commits: ${url}`
       );
-      return JSON.parse(output);
+      const parsed = commitLogSchema.safeParse(JSON.parse(output));
+      if (!parsed.success) {
+        this.outputConsole.appendLine(`Invalid response from log_remote: ${parsed.error.message}`);
+        throw new Error(`Invalid response from embgit log_remote: ${parsed.error.message}`);
+      }
+      return parsed.data;
     } catch (error) {
       this.outputConsole.appendLine(`Git log remote failed: ${url}`);
       throw error;
@@ -381,13 +397,18 @@ export class Embgit {
   /**
    * Get local commit history
    */
-  async logLocal(destination_path: string): Promise<any[]> {
+  async logLocal(destination_path: string): Promise<CommitEntry[]> {
     try {
       const output = await this.executeEmbgit(
         ['log_local', destination_path],
         `Getting local commits: ${destination_path}`
       );
-      return JSON.parse(output);
+      const parsed = commitLogSchema.safeParse(JSON.parse(output));
+      if (!parsed.success) {
+        this.outputConsole.appendLine(`Invalid response from log_local: ${parsed.error.message}`);
+        throw new Error(`Invalid response from embgit log_local: ${parsed.error.message}`);
+      }
+      return parsed.data;
     } catch (error) {
       this.outputConsole.appendLine(`Git log local failed: ${destination_path}`);
       throw error;

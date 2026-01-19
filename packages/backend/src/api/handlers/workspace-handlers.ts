@@ -14,7 +14,7 @@ import matter from 'gray-matter';
 import { createWorkspaceServiceForParams, getCurrentWorkspaceService } from './helpers/workspace-helper.js';
 import { processPromptTemplate, buildSelfObject } from '../../utils/prompt-template-processor.js';
 import { callLLM, getProviderDisplayName } from '../../utils/llm-service.js';
-import type { PromptItemConfig, WorkspaceConfig, CollectionConfig, SingleConfig, MergeableConfigItem } from '@quiqr/types';
+import type { PromptItemConfig, WorkspaceConfig, CollectionConfig, SingleConfig, MergeableConfigItem, Field } from '@quiqr/types';
 
 /**
  * List all workspaces for a site
@@ -246,6 +246,18 @@ export function createGetDynFormFieldsHandler(container: AppContainer) {
 }
 
 /**
+ * Type guard to check if a value is a Field with a matching key
+ */
+function isFieldWithKey(value: unknown, key: string): value is Field {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'key' in value &&
+    value.key === key
+  );
+}
+
+/**
  * Get value by config path
  */
 export function createGetValueByConfigPathHandler(container: AppContainer) {
@@ -255,22 +267,31 @@ export function createGetValueByConfigPathHandler(container: AppContainer) {
   }: {
     searchRootNode: string;
     path: string;
-  }) => {
+  }): Promise<Field | null> => {
     const workspaceService = getCurrentWorkspaceService(container);
     const configuration = await workspaceService.getConfigurationsData();
 
-    if (searchRootNode in configuration) {
-      const configArray = (configuration as any)[searchRootNode];
-      if (Array.isArray(configArray)) {
-        const confObj = configArray.find((x: any) => x['key'] === 'mainConfig');
-        if (confObj && confObj.fields) {
-          const value = confObj.fields.find((x: any) => x['key'] === path);
-          return value;
-        }
-      }
+    if (!isDynFormArrayKey(configuration, searchRootNode)) {
+      return null;
     }
 
-    return null;
+    const configArray = configuration[searchRootNode];
+    if (!configArray) {
+      return null;
+    }
+
+    const confObj = configArray.find((item) => item.key === 'mainConfig');
+    if (!confObj) {
+      return null;
+    }
+
+    const fields = getConfigItemProperty(confObj, 'fields');
+    if (!Array.isArray(fields)) {
+      return null;
+    }
+
+    const value = fields.find((field) => isFieldWithKey(field, path));
+    return value ?? null;
   };
 }
 
@@ -345,7 +366,7 @@ export function createGlobSyncHandler(container: AppContainer) {
     options,
   }: {
     pattern: string;
-    options?: any;
+    options?: string[];
   }) => {
     const { state } = container;
 
