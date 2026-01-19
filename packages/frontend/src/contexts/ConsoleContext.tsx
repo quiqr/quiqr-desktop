@@ -13,6 +13,11 @@ interface ConsoleProviderProps {
   children: ReactNode;
 }
 
+// Regular expression to strip ANSI escape codes (terminal colors/formatting)
+// @see https://eslint.org/docs/latest/rules/no-control-regex for full explanation
+// eslint-disable-next-line no-control-regex
+const ANSI_ESCAPE_REGEX = /\u001b[^m]*?m/g;
+
 export function ConsoleProvider({ children }: ConsoleProviderProps) {
   const [messages, setMessages] = useState<ConsoleMessage[]>([
     { id: -2, line: 'This is the application output console. Here you can learn about what is happening behind the scenes.' },
@@ -35,7 +40,7 @@ export function ConsoleProvider({ children }: ConsoleProviderProps) {
   }, [buffer]);
 
   const onConsole = useCallback(({ line }: { line: string }) => {
-    const cleanLine = line.replace(/\u001b[^m]*?m/g, '');
+    const cleanLine = line.replace(ANSI_ESCAPE_REGEX, '');
     const newMessage: ConsoleMessage = {
       id: lastIdRef.current++,
       line: cleanLine
@@ -53,7 +58,7 @@ export function ConsoleProvider({ children }: ConsoleProviderProps) {
   }, [processBuffer]);
 
   const onHugoOutput = useCallback((line: string) => {
-    const cleanLine = line.replace(/\u001b[^m]*?m/g, '');
+    const cleanLine = line.replace(ANSI_ESCAPE_REGEX, '');
     const newMessage: ConsoleMessage = {
       id: lastIdRef.current++,
       line: cleanLine
