@@ -14,6 +14,7 @@ import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
 import type { ConfigurationDataProvider } from '../services/configuration/index.js';
 import { recurForceRemove } from '../utils/file-dir-utils.js';
+import { object } from 'zod/v4';
 
 /**
  * Base configuration shared by GitHub, Sysgit, and Git sync
@@ -243,8 +244,16 @@ export abstract class EmbgitSyncBase implements SyncService {
 
       try {
         await this.embgit.pull(fullDestinationPath);
-      } catch (pullError: any) {
-        const errorOutput = pullError.stdout?.toString() || pullError.message || '';
+      } catch (pullError: unknown) {
+        let errorOutput = ""
+        if (typeof pullError === 'object' && pullError != null && 'stdout' in pullError && isValidToString(pullError.stdout)) {
+          errorOutput = pullError.stdout.toString()
+        }
+        
+        if (pullError instanceof Error) {
+          errorOutput = pullError.message
+        }
+
         if (errorOutput.includes('already up-to-date')) {
           // Not an error, just no changes
         } else {
@@ -632,4 +641,15 @@ jobs:
       this.windowAdapter.sendToRenderer('updateProgress', { message, progress });
     }
   }
+}
+
+// https://stackoverflow.com/questions/76970937/how-to-check-if-an-object-implements-the-tostring-method-at-compile-time
+interface HasToString {
+    toString(): string;
+}
+
+function isValidToString(obj: unknown): obj is HasToString {
+    return (
+        typeof obj === "object" && obj !== null && typeof obj.toString === "function" && obj.toString !== Object.prototype.toString
+    );
 }

@@ -23,7 +23,7 @@ import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
-import type { SingleConfig, CollectionConfig, ExtraBuildConfig } from '@quiqr/types';
+import type { SingleConfig, CollectionConfig, ExtraBuildConfig, BuildConfig, ServeConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
@@ -1280,7 +1280,7 @@ export class WorkspaceService {
   /**
    * Find first match or default in array
    */
-  private _findFirstMatchOrDefault(arr: any[] | undefined, key: string): any {
+  private _findFirstMatchOrDefault(arr: BuildConfig[] | ServeConfig[] | undefined, key: string): BuildConfig | ServeConfig {
     let result;
 
     if (key) {
@@ -1356,7 +1356,7 @@ export class WorkspaceService {
     const workspaceDetails = await this.getConfigurationsData();
 
     try {
-      let serveConfig: any;
+      let serveConfig: Partial<ServeConfig> | null = null;
       if (workspaceDetails.serve && workspaceDetails.serve.length) {
         serveConfig = this._findFirstMatchOrDefault(workspaceDetails.serve, '');
       } else {
@@ -1381,6 +1381,7 @@ export class WorkspaceService {
       }
 
       // config.mounts can be either an array or an object with a mounts property
+      // TODO: fix this weirdness with the mounts??
       const mountsArray = Array.isArray(config.mounts)
         ? config.mounts
         : (config.mounts as any).mounts;
