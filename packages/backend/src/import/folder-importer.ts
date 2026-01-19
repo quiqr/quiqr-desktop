@@ -134,7 +134,7 @@ export class FolderImporter {
         this.formatProviderResolver,
         this.pathHelper
       );
-      configBuilder.buildAll(hugoVersion);
+      configBuilder.buildAll('hugo', hugoVersion);
     }
 
     // Create the site from the temp directory

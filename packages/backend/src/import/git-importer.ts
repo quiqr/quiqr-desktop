@@ -247,7 +247,7 @@ export class GitImporter {
         this.formatProviderResolver,
         this.pathHelper
       );
-      configBuilder.buildAll(hugoVersion);
+      configBuilder.buildAll('hugo', hugoVersion);
 
       // Create the site
       await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempDir);
