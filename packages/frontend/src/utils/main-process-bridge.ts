@@ -16,8 +16,15 @@ function validateApiResponse(method: ApiMethod, response: unknown): unknown {
 
   const schema = apiSchemas[method];
 
+  // Handle void schemas: axios returns empty string for undefined/null responses
+  // Convert empty string to undefined for void schema validation
+  let dataToValidate = response;
+  if (schema instanceof z.ZodVoid && response === "") {
+    dataToValidate = undefined;
+  }
+
   try {
-    const validated = schema.parse(response);
+    const validated = schema.parse(dataToValidate);
     return validated;
   } catch (error) {
     if (error instanceof z.ZodError) {

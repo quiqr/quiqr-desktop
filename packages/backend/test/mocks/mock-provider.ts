@@ -93,7 +93,7 @@ class MockBinaryManager implements SSGBinaryManager {
 class MockDevServer implements SSGDevServer {
   private config: SSGServerConfig;
   private dependencies: SSGProviderDependencies;
-  private process: any = null;
+  private process: { pid: number } | null = null;
 
   constructor(config: SSGServerConfig, dependencies: SSGProviderDependencies) {
     this.config = config;
