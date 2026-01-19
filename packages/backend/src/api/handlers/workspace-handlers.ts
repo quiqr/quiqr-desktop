@@ -14,7 +14,7 @@ import matter from 'gray-matter';
 import { createWorkspaceServiceForParams, getCurrentWorkspaceService } from './helpers/workspace-helper.js';
 import { processPromptTemplate, buildSelfObject } from '../../utils/prompt-template-processor.js';
 import { callLLM, getProviderDisplayName } from '../../utils/llm-service.js';
-import type { PromptItemConfig, WorkspaceConfig, CollectionConfig, SingleConfig, MergeableConfigItem, Field } from '@quiqr/types';
+import { type WorkspaceConfig, type CollectionConfig, type SingleConfig, type MergeableConfigItem, type Field, promptItemConfigSchema, readonlyFieldSchema } from '@quiqr/types';
 
 /**
  * List all workspaces for a site
@@ -535,7 +535,14 @@ export function createProcessAiPromptHandler(container: AppContainer) {
       throw new Error(`Unsupported file format for prompt template: ${templatePath}`);
     }
 
-    const templateConfig = formatProvider.parse(fileContent) as PromptItemConfig;
+    const rawConfig = formatProvider.parse(fileContent);
+    const validationResult = promptItemConfigSchema.safeParse(rawConfig);
+    let templateConfig;
+    if (validationResult.success) {
+      templateConfig = validationResult.data
+    } else {
+      throw new Error('Schema validation failed: ' + validationResult.error)
+    }
 
     // Build self object if we have context
     let selfObject = null;
@@ -571,10 +578,13 @@ export function createProcessAiPromptHandler(container: AppContainer) {
     let templateText = '';
     if (templateConfig.fields) {
       const templateField = templateConfig.fields.find(
-        (f: any) => f.type === 'readonly' && f.key === 'promptTemplate'
+        (f: Field) => f.type === 'readonly' && f.key === 'promptTemplate'
       );
-      if (templateField && (templateField as any).default) {
-        templateText = (templateField as any).default;
+
+      const validationResult = readonlyFieldSchema.safeParse(templateField)
+
+      if (validationResult.data && validationResult.data.default) {
+        templateText = validationResult.data.default;
       }
     }
 
