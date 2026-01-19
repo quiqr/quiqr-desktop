@@ -24,6 +24,8 @@ import { ModelWatcher, createModelWatcher } from '../services/workspace/model-wa
 import { BuildActionService } from '../build-actions/index.js';
 import { ProviderFactory } from '../ssg-providers/provider-factory.js';
 import type { EnvironmentInfo } from '../utils/path-helper.js';
+import { HugoDownloader } from '../ssg-providers/hugo/hugo-downloader.js';
+import { HugoUtils } from '../ssg-providers/hugo/hugo-utils.js';
 
 /**
  * Event emitted when the model cache is cleared
@@ -156,13 +158,13 @@ export interface AppContainer {
    * @deprecated Use providerFactory.getProvider('hugo').getBinaryManager() instead
    * Backward compatibility accessor for Hugo downloader
    */
-  get hugoDownloader(): any;
+  get hugoDownloader(): HugoDownloader;
 
   /**
    * @deprecated Use providerFactory.getProvider('hugo') for site creation instead
    * Backward compatibility accessor for Hugo utils
    */
-  get hugoUtils(): any;
+  get hugoUtils(): HugoUtils;
 }
 
 /**

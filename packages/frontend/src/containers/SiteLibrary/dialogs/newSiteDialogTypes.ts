@@ -1,5 +1,7 @@
 // Types and state management for NewSlashImportSiteDialog
 
+import { HugoThemeInfo } from "@quiqr/types";
+
 export type SourceType = "scratch" | "hugotheme" | "folder" | "git" | "";
 export type DialogMode = "new" | "import";
 export type GitProvider = "github" | "gitlab" | "forgejo" | "generic";
@@ -28,20 +30,6 @@ export const defaultPrivateRepoData: PrivateRepoData = {
   deployPrivateKey: "",
   deployPublicKey: "",
 };
-
-export interface HugoThemeInfo {
-  Screenshot?: string;
-  MinHugoVersion?: string;
-  Name?: string;
-  License?: string;
-  LicenseLink?: string;
-  Homepage?: string;
-  Demosite?: string;
-  Description?: string;
-  ExampleSite?: boolean;
-  Author?: string;
-  AuthorHomepage?: string;
-}
 
 // Validation result types for form partials
 export interface GitValidationResult {

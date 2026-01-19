@@ -15,11 +15,11 @@ export class JsonFormatProvider implements FormatProvider {
     return line.startsWith('{');
   }
 
-  parse(str: string): any {
+  parse(str: string): unknown {
     return JSON.parse(str);
   }
 
-  dump(obj: any): string {
+  dump(obj: unknown): string {
     return JSON.stringify(obj, null, '  ');
   }
 
@@ -58,7 +58,7 @@ ${content}`;
       md = data.substr(jsonEnd + 1);
     }
 
-    let parsedData: ParsedContent = this.parse(json);
+    let parsedData = this.parse(json) as ParsedContent;
     if (parsedData === undefined) {
       parsedData = {};
       hasFrontMatter = false;

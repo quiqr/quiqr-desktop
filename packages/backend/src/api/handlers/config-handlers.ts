@@ -49,7 +49,7 @@ export function createSaveConfPrefKeyHandler(container: AppContainer) {
     prefValue,
   }: {
     prefKey: string;
-    prefValue: any;
+    prefValue: string | boolean;
   }) => {
     container.config.setPrefKey(prefKey, prefValue);
     container.config.saveSync();

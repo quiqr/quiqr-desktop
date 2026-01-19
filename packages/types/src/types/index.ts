@@ -107,3 +107,25 @@ export interface PageConfig extends SingleConfig {
 }
 
 export type SinglesConfig = SingleConfig[]
+
+export interface HugoThemeInfo {
+  Screenshot?: string;
+  MinHugoVersion?: string;
+  Name?: string;
+  License?: string;
+  LicenseLink?: string;
+  Homepage?: string;
+  Demosite?: string;
+  Description?: string;
+  ExampleSite?: boolean;
+  Author?: string;
+  AuthorHomepage?: string;
+}
+
+/**
+ * Extra build configuration
+ */
+export interface ExtraBuildConfig {
+  overrideBaseURLSwitch?: boolean;
+  overrideBaseURL?: string;
+}

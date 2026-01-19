@@ -11,15 +11,7 @@ import type { FormatProviderResolver } from '../utils/format-provider-resolver.j
 import type { LibraryService } from '../services/library/library-service.js';
 import type { Embgit } from '../embgit/embgit.js';
 import { InitialWorkspaceConfigBuilder } from '../services/workspace/initial-workspace-config-builder.js';
-
-/**
- * Theme information from repository inspection
- */
-export interface ThemeInfo {
-  Name?: string;
-  ExampleSite?: boolean;
-  [key: string]: any;
-}
+import { HugoThemeInfo } from '@quiqr/types';
 
 /**
  * GitImporter - Imports sites from git repositories
@@ -191,7 +183,7 @@ export class GitImporter {
   async newSiteFromPublicHugoThemeUrl(
     url: string,
     siteName: string,
-    themeInfo: ThemeInfo,
+    themeInfo: HugoThemeInfo,
     hugoVersion: string
   ): Promise<string> {
     if (!themeInfo.Name) {
@@ -228,8 +220,12 @@ export class GitImporter {
       if (hugoConfigFilePath) {
         const strData = fs.readFileSync(hugoConfigFilePath, { encoding: 'utf-8' });
         formatProvider = this.formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
+        console.log(strData)
         if (formatProvider) {
-          hconfig = formatProvider.parse(strData);
+          const rawData = formatProvider.parse(strData);
+          console.log(rawData)
+          // const result = hugoconfig
+          hconfig = rawData;
         }
       }
 

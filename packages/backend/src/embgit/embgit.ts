@@ -143,8 +143,21 @@ export class Embgit {
         cwd,
       });
       return stdout;
-    } catch (error: any) {
-      const errorMessage = error.stderr?.toString() || error.stdout?.toString() || error.message;
+    } catch (error) {
+      let errorMessage = "Unknown error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      if (typeof error === "object" && error !== null) {
+        if ("stderr" in error && (typeof error.stderr === "string" || Buffer.isBuffer(error.stderr))) {
+          errorMessage = error.stderr.toString();
+        } else if ("stdout" in error && (typeof error.stdout === "string" || Buffer.isBuffer(error.stdout))) {
+          errorMessage = error.stdout.toString();
+        }
+      }
+
       this.outputConsole.appendLine(`Embgit error: ${errorMessage}`);
       throw error;
     }

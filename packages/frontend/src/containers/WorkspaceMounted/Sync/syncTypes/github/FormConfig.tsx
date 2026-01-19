@@ -76,7 +76,9 @@ function FormConfig({ publishConf, setData, setSaveEnabled }: FormConfigProps) {
       updatePubData({ deployPublicKey: resp.publicKey });
       setKeyPairBusy(false);
     } catch (e) {
-      service.api.logToConsole((e as Error).message, 'ERROR');
+      if (e instanceof Error) {
+        service.api.logToConsole(e.message, 'ERROR');
+      }
       setKeyPairBusy(false);
     }
   };

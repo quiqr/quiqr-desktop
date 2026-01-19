@@ -8,7 +8,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import { createElectronAdapters } from './adapters/index.js';
-import { createContainer } from '@quiqr/backend';
+import { AppContainer, createContainer } from '@quiqr/backend';
 import { createServer } from '@quiqr/backend/api';
 import { getCurrentInstanceOrNew } from './ui-managers/main-window-manager.js';
 import { menuManager } from './ui-managers/menu-manager.js';
@@ -110,7 +110,7 @@ async function startBackend() {
 /**
  * Create the main application window
  */
-function createWindow(container?: any): BrowserWindow {
+function createWindow(container?: AppContainer): BrowserWindow {
   // Use the main window manager
   mainWindow = getCurrentInstanceOrNew();
 

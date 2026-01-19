@@ -71,7 +71,7 @@ export function createUpdateCollectionItemHandler(container: AppContainer) {
     workspaceKey: string;
     collectionKey: string;
     collectionItemKey: string;
-    document: any;
+    document: Record<string, unknown>;
   }) => {
     const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
     return await workspaceService.updateCollectionItem(collectionKey, collectionItemKey, document);

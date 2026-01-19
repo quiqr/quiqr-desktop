@@ -8,22 +8,17 @@
 import path from 'path';
 import { z } from 'zod';
 import {
-  workspaceDetailsBaseSchema,
+  workspaceConfigSchema,
   singleConfigSchema,
   collectionConfigSchema,
   type SingleConfig,
   type CollectionConfig,
-  type WorkspaceDetails,
+  type WorkspaceConfig,
 } from '@quiqr/types';
 import { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
 
-/**
- * Workspace configuration with optional dynamics field
- * Extends WorkspaceDetails from @quiqr/types with dynamics support
- */
-export interface WorkspaceConfig extends WorkspaceDetails {
-  dynamics?: any[];
-}
+// Re-export WorkspaceConfig type for consumers
+export type { WorkspaceConfig } from '@quiqr/types';
 
 /**
  * Validation utilities for content and data formats
@@ -64,7 +59,7 @@ export class WorkspaceConfigValidator {
    * Apply config migration from old format to new format
    * Handles hugover → ssgType + ssgVersion migration
    */
-  private applyConfigMigration(config: any): any {
+  private applyConfigMigration(config: Record<string, unknown>): Record<string, unknown> {
     if (!config) return config;
 
     console.log('[CONFIG MIGRATION] Input config:', JSON.stringify({ ssgType: config.ssgType, ssgVersion: config.ssgVersion, hugover: config.hugover }, null, 2));
@@ -119,12 +114,8 @@ export class WorkspaceConfigValidator {
       Object.assign(config, preprocessed);
     }
 
-    // Extend workspaceDetailsBaseSchema to include dynamics (not in base schema yet)
-    const workspaceConfigSchema = workspaceDetailsBaseSchema.extend({
-      dynamics: z.array(z.any()).optional(),
-    });
-
     try {
+      // Use the workspaceConfigSchema from @quiqr/types (includes dynamics support)
       workspaceConfigSchema.parse(preprocessed);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -157,15 +148,22 @@ export class WorkspaceConfigValidator {
 
   /**
    * Check that all fields have unique keys
+   * Accepts unknown[] to accommodate various field schema shapes from Zod
    */
-  checkFieldsKeys(fields: any[] | null | undefined, hintPath: string): void {
+  checkFieldsKeys(fields: unknown[] | null | undefined, hintPath: string): void {
     if (fields == null) return;
 
     const keys: string[] = [];
     const error = `${hintPath}: Each field must have an unique key and the key must be a string.`;
 
     for (const field of fields) {
-      const key = field.key;
+      // Runtime check: field must be an object with a key property
+      if (typeof field !== 'object' || field === null) {
+        throw new Error(error + ' Field must be an object.');
+      }
+
+      const fieldObj = field as Record<string, unknown>;
+      const key = fieldObj.key;
 
       if (key == null) {
         throw new Error(error + ` Field without a key is not allowed.`);
@@ -176,7 +174,11 @@ export class WorkspaceConfigValidator {
         throw new Error(error + ` The key "${key}" is duplicated.`);
       } else {
         keys.push(key);
-        this.checkFieldsKeys(field.fields, `${hintPath} > Field[key=${key}]`);
+        // Recursively check nested fields if present
+        const nestedFields = fieldObj.fields;
+        if (Array.isArray(nestedFields)) {
+          this.checkFieldsKeys(nestedFields, `${hintPath} > Field[key=${key}]`);
+        }
       }
     }
   }
@@ -185,7 +187,7 @@ export class WorkspaceConfigValidator {
    * Validate a single collection configuration
    * @returns null if valid, error message string if invalid
    */
-  validateCollection(collection: any): string | null {
+  validateCollection(collection: CollectionConfig): string | null {
     try {
       // Use the Zod schema from @quiqr/types
       collectionConfigSchema.parse(collection);
@@ -226,7 +228,7 @@ export class WorkspaceConfigValidator {
    * Validate a single configuration
    * @returns null if valid, error message string if invalid
    */
-  validateSingle(single: any): string | null {
+  validateSingle(single: SingleConfig): string | null {
     try {
       // Use the Zod schema from @quiqr/types
       singleConfigSchema.parse(single);
@@ -237,21 +239,24 @@ export class WorkspaceConfigValidator {
       return String(err);
     }
 
-    const extension = path.extname(single.file).replace('.', '');
+    // Additional validation only if file is specified
+    if (single.file) {
+      const extension = path.extname(single.file).replace('.', '');
 
-    // Additional validation for content files
-    if (single.file.startsWith('content') || single.file.startsWith('quiqr/home')) {
-      // Content files require dataformat
-      if (!single.dataformat) {
-        return 'The dataformat value is invalid. Content files require a dataformat.';
-      }
-      if (!validationUtils.dataFormatReg.test(single.dataformat)) {
-        return 'The dataformat value is invalid.';
-      }
-    } else {
-      // Data files: dataformat should match extension
-      if (single.dataformat && single.dataformat !== extension) {
-        return 'The dataformat value does not match the file value: ' + single.dataformat;
+      // Additional validation for content files
+      if (single.file.startsWith('content') || single.file.startsWith('quiqr/home')) {
+        // Content files require dataformat
+        if (!single.dataformat) {
+          return 'The dataformat value is invalid. Content files require a dataformat.';
+        }
+        if (!validationUtils.dataFormatReg.test(single.dataformat)) {
+          return 'The dataformat value is invalid.';
+        }
+      } else {
+        // Data files: dataformat should match extension
+        if (single.dataformat && single.dataformat !== extension) {
+          return 'The dataformat value does not match the file value: ' + single.dataformat;
+        }
       }
     }
 

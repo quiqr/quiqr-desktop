@@ -30,7 +30,7 @@ afterAll(() => {
 describe('Theme API Integration', () => {
   describe('saveConfPrefKey - interfaceStyle', () => {
     it('makes POST request to save interface style preference', async () => {
-      let requestBody: any = null;
+      let requestBody: unknown = null;
 
       // Setup handler to capture the request
       server.use(

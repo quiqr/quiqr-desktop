@@ -20,19 +20,9 @@ import { createCollectionHandlers } from './handlers/collection-handlers.js';
 import { createSyncHandlers } from './handlers/sync-handlers.js';
 
 /**
- * API handler function type
- */
-export type ApiHandler = (data: any) => Promise<any>;
-
-/**
- * Map of all API method names to their handlers
- */
-export type ApiHandlerMap = Record<string, ApiHandler>;
-
-/**
  * Create the complete API handler registry
  */
-export function createApiHandlers(container: AppContainer): ApiHandlerMap {
+export function createApiHandlers(container: AppContainer) {
   // Create all handler groups
   const configHandlers = createConfigHandlers(container);
   const dialogHandlers = createDialogHandlers(container);
@@ -88,11 +78,24 @@ export function createApiHandlers(container: AppContainer): ApiHandlerMap {
 }
 
 /**
+ * Inferred type of all API handlers
+ */
+export type ApiHandlers = ReturnType<typeof createApiHandlers>;
+
+/**
  * Get a handler by method name
  */
+export function getHandler<K extends keyof ApiHandlers>(
+  handlers: ApiHandlers,
+  method: K
+): ApiHandlers[K];
 export function getHandler(
-  handlers: ApiHandlerMap,
+  handlers: ApiHandlers,
   method: string
-): ApiHandler | undefined {
-  return handlers[method];
+): ApiHandlers[keyof ApiHandlers] | undefined;
+export function getHandler(
+  handlers: ApiHandlers,
+  method: string
+): ApiHandlers[keyof ApiHandlers] | undefined {
+  return handlers[method as keyof ApiHandlers];
 }

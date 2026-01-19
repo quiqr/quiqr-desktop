@@ -80,7 +80,7 @@ export class ElectronWindowAdapter implements WindowAdapter {
     }
   }
 
-  sendToRenderer(channel: string, data: any): void {
+  sendToRenderer(channel: string, data: string | object): void {
     if (this.mainWindow) {
       this.mainWindow.webContents.send(channel, data);
     }

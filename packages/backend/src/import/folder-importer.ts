@@ -13,6 +13,7 @@ import type { LibraryService } from '../services/library/library-service.js';
 import { WorkspaceConfigProvider } from '../services/workspace/workspace-config-provider.js';
 import { InitialWorkspaceConfigBuilder } from '../services/workspace/initial-workspace-config-builder.js';
 import type { WorkspaceConfig } from '../services/workspace/workspace-config-validator.js';
+import { SiteConfig, siteConfigSchema } from '@quiqr/types';
 
 /**
  * Site inspection inventory - detailed info about a folder's contents
@@ -21,7 +22,7 @@ export interface SiteInventory {
   dirExist: boolean;
   dirName: string;
   hugoConfigExists: boolean;
-  hugoConfigParsed: any | null;
+  hugoConfigParsed: SiteConfig | null;
   hugoThemesDirExists: boolean;
   hugoContentDirExists: boolean;
   hugoDataDirExists: boolean;
@@ -88,8 +89,16 @@ export class FolderImporter {
       const strData = fs.readFileSync(hugoConfigFilePath, { encoding: 'utf-8' });
       const formatProvider = this.formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
       if (formatProvider) {
-        inventory.hugoConfigParsed = formatProvider.parse(strData);
-        inventory.hugoConfigExists = true;
+        const config = formatProvider.parse(strData);
+        const result = siteConfigSchema.safeParse(config)
+
+        inventory.hugoConfigParsed = null;
+        inventory.hugoConfigExists = false;
+        
+        if (result.data) {
+          inventory.hugoConfigParsed = result.data;
+          inventory.hugoConfigExists = true;
+        }
       }
     }
 

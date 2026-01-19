@@ -23,7 +23,7 @@ import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
-import type { SingleConfig, CollectionConfig } from '@quiqr/types';
+import type { SingleConfig, CollectionConfig, ExtraBuildConfig } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
@@ -103,14 +103,6 @@ export interface CollectionItemCopyResult {
 export interface HugoLanguage {
   lang: string;
   source: string;
-}
-
-/**
- * Extra build configuration
- */
-export interface ExtraBuildConfig {
-  overrideBaseURLSwitch?: boolean;
-  overrideBaseURL?: string;
 }
 
 /**
@@ -371,7 +363,7 @@ export class WorkspaceService {
   /**
    * Update a single content item
    */
-  async updateSingle(singleKey: string, document: any): Promise<any> {
+  async updateSingle(singleKey: string, document: Record<string, unknown>): Promise<any> {
     const config = await this.getConfigurationsData();
     const single = config.singles.find((x) => x.key === singleKey);
     if (single == null) throw new Error('Could not find single.');
@@ -577,7 +569,7 @@ export class WorkspaceService {
   /**
    * Strip non-document data (internal fields starting with __)
    */
-  private _stripNonDocumentData(document: any): void {
+  private _stripNonDocumentData(document: Record<string, unknown>): void {
     for (const key in document) {
       if (key.startsWith('__')) {
         delete document[key];
@@ -872,7 +864,7 @@ export class WorkspaceService {
   async updateCollectionItem(
     collectionKey: string,
     collectionItemKey: string,
-    document: any
+    document: Record<string, unknown>
   ): Promise<any> {
     const config = await this.getConfigurationsData();
     const collection = config.collections.find((x) => x.key === collectionKey);

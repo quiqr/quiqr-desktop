@@ -47,7 +47,7 @@ export function createDevAdapters(): PlatformAdapters {
       reloadMainWindow() {
         console.log('[DevAdapter] reloadMainWindow called');
       },
-      sendToRenderer(channel: string, data: any) {
+      sendToRenderer(channel: string, data: string | object) {
         console.log('[DevAdapter] sendToRenderer called:', channel, data);
       },
       async openSiteLibrary() {

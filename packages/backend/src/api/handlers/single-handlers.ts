@@ -34,7 +34,7 @@ export function createUpdateSingleHandler(container: AppContainer) {
     siteKey: string;
     workspaceKey: string;
     singleKey: string;
-    document: any;
+    document: Record<string, unknown>;
   }) => {
     const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
     return await workspaceService.updateSingle(singleKey, document);

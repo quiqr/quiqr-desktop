@@ -12,6 +12,7 @@ import path from 'path';
 import { glob } from 'glob';
 import type { PathHelper } from '../../utils/path-helper.js';
 import type { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
+import { isRecord } from '../../utils/format-providers/types.js';
 import { siteConfigSchema } from '@quiqr/types/schemas';
 import type { SiteConfig, Configurations } from '@quiqr/types';
 
@@ -224,7 +225,9 @@ export class ConfigurationDataProvider {
         const formatProvider = this.formatResolver.resolveForFilePath(etalagePath);
         if (formatProvider) {
           const parsed = formatProvider.parse(strData);
-          etalage = { ...etalage, ...parsed };
+          if (isRecord(parsed)) {
+            etalage = { ...etalage, ...parsed };
+          }
         }
       } catch (e) {
         this.logger.appendLine(

@@ -168,8 +168,8 @@ export class AppConfig {
     this.config.lastOpenedPublishTargetForSite[siteKey] = publishKey;
   }
 
-  setPrefKey(prefKey: string, prefValue: any): void {
-    (this.config.prefs as any)[prefKey] = prefValue;
+  setPrefKey(prefKey: string, prefValue: string | boolean): void {
+    this.config.prefs[prefKey] = prefValue;
   }
 
   setCurrentUsername(username: string | null): void {

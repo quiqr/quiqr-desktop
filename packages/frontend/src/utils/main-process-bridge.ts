@@ -1,23 +1,20 @@
 import axios from "axios";
 import { z } from 'zod'
-import { apiSchemas, ApiResponse } from '../../types'
+import { apiSchemas, ApiResponse, ApiMethod } from '../../types'
 
 axios.defaults.timeout = 30000
 axios.defaults.timeoutErrorMessage='timeout'
 
 // Module-level state for message handlers (private to this module)
-const messageHandlers: { [key: string]: Array<(data: any) => void> } = {};
+const messageHandlers: { [key: string]: Array<(data: unknown) => void> } = {};
 
-function validateApiResponse(method: string, response: any): any {
+interface RequestOptions {
+  timeout: number
+}
 
-  // Check if we have a schema for this method
-  const schema = apiSchemas[method as keyof typeof apiSchemas];
+function validateApiResponse(method: ApiMethod, response: unknown): unknown {
 
-  // This means we need to create a new zod schema in types.ts
-  if (!schema) {
-    console.warn(`[API Validation] No schema found for method: ${method}`);
-    return response;
-  }
+  const schema = apiSchemas[method];
 
   try {
     const validated = schema.parse(response);
@@ -38,7 +35,7 @@ function validateApiResponse(method: string, response: any): any {
  * Currently a no-op until WebSocket integration is implemented.
  * See NEXTSTEPS.md for the planned WebSocket push notification system.
  */
-export function addMessageHandler(type: string, handler: (data: any) => void) {
+export function addMessageHandler(type: string, handler: (data: unknown) => void) {
   let handlers = messageHandlers[type];
   if (handlers === undefined) {
     handlers = [];
@@ -47,7 +44,7 @@ export function addMessageHandler(type: string, handler: (data: any) => void) {
   handlers.push(handler);
 }
 
-export function removeMessageHandler(type: string, handler: (data: any) => void) {
+export function removeMessageHandler(type: string, handler: (data: unknown) => void) {
   const handlers = messageHandlers[type];
   if (handlers === undefined) {
     return;
@@ -59,7 +56,7 @@ export function removeMessageHandler(type: string, handler: (data: any) => void)
  * Dispatch a message to registered handlers.
  * This will be called by the future WebSocket client.
  */
-export function dispatchMessage(type: string, data: any) {
+export function dispatchMessage(type: string, data: unknown) {
   const handlers = messageHandlers[type];
   if (handlers) {
     for (const handler of handlers) {
@@ -68,7 +65,7 @@ export function dispatchMessage(type: string, data: any) {
   }
 }
 
-export function request<M extends string>(method: M, data?: any, opts = {timeout:90000}): Promise<ApiResponse<M>> {
+export function request<M extends ApiMethod>(method: M, data?: unknown, opts: RequestOptions = {timeout:90000}): Promise<ApiResponse<M>> {
 
   const host = window.location.hostname;
 

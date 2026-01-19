@@ -4,7 +4,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid";
+import Grid, { GridProps } from "@mui/material/Grid";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { copyToClipboard } from "../utils/platform";
 
@@ -33,7 +33,7 @@ interface BundleManagerItemProps {
   bundleStyle?: React.CSSProperties;
   bodyStyle?: React.CSSProperties;
   style?: React.CSSProperties;
-  wrapperProps?: any;
+  wrapperProps?: GridProps
 }
 
 interface BundleManagerProps {

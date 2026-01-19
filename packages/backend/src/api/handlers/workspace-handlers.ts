@@ -14,7 +14,7 @@ import matter from 'gray-matter';
 import { createWorkspaceServiceForParams, getCurrentWorkspaceService } from './helpers/workspace-helper.js';
 import { processPromptTemplate, buildSelfObject } from '../../utils/prompt-template-processor.js';
 import { callLLM, getProviderDisplayName } from '../../utils/llm-service.js';
-import type { PromptItemConfig } from '@quiqr/types';
+import type { PromptItemConfig, WorkspaceConfig, CollectionConfig, SingleConfig, MergeableConfigItem } from '@quiqr/types';
 
 /**
  * List all workspaces for a site
@@ -180,6 +180,41 @@ export function createGetFilesFromAbsolutePathHandler(container: AppContainer) {
 }
 
 /**
+ * Keys in WorkspaceConfig that contain searchable arrays of config items
+ */
+type DynFormArrayKey = 'collections' | 'singles' | 'dynamics';
+
+/**
+ * Union of all config item types that can be searched
+ */
+type DynFormConfigItem = CollectionConfig | SingleConfig | MergeableConfigItem;
+
+/**
+ * Type guard to check if a key is a valid array property in WorkspaceConfig
+ */
+function isDynFormArrayKey(
+  config: WorkspaceConfig,
+  key: string
+): key is DynFormArrayKey {
+  return (
+    (key === 'collections' || key === 'singles' || key === 'dynamics') &&
+    key in config
+  );
+}
+
+/**
+ * Get a property value from a config item by dynamic key
+ * This is needed because config item types don't have index signatures
+ */
+function getConfigItemProperty(
+  item: DynFormConfigItem,
+  key: string
+): unknown {
+  // All config items are plain objects, safe to access by key
+  return (item as Record<string, unknown>)[key];
+}
+
+/**
  * Get dynamic form fields
  */
 export function createGetDynFormFieldsHandler(container: AppContainer) {
@@ -189,21 +224,24 @@ export function createGetDynFormFieldsHandler(container: AppContainer) {
   }: {
     searchRootNode: string;
     searchLevelKeyVal: { key: string; val: string };
-  }) => {
+  }): Promise<DynFormConfigItem | null> => {
     const workspaceService = getCurrentWorkspaceService(container);
     const configuration = await workspaceService.getConfigurationsData();
 
-    if (searchRootNode in configuration) {
-      const configArray = (configuration as any)[searchRootNode];
-      if (Array.isArray(configArray)) {
-        const dynConf = configArray.find(
-          (x: any) => x[searchLevelKeyVal.key] === searchLevelKeyVal.val
-        );
-        return dynConf;
-      }
+    if (!isDynFormArrayKey(configuration, searchRootNode)) {
+      return null;
     }
 
-    return null;
+    const configArray = configuration[searchRootNode];
+    if (!configArray) {
+      return null;
+    }
+
+    const dynConf = configArray.find(
+      (item) => getConfigItemProperty(item, searchLevelKeyVal.key) === searchLevelKeyVal.val
+    );
+
+    return dynConf ?? null;
   };
 }
 
@@ -407,6 +445,7 @@ export function createGetPromptTemplateConfigHandler(container: AppContainer) {
     }
 
     const parsed = formatProvider.parse(fileContent);
+    console.log(parsed)
     return parsed;
   };
 }
