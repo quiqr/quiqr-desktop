@@ -74,6 +74,7 @@
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.6",
     "@electron/notarize": "^3.1.1",
+    "@eslint/js": "^9.39.2",
     "@testing-library/dom": "^10.4.1",
     "@types/adm-zip": "^0.5.7",
     "@vitest/coverage-v8": "^4.0.15",
@@ -82,6 +83,8 @@
     "cross-env": "^7.0.3",
     "electron": "^39.2.3",
     "electron-builder": "^26.3.3",
+    "globals": "^17.0.0",
+    "typescript-eslint": "^8.53.1",
     "vitest": "^4.0.15",
     "wait-on": "^8.0.4"
   },
