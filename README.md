@@ -18,7 +18,25 @@
   </a>
 </p>
 
-# Quiqr Desktop NG (Next Generation)
+# Quiqr
+
+Quiqr is a local-first CMS for static site generators like Hugo, Quarto,
+Jekyll, and Eleventy. Available as a desktop application (Electron) or web
+server, it provides fast content management with zero network latency while
+keeping your data local for privacy and developer-friendly workflows.
+
+## Key Features
+
+- **Local-First Architecture**: All data stays on your computer for maximum privacy and speed
+- **Multi-SSG Support**: Built for Hugo with expanding support for Quarto, Jekyll, and Eleventy
+- **Integrated Hugo Server**: Preview your site changes instantly
+- **Built-in Git Client**: Publish directly to GitHub, GitLab, or BitBucket
+- **Template Gallery**: Quick-start with pre-built site templates
+- **Schema-Driven Forms**: Powerful, customizable content editing interface
+- **Dual Deployment**: Run as desktop app or standalone web server
+- **Modern Stack**: React frontend with Node.js backend for reliability and performance
+
+## NG (Next Generation)
 
 Quiqr Desktop NG is a major upgrade of the Quiqr source code including:
 
