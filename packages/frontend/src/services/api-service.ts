@@ -26,11 +26,3 @@ export async function openWorkspaceDir(siteKey: string, workspaceKey: string): P
     apiModule.openFileExplorer(workspace.path, false);
   }
 }
-
-let configurationsCache: any;
-let configurationsCachePromise: Promise<any> | undefined;
-
-export function clearConfigurationsCache(): void {
-  configurationsCache = undefined;
-  configurationsCachePromise = undefined;
-}

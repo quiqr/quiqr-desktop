@@ -135,7 +135,7 @@ export interface SSGSiteConfig {
   config: Record<string, unknown>;
 
   /** Mounts/module information (if supported) */
-  mounts?: unknown[];
+  mounts?: unknown[] | undefined;
 
   /** Content directories */
   contentDirs?: string[];

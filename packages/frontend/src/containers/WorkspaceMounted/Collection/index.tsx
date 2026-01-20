@@ -29,6 +29,7 @@ import Spinner                       from './../../../components/Spinner'
 import { createDebounce }            from './../../../utils/debounce';
 import { useSnackbar }               from './../../../contexts/SnackbarContext';
 import { api }                       from './../../../services/api-service'
+import type { CollectionItem, Language, WorkspaceDetails, CollectionConfig } from '@quiqr/types'
 
 const Fragment = React.Fragment;
 
@@ -47,7 +48,7 @@ const MakePageBundleItemKeyDialog = ({
   handleClose,
   handleConfirm
 }: MakePageBundleItemKeyDialogProps) => {
-  const [state, setState] = React.useState({
+  const [state, ] = React.useState({
     value: '',
     valid: null
   });
@@ -91,16 +92,16 @@ const MakePageBundleItemKeyDialog = ({
 
 interface CollectionListItemsProps {
   collectionExtension: string;
-  filteredItems: any[];
-  onItemClick: (item: any) => void;
-  onRenameItemClick: (item: any) => void;
-  onCopyItemClick: (item: any) => void;
-  onCopyToLangClick: (item: any) => void;
-  onDeleteItemClick: (item: any) => void;
-  onMakePageBundleItemClick: (item: any) => void;
+  filteredItems: CollectionItem[];
+  onItemClick: (item: CollectionItem) => void;
+  onRenameItemClick: (item: CollectionItem) => void;
+  onCopyItemClick: (item: CollectionItem) => void;
+  onCopyToLangClick: (item: CollectionItem) => void;
+  onDeleteItemClick: (item: CollectionItem) => void;
+  onMakePageBundleItemClick: (item: CollectionItem) => void;
   sortDescending?: boolean;
   showSortValue?: boolean;
-  languages: any[];
+  languages: Language[];
 }
 
 const CollectionListItems = React.memo(({
@@ -117,9 +118,9 @@ const CollectionListItems = React.memo(({
   languages
 }: CollectionListItemsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [currentItem, setCurrentItem] = React.useState<any>(null);
+  const [currentItem, setCurrentItem] = React.useState<CollectionItem | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>, item: any) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>, item: CollectionItem) => {
     setAnchorEl(event.currentTarget);
     setCurrentItem(item);
   };
@@ -220,13 +221,21 @@ interface CollectionProps {
   collectionKey: string;
 }
 
+type CollectionView =
+  | { key: 'createItem'; item: null }
+  | { key: 'renameItem'; item: CollectionItem }
+  | { key: 'copyItem'; item: CollectionItem }
+  | { key: 'copyToLang'; item: CollectionItem }
+  | { key: 'deleteItem'; item: CollectionItem }
+  | { key: 'makePageBundleItem'; item: CollectionItem }
+
 interface CollectionState {
-  selectedWorkspaceDetails: any;
-  items: any[] | null;
-  languages: any[];
+  selectedWorkspaceDetails: WorkspaceDetails | null;
+  items: CollectionItem[] | null;
+  languages: Language[];
   filter: string;
-  filteredItems: any[];
-  view: any;
+  filteredItems: CollectionItem[];
+  view?: CollectionView;
   trunked: boolean;
   modalBusy: boolean;
   dirs: string[];
@@ -256,23 +265,23 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     setState(prev => ({ ...prev, view: { key: 'createItem', item: null }, modalBusy: false }));
   };
 
-  const setRenameItemView = (item: any) => {
+  const setRenameItemView = (item: CollectionItem) => {
     setState(prev => ({ ...prev, view: { key: 'renameItem', item }, modalBusy: false }));
   };
 
-  const setCopyToLangView = (item: any) => {
+  const setCopyToLangView = (item: CollectionItem) => {
     setState(prev => ({ ...prev, view: { key: 'copyToLang', item }, modalBusy: false }));
   };
 
-  const setCopyItemView = (item: any) => {
+  const setCopyItemView = (item: CollectionItem) => {
     setState(prev => ({ ...prev, view: { key: 'copyItem', item }, modalBusy: false }));
   };
 
-  const setMakePageBundleItemView = (item: any) => {
+  const setMakePageBundleItemView = (item: CollectionItem) => {
     setState(prev => ({ ...prev, view: { key: 'makePageBundleItem', item }, modalBusy: false }));
   };
 
-  const setDeleteItemView = (item: any) => {
+  const setDeleteItemView = (item: CollectionItem) => {
     setState(prev => ({ ...prev, view: { key: 'deleteItem', item }, modalBusy: false }));
   };
 
@@ -309,7 +318,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
             selectedWorkspaceDetails: workspaceDetails 
           }));
         })
-      ]).catch((e) => {
+      ]).catch(() => {
         // Handle error if needed
       });
     }
@@ -439,13 +448,13 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
   const createCollectionItemKey = (itemKey: string, itemTitle: string) => {
     setState(prev => ({ ...prev, modalBusy: true }));
     api.createCollectionItemKey(siteKey, workspaceKey, collectionKey, itemKey, itemTitle)
-      .then(({ unavailableReason, key }) => {
+      .then(({ unavailableReason }) => {
         if (unavailableReason) {
           setState(prev => ({ ...prev, modalBusy: false }));
         } else {
           refreshItems();
         }
-      }, (e) => {
+      }, () => {
         setState(prev => ({ ...prev, modalBusy: false }));
       }).then(() => {
         const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`;
@@ -453,10 +462,10 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
       });
   };
 
-  const resolveFilteredItems = React.useCallback((items: any[], filter: string) => {
+  const resolveFilteredItems = React.useCallback((items: CollectionItem[], filter: string) => {
     let trunked = false;
     const dirs: Record<string, boolean> = { '': true };
-    let filteredItems: any[] = (items || []).filter((item) => {
+    let filteredItems: CollectionItem[] = (items || []).filter((item) => {
       const parts = item.label.split('/');
       let c = '';
       for (let i = 0; i < parts.length - 1; i++) {
@@ -465,12 +474,12 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
       }
       return item.key.includes(filter);
     });
-    
+
     if (filteredItems.length > MAX_RECORDS) {
       filteredItems = filteredItems.slice(0, MAX_RECORDS);
       trunked = true;
     }
-    
+
     const dirsArr: string[] = Object.keys(dirs);
     return { filteredItems, trunked, dirs: dirsArr };
   }, []);
@@ -485,28 +494,28 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     });
   };
 
-  const handleItemClick = (item: any) => {
+  const handleItemClick = (item: CollectionItem) => {
     const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(item.key)}`;
     navigate(path);
   };
 
-  const handleDeleteItemClick = (item: any) => {
+  const handleDeleteItemClick = (item: CollectionItem) => {
     setDeleteItemView(item);
   };
 
-  const handleRenameItemClick = (item: any) => {
+  const handleRenameItemClick = (item: CollectionItem) => {
     setRenameItemView(item);
   };
-  
-  const handleCopyToLangClick = (item: any) => {
+
+  const handleCopyToLangClick = (item: CollectionItem) => {
     setCopyToLangView(item);
   };
-  
-  const handleCopyItemClick = (item: any) => {
+
+  const handleCopyItemClick = (item: CollectionItem) => {
     setCopyItemView(item);
   };
-  
-  const handleMakePageBundleItemClick = (item: any) => {
+
+  const handleMakePageBundleItemClick = (item: CollectionItem) => {
     setMakePageBundleItemView(item);
   };
 
@@ -519,7 +528,8 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     });
   };
 
-  const generatePageUrl = (collection) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const generatePageUrl = (collection: CollectionConfig) => {
 
     const CollectionPath = collection.folder.split("/")
     CollectionPath.shift();
@@ -537,7 +547,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     return (<Spinner />);
   }
   
-  const collection = state.selectedWorkspaceDetails.collections.find((x: any) => x.key === collectionKey);
+  const collection = state.selectedWorkspaceDetails.collections.find((x) => x.key === collectionKey);
   if (collection == null)
     return null;
 
@@ -643,7 +653,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
 
               <Switch
                 checked={state.sortDescending}
-                onChange={(e, value) => {
+                onChange={(_e, _value) => {
                   setState(prev => ({
                     ...prev,
                     sortDescending: !prev.sortDescending
@@ -658,7 +668,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
             control={
               <Switch
                 checked={state.showSortValue}
-                onChange={(e, value) => {
+                onChange={(_e, _value) => {
                   setState(prev => ({
                     ...prev,
                     showSortValue: !prev.showSortValue

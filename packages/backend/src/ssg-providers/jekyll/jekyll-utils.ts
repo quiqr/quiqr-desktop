@@ -17,6 +17,7 @@ export class JekyllUtils {
   async createSiteDir(
     directory: string,
     title: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     configFormat: 'yaml' | 'yml' = 'yml'
   ): Promise<void> {
     // Create directory structure

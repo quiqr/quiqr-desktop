@@ -93,12 +93,13 @@ export function createOpenExternalHandler(container: AppContainer) {
 /**
  * Log a message to the console (for debugging)
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createLogToConsoleHandler(container: AppContainer) {
   return async ({
     message,
     label,
   }: {
-    message: any;
+    message: unknown;
     label?: string;
   }) => {
     if (label) {

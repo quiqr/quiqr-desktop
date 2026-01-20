@@ -2,6 +2,7 @@ import { useSnackbar } from '../contexts/SnackbarContext';
 import { useConsole } from '../contexts/ConsoleContext';
 
 export const snackMessageService = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   addSnackMessage: (...args: Parameters<ReturnType<typeof useSnackbar>['addSnackMessage']>) => {
     console.warn('Direct snackMessageService usage is deprecated. Use useSnackbar() hook in components.');
     throw new Error('snackMessageService can only be used within React components via useSnackbar() hook');

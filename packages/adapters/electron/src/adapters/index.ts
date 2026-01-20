@@ -23,17 +23,17 @@ import type {
 
 export class ElectronDialogAdapter implements DialogAdapter {
   async showOpenDialog(options: OpenDialogOptions): Promise<string[]> {
-    const result = await dialog.showOpenDialog(options as any);
+    const result = await dialog.showOpenDialog(options);
     return result.canceled ? [] : result.filePaths;
   }
 
   async showSaveDialog(options: SaveDialogOptions): Promise<string | undefined> {
-    const result = await dialog.showSaveDialog(options as any);
+    const result = await dialog.showSaveDialog(options);
     return result.canceled ? undefined : result.filePath;
   }
 
   async showMessageBox(options: MessageBoxOptions): Promise<number> {
-    const result = await dialog.showMessageBox(options as any);
+    const result = await dialog.showMessageBox(options);
     return result.response;
   }
 }
@@ -80,7 +80,7 @@ export class ElectronWindowAdapter implements WindowAdapter {
     }
   }
 
-  sendToRenderer(channel: string, data: any): void {
+  sendToRenderer(channel: string, data: string | object): void {
     if (this.mainWindow) {
       this.mainWindow.webContents.send(channel, data);
     }

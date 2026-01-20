@@ -9,7 +9,6 @@ import { vi } from 'vitest';
 import type {
   PathHelper,
   EnvironmentInfo,
-  PathHelperConfig,
 } from '../../src/utils/path-helper.js';
 import type {
   SSGProviderDependencies,
@@ -19,7 +18,6 @@ import type {
   OutputConsole,
   WindowAdapter,
   ShellAdapter,
-  AppInfoAdapter,
 } from '../../src/adapters/types.js';
 import type { AppConfig } from '../../src/config/app-config.js';
 import path from 'path';
@@ -214,7 +212,7 @@ export function createMockProgressSteps(complete: boolean = true): DownloadProgr
  * Returns a mock that can be customized for different test scenarios
  */
 export function createMockExecFile() {
-  return vi.fn((cmd: string, args: string[], opts: any, callback: Function) => {
+  return vi.fn((cmd: string, args: string[], opts: unknown, callback: Function) => {
     // Default: successful execution
     callback(null, { stdout: 'success', stderr: '' });
   });

@@ -7,10 +7,19 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { z } from 'zod';
 import service from '../../src/services/service';
+
+// Request body schemas for type-safe validation
+const saveConfPrefKeyRequestSchema = z.object({
+  data: z.object({
+    prefKey: z.string(),
+    prefValue: z.unknown(),
+  }),
+});
 
 // Setup MSW server to intercept API requests
 const server = setupServer();
@@ -30,7 +39,7 @@ afterAll(() => {
 describe('Theme API Integration', () => {
   describe('saveConfPrefKey - interfaceStyle', () => {
     it('makes POST request to save interface style preference', async () => {
-      let requestBody: any = null;
+      let requestBody: unknown = null;
 
       // Setup handler to capture the request
       server.use(
@@ -173,9 +182,10 @@ describe('Theme API Integration', () => {
 
       server.use(
         http.post('http://localhost:5150/api/saveConfPrefKey', async ({ request }) => {
-          const body: any = await request.json();
-          if (body.data.prefKey === 'interfaceStyle') {
-            savedValue = body.data.prefValue;
+          const body = await request.json();
+          const parsed = saveConfPrefKeyRequestSchema.parse(body);
+          if (parsed.data.prefKey === 'interfaceStyle') {
+            savedValue = String(parsed.data.prefValue);
           }
           return HttpResponse.json(true);
         })
@@ -191,9 +201,10 @@ describe('Theme API Integration', () => {
 
       server.use(
         http.post('http://localhost:5150/api/saveConfPrefKey', async ({ request }) => {
-          const body: any = await request.json();
-          if (body.data.prefKey === 'interfaceStyle') {
-            savedValues.push(body.data.prefValue);
+          const body = await request.json();
+          const parsed = saveConfPrefKeyRequestSchema.parse(body);
+          if (parsed.data.prefKey === 'interfaceStyle') {
+            savedValues.push(String(parsed.data.prefValue));
           }
           return HttpResponse.json(true);
         })

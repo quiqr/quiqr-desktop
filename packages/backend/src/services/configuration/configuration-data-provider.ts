@@ -12,6 +12,7 @@ import path from 'path';
 import { glob } from 'glob';
 import type { PathHelper } from '../../utils/path-helper.js';
 import type { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
+import { isRecord } from '../../utils/format-providers/types.js';
 import { siteConfigSchema } from '@quiqr/types/schemas';
 import type { SiteConfig, Configurations } from '@quiqr/types';
 
@@ -106,19 +107,20 @@ export class ConfigurationDataProvider {
           throw new Error(`Could not resolve a format provider for file ${conffile}.`);
         }
 
-        let site = formatProvider.parse(strData) as SiteConfig;
+        const site = formatProvider.parse(strData);
+        const result = siteConfigSchema.safeParse(site);
         let needsMigration = false;
 
         // Migration: Ensure name field exists - use key as fallback
-        if (!site.name && site.key) {
-          site.name = site.key;
+        if (result.success) {
+          result.data.name = result.data.key;
           needsMigration = true;
           this.logger.appendLine(`Migration: Added missing 'name' field to '${conffile}'`);
         }
 
         // Migration: Ensure source field exists - use default folder source
-        if (!site.source) {
-          site.source = {
+        if (result.success && !result.data.source) {
+          result.data.source = {
             type: 'folder',
             path: 'main'
           };
@@ -224,7 +226,9 @@ export class ConfigurationDataProvider {
         const formatProvider = this.formatResolver.resolveForFilePath(etalagePath);
         if (formatProvider) {
           const parsed = formatProvider.parse(strData);
-          etalage = { ...etalage, ...parsed };
+          if (isRecord(parsed)) {
+            etalage = { ...etalage, ...parsed };
+          }
         }
       } catch (e) {
         this.logger.appendLine(
@@ -241,7 +245,7 @@ export class ConfigurationDataProvider {
         return normalized.substr(sourcePath.length);
       });
       etalage.screenshots = screenshotFiles;
-    } catch (e) {
+    } catch {
       // Ignore glob errors (directory doesn't exist, etc.)
     }
 
@@ -253,7 +257,7 @@ export class ConfigurationDataProvider {
         return normalized.substr(sourcePath.length);
       });
       etalage.favicons = faviconFiles;
-    } catch (e) {
+    } catch {
       // Ignore glob errors (directory doesn't exist, etc.)
     }
 

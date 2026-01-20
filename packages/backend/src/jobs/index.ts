@@ -1,6 +1,7 @@
 import { jobsManager } from './job-manager.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import type { GlobOptions } from 'glob'
 import type { CreateThumbnailParams } from './create-thumbnail-job.js'
 import type { GlobJobParams } from './glob-job.js'
 import type { CommunityTemplate } from '@quiqr/types'
@@ -33,7 +34,7 @@ export function createThumbnailJob(src: string, dest: string): Promise<string> {
  * Run a glob pattern match to find files.
  * Each call runs in its own worker thread.
  */
-export function globJob(expression: string, options?: any): Promise<string[]> {
+export function globJob(expression: string, options?: GlobOptions): Promise<string[]> {
   const params: GlobJobParams = { expression, options }
   return jobsManager.runBackgroundJob<string[]>(
     `glob-job:${expression}(${JSON.stringify(options)})`,

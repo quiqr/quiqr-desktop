@@ -11,15 +11,7 @@ import type { FormatProviderResolver } from '../utils/format-provider-resolver.j
 import type { LibraryService } from '../services/library/library-service.js';
 import type { Embgit } from '../embgit/embgit.js';
 import { InitialWorkspaceConfigBuilder } from '../services/workspace/initial-workspace-config-builder.js';
-
-/**
- * Theme information from repository inspection
- */
-export interface ThemeInfo {
-  Name?: string;
-  ExampleSite?: boolean;
-  [key: string]: any;
-}
+import { HugoThemeInfo, hugoConfigSchema, type HugoConfig } from '@quiqr/types';
 
 /**
  * GitImporter - Imports sites from git repositories
@@ -113,51 +105,46 @@ export class GitImporter {
     // Clean up any existing temp directory
     fs.removeSync(tempCloneDir);
 
-    try {
-      // Clone the repository
-      await this.embgit.clonePrivateWithKey(url, tempCloneDir, privKey);
+    await this.embgit.clonePrivateWithKey(url, tempCloneDir, privKey);
 
-      // Create the site from the cloned directory
-      await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir);
+    // Create the site from the cloned directory
+    await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir);
 
-      // Save sync target if requested
-      if (saveSyncTarget) {
-        const siteConf = await this.libraryService.getSiteConf(siteKey);
-        const inkey = `publ-${Math.random()}`;
+    // Save sync target if requested
+    if (saveSyncTarget) {
+      const siteConf = await this.libraryService.getSiteConf(siteKey);
+      const inkey = `publ-${Math.random()}`;
 
-        // Derive public key from private key
-        const deployPublicKey = this.embgit.derivePublicKeyFromPrivate(privKey);
+      // Derive public key from private key
+      const deployPublicKey = this.embgit.derivePublicKeyFromPrivate(privKey);
 
-        const publConf = {
-          type: 'git' as const,
-          gitProvider: gitProvider,
-          gitBaseUrl: gitBaseUrl,
-          gitProtocol: protocol,
-          sshPort: sshPort,
-          username: gitOrg,
-          email: gitEmail,
-          repository: gitRepo,
-          branch: 'main',
-          deployPrivateKey: privKey,
-          deployPublicKey,
-          publishScope: 'source' as const,
-          keyPairBusy: false,
-          overrideBaseURLSwitch: false,
-          overrideBaseURL: '',
-          setCIWorkflow: false,
-        };
+      const publConf = {
+        type: 'git' as const,
+        gitProvider: gitProvider,
+        gitBaseUrl: gitBaseUrl,
+        gitProtocol: protocol,
+        sshPort: sshPort,
+        username: gitOrg,
+        email: gitEmail,
+        repository: gitRepo,
+        branch: 'main',
+        deployPrivateKey: privKey,
+        deployPublicKey,
+        publishScope: 'source' as const,
+        keyPairBusy: false,
+        overrideBaseURLSwitch: false,
+        overrideBaseURL: '',
+        setCIWorkflow: false,
+      };
 
-        if (!siteConf.publish) {
-          siteConf.publish = [];
-        }
-        siteConf.publish.push({ key: inkey, config: publConf });
-        await this.libraryService.writeSiteConf(siteConf, siteKey);
+      if (!siteConf.publish) {
+        siteConf.publish = [];
       }
-
-      return siteKey;
-    } catch (error) {
-      throw error;
+      siteConf.publish.push({ key: inkey, config: publConf });
+      await this.libraryService.writeSiteConf(siteConf, siteKey);
     }
+
+    return siteKey;
   }
 
   /**
@@ -171,17 +158,13 @@ export class GitImporter {
     // Clean up any existing temp directory
     fs.removeSync(tempCloneDir);
 
-    try {
-      // Clone the repository
-      await this.embgit.cloneFromPublicUrl(url, tempCloneDir);
+    // Clone the repository
+    await this.embgit.cloneFromPublicUrl(url, tempCloneDir);
 
-      // Create the site from the cloned directory
-      await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir);
+    // Create the site from the cloned directory
+    await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempCloneDir);
 
-      return siteKey;
-    } catch (error) {
-      throw error;
-    }
+    return siteKey;
   }
 
   /**
@@ -191,7 +174,7 @@ export class GitImporter {
   async newSiteFromPublicHugoThemeUrl(
     url: string,
     siteName: string,
-    themeInfo: ThemeInfo,
+    themeInfo: HugoThemeInfo,
     hugoVersion: string
   ): Promise<string> {
     if (!themeInfo.Name) {
@@ -208,57 +191,56 @@ export class GitImporter {
     await fs.ensureDir(tempDir);
     await fs.ensureDir(path.join(tempDir, 'themes'));
 
-    try {
-      // Clone the theme repository
-      await this.embgit.cloneFromPublicUrl(url, tempCloneThemeDir);
+    await this.embgit.cloneFromPublicUrl(url, tempCloneThemeDir);
 
-      // Copy exampleSite if it exists
-      if (themeInfo.ExampleSite) {
-        const exampleSitePath = path.join(tempCloneThemeDir, 'exampleSite');
-        if (fs.existsSync(exampleSitePath)) {
-          fs.copySync(exampleSitePath, tempDir);
-        }
+    // Copy exampleSite if it exists
+    if (themeInfo.ExampleSite) {
+      const exampleSitePath = path.join(tempCloneThemeDir, 'exampleSite');
+      if (fs.existsSync(exampleSitePath)) {
+        fs.copySync(exampleSitePath, tempDir);
       }
-
-      // Process Hugo config
-      let formatProvider;
-      let hconfig: any = null;
-      const hugoConfigFilePath = this.pathHelper.hugoConfigFilePath(tempDir);
-
-      if (hugoConfigFilePath) {
-        const strData = fs.readFileSync(hugoConfigFilePath, { encoding: 'utf-8' });
-        formatProvider = this.formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
-        if (formatProvider) {
-          hconfig = formatProvider.parse(strData);
-        }
-      }
-
-      // Set theme and baseURL
-      if (!hconfig) {
-        hconfig = {};
-      }
-      hconfig.theme = themeName;
-      hconfig.baseURL = '/';
-
-      // Write updated config
-      if (hugoConfigFilePath && formatProvider) {
-        fs.writeFileSync(hugoConfigFilePath, formatProvider.dump(hconfig));
-      }
-
-      // Build Quiqr model
-      const configBuilder = new InitialWorkspaceConfigBuilder(
-        tempDir,
-        this.formatProviderResolver,
-        this.pathHelper
-      );
-      configBuilder.buildAll(hugoVersion);
-
-      // Create the site
-      await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempDir);
-
-      return siteKey;
-    } catch (error) {
-      throw error;
     }
+
+    // Process Hugo config
+    let formatProvider;
+    let hconfig: HugoConfig | null = null;
+    const hugoConfigFilePath = this.pathHelper.hugoConfigFilePath(tempDir);
+
+    if (hugoConfigFilePath) {
+      const strData = fs.readFileSync(hugoConfigFilePath, { encoding: 'utf-8' });
+      formatProvider = this.formatProviderResolver.resolveForFilePath(hugoConfigFilePath);
+      if (formatProvider) {
+        const rawData = formatProvider.parse(strData);
+        const parseResult = hugoConfigSchema.safeParse(rawData);
+        if (parseResult.success) {
+          hconfig = parseResult.data;
+        }
+      }
+    }
+
+    // Set theme and baseURL
+    if (!hconfig) {
+      hconfig = {};
+    }
+    hconfig.theme = themeName;
+    hconfig.baseURL = '/';
+
+    // Write updated config
+    if (hugoConfigFilePath && formatProvider) {
+      fs.writeFileSync(hugoConfigFilePath, formatProvider.dump(hconfig));
+    }
+
+    // Build Quiqr model
+    const configBuilder = new InitialWorkspaceConfigBuilder(
+      tempDir,
+      this.formatProviderResolver,
+      this.pathHelper
+    );
+    configBuilder.buildAll('hugo', hugoVersion);
+
+    // Create the site
+    await this.libraryService.createNewSiteWithTempDirAndKey(siteKey, tempDir);
+
+    return siteKey;
   }
 }

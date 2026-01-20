@@ -135,7 +135,8 @@ export class Pogozipper {
    * Import a site from a .pogosite ZIP file
    */
   async importSite(options: ImportSiteOptions = {}): Promise<void> {
-    let { filePath, autoConfirm = false } = options;
+    let { filePath } = options;
+    const { autoConfirm = false } = options;
 
     // Show file picker if no path provided
     if (!filePath) {

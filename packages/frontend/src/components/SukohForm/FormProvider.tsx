@@ -170,7 +170,7 @@ export function FormProvider({
   onSave,
   onChange,
 }: FormProviderProps) {
-  const { fieldConfigs, processedFields } = useMemo(() => {
+  const { fieldConfigs } = useMemo(() => {
     const configMap = new Map<string, FieldConfig>();
     const processed = processFields(fields, 'root', configMap);
     return { fieldConfigs: configMap, processedFields: processed };

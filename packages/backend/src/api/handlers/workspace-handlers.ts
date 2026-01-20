@@ -14,7 +14,7 @@ import matter from 'gray-matter';
 import { createWorkspaceServiceForParams, getCurrentWorkspaceService } from './helpers/workspace-helper.js';
 import { processPromptTemplate, buildSelfObject } from '../../utils/prompt-template-processor.js';
 import { callLLM, getProviderDisplayName } from '../../utils/llm-service.js';
-import type { PromptItemConfig } from '@quiqr/types';
+import { type WorkspaceConfig, type CollectionConfig, type SingleConfig, type MergeableConfigItem, type Field, promptItemConfigSchema, readonlyFieldSchema } from '@quiqr/types';
 
 /**
  * List all workspaces for a site
@@ -180,6 +180,41 @@ export function createGetFilesFromAbsolutePathHandler(container: AppContainer) {
 }
 
 /**
+ * Keys in WorkspaceConfig that contain searchable arrays of config items
+ */
+type DynFormArrayKey = 'collections' | 'singles' | 'dynamics';
+
+/**
+ * Union of all config item types that can be searched
+ */
+type DynFormConfigItem = CollectionConfig | SingleConfig | MergeableConfigItem;
+
+/**
+ * Type guard to check if a key is a valid array property in WorkspaceConfig
+ */
+function isDynFormArrayKey(
+  config: WorkspaceConfig,
+  key: string
+): key is DynFormArrayKey {
+  return (
+    (key === 'collections' || key === 'singles' || key === 'dynamics') &&
+    key in config
+  );
+}
+
+/**
+ * Get a property value from a config item by dynamic key
+ * This is needed because config item types don't have index signatures
+ */
+function getConfigItemProperty(
+  item: DynFormConfigItem,
+  key: string
+): unknown {
+  // All config items are plain objects, safe to access by key
+  return (item as Record<string, unknown>)[key];
+}
+
+/**
  * Get dynamic form fields
  */
 export function createGetDynFormFieldsHandler(container: AppContainer) {
@@ -189,22 +224,37 @@ export function createGetDynFormFieldsHandler(container: AppContainer) {
   }: {
     searchRootNode: string;
     searchLevelKeyVal: { key: string; val: string };
-  }) => {
+  }): Promise<DynFormConfigItem | null> => {
     const workspaceService = getCurrentWorkspaceService(container);
     const configuration = await workspaceService.getConfigurationsData();
 
-    if (searchRootNode in configuration) {
-      const configArray = (configuration as any)[searchRootNode];
-      if (Array.isArray(configArray)) {
-        const dynConf = configArray.find(
-          (x: any) => x[searchLevelKeyVal.key] === searchLevelKeyVal.val
-        );
-        return dynConf;
-      }
+    if (!isDynFormArrayKey(configuration, searchRootNode)) {
+      return null;
     }
 
-    return null;
+    const configArray = configuration[searchRootNode];
+    if (!configArray) {
+      return null;
+    }
+
+    const dynConf = configArray.find(
+      (item) => getConfigItemProperty(item, searchLevelKeyVal.key) === searchLevelKeyVal.val
+    );
+
+    return dynConf ?? null;
   };
+}
+
+/**
+ * Type guard to check if a value is a Field with a matching key
+ */
+function isFieldWithKey(value: unknown, key: string): value is Field {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'key' in value &&
+    value.key === key
+  );
 }
 
 /**
@@ -217,22 +267,31 @@ export function createGetValueByConfigPathHandler(container: AppContainer) {
   }: {
     searchRootNode: string;
     path: string;
-  }) => {
+  }): Promise<Field | null> => {
     const workspaceService = getCurrentWorkspaceService(container);
     const configuration = await workspaceService.getConfigurationsData();
 
-    if (searchRootNode in configuration) {
-      const configArray = (configuration as any)[searchRootNode];
-      if (Array.isArray(configArray)) {
-        const confObj = configArray.find((x: any) => x['key'] === 'mainConfig');
-        if (confObj && confObj.fields) {
-          const value = confObj.fields.find((x: any) => x['key'] === path);
-          return value;
-        }
-      }
+    if (!isDynFormArrayKey(configuration, searchRootNode)) {
+      return null;
     }
 
-    return null;
+    const configArray = configuration[searchRootNode];
+    if (!configArray) {
+      return null;
+    }
+
+    const confObj = configArray.find((item) => item.key === 'mainConfig');
+    if (!confObj) {
+      return null;
+    }
+
+    const fields = getConfigItemProperty(confObj, 'fields');
+    if (!Array.isArray(fields)) {
+      return null;
+    }
+
+    const value = fields.find((field) => isFieldWithKey(field, path));
+    return value ?? null;
   };
 }
 
@@ -307,7 +366,7 @@ export function createGlobSyncHandler(container: AppContainer) {
     options,
   }: {
     pattern: string;
-    options?: any;
+    options?: string[];
   }) => {
     const { state } = container;
 
@@ -364,12 +423,6 @@ export function createGetPromptTemplateConfigHandler(container: AppContainer) {
     workspaceKey: string;
     templateKey: string;
   }) => {
-    const workspaceService = await createWorkspaceServiceForParams(
-      container,
-      siteKey,
-      workspaceKey
-    );
-
     // Get the workspace path
     const siteConfig = await container.libraryService.getSiteConf(siteKey);
     const siteService = new SiteService(
@@ -407,6 +460,7 @@ export function createGetPromptTemplateConfigHandler(container: AppContainer) {
     }
 
     const parsed = formatProvider.parse(fileContent);
+    console.log(parsed)
     return parsed;
   };
 }
@@ -475,7 +529,14 @@ export function createProcessAiPromptHandler(container: AppContainer) {
       throw new Error(`Unsupported file format for prompt template: ${templatePath}`);
     }
 
-    const templateConfig = formatProvider.parse(fileContent) as PromptItemConfig;
+    const rawConfig = formatProvider.parse(fileContent);
+    const validationResult = promptItemConfigSchema.safeParse(rawConfig);
+    let templateConfig;
+    if (validationResult.success) {
+      templateConfig = validationResult.data
+    } else {
+      throw new Error('Schema validation failed: ' + validationResult.error)
+    }
 
     // Build self object if we have context
     let selfObject = null;
@@ -511,10 +572,13 @@ export function createProcessAiPromptHandler(container: AppContainer) {
     let templateText = '';
     if (templateConfig.fields) {
       const templateField = templateConfig.fields.find(
-        (f: any) => f.type === 'readonly' && f.key === 'promptTemplate'
+        (f: Field) => f.type === 'readonly' && f.key === 'promptTemplate'
       );
-      if (templateField && (templateField as any).default) {
-        templateText = (templateField as any).default;
+
+      const validationResult = readonlyFieldSchema.safeParse(templateField)
+
+      if (validationResult.data && validationResult.data.default) {
+        templateText = validationResult.data.default;
       }
     }
 
@@ -567,13 +631,21 @@ export function createProcessAiPromptHandler(container: AppContainer) {
         usage: llmResponse.usage,
         provider: getProviderDisplayName(llmResponse.provider),
       };
-    } catch (error: any) {
-      console.error('\n--- LLM Error ---');
-      console.error(error.message);
-      console.log('\n======================\n');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('\n--- LLM Error ---');
+        console.error(error.message);
+        console.log('\n======================\n');
+        // Re-throw with context
+        throw new Error(`Failed to process AI prompt: ${error.message}`);
+      }
 
-      // Re-throw with context
-      throw new Error(`Failed to process AI prompt: ${error.message}`);
+      const msg =
+        typeof error === "string"
+          ? error
+          : "Failed to process AI prompt";
+
+      throw new Error(msg);
     }
   };
 }

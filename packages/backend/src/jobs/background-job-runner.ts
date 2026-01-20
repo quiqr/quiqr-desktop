@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename)
 
 interface QueuedJob<T> {
   action: string
-  params?: any
+  params?: unknown
   resolve: (value: T) => void
   reject: (error: Error) => void
 }
@@ -21,6 +21,11 @@ export class BackgroundJobRunner {
   private maxConcurrency: number
   private activeWorkers: number = 0
   private maxActiveWorkers: number = 0 // Track peak concurrency for testing
+  // Using `any` here because this queue holds jobs with different return types.
+  // The generic type T varies per job, and TypeScript's variance rules prevent
+  // using `unknown` with the resolve callback. Type safety is enforced at the
+  // API boundary via the generic run<T>() method.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private jobQueue: QueuedJob<any>[] = []
 
   constructor(maxConcurrency: number = 4) {
@@ -47,7 +52,7 @@ export class BackgroundJobRunner {
    * @param params - Parameters to pass to the job
    * @returns Promise that resolves with the job result
    */
-  run<T = any>(action: string, params?: any): Promise<T> {
+  run<T = unknown>(action: string, params?: unknown): Promise<T> {
     return new Promise((resolve, reject) => {
       const job: QueuedJob<T> = { action, params, resolve, reject }
 

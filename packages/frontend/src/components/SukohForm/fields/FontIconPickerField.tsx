@@ -30,6 +30,7 @@ function FontIconPickerField({ compositeKey }: Props) {
   }
 
   // Handle value change (for future use when icon picker is re-enabled)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleChange = (newValue: string) => {
     if (newValue !== currentValue) {
       setValue(newValue);

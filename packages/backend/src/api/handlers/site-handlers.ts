@@ -6,7 +6,7 @@
 
 import path from 'path';
 import type { AppContainer } from '../../config/container.js';
-import type { Configurations } from '@quiqr/types';
+import type { Configurations, SiteConfig } from '@quiqr/types';
 import fs from 'fs-extra';
 
 export function createGetConfigurationsHandler(container: AppContainer) {
@@ -37,7 +37,7 @@ export function createCheckFreeSiteNameHandler(container: AppContainer) {
 }
 
 export function createSaveSiteConfHandler(container: AppContainer) {
-  return async ({ siteKey, newConf }: { siteKey: string; newConf: Record<string, unknown> }) => {
+  return async ({ siteKey, newConf }: { siteKey: string; newConf: SiteConfig }) => {
     await container.libraryService.writeSiteConf(newConf, siteKey);
     // Invalidate cache so next read gets fresh data
     container.configurationProvider.invalidateCache();
@@ -46,7 +46,7 @@ export function createSaveSiteConfHandler(container: AppContainer) {
 }
 
 export function createCopySiteHandler(container: AppContainer) {
-  return async ({ siteKey, newConf }: { siteKey: string; newConf: any }) => {
+  return async ({ siteKey, newConf }: { siteKey: string; newConf: SiteConfig }) => {
     // Get the source site configuration
     const sourceSiteConfig = await container.libraryService.getSiteConf(siteKey);
 

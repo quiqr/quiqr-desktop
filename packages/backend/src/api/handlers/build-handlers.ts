@@ -5,12 +5,14 @@
  * TODO: Implement when Hugo modules are migrated.
  */
 
+import { ExtraBuildConfig } from '@quiqr/types';
 import type { AppContainer } from '../../config/container.js';
 
 export function createServeWorkspaceHandler(container: AppContainer) {
   return async ({
     siteKey,
     workspaceKey,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     serveKey,
   }: {
     siteKey: string;
@@ -68,7 +70,7 @@ export function createBuildWorkspaceHandler(container: AppContainer) {
     siteKey: string;
     workspaceKey: string;
     buildKey: string;
-    extraConfig?: any;
+    extraConfig?: ExtraBuildConfig;
   }) => {
     const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
     await workspaceService.build(buildKey, extraConfig || {});

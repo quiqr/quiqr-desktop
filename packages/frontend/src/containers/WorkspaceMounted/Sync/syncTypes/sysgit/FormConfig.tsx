@@ -51,7 +51,7 @@ const defaultPubData: SysgitPublishConf = {
 
 function FormConfig({ publishConf, setData, setSaveEnabled }: FormConfigProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [gitHubActionsSwitchEnable, setGitHubActionsSwitchEnable] = useState(false);
+  const [, setGitHubActionsSwitchEnable] = useState(false);
   const [syncSelectionSwitchEnable, setSyncSelectionSwitchEnable] = useState(true);
   const [keyPairBusy, setKeyPairBusy] = useState(true);
   const [pubData, setPubData] = useState<SysgitPublishConf>(defaultPubData);
@@ -286,4 +286,3 @@ function FormConfig({ publishConf, setData, setSaveEnabled }: FormConfigProps) {
 }
 
 export default FormConfig;
-

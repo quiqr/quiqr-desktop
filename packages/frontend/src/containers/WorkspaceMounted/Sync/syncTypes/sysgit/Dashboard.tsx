@@ -26,7 +26,7 @@ import * as Meta from './Meta';
 import { useSnackbar } from '../../../../../contexts/SnackbarContext';
 import service from '../../../../../services/service';
 import { useSyncProgress, SyncProgress } from '../../../../../hooks/useSyncProgress';
-import { SysgitPublishConf } from '../../../../../../types';
+import { GitPublishConf, SysgitPublishConf } from '../../../../../../types';
 import { openExternal } from '../../../../../utils/platform';
 
 interface HistoryItem {
@@ -47,7 +47,7 @@ interface DashboardProps {
   workspaceKey: string;
   enableSyncFrom: boolean;
   enableSyncTo: boolean;
-  publishConf: SysgitPublishConf;
+  publishConf: SysgitPublishConf | GitPublishConf;
   onSyncDialogControl: (open: boolean, text: string, icon: React.ReactNode) => void;
   onSyncProgress: (progress: SyncProgress | null) => void;
   onConfigure: () => void;

@@ -7,33 +7,7 @@
 
 import type { AppContainer } from '../../config/container.js';
 import { updateCommunityTemplatesJob } from '../../jobs/index.js';
-import type { CommunityTemplate } from '@quiqr/types';
-
-export function createMergeSiteWithRemoteHandler(container: AppContainer) {
-  return async ({
-    siteKey,
-    publishConf,
-  }: {
-    siteKey: string;
-    publishConf: any;
-  }) => {
-    // Import SiteService dynamically to avoid circular dependency
-    const { SiteService } = await import('../../services/site/site-service.js');
-
-    // Get site configuration
-    const siteConfig = await container.libraryService.getSiteConf(siteKey);
-
-    // Create SiteService instance
-    const siteService = new SiteService(
-      siteConfig,
-      container.siteSourceFactory,
-      container.syncFactory
-    );
-
-    // Dispatch pullFromRemote action to merge with remote
-    return await siteService.publisherDispatchAction(publishConf, 'pullFromRemote');
-  };
-}
+import type { CommunityTemplate, PublConf } from '@quiqr/types';
 
 export function createPublishSiteHandler(container: AppContainer) {
   return async ({
@@ -41,7 +15,7 @@ export function createPublishSiteHandler(container: AppContainer) {
     publishConf,
   }: {
     siteKey: string;
-    publishConf: any;
+    publishConf: PublConf;
   }) => {
     // Import SiteService dynamically to avoid circular dependency
     const { SiteService } = await import('../../services/site/site-service.js');
@@ -70,9 +44,9 @@ export function createPublisherDispatchActionHandler(container: AppContainer) {
     actionParameters,
   }: {
     siteKey: string;
-    publishConf: any;
+    publishConf: PublConf;
     action: string;
-    actionParameters: any;
+    actionParameters: unknown;
   }) => {
     // Import SiteService dynamically to avoid circular dependency
     const { SiteService } = await import('../../services/site/site-service.js');
@@ -92,6 +66,7 @@ export function createPublisherDispatchActionHandler(container: AppContainer) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createUpdateCommunityTemplatesHandler(container: AppContainer) {
   return async (): Promise<CommunityTemplate[]> => {
     return updateCommunityTemplatesJob();
@@ -111,15 +86,15 @@ export function createDerivePublicKeyHandler(container: AppContainer) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createOpenCustomCommandHandler(container: AppContainer) {
-  return async ({ command }: { command: string }) => {
+  return async ({ _command }: { _command: string }) => {
     throw new Error('openCustomCommand: Not yet implemented');
   };
 }
 
 export function createSyncHandlers(container: AppContainer) {
   return {
-    mergeSiteWithRemote: createMergeSiteWithRemoteHandler(container),
     publishSite: createPublishSiteHandler(container),
     publisherDispatchAction: createPublisherDispatchActionHandler(container),
     updateCommunityTemplates: createUpdateCommunityTemplatesHandler(container),

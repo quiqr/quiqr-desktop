@@ -5,6 +5,7 @@
  * Note: ZIP-based import (importSiteAction) is in site-handlers.ts.
  */
 
+import { HugoThemeInfo } from '@quiqr/types';
 import type { AppContainer } from '../../config/container.js';
 import type { HugoConfigFormat } from '../../ssg-providers/hugo/hugo-utils.js';
 
@@ -68,7 +69,7 @@ export function createNewSiteFromPublicHugoThemeUrlHandler(container: AppContain
   }: {
     siteName: string;
     url: string;
-    themeInfo: any;
+    themeInfo: HugoThemeInfo;
     hugoVersion: string;
   }) => {
     const siteKey = await container.gitImporter.newSiteFromPublicHugoThemeUrl(

@@ -144,7 +144,7 @@ export class HugoServer {
           try {
             this.outputConsole.appendLine('Sending serverLive.');
             this.windowAdapter.sendToRenderer('serverLive', {});
-          } catch (e) {
+          } catch {
             this.outputConsole.appendLine('Failed to send serverLive message.');
           }
           return;
@@ -157,7 +157,7 @@ export class HugoServer {
       try {
         this.outputConsole.appendLine('Sending serverDown.');
         this.windowAdapter.sendToRenderer('serverDown', {});
-      } catch (err) {
+      } catch {
         this.outputConsole.appendLine('Failed to send serverDown message.');
       }
       throw e;

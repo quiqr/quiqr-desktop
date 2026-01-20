@@ -19,7 +19,7 @@ type RepositoryInfoCardProps = {
   screenshot: string | null;
   hugoTheme: string;
   quiqrModel: string;
-  quiqrForms: string;
+  quiqrForms: number;
 };
 
 const RepositoryInfoCard = ({

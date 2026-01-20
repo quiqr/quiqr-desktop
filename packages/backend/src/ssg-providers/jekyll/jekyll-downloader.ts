@@ -54,7 +54,7 @@ export class JekyllDownloader implements SSGBinaryManager {
     try {
       await execFileAsync('ruby', ['--version'], { timeout: 5000 });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -66,7 +66,7 @@ export class JekyllDownloader implements SSGBinaryManager {
     try {
       await execFileAsync('bundle', ['--version'], { timeout: 5000 });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -79,7 +79,7 @@ export class JekyllDownloader implements SSGBinaryManager {
     try {
       await execFileAsync('bundle', ['--version'], { timeout: 5000 });
       return 'bundle';
-    } catch (error) {
+    } catch {
       // Bundle not in PATH, try to find it in user gem directory
       try {
         // Get gem environment to find user gem paths
@@ -93,7 +93,7 @@ export class JekyllDownloader implements SSGBinaryManager {
             return bundlePath;
           }
         }
-      } catch (e) {
+      } catch {
         // Ignore errors
       }
 
@@ -146,7 +146,7 @@ export class JekyllDownloader implements SSGBinaryManager {
         if (!hasMinima || !hasFeed || !hasSeoTag) {
           return false;
         }
-      } catch (error) {
+      } catch {
         return false;
       }
     }
@@ -260,7 +260,7 @@ export class JekyllDownloader implements SSGBinaryManager {
           await execFileAsync('gem', ['install', 'bundler', '--user-install', '--no-document'], {
             timeout: 120000, // 2 minutes
           });
-        } catch (error) {
+        } catch {
           // If that fails, provide a helpful error message
           throw new Error(
             'Bundler is not installed and automatic installation failed. ' +

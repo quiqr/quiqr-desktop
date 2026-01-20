@@ -16,14 +16,19 @@ import deepmerge from 'deepmerge';
 function toGlobPath(p: string): string {
   return p.replace(/\\/g, '/');
 }
-import type { FormatProvider } from '../../utils/format-providers/types.js';
+import { isRecord } from '../../utils/format-providers/types.js';
 import { FormatProviderResolver } from '../../utils/format-provider-resolver.js';
 import { WorkspaceConfigValidator, type WorkspaceConfig } from './workspace-config-validator.js';
 import { InitialWorkspaceConfigBuilder } from './initial-workspace-config-builder.js';
 import { FileCacheToken } from './file-cache-token.js';
 import type { PathHelper, EnvironmentInfo } from '../../utils/path-helper.js';
 import type { AppConfig } from '../../config/app-config.js';
-import type { SingleConfig, CollectionConfig } from '@quiqr/types';
+import {
+  type MergeableConfigItem,
+  type PartialWorkspaceConfig,
+  type MenuConfig,
+  type Field,
+} from '@quiqr/types';
 
 /**
  * Parse information - tracks which files were used to build the config
@@ -96,7 +101,6 @@ export class WorkspaceConfigProvider {
 
     this.parseInfo.baseFile = filePath || '';
 
-    let config: WorkspaceConfig;
     let token: FileCacheToken;
 
     if (filePath != null) {
@@ -122,9 +126,9 @@ export class WorkspaceConfigProvider {
       token = await new FileCacheToken([filePath]).build();
     }
 
-    config = await this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
-    (config as any).path = workspacePath;
-    (config as any).key = workspaceKey;
+    const config: WorkspaceConfig = await this._loadConfigurationsData(filePath, workspaceKey, workspacePath);
+    config.path = workspacePath;
+    config.key = workspaceKey;
 
     this.cache[filePath] = { token, config };
     return config;
@@ -169,35 +173,52 @@ export class WorkspaceConfigProvider {
     }
 
     const dataPhase1Parse = formatProvider.parse(strData);
+    if (!isRecord(dataPhase1Parse)) {
+      throw new Error(`Invalid config file format: ${filePath} - expected object`);
+    }
     const dataPhase2Merged = await this._postProcessConfigObject(dataPhase1Parse, workspacePath);
 
+    // Validate and migrate the config using Zod schemas
+    // The validator mutates the config to apply migrations (hugover -> ssgType/ssgVersion)
     const validator = new WorkspaceConfigValidator();
-    const result = validator.validate(dataPhase2Merged);
-    if (result) {
-      throw new Error(result);
+    const validationError = validator.validate(dataPhase2Merged as Partial<WorkspaceConfig>);
+    if (validationError) {
+      throw new Error(validationError);
     }
 
+    // After successful validation, the config conforms to WorkspaceConfig
+    // The cast is safe here because the validator has verified the structure
     return dataPhase2Merged as WorkspaceConfig;
   }
 
   /**
    * Ensure config object has required structure
+   * Builds a PartialWorkspaceConfig with defaults for missing arrays
    */
-  private configObjectSkeleton(configOrg: any): any {
-    if (configOrg) {
-      if (!configOrg.menu) configOrg.menu = [];
-      if (!configOrg.collections) configOrg.collections = [];
-      if (!configOrg.singles) configOrg.singles = [];
-      if (!configOrg.dynamics) configOrg.dynamics = [];
-    }
-    return configOrg;
+  private configObjectSkeleton(configOrg: Record<string, unknown>): PartialWorkspaceConfig {
+    return {
+      ...configOrg,
+      menu: Array.isArray(configOrg.menu) ? (configOrg.menu as MenuConfig) : [],
+      collections: Array.isArray(configOrg.collections)
+        ? (configOrg.collections as MergeableConfigItem[])
+        : [],
+      singles: Array.isArray(configOrg.singles)
+        ? (configOrg.singles as MergeableConfigItem[])
+        : [],
+      dynamics: Array.isArray(configOrg.dynamics)
+        ? (configOrg.dynamics as MergeableConfigItem[])
+        : [],
+    };
   }
 
   /**
    * Post-process config object: load includes and merge partials
    */
-  private async _postProcessConfigObject(configOrg: any, workspacePath: string): Promise<any> {
-    configOrg = this.configObjectSkeleton(configOrg);
+  private async _postProcessConfigObject(
+    configOrg: Record<string, unknown>,
+    workspacePath: string
+  ): Promise<PartialWorkspaceConfig> {
+    let config = this.configObjectSkeleton(configOrg);
 
     // LOAD AND MERGE INCLUDES
     const siteModelIncludes = path.join(
@@ -207,7 +228,7 @@ export class WorkspaceConfigProvider {
       'includes',
       '*.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
-    configOrg = this._loadIncludes(configOrg, siteModelIncludes, true);
+    config = this._loadIncludes(config, siteModelIncludes, true);
 
     const siteModelIncludesSingles = path.join(
       workspacePath,
@@ -217,7 +238,7 @@ export class WorkspaceConfigProvider {
       'singles',
       '*.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
-    configOrg = this._loadIncludesSub('singles', configOrg, siteModelIncludesSingles, true);
+    config = this._loadIncludesSub('singles', config, siteModelIncludesSingles, true);
 
     const siteModelIncludesCollections = path.join(
       workspacePath,
@@ -227,7 +248,7 @@ export class WorkspaceConfigProvider {
       'collections',
       '*.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
-    configOrg = this._loadIncludesSub('collections', configOrg, siteModelIncludesCollections, true);
+    config = this._loadIncludesSub('collections', config, siteModelIncludesCollections, true);
 
     const siteModelIncludesMenus = path.join(
       workspacePath,
@@ -237,7 +258,7 @@ export class WorkspaceConfigProvider {
       'menus',
       '*.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
-    configOrg = this._loadIncludesSub('menu', configOrg, siteModelIncludesMenus, true);
+    config = this._loadIncludesSub('menu', config, siteModelIncludesMenus, true);
 
     const dogFoodIncludes = path.join(
       this.pathHelper.getApplicationResourcesDir(this.environmentInfo),
@@ -245,37 +266,40 @@ export class WorkspaceConfigProvider {
       'dog_food_model/includes',
       '*.{' + this.formatProviderResolver.allFormatsExt().join(',') + '}'
     );
-    configOrg = this._loadIncludes(configOrg, dogFoodIncludes, false);
+    config = this._loadIncludes(config, dogFoodIncludes, false);
 
     // MERGE PARTIALS
     const mergedDataCollections = await Promise.all(
-      configOrg.collections.map((x: any) => this.getMergePartialResult(x, workspacePath))
+      config.collections.map((x) => this.getMergePartialResult(x, workspacePath))
     );
-    configOrg.collections = mergedDataCollections;
+    config.collections = mergedDataCollections;
 
     const mergedDataSingles = await Promise.all(
-      configOrg.singles.map((x: any) => this.getMergePartialResult(x, workspacePath))
+      config.singles.map((x) => this.getMergePartialResult(x, workspacePath))
     );
-    configOrg.singles = mergedDataSingles;
+    config.singles = mergedDataSingles;
 
     const mergedDataDynamics = await Promise.all(
-      configOrg.dynamics.map((x: any) => this.getMergePartialResult(x, workspacePath))
+      config.dynamics.map((x) => this.getMergePartialResult(x, workspacePath))
     );
-    configOrg.dynamics = mergedDataDynamics;
+    config.dynamics = mergedDataDynamics;
 
     // CLEANUP
-    if (configOrg.menu.length < 1) delete configOrg['menu'];
-    if (configOrg.collections.length < 1) delete configOrg['collections'];
-    if (configOrg.singles.length < 1) delete configOrg['singles'];
-    if (configOrg.dynamics.length < 1) delete configOrg['dynamics'];
+    if (config.menu.length < 1) delete (config as Partial<PartialWorkspaceConfig>).menu;
+    if (config.collections.length < 1) delete (config as Partial<PartialWorkspaceConfig>).collections;
+    if (config.singles.length < 1) delete (config as Partial<PartialWorkspaceConfig>).singles;
+    if (config.dynamics.length < 1) delete (config as Partial<PartialWorkspaceConfig>).dynamics;
 
-    return configOrg;
+    return config;
   }
 
   /**
    * Get merge partial result
    */
-  async getMergePartialResult(mergeKey: any, workspacePath: string): Promise<any> {
+  async getMergePartialResult(
+    mergeKey: MergeableConfigItem,
+    workspacePath: string
+  ): Promise<MergeableConfigItem> {
     const result = await this._mergePartials(mergeKey, workspacePath);
     return result;
   }
@@ -298,27 +322,53 @@ export class WorkspaceConfigProvider {
 
   /**
    * Load includes and merge into config object
+   * Handles both object includes (merged by key) and array includes (for collections, singles, menu, dynamics)
    */
-  private _loadIncludes(configObject: any, fileIncludes: string, showInParseInfo: boolean): any {
+  private _loadIncludes(
+    configObject: PartialWorkspaceConfig,
+    fileIncludes: string,
+    showInParseInfo: boolean
+  ): PartialWorkspaceConfig {
     const files = glob.sync(toGlobPath(fileIncludes));
 
-    const newObject: any = {};
+    const newObject: Record<string, unknown> = {};
+    // Track array includes separately to merge with existing arrays
+    const arrayKeys = ['collections', 'singles', 'dynamics', 'menu'];
 
     files.forEach((filename) => {
       const strData = fs.readFileSync(filename, 'utf8');
-      let formatProvider = this.formatProviderResolver.resolveForFilePath(files[0]);
+      let formatProvider = this.formatProviderResolver.resolveForFilePath(filename);
       if (formatProvider == null) {
         formatProvider = this.formatProviderResolver.getDefaultFormat();
       }
       const mergeData = formatProvider.parse(strData);
+      const key = path.parse(filename).name;
 
       if (showInParseInfo) {
-        this.parseInfo.includeFiles.push({ key: path.parse(filename).name, filename: filename });
+        this.parseInfo.includeFiles.push({ key, filename });
       }
 
-      newObject[path.parse(filename).name] = deepmerge(
+      // Handle array includes (collections.yaml, singles.yaml, menu.yaml, dynamics.yaml)
+      if (Array.isArray(mergeData) && arrayKeys.includes(key)) {
+        const existingArray = configObject[key];
+        if (Array.isArray(existingArray)) {
+          // Concatenate with existing array
+          newObject[key] = [...existingArray, ...mergeData];
+        } else {
+          newObject[key] = mergeData;
+        }
+        return;
+      }
+
+      // Handle object includes (merged by key)
+      if (!isRecord(mergeData)) {
+        return;
+      }
+
+      const existingValue = configObject[key];
+      newObject[key] = deepmerge(
         mergeData,
-        configObject[path.parse(filename).name] || {}
+        isRecord(existingValue) ? existingValue : {}
       );
     });
 
@@ -329,18 +379,18 @@ export class WorkspaceConfigProvider {
    * Load sub-includes (singles, collections, menus)
    */
   private _loadIncludesSub(
-    modelType: string,
-    configObject: any,
+    modelType: keyof Pick<PartialWorkspaceConfig, 'singles' | 'collections' | 'menu'>,
+    configObject: PartialWorkspaceConfig,
     fileIncludes: string,
     showInParseInfo: boolean
-  ): any {
+  ): PartialWorkspaceConfig {
     const files = glob.sync(toGlobPath(fileIncludes));
 
-    const newObject: any = { ...configObject };
+    const newObject = { ...configObject };
 
     files.forEach((filename) => {
       const strData = fs.readFileSync(filename, 'utf8');
-      let formatProvider = this.formatProviderResolver.resolveForFilePath(files[0]);
+      let formatProvider = this.formatProviderResolver.resolveForFilePath(filename);
       if (formatProvider == null) {
         formatProvider = this.formatProviderResolver.getDefaultFormat();
       }
@@ -351,7 +401,13 @@ export class WorkspaceConfigProvider {
         this.parseInfo.includeFilesSub.push({ key: modelType, filename: filename });
       }
 
-      newObject[modelType].push(mergeDataSub);
+      if (modelType === 'menu') {
+        // Menu items are MenuSection objects
+        newObject.menu.push(mergeDataSub as MenuConfig[number]);
+      } else {
+        // Singles and collections are MergeableConfigItem objects
+        newObject[modelType].push(mergeDataSub as MergeableConfigItem);
+      }
     });
 
     return newObject;
@@ -360,16 +416,31 @@ export class WorkspaceConfigProvider {
   /**
    * Get encoded destination path for remote partials
    */
-  getEncodedDestinationPath(filePartialDir: string, mergeKey: any): string {
+  getEncodedDestinationPath(
+    filePartialDir: string,
+    mergeKey: MergeableConfigItem & { _mergePartial: string }
+  ): string {
     const encodeFilename = encodeURIComponent(mergeKey._mergePartial);
     return path.join(filePartialDir, encodeFilename);
   }
 
   /**
+   * Type guard to check if a config item has _mergePartial property
+   */
+  private hasMergePartial(
+    item: MergeableConfigItem
+  ): item is MergeableConfigItem & { _mergePartial: string } {
+    return '_mergePartial' in item && typeof item._mergePartial === 'string';
+  }
+
+  /**
    * Merge partials into configuration
    */
-  private async _mergePartials(mergeKey: any, workspacePath: string): Promise<any> {
-    if (!('_mergePartial' in mergeKey)) {
+  private async _mergePartials(
+    mergeKey: MergeableConfigItem,
+    workspacePath: string
+  ): Promise<MergeableConfigItem> {
+    if (!this.hasMergePartial(mergeKey)) {
       return mergeKey;
     }
 
@@ -436,28 +507,35 @@ export class WorkspaceConfigProvider {
         formatProvider = this.formatProviderResolver.getDefaultFormat();
       }
       const mergeData = formatProvider.parse(strData);
+
+      if (!isRecord(mergeData)) {
+        throw new Error(`Invalid partial file format: ${filePartial}`);
+      }
+
       // Merge partial data with base config
       // mergeKey (base config) takes precedence over mergeData (partial) for duplicate field keys
-      const newData = deepmerge(mergeData, mergeKey) as SingleConfig | CollectionConfig;
+      const newData = deepmerge(mergeData, mergeKey) as MergeableConfigItem;
 
       // REMOVE DUPLICATE FIELDS - PREFER FIELDS FROM BASE CONFIG OVER PARTIAL FIELDS
       // Both singleConfig and collectionConfig have optional fields arrays
       // If a field key exists in both, the base config version is kept
-      if (newData.fields && Array.isArray(newData.fields)) {
-        newData.fields = newData.fields
+      const fields = newData.fields;
+      if (fields && Array.isArray(fields)) {
+        const typedFields = fields as Field[];
+        const deduped = typedFields
           .reverse()
           .filter(
-            (field: any, index: number, self: any[]) =>
-              index === self.findIndex((t: any) => t.key === field.key)
+            (field: Field, index: number, self: Field[]) =>
+              index === self.findIndex((t) => t.key === field.key)
           );
         // RESTORE ORIGINAL ORDER
-        newData.fields = newData.fields.reverse();
+        newData.fields = deduped.reverse();
       }
 
-      mergeKey = newData;
-
       // ONLY WHEN MERGE WAS SUCCESSFUL DELETE THE KEY TO PREVENT ERROR.
-      delete mergeKey['_mergePartial'];
+      delete newData._mergePartial;
+
+      return newData;
     }
 
     return mergeKey;
@@ -478,7 +556,11 @@ export class WorkspaceConfigProvider {
       fs.writeFileSync(destination, data);
       return destination;
     } catch (err) {
-      console.log(err);
+      if (err instanceof Error) {
+        console.log(`Error fetching remote partial from ${url}: ${err.message}`);
+      } else {
+        console.log('Unknown error fetching remote partial:', err);
+      }
       throw err;
     }
   }

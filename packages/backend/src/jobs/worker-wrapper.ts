@@ -9,7 +9,7 @@ import { pathToFileURL } from 'url'
 
 interface WorkerData {
   actionPath: string
-  params?: any
+  params?: unknown
 }
 
 ;(async () => {

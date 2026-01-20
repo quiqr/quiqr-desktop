@@ -6,6 +6,10 @@ import { BackgroundJobRunner } from './background-job-runner.js'
  */
 export class JobsManager {
   private backgroundJobRunner: BackgroundJobRunner
+  // Using `any` here because this map caches promises with different result types.
+  // The generic type T varies per job. Type safety is enforced at the API boundary
+  // via the generic runSharedJob<T>() and runSharedBackgroundJob<T>() methods.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private runningActions: Map<string, Promise<any>>
 
   constructor() {
@@ -33,7 +37,7 @@ export class JobsManager {
    * Run a single background job in a worker thread.
    * Each call creates a new worker.
    */
-  runBackgroundJob<T>(key: string, resolvedPath: string, payload?: any): Promise<T> {
+  runBackgroundJob<T>(key: string, resolvedPath: string, payload?: unknown): Promise<T> {
     return this.backgroundJobRunner.run<T>(resolvedPath, payload)
   }
 
@@ -41,7 +45,7 @@ export class JobsManager {
    * Run a shared background job in a worker thread.
    * If the job is already running, returns the existing promise.
    */
-  runSharedBackgroundJob<T>(key: string, resolvedPath: string, payload?: any): Promise<T> {
+  runSharedBackgroundJob<T>(key: string, resolvedPath: string, payload?: unknown): Promise<T> {
     let promise = this.runningActions.get(key)
 
     if (promise == null) {
@@ -57,7 +61,7 @@ export class JobsManager {
    * Run a shared debounced background job.
    * Maximum number of times it can be called over time.
    */
-  runSharedDebouncedBackgroundJob(): Promise<any> {
+  runSharedDebouncedBackgroundJob(): Promise<unknown> {
     throw new Error('runSharedDebouncedJob is not implemented.')
   }
 
@@ -65,7 +69,7 @@ export class JobsManager {
    * Run a shared throttled background job.
    * Cannot be called again until a certain amount of time has passed.
    */
-  runSharedThrottledBackgroundJob(): Promise<any> {
+  runSharedThrottledBackgroundJob(): Promise<unknown> {
     throw new Error('runSharedThrottledJob is not implemented.')
   }
 }

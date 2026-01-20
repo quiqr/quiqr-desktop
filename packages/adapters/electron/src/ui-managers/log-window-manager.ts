@@ -3,14 +3,14 @@
  */
 
 import { BrowserWindow, app } from 'electron';
-import windowStateKeeper from 'electron-window-state';
+import windowStateKeeper, { State } from 'electron-window-state';
 import path from 'path';
 import fs from 'fs-extra';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let logWindow: BrowserWindow | null = null;
-let logWindowState: any = null;
+let logWindowState: State;
 
 /**
  * Determine the console page location based on environment
