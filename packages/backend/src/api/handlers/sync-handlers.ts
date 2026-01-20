@@ -66,6 +66,7 @@ export function createPublisherDispatchActionHandler(container: AppContainer) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createUpdateCommunityTemplatesHandler(container: AppContainer) {
   return async (): Promise<CommunityTemplate[]> => {
     return updateCommunityTemplatesJob();
@@ -85,8 +86,9 @@ export function createDerivePublicKeyHandler(container: AppContainer) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function createOpenCustomCommandHandler(container: AppContainer) {
-  return async ({ command }: { command: string }) => {
+  return async ({ _command }: { _command: string }) => {
     throw new Error('openCustomCommand: Not yet implemented');
   };
 }

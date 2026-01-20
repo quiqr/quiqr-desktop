@@ -9,7 +9,6 @@ import { vi } from 'vitest';
 import type {
   PathHelper,
   EnvironmentInfo,
-  PathHelperConfig,
 } from '../../src/utils/path-helper.js';
 import type {
   SSGProviderDependencies,
@@ -19,7 +18,6 @@ import type {
   OutputConsole,
   WindowAdapter,
   ShellAdapter,
-  AppInfoAdapter,
 } from '../../src/adapters/types.js';
 import type { AppConfig } from '../../src/config/app-config.js';
 import path from 'path';

@@ -23,14 +23,15 @@ import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
-import type { SingleConfig, CollectionConfig, ExtraBuildConfig, BuildConfig, ServeConfig } from '@quiqr/types';
+import type { CollectionConfig, ExtraBuildConfig, BuildConfig, ServeConfig } from '@quiqr/types';
 import { frontMatterContentSchema } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
 import type { ProviderFactory } from '../../ssg-providers/provider-factory.js';
-import type { SSGDevServer, SSGBuilder, SSGConfigQuerier, SSGServerConfig, SSGBuildConfig } from '../../ssg-providers/types.js';
+import type { SSGDevServer, SSGServerConfig, SSGBuildConfig } from '../../ssg-providers/types.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
+import { isValidToString } from '../../sync/embgit-sync-base.js';
 
 /**
  * Dependencies required by WorkspaceService
@@ -182,7 +183,8 @@ export class WorkspaceService {
       if (fs.existsSync(indexPath)) {
         const data = await fs.readFile(indexPath, 'utf8');
         const obj = await this._smartParse(indexPath, ['md'], data);
-        if ('mainContent' in obj) {
+        // TODO: probably move this validation to when we parse the data
+        if (typeof obj === 'object' && obj !== null && 'mainContent' in obj && isValidToString(obj.mainContent)) {
           return obj.mainContent.toString();
         } else {
           return data;
@@ -269,7 +271,7 @@ export class WorkspaceService {
     filePath: string,
     formatFallbacks: string[],
     str: string
-  ): Promise<any> {
+  ): Promise<ParsedContent | unknown> {
     if (!str || str.length === 0 || !/\S/.test(str)) {
       return {};
     }
@@ -278,7 +280,7 @@ export class WorkspaceService {
         formatFallbacks.push('yaml');
       }
     }
-    let formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
+    const formatProvider = await this._smartResolveFormatProvider(filePath, formatFallbacks);
     if (formatProvider === undefined) {
       console.log('formatprovider undefined');
       return {};
@@ -294,7 +296,7 @@ export class WorkspaceService {
   /**
    * Get a single content item
    */
-  async getSingle(singleKey: string, fileOverride?: string): Promise<any> {
+  async getSingle(singleKey: string, fileOverride?: string): Promise<unknown> {
     const config = await this.getConfigurationsData();
 
     const single = config.singles.find((x) => x.key === singleKey);
@@ -364,7 +366,7 @@ export class WorkspaceService {
   /**
    * Update a single content item
    */
-  async updateSingle(singleKey: string, document: Record<string, unknown>): Promise<any> {
+  async updateSingle(singleKey: string, document: Record<string, unknown>): Promise<unknown> {
     const config = await this.getConfigurationsData();
     const single = config.singles.find((x) => x.key === singleKey);
     if (single == null) throw new Error('Could not find single.');
@@ -450,7 +452,7 @@ export class WorkspaceService {
   /**
    * Get a collection item
    */
-  async getCollectionItem(collectionKey: string, collectionItemKey: string): Promise<any> {
+  async getCollectionItem(collectionKey: string, collectionItemKey: string): Promise<unknown> {
     const config = await this.getConfigurationsData();
     const collection = config.collections.find((x) => x.key === collectionKey);
     if (collection == null) throw new Error('Could not find collection.');
@@ -867,7 +869,7 @@ export class WorkspaceService {
     collectionKey: string,
     collectionItemKey: string,
     document: Record<string, unknown>
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     const config = await this.getConfigurationsData();
     const collection = config.collections.find((x) => x.key === collectionKey);
     if (collection == null) throw new Error('Could not find collection.');
@@ -1263,7 +1265,7 @@ export class WorkspaceService {
       if (!thumbSrcExists) {
         try {
           await createThumbnailJob(completePath, thumbSrc);
-        } catch (e) {
+        } catch {
           return 'NOT_FOUND';
         }
       }

@@ -12,6 +12,7 @@ export function createServeWorkspaceHandler(container: AppContainer) {
   return async ({
     siteKey,
     workspaceKey,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     serveKey,
   }: {
     siteKey: string;

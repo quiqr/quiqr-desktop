@@ -14,7 +14,6 @@ import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
 import type { ConfigurationDataProvider } from '../services/configuration/index.js';
 import { recurForceRemove } from '../utils/file-dir-utils.js';
-import { object } from 'zod/v4';
 
 /**
  * Base configuration shared by GitHub, Sysgit, and Git sync

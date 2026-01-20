@@ -360,7 +360,7 @@ export class HugoDownloader {
       try {
         await fs.unlink(this.currentDownloadPath);
         this.outputConsole.appendLine('Cleaned up partial download file.');
-      } catch (e) {
+      } catch {
         // Ignore cleanup errors
       }
     }

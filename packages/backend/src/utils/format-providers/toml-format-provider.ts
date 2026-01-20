@@ -58,7 +58,7 @@ ${content}`;
       md = data.substr(tomlEnd + 3);
     }
 
-    let parsedData = this.parse(tomlStr) as ParsedContent;
+    const parsedData = this.parse(tomlStr) as ParsedContent;
     if (parsedData === undefined) {
       return {};
     }

@@ -1,5 +1,5 @@
 import { spawn } from 'child_process'
-import type { BuildAction, BuildActionExecute, BuildActionCommand } from '@quiqr/types'
+import type { BuildActionExecute, BuildActionCommand } from '@quiqr/types'
 
 /**
  * Platform types

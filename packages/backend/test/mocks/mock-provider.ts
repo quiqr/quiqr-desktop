@@ -62,11 +62,13 @@ class MockBinaryManager implements SSGBinaryManager {
     this.config = config;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isVersionInstalled(version: string): boolean {
     // Mock: always return false (not installed)
     return false;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async *download(version: string, skipExistCheck?: boolean): AsyncGenerator<DownloadProgress> {
     // Simulate download progress
     yield { percent: 0, message: 'Starting download...', complete: false };
@@ -261,6 +263,7 @@ export class MockProvider implements SSGProvider {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async detectSite(directory: string): Promise<SSGDetectionResult> {
     if (this.config.throwErrors) {
       throw new Error('Mock error: Cannot detect site');

@@ -6,7 +6,7 @@ declare module 'tomlify-j0.4' {
   export interface TomlifyOptions {
     space?: number;
     sort?: boolean;
-    replace?: (key: string, value: unknown) => any;
+    replace?: (key: string, value: unknown) => unknown;
   }
 
   export function toToml(obj: unknown, options?: TomlifyOptions): string;

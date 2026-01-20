@@ -84,7 +84,7 @@ async function funcReadFile(
 
   try {
     return await fs.readFile(absolutePath, 'utf-8');
-  } catch (error) {
+  } catch {
     return `Could not read: ${filePath}`;
   }
 }

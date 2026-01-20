@@ -12,7 +12,7 @@ import type { AppContainer } from '../../config/container.js';
 export function createReadConfKeyHandler(container: AppContainer) {
   return async ({ confkey }: { confkey: string }) => {
     // Map config keys to their values
-    const configMap: Record<string, any> = {
+    const configMap: Record<string, unknown> = {
       sitesListingView: container.config.sitesListingView,
       lastOpenedSite: container.config.lastOpenedSite,
       prefs: container.config.prefs,

@@ -88,8 +88,11 @@ export class EleventyProvider implements SSGProvider {
   }
 
   createConfigQuerier(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     workspacePath: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     version: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     configFile?: string
   ): SSGConfigQuerier | null {
     // Eleventy uses JavaScript config files which are hard to parse safely
@@ -147,7 +150,7 @@ export class EleventyProvider implements SSGProvider {
             metadata: { source: 'package.json' },
           };
         }
-      } catch (error) {
+      } catch {
         // Ignore JSON parse errors
       }
     }
