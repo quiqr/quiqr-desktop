@@ -112,7 +112,7 @@ export class ConfigurationDataProvider {
         let needsMigration = false;
 
         // Migration: Ensure name field exists - use key as fallback
-        if (result.success) {
+        if (result.success && !result.data.name) {
           result.data.name = result.data.key;
           needsMigration = true;
           this.logger.appendLine(`Migration: Added missing 'name' field to '${conffile}'`);
