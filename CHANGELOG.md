@@ -1,24 +1,24 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
-- chore: semantic versioning policy in RELEASE.md
 - feature: Add OpenSpec Workflow for Spec-Driven Development
-- feature: electron replacement main menu in the standalone web version
-- feature: add collapsible sidebar with workspace switcher
-- feature: add siteDeveloper settings to sidebar
-- feature: add missing new site and import site standalone menu actions
-- feature: implement openExternal in standalone mode
-- feature: use SSE for menu updates
-- feature: workspace selection and initial vitest
+- feature: SSG provider architecture - support for multiple static site generators (Jekyll added)
+- feature: standalone web version with menu bar replacing Electron native menu
+- feature: collapsible sidebar with workspace switcher and site developer settings
+- feature: breadcrumb navigation in nest fields and accordions
+- feature: implement openExternal and SSE for menu updates
 - fix: reload theme automatically when toggling between light and dark theme
-- fix: config.mounts is sometimes config.mounts.mounts
+- fix: config.mounts handling and site name validation in config migration
+- fix: clear site library cache before navigating to newly imported sites
+- refactor: convert all remaining class components to functional components
+- refactor: massive TypeScript improvements - removed hundreds of `any` types across codebase
+- refactor: workspace routing from wildcard to nested routes
+- refactor: dialog management through DialogContext
+- refactor: replace Jimp with Sharp for image processing
+- chore: upgrade Node.js to v22 in CI, add backend tests with coverage reporting
+- chore: monorepo package refactoring - moved frontend to @quiqr/frontend workspace
 - chore: upgrade glob package from v10 to v13 with comprehensive test coverage
-- chore: adjust padding and border in workspace select dialog
-- chore: remove debug test
-- chore: add tests and coverage
-- chore: add workspace test fixtures
-- chore: refactor docs dir
-- chore: update copyright
+- chore: add ESLint configs for all packages and contribution guidelines
 - security: remove dependency on @electron/remote. Enable nodeIntegration: false and contextIsolation: true
 
 ## 0.21.6 (2025-12-12)
