@@ -1,7 +1,7 @@
 name: Test Pull Request
 
 # Trigger this workflow on pull requests targeting main or ng (Next Generation) branches
-# Also trigger on pushes to ng branch for coverage badge updates
+# Also trigger on pushes to main and ng branches for coverage badge and OpenSpec UI updates
 # Also allow manual triggering via workflow_dispatch for testing
 on:
   pull_request:
@@ -10,6 +10,7 @@ on:
       - ng
   push:
     branches:
+      - main
       - ng
   workflow_dispatch:
 
@@ -120,3 +121,59 @@ jobs:
         working-directory: ./packages/frontend
         run: npx tsc --noEmit
         continue-on-error: true
+
+  publish-openspec:
+    name: Publish OpenSpec UI
+    runs-on: ubuntu-latest
+    # Only publish on push to main or ng branches (not on PRs)
+    # This prevents preview pollution and ensures only merged changes are published
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ng')
+    
+    # Permissions required for GitHub Pages deployment
+    # - contents: read - to checkout the repository
+    # - pages: write - to deploy to GitHub Pages
+    # - id-token: write - for attestation during deployment
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      # Step 2: Install Nix with flakes support
+      # Uses cachix/install-nix-action which is the standard for Nix in GitHub Actions
+      # Enables experimental features needed for the openspecui fork
+      - name: Install Nix
+        uses: cachix/install-nix-action@v24
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      
+      # Step 3: Generate OpenSpec UI static export
+      # Uses a fork of openspecui that adds static export functionality
+      # Fork: github:mipmip/openspecui/feature/nixFlake
+      # The fork is required because the official openspecui doesn't support static export
+      # Once the PR is merged upstream, we can switch to the official package
+      - name: Generate OpenSpec UI
+        run: |
+          nix run github:mipmip/openspecui/feature/nixFlake -- export \
+            --dir . \
+            --clean \
+            ./openspec-export
+      
+      # Step 4: Upload the generated site as a Pages artifact
+      # GitHub's official action handles artifact upload for Pages deployment
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./openspec-export
+      
+      # Step 5: Deploy to GitHub Pages
+      # Deploys to root path, coverage badge remains at /badges/coverage.svg
+      # Requires: Repository settings > Pages > Source = "GitHub Actions"
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
