@@ -112,6 +112,11 @@ jobs:
     name: Publish OpenSpec UI
     runs-on: ubuntu-latest
     
+    # GitHub Pages environment configuration
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     # Permissions required for GitHub Pages deployment
     # - contents: read - to checkout the repository
     # - pages: write - to deploy to GitHub Pages
@@ -159,4 +164,5 @@ jobs:
       # Deploys to root path, coverage badge remains at /badges/coverage.svg
       # Requires: Repository settings > Pages > Source = "GitHub Actions"
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
