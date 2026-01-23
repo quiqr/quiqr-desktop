@@ -70,27 +70,27 @@ jobs:
             echo "Error: Frontend coverage file not found"
             exit 1
           fi
-          
+
           # If backend coverage exists, combine; otherwise use frontend only
           if [ -f "./packages/backend/coverage/coverage-summary.json" ]; then
             echo "Combining coverage from frontend and backend..."
-            
+
             # Extract coverage percentages from both packages
             FRONTEND_COV=$(node -p 't=require("./packages/frontend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
             BACKEND_COV=$(node -p 't=require("./packages/backend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
-            
+
             # Calculate weighted average based on total statements
             FRONTEND_STMTS=$(node -p 'require("./packages/frontend/coverage/coverage-summary.json").total.statements.total')
             BACKEND_STMTS=$(node -p 'require("./packages/backend/coverage/coverage-summary.json").total.statements.total')
             TOTAL_STMTS=$((FRONTEND_STMTS + BACKEND_STMTS))
-            
+
             # Weighted average coverage
             COMBINED_COV=$(node -p "((${FRONTEND_COV} * ${FRONTEND_STMTS} + ${BACKEND_COV} * ${BACKEND_STMTS}) / ${TOTAL_STMTS}).toFixed(2)")
-            
+
             echo "Frontend coverage: ${FRONTEND_COV}%"
             echo "Backend coverage: ${BACKEND_COV}%"
             echo "Combined coverage: ${COMBINED_COV}%"
-            
+
             # Create combined coverage summary for badge
             mkdir -p ./coverage
             node -p "JSON.stringify({total:{lines:{pct:${COMBINED_COV}},statements:{pct:${COMBINED_COV}},functions:{pct:${COMBINED_COV}},branches:{pct:${COMBINED_COV}}}})" > ./coverage/coverage-summary.json
@@ -111,12 +111,12 @@ jobs:
   publish-openspec:
     name: Publish OpenSpec UI
     runs-on: ubuntu-latest
-    
+
     # GitHub Pages environment configuration
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+
     # Permissions required for GitHub Pages deployment
     # - contents: read - to checkout the repository
     # - pages: write - to deploy to GitHub Pages
@@ -125,12 +125,12 @@ jobs:
       contents: read
       pages: write
       id-token: write
-    
+
     steps:
       # Step 1: Check out the repository code
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       # Step 2: Install Nix with flakes support
       # Uses cachix/install-nix-action which is the standard for Nix in GitHub Actions
       # Enables experimental features needed for the openspecui fork
@@ -140,7 +140,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
             experimental-features = nix-command flakes
-      
+
       # Step 3: Generate OpenSpec UI static export
       # Uses a fork of openspecui that adds static export functionality
       # Fork: github:mipmip/openspecui/feature/nixFlake
@@ -152,15 +152,15 @@ jobs:
             --dir . \
             --clean \
             --base-path /quiqr-desktop/ \
-            ./openspec-export
-      
+            --output ./openspec-export
+
       # Step 4: Upload the generated site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./openspec-export
-      
+
       # Step 5: Deploy to GitHub Pages
       # Deploys to root path, coverage badge remains at /badges/coverage.svg
       # Requires: Repository settings > Pages > Source = "GitHub Actions"
