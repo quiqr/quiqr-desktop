@@ -151,6 +151,7 @@ jobs:
           nix run github:mipmip/openspecui/feature/nixFlake -- export \
             --dir . \
             --clean \
+            --base-path /quiqr-desktop/ \
             ./openspec-export
       
       # Step 4: Upload the generated site as a Pages artifact
