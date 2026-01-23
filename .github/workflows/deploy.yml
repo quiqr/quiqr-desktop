@@ -1,13 +1,8 @@
-name: Test Pull Request
+name: Deploy Coverage Badge and OpenSpec UI
 
-# Trigger this workflow on pull requests targeting main or ng (Next Generation) branches
-# Also trigger on pushes to main and ng branches for coverage badge and OpenSpec UI updates
-# Also allow manual triggering via workflow_dispatch for testing
+# This workflow runs on push to main or ng branches only (after PR merge)
+# It generates coverage reports, updates the coverage badge, and publishes OpenSpec UI
 on:
-  pull_request:
-    branches:
-      - main
-      - ng
   push:
     branches:
       - main
@@ -15,8 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run Tests
+  coverage:
+    name: Generate and Publish Coverage Badge
     runs-on: ubuntu-latest
 
     steps:
@@ -52,7 +47,7 @@ jobs:
 
       # Step 6: Run frontend tests with coverage
       # This executes all tests in the packages/frontend/test directory
-      # Coverage is generated for badge updates on ng branch
+      # Coverage is generated for badge updates
       # See: https://vitest.dev/
       - name: Run frontend tests with coverage
         working-directory: ./packages/frontend
@@ -66,10 +61,9 @@ jobs:
         working-directory: ./packages/backend
         run: npm run test:coverage || true
 
-      # Step 8: Combine coverage from frontend and backend (ng branch only)
+      # Step 8: Combine coverage from frontend and backend
       # Calculate the combined coverage percentage from both packages
       - name: Combine coverage reports
-        if: github.ref == 'refs/heads/ng'
         run: |
           # Check if both coverage files exist
           if [ ! -f "./packages/frontend/coverage/coverage-summary.json" ]; then
@@ -114,20 +108,9 @@ jobs:
         if: github.ref == 'refs/heads/ng'
         uses: we-cli/coverage-badge-action@main
 
-      # Step 10: Run TypeScript type checking
-      # Note: Using continue-on-error because there are pre-existing type errors
-      # Once all type errors are fixed, remove continue-on-error to make this blocking
-      - name: TypeScript type check
-        working-directory: ./packages/frontend
-        run: npx tsc --noEmit
-        continue-on-error: true
-
   publish-openspec:
     name: Publish OpenSpec UI
     runs-on: ubuntu-latest
-    # Only publish on push to main or ng branches (not on PRs)
-    # This prevents preview pollution and ensures only merged changes are published
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/ng')
     
     # Permissions required for GitHub Pages deployment
     # - contents: read - to checkout the repository

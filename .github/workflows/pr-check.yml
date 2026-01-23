@@ -1,0 +1,72 @@
+name: PR Check
+
+# This workflow runs tests and type checking on pull requests and pushes
+# It provides quick feedback without the overhead of coverage badge generation
+on:
+  pull_request:
+    branches:
+      - main
+      - ng
+  push:
+    branches:
+      - main
+      - ng
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests and Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment with caching for faster subsequent runs
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      # Step 3: Install root dependencies
+      # This includes the main package.json dependencies
+      - name: Install root dependencies
+        run: npm install
+
+      # Step 4: Install frontend dependencies
+      # The frontend is a workspace with its own package.json
+      - name: Install frontend dependencies
+        working-directory: ./packages/frontend
+        run: npm install
+
+      # Step 5: Build workspace packages
+      # The frontend depends on @quiqr/types which must be built first
+      # The backend tests also require the backend to be built
+      - name: Build workspace packages
+        run: |
+          npm run build -w @quiqr/types
+          npm run build -w @quiqr/backend
+
+      # Step 6: Run frontend tests
+      # This executes all tests in the packages/frontend/test directory
+      # No coverage collection for faster PR feedback
+      - name: Run frontend tests
+        working-directory: ./packages/frontend
+        run: npm run test
+
+      # Step 7: Run backend tests
+      # This executes all tests in the packages/backend directory
+      # Backend has 260+ tests covering SSG providers, jobs, and utilities
+      - name: Run backend tests
+        working-directory: ./packages/backend
+        run: npm run test
+
+      # Step 8: Run TypeScript type checking
+      # Note: Using continue-on-error because there are pre-existing type errors
+      # Once all type errors are fixed, remove continue-on-error to make this blocking
+      - name: TypeScript type check
+        working-directory: ./packages/frontend
+        run: npx tsc --noEmit
+        continue-on-error: true
