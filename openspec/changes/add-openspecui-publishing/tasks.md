@@ -15,19 +15,19 @@
 - [x] 2.6 Add necessary workflow permissions (`contents: read`, `pages: write`, `id-token: write`)
 
 ## 3. GitHub Pages Configuration
-- [ ] 3.1 Verify GitHub Pages is configured to use "GitHub Actions" as deployment source
+- [x] 3.1 Verify GitHub Pages is configured to use "GitHub Actions" as deployment source
 - [ ] 3.2 Test that existing coverage badge at `/badges/coverage.svg` remains accessible after deployment
 - [ ] 3.3 Verify OpenSpec UI deploys to root path without overwriting badges
 
 ## 4. Documentation
 - [x] 4.1 Add workflow comments explaining OpenSpec UI publishing with Nix
-- [ ] 4.2 Update README with link to published OpenSpec UI (optional, based on preference)
+- [x] 4.2 Update README with link to published OpenSpec UI (optional, based on preference)
 - [x] 4.3 Document prerequisites (GitHub Pages must use "GitHub Actions" source)
 - [x] 4.4 Document the fork usage and plan for switching to official package when PR merges
 
 ## 5. Testing and Validation
 - [ ] 5.1 Test workflow on a feature branch pushed to remote
-- [ ] 5.2 Verify OpenSpec UI is accessible at expected URL after deployment
+- [x] 5.2 Verify OpenSpec UI is accessible at expected URL after deployment
 - [ ] 5.3 Confirm coverage badge is not broken by the new deployment
 - [ ] 5.4 Validate that both `main` and `ng` branch pushes trigger publishing correctly
 - [ ] 5.5 Monitor CI execution time to ensure it stays under 5 minutes total
