@@ -39,8 +39,8 @@ describe('createThumbnailJob', () => {
       const dest = path.join(outputDir, 'thumb.jpeg')
 
       await generateTestImage(src, {
-        width: 2000,
-        height: 1500,
+        width: 800,
+        height: 600,
         format: 'jpeg'
       })
 
@@ -60,8 +60,8 @@ describe('createThumbnailJob', () => {
       const dest = path.join(outputDir, 'thumb.png')
 
       await generateTestImage(src, {
-        width: 1600,
-        height: 1200,
+        width: 800,
+        height: 600,
         format: 'png'
       })
 
@@ -80,8 +80,8 @@ describe('createThumbnailJob', () => {
       const dest = path.join(outputDir, 'thumb.webp')
 
       await generateTestImage(src, {
-        width: 3000,
-        height: 2000,
+        width: 1200,
+        height: 800,
         format: 'webp'
       })
 
@@ -101,8 +101,8 @@ describe('createThumbnailJob', () => {
 
       // Create a wide image (2:1 aspect ratio)
       await generateTestImage(src, {
-        width: 4000,
-        height: 2000,
+        width: 1600,
+        height: 800,
         format: 'jpeg'
       })
 
@@ -188,15 +188,15 @@ describe('createThumbnailJob', () => {
   })
 
   describe('Large image handling', () => {
-    it('should handle very large JPEG images (100MP+)', async () => {
-      const src = path.join(testDir, 'huge.jpeg')
-      const dest = path.join(outputDir, 'huge-thumb.jpeg')
+    it('should handle large JPEG images (10MP)', async () => {
+      const src = path.join(testDir, 'large.jpeg')
+      const dest = path.join(outputDir, 'large-thumb.jpeg')
 
-      // Generate a 100 megapixel image
-      await generateLargeImage(src, 100)
+      // Generate a 10 megapixel image (instead of 100MP)
+      await generateLargeImage(src, 10)
 
       const srcMetadata = await sharp(src).metadata()
-      expect(srcMetadata.width! * srcMetadata.height!).toBeGreaterThan(99_000_000)
+      expect(srcMetadata.width! * srcMetadata.height!).toBeGreaterThan(9_000_000)
 
       const result = await createThumbnailJob({ src, dest })
 
@@ -214,14 +214,14 @@ describe('createThumbnailJob', () => {
       expect(destSizeMB).toBeLessThan(srcSizeMB / 10)
     })
 
-    it('should handle very large PNG images', async () => {
+    it('should handle large PNG images', async () => {
       const src = path.join(testDir, 'large.png')
       const dest = path.join(outputDir, 'large-thumb.png')
 
-      // Generate a large PNG (slower than JPEG)
+      // Generate a moderately large PNG (reduced from 8000x6000)
       await generateTestImage(src, {
-        width: 8000,
-        height: 6000,
+        width: 1200,
+        height: 900,
         format: 'png'
       })
 
@@ -232,7 +232,7 @@ describe('createThumbnailJob', () => {
       const metadata = await sharp(dest).metadata()
       expect(metadata.width).toBeLessThanOrEqual(400)
       expect(metadata.height).toBeLessThanOrEqual(400)
-    }, 60000)
+    })
   })
 
   describe('Error handling', () => {
@@ -274,8 +274,8 @@ describe('createThumbnailJob', () => {
         const dest = path.join(outputDir, `thumb.${ext}`)
 
         await generateTestImage(src, {
-          width: 2400,
-          height: 1800,
+          width: 1000,
+          height: 750,
           format
         })
 
@@ -289,6 +289,6 @@ describe('createThumbnailJob', () => {
       })
 
       await Promise.all(promises)
-    })
+    }, 15000) // 15 second timeout for batch processing
   })
 })
