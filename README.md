@@ -6,7 +6,8 @@
 
 <p align="center">
   <a href="https://quiqr.org">Website</a> ·
-  <a href="https://discord.gg/nJ2JH7jvmV">Discord</a>
+  <a href="https://discord.gg/nJ2JH7jvmV">Discord</a> ·
+  <a href="https://quiqr.github.io/quiqr-desktop/">OpenSpec UI</a>
 </p>
 
 <p align="center">
