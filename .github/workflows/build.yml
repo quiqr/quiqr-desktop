@@ -35,7 +35,7 @@ jobs:
       # Navigate to frontend and install dependencies
       - name: Install dependencies in frontend directory
         working-directory: ./frontend
-        run: npm ci
+        run: npm install
 
       # Step 4: Build the frontend
       - name: Build the frontend
@@ -47,7 +47,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       # Build the app
       - name: Build Electron App

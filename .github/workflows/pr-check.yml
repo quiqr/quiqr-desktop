@@ -33,13 +33,13 @@ jobs:
       # Step 3: Install root dependencies
       # This includes the main package.json dependencies
       - name: Install root dependencies
-        run: npm ci
+        run: npm install
 
       # Step 4: Install frontend dependencies
       # The frontend is a workspace with its own package.json
       - name: Install frontend dependencies
         working-directory: ./packages/frontend
-        run: npm ci
+        run: npm install
 
       # Step 5: Build workspace packages
       # The frontend depends on @quiqr/types which must be built first
