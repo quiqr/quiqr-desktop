@@ -292,6 +292,144 @@ This is achieved through:
 - **Single**: A single-file content item (e.g., homepage, about page)
 - **Collection**: A folder of multiple content items (e.g., blog posts)
 
+### LLM Provider Configuration
+
+The application supports AI-powered content assistance via multiple LLM providers. Configuration uses connection strings in environment variables.
+
+**Quick Setup:**
+
+Use the interactive configuration script:
+```bash
+./scripts/configure-llm-provider.sh
+```
+
+This script helps you generate valid connection strings for all supported providers and optionally saves them to your `.env` file.
+
+**Manual Configuration:**
+
+Set environment variables `QUIQR_LLM_PROVIDER_0` through `QUIQR_LLM_PROVIDER_9` (maximum 10 providers).
+
+Connection string format: `provider://credentials@endpoint?params`
+
+**Supported Providers:**
+- OpenAI (`openai`)
+- Anthropic Direct (`anthropic`)
+- AWS Bedrock (`bedrock`) - Multi-model platform supporting Anthropic Claude, Meta Llama, Amazon Titan, Cohere, and more
+- Google Gemini (`google`)
+- Azure OpenAI (`azure`)
+- Mistral AI (`mistral`)
+- Cohere (`cohere`)
+
+**Examples:**
+
+```bash
+# OpenAI with API key
+QUIQR_LLM_PROVIDER_0="openai://sk-abc123..."
+
+# AWS Bedrock (multi-model platform, requires region and API key)
+QUIQR_LLM_PROVIDER_1="bedrock://your-api-key?region=eu-central-1"
+
+# Direct Anthropic
+QUIQR_LLM_PROVIDER_2="anthropic://sk-ant-xyz..."
+
+# Google Gemini with optional location
+QUIQR_LLM_PROVIDER_3="google://api-key-123?location=us-central1"
+
+# Azure OpenAI (requires endpoint and deployment)
+QUIQR_LLM_PROVIDER_4="azure://api-key@myresource.openai.azure.com?deployment=gpt4"
+
+# Custom OpenAI-compatible endpoint
+QUIQR_LLM_PROVIDER_5="openai://api-key@api.custom.com"
+
+# Mistral AI
+QUIQR_LLM_PROVIDER_6="mistral://api-key-xyz"
+
+# Cohere
+QUIQR_LLM_PROVIDER_7="cohere://api-key-abc"
+```
+
+**Provider Selection:**
+
+The system automatically selects providers based on model name patterns:
+- `gpt-*`, `o1-*`, `text-*` → OpenAI
+- `claude-*` → Anthropic (direct API)
+- `anthropic.claude*`, `eu.anthropic.claude*`, `us.anthropic.claude*`, `amazon.titan*`, `meta.llama*`, `cohere.command*`, `ai21.*`, `mistral.*` → Bedrock
+- `gemini-*`, `models/gemini*` → Google
+- `azure/*`, `deployment/*` → Azure
+- `mistral-*`, `open-mistral*` → Mistral
+- `command-*`, `embed-*` → Cohere
+
+For explicit provider selection, pass `provider` parameter in LLM request:
+```typescript
+await callLLM({
+  model: 'gpt-4',
+  prompt: '...',
+  provider: 'provider-0'  // Use specific provider ID
+});
+```
+
+**Multiple Provider Instances:**
+
+You can configure multiple instances of the same provider type. The first matching provider (by registration order) handles each request:
+
+```bash
+QUIQR_LLM_PROVIDER_0="openai://key-for-work"
+QUIQR_LLM_PROVIDER_1="openai://key-for-personal"
+# Requests for gpt-4 will use provider-0 unless explicitly specified
+```
+
+**Validation:**
+
+On startup, the backend validates and logs configured providers:
+
+```
+============================================================
+Initializing LLM Providers
+============================================================
+
+✓ Registered provider-0: Openai
+✓ Registered provider-1: Bedrock [eu-central-1]
+
+✓ 2 provider(s) configured:
+
+  provider-0: Openai
+    Type: openai
+    Example models: gpt-4, gpt-3.5-turbo
+
+  provider-1: Bedrock [eu-central-1]
+    Type: bedrock
+    Example models: anthropic.claude-3-5-sonnet, meta.llama3, amazon.titan-text
+
+============================================================
+```
+
+**Troubleshooting:**
+
+- **"No provider found for model"**: Check that model name matches provider patterns, or configure the needed provider
+- **Missing region/deployment**: Some providers require additional parameters (see examples above)
+- **URL-encoded credentials**: If API keys contain special characters (`+`, `=`, `/`), URL-encode them
+- **Provider precedence**: When multiple providers match, the first one (lowest number) is used
+- **No providers configured**: Set at least one `QUIQR_LLM_PROVIDER_*` environment variable
+
+**Migration from Legacy Configuration:**
+
+Previous versions used provider-specific environment variables:
+- ❌ `OPENAI_API_KEY` (no longer supported)
+- ❌ `AWS_BEARER_TOKEN_BEDROCK` (no longer supported)
+- ❌ `AWS_REGION` (no longer supported)
+
+Migrate to the new format:
+```bash
+# Old format
+OPENAI_API_KEY=sk-abc123
+AWS_BEARER_TOKEN_BEDROCK=token
+AWS_REGION=eu-central-1
+
+# New format
+QUIQR_LLM_PROVIDER_0="openai://sk-abc123"
+QUIQR_LLM_PROVIDER_1="bedrock://your-api-key?region=eu-central-1"
+```
+
 ## Workspace Structure
 
 Projects use NPM workspaces with `/packages/frontend` as a workspace. Install dependencies in the root first, then frontend-specific dependencies will be linked automatically.

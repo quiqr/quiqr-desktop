@@ -18,7 +18,12 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^4.0.36",
     "@ai-sdk/anthropic": "^3.0.12",
+    "@ai-sdk/azure": "^3.0.21",
+    "@ai-sdk/cohere": "^3.0.12",
+    "@ai-sdk/google": "^3.0.15",
+    "@ai-sdk/mistral": "^3.0.13",
     "@ai-sdk/openai": "^3.0.9",
     "@quiqr/types": "*",
     "ai": "^6.0.33",
