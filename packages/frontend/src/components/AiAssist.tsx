@@ -87,7 +87,7 @@ const AiAssist = ({ inValue, inField, handleSetAiText }: AiAssistProps) => {
         if (chatCompletion && chatCompletion.choices.length > 0) {
           setResult(chatCompletion.choices[0].message.content || "");
         } else {
-          service.api.logToConsole("error");
+          console.error("AI response error: No completion returned");
         }
       }
     }

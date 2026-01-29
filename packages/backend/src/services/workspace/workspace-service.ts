@@ -1445,6 +1445,8 @@ export class WorkspaceService {
       workspacePath: this.workspacePath,
       version: ssgVersion,
       configFile: serveConfig.config,
+      siteKey: this.siteKey,
+      workspaceKey: this.workspaceKey,
     };
 
     // Create and start dev server

@@ -354,7 +354,8 @@ export const userPreferencesSchema = z.object({
   systemGitBinPath: z.string().optional(),
   customOpenInCommand: z.string().optional(),
   showSplashAtStartup: z.boolean().optional(),
-  applicationRole: z.string().optional()
+  applicationRole: z.string().optional(),
+  logRetentionDays: z.number().min(0).max(365).optional().default(30)
 }).passthrough() // TODO fix nested types
 
 // Schema for the full application config object (global.pogoconf in backend)

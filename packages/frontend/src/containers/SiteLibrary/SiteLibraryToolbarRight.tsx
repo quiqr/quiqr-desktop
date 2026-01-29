@@ -6,7 +6,9 @@ import InputIcon from "@mui/icons-material/Input";
 import AddIcon from "@mui/icons-material/Add";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import { useDialog } from "../../hooks/useDialog";
+import { useToolbarActiveStates } from "../../hooks/useToolbarActiveStates";
 import service from "../../services/service";
 
 interface SiteLibraryToolbarItemsProps {
@@ -24,6 +26,9 @@ export const useSiteLibraryToolbarItems = ({
 }: SiteLibraryToolbarItemsProps) => {
   const navigate = useNavigate();
   const { openDialog } = useDialog();
+  
+  // Get active states from shared hook
+  const { isSiteLibraryActive, isApplicationLogsActive, isPreferencesActive } = useToolbarActiveStates();
 
   const leftItems = [
     <ToolbarButton
@@ -77,13 +82,21 @@ export const useSiteLibraryToolbarItems = ({
   const rightItems = [
     <ToolbarButton
       key={"toolbarbutton-library"}
-      active={true}
+      active={isSiteLibraryActive}
       action={() => navigate("/sites/last")}
       title='Site Library'
       icon={AppsIcon}
     />,
     <ToolbarButton
+      key='buttonApplicationLogs'
+      active={isApplicationLogsActive}
+      action={() => navigate("/logs/application")}
+      title='Application Logs'
+      icon={DeveloperModeIcon}
+    />,
+    <ToolbarButton
       key='buttonPrefs'
+      active={isPreferencesActive}
       action={() => navigate("/prefs/")}
       title='Preferences'
       icon={SettingsApplicationsIcon}

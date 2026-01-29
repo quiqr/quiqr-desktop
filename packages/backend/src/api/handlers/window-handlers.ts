@@ -85,16 +85,6 @@ export function createReloadThemeStyleHandler(container: AppContainer) {
 }
 
 /**
- * Show the log window
- */
-export function createShowLogWindowHandler(container: AppContainer) {
-  return async () => {
-    container.adapters.window.showLogWindow('');
-    return true;
-  };
-}
-
-/**
  * Reload the current form if the path matches
  */
 export function createReloadCurrentFormHandler(container: AppContainer) {
@@ -132,7 +122,6 @@ export function createWindowHandlers(container: AppContainer) {
     redirectTo: createRedirectToHandler(container),
     parentMountWorkspace: createParentMountWorkspaceHandler(container),
     reloadThemeStyle: createReloadThemeStyleHandler(container),
-    showLogWindow: createShowLogWindowHandler(container),
     reloadCurrentForm: createReloadCurrentFormHandler(container),
   };
 }

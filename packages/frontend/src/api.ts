@@ -72,12 +72,37 @@ export function stopHugoServer(){
   return request('stopHugoServer', {}, {timeout:100000});
 }
 
-export function showLogWindow(){
-  return request('showLogWindow', {});
+// Logging API
+export function getApplicationLogs(options: {
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return request('getApplicationLogs', options);
 }
 
-export function logToConsole( message, label = ""){
-  return request('logToConsole', {message, label}, {timeout: 1000});
+export function getSiteLogs(options: {
+  siteKey: string;
+  workspaceKey: string;
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return request('getSiteLogs', options);
+}
+
+export function getLogDates(options: {
+  type: 'application' | 'site';
+  siteKey?: string;
+  workspaceKey?: string;
+}) {
+  return request('getLogDates', options);
 }
 
 export function getDynFormFields(searchRootNode: string, searchLevelKeyVal: unknown){
@@ -562,8 +587,9 @@ export interface API {
   getPreviewCheckConfiguration: typeof getPreviewCheckConfiguration;
   serveWorkspace: typeof serveWorkspace;
   stopHugoServer: typeof stopHugoServer;
-  showLogWindow: typeof showLogWindow;
-  logToConsole: typeof logToConsole;
+  getApplicationLogs: typeof getApplicationLogs;
+  getSiteLogs: typeof getSiteLogs;
+  getLogDates: typeof getLogDates;
   getDynFormFields: typeof getDynFormFields;
   importSite: typeof importSite;
   getFilteredHugoVersions: typeof getFilteredHugoVersions;

@@ -67,13 +67,6 @@ export class ElectronWindowAdapter implements WindowAdapter {
     this.mainWindow = window;
   }
 
-  showLogWindow(content: string): void {
-    // Import dynamically to avoid circular dependency
-    import('../ui-managers/log-window-manager.js').then(({ showLogWindow }) => {
-      showLogWindow(content);
-    });
-  }
-
   reloadMainWindow(): void {
     if (this.mainWindow) {
       this.mainWindow.reload();
@@ -99,17 +92,8 @@ export class ElectronWindowAdapter implements WindowAdapter {
   }
 
   appendToOutputConsole(line: string): void {
-    // Import dynamically to avoid circular dependency
-    import('../ui-managers/log-window-manager.js').then(({ getCurrentInstance }) => {
-      const logWindow = getCurrentInstance();
-      if (logWindow) {
-        // Send the line to the log window renderer
-        logWindow.webContents.send('hugo-output-line', line);
-      } else {
-        // Fallback to console if log window not open
-        console.log('[HUGO OUTPUT]', line);
-      }
-    });
+    // Output console deprecated - just log to console
+    console.log('[HUGO OUTPUT]', line);
   }
 }
 

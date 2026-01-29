@@ -313,6 +313,10 @@ export function startServer(
   const app = createServer(container, options);
 
   app.listen(port, () => {
+    container.logger.info('backend-server', 'API Server started', {
+      port,
+      url: `http://localhost:${port}`
+    });
     console.log(`API Server running on http://localhost:${port}`);
   });
 }
