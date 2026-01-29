@@ -41,6 +41,7 @@ function LogViewer({ title, fetchLogs }: Props) {
   // Pagination state
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const pageSize = 100;
 
   // Load logs
@@ -59,6 +60,15 @@ function LogViewer({ title, fetchLogs }: Props) {
 
       setEntries(result.entries);
       setTotal(result.total);
+      
+      // On initial load, jump to the last page
+      if (isInitialLoad && result.total > 0) {
+        const lastPage = Math.ceil(result.total / pageSize);
+        if (lastPage > 1) {
+          setPage(lastPage);
+        }
+        setIsInitialLoad(false);
+      }
 
       // Extract unique categories
       const uniqueCategories = Array.from(
@@ -81,9 +91,11 @@ function LogViewer({ title, fetchLogs }: Props) {
     loadLogs();
   }, [level, category, search, page]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters change (but not on initial load)
   useEffect(() => {
-    setPage(1);
+    if (!isInitialLoad) {
+      setPage(1);
+    }
   }, [level, category, search]);
 
   const totalPages = Math.ceil(total / pageSize);
