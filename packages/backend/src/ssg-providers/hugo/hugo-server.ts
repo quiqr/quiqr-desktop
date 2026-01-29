@@ -9,6 +9,8 @@ import fs from 'fs-extra';
 import type { PathHelper } from '../../utils/path-helper.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { WindowAdapter, OutputConsole } from '../../adapters/types.js';
+import type { AppContainer } from '../../config/container.js';
+import { SITE_CATEGORIES } from '../../logging/categories.js';
 
 /**
  * Hugo server configuration
@@ -28,6 +30,9 @@ export class HugoServer {
   private appConfig: AppConfig;
   private windowAdapter: WindowAdapter;
   private outputConsole: OutputConsole;
+  private container: AppContainer;
+  private siteKey: string;
+  private workspaceKey: string;
   private currentServerProcess?: ChildProcess;
 
   constructor(
@@ -35,13 +40,19 @@ export class HugoServer {
     pathHelper: PathHelper,
     appConfig: AppConfig,
     windowAdapter: WindowAdapter,
-    outputConsole: OutputConsole
+    outputConsole: OutputConsole,
+    container: AppContainer,
+    siteKey: string,
+    workspaceKey: string
   ) {
     this.config = config;
     this.pathHelper = pathHelper;
     this.appConfig = appConfig;
     this.windowAdapter = windowAdapter;
     this.outputConsole = outputConsole;
+    this.container = container;
+    this.siteKey = siteKey;
+    this.workspaceKey = workspaceKey;
   }
 
   /**
@@ -74,8 +85,24 @@ export class HugoServer {
       this.outputConsole.appendLine('Stopping Hugo Server...');
       this.outputConsole.appendLine('');
 
+      // Log server shutdown
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Stopping Hugo Server',
+        {}
+      );
+
       this.currentServerProcess.kill();
       this.currentServerProcess = undefined;
+    }
+
+    try {
+      this.outputConsole.appendLine('Sending serverDown.');
+      this.windowAdapter.sendToRenderer('serverDown', {});
+    } catch (e) {
+      console.log('Failed to send serverDown message:', e);
     }
   }
 
@@ -97,13 +124,28 @@ export class HugoServer {
     const exec = this.pathHelper.getSSGBinForVer('hugo', hugover);
 
     if (!fs.existsSync(exec)) {
-      throw new Error('Could not find hugo executable for version ' + hugover);
+      const error = 'Could not find hugo executable for version ' + hugover;
+      this.container.logger.errorSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Hugo executable not found',
+        { errorCode: 'HUGO_EXEC_NOT_FOUND', hugover, exec }
+      );
+      throw new Error(error);
     }
 
     const hugoArgs = ['server', '--bind','0.0.0.0', '--port', '13131', '--disableFastRender'];
 
     if (this.appConfig.hugoServeDraftMode) {
       this.outputConsole.appendLine('Server Draft Mode Enabled...');
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Hugo server draft mode enabled',
+        { draftMode: true }
+      );
       hugoArgs.push('--buildDrafts');
     }
 
@@ -125,11 +167,30 @@ export class HugoServer {
       this.emitLines(stdout);
 
       stderr.on('data', (data) => {
-        this.outputConsole.appendLine('Hugo Server Error: ' + data);
+        const errorMsg = String(data);
+        this.outputConsole.appendLine('Hugo Server Error: ' + errorMsg);
+        
+        // Log Hugo errors
+        this.container.logger.errorSite(
+          this.siteKey,
+          this.workspaceKey,
+          SITE_CATEGORIES.BUILDACTION,
+          'Hugo server error',
+          { errorCode: 'HUGO_SERVER_ERROR', error: errorMsg }
+        );
       });
 
       this.currentServerProcess.on('close', (code) => {
         this.outputConsole.appendLine('Hugo Server Closed: ' + code);
+        
+        // Log server close
+        this.container.logger.infoSite(
+          this.siteKey,
+          this.workspaceKey,
+          SITE_CATEGORIES.BUILDACTION,
+          'Hugo server closed',
+          { exitCode: code }
+        );
       });
 
       stdout.setEncoding('utf8');
@@ -141,6 +202,16 @@ export class HugoServer {
           isFirst = false;
           this.outputConsole.appendLine('Starting Hugo Server...');
           this.outputConsole.appendLine('');
+          
+          // Log server start
+          this.container.logger.infoSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Hugo Server started',
+            { port: 13131, workspacePath }
+          );
+          
           try {
             this.outputConsole.appendLine('Sending serverLive.');
             this.windowAdapter.sendToRenderer('serverLive', {});
@@ -149,11 +220,52 @@ export class HugoServer {
           }
           return;
         }
+        
+        // Write to console
         this.outputConsole.appendLine(line);
+        
+        // Also log to structured logs
+        // Determine log level based on content
+        if (line.includes('ERROR') || line.includes('FATAL')) {
+          this.container.logger.errorSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Hugo output',
+            { message: line }
+          );
+        } else if (line.includes('WARN')) {
+          this.container.logger.warningSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Hugo output',
+            { message: line }
+          );
+        } else {
+          // Regular info messages
+          this.container.logger.infoSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Hugo output',
+            { message: line }
+          );
+        }
       });
     } catch (e) {
       this.outputConsole.appendLine('Hugo Server failed to start.');
       this.outputConsole.appendLine((e as Error).message);
+      
+      // Log server start failure
+      this.container.logger.errorSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Hugo server failed to start',
+        { errorCode: 'HUGO_START_FAILED', error: (e as Error).message }
+      );
+      
       try {
         this.outputConsole.appendLine('Sending serverDown.');
         this.windowAdapter.sendToRenderer('serverDown', {});

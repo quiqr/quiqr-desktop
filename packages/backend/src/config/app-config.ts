@@ -45,6 +45,7 @@ export class AppConfig {
       prefs: {
         dataFolder: '~/Quiqr',
         interfaceStyle: 'quiqr10-light',
+        logRetentionDays: 30, // Default retention period
       },
       lastOpenedPublishTargetForSite: {},
       skipWelcomeScreen: false,

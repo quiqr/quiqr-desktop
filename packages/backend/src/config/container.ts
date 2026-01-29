@@ -26,6 +26,7 @@ import { ProviderFactory } from '../ssg-providers/provider-factory.js';
 import type { EnvironmentInfo } from '../utils/path-helper.js';
 import { HugoDownloader } from '../ssg-providers/hugo/hugo-downloader.js';
 import { HugoUtils } from '../ssg-providers/hugo/hugo-utils.js';
+import { Logger } from '../logging/logger.js';
 
 /**
  * Event emitted when the model cache is cleared
@@ -165,6 +166,11 @@ export interface AppContainer {
    * Backward compatibility accessor for Hugo utils
    */
   get hugoUtils(): HugoUtils;
+
+  /**
+   * Structured logging service
+   */
+  logger: Logger;
 }
 
 /**
@@ -214,6 +220,9 @@ export function createContainer(options: ContainerOptions): AppContainer {
 
   // Create format resolver
   const formatResolver = new FormatProviderResolver();
+
+  // Create structured logger
+  const structuredLogger = new Logger();
 
   // Create configuration provider with dependencies
   const logger = new ConsoleLogger();
@@ -285,6 +294,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
     workspaceConfigProvider,
     environmentInfo,
     modelChangeEventBroadcaster,
+    logger: structuredLogger,
   } as AppContainer;
 
   // Create library service with container dependency
@@ -335,10 +345,14 @@ export function createContainer(options: ContainerOptions): AppContainer {
     windowAdapter: adapters.window,
     configurationProvider,
     embgit,
+    container,
   });
 
-  // Create BuildActionService (uses outputConsole for logging)
-  const buildActionService = new BuildActionService(adapters.outputConsole);
+  // Initialize providerFactory with container reference (breaks circular dependency)
+  providerFactory.setContainer(container);
+
+  // Create BuildActionService (uses outputConsole for logging and container for structured logging)
+  const buildActionService = new BuildActionService(adapters.outputConsole, container);
 
   // Create WorkspaceService factory
   // Note: OutputConsole and ScreenshotWindowManager are provided by Electron runtime
@@ -359,6 +373,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       outputConsole: adapters.outputConsole,
       screenshotWindowManager: adapters.screenshotWindowManager,
       buildActionService,
+      container,
     };
 
     return new WorkspaceService(workspacePath, workspaceKey, siteKey, dependencies);

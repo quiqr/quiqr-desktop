@@ -149,25 +149,55 @@ export const publicKeyResponseSchema = z.object({
 
 // AI Prompt schemas
 export const aiPromptResponseSchema = z.object({
-  response: z.string(),
-  provider: z.string().optional(),
-  usage: z.object({
-    promptTokens: z.number().optional(),
-    completionTokens: z.number().optional(),
-    totalTokens: z.number().optional()
-  }).optional()
-}).passthrough()
+  status: z.literal('ok'),
+  response: z.string()
+})
 
-// Hugo configuration file schema (hugo.toml, config.toml, etc.)
-// Uses passthrough to allow any Hugo config properties while typing the ones we use
-export const hugoConfigSchema = z
-  .object({
-    baseURL: z.string().optional(),
-    theme: z.union([z.string(), z.array(z.string())]).optional(),
-    title: z.string().optional(),
-    languageCode: z.string().optional()
-  })
-  .passthrough()
+// Logging schemas
+export const logLevelSchema = z.enum(['debug', 'info', 'warning', 'error'])
+
+export const baseLogEntrySchema = z.object({
+  timestamp: z.string(),
+  level: logLevelSchema,
+  category: z.string(),
+  message: z.string(),
+  errorCode: z.string().optional(),
+  metadata: z.record(z.unknown()).optional()
+})
+
+export const globalLogEntrySchema = baseLogEntrySchema.extend({
+  type: z.literal('global')
+})
+
+export const siteLogEntrySchema = baseLogEntrySchema.extend({
+  type: z.literal('site'),
+  siteKey: z.string(),
+  workspaceKey: z.string()
+})
+
+export const logEntrySchema = z.union([globalLogEntrySchema, siteLogEntrySchema])
+
+export const logQueryOptionsSchema = z.object({
+  date: z.string().optional(),
+  level: logLevelSchema.optional(),
+  category: z.string().optional(),
+  search: z.string().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional()
+})
+
+export const logQueryResultSchema = z.object({
+  entries: z.array(logEntrySchema),
+  total: z.number(),
+  hasMore: z.boolean()
+})
+
+export const logDatesResultSchema = z.object({
+  dates: z.array(z.string())
+})
+
+// Hugo config schema (flexible object)
+export const hugoConfigSchema = z.record(z.unknown())
 
 export type HugoConfig = z.infer<typeof hugoConfigSchema>
 
@@ -367,6 +397,11 @@ export const apiSchemas = {
   openSiteLibrary: z.boolean(),
   updateCommunityTemplates: z.array(communityTemplateSchema),
   showOpenFolderDialog: folderDialogResponseSchema,
+
+  // Logging
+  getApplicationLogs: logQueryResultSchema,
+  getSiteLogs: logQueryResultSchema,
+  getLogDates: logDatesResultSchema,
 
   // Menu operations (web mode)
   getMenuState: webMenuStateSchema,

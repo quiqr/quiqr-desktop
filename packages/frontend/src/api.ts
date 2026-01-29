@@ -99,12 +99,37 @@ export function stopHugoServer(){
   return request('stopHugoServer', {}, {timeout:100000});
 }
 
-export function showLogWindow(){
-  return request('showLogWindow', {});
+// Logging API
+export function getApplicationLogs(options: {
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return request('getApplicationLogs', options);
 }
 
-export function logToConsole( message, label = ""){
-  return request('logToConsole', {message, label}, {timeout: 1000});
+export function getSiteLogs(options: {
+  siteKey: string;
+  workspaceKey: string;
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return request('getSiteLogs', options);
+}
+
+export function getLogDates(options: {
+  type: 'application' | 'site';
+  siteKey?: string;
+  workspaceKey?: string;
+}) {
+  return request('getLogDates', options);
 }
 
 export function getDynFormFields(searchRootNode: string, searchLevelKeyVal: unknown){
@@ -471,11 +496,11 @@ export function getLanguages(siteKey: string, workspaceKey: string){
   return request('getLanguages', {siteKey, workspaceKey});
 }
 
-export function publisherDispatchAction(siteKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
+export function publisherDispatchAction(siteKey: string, workspaceKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
   if(!Number.isInteger(timeout)){
     timeout=130000;
   }
-  return request('publisherDispatchAction', {siteKey, publishConf, action, actionParameters}, {timeout: timeout});
+  return request('publisherDispatchAction', {siteKey, workspaceKey, publishConf, action, actionParameters}, {timeout: timeout});
 }
 
 export function getCreatorMessage(siteKey: string, workspaceKey: string){
@@ -591,8 +616,9 @@ export interface API {
   getPreviewCheckConfiguration: typeof getPreviewCheckConfiguration;
   serveWorkspace: typeof serveWorkspace;
   stopHugoServer: typeof stopHugoServer;
-  showLogWindow: typeof showLogWindow;
-  logToConsole: typeof logToConsole;
+  getApplicationLogs: typeof getApplicationLogs;
+  getSiteLogs: typeof getSiteLogs;
+  getLogDates: typeof getLogDates;
   getDynFormFields: typeof getDynFormFields;
   importSite: typeof importSite;
   getFilteredHugoVersions: typeof getFilteredHugoVersions;

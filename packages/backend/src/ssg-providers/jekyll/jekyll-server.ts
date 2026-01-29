@@ -9,8 +9,10 @@ import fs from 'fs-extra';
 import path from 'path';
 import type { PathHelper } from '../../utils/path-helper.js';
 import type { AppConfig } from '../../config/app-config.js';
+import type { AppContainer } from '../../config/container.js';
 import type { WindowAdapter, OutputConsole } from '../../adapters/types.js';
 import type { SSGDevServer } from '../types.js';
+import { SITE_CATEGORIES } from '../../logging/index.js';
 
 /**
  * Jekyll server configuration
@@ -31,6 +33,9 @@ export class JekyllServer implements SSGDevServer {
   private appConfig: AppConfig;
   private windowAdapter: WindowAdapter;
   private outputConsole: OutputConsole;
+  private container: AppContainer;
+  private siteKey: string;
+  private workspaceKey: string;
   private currentServerProcess?: ChildProcess;
 
   constructor(
@@ -38,13 +43,19 @@ export class JekyllServer implements SSGDevServer {
     pathHelper: PathHelper,
     appConfig: AppConfig,
     windowAdapter: WindowAdapter,
-    outputConsole: OutputConsole
+    outputConsole: OutputConsole,
+    container: AppContainer,
+    siteKey: string,
+    workspaceKey: string
   ) {
     this.config = config;
     this.pathHelper = pathHelper;
     this.appConfig = appConfig;
     this.windowAdapter = windowAdapter;
     this.outputConsole = outputConsole;
+    this.container = container;
+    this.siteKey = siteKey;
+    this.workspaceKey = workspaceKey;
   }
 
   /**
@@ -77,6 +88,15 @@ export class JekyllServer implements SSGDevServer {
     if (this.currentServerProcess) {
       this.outputConsole.appendLine('Stopping Jekyll Server...');
       this.outputConsole.appendLine('');
+      
+      // Log server stop
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Jekyll Server stopping',
+        { workspacePath: this.config.workspacePath }
+      );
 
       this.currentServerProcess.kill();
       this.currentServerProcess = undefined;
@@ -148,6 +168,20 @@ export class JekyllServer implements SSGDevServer {
 
     this.outputConsole.appendLine(`Command: ${jekyllCommand} ${args.join(' ')}`);
     this.outputConsole.appendLine('');
+    
+    // Log server start
+    this.container.logger.infoSite(
+      this.siteKey,
+      this.workspaceKey,
+      SITE_CATEGORIES.BUILDACTION,
+      'Jekyll Server started',
+      { 
+        port,
+        workspacePath: this.config.workspacePath,
+        version: this.config.version,
+        command: `${jekyllCommand} ${args.join(' ')}`
+      }
+    );
 
     // Spawn Jekyll server
     this.currentServerProcess = spawn(jekyllCommand, args, {
@@ -164,6 +198,35 @@ export class JekyllServer implements SSGDevServer {
       this.emitLines(this.currentServerProcess.stdout);
       this.currentServerProcess.stdout.on('line', (line: string) => {
         this.outputConsole.appendLine(line);
+        
+        // Also log to structured logs
+        // Determine log level based on content
+        if (line.includes('ERROR') || line.includes('FATAL') || line.includes('Error')) {
+          this.container.logger.errorSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Jekyll output',
+            { message: line }
+          );
+        } else if (line.includes('WARN') || line.includes('Warning')) {
+          this.container.logger.warningSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Jekyll output',
+            { message: line }
+          );
+        } else {
+          // Regular info messages
+          this.container.logger.infoSite(
+            this.siteKey,
+            this.workspaceKey,
+            SITE_CATEGORIES.BUILDACTION,
+            'Jekyll output',
+            { message: line }
+          );
+        }
       });
     }
 
@@ -172,6 +235,15 @@ export class JekyllServer implements SSGDevServer {
       this.emitLines(this.currentServerProcess.stderr);
       this.currentServerProcess.stderr.on('line', (line: string) => {
         this.outputConsole.appendLine(line);
+        
+        // Log stderr as errors
+        this.container.logger.errorSite(
+          this.siteKey,
+          this.workspaceKey,
+          SITE_CATEGORIES.BUILDACTION,
+          'Jekyll error output',
+          { message: line }
+        );
       });
     }
 
@@ -179,6 +251,16 @@ export class JekyllServer implements SSGDevServer {
     this.currentServerProcess.on('exit', (code) => {
       this.outputConsole.appendLine('');
       this.outputConsole.appendLine(`Jekyll Server exited with code ${code}`);
+      
+      // Log exit
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Jekyll Server exited',
+        { exitCode: code }
+      );
+      
       this.currentServerProcess = undefined;
     });
 
@@ -186,6 +268,16 @@ export class JekyllServer implements SSGDevServer {
     this.currentServerProcess.on('error', (error) => {
       this.outputConsole.appendLine('');
       this.outputConsole.appendLine(`Jekyll Server error: ${error.message}`);
+      
+      // Log error
+      this.container.logger.errorSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Jekyll Server error',
+        { error: error.message, stack: error.stack }
+      );
+      
       this.currentServerProcess = undefined;
     });
   }

@@ -1,5 +1,7 @@
 import { spawn } from 'child_process'
 import type { BuildActionExecute, BuildActionCommand } from '@quiqr/types'
+import type { AppContainer } from '../config/container.js'
+import { SITE_CATEGORIES } from '../logging/index.js'
 
 /**
  * Platform types
@@ -35,9 +37,11 @@ export interface BuildActionLogger {
  */
 export class BuildActionService {
   private logger: BuildActionLogger
+  private container?: AppContainer
 
-  constructor(logger: BuildActionLogger) {
+  constructor(logger: BuildActionLogger, container?: AppContainer) {
     this.logger = logger
+    this.container = container
   }
 
   /**
@@ -47,35 +51,87 @@ export class BuildActionService {
    * @param executeDict - Execution configuration (windows/unix commands)
    * @param filePath - Path to the document file
    * @param sitePath - Path to the site root
+   * @param siteKey - Site key for logging
+   * @param workspaceKey - Workspace key for logging
    * @returns Promise with build result
    */
   async runAction(
     actionName: string,
     executeDict: BuildActionExecute,
     filePath: string,
-    sitePath: string
+    sitePath: string,
+    siteKey?: string,
+    workspaceKey?: string
   ): Promise<BuildActionResult> {
     const platform = this.detectPlatform()
+    
+    // Log build action start
+    if (this.container && siteKey && workspaceKey) {
+      this.container.logger.infoSite(
+        siteKey,
+        workspaceKey,
+        SITE_CATEGORIES.BUILDACTION,
+        'Build action started',
+        { actionName, filePath, sitePath, platform }
+      )
+    }
 
-    if (platform === Platform.WINDOWS) {
-      return this.runOn(
-        actionName,
-        executeDict.windows,
-        filePath,
-        sitePath,
-        executeDict.stdout_type,
-        executeDict.variables
-      )
-    } else {
-      // Unix or macOS
-      return this.runOn(
-        actionName,
-        executeDict.unix,
-        filePath,
-        sitePath,
-        executeDict.stdout_type,
-        executeDict.variables
-      )
+    try {
+      let result: BuildActionResult
+      
+      if (platform === Platform.WINDOWS) {
+        result = await this.runOn(
+          actionName,
+          executeDict.windows,
+          filePath,
+          sitePath,
+          executeDict.stdout_type,
+          executeDict.variables,
+          siteKey,
+          workspaceKey
+        )
+      } else {
+        // Unix or macOS
+        result = await this.runOn(
+          actionName,
+          executeDict.unix,
+          filePath,
+          sitePath,
+          executeDict.stdout_type,
+          executeDict.variables,
+          siteKey,
+          workspaceKey
+        )
+      }
+      
+      // Log success
+      if (this.container && siteKey && workspaceKey) {
+        this.container.logger.infoSite(
+          siteKey,
+          workspaceKey,
+          SITE_CATEGORIES.BUILDACTION,
+          'Build action completed',
+          { actionName, filePath, stdoutType: result.stdoutType }
+        )
+      }
+      
+      return result
+    } catch (error) {
+      // Log error
+      if (this.container && siteKey && workspaceKey) {
+        this.container.logger.errorSite(
+          siteKey,
+          workspaceKey,
+          SITE_CATEGORIES.BUILDACTION,
+          'Build action failed',
+          { 
+            actionName, 
+            filePath, 
+            error: error instanceof Error ? error.message : String(error)
+          }
+        )
+      }
+      throw error
     }
   }
 
@@ -158,7 +214,9 @@ export class BuildActionService {
     filePath: string,
     sitePath: string,
     stdoutType?: string,
-    customVariables?: Array<{ name: string; value: string }>
+    customVariables?: Array<{ name: string; value: string }>,
+    siteKey?: string,
+    workspaceKey?: string
   ): Promise<BuildActionResult> {
     // Apply document_path replacements to filePath if specified
     let processedFilePath = filePath
@@ -218,6 +276,18 @@ export class BuildActionService {
 
         child.on('error', (error) => {
           this.logger.appendLine(`Build action error: ${error.message}`)
+          
+          // Log error to structured logs
+          if (this.container && siteKey && workspaceKey) {
+            this.container.logger.errorSite(
+              siteKey,
+              workspaceKey,
+              SITE_CATEGORIES.BUILDACTION,
+              'Build action process error',
+              { actionName, error: error.message }
+            )
+          }
+          
           reject(error)
         })
 
@@ -229,6 +299,17 @@ export class BuildActionService {
           const stdoutContent = Buffer.concat(stdoutChunks).toString()
           if (stdoutContent) {
             this.logger.appendLine(stdoutContent)
+            
+            // Log stdout to structured logs
+            if (this.container && siteKey && workspaceKey) {
+              this.container.logger.infoSite(
+                siteKey,
+                workspaceKey,
+                SITE_CATEGORIES.BUILDACTION,
+                'Build action output',
+                { actionName, message: stdoutContent }
+              )
+            }
           }
         })
 
@@ -237,6 +318,17 @@ export class BuildActionService {
           const stderrContent = Buffer.concat(stderrChunks).toString()
           if (stderrContent) {
             this.logger.appendLine(stderrContent)
+            
+            // Log stderr to structured logs
+            if (this.container && siteKey && workspaceKey) {
+              this.container.logger.errorSite(
+                siteKey,
+                workspaceKey,
+                SITE_CATEGORIES.BUILDACTION,
+                'Build action error output',
+                { actionName, message: stderrContent }
+              )
+            }
           }
         })
       } catch (error) {

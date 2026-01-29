@@ -9,13 +9,6 @@ import type { WindowAdapter } from '@quiqr/backend';
 
 export class WebWindowAdapter implements WindowAdapter {
   /**
-   * Show a log window with content (console.log in web mode)
-   */
-  showLogWindow(content: string): void {
-    console.log('[LOG]', content);
-  }
-
-  /**
    * Reload the main application window
    * In web mode, this would require server-sent events or similar
    * For now, just log the request

@@ -8,6 +8,7 @@
 import type { PathHelper, EnvironmentInfo } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter, ShellAdapter } from '../adapters/types.js';
 import type { AppConfig } from '../config/app-config.js';
+import type { AppContainer } from '../config/container.js';
 
 /**
  * Provider metadata and capabilities
@@ -83,6 +84,8 @@ export interface SSGServerConfig {
   configFile?: string;
   port?: number;
   additionalArgs?: string[];
+  siteKey: string;
+  workspaceKey: string;
 }
 
 /**
@@ -235,4 +238,5 @@ export interface SSGProviderDependencies {
   windowAdapter: WindowAdapter;
   shellAdapter: ShellAdapter;
   appConfig: AppConfig;
+  container?: AppContainer; // Optional - injected after construction to break circular dependency
 }

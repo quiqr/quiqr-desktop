@@ -18,6 +18,7 @@ import { createBuildHandlers } from './handlers/build-handlers.js';
 import { createSingleHandlers } from './handlers/single-handlers.js';
 import { createCollectionHandlers } from './handlers/collection-handlers.js';
 import { createSyncHandlers } from './handlers/sync-handlers.js';
+import { createLogHandlers } from './handlers/log-handlers.js';
 
 /**
  * Create the complete API handler registry
@@ -36,6 +37,7 @@ export function createApiHandlers(container: AppContainer) {
   const singleHandlers = createSingleHandlers(container);
   const collectionHandlers = createCollectionHandlers(container);
   const syncHandlers = createSyncHandlers(container);
+  const logHandlers = createLogHandlers(container);
 
   // Combine all handlers into a single registry
   return {
@@ -74,6 +76,9 @@ export function createApiHandlers(container: AppContainer) {
 
     // Sync and publish
     ...syncHandlers,
+
+    // Logging
+    ...logHandlers,
   };
 }
 
