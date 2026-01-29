@@ -469,11 +469,11 @@ export function getLanguages(siteKey: string, workspaceKey: string){
   return request('getLanguages', {siteKey, workspaceKey});
 }
 
-export function publisherDispatchAction(siteKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
+export function publisherDispatchAction(siteKey: string, workspaceKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
   if(!Number.isInteger(timeout)){
     timeout=130000;
   }
-  return request('publisherDispatchAction', {siteKey, publishConf, action, actionParameters}, {timeout: timeout});
+  return request('publisherDispatchAction', {siteKey, workspaceKey, publishConf, action, actionParameters}, {timeout: timeout});
 }
 
 export function getCreatorMessage(siteKey: string, workspaceKey: string){

@@ -23,11 +23,13 @@ import type { PathHelper } from '../../utils/path-helper.js';
 import { recurForceRemove } from '../../utils/file-dir-utils.js';
 import { createThumbnailJob } from '../../jobs/index.js';
 import { BuildActionService, type BuildActionResult } from '../../build-actions/index.js';
+import { SITE_CATEGORIES } from '../../logging/index.js';
 import type { CollectionConfig, ExtraBuildConfig, BuildConfig, ServeConfig } from '@quiqr/types';
 import { frontMatterContentSchema } from '@quiqr/types';
 import type { WorkspaceConfig } from './workspace-config-validator.js';
 import type { AppConfig } from '../../config/app-config.js';
 import type { AppState } from '../../config/app-state.js';
+import type { AppContainer } from '../../config/container.js';
 import type { ProviderFactory } from '../../ssg-providers/provider-factory.js';
 import type { SSGDevServer, SSGServerConfig, SSGBuildConfig } from '../../ssg-providers/types.js';
 import { WindowAdapter, OutputConsole, ScreenshotWindowManager, ShellAdapter } from '../../adapters/types.js';
@@ -48,6 +50,7 @@ export interface WorkspaceServiceDependencies {
   outputConsole: OutputConsole;
   screenshotWindowManager: ScreenshotWindowManager;
   buildActionService: BuildActionService;
+  container: AppContainer;
 }
 
 /**
@@ -125,6 +128,7 @@ export class WorkspaceService {
   private outputConsole: OutputConsole;
   private screenshotWindowManager: ScreenshotWindowManager;
   private buildActionService: BuildActionService;
+  private container: AppContainer;
   private currentDevServer?: SSGDevServer;
   private currentSSGType?: string;
 
@@ -148,6 +152,7 @@ export class WorkspaceService {
     this.outputConsole = dependencies.outputConsole;
     this.screenshotWindowManager = dependencies.screenshotWindowManager;
     this.buildActionService = dependencies.buildActionService;
+    this.container = dependencies.container;
   }
 
   /**
@@ -373,26 +378,60 @@ export class WorkspaceService {
     if (!single.file) throw new Error(`Single '${singleKey}' has no file configured`);
     const filePath = path.join(this.workspacePath, single.file);
 
-    const directory = path.dirname(filePath);
-
-    if (!fs.existsSync(directory)) fs.mkdirSync(directory); // ensure directory existence
-
-    let documentClone = JSON.parse(JSON.stringify(document));
-
-    if (typeof single.pullOuterRootKey === 'string') {
-      documentClone = documentClone[single.pullOuterRootKey];
-    }
-
-    this._stripNonDocumentData(documentClone);
-
-    const stringData = await this._smartDump(
-      filePath,
-      [path.extname(single.file).replace('.', '')],
-      documentClone
+    // Log update start
+    this.container.logger.infoSite(
+      this.siteKey,
+      this.workspaceKey,
+      SITE_CATEGORIES.CONTENT,
+      'Single document update started',
+      { singleKey, filePath }
     );
-    fs.writeFileSync(filePath, stringData);
 
-    return document;
+    try {
+      const directory = path.dirname(filePath);
+
+      if (!fs.existsSync(directory)) fs.mkdirSync(directory); // ensure directory existence
+
+      let documentClone = JSON.parse(JSON.stringify(document));
+
+      if (typeof single.pullOuterRootKey === 'string') {
+        documentClone = documentClone[single.pullOuterRootKey];
+      }
+
+      this._stripNonDocumentData(documentClone);
+
+      const stringData = await this._smartDump(
+        filePath,
+        [path.extname(single.file).replace('.', '')],
+        documentClone
+      );
+      fs.writeFileSync(filePath, stringData);
+
+      // Log success
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.CONTENT,
+        'Single document updated',
+        { singleKey, filePath }
+      );
+
+      return document;
+    } catch (error) {
+      // Log error
+      this.container.logger.errorSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.CONTENT,
+        'Single document update failed',
+        { 
+          singleKey, 
+          filePath, 
+          error: error instanceof Error ? error.message : String(error) 
+        }
+      );
+      throw error;
+    }
   }
 
   /**
@@ -834,7 +873,9 @@ export class WorkspaceService {
       buildAction,
       buildActionDict.execute,
       filePath,
-      this.workspacePath
+      this.workspacePath,
+      this.siteKey,
+      this.workspaceKey
     );
   }
 
@@ -858,7 +899,9 @@ export class WorkspaceService {
       buildAction,
       buildActionDict.execute,
       filePath,
-      this.workspacePath
+      this.workspacePath,
+      this.siteKey,
+      this.workspaceKey
     );
   }
 
@@ -874,16 +917,52 @@ export class WorkspaceService {
     const collection = config.collections.find((x) => x.key === collectionKey);
     if (collection == null) throw new Error('Could not find collection.');
     const filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
-    const directory = path.dirname(filePath);
 
-    if (!fs.existsSync(directory)) fs.mkdirSync(directory); // ensure directory existence
+    // Log update start
+    this.container.logger.infoSite(
+      this.siteKey,
+      this.workspaceKey,
+      SITE_CATEGORIES.CONTENT,
+      'Collection item update started',
+      { collectionKey, collectionItemKey, filePath }
+    );
 
-    const documentClone = JSON.parse(JSON.stringify(document));
-    this._stripNonDocumentData(documentClone);
-    const stringData = await this._smartDump(filePath, [collection.dataformat], documentClone);
-    fs.writeFileSync(filePath, stringData);
+    try {
+      const directory = path.dirname(filePath);
 
-    return document;
+      if (!fs.existsSync(directory)) fs.mkdirSync(directory); // ensure directory existence
+
+      const documentClone = JSON.parse(JSON.stringify(document));
+      this._stripNonDocumentData(documentClone);
+      const stringData = await this._smartDump(filePath, [collection.dataformat], documentClone);
+      fs.writeFileSync(filePath, stringData);
+
+      // Log success
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.CONTENT,
+        'Collection item updated',
+        { collectionKey, collectionItemKey, filePath }
+      );
+
+      return document;
+    } catch (error) {
+      // Log error
+      this.container.logger.errorSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.CONTENT,
+        'Collection item update failed',
+        { 
+          collectionKey, 
+          collectionItemKey, 
+          filePath, 
+          error: error instanceof Error ? error.message : String(error) 
+        }
+      );
+      throw error;
+    }
   }
 
   /**

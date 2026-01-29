@@ -345,13 +345,14 @@ export function createContainer(options: ContainerOptions): AppContainer {
     windowAdapter: adapters.window,
     configurationProvider,
     embgit,
+    container,
   });
 
   // Initialize providerFactory with container reference (breaks circular dependency)
   providerFactory.setContainer(container);
 
-  // Create BuildActionService (uses outputConsole for logging)
-  const buildActionService = new BuildActionService(adapters.outputConsole);
+  // Create BuildActionService (uses outputConsole for logging and container for structured logging)
+  const buildActionService = new BuildActionService(adapters.outputConsole, container);
 
   // Create WorkspaceService factory
   // Note: OutputConsole and ScreenshotWindowManager are provided by Electron runtime
@@ -372,6 +373,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       outputConsole: adapters.outputConsole,
       screenshotWindowManager: adapters.screenshotWindowManager,
       buildActionService,
+      container,
     };
 
     return new WorkspaceService(workspacePath, workspaceKey, siteKey, dependencies);

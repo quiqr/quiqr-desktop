@@ -60,6 +60,12 @@ export class EleventyProvider implements SSGProvider {
   }
 
   createDevServer(config: SSGServerConfig): SSGDevServer {
+    // Container may not be set yet during initialization
+    const container = this.dependencies.container;
+    if (!container) {
+      throw new Error('Container not initialized in EleventyProvider');
+    }
+
     return new EleventyServer(
       {
         workspacePath: config.workspacePath,
@@ -70,7 +76,10 @@ export class EleventyProvider implements SSGProvider {
       this.dependencies.pathHelper,
       this.dependencies.appConfig,
       this.dependencies.windowAdapter,
-      this.dependencies.outputConsole
+      this.dependencies.outputConsole,
+      container,
+      config.siteKey,
+      config.workspaceKey
     );
   }
 

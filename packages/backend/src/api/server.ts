@@ -209,7 +209,7 @@ export function createServer(
 
         // Get publisher with progress callback
         const action = publishConf.type === 'folder' ? 'pushToRemote' : 'pushWithSoftMerge';
-        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, progressCallback);
+        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, "main", progressCallback);
 
         // Execute sync operation
         const result = await publisher.actionDispatcher(action);
@@ -244,7 +244,7 @@ export function createServer(
         };
 
         // Get publisher with progress callback
-        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, progressCallback);
+        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, "main", progressCallback);
 
         // Execute sync operation
         const result = await publisher.actionDispatcher('pullFromRemote');
@@ -279,7 +279,7 @@ export function createServer(
         };
 
         // Get publisher with progress callback
-        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, progressCallback);
+        const publisher = container.syncFactory.getPublisher(publishConf, siteKey, "main", progressCallback);
 
         // Execute sync operation
         const result = await publisher.actionDispatcher(action, actionParameters);
