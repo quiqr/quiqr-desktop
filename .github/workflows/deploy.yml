@@ -181,12 +181,12 @@ jobs:
           mkdir -p ./combined-output/specs
           cp -r ./openspec-export/* ./combined-output/specs/
           
-          # Copy Docusaurus build to /quiqr-desktop/docs/
+          # Copy Docusaurus build to /docs/
           # Docusaurus builds with /quiqr-desktop/docs/ base path
-          # The build output is in packages/docs/build/ and contains files with asset paths
-          # that expect to be served from /quiqr-desktop/docs/
-          mkdir -p ./combined-output/quiqr-desktop/docs
-          cp -r ./packages/docs/build/* ./combined-output/quiqr-desktop/docs/
+          # GitHub Pages deploys combined-output to /quiqr-desktop/
+          # So we put files in combined-output/docs/ to get /quiqr-desktop/docs/
+          mkdir -p ./combined-output/docs
+          cp -r ./packages/docs/build/* ./combined-output/docs/
           
           # Fetch and preserve existing badges from gh-pages branch
           # This ensures the coverage badge persists across deployments
@@ -204,10 +204,10 @@ jobs:
           # Verify structure
           echo "Combined output structure:"
           ls -la ./combined-output/
-          echo "Quiqr-desktop structure:"
-          ls -la ./combined-output/quiqr-desktop/ || true
           echo "Docs structure:"
-          ls -la ./combined-output/quiqr-desktop/docs/ || true
+          ls -la ./combined-output/docs/ || true
+          echo "Specs structure:"
+          ls -la ./combined-output/specs/ || true
 
       # Step 8: Upload the combined site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
