@@ -228,12 +228,12 @@ export const SukohForm = ({
               onClick={() => setAiAssistOpen(true)}
               sx={{
                 position: 'absolute',
-                top: 66,
+                top: 142,
                 right: 16,
                 zIndex: 10,
               }}
             >
-              AI Assist
+              PAGE ASSIST
             </Button>
             <PageAIAssistDialog
               open={aiAssistOpen}
