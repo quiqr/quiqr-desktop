@@ -150,7 +150,7 @@ jobs:
         run: |
           nix run github:mipmip/openspecui/feature/nixFlake -- export \
             --dir . \
-            --base-path /quiqr-desktop/ \
+            --base-path /quiqr-desktop/specs/ \
             --output ./openspec-export
 
       # Step 4: Set up Node.js for Docusaurus build
@@ -182,12 +182,30 @@ jobs:
           cp -r ./openspec-export/* ./combined-output/specs/
           
           # Copy Docusaurus build to /docs/
-          # Docusaurus builds to packages/docs/build with /quiqr-desktop/docs/ base path
-          cp -r ./packages/docs/build/* ./combined-output/
+          # Docusaurus builds with /quiqr-desktop/docs/ base path
+          # The build output has the structure: quiqr-desktop/docs/...
+          # We need to extract just the docs/ part
+          mkdir -p ./combined-output/quiqr-desktop
+          cp -r ./packages/docs/build/quiqr-desktop/docs ./combined-output/quiqr-desktop/
+          
+          # Fetch and preserve existing badges from gh-pages branch
+          # This ensures the coverage badge persists across deployments
+          git fetch origin gh-pages --depth=1 || true
+          if git rev-parse origin/gh-pages >/dev/null 2>&1; then
+            # Check out the badges directory from gh-pages
+            git checkout origin/gh-pages -- badges/ 2>/dev/null || true
+            if [ -d "badges" ]; then
+              mkdir -p ./combined-output/badges
+              cp -r badges/* ./combined-output/badges/
+              echo "Preserved existing badges from gh-pages"
+            fi
+          fi
           
           # Verify structure
           echo "Combined output structure:"
           ls -la ./combined-output/
+          echo "Docs structure:"
+          ls -la ./combined-output/quiqr-desktop/ || true
 
       # Step 8: Upload the combined site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
