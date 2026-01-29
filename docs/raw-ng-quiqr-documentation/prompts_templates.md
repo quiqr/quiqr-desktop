@@ -455,6 +455,99 @@ If you have templates in the old `prompts_templates/` directory:
 
 The old directory still works but will be removed in a future version.
 
+## Migration from Legacy Direct OpenAI Field AI Assist
+
+**BREAKING CHANGE (Current Version):** The legacy field AI assist functionality that used direct OpenAI API calls from the frontend has been removed.
+
+### What Changed
+
+Previous versions allowed configuring `openAiApiKey` in Advanced Preferences, which enabled a hardcoded AI assist button on fields. This feature has been replaced with the more flexible and secure template-based system.
+
+**Removed:**
+- `openAiApiKey` configuration field in Advanced Preferences
+- Direct OpenAI API calls from frontend
+- `meta.enableAiAssist` flag
+- Hardcoded AI prompts in field components
+
+**Replacement:**
+- Template-based field AI assist (documented above)
+- Backend-managed LLM providers (supports multiple providers)
+- Configurable prompts via `field_prompt_templates/`
+- Per-field control via `field_prompt_templates` array
+
+### How to Migrate
+
+If you previously used `openAiApiKey` configuration:
+
+1. **Remove old configuration:**
+   - The `openAiApiKey` field no longer appears in Advanced Preferences
+   - Your old API key is ignored
+
+2. **Configure LLM provider:**
+   - Set environment variable: `QUIQR_LLM_PROVIDER_0="openai://your-api-key"`
+   - See AGENTS.md "LLM Provider Configuration" section for details
+   - Supports multiple providers (OpenAI, Anthropic, AWS Bedrock, Google Gemini, etc.)
+
+3. **Create field prompt templates:**
+   - Create directory: `quiqr/model/includes/field_prompt_templates/`
+   - Add template files (see examples in this documentation)
+   - Configure fields with `field_prompt_templates: [template_name]`
+
+4. **Benefits of migration:**
+   - More secure (no API keys in frontend)
+   - More flexible (custom prompts per use case)
+   - Multi-provider support (not locked to OpenAI)
+   - Better UX (dynamic forms for template inputs)
+
+### Example Migration
+
+**Before (removed):**
+```yaml
+# Advanced Preferences
+openAiApiKey: sk-abc123...
+
+# Field configuration
+fields:
+  - key: description
+    title: Description
+    type: string
+    # AI button appeared automatically when openAiApiKey was set
+```
+
+**After (current):**
+```bash
+# Environment variable
+export QUIQR_LLM_PROVIDER_0="openai://sk-abc123..."
+```
+
+```yaml
+# Create: field_prompt_templates/improve_text.yaml
+---
+key: improve_text
+title: Improve Text
+llm_settings:
+  model: gpt-4
+fields:
+  - key: style
+    type: select
+    options: [professional, casual, academic]
+  - key: promptTemplate
+    type: readonly
+    default: >
+      Improve the following text using {{ field.style }} style:
+      {{ self.content }}
+```
+
+```yaml
+# Field configuration
+fields:
+  - key: description
+    title: Description
+    type: string
+    field_prompt_templates:
+      - improve_text
+```
+
 
 
 

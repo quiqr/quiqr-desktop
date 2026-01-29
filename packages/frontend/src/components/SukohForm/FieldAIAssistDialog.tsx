@@ -238,7 +238,6 @@ export function FieldAIAssistDialog({
       collectionKey: '',
       collectionItemKey: '',
       prompt_templates: [],
-      enableAiAssist: false, // Disable nested AI Assist
       pageUrl: '',
     }),
     [siteKey, workspaceKey]

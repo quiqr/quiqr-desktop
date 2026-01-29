@@ -350,7 +350,6 @@ export const userPreferencesSchema = z.object({
   interfaceStyle: z.union([z.literal('quiqr10-dark'), z.literal('quiqr10-light')]),
   sitesListingView: z.string().optional(),
   libraryView: z.string().optional(),
-  openAiApiKey: z.string().optional(),
   systemGitBinPath: z.string().optional(),
   customOpenInCommand: z.string().optional(),
   showSplashAtStartup: z.boolean().optional(),

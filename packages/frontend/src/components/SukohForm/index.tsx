@@ -212,7 +212,6 @@ export const SukohForm = ({
       collectionKey: collectionKey || '',
       collectionItemKey: collectionItemKey || singleKey || '',
       prompt_templates,
-      enableAiAssist: true, // TODO: Get from user prefs
       pageUrl: pageUrl || '',
     };
 

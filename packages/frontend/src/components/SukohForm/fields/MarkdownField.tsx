@@ -18,7 +18,6 @@ import {
 } from '@mdxeditor/editor';
 import FormItemWrapper from '../components/shared/FormItemWrapper';
 import Tip from '../../Tip';
-import PageAIAssistButton from '../../PageAIAssistButton';
 import { FieldAIAssistButton } from '../FieldAIAssistButton';
 import { useField } from '../useField';
 import type { MarkdownField as MarkdownFieldConfig } from '@quiqr/types';
@@ -83,21 +82,6 @@ function MarkdownField({ compositeKey }: Props) {
         collectionKey={isCollection ? meta.collectionKey : undefined}
         collectionItemKey={isCollection ? meta.collectionItemKey : undefined}
         singleKey={!isCollection ? meta.collectionItemKey : undefined}
-      />
-    );
-  }
-
-  // Legacy AI assist (direct OpenAI, will be deprecated)
-  if (meta.enableAiAssist) {
-    iconButtons.push(
-      <PageAIAssistButton
-        key="ai-assist"
-        handleSetAiText={(text: string) => {
-          editorRef.current?.setMarkdown(text);
-          setValue(text);
-        }}
-        inField={config}
-        inValue={value ?? ''}
       />
     );
   }

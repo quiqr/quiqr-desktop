@@ -7,13 +7,11 @@ import { UserPreferences } from '../../../types';
 
 function PrefsAdvanced() {
   const [systemGitBinPath, setSystemGitBinPath] = useState('');
-  const [openAiApiKey, setOpenAiApiKey] = useState('');
   const [customOpenInCommand, setCustomOpenInCommand] = useState('');
 
   useEffect(() => {
     service.api.readConfKey('prefs').then((value: UserPreferences) => {
       setSystemGitBinPath(value.systemGitBinPath ?? '');
-      setOpenAiApiKey(value.openAiApiKey ?? '');
       setCustomOpenInCommand(value.customOpenInCommand ?? '');
     });
   }, []);
@@ -21,11 +19,6 @@ function PrefsAdvanced() {
   const handleCustomOpenInCommandChange = (value: string) => {
     setCustomOpenInCommand(value);
     service.api.saveConfPrefKey('customOpenInCommand', value);
-  };
-
-  const handleOpenAiApiKeyChange = (value: string) => {
-    setOpenAiApiKey(value);
-    service.api.saveConfPrefKey('openAiApiKey', value);
   };
 
   const handleSystemGitBinPathChange = (value: string) => {
@@ -46,18 +39,6 @@ function PrefsAdvanced() {
           sx={{ m: 1 }}
           value={customOpenInCommand}
           onChange={(e) => handleCustomOpenInCommandChange(e.target.value)}
-        />
-      </Box>
-
-      <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-        <TextField
-          id="openAiApiKey"
-          label="openAiApikey"
-          helperText="Enter API key to enable AI services. Translate texts, create meta summaries, etc.."
-          variant="outlined"
-          sx={{ m: 1 }}
-          value={openAiApiKey}
-          onChange={(e) => handleOpenAiApiKeyChange(e.target.value)}
         />
       </Box>
 
