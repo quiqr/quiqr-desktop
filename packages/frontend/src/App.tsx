@@ -8,7 +8,8 @@ import DashboardRoute from "./containers/WorkspaceMounted/components/DashboardRo
 import CollectionRoute from "./containers/WorkspaceMounted/components/CollectionRoute";
 import CollectionItemRoute from "./containers/WorkspaceMounted/components/CollectionItemRoute";
 import SingleRoute from "./containers/WorkspaceMounted/components/SingleRoute";
-import Console from "./containers/Console";
+import ApplicationLogs from "./containers/ApplicationLogs";
+import SiteLogs from "./containers/SiteLogs";
 import { PrefsLayout } from "./containers/Prefs";
 import { SiteLibraryLayout, SiteLibraryRouted } from "./containers/SiteLibrary";
 import service from "./services/service";
@@ -132,47 +133,42 @@ const AppContent = ({ theme }: { theme: Theme }) => {
 
   return (
     <Routes>
-      {/* Console - standalone layout */}
-      <Route
-        path="/console"
-        element={
-          <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              <Box
-                key="main-content"
-                sx={{
-                  flex: 'auto',
-                  userSelect: 'none',
-                  overflow: 'auto',
-                  overflowX: 'hidden',
-                }}
-              >
-                <Console />
-              </Box>
-            </ThemeProvider>
-          </StyledEngineProvider>
-        }
-      />
-
       {/* Workspace - nested routes */}
       <Route
-        path="/sites/:site/workspaces/:workspace"
+        path="/sites/:site/workspaces/:workspace/*"
         element={<WorkspaceRoute applicationRole={applicationRole} theme={theme} />}
       >
         {/* Workspace child routes - all inherit site/workspace params */}
         <Route index element={<DashboardRoute />} />
-        <Route path="home/:refresh" element={<DashboardRoute />} />
-        <Route path="collections/:collection" element={<CollectionRoute />} />
-        <Route path="collections/:collection/:item" element={<CollectionItemRoute />} />
-        <Route path="collections/:collection/:item/nest/*" element={<CollectionItemRoute />} />
-        <Route path="collections/:collection/:item/:refresh" element={<CollectionItemRoute />} />
-        <Route path="singles/:single" element={<SingleRoute refreshed={false} />} />
+        <Route path="prefs/*" element={<PrefsLayout />} />
+        <Route path="collections/:collection/*" element={<CollectionRoute refreshed={false} />} />
+        <Route path="collections/:collection/:refresh" element={<CollectionRoute refreshed={true} />} />
+        <Route path="singles/:single/*" element={<SingleRoute refreshed={false} />} />
         <Route path="singles/:single/nest/*" element={<SingleRoute refreshed={false} />} />
         <Route path="singles/:single/:refresh" element={<SingleRoute refreshed={true} />} />
+        <Route path="logs" element={<SiteLogs />} />
         <Route path="sync/*" element={<SyncRoutedWithContext />} />
         <Route path="siteconf/*" element={<SiteConfRoutedWithContext />} />
+        <Route path="*" element={<DashboardRoute />} />
       </Route>
+
+      {/* Application Logs - top-level route with SiteLibrary layout */}
+      <Route
+        path="/logs/application"
+        element={
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <SiteLibraryLayout
+                libraryView={libraryView}
+                onLibraryViewChange={handleLibraryViewChange}
+              >
+                <ApplicationLogs />
+              </SiteLibraryLayout>
+            </ThemeProvider>
+          </StyledEngineProvider>
+        }
+      />
 
       {/* Refresh route - empty */}
       <Route

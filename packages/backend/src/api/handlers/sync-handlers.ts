@@ -39,11 +39,13 @@ export function createPublishSiteHandler(container: AppContainer) {
 export function createPublisherDispatchActionHandler(container: AppContainer) {
   return async ({
     siteKey,
+    workspaceKey,
     publishConf,
     action,
     actionParameters,
   }: {
     siteKey: string;
+    workspaceKey?: string; // Optional - defaults to "main" if not provided
     publishConf: PublConf;
     action: string;
     actionParameters: unknown;
@@ -61,8 +63,8 @@ export function createPublisherDispatchActionHandler(container: AppContainer) {
       container.syncFactory
     );
 
-    // Dispatch the action with parameters
-    return await siteService.publisherDispatchAction(publishConf, action, actionParameters);
+    // Dispatch the action with parameters and workspaceKey (or undefined to use default)
+    return await siteService.publisherDispatchAction(publishConf, action, actionParameters, workspaceKey);
   };
 }
 

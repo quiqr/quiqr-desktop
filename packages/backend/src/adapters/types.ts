@@ -101,11 +101,6 @@ export interface ShellAdapter {
 
 export interface WindowAdapter {
   /**
-   * Show a log window with content (for debugging/error display)
-   */
-  showLogWindow(content: string): void;
-
-  /**
    * Reload the main application window
    */
   reloadMainWindow(): void;

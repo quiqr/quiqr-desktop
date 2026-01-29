@@ -12,10 +12,12 @@ import { AppContainer, createContainer } from '@quiqr/backend';
 import { createServer } from '@quiqr/backend/api';
 import { getCurrentInstanceOrNew } from './ui-managers/main-window-manager.js';
 import { menuManager } from './ui-managers/menu-manager.js';
+import { GLOBAL_CATEGORIES } from '@quiqr/backend/logging';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
+let appContainer: AppContainer | null = null;
 
 /**
  * Find the frontend build directory
@@ -65,6 +67,18 @@ async function startBackend() {
     });
 
     console.log('Container created with dependency injection');
+
+    // Initialize structured logger
+    const prefs = container.config.prefs;
+    const logRetentionDays = prefs.logRetentionDays ?? 30;
+    container.logger.initCleanup(logRetentionDays);
+    
+    // Log application start
+    container.logger.info(GLOBAL_CATEGORIES.ELECTRON_INIT, 'Quiqr Desktop started in Electron mode', {
+      version: app.getVersion(),
+      userDataPath,
+      logRetentionDays
+    });
 
     // Create the Express app from backend
     const expressApp = createServer(container, { port: 5150 });
@@ -134,6 +148,9 @@ app.on('ready', async () => {
 
   // Start backend first
   const { windowAdapter, container } = await startBackend();
+  
+  // Store container for shutdown handler
+  appContainer = container;
 
   // Create the window with container reference
   mainWindow = createWindow(container);
@@ -154,7 +171,12 @@ app.on('ready', async () => {
 /**
  * All windows closed event
  */
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
+  // Flush logger before quitting
+  if (appContainer) {
+    await appContainer.logger.shutdown();
+  }
+  
   // On macOS, keep the app running even when all windows are closed
   if (process.platform !== 'darwin') {
     app.quit();

@@ -10,6 +10,7 @@ import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
 import type { ConfigurationDataProvider } from '../services/configuration/index.js';
 import type { Embgit } from '../embgit/embgit.js';
+import type { AppContainer } from '../config/container.js';
 import { FolderSync } from './folder/folder-sync.js';
 import { GithubSync } from './github/github-sync.js';
 import { SysgitSync } from './sysgit/sysgit-sync.js';
@@ -37,6 +38,8 @@ export interface SyncServiceDependencies {
   windowAdapter: WindowAdapter;
   configurationProvider: ConfigurationDataProvider;
   embgit: Embgit;
+  container: AppContainer;
+  workspaceKey?: string; // Optional - provided when creating publisher instance
   /** Optional callback for streaming progress updates (used by SSE endpoints) */
   progressCallback?: SyncProgressCallback;
 }
@@ -60,6 +63,7 @@ export class SyncFactory {
    *
    * @param publisherConfig - The publisher configuration (folder, github, or sysgit)
    * @param siteKey - The site key
+   * @param workspaceKey - The workspace key
    * @param progressCallback - Optional callback for streaming progress (overrides default)
    * @returns A sync service instance
    * @throws Error if the sync type is not implemented or dependencies not set
@@ -67,15 +71,17 @@ export class SyncFactory {
   getPublisher(
     publisherConfig: PublConf,
     siteKey: string,
+    workspaceKey: string,
     progressCallback?: SyncProgressCallback
   ): SyncService {
     if (!this.dependencies) {
       throw new Error('SyncFactory dependencies not set. Call setDependencies() first.');
     }
 
-    // Create dependencies with optional progress callback override
+    // Create dependencies with optional progress callback override and workspaceKey
     const deps: SyncServiceDependencies = {
       ...this.dependencies,
+      workspaceKey,
       progressCallback: progressCallback ?? this.dependencies.progressCallback,
     };
 

@@ -91,26 +91,6 @@ export function createOpenExternalHandler(container: AppContainer) {
 }
 
 /**
- * Log a message to the console (for debugging)
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function createLogToConsoleHandler(container: AppContainer) {
-  return async ({
-    message,
-    label,
-  }: {
-    message: unknown;
-    label?: string;
-  }) => {
-    if (label) {
-      console.log('\n--- ' + label.toUpperCase() + ' --> ');
-    }
-    console.log(util.inspect(message, false, null, true));
-    return true;
-  };
-}
-
-/**
  * Create all shell-related handlers
  */
 export function createShellHandlers(container: AppContainer) {
@@ -118,6 +98,5 @@ export function createShellHandlers(container: AppContainer) {
     openFileExplorer: createOpenFileExplorerHandler(container),
     openFileInEditor: createOpenFileInEditorHandler(container),
     openExternal: createOpenExternalHandler(container),
-    logToConsole: createLogToConsoleHandler(container),
   };
 }

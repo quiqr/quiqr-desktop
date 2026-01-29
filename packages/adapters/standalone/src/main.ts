@@ -8,6 +8,7 @@
 import { createDevAdapters, createContainer } from '@quiqr/backend';
 import { startServer } from '@quiqr/backend/api';
 import { createWebAdapters } from './adapters/index.js';
+import { GLOBAL_CATEGORIES } from '@quiqr/backend/logging';
 import { homedir } from 'os';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -52,6 +53,8 @@ function findProjectRoot(): string {
 /**
  * Start the standalone backend server
  */
+let appContainer: any = null;
+
 async function startStandaloneBackend() {
   console.log('='.repeat(60));
   console.log('Starting Quiqr Backend in STANDALONE Mode');
@@ -78,6 +81,9 @@ async function startStandaloneBackend() {
 
     console.log('Container created with dependency injection');
 
+    // Store container for shutdown handler
+    appContainer = container;
+
     // Replace with web adapters (includes real menu adapter)
     const webAdapters = createWebAdapters(container, rootPath);
     container.adapters = webAdapters;
@@ -87,11 +93,33 @@ async function startStandaloneBackend() {
     // Get port from environment or use default
     const port = process.env.PORT ? parseInt(process.env.PORT) : 5150;
 
-    // Start the backend server with container
-    startServer(container, { port });
-    console.log(`Backend server started on http://localhost:${port}`);
+    // Initialize structured logger
+    const prefs = container.config.prefs;
+    const logRetentionDays = prefs.logRetentionDays ?? 30;
+    container.logger.initCleanup(logRetentionDays);
+    
+    // Log application start
+    container.logger.info(GLOBAL_CATEGORIES.STANDALONE_INIT, 'Quiqr Backend started in standalone mode', {
+      userDataPath,
+      rootPath,
+      port,
+      logRetentionDays
+    });
 
-    console.log('='.repeat(60));
+    // Start the Express server
+    startServer(container, { port });
+
+    container.logger.info(GLOBAL_CATEGORIES.STANDALONE_INIT, 'Quiqr Backend ready', {
+      api: `http://localhost:${port}`,
+      mode: 'production',
+      note: 'Standalone mode - UI operations will log to console'
+    });
+
+    console.log('🚀 Quiqr Backend ready!');
+    console.log(`   API:  http://localhost:${port}`);
+    console.log('   Mode: production');
+    console.log('');
+    console.log('Note: This is standalone mode. UI operations will log to console.');
     console.log('');
     console.log('🚀 Quiqr Backend ready!');
     console.log(`   API:  http://localhost:${port}`);
@@ -106,13 +134,19 @@ async function startStandaloneBackend() {
 }
 
 // Handle graceful shutdown
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('\n\nShutting down gracefully...');
+  if (appContainer) {
+    await appContainer.logger.shutdown();
+  }
   process.exit(0);
 });
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('\n\nShutting down gracefully...');
+  if (appContainer) {
+    await appContainer.logger.shutdown();
+  }
   process.exit(0);
 });
 

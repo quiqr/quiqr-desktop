@@ -6,6 +6,7 @@
  */
 
 import type { SSGProvider, SSGProviderDependencies, SSGServerConfig, SSGBuildConfig } from './types.js';
+import type { AppContainer } from '../config/container.js';
 import { ProviderRegistry } from './provider-registry.js';
 
 /**
@@ -19,6 +20,13 @@ export class ProviderFactory {
     this.registry = new ProviderRegistry(dependencies);
     // Register built-in providers (Hugo, etc.) - async to handle dynamic imports
     this.initPromise = this.registry.registerBuiltInProviders();
+  }
+
+  /**
+   * Set container reference after construction (to break circular dependency)
+   */
+  setContainer(container: AppContainer): void {
+    this.registry.setContainer(container);
   }
 
   /**

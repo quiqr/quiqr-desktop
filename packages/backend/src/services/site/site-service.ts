@@ -125,9 +125,12 @@ export class SiteService {
   async publisherDispatchAction(
     publishConfig: PublConf,
     action: string,
-    actionParameters?: unknown
+    actionParameters?: unknown,
+    workspaceKey?: string
   ): Promise<unknown> {
-    const publisher = this.syncFactory.getPublisher(publishConfig, this.config.key);
+    // Use provided workspaceKey or fall back to "main"
+    const wsKey = workspaceKey || "main";
+    const publisher = this.syncFactory.getPublisher(publishConfig, this.config.key, wsKey);
     return await publisher.actionDispatcher(action, actionParameters);
   }
 }

@@ -6,6 +6,7 @@
  */
 
 import type { SSGProvider, ProviderMetadata, SSGProviderDependencies } from './types.js';
+import type { AppContainer } from '../config/container.js';
 
 /**
  * Provider constructor type
@@ -32,6 +33,13 @@ export class ProviderRegistry {
 
   constructor(dependencies: SSGProviderDependencies) {
     this.dependencies = dependencies;
+  }
+
+  /**
+   * Set container reference after construction (to break circular dependency)
+   */
+  setContainer(container: AppContainer): void {
+    this.dependencies.container = container;
   }
 
   /**
