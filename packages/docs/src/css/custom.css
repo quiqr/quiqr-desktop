@@ -1,0 +1,348 @@
+/**
+ * Quiqr Desktop Documentation Custom Styles
+ * Based on the branding from https://book.quiqr.org/
+ */
+
+/* Import Roboto font (matching Quiqr Book) */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300&family=Roboto+Mono:wght@400&display=swap');
+
+/* Quiqr color scheme - Light mode */
+:root {
+  /* Primary blue from Quiqr Book */
+  --ifm-color-primary: #0055bb;
+  --ifm-color-primary-dark: #004da8;
+  --ifm-color-primary-darker: #00489e;
+  --ifm-color-primary-darkest: #003b82;
+  --ifm-color-primary-light: #005dce;
+  --ifm-color-primary-lighter: #0062d8;
+  --ifm-color-primary-lightest: #1a70db;
+  
+  /* Quiqr grays */
+  --ifm-color-gray-100: #f8f9fa;
+  --ifm-color-gray-200: #e9ecef;
+  --ifm-color-gray-500: #adb5bd;
+  
+  /* Font family matching Quiqr Book */
+  --ifm-font-family-base: 'Roboto', sans-serif;
+  --ifm-font-family-monospace: 'Roboto Mono', monospace;
+  
+  /* Link colors */
+  --ifm-link-color: #0055bb;
+  --ifm-link-hover-color: #003b82;
+  
+  /* Code styling */
+  --ifm-code-font-size: 90%;
+  --ifm-code-background: var(--ifm-color-gray-200);
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  
+  /* Navbar */
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  
+  /* Sidebar */
+  --ifm-menu-color-background-active: rgba(0, 85, 187, 0.1);
+}
+
+/* Dark mode - lighter colors for readability */
+[data-theme='dark'] {
+  --ifm-color-primary: #84b2ff;
+  --ifm-color-primary-dark: #6ba3ff;
+  --ifm-color-primary-darker: #5c9aff;
+  --ifm-color-primary-darkest: #2981ff;
+  --ifm-color-primary-light: #9dc1ff;
+  --ifm-color-primary-lighter: #accaff;
+  --ifm-color-primary-lightest: #d4e3ff;
+  
+  /* Dark mode grays */
+  --ifm-color-gray-100: rgba(255, 255, 255, 0.1);
+  --ifm-color-gray-200: rgba(255, 255, 255, 0.2);
+  --ifm-color-gray-500: rgba(255, 255, 255, 0.5);
+  
+  /* Dark mode backgrounds */
+  --ifm-background-color: #1a1a1a;
+  --ifm-navbar-background-color: #1f1f1f;
+  
+  /* Code in dark mode */
+  --ifm-code-background: rgba(255, 255, 255, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Sidebar dark mode */
+  --ifm-menu-color-background-active: rgba(132, 178, 255, 0.15);
+}
+
+/* Logo styling to match Quiqr Book */
+.navbar__logo {
+  height: 2.5rem;
+  margin-right: 0.5rem;
+}
+
+.navbar__title {
+  font-weight: 400;
+  font-size: 1.2rem;
+}
+
+/* Table styling matching Quiqr Book */
+.markdown table {
+  font-size: 90%;
+  border-collapse: collapse;
+}
+
+.markdown table th {
+  background: var(--ifm-color-gray-500);
+  font-weight: 700;
+}
+
+.markdown table tr th,
+.markdown table tr td {
+  border: 1px solid var(--ifm-color-gray-500);
+  padding: 0.5rem 1rem;
+}
+
+.markdown table tr:nth-child(2n) {
+  background: var(--ifm-color-gray-100);
+}
+
+/* Code blocks */
+.markdown code {
+  background: var(--ifm-code-background);
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.3rem;
+}
+
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Blockquotes */
+.markdown blockquote {
+  border-left: 0.25rem solid var(--ifm-color-primary);
+  border-radius: 0.25rem;
+  background: var(--ifm-color-gray-100);
+}
+
+[data-theme='dark'] .markdown blockquote {
+  background: var(--ifm-color-gray-100);
+}
+
+/* Sidebar improvements */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--ifm-toc-border-color);
+}
+
+.menu__link--active {
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+  background: var(--ifm-menu-color-background-active);
+}
+
+.menu__link:hover {
+  background: var(--ifm-menu-color-background-hover);
+  color: var(--ifm-color-primary);
+}
+
+/* Admonitions styling */
+.alert--info {
+  --ifm-alert-background-color: rgba(102, 187, 255, 0.1);
+  --ifm-alert-border-color: #6bf;
+}
+
+.alert--warning {
+  --ifm-alert-background-color: rgba(255, 221, 102, 0.1);
+  --ifm-alert-border-color: #fd6;
+}
+
+.alert--danger {
+  --ifm-alert-background-color: rgba(255, 102, 102, 0.1);
+  --ifm-alert-border-color: #f66;
+}
+
+/* Footer */
+.footer {
+  --ifm-footer-background-color: #2d3748;
+  --ifm-footer-color: #e9ecef;
+  --ifm-footer-link-color: #84b2ff;
+  --ifm-footer-link-hover-color: #b3d1ff;
+}
+
+[data-theme='dark'] .footer {
+  --ifm-footer-background-color: #1a1a1a;
+}
+
+/* Search bar styling */
+.DocSearch-Button {
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 0.5rem;
+}
+
+.DocSearch-Button:hover {
+  background: var(--ifm-color-gray-100);
+  box-shadow: none;
+}
+
+/* Local search bar styling (docusaurus-lunr-search) */
+.navbar__search {
+  padding-left: 1rem;
+}
+
+.navbar__search-input {
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  transition: border-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
+  width: 200px;
+}
+
+.navbar__search-input:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 85, 187, 0.1);
+}
+
+.navbar__search-input::placeholder {
+  color: var(--ifm-color-gray-500);
+}
+
+[data-theme='dark'] .navbar__search-input {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .navbar__search-input:focus {
+  box-shadow: 0 0 0 2px rgba(132, 178, 255, 0.2);
+}
+
+/* Search results dropdown */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--ifm-background-color);
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.search-result-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+  cursor: pointer;
+  transition: background-color 200ms ease-in-out;
+}
+
+.search-result-item:hover,
+.search-result-item:focus {
+  background: var(--ifm-color-gray-100);
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-title {
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.search-result-content {
+  font-size: 0.875rem;
+  color: var(--ifm-font-color-base);
+  opacity: 0.8;
+}
+
+.search-no-results {
+  padding: 1rem;
+  text-align: center;
+  color: var(--ifm-color-gray-500);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 200ms ease-in-out, 
+              border-color 200ms ease-in-out,
+              color 200ms ease-in-out;
+}
+
+/* Typography improvements matching Quiqr Book */
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.markdown h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.markdown h2 {
+  font-size: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.markdown h3 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  font-weight: 700;
+}
+
+/* Link styling */
+.markdown a {
+  text-decoration: none;
+  color: var(--ifm-link-color);
+}
+
+.markdown a:hover {
+  text-decoration: underline;
+  color: var(--ifm-link-hover-color);
+}
+
+/* Improve readability */
+.markdown {
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.markdown p {
+  margin-bottom: 1rem;
+}
+
+/* Button styling */
+.button--primary {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.button--primary:hover {
+  background-color: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+}
+
+/* TOC (table of contents) */
+.table-of-contents__link {
+  color: inherit;
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+}

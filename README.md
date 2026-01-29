@@ -6,8 +6,9 @@
 
 <p align="center">
   <a href="https://quiqr.org">Website</a> ·
+  <a href="https://quiqr.github.io/quiqr-desktop/docs">Documentation</a> ·
   <a href="https://discord.gg/nJ2JH7jvmV">Discord</a> ·
-  <a href="https://quiqr.github.io/quiqr-desktop/">OpenSpec UI</a>
+  <a href="https://quiqr.github.io/quiqr-desktop/specs">OpenSpec UI</a>
 </p>
 
 <p align="center">
@@ -36,6 +37,15 @@ keeping your data local for privacy and developer-friendly workflows.
 - **Schema-Driven Forms**: Powerful, customizable content editing interface
 - **Dual Deployment**: Run as desktop app or standalone web server
 - **Modern Stack**: React frontend with Node.js backend for reliability and performance
+
+## Documentation
+
+Full documentation is available at [https://quiqr.github.io/quiqr-desktop/docs](https://quiqr.github.io/quiqr-desktop/docs) including:
+
+- [Getting Started Guide](https://quiqr.github.io/quiqr-desktop/docs/getting-started/installation)
+- [Developer Guide](https://quiqr.github.io/quiqr-desktop/docs/developer-guide)
+- [Field Reference](https://quiqr.github.io/quiqr-desktop/docs/field-reference)
+- [Contributing Guide](https://quiqr.github.io/quiqr-desktop/docs/contributing)
 
 ## NG (Next Generation)
 

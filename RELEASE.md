@@ -77,6 +77,16 @@ After pushing the tag, the GitHub Actions workflow will automatically:
 - Build installers for all platforms
 - Create a GitHub release
 - Attach installers to the release
+- Deploy documentation to GitHub Pages at `https://quiqr.github.io/quiqr-desktop/docs/`
+- Deploy OpenSpec UI to GitHub Pages at `https://quiqr.github.io/quiqr-desktop/specs/`
+
+### Documentation Updates
+
+For major releases (v0.X.0):
+- Ensure all documentation is up to date in `/packages/docs/`
+- Add release notes to `/packages/docs/docs/release-notes/`
+- Verify documentation builds successfully: `npm run build -w @quiqr/docs`
+- Documentation is automatically deployed to GitHub Pages when changes are merged to main
 
 ## Best Practices
 

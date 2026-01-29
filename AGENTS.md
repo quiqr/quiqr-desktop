@@ -442,3 +442,67 @@ Projects use NPM workspaces with `/packages/frontend` as a workspace. Install de
 - Frontend components use Material-UI (MUI) v7 with Emotion styling
 - Backend remains JavaScript (Node.js)
 - Do not use React.FC, just create a const and type the props. Do not use props.somevar, but destructure them in the args of the functional component.
+
+## Documentation
+
+:::note
+Full documentation requirements are defined in `openspec/specs/documentation/spec.md`. This section provides quick reference for AI assistants.
+:::
+
+Quiqr uses Docusaurus for documentation. All documentation is in `/packages/docs/`.
+
+### When to Document
+
+Document when:
+- Adding new features (user-facing documentation in getting-started/ or user-guide/)
+- API changes (developer guide updates)
+- New field types (field reference entries)
+- Breaking changes (release notes)
+
+### Quick Commands
+
+```bash
+# Development server with hot reload
+npm run start -w @quiqr/docs
+
+# Production build (validates links)
+npm run build -w @quiqr/docs
+
+# Serve production build locally
+npm run serve -w @quiqr/docs
+```
+
+### Documentation Structure
+
+```
+packages/docs/docs/
+├── intro.md              # Landing page
+├── getting-started/      # Installation, quick start, import
+├── user-guide/           # Using Quiqr
+├── developer-guide/      # Architecture, APIs, field system
+├── field-reference/      # Field types reference
+├── contributing/         # Contribution guidelines
+└── release-notes/        # Version history
+```
+
+### Frontmatter Template
+
+```markdown
+---
+sidebar_position: 1
+---
+
+# Page Title
+
+Content here...
+```
+
+### Deployment
+
+- Documentation deploys automatically to `https://quiqr.github.io/quiqr-desktop/docs/` on merge to main
+- PR checks build documentation (non-blocking) to catch errors early
+- OpenSpec UI deploys to `/specs/`, docs to `/docs/`, coverage badge at `/badges/`
+
+### More Information
+
+See `openspec/specs/documentation/spec.md` for complete documentation requirements and standards.
