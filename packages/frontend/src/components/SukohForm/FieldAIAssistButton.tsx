@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import AiIcon from '@mui/icons-material/Memory';
+import AiIcon from '@mui/icons-material/AutoAwesome';
 import { FieldAIAssistDialog } from './FieldAIAssistDialog';
 
 interface FieldAIAssistButtonProps {
@@ -48,8 +48,8 @@ export function FieldAIAssistButton({
 
   return (
     <>
-      <Tooltip title="AI Assist">
-        <IconButton aria-label="AI Assist" onClick={handleOpen} size="small">
+      <Tooltip title="Field Assist">
+        <IconButton aria-label="Page Assist" onClick={handleOpen} size="small">
           <AiIcon />
         </IconButton>
       </Tooltip>
