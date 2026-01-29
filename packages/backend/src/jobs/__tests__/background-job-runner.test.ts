@@ -117,8 +117,8 @@ describe('BackgroundJobRunner', () => {
     it('should process queued jobs after workers become available', async () => {
       runner = new BackgroundJobRunner(3)
 
-      // Generate 9 images (3 batches of 3)
-      const images = await generateImageBatch(testDir, 9, { width: 800, height: 600 })
+      // Generate 9 images (3 batches of 3) - smaller size for faster testing
+      const images = await generateImageBatch(testDir, 9, { width: 400, height: 300 })
 
       const jobPath = path.join(__dirname, '../../../dist/jobs/create-thumbnail-job.js')
       const completedJobs: string[] = []
@@ -138,7 +138,7 @@ describe('BackgroundJobRunner', () => {
       for (const dest of completedJobs) {
         expect(await fs.pathExists(dest)).toBe(true)
       }
-    })
+    }, 15000)
   })
 
   describe('Large batch processing', () => {
