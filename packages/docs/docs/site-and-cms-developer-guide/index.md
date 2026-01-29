@@ -30,6 +30,10 @@ Deep dive into creating and customizing content models that define how your cont
 
 Complete reference for all 18+ field types available in Quiqr, including data fields, container fields, and special fields.
 
+### [Prompt Templates](./prompt-templates.md)
+
+Learn how to create AI-powered content assistance using prompt templates. Configure page-level and field-level AI operations with customizable prompts and variables.
+
 ## Who This Guide Is For
 
 This guide is designed for:

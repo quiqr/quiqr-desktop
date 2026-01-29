@@ -1,12 +1,27 @@
+---
+sidebar_position: 5
+---
+
 # Prompt Templates
 
-A Prompt Template is a text field containing the prompt text in which special variables can be replaced with actual values. The variables can point to the page file itself, to parent page context, or to values from the Prompt Template form which are gathered or populated by the user.
+Prompt templates enable AI-powered content assistance in Quiqr Desktop. They are text prompts with special variables that get replaced with actual values from your content, allowing you to create customized AI workflows for both entire pages and individual fields.
 
-Variables are enclosed with `{{ }}`.
+## Overview
+
+A prompt template consists of:
+- **Prompt text** with variables enclosed in `{{ }}`
+- **Form fields** for user input (optional)
+- **LLM settings** (model, temperature)
+
+Variables can reference:
+- The current page or field (`self`)
+- Parent page context (`parent_page`, field templates only)
+- User form inputs (`field`)
+- Utility functions (`func`)
 
 ## Directory Structure
 
-Quiqr uses two separate directories for prompt templates, each serving a different purpose:
+Quiqr uses two separate directories for prompt templates:
 
 ### Page Prompt Templates
 
@@ -22,7 +37,7 @@ Page prompt templates are used for **whole-page AI operations**. They appear in 
 
 **File naming:** Both `.yaml` and `.yml` extensions are supported. If both exist for the same template key, `.yaml` takes precedence.
 
-**Legacy note:** The old `prompts_templates/` directory is still supported for backward compatibility but will be deprecated in a future version.
+**Legacy note:** The old `prompts_templates/` directory is still supported for backward compatibility but is deprecated.
 
 ### Field Prompt Templates
 
@@ -37,7 +52,7 @@ Field prompt templates are used for **individual field AI operations**. They app
 - Generate suggestions for a specific field
 - Summarize long content
 
-**File naming:** Both `.yaml` and `.yml` extensions are supported. If both exist for the same template key, `.yaml` takes precedence.
+**File naming:** Both `.yaml` and `.yml` extensions are supported.
 
 **Configuration:** To enable field AI assist on a field, add `field_prompt_templates` to the field definition:
 
@@ -54,29 +69,25 @@ fields:
 
 **Supported field types:** Currently only `string` and `markdown` fields support field AI assist.
 
-## Objects with variables
+## Template Variables
 
-Variables are children of parent objects. The following objects are implemented:
+Variables are organized into parent objects. All variables use the `{{ variable }}` syntax.
 
-- `self`: refers to current context (page or field depending on template type)
-- `parent_page`: refers to the parent page (only available in field templates)
-- `field`: refers to the object with fields defined in the prompt_template
-- `func`: refers to the object with functions which can be used to modify variable outputs
-
-
-## The Self Object and its Variables
+### The Self Object
 
 The `self` object refers to the current context - either the whole page (in page templates) or the specific field (in field templates).
 
-### In Page Prompt Templates
+#### In Page Prompt Templates
 
 When used in page prompt templates (`page_prompt_templates/`), `self` refers to the entire page file:
 
-- `self.content`: The complete contents of the current page file (including frontmatter and body)
-- `self.file_path`: The file path of the current file relative to the site root
-- `self.file_name`: The file name component of the current file
-- `self.file_base_name`: The file base name of the current file (without extension)
-- `self.fields.[key].content`: Access to any frontmatter field by key (new)
+| Variable | Description |
+|----------|-------------|
+| `self.content` | The complete contents of the current page file (including frontmatter and body) |
+| `self.file_path` | The file path of the current file relative to the site root |
+| `self.file_name` | The file name component of the current file |
+| `self.file_base_name` | The file base name of the current file (without extension) |
+| `self.fields.[key].content` | Access to any frontmatter field by key |
 
 **Example:**
 
@@ -89,13 +100,15 @@ promptTemplate: >
   {{ self.content }}
 ```
 
-### In Field Prompt Templates
+#### In Field Prompt Templates
 
 When used in field prompt templates (`field_prompt_templates/`), `self` refers to the current field being edited:
 
-- `self.content`: The current value of the field being edited
-- `self.key`: The key/name of the field (e.g., "description", "title")
-- `self.type`: The field type (e.g., "string", "markdown")
+| Variable | Description |
+|----------|-------------|
+| `self.content` | The current value of the field being edited |
+| `self.key` | The key/name of the field (e.g., "description", "title") |
+| `self.type` | The field type (e.g., "string", "markdown") |
 
 **Example:**
 
@@ -106,16 +119,19 @@ promptTemplate: >
   {{ self.content }}
 ```
 
-## The Parent Page Object and its Variables
+### The Parent Page Object
 
 The `parent_page` object is **only available in field prompt templates** and provides context about the page containing the field being edited.
 
 **Available variables:**
 
-- `parent_page.fields.[key].content`: Access any frontmatter field from the parent page by key
-- `parent_page.file_path`: The file path of the parent page relative to the site root
-- `parent_page.file_name`: The file name of the parent page
-- `parent_page.file_base_name`: The file base name of the parent page (without extension)
+| Variable | Description |
+|----------|-------------|
+| `parent_page.content` | Full page content including frontmatter |
+| `parent_page.file_path` | The file path relative to the site root |
+| `parent_page.file_name` | The file name of the parent page |
+| `parent_page.file_base_name` | The file base name (without extension) |
+| `parent_page.fields.[key].content` | Access any frontmatter field from the parent page by key |
 
 **Example use case:** When editing a blog post's description field, you can access the post's title to provide context:
 
@@ -138,7 +154,7 @@ promptTemplate: >
 {{ parent_page.fields.tags.0.content }}
 ```
 
-## The Field Object and its Variables
+### The Field Object
 
 The `field` object provides access to values from the template's dynamic form fields. When a user opens an AI assist dialog, they fill out a form, and those values become available via the `field` object.
 
@@ -192,12 +208,14 @@ fields:
 {% if field.preserve_formatting %}Preserve the original formatting.{% endif %}
 ```
 
-## The Func Object and its functions
+### The Func Object
 
-The func object has the following functions which gets its argument using the Unix pipe method.
+The `func` object provides utility functions that can process variable values using Unix pipe syntax.
 
-- `func.readfile`: receives a file_path relative to the site root as string value. It opens the file and returns the contents of this file. If the file can not be read it returns the value `Could not read: path/to/file.md`
-- `func.toUpper`: receives a string and returns the string in upper case.
+| Function | Description |
+|----------|-------------|
+| `func.readFile` | Receives a file path relative to the site root, opens the file, and returns its contents. Returns error message if file cannot be read. |
+| `func.toUpper` | Receives a string and returns it in uppercase. |
 
 **Example:**
 
@@ -443,7 +461,28 @@ To avoid errors:
 - Ensure at least one template file exists
 - Restart Quiqr Desktop after model changes
 
-## Migration from Legacy `prompts_templates/`
+## LLM Configuration
+
+Before using prompt templates, you need to configure at least one LLM provider via environment variables.
+
+**Quick setup:**
+
+```bash
+# OpenAI
+export QUIQR_LLM_PROVIDER_0="openai://sk-your-api-key"
+
+# AWS Bedrock (supports Claude, Llama, Titan, Cohere, Mistral)
+export QUIQR_LLM_PROVIDER_1="bedrock://your-api-key?region=us-east-1"
+
+# Direct Anthropic
+export QUIQR_LLM_PROVIDER_2="anthropic://sk-ant-your-key"
+```
+
+For detailed LLM configuration including all supported providers (Google Gemini, Azure OpenAI, Mistral AI, Cohere), see the [LLM Provider Configuration](../configuration/llm-providers.md) guide.
+
+## Migration Notes
+
+### From Legacy `prompts_templates/` Directory
 
 If you have templates in the old `prompts_templates/` directory:
 
@@ -453,17 +492,13 @@ If you have templates in the old `prompts_templates/` directory:
 4. Test templates still work
 5. Delete old `prompts_templates/` directory when ready
 
-The old directory still works but will be removed in a future version.
+The old directory still works but is deprecated and will be removed in a future version.
 
-## Migration from Legacy Direct OpenAI Field AI Assist
+### From Legacy Direct OpenAI Field AI Assist
 
-**BREAKING CHANGE (Current Version):** The legacy field AI assist functionality that used direct OpenAI API calls from the frontend has been removed.
+**BREAKING CHANGE:** The legacy field AI assist functionality that used direct OpenAI API calls from the frontend has been removed.
 
-### What Changed
-
-Previous versions allowed configuring `openAiApiKey` in Advanced Preferences, which enabled a hardcoded AI assist button on fields. This feature has been replaced with the more flexible and secure template-based system.
-
-**Removed:**
+**What was removed:**
 - `openAiApiKey` configuration field in Advanced Preferences
 - Direct OpenAI API calls from frontend
 - `meta.enableAiAssist` flag
@@ -475,79 +510,107 @@ Previous versions allowed configuring `openAiApiKey` in Advanced Preferences, wh
 - Configurable prompts via `field_prompt_templates/`
 - Per-field control via `field_prompt_templates` array
 
-### How to Migrate
+**How to migrate:**
 
 If you previously used `openAiApiKey` configuration:
 
-1. **Remove old configuration:**
-   - The `openAiApiKey` field no longer appears in Advanced Preferences
-   - Your old API key is ignored
+1. **Configure LLM provider:**
+   ```bash
+   export QUIQR_LLM_PROVIDER_0="openai://your-api-key"
+   ```
 
-2. **Configure LLM provider:**
-   - Set environment variable: `QUIQR_LLM_PROVIDER_0="openai://your-api-key"`
-   - See AGENTS.md "LLM Provider Configuration" section for details
-   - Supports multiple providers (OpenAI, Anthropic, AWS Bedrock, Google Gemini, etc.)
-
-3. **Create field prompt templates:**
+2. **Create field prompt templates:**
    - Create directory: `quiqr/model/includes/field_prompt_templates/`
-   - Add template files (see examples in this documentation)
+   - Add template files (see examples above)
    - Configure fields with `field_prompt_templates: [template_name]`
 
-4. **Benefits of migration:**
+3. **Benefits:**
    - More secure (no API keys in frontend)
    - More flexible (custom prompts per use case)
    - Multi-provider support (not locked to OpenAI)
    - Better UX (dynamic forms for template inputs)
 
-### Example Migration
+## Example Template Files
 
-**Before (removed):**
-```yaml
-# Advanced Preferences
-openAiApiKey: sk-abc123...
-
-# Field configuration
-fields:
-  - key: description
-    title: Description
-    type: string
-    # AI button appeared automatically when openAiApiKey was set
-```
-
-**After (current):**
-```bash
-# Environment variable
-export QUIQR_LLM_PROVIDER_0="openai://sk-abc123..."
-```
+### improve_text.yaml
 
 ```yaml
-# Create: field_prompt_templates/improve_text.yaml
 ---
 key: improve_text
 title: Improve Text
+description: Enhances text quality with clarity and readability improvements
 llm_settings:
   model: gpt-4
+  temperature: 0.7
 fields:
   - key: style
+    title: Writing Style
     type: select
-    options: [professional, casual, academic]
+    options:
+      - professional
+      - casual
+      - academic
   - key: promptTemplate
+    title: Prompt Template
     type: readonly
     default: >
-      Improve the following text using {{ field.style }} style:
+      Improve the following text using {{ field.style }} style.
+      Enhance clarity and readability while preserving the core message:
+      
       {{ self.content }}
 ```
 
+### fix_grammar.yaml
+
 ```yaml
-# Field configuration
+---
+key: fix_grammar
+title: Fix Grammar
+description: Corrects grammar and spelling errors
+llm_settings:
+  model: gpt-4
+  temperature: 0.3
 fields:
-  - key: description
-    title: Description
-    type: string
-    field_prompt_templates:
-      - improve_text
+  - key: promptTemplate
+    title: Prompt Template
+    type: readonly
+    default: >
+      Fix any grammar and spelling errors in the following text.
+      Preserve the original style and meaning:
+      
+      {{ self.content }}
 ```
 
+### summarize.yaml
 
+```yaml
+---
+key: summarize
+title: Summarize
+description: Creates concise summaries of longer text
+llm_settings:
+  model: gpt-4
+  temperature: 0.5
+fields:
+  - key: length
+    title: Summary Length
+    type: select
+    options:
+      - very brief (1 sentence)
+      - brief (2-3 sentences)
+      - medium (1 paragraph)
+  - key: promptTemplate
+    title: Prompt Template
+    type: readonly
+    default: >
+      Create a {{ field.length }} summary of the following text.
+      Capture the main points and key information:
+      
+      {{ self.content }}
+```
 
+## Next Steps
 
+- [Field Reference](./field-reference/index.md) - Learn about string and markdown fields that support AI assist
+- [Content Model](./content-model/index.md) - Understand how to structure your content
+- [LLM Provider Configuration](../configuration/llm-providers.md) - Set up AI providers

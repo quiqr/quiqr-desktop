@@ -33,11 +33,21 @@ Set global variables that can be used as overrides in build actions. Useful for:
 - Environment-specific configuration values
 - Template variables for build scripts
 
+### [LLM Provider Configuration](./llm-providers.md)
+
+Configure AI-powered content assistance with support for multiple LLM providers:
+- OpenAI (GPT-4, GPT-3.5, o1)
+- AWS Bedrock (Claude, Llama, Titan, Cohere, Mistral)
+- Anthropic Direct (Claude)
+- Google Gemini
+- Azure OpenAI
+- Mistral AI
+- Cohere
+
 ### [Advanced Settings](./advanced-settings.md)
 
 Configure power-user features:
 - **Custom Open-In Command:** Custom shell commands to open site directories
-- **OpenAI API Key:** Enable AI-powered text assistance in content fields
 
 ## Accessing Configuration
 
@@ -50,5 +60,6 @@ When manually editing the configuration file, ensure Quiqr Desktop is closed to 
 ## Next Steps
 
 - Learn about [General Preferences](./preferences.md)
+- Configure [LLM Providers](./llm-providers.md) for AI features
 - Configure [Global Variables](./variables.md)
 - Explore [Advanced Settings](./advanced-settings.md)
