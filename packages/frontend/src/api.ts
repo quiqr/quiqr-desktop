@@ -388,7 +388,7 @@ export function openFileDialogForSingleAndCollectionItem(
         resolve();
       } catch (error) {
         console.error('Error uploading files:', error);
-        this.logToConsole(error, 'File upload error');
+        logToConsole(error, 'File upload error');
         reject(error);
       } finally {
         // Cleanup
@@ -424,6 +424,10 @@ export function openCustomCommand(command: string){
 
 export function openExternal(url: string) {
   return request('openExternal', { url });
+}
+
+export function logToConsole(message: unknown, label?: string) {
+  return request('logToConsole', { message, label }, { timeout: 1000 });
 }
 
 export function getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){

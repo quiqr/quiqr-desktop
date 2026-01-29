@@ -20,6 +20,7 @@ import type {
   ShellAdapter,
 } from '../../src/adapters/types.js';
 import type { AppConfig } from '../../src/config/app-config.js';
+import type { AppContainer } from '../../src/config/container.js';
 import path from 'path';
 
 /**
@@ -139,6 +140,32 @@ export function createMockAppConfig(): AppConfig {
 }
 
 /**
+ * Create a mock AppContainer for testing
+ */
+export function createMockContainer(): AppContainer {
+  return {
+    logger: {
+      infoSite: vi.fn(),
+      errorSite: vi.fn(),
+      warnSite: vi.fn(),
+      debugSite: vi.fn(),
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+    },
+    state: {
+      getCurrentSiteKey: vi.fn(() => 'test-site'),
+      getCurrentWorkspaceKey: vi.fn(() => 'main'),
+      getCurrentSitePath: vi.fn(() => '/test/site'),
+      setCurrentSite: vi.fn(),
+      clearCurrentSite: vi.fn(),
+    },
+    config: {} as any,
+  } as any;
+}
+
+/**
  * Create a complete set of SSG provider dependencies
  */
 export function createMockSSGProviderDependencies(
@@ -151,7 +178,6 @@ export function createMockSSGProviderDependencies(
       appendLine: vi.fn(),
     } as OutputConsole,
     windowAdapter: {
-      showLogWindow: vi.fn(),
       reloadMainWindow: vi.fn(),
       sendToRenderer: vi.fn(),
       openSiteLibrary: vi.fn().mockResolvedValue(undefined),
@@ -164,6 +190,7 @@ export function createMockSSGProviderDependencies(
       openPath: vi.fn().mockResolvedValue(''),
     } as ShellAdapter,
     appConfig: createMockAppConfig(),
+    container: createMockContainer(),
     ...overrides,
   };
 }
@@ -277,7 +304,6 @@ export function resetSSGDependencyMocks(deps: SSGProviderDependencies): void {
   vi.mocked(deps.outputConsole.appendLine).mockReset();
 
   // Reset WindowAdapter
-  vi.mocked(deps.windowAdapter.showLogWindow).mockReset();
   vi.mocked(deps.windowAdapter.sendToRenderer).mockReset();
 
   // Reset ShellAdapter
