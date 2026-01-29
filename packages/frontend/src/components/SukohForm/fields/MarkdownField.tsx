@@ -18,7 +18,7 @@ import {
 } from '@mdxeditor/editor';
 import FormItemWrapper from '../components/shared/FormItemWrapper';
 import Tip from '../../Tip';
-import AiAssist from '../../AiAssist';
+import { FieldAIAssistButton } from '../FieldAIAssistButton';
 import { useField } from '../useField';
 import type { MarkdownField as MarkdownFieldConfig } from '@quiqr/types';
 
@@ -55,16 +55,33 @@ function MarkdownField({ compositeKey }: Props) {
     iconButtons.push(<Tip key="tip" markdown={config.tip} />);
   }
 
-  if (meta.enableAiAssist) {
+  // New field-level AI assist (template-based)
+  if (config.field_prompt_templates && config.field_prompt_templates.length > 0) {
+    // Determine if we're in a single or collection context
+    const isCollection = meta.collectionKey && meta.collectionItemKey;
+    
     iconButtons.push(
-      <AiAssist
-        key="ai-assist"
-        handleSetAiText={(text: string) => {
+      <FieldAIAssistButton
+        key="field-ai-assist"
+        fieldKey={config.key}
+        fieldType="markdown"
+        fieldContent={value ?? ''}
+        availableTemplates={config.field_prompt_templates}
+        onReplace={(text: string) => {
           editorRef.current?.setMarkdown(text);
-          setValue(text);
+          setValue(text, 0);
         }}
-        inField={config}
-        inValue={value ?? ''}
+        onAppend={(text: string) => {
+          const currentValue = value ?? '';
+          const newValue = currentValue ? `${currentValue}\n\n${text}` : text;
+          editorRef.current?.setMarkdown(newValue);
+          setValue(newValue, 0);
+        }}
+        siteKey={meta.siteKey}
+        workspaceKey={meta.workspaceKey}
+        collectionKey={isCollection ? meta.collectionKey : undefined}
+        collectionItemKey={isCollection ? meta.collectionItemKey : undefined}
+        singleKey={!isCollection ? meta.collectionItemKey : undefined}
       />
     );
   }

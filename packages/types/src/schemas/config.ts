@@ -350,11 +350,11 @@ export const userPreferencesSchema = z.object({
   interfaceStyle: z.union([z.literal('quiqr10-dark'), z.literal('quiqr10-light')]),
   sitesListingView: z.string().optional(),
   libraryView: z.string().optional(),
-  openAiApiKey: z.string().optional(),
   systemGitBinPath: z.string().optional(),
   customOpenInCommand: z.string().optional(),
   showSplashAtStartup: z.boolean().optional(),
-  applicationRole: z.string().optional()
+  applicationRole: z.string().optional(),
+  logRetentionDays: z.number().min(0).max(365).optional().default(30)
 }).passthrough() // TODO fix nested types
 
 // Schema for the full application config object (global.pogoconf in backend)

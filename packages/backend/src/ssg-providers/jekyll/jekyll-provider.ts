@@ -60,6 +60,12 @@ export class JekyllProvider implements SSGProvider {
   }
 
   createDevServer(config: SSGServerConfig): SSGDevServer {
+    // Container may not be set yet during initialization
+    const container = this.dependencies.container;
+    if (!container) {
+      throw new Error('Container not initialized in JekyllProvider');
+    }
+
     return new JekyllServer(
       {
         workspacePath: config.workspacePath,
@@ -70,7 +76,10 @@ export class JekyllProvider implements SSGProvider {
       this.dependencies.pathHelper,
       this.dependencies.appConfig,
       this.dependencies.windowAdapter,
-      this.dependencies.outputConsole
+      this.dependencies.outputConsole,
+      container,
+      config.siteKey,
+      config.workspaceKey
     );
   }
 

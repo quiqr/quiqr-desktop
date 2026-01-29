@@ -9,9 +9,41 @@
 
 import fs from 'fs-extra';
 import path from 'path';
+import matter from 'gray-matter';
 
 /**
- * Self object - metadata and content of the current file
+ * Self object - metadata and content of the current file (for page context)
+ */
+export interface PageSelfObject {
+  content: string;
+  file_path: string;
+  file_name: string;
+  file_base_name: string;
+  fields: Record<string, { content: unknown }>;
+}
+
+/**
+ * Self object for field context - represents the current field
+ */
+export interface FieldSelfObject {
+  content: string;
+  key: string;
+  type: string;
+}
+
+/**
+ * Parent page object - represents the parent page in field context
+ */
+export interface ParentPageObject {
+  content: string;
+  file_path: string;
+  file_name: string;
+  file_base_name: string;
+  fields: Record<string, { content: unknown }>;
+}
+
+/**
+ * Legacy self object for backward compatibility
  */
 export interface SelfObject {
   content: string;
@@ -26,16 +58,167 @@ export interface SelfObject {
 export type FieldObject = Record<string, unknown>;
 
 /**
- * Context for variable replacement
+ * Context for page variable replacement
  */
-export interface VariableContext {
-  self: SelfObject | null;
+export interface PageVariableContext {
+  self: PageSelfObject | null;
   field: FieldObject;
   workspacePath: string;
+  contextType: 'page';
 }
 
 /**
- * Build self object from a file path
+ * Context for field variable replacement
+ */
+export interface FieldVariableContext {
+  self: FieldSelfObject | null;
+  parent_page: ParentPageObject | null;
+  field: FieldObject;
+  workspacePath: string;
+  contextType: 'field';
+}
+
+/**
+ * Union type for all variable contexts
+ */
+export type VariableContext = PageVariableContext | FieldVariableContext;
+
+/**
+ * Parse frontmatter from content string
+ */
+function parseFrontmatter(content: string): {
+  data: Record<string, unknown>;
+  body: string;
+} {
+  try {
+    const parsed = matter(content);
+    return {
+      data: parsed.data || {},
+      body: parsed.content || '',
+    };
+  } catch (error) {
+    console.error('Failed to parse frontmatter:', error);
+    return {
+      data: {},
+      body: content,
+    };
+  }
+}
+
+/**
+ * Convert frontmatter data to fields object
+ */
+function buildFieldsFromFrontmatter(
+  data: Record<string, unknown>
+): Record<string, { content: unknown }> {
+  const fields: Record<string, { content: unknown }> = {};
+  for (const [key, value] of Object.entries(data)) {
+    fields[key] = { content: value };
+  }
+  return fields;
+}
+
+/**
+ * Build page self object from a file path (with parsed frontmatter fields)
+ */
+export async function buildPageSelfObject(
+  workspacePath: string,
+  filePath: string
+): Promise<PageSelfObject> {
+  const absolutePath = path.isAbsolute(filePath)
+    ? filePath
+    : path.join(workspacePath, filePath);
+
+  // Read file content
+  let content = '';
+  try {
+    content = await fs.readFile(absolutePath, 'utf-8');
+  } catch (error) {
+    console.error(`Failed to read file for page self object: ${absolutePath}`, error);
+    content = `[Could not read file: ${filePath}]`;
+  }
+
+  // Parse frontmatter
+  const { data } = parseFrontmatter(content);
+  const fields = buildFieldsFromFrontmatter(data);
+
+  // Extract file path relative to workspace
+  const relativePath = path.relative(workspacePath, absolutePath);
+
+  // Extract file name
+  const fileName = path.basename(absolutePath);
+
+  // Extract base name (without extension)
+  const baseName = path.basename(absolutePath, path.extname(absolutePath));
+
+  return {
+    content,
+    file_path: relativePath,
+    file_name: fileName,
+    file_base_name: baseName,
+    fields,
+  };
+}
+
+/**
+ * Build field self object (represents the current field in field context)
+ */
+export function buildFieldSelfObject(
+  fieldKey: string,
+  fieldType: string,
+  fieldContent: string
+): FieldSelfObject {
+  return {
+    content: fieldContent,
+    key: fieldKey,
+    type: fieldType,
+  };
+}
+
+/**
+ * Build parent page object (represents the parent page in field context)
+ */
+export async function buildParentPageObject(
+  workspacePath: string,
+  filePath: string
+): Promise<ParentPageObject> {
+  const absolutePath = path.isAbsolute(filePath)
+    ? filePath
+    : path.join(workspacePath, filePath);
+
+  // Read file content
+  let content = '';
+  try {
+    content = await fs.readFile(absolutePath, 'utf-8');
+  } catch (error) {
+    console.error(`Failed to read file for parent page object: ${absolutePath}`, error);
+    content = `[Could not read file: ${filePath}]`;
+  }
+
+  // Parse frontmatter
+  const { data } = parseFrontmatter(content);
+  const fields = buildFieldsFromFrontmatter(data);
+
+  // Extract file path relative to workspace
+  const relativePath = path.relative(workspacePath, absolutePath);
+
+  // Extract file name
+  const fileName = path.basename(absolutePath);
+
+  // Extract base name (without extension)
+  const baseName = path.basename(absolutePath, path.extname(absolutePath));
+
+  return {
+    content,
+    file_path: relativePath,
+    file_name: fileName,
+    file_base_name: baseName,
+    fields,
+  };
+}
+
+/**
+ * Build self object from a file path (legacy - for backward compatibility)
  */
 export async function buildSelfObject(
   workspacePath: string,
@@ -97,6 +280,42 @@ function funcToUpper(input: string): string {
 }
 
 /**
+ * Resolve a nested property path in an object
+ * Supports paths like "fields.title.content" or "fields[key].content"
+ */
+function resolveNestedPath(obj: unknown, path: string): unknown {
+  if (!obj || typeof obj !== 'object') {
+    return undefined;
+  }
+
+  const parts = path.split('.');
+  let current: unknown = obj;
+
+  for (const part of parts) {
+    if (!current || typeof current !== 'object') {
+      return undefined;
+    }
+
+    // Handle array-like access with brackets (e.g., "fields[key]")
+    const bracketMatch = part.match(/^(\w+)\[([^\]]+)\]$/);
+    if (bracketMatch) {
+      const objKey = bracketMatch[1];
+      const nestedKey = bracketMatch[2];
+      current = (current as Record<string, unknown>)[objKey];
+      if (current && typeof current === 'object') {
+        current = (current as Record<string, unknown>)[nestedKey];
+      } else {
+        return undefined;
+      }
+    } else {
+      current = (current as Record<string, unknown>)[part];
+    }
+  }
+
+  return current;
+}
+
+/**
  * Resolve a variable expression to its value
  */
 function resolveVariable(
@@ -114,23 +333,61 @@ function resolveVariable(
   const objectName = trimmed.substring(0, firstDotIndex);
   const propertyPath = trimmed.substring(firstDotIndex + 1);
 
-  // Resolve based on object type
-  if (objectName === 'self') {
-    if (!context.self || !isKeyOfSelfObject(propertyPath, context)) {
-      return '';
-    }
+  // Handle page context
+  if (context.contextType === 'page') {
+    if (objectName === 'self') {
+      if (!context.self) {
+        return '';
+      }
 
-    return context.self[propertyPath];
-    
-  } else if (objectName === 'field') {
-    return context.field[propertyPath];
+      // Check for simple properties
+      if (propertyPath in context.self) {
+        return context.self[propertyPath as keyof PageSelfObject];
+      }
+
+      // Check for nested paths (e.g., "fields.title.content")
+      return resolveNestedPath(context.self, propertyPath);
+    } else if (objectName === 'field') {
+      return resolveNestedPath(context.field, propertyPath);
+    }
+  }
+
+  // Handle field context
+  if (context.contextType === 'field') {
+    if (objectName === 'self') {
+      if (!context.self) {
+        return '';
+      }
+
+      // Simple field properties
+      if (propertyPath in context.self) {
+        return context.self[propertyPath as keyof FieldSelfObject];
+      }
+
+      return '';
+    } else if (objectName === 'parent_page') {
+      if (!context.parent_page) {
+        return '';
+      }
+
+      // Check for simple properties
+      if (propertyPath in context.parent_page) {
+        return context.parent_page[propertyPath as keyof ParentPageObject];
+      }
+
+      // Check for nested paths (e.g., "fields.title.content")
+      return resolveNestedPath(context.parent_page, propertyPath);
+    } else if (objectName === 'field') {
+      return resolveNestedPath(context.field, propertyPath);
+    }
   }
 
   return undefined;
 }
 
 function isKeyOfSelfObject(value: unknown, context: VariableContext): value is keyof SelfObject {
-  return typeof value === 'string' && context.self !== null && value in context.self;
+  // This function is now less useful with our new context types, but kept for potential legacy use
+  return typeof value === 'string';
 }
 
 /**

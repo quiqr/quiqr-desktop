@@ -29,7 +29,6 @@ export interface FormMeta {
   collectionKey: string;
   collectionItemKey: string;
   prompt_templates: string[];
-  enableAiAssist: boolean;
   pageUrl: string;
 }
 

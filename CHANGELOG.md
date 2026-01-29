@@ -1,6 +1,23 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
+- **BREAKING CHANGE:** Removed legacy direct OpenAI field AI assist
+  - Removed `openAiApiKey` configuration from Advanced Preferences
+  - Removed direct OpenAI API calls from frontend (`openai` npm package)
+  - Removed `meta.enableAiAssist` flag from form system
+  - **Migration:** Use template-based field AI assist with `field_prompt_templates/`
+  - **Migration:** Configure LLM providers via `QUIQR_LLM_PROVIDER_*` environment variables
+  - **See:** Documentation in `prompts_templates.md` for migration guide
+- feature: Field AI Assist with Prompt Templates
+  - Add `field_prompt_templates/` directory for field-specific AI templates
+  - Support both `.yaml` and `.yml` file extensions for all templates
+  - New variables: `self.fields.[key].content` for page templates
+  - New variables: `parent_page.fields.[key].content` for field templates
+  - Rename components: `AiAssist.tsx` → `PageAIAssistButton.tsx`, `AIAssistDialog.tsx` → `PageAIAssistDialog.tsx`
+  - Create `FieldAIAssistButton` and `FieldAIAssistDialog` components
+  - Backend: Enhanced `prompt-template-processor.ts` with field context support
+  - Backend: Add field prompt template handlers
+  - Backend: Support both `.yaml` and `.yml` extensions with `.yaml` precedence
 - feature: Add OpenSpec Workflow for Spec-Driven Development
 - feature: SSG provider architecture - support for multiple static site generators (Jekyll added)
 - feature: standalone web version with menu bar replacing Electron native menu
@@ -10,6 +27,7 @@
 - fix: reload theme automatically when toggling between light and dark theme
 - fix: config.mounts handling and site name validation in config migration
 - fix: clear site library cache before navigating to newly imported sites
+- fix: Field AI templates - `parent_page.fields.*` variable resolution for Singles
 - refactor: convert all remaining class components to functional components
 - refactor: massive TypeScript improvements - removed hundreds of `any` types across codebase
 - refactor: workspace routing from wildcard to nested routes

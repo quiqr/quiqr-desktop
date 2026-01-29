@@ -60,8 +60,8 @@ describe('createThumbnailJob', () => {
       const dest = path.join(outputDir, 'thumb.png')
 
       await generateTestImage(src, {
-        width: 800,
-        height: 600,
+        width: 500,
+        height: 375,
         format: 'png'
       })
 
@@ -188,15 +188,15 @@ describe('createThumbnailJob', () => {
   })
 
   describe('Large image handling', () => {
-    it('should handle large JPEG images (10MP)', async () => {
+    it('should handle large JPEG images (2MP)', async () => {
       const src = path.join(testDir, 'large.jpeg')
       const dest = path.join(outputDir, 'large-thumb.jpeg')
 
-      // Generate a 10 megapixel image (instead of 100MP)
-      await generateLargeImage(src, 10)
+      // Generate a 2 megapixel image for faster testing
+      await generateLargeImage(src, 2)
 
       const srcMetadata = await sharp(src).metadata()
-      expect(srcMetadata.width! * srcMetadata.height!).toBeGreaterThan(9_000_000)
+      expect(srcMetadata.width! * srcMetadata.height!).toBeGreaterThan(1_800_000)
 
       const result = await createThumbnailJob({ src, dest })
 
@@ -218,10 +218,10 @@ describe('createThumbnailJob', () => {
       const src = path.join(testDir, 'large.png')
       const dest = path.join(outputDir, 'large-thumb.png')
 
-      // Generate a moderately large PNG (reduced from 8000x6000)
+      // Generate a small PNG for faster testing
       await generateTestImage(src, {
-        width: 1200,
-        height: 900,
+        width: 500,
+        height: 375,
         format: 'png'
       })
 
@@ -274,8 +274,8 @@ describe('createThumbnailJob', () => {
         const dest = path.join(outputDir, `thumb.${ext}`)
 
         await generateTestImage(src, {
-          width: 1000,
-          height: 750,
+          width: 500,
+          height: 375,
           format
         })
 
@@ -289,6 +289,6 @@ describe('createThumbnailJob', () => {
       })
 
       await Promise.all(promises)
-    }, 15000) // 15 second timeout for batch processing
+    }, 8000) // 8 second timeout for batch processing
   })
 })

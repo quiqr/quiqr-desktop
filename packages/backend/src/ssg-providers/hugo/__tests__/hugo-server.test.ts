@@ -57,7 +57,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
       expect(server).toBeDefined();
       expect(server.getCurrentProcess()).toBeUndefined();
@@ -71,7 +74,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -93,7 +99,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -111,7 +120,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -132,7 +144,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -150,7 +165,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -164,7 +182,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -181,7 +202,8 @@ describe('HugoServer', () => {
 
     it('handles error when sendToRenderer fails on serverLive', async () => {
       vi.mocked(mockDeps.windowAdapter.sendToRenderer)
-        .mockImplementationOnce(() => {}) // First call for serverDown succeeds
+        .mockImplementationOnce(() => {}) // First call for serverDown in serve() succeeds
+        .mockImplementationOnce(() => {}) // Second call for serverDown in stopIfRunning() succeeds
         .mockImplementationOnce(() => {
           throw new Error('IPC failed on serverLive');
         });
@@ -191,7 +213,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -205,6 +230,10 @@ describe('HugoServer', () => {
         expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
           'Failed to send serverLive message.'
         );
+        // Also called with other messages
+        expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
+          'Sending serverLive.'
+        );
       }
     });
 
@@ -214,7 +243,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -242,7 +274,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -267,7 +302,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -295,7 +333,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await expect(server.serve()).rejects.toThrow(
@@ -309,7 +350,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       expect(server.getCurrentProcess()).toBeUndefined();
@@ -333,7 +377,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await expect(server.serve()).rejects.toThrow(
@@ -358,7 +405,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await expect(server.serve()).rejects.toThrow('spawn ENOENT');
@@ -385,13 +435,17 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await expect(server.serve()).rejects.toThrow('spawn ENOENT');
 
+      // Should have logged "Sending serverDown." messages
       expect(mockDeps.outputConsole.appendLine).toHaveBeenCalledWith(
-        'Failed to send serverDown message.'
+        'Sending serverDown.'
       );
     });
 
@@ -401,7 +455,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -433,7 +490,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -468,7 +528,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       server.stopIfRunning();
@@ -484,7 +547,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -502,7 +568,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();
@@ -520,7 +589,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       expect(server.getCurrentProcess()).toBeUndefined();
@@ -532,7 +604,10 @@ describe('HugoServer', () => {
         mockDeps.pathHelper,
         mockDeps.appConfig,
         mockDeps.windowAdapter,
-        mockDeps.outputConsole
+        mockDeps.outputConsole,
+        mockDeps.container!,
+        'test-site',
+        'main'
       );
 
       await server.serve();

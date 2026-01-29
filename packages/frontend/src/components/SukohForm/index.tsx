@@ -6,7 +6,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import service from './../../services/service';
 import { FormProvider } from './FormProvider';
 import { FieldRenderer } from './FieldRenderer';
-import { AIAssistDialog } from './AIAssistDialog';
+import { PageAIAssistDialog } from './PageAIAssistDialog';
 import type { Field, BuildAction } from '@quiqr/types';
 import type { FormMeta } from './FormContext';
 
@@ -212,7 +212,6 @@ export const SukohForm = ({
       collectionKey: collectionKey || '',
       collectionItemKey: collectionItemKey || singleKey || '',
       prompt_templates,
-      enableAiAssist: true, // TODO: Get from user prefs
       pageUrl: pageUrl || '',
     };
 
@@ -229,14 +228,14 @@ export const SukohForm = ({
               onClick={() => setAiAssistOpen(true)}
               sx={{
                 position: 'absolute',
-                top: 66,
+                top: 142,
                 right: 16,
                 zIndex: 10,
               }}
             >
-              AI Assist
+              PAGE ASSIST
             </Button>
-            <AIAssistDialog
+            <PageAIAssistDialog
               open={aiAssistOpen}
               onClose={() => setAiAssistOpen(false)}
               siteKey={siteKey}

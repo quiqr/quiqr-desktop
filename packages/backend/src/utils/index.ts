@@ -9,3 +9,4 @@ export * from './file-dir-utils.js';
 export * from './path-helper.js';
 export * from './format-provider-resolver.js';
 export * from './format-providers/index.js';
+export * from './llm-service.js';

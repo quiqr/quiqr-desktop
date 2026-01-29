@@ -60,6 +60,33 @@ export function updatePageFromAiResponse(
   });
 }
 
+export function getFieldPromptTemplateConfig(siteKey: string, workspaceKey: string, templateKey: string) {
+  return request('getFieldPromptTemplateConfig', {siteKey, workspaceKey, templateKey});
+}
+
+export function processFieldAiPrompt(
+  siteKey: string,
+  workspaceKey: string,
+  templateKey: string,
+  formValues: Record<string, unknown>,
+  fieldContext: {
+    fieldKey: string;
+    fieldType: string;
+    fieldContent: string;
+    collectionKey?: string;
+    collectionItemKey?: string;
+    singleKey?: string;
+  }
+) {
+  return request('processFieldAiPrompt', {
+    siteKey,
+    workspaceKey,
+    templateKey,
+    formValues,
+    fieldContext
+  });
+}
+
 export function getPreviewCheckConfiguration() {
   return request('getPreviewCheckConfiguration', {});
 }
@@ -72,12 +99,37 @@ export function stopHugoServer(){
   return request('stopHugoServer', {}, {timeout:100000});
 }
 
-export function showLogWindow(){
-  return request('showLogWindow', {});
+// Logging API
+export function getApplicationLogs(options: {
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return request('getApplicationLogs', options);
 }
 
-export function logToConsole( message, label = ""){
-  return request('logToConsole', {message, label}, {timeout: 1000});
+export function getSiteLogs(options: {
+  siteKey: string;
+  workspaceKey: string;
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return request('getSiteLogs', options);
+}
+
+export function getLogDates(options: {
+  type: 'application' | 'site';
+  siteKey?: string;
+  workspaceKey?: string;
+}) {
+  return request('getLogDates', options);
 }
 
 export function getDynFormFields(searchRootNode: string, searchLevelKeyVal: unknown){
@@ -336,7 +388,7 @@ export function openFileDialogForSingleAndCollectionItem(
         resolve();
       } catch (error) {
         console.error('Error uploading files:', error);
-        this.logToConsole(error, 'File upload error');
+        logToConsole(error, 'File upload error');
         reject(error);
       } finally {
         // Cleanup
@@ -372,6 +424,10 @@ export function openCustomCommand(command: string){
 
 export function openExternal(url: string) {
   return request('openExternal', { url });
+}
+
+export function logToConsole(message: unknown, label?: string) {
+  return request('logToConsole', { message, label }, { timeout: 1000 });
 }
 
 export function getThumbnailForPath(siteKey: string, workspaceKey: string, targetPath: string){
@@ -444,11 +500,11 @@ export function getLanguages(siteKey: string, workspaceKey: string){
   return request('getLanguages', {siteKey, workspaceKey});
 }
 
-export function publisherDispatchAction(siteKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
+export function publisherDispatchAction(siteKey: string, workspaceKey: string, publishConf: GitPublishConf, action: string, actionParameters: unknown, timeout: number){
   if(!Number.isInteger(timeout)){
     timeout=130000;
   }
-  return request('publisherDispatchAction', {siteKey, publishConf, action, actionParameters}, {timeout: timeout});
+  return request('publisherDispatchAction', {siteKey, workspaceKey, publishConf, action, actionParameters}, {timeout: timeout});
 }
 
 export function getCreatorMessage(siteKey: string, workspaceKey: string){
@@ -559,11 +615,14 @@ export interface API {
   getPromptTemplateConfig: typeof getPromptTemplateConfig;
   processAiPrompt: typeof processAiPrompt;
   updatePageFromAiResponse: typeof updatePageFromAiResponse;
+  getFieldPromptTemplateConfig: typeof getFieldPromptTemplateConfig;
+  processFieldAiPrompt: typeof processFieldAiPrompt;
   getPreviewCheckConfiguration: typeof getPreviewCheckConfiguration;
   serveWorkspace: typeof serveWorkspace;
   stopHugoServer: typeof stopHugoServer;
-  showLogWindow: typeof showLogWindow;
-  logToConsole: typeof logToConsole;
+  getApplicationLogs: typeof getApplicationLogs;
+  getSiteLogs: typeof getSiteLogs;
+  getLogDates: typeof getLogDates;
   getDynFormFields: typeof getDynFormFields;
   importSite: typeof importSite;
   getFilteredHugoVersions: typeof getFilteredHugoVersions;

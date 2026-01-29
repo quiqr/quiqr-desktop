@@ -104,7 +104,7 @@ const SiteConfRouteModel = ({ siteKey, workspaceKey, modelRefreshKey }: SiteConf
     return (
       <Box m={2}>
         <Typography variant="h6">{title}</Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           {files.map((item, index) => {
             return (
               <Grid container key={'grid' + index} spacing={1} alignItems="flex-end">

@@ -253,6 +253,7 @@
     "packages/backend",
     "packages/adapters/electron",
     "packages/adapters/standalone",
-    "packages/frontend"
+    "packages/frontend",
+    "packages/docs"
   ]
 }

@@ -6,8 +6,9 @@
 
 <p align="center">
   <a href="https://quiqr.org">Website</a> ·
+  <a href="https://quiqr.github.io/quiqr-desktop/docs">Documentation</a> ·
   <a href="https://discord.gg/nJ2JH7jvmV">Discord</a> ·
-  <a href="https://quiqr.github.io/quiqr-desktop/">OpenSpec UI</a>
+  <a href="https://quiqr.github.io/quiqr-desktop/specs">OpenSpec UI</a>
 </p>
 
 <p align="center">
@@ -36,6 +37,15 @@ keeping your data local for privacy and developer-friendly workflows.
 - **Schema-Driven Forms**: Powerful, customizable content editing interface
 - **Dual Deployment**: Run as desktop app or standalone web server
 - **Modern Stack**: React frontend with Node.js backend for reliability and performance
+
+## Documentation
+
+Full documentation is available at [https://quiqr.github.io/quiqr-desktop/docs](https://quiqr.github.io/quiqr-desktop/docs) including:
+
+- [Getting Started Guide](https://quiqr.github.io/quiqr-desktop/docs/getting-started/installation)
+- [Developer Guide](https://quiqr.github.io/quiqr-desktop/docs/developer-guide)
+- [Field Reference](https://quiqr.github.io/quiqr-desktop/docs/field-reference)
+- [Contributing Guide](https://quiqr.github.io/quiqr-desktop/docs/contributing)
 
 ## NG (Next Generation)
 
@@ -179,6 +189,13 @@ procedures, see [RELEASE.md](./RELEASE.md).
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/bert-janzwanepol">
+                    <img src="https://avatars.githubusercontent.com/u/49754171?v=4" width="100;" alt="bert-janzwanepol"/>
+                    <br />
+                    <sub><b>Bert-Jan</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/swanenberg">
                     <img src="https://avatars.githubusercontent.com/u/4381573?v=4" width="100;" alt="swanenberg"/>
                     <br />
@@ -206,6 +223,8 @@ procedures, see [RELEASE.md](./RELEASE.md).
                     <sub><b>Jose Diaz-Gonzalez</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/rpetit3">
                     <img src="https://avatars.githubusercontent.com/u/5334269?v=4" width="100;" alt="rpetit3"/>
@@ -213,8 +232,6 @@ procedures, see [RELEASE.md](./RELEASE.md).
                     <sub><b>Robert A. Petit III</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/vendhana">
                     <img src="https://avatars.githubusercontent.com/u/1776624?v=4" width="100;" alt="vendhana"/>

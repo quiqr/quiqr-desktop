@@ -61,6 +61,12 @@ export class HugoProvider implements SSGProvider {
   }
 
   createDevServer(config: SSGServerConfig): SSGDevServer {
+    // Container may not be set yet during initialization
+    const container = this.dependencies.container;
+    if (!container) {
+      throw new Error('Container not initialized in HugoProvider');
+    }
+
     return new HugoServer(
       {
         workspacePath: config.workspacePath,
@@ -70,7 +76,10 @@ export class HugoProvider implements SSGProvider {
       this.dependencies.pathHelper,
       this.dependencies.appConfig,
       this.dependencies.windowAdapter,
-      this.dependencies.outputConsole
+      this.dependencies.outputConsole,
+      container,
+      config.siteKey,
+      config.workspaceKey
     );
   }
 

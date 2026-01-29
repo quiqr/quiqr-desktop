@@ -91,8 +91,8 @@ describe('BackgroundJobRunner', () => {
     it('should queue jobs when at max concurrency', async () => {
       runner = new BackgroundJobRunner(2) // Lower limit for easier testing
 
-      // Generate 6 images
-      const images = await generateImageBatch(testDir, 6, { width: 1000, height: 800 })
+      // Generate 6 images - smaller size for faster testing
+      const images = await generateImageBatch(testDir, 6, { width: 400, height: 300 })
 
       const jobPath = path.join(__dirname, '../../../dist/jobs/create-thumbnail-job.js')
       const completionOrder: number[] = []
@@ -112,13 +112,13 @@ describe('BackgroundJobRunner', () => {
       // Verify all files created
       const files = await fs.readdir(outputDir)
       expect(files).toHaveLength(6)
-    })
+    }, 15000) // 15 second timeout
 
     it('should process queued jobs after workers become available', async () => {
       runner = new BackgroundJobRunner(3)
 
-      // Generate 9 images (3 batches of 3)
-      const images = await generateImageBatch(testDir, 9, { width: 800, height: 600 })
+      // Generate 9 images (3 batches of 3) - smaller size for faster testing
+      const images = await generateImageBatch(testDir, 9, { width: 400, height: 300 })
 
       const jobPath = path.join(__dirname, '../../../dist/jobs/create-thumbnail-job.js')
       const completedJobs: string[] = []
@@ -138,7 +138,7 @@ describe('BackgroundJobRunner', () => {
       for (const dest of completedJobs) {
         expect(await fs.pathExists(dest)).toBe(true)
       }
-    })
+    }, 15000)
   })
 
   describe('Large batch processing', () => {

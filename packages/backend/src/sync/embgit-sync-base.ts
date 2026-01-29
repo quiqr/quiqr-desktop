@@ -13,7 +13,9 @@ import type { Embgit } from '../embgit/embgit.js';
 import type { PathHelper } from '../utils/path-helper.js';
 import type { OutputConsole, WindowAdapter } from '../adapters/types.js';
 import type { ConfigurationDataProvider } from '../services/configuration/index.js';
+import type { AppContainer } from '../config/container.js';
 import { recurForceRemove } from '../utils/file-dir-utils.js';
+import { SITE_CATEGORIES } from '../logging/index.js';
 
 /**
  * Base configuration shared by GitHub, Sysgit, and Git sync
@@ -64,6 +66,8 @@ export abstract class EmbgitSyncBase implements SyncService {
   protected outputConsole: OutputConsole;
   protected windowAdapter: WindowAdapter;
   protected configurationProvider: ConfigurationDataProvider;
+  protected container: AppContainer;
+  protected workspaceKey: string;
   protected progressCallback?: SyncProgressCallback;
   protected config: BaseSyncConfig;
   protected siteKey: string;
@@ -81,6 +85,8 @@ export abstract class EmbgitSyncBase implements SyncService {
     this.outputConsole = dependencies.outputConsole;
     this.windowAdapter = dependencies.windowAdapter;
     this.configurationProvider = dependencies.configurationProvider;
+    this.container = dependencies.container;
+    this.workspaceKey = dependencies.workspaceKey || 'unknown';
     this.progressCallback = dependencies.progressCallback;
     this.fromPath = this.pathHelper.getLastBuildDir();
   }
@@ -206,20 +212,64 @@ export abstract class EmbgitSyncBase implements SyncService {
     this.outputConsole.appendLine('-----------------');
     this.outputConsole.appendLine('');
 
-    this.sendProgress('Get remote files..', 20);
-    await this.publishStep1InitialClone(tmpKeypathPrivate, this.getGitUrl(), fullDestinationPath);
+    // Log sync start
+    this.container.logger.infoSite(
+      this.siteKey,
+      this.workspaceKey,
+      SITE_CATEGORIES.SYNC,
+      'Sync push started',
+      { 
+        type: this.getLogPrefix(),
+        repository: this.config.repository,
+        branch: this.config.branch,
+        publishScope: this.config.publishScope,
+        gitUrl: this.getGitUrl()
+      }
+    );
 
-    this.sendProgress('Prepare files before uploading..', 30);
-    if (this.config.publishScope === 'build') {
-      await this.publishStep2PrepareDircontentsBuild(fullDestinationPath);
-    } else {
-      await this.publishStep2PrepareDircontentsSource(fullDestinationPath);
+    try {
+      this.sendProgress('Get remote files..', 20);
+      await this.publishStep1InitialClone(tmpKeypathPrivate, this.getGitUrl(), fullDestinationPath);
+
+      this.sendProgress('Prepare files before uploading..', 30);
+      if (this.config.publishScope === 'build') {
+        await this.publishStep2PrepareDircontentsBuild(fullDestinationPath);
+      } else {
+        await this.publishStep2PrepareDircontentsSource(fullDestinationPath);
+      }
+
+      this.sendProgress('Upload files to remote server..', 70);
+      await this.publishStep3AddCommitPush(tmpKeypathPrivate, fullDestinationPath);
+
+      // Log success
+      this.container.logger.infoSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.SYNC,
+        'Sync push completed',
+        { 
+          type: this.getLogPrefix(),
+          repository: this.config.repository,
+          branch: this.config.branch
+        }
+      );
+
+      return true;
+    } catch (error) {
+      // Log error
+      this.container.logger.errorSite(
+        this.siteKey,
+        this.workspaceKey,
+        SITE_CATEGORIES.SYNC,
+        'Sync push failed',
+        { 
+          type: this.getLogPrefix(),
+          repository: this.config.repository,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      );
+      throw error;
     }
-
-    this.sendProgress('Upload files to remote server..', 70);
-    await this.publishStep3AddCommitPush(tmpKeypathPrivate, fullDestinationPath);
-
-    return true;
   }
 
   /**
