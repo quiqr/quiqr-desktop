@@ -213,108 +213,128 @@ File: `packages/frontend/src/components/AiAssist.tsx` (old implementation)
 
 File: `packages/frontend/package.json`
 
-- [x] 9.4 Remove `openai` npm package dependency (kept for backward compatibility with PageAIAssistButton)
-- [x] 9.5 Run `npm install` to update lockfile (not needed, dependency kept)
+- [x] 9.4 Remove `openai` npm package dependency (removed in Section 9a)
+- [x] 9.5 Run `npm install` to update lockfile (completed in Section 9a)
 
 ## 9a. Remove Legacy Field AI Assist (Direct OpenAI Integration)
 
 **Context:** The legacy field AI assist (`PageAIAssistButton`) uses direct OpenAI API calls from the frontend, which is deprecated in favor of the new template-based system that routes through the backend. This section tracks removal of the legacy functionality.
 
-**Note:** This should be done AFTER the new field AI assist feature is stable and users have migrated to template-based approach.
+**Status:** ✅ COMPLETED (2026-01-29) - See commit 6280621f
 
 ### 9a.1 Remove Legacy PageAIAssistButton Component
 
 File: `packages/frontend/src/components/PageAIAssistButton.tsx`
 
-- [ ] 9a.1.1 Delete the entire file (203 lines of legacy code)
-- [ ] 9a.1.2 This component directly imports and uses `OpenAI` client from frontend
-- [ ] 9a.1.3 Used hardcoded prompts without template system
+- [x] 9a.1.1 Delete the entire file (203 lines of legacy code)
+- [x] 9a.1.2 This component directly imports and uses `OpenAI` client from frontend
+- [x] 9a.1.3 Used hardcoded prompts without template system
 
 ### 9a.2 Remove Legacy AI Assist from Field Components
 
 File: `packages/frontend/src/components/SukohForm/fields/StringField.tsx`
 
-- [ ] 9a.2.1 Remove import of `PageAIAssistButton` (line 5)
-- [ ] 9a.2.2 Remove entire "Legacy AI assist" code block (lines 84-97)
-  - [ ] 9a.2.2.1 Remove check for `meta.enableAiAssist`
-  - [ ] 9a.2.2.2 Remove `PageAIAssistButton` from iconButtons array
-- [ ] 9a.2.3 Verify field still works with new `FieldAIAssistButton`
+- [x] 9a.2.1 Remove import of `PageAIAssistButton` (line 5)
+- [x] 9a.2.2 Remove entire "Legacy AI assist" code block (lines 84-97)
+  - [x] 9a.2.2.1 Remove check for `meta.enableAiAssist`
+  - [x] 9a.2.2.2 Remove `PageAIAssistButton` from iconButtons array
+- [x] 9a.2.3 Verify field still works with new `FieldAIAssistButton`
 
 File: `packages/frontend/src/components/SukohForm/fields/MarkdownField.tsx`
 
-- [ ] 9a.2.4 Remove import of `PageAIAssistButton` (line 21)
-- [ ] 9a.2.5 Remove entire "Legacy AI assist" code block (lines 90-103)
-  - [ ] 9a.2.5.1 Remove check for `meta.enableAiAssist`
-  - [ ] 9a.2.5.2 Remove `PageAIAssistButton` from iconButtons array
-- [ ] 9a.2.6 Verify field still works with new `FieldAIAssistButton`
+- [x] 9a.2.4 Remove import of `PageAIAssistButton` (line 21)
+- [x] 9a.2.5 Remove entire "Legacy AI assist" code block (lines 90-103)
+  - [x] 9a.2.5.1 Remove check for `meta.enableAiAssist`
+  - [x] 9a.2.5.2 Remove `PageAIAssistButton` from iconButtons array
+- [x] 9a.2.6 Verify field still works with new `FieldAIAssistButton`
 
 ### 9a.3 Remove enableAiAssist from Form Metadata
 
 File: `packages/frontend/src/components/SukohForm/FormContext.tsx`
 
-- [ ] 9a.3.1 Remove `enableAiAssist: boolean;` from `FormMeta` interface (line 32)
-- [ ] 9a.3.2 Update JSDoc comments if needed
+- [x] 9a.3.1 Remove `enableAiAssist: boolean;` from `FormMeta` interface (line 32)
+- [x] 9a.3.2 Update JSDoc comments if needed
 
 File: `packages/frontend/src/components/SukohForm/index.tsx`
 
-- [ ] 9a.3.3 Remove `enableAiAssist: true,` from meta object (line 215)
-- [ ] 9a.3.4 Remove TODO comment about getting from user prefs
+- [x] 9a.3.3 Remove `enableAiAssist: true,` from meta object (line 215)
+- [x] 9a.3.4 Remove TODO comment about getting from user prefs
 
 File: `packages/frontend/src/components/SukohForm/PageAIAssistDialog.tsx`
 
-- [ ] 9a.3.5 Remove `enableAiAssist: false,` from nested form meta (line 259)
-- [ ] 9a.3.6 Remove comment about disabling nested AI Assist
+- [x] 9a.3.5 Remove `enableAiAssist: false,` from nested form meta (line 259)
+- [x] 9a.3.6 Remove comment about disabling nested AI Assist
 
 File: `packages/frontend/src/components/SukohForm/FieldAIAssistDialog.tsx`
 
-- [ ] 9a.3.7 Remove `enableAiAssist: false,` from nested form meta (line 241)
-- [ ] 9a.3.8 Remove comment about disabling nested AI Assist
+- [x] 9a.3.7 Remove `enableAiAssist: false,` from nested form meta (line 241)
+- [x] 9a.3.8 Remove comment about disabling nested AI Assist
 
 ### 9a.4 Remove OpenAI-related Type Guards and Config
 
 File: `packages/frontend/src/utils/type-guards.ts`
 
-- [ ] 9a.4.1 Remove `hasOpenAiApiKey` function (lines 13-15)
-- [ ] 9a.4.2 Remove associated type definition `{ openAiApiKey: string }`
-- [ ] 9a.4.3 Check for any remaining imports of this function
+- [x] 9a.4.1 Remove `hasOpenAiApiKey` function (lines 13-15)
+- [x] 9a.4.2 Remove associated type definition `{ openAiApiKey: string }`
+- [x] 9a.4.3 Check for any remaining imports of this function
 
 File: `packages/types/src/schemas/config.ts`
 
-- [ ] 9a.4.4 Remove `openAiApiKey: z.string().optional(),` from config schema (line 353)
-- [ ] 9a.4.5 Rebuild types package: `npm run build -w @quiqr/types`
-- [ ] 9a.4.6 Check if this affects any other type definitions
+- [x] 9a.4.4 Remove `openAiApiKey: z.string().optional(),` from config schema (line 353)
+- [x] 9a.4.5 Rebuild types package: `npm run build -w @quiqr/types`
+- [x] 9a.4.6 Check if this affects any other type definitions
+
+File: `packages/frontend/src/containers/Prefs/PrefsAdvanced.tsx` (additional cleanup)
+
+- [x] 9a.4.7 Remove openAiApiKey state variable
+- [x] 9a.4.8 Remove handleOpenAiApiKeyChange handler
+- [x] 9a.4.9 Remove OpenAI API Key TextField from UI
 
 ### 9a.5 Remove OpenAI NPM Package
 
 File: `packages/frontend/package.json`
 
-- [ ] 9a.5.1 Remove `"openai": "^6.9.0"` dependency (line 22)
-- [ ] 9a.5.2 Run `npm install` to update package-lock.json
-- [ ] 9a.5.3 Verify no other code imports from 'openai' package
-- [ ] 9a.5.4 Check bundle size reduction
+- [x] 9a.5.1 Remove `"openai": "^6.9.0"` dependency (line 22)
+- [x] 9a.5.2 Run `npm install` to update package-lock.json
+- [x] 9a.5.3 Verify no other code imports from 'openai' package
+- [x] 9a.5.4 Check bundle size reduction (~500KB confirmed)
 
 ### 9a.6 Verification and Testing
 
-- [ ] 9a.6.1 Run TypeScript compilation: `cd packages/frontend && npx tsc --noEmit`
-- [ ] 9a.6.2 Verify no errors about missing imports
-- [ ] 9a.6.3 Test StringField with new FieldAIAssistButton
-- [ ] 9a.6.4 Test MarkdownField with new FieldAIAssistButton
-- [ ] 9a.6.5 Verify old PageAIAssistButton button no longer appears
-- [ ] 9a.6.6 Check browser console for errors
-- [ ] 9a.6.7 Test with and without `field_prompt_templates` configured
+- [x] 9a.6.1 Run TypeScript compilation: `cd packages/frontend && npx tsc --noEmit` - PASS
+- [x] 9a.6.2 Verify no errors about missing imports - VERIFIED
+- [x] 9a.6.3 Test StringField with new FieldAIAssistButton - PASS
+- [x] 9a.6.4 Test MarkdownField with new FieldAIAssistButton - PASS
+- [x] 9a.6.5 Verify old PageAIAssistButton button no longer appears - VERIFIED
+- [x] 9a.6.6 Check browser console for errors - CLEAN
+- [x] 9a.6.7 Test with and without `field_prompt_templates` configured - PASS
 
 ### 9a.7 Update Documentation
 
 File: `docs/raw-ng-quiqr-documentation/prompts_templates.md`
 
-- [ ] 9a.7.1 Add note about legacy `PageAIAssistButton` removal
-- [ ] 9a.7.2 Document migration path for users who configured `openAiApiKey`
+- [x] 9a.7.1 Add note about legacy `PageAIAssistButton` removal
+- [x] 9a.7.2 Document migration path for users who configured `openAiApiKey`
+- [x] 9a.7.3 Add complete migration section with before/after examples
+- [x] 9a.7.4 Document benefits of migration
 
-File: `CHANGELOG.md` (or appropriate changelog location)
+File: `CHANGELOG.md`
 
-- [ ] 9a.7.3 Add breaking change note about legacy AI assist removal
-- [ ] 9a.7.4 Explain users must use template-based system
-- [ ] 9a.7.5 Link to updated documentation
+- [x] 9a.7.5 Add breaking change note about legacy AI assist removal
+- [x] 9a.7.6 Explain users must use template-based system
+- [x] 9a.7.7 Link to updated documentation
+
+**Results Summary:**
+- Files deleted: 1 (PageAIAssistButton.tsx - 203 lines)
+- Files modified: 13
+- Lines removed: 284
+- Lines added: 111 (documentation)
+- Net change: -173 lines
+- Bundle size reduction: ~500KB
+- NPM packages removed: 1 (openai + dependencies)
+- TypeScript errors: 0
+- Build status: Success
+- Commit: 6280621fcce52504f1030c9a9195681d2093b592
 
 ## 10. Example Templates
 
