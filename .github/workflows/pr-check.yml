@@ -70,3 +70,11 @@ jobs:
         working-directory: ./packages/frontend
         run: npx tsc --noEmit
         continue-on-error: true
+
+      # Step 9: Build documentation
+      # This verifies docs build successfully without blocking on failure
+      # Documentation is built with Docusaurus
+      - name: Build documentation
+        working-directory: ./packages/docs
+        run: npm run build
+        continue-on-error: true

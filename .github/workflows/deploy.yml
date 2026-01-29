@@ -109,7 +109,7 @@ jobs:
         uses: we-cli/coverage-badge-action@main
 
   publish-openspec:
-    name: Publish OpenSpec UI
+    name: Publish OpenSpec UI and Documentation
     runs-on: ubuntu-latest
 
     # GitHub Pages environment configuration
@@ -153,15 +153,51 @@ jobs:
             --base-path /quiqr-desktop/ \
             --output ./openspec-export
 
-      # Step 4: Upload the generated site as a Pages artifact
+      # Step 4: Set up Node.js for Docusaurus build
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      # Step 5: Install dependencies and build documentation
+      - name: Install dependencies
+        run: npm install
+
+      # Step 6: Build documentation
+      - name: Build documentation
+        working-directory: ./packages/docs
+        run: npm run build
+
+      # Step 7: Combine OpenSpec UI and Docusaurus output
+      # OpenSpec UI goes to /specs/, Docusaurus goes to /docs/
+      # Coverage badge remains at /badges/coverage.svg
+      - name: Combine outputs
+        run: |
+          # Create combined output directory
+          mkdir -p ./combined-output
+          
+          # Copy OpenSpec UI to /specs/
+          mkdir -p ./combined-output/specs
+          cp -r ./openspec-export/* ./combined-output/specs/
+          
+          # Copy Docusaurus build to /docs/
+          # Docusaurus builds to packages/docs/build with /quiqr-desktop/docs/ base path
+          cp -r ./packages/docs/build/* ./combined-output/
+          
+          # Verify structure
+          echo "Combined output structure:"
+          ls -la ./combined-output/
+
+      # Step 8: Upload the combined site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./openspec-export
+          path: ./combined-output
 
-      # Step 5: Deploy to GitHub Pages
-      # Deploys to root path, coverage badge remains at /badges/coverage.svg
+      # Step 9: Deploy to GitHub Pages
+      # Deploys all content: /specs/ (OpenSpec), /docs/ (Docusaurus), /badges/ (coverage)
       # Requires: Repository settings > Pages > Source = "GitHub Actions"
       - name: Deploy to GitHub Pages
         id: deployment
