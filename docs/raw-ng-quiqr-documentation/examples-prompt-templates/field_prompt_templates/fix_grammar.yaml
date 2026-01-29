@@ -1,0 +1,17 @@
+---
+key: fix_grammar
+title: Fix Grammar & Spelling
+description: Correct grammar and spelling errors while preserving style
+llm_settings:
+  model: gpt-4
+  temperature: 0.3
+fields:
+  - key: promptTemplate
+    title: Prompt Template
+    type: readonly
+    default: >
+      Fix any grammar and spelling errors in the following text.
+      Preserve the original meaning and writing style.
+      Do not make other changes.
+      
+      {{ self.content }}

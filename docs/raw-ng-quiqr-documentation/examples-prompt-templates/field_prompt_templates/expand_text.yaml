@@ -1,0 +1,34 @@
+---
+key: expand_text
+title: Expand Text
+description: Expand brief text into a longer, more detailed version
+llm_settings:
+  model: gpt-4
+  temperature: 0.7
+fields:
+  - key: target_length
+    title: Target Length
+    type: select
+    options:
+      - short paragraph (50-100 words)
+      - medium (100-200 words)
+      - long (200-400 words)
+  - key: tone
+    title: Tone
+    type: select
+    options:
+      - informative
+      - persuasive
+      - narrative
+  - key: promptTemplate
+    title: Prompt Template
+    type: readonly
+    default: >
+      Expand the following brief text into {{ field.target_length }} with a {{ field.tone }} tone.
+      Keep the core message but add relevant details, examples, or context.
+      Make it engaging and well-structured.
+      
+      Context: This is the "{{ self.key }}" field from the page "{{ parent_page.fields.title.content }}".
+      
+      Original text:
+      {{ self.content }}

@@ -1,0 +1,23 @@
+---
+key: summarize
+title: Summarize Text
+description: Create a concise summary of the text
+llm_settings:
+  model: gpt-4
+  temperature: 0.5
+fields:
+  - key: length
+    title: Summary Length
+    type: select
+    options:
+      - one sentence
+      - short (2-3 sentences)
+      - medium (paragraph)
+  - key: promptTemplate
+    title: Prompt Template
+    type: readonly
+    default: >
+      Create {{ field.length }} summary of the following text.
+      Capture the main points and key ideas.
+      
+      {{ self.content }}

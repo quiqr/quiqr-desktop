@@ -12,9 +12,30 @@ import { globSync } from 'glob';
 import path from 'path';
 import matter from 'gray-matter';
 import { createWorkspaceServiceForParams, getCurrentWorkspaceService } from './helpers/workspace-helper.js';
-import { processPromptTemplate, buildSelfObject } from '../../utils/prompt-template-processor.js';
+import { processPromptTemplate, buildSelfObject, buildPageSelfObject, buildFieldSelfObject, buildParentPageObject } from '../../utils/prompt-template-processor.js';
 import { callLLM, getProviderDisplayName } from '../../utils/llm-service.js';
 import { type WorkspaceConfig, type CollectionConfig, type SingleConfig, type MergeableConfigItem, type Field, promptItemConfigSchema, readonlyFieldSchema } from '@quiqr/types';
+
+/**
+ * Helper function to find a template file with either .yaml or .yml extension
+ * @param basePath - The directory containing the template
+ * @param templateKey - The template key (filename without extension)
+ * @returns The full path to the template file, or null if not found
+ */
+function findTemplateFile(basePath: string, templateKey: string): string | null {
+  const yamlPath = path.join(basePath, `${templateKey}.yaml`);
+  const ymlPath = path.join(basePath, `${templateKey}.yml`);
+  
+  if (fs.existsSync(yamlPath)) {
+    return yamlPath;
+  }
+  
+  if (fs.existsSync(ymlPath)) {
+    return ymlPath;
+  }
+  
+  return null;
+}
 
 /**
  * List all workspaces for a site
@@ -411,7 +432,8 @@ export function createCheckSSGVersionHandler(container: AppContainer) {
 
 /**
  * Get prompt template configuration by key
- * Loads and parses the YAML file from quiqr/model/includes/prompts_templates/{templateKey}.yaml
+ * Loads and parses the YAML file from quiqr/model/includes/page_prompt_templates/{templateKey}.yaml
+ * Falls back to old prompts_templates/ directory if new one doesn't exist
  */
 export function createGetPromptTemplateConfigHandler(container: AppContainer) {
   return async ({
@@ -436,18 +458,32 @@ export function createGetPromptTemplateConfigHandler(container: AppContainer) {
       throw new Error('Workspace not found');
     }
 
-    // Construct the path to the prompt template file
-    const templatePath = path.join(
-      workspace.path,
-      'quiqr',
-      'model',
-      'includes',
-      'prompts_templates',
-      `${templateKey}.yaml`
+    const baseIncludePath = path.join(workspace.path, 'quiqr', 'model', 'includes');
+
+    // Try new directory first, then fall back to old directory
+    let templatePath = findTemplateFile(
+      path.join(baseIncludePath, 'page_prompt_templates'),
+      templateKey
     );
+    let usingFallback = false;
+
+    if (!templatePath) {
+      // Try old directory
+      const oldTemplatePath = findTemplateFile(
+        path.join(baseIncludePath, 'prompts_templates'),
+        templateKey
+      );
+      if (oldTemplatePath) {
+        templatePath = oldTemplatePath;
+        usingFallback = true;
+        console.warn(
+          `⚠️  Using deprecated 'prompts_templates/' directory. Please rename to 'page_prompt_templates/' for page-level templates.`
+        );
+      }
+    }
 
     // Check if the file exists
-    if (!fs.existsSync(templatePath)) {
+    if (!templatePath) {
       throw new Error(`Prompt template not found: ${templateKey}`);
     }
 
@@ -508,17 +544,29 @@ export function createProcessAiPromptHandler(container: AppContainer) {
 
     const workspacePath = workspace.path;
 
-    // Load the prompt template configuration
-    const templatePath = path.join(
-      workspacePath,
-      'quiqr',
-      'model',
-      'includes',
-      'prompts_templates',
-      `${templateKey}.yaml`
+    const baseIncludePath = path.join(workspacePath, 'quiqr', 'model', 'includes');
+
+    // Try new directory first, then fall back to old directory
+    let templatePath = findTemplateFile(
+      path.join(baseIncludePath, 'page_prompt_templates'),
+      templateKey
     );
 
-    if (!fs.existsSync(templatePath)) {
+    if (!templatePath) {
+      // Try old directory
+      const oldTemplatePath = findTemplateFile(
+        path.join(baseIncludePath, 'prompts_templates'),
+        templateKey
+      );
+      if (oldTemplatePath) {
+        templatePath = oldTemplatePath;
+        console.warn(
+          `⚠️  Using deprecated 'prompts_templates/' directory. Please rename to 'page_prompt_templates/' for page-level templates.`
+        );
+      }
+    }
+
+    if (!templatePath) {
       throw new Error(`Prompt template not found: ${templateKey}`);
     }
 
@@ -560,7 +608,7 @@ export function createProcessAiPromptHandler(container: AppContainer) {
         }
 
         if (filePath) {
-          selfObject = await buildSelfObject(workspacePath, filePath);
+          selfObject = await buildPageSelfObject(workspacePath, filePath);
         }
       } catch (error) {
         console.error('Failed to build self object:', error);
@@ -591,6 +639,7 @@ export function createProcessAiPromptHandler(container: AppContainer) {
       self: selfObject,
       field: formValues,
       workspacePath,
+      contextType: 'page',
     });
 
     // Log the prompt to console
@@ -714,6 +763,251 @@ export function createUpdatePageFromAiResponseHandler(container: AppContainer) {
 }
 
 /**
+ * Get field prompt template configuration by key
+ * Loads and parses the YAML file from quiqr/model/includes/field_prompt_templates/{templateKey}.yaml
+ */
+export function createGetFieldPromptTemplateConfigHandler(container: AppContainer) {
+  return async ({
+    siteKey,
+    workspaceKey,
+    templateKey,
+  }: {
+    siteKey: string;
+    workspaceKey: string;
+    templateKey: string;
+  }) => {
+    // Get the workspace path
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+    const workspace = await siteService.getWorkspaceHead(workspaceKey);
+
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+
+    // Construct the path to the field prompt template file
+    const templatePath = findTemplateFile(
+      path.join(workspace.path, 'quiqr', 'model', 'includes', 'field_prompt_templates'),
+      templateKey
+    );
+
+    // Check if the file exists
+    if (!templatePath) {
+      throw new Error(`Field prompt template not found: ${templateKey}`);
+    }
+
+    // Read and parse the file
+    const fileContent = await fs.readFile(templatePath, 'utf-8');
+    const formatProvider = container.formatResolver.resolveForFilePath(templatePath);
+
+    if (!formatProvider) {
+      throw new Error(`Unsupported file format for field prompt template: ${templatePath}`);
+    }
+
+    const rawConfig = formatProvider.parse(fileContent);
+
+    // Validate the schema
+    const validationResult = promptItemConfigSchema.safeParse(rawConfig);
+
+    if (!validationResult.success) {
+      throw new Error(
+        `Field prompt template validation failed: ${validationResult.error.message}`
+      );
+    }
+
+    // Return the validated configuration
+    return validationResult.data;
+  };
+}
+
+/**
+ * Process field AI prompt
+ * Similar to page AI prompt but works with field context
+ */
+export function createProcessFieldAiPromptHandler(container: AppContainer) {
+  return async ({
+    siteKey,
+    workspaceKey,
+    templateKey,
+    formValues,
+    fieldContext,
+  }: {
+    siteKey: string;
+    workspaceKey: string;
+    templateKey: string;
+    formValues: Record<string, unknown>;
+    fieldContext: {
+      fieldKey: string;
+      fieldType: string;
+      fieldContent: string;
+      collectionKey?: string;
+      collectionItemKey?: string;
+      singleKey?: string;
+    };
+  }) => {
+    // Get workspace service and path
+    const workspaceService = await createWorkspaceServiceForParams(
+      container,
+      siteKey,
+      workspaceKey
+    );
+
+    const siteConfig = await container.libraryService.getSiteConf(siteKey);
+    const siteService = new SiteService(
+      siteConfig,
+      container.siteSourceFactory,
+      container.syncFactory
+    );
+    const workspace = await siteService.getWorkspaceHead(workspaceKey);
+
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+
+    const workspacePath = workspace.path;
+
+    // Load the field prompt template configuration
+    const templatePath = findTemplateFile(
+      path.join(workspacePath, 'quiqr', 'model', 'includes', 'field_prompt_templates'),
+      templateKey
+    );
+
+    if (!templatePath) {
+      throw new Error(`Field prompt template not found: ${templateKey}`);
+    }
+
+    const fileContent = await fs.readFile(templatePath, 'utf-8');
+    const formatProvider = container.formatResolver.resolveForFilePath(templatePath);
+
+    if (!formatProvider) {
+      throw new Error(`Unsupported file format for field prompt template: ${templatePath}`);
+    }
+
+    const rawConfig = formatProvider.parse(fileContent);
+    const validationResult = promptItemConfigSchema.safeParse(rawConfig);
+    let templateConfig;
+    if (validationResult.success) {
+      templateConfig = validationResult.data;
+    } else {
+      throw new Error('Schema validation failed: ' + validationResult.error);
+    }
+
+    // Build field self object
+    const fieldSelfObject = buildFieldSelfObject(
+      fieldContext.fieldKey,
+      fieldContext.fieldType,
+      fieldContext.fieldContent
+    );
+
+    // Build parent page object if we have context
+    let parentPageObject = null;
+    if (fieldContext.singleKey || fieldContext.collectionItemKey) {
+      try {
+        const config = await workspaceService.getConfigurationsData();
+        let filePath = '';
+
+        if (fieldContext.singleKey) {
+          // Get file path for single
+          const single = config.singles.find((x) => x.key === fieldContext.singleKey);
+          if (single && single.file) {
+            filePath = single.file;
+          }
+        } else if (fieldContext.collectionItemKey && fieldContext.collectionKey) {
+          // Get file path for collection item
+          const collection = config.collections.find(
+            (x) => x.key === fieldContext.collectionKey
+          );
+          if (collection) {
+            filePath = path.join(collection.folder, fieldContext.collectionItemKey);
+          }
+        }
+
+        if (filePath) {
+          parentPageObject = await buildParentPageObject(workspacePath, filePath);
+        }
+      } catch (error) {
+        console.error('Failed to build parent page object:', error);
+        // Continue without parent page object
+      }
+    }
+
+    // Find the prompt template text
+    let templateText = '';
+    if (templateConfig.fields) {
+      const templateField = templateConfig.fields.find(
+        (f: Field) => f.type === 'readonly' && f.key === 'promptTemplate'
+      );
+
+      const validationResult = readonlyFieldSchema.safeParse(templateField);
+
+      if (validationResult.data && validationResult.data.default) {
+        templateText = validationResult.data.default;
+      }
+    }
+
+    if (!templateText) {
+      throw new Error('No prompt template text found in configuration');
+    }
+
+    // Process the template with field variable context
+    const finalPrompt = await processPromptTemplate(templateText, {
+      self: fieldSelfObject,
+      parent_page: parentPageObject,
+      field: formValues,
+      workspacePath,
+      contextType: 'field',
+    });
+
+    // Log the prompt to console
+    console.log('\n=== FIELD AI ASSIST PROMPT ===');
+    console.log('Template:', templateKey);
+    console.log('Field:', fieldContext.fieldKey, `(${fieldContext.fieldType})`);
+    console.log('LLM Settings:', JSON.stringify(templateConfig.llm_settings, null, 2));
+    console.log('\n--- Final Prompt ---');
+    console.log(finalPrompt);
+    console.log('\n--- Calling LLM ---');
+
+    // Call the LLM
+    try {
+      const llmResponse = await callLLM({
+        model: templateConfig.llm_settings.model,
+        prompt: finalPrompt,
+        temperature: templateConfig.llm_settings.temperature,
+        maxTokens: 4096,
+      });
+
+      // Log the response
+      console.log('\n--- LLM Response ---');
+      console.log(llmResponse.text);
+
+      if (llmResponse.usage) {
+        console.log('\n--- Usage Stats ---');
+        console.log(`Prompt tokens: ${llmResponse.usage.promptTokens}`);
+        console.log(`Completion tokens: ${llmResponse.usage.completionTokens}`);
+        console.log(`Total tokens: ${llmResponse.usage.totalTokens}`);
+      }
+
+      console.log('\n============================\n');
+
+      // Return both prompt and response
+      return {
+        prompt: finalPrompt,
+        response: llmResponse.text,
+        llm_settings: templateConfig.llm_settings,
+        usage: llmResponse.usage || null,
+      };
+    } catch (error) {
+      console.error('LLM call failed:', error);
+      throw new Error(`Failed to generate AI response: ${(error as Error).message}`);
+    }
+  };
+}
+
+/**
  * Create all workspace-related handlers
  */
 export function createWorkspaceHandlers(container: AppContainer) {
@@ -735,5 +1029,7 @@ export function createWorkspaceHandlers(container: AppContainer) {
     getPromptTemplateConfig: createGetPromptTemplateConfigHandler(container),
     processAiPrompt: createProcessAiPromptHandler(container),
     updatePageFromAiResponse: createUpdatePageFromAiResponseHandler(container),
+    getFieldPromptTemplateConfig: createGetFieldPromptTemplateConfigHandler(container),
+    processFieldAiPrompt: createProcessFieldAiPromptHandler(container),
   };
 }

@@ -12,7 +12,8 @@ export const baseFieldSchema = z.object({
   group: z.string().optional(),
   groupdata: z.boolean().optional(),
   content: z.string().optional(),
-  theme: z.string().optional()
+  theme: z.string().optional(),
+  field_prompt_templates: z.array(z.string()).optional()
 })
 
 // Extended base schema that includes the type property

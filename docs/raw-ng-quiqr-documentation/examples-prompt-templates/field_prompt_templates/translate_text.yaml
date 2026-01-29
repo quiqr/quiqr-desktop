@@ -1,0 +1,32 @@
+---
+key: translate_text
+title: Translate Text
+description: Translate text to another language
+llm_settings:
+  model: gpt-4
+  temperature: 0.5
+fields:
+  - key: target_language
+    title: Target Language
+    type: select
+    options:
+      - Spanish
+      - French
+      - German
+      - Italian
+      - Portuguese
+      - Chinese
+      - Japanese
+  - key: preserve_formatting
+    title: Preserve Formatting
+    type: boolean
+    default: true
+  - key: promptTemplate
+    title: Prompt Template
+    type: readonly
+    default: >
+      Translate the following text to {{ field.target_language }}.
+      {% if field.preserve_formatting %}Preserve the original formatting, including line breaks and markdown syntax.{% endif %}
+      Maintain the same tone and style as the original.
+
+      {{ self.content }}

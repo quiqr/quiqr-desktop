@@ -60,6 +60,33 @@ export function updatePageFromAiResponse(
   });
 }
 
+export function getFieldPromptTemplateConfig(siteKey: string, workspaceKey: string, templateKey: string) {
+  return request('getFieldPromptTemplateConfig', {siteKey, workspaceKey, templateKey});
+}
+
+export function processFieldAiPrompt(
+  siteKey: string,
+  workspaceKey: string,
+  templateKey: string,
+  formValues: Record<string, unknown>,
+  fieldContext: {
+    fieldKey: string;
+    fieldType: string;
+    fieldContent: string;
+    collectionKey?: string;
+    collectionItemKey?: string;
+    singleKey?: string;
+  }
+) {
+  return request('processFieldAiPrompt', {
+    siteKey,
+    workspaceKey,
+    templateKey,
+    formValues,
+    fieldContext
+  });
+}
+
 export function getPreviewCheckConfiguration() {
   return request('getPreviewCheckConfiguration', {});
 }
@@ -559,6 +586,8 @@ export interface API {
   getPromptTemplateConfig: typeof getPromptTemplateConfig;
   processAiPrompt: typeof processAiPrompt;
   updatePageFromAiResponse: typeof updatePageFromAiResponse;
+  getFieldPromptTemplateConfig: typeof getFieldPromptTemplateConfig;
+  processFieldAiPrompt: typeof processFieldAiPrompt;
   getPreviewCheckConfiguration: typeof getPreviewCheckConfiguration;
   serveWorkspace: typeof serveWorkspace;
   stopHugoServer: typeof stopHugoServer;

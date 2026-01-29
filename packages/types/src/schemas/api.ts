@@ -245,6 +245,8 @@ export const apiSchemas = {
   getPromptTemplateConfig: promptItemConfigSchema,
   processAiPrompt: aiPromptResponseSchema,
   updatePageFromAiResponse: z.record(z.unknown()),
+  getFieldPromptTemplateConfig: promptItemConfigSchema,
+  processFieldAiPrompt: aiPromptResponseSchema,
   getPreviewCheckConfiguration: z.unknown().nullable(),
   mountWorkspace: z.string(),
   serveWorkspace: z.void(),

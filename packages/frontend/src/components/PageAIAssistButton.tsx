@@ -22,13 +22,13 @@ import type { StringField, EasymdeField, MarkdownField } from "@quiqr/types";
 // Field type that can be used with AI assist - all have title property
 type AiAssistField = StringField | EasymdeField | MarkdownField;
 
-interface AiAssistProps {
+interface PageAIAssistButtonProps {
   inValue: string;
   inField: AiAssistField;
   handleSetAiText: (text: string) => void;
 }
 
-const AiAssist = ({ inValue, inField, handleSetAiText }: AiAssistProps) => {
+const PageAIAssistButton = ({ inValue, inField, handleSetAiText }: PageAIAssistButtonProps) => {
   // State hooks
   const [dialogOpen, setDialogOpen] = useState(false);
   const [result, setResult] = useState("");
@@ -200,4 +200,4 @@ const AiAssist = ({ inValue, inField, handleSetAiText }: AiAssistProps) => {
   );
 };
 
-export default AiAssist;
+export default PageAIAssistButton;

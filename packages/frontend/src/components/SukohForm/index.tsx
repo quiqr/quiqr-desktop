@@ -6,7 +6,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import service from './../../services/service';
 import { FormProvider } from './FormProvider';
 import { FieldRenderer } from './FieldRenderer';
-import { AIAssistDialog } from './AIAssistDialog';
+import { PageAIAssistDialog } from './PageAIAssistDialog';
 import type { Field, BuildAction } from '@quiqr/types';
 import type { FormMeta } from './FormContext';
 
@@ -236,7 +236,7 @@ export const SukohForm = ({
             >
               AI Assist
             </Button>
-            <AIAssistDialog
+            <PageAIAssistDialog
               open={aiAssistOpen}
               onClose={() => setAiAssistOpen(false)}
               siteKey={siteKey}

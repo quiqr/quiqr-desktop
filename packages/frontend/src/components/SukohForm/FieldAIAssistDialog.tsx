@@ -21,33 +21,43 @@ import { FormProvider } from './FormProvider';
 import { FieldRenderer } from './FieldRenderer';
 import type { FormMeta } from './FormContext';
 
-interface AIAssistDialogProps {
+interface FieldAIAssistDialogProps {
   open: boolean;
   onClose: () => void;
   siteKey: string;
   workspaceKey: string;
-  promptTemplateKeys: string[];
+  fieldKey: string;
+  fieldType: string;
+  fieldContent: string;
+  availableTemplates: string[];
+  onReplace: (content: string) => void;
+  onAppend: (content: string) => void;
   collectionKey?: string;
   collectionItemKey?: string;
   singleKey?: string;
 }
 
-export function AIAssistDialog({
+export function FieldAIAssistDialog({
   open,
   onClose,
   siteKey,
   workspaceKey,
-  promptTemplateKeys,
+  fieldKey,
+  fieldType,
+  fieldContent,
+  availableTemplates,
+  onReplace,
+  onAppend,
   collectionKey,
   collectionItemKey,
   singleKey,
-}: AIAssistDialogProps) {
+}: FieldAIAssistDialogProps) {
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string>('');
   const [templateConfigs, setTemplateConfigs] = useState<Record<string, PromptItemConfig>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
-  const [,setFormDirty] = useState(false);
+  const [, setFormDirty] = useState(false);
   const [sending, setSending] = useState(false);
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [responseMetadata, setResponseMetadata] = useState<{
@@ -61,7 +71,7 @@ export function AIAssistDialog({
 
   // Load all template configs when dialog opens
   useEffect(() => {
-    if (!open || promptTemplateKeys.length === 0) return;
+    if (!open || availableTemplates.length === 0) return;
 
     const loadTemplates = async () => {
       setLoading(true);
@@ -70,8 +80,8 @@ export function AIAssistDialog({
       try {
         const configs: Record<string, PromptItemConfig> = {};
 
-        for (const templateKey of promptTemplateKeys) {
-          const config = await service.api.getPromptTemplateConfig(
+        for (const templateKey of availableTemplates) {
+          const config = await service.api.getFieldPromptTemplateConfig(
             siteKey,
             workspaceKey,
             templateKey
@@ -82,11 +92,11 @@ export function AIAssistDialog({
         setTemplateConfigs(configs);
 
         // Select first template by default
-        if (promptTemplateKeys.length > 0 && !selectedTemplateKey) {
-          setSelectedTemplateKey(promptTemplateKeys[0]);
+        if (availableTemplates.length > 0 && !selectedTemplateKey) {
+          setSelectedTemplateKey(availableTemplates[0]);
         }
       } catch (e) {
-        console.error('Failed to load prompt templates:', e);
+        console.error('Failed to load field prompt templates:', e);
         setError('Failed to load AI Assist templates. Please try again.');
       } finally {
         setLoading(false);
@@ -94,7 +104,7 @@ export function AIAssistDialog({
     };
 
     loadTemplates();
-  }, [open, siteKey, workspaceKey, promptTemplateKeys, selectedTemplateKey]);
+  }, [open, siteKey, workspaceKey, availableTemplates, selectedTemplateKey]);
 
   // Reset form values when template changes
   useEffect(() => {
@@ -139,19 +149,22 @@ export function AIAssistDialog({
     setError(null);
 
     try {
-      const result = await service.api.processAiPrompt(
+      const result = await service.api.processFieldAiPrompt(
         siteKey,
         workspaceKey,
         selectedTemplateKey,
         formValues,
         {
+          fieldKey,
+          fieldType,
+          fieldContent,
           collectionKey,
           collectionItemKey,
           singleKey,
         }
       );
 
-      console.log('AI Prompt processed successfully:', result);
+      console.log('Field AI Prompt processed successfully:', result);
 
       // Store the response
       setAiResponse(result.response);
@@ -160,7 +173,7 @@ export function AIAssistDialog({
         usage: result.usage,
       });
     } catch (err: unknown) {
-      console.error('Failed to process AI prompt:', err);
+      console.error('Failed to process field AI prompt:', err);
       if (err instanceof Error) {
         setError(err.message || 'Failed to process prompt. Please check the console for details.');
       }
@@ -174,6 +187,9 @@ export function AIAssistDialog({
     formValues,
     siteKey,
     workspaceKey,
+    fieldKey,
+    fieldType,
+    fieldContent,
     collectionKey,
     collectionItemKey,
     singleKey,
@@ -190,93 +206,50 @@ export function AIAssistDialog({
 
   const handleCopyResponse = useCallback(() => {
     if (aiResponse) {
-      navigator.clipboard.writeText(aiResponse).then(() => {
-        alert('Response copied to clipboard!');
-      }).catch((err) => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy to clipboard');
-      });
+      navigator.clipboard
+        .writeText(aiResponse)
+        .then(() => {
+          alert('Response copied to clipboard!');
+        })
+        .catch((err) => {
+          console.error('Failed to copy:', err);
+          alert('Failed to copy to clipboard');
+        });
     }
   }, [aiResponse]);
 
-  const handleUpdatePage = useCallback(async () => {
+  const handleReplaceClick = useCallback(() => {
     if (!aiResponse) return;
+    onReplace(aiResponse);
+    handleClose();
+  }, [aiResponse, onReplace, handleClose]);
 
-    // Confirm with user
-    if (!window.confirm('This will replace the current page content with the AI response. Continue?')) {
-      return;
-    }
-
-    setSending(true);
-    setError(null);
-
-    try {
-      // Send the AI response to backend for parsing and updating
-      await service.api.updatePageFromAiResponse(
-        siteKey,
-        workspaceKey,
-        aiResponse,
-        {
-          collectionKey,
-          collectionItemKey,
-          singleKey,
-        }
-      );
-
-      // Reload the current form to show the updated content
-      await service.api.reloadCurrentForm();
-
-      // Close the dialog
-      handleClose();
-
-      // Show success message
-      alert('Page updated successfully!');
-    } catch (err: unknown) {
-      console.error('Failed to update page:', err);
-      if (err instanceof Error) {
-        setError(err.message || 'Failed to update page. Please check the console for details.');
-      }
-    } finally {
-      setSending(false);
-    }
-  }, [
-    aiResponse,
-    siteKey,
-    workspaceKey,
-    singleKey,
-    collectionKey,
-    collectionItemKey,
-    handleClose,
-  ]);
+  const handleAppendClick = useCallback(() => {
+    if (!aiResponse) return;
+    onAppend(aiResponse);
+    handleClose();
+  }, [aiResponse, onAppend, handleClose]);
 
   // Create metadata for the form
-  const meta: FormMeta = useMemo(() => ({
-    siteKey,
-    workspaceKey,
-    collectionKey: '',
-    collectionItemKey: '',
-    prompt_templates: [],
-    enableAiAssist: false, // Disable nested AI Assist
-    pageUrl: '',
-  }), [siteKey, workspaceKey]);
+  const meta: FormMeta = useMemo(
+    () => ({
+      siteKey,
+      workspaceKey,
+      collectionKey: '',
+      collectionItemKey: '',
+      prompt_templates: [],
+      enableAiAssist: false, // Disable nested AI Assist
+      pageUrl: '',
+    }),
+    [siteKey, workspaceKey]
+  );
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-      scroll="paper"
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth scroll="paper">
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span>AI Assist</span>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={handleClose}
-            aria-label="close"
-          >
+          <span>AI Assist for Field: {fieldKey}</span>
+          <IconButton edge="end" color="inherit" onClick={handleClose} aria-label="close">
             <CloseIcon />
           </IconButton>
         </Box>
@@ -299,15 +272,15 @@ export function AIAssistDialog({
           <>
             {/* Template Selector */}
             <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel id="ai-template-select-label">Template</InputLabel>
+              <InputLabel id="field-ai-template-select-label">Template</InputLabel>
               <Select
-                labelId="ai-template-select-label"
-                id="ai-template-select"
+                labelId="field-ai-template-select-label"
+                id="field-ai-template-select"
                 value={selectedTemplateKey}
                 label="Template"
                 onChange={handleTemplateChange}
               >
-                {promptTemplateKeys.map((key) => {
+                {availableTemplates.map((key) => {
                   const config = templateConfigs[key];
                   return (
                     <MenuItem key={key} value={key}>
@@ -317,6 +290,33 @@ export function AIAssistDialog({
                 })}
               </Select>
             </FormControl>
+
+            {/* Current Field Content Preview */}
+            {fieldContent && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  Current Content:
+                </Typography>
+                <Box
+                  component="pre"
+                  sx={{
+                    backgroundColor: 'grey.50',
+                    border: '1px solid',
+                    borderColor: 'grey.300',
+                    borderRadius: 1,
+                    p: 1.5,
+                    maxHeight: '150px',
+                    overflow: 'auto',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                    fontFamily: 'monospace',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  {fieldContent}
+                </Box>
+              </Box>
+            )}
 
             {/* Form Area */}
             {selectedConfig && selectedConfig.fields && (
@@ -342,15 +342,20 @@ export function AIAssistDialog({
             )}
 
             {selectedConfig && !selectedConfig.fields && (
-              <Alert severity="warning">
-                This template has no fields configured.
-              </Alert>
+              <Alert severity="warning">This template has no fields configured.</Alert>
             )}
 
             {/* AI Response Section */}
             {aiResponse && (
               <Box sx={{ mt: 4 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 1,
+                  }}
+                >
                   <Typography variant="h6" component="h3">
                     Response
                   </Typography>
@@ -361,28 +366,39 @@ export function AIAssistDialog({
                       onClick={handleCopyResponse}
                       disabled={sending}
                     >
-                      Copy Response
+                      Copy
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleAppendClick}
+                      disabled={sending}
+                    >
+                      Append to Field
                     </Button>
                     <Button
                       size="small"
                       variant="contained"
                       color="primary"
-                      onClick={handleUpdatePage}
+                      onClick={handleReplaceClick}
                       disabled={sending}
                     >
-                      Update Page
+                      Replace Field
                     </Button>
                   </Box>
                 </Box>
 
                 {responseMetadata && (
-                  <Box sx={{ mb: 1, display: 'flex', gap: 2, fontSize: '0.875rem', color: 'text.secondary' }}>
-                    {responseMetadata.provider && (
-                      <span>Provider: {responseMetadata.provider}</span>
-                    )}
+                  <Box
+                    sx={{ mb: 1, display: 'flex', gap: 2, fontSize: '0.875rem', color: 'text.secondary' }}
+                  >
+                    {responseMetadata.provider && <span>Provider: {responseMetadata.provider}</span>}
                     {responseMetadata.usage && (
                       <span>
-                        Tokens: {responseMetadata.usage.promptTokens ?? 0} + {responseMetadata.usage.completionTokens ?? 0} = {responseMetadata.usage.totalTokens ?? 0}
+                        Tokens: {responseMetadata.usage.promptTokens ?? 0} +{' '}
+                        {responseMetadata.usage.completionTokens ?? 0} ={' '}
+                        {responseMetadata.usage.totalTokens ?? 0}
                       </span>
                     )}
                   </Box>
@@ -422,7 +438,7 @@ export function AIAssistDialog({
             onClick={handleSendPrompt}
             disabled={loading || !!error || !selectedTemplateKey || sending}
           >
-            {sending ? 'Processing...' : 'Send Prompt to AI Assist'}
+            {sending ? 'Processing...' : 'Send Prompt to AI'}
           </Button>
         )}
       </DialogActions>
@@ -430,4 +446,4 @@ export function AIAssistDialog({
   );
 }
 
-export default AIAssistDialog;
+export default FieldAIAssistDialog;
