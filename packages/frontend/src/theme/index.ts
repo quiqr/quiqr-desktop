@@ -444,7 +444,7 @@ const getComponentOverrides = (mode: PaletteMode): ThemeOptions['components'] =>
         '& th, & td': {
           padding: '12px 15px',
           textAlign: 'left',
-          borderBottom: '1px solid #E1E1E1',
+          borderBottom: mode === 'dark' ? '1px solid #555' : '1px solid #E1E1E1',
         },
         '& th:first-of-type, & td:first-of-type': {
           paddingLeft: 0,
@@ -475,6 +475,56 @@ const getComponentOverrides = (mode: PaletteMode): ThemeOptions['components'] =>
       'ul': {
         paddingInlineStart: '16px',
       },
+      // MDXEditor dark mode support
+      ...(mode === 'dark' && {
+        '.mdx-editor-wrapper .mdxeditor': {
+          '--baseTextContrast': '#a0abb5',
+          backgroundColor: gray[800],
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-toolbar': {
+          backgroundColor: gray[700],
+          borderBottom: `1px solid ${gray[600]}`,
+        },
+        '.mdx-editor-wrapper .mdxeditor-toolbar button': {
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-toolbar button:hover': {
+          backgroundColor: gray[600],
+        },
+        '.mdx-editor-wrapper .mdxeditor-toolbar button[aria-pressed="true"]': {
+          backgroundColor: gray[600],
+        },
+        '.mdx-editor-wrapper .mdxeditor-toolbar select': {
+          color: '#ffffff',
+          backgroundColor: gray[700],
+          borderColor: gray[600],
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor': {
+          backgroundColor: gray[800],
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor p': {
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor h1, .mdx-editor-wrapper .mdxeditor-rich-text-editor h2, .mdx-editor-wrapper .mdxeditor-rich-text-editor h3, .mdx-editor-wrapper .mdxeditor-rich-text-editor h4, .mdx-editor-wrapper .mdxeditor-rich-text-editor h5, .mdx-editor-wrapper .mdxeditor-rich-text-editor h6': {
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor li': {
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor a': {
+          color: brand[300],
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor code': {
+          backgroundColor: gray[700],
+          color: '#ffffff',
+        },
+        '.mdx-editor-wrapper .mdxeditor-rich-text-editor pre': {
+          backgroundColor: gray[700],
+          borderColor: gray[600],
+        },
+      }),
     },
   },
 });

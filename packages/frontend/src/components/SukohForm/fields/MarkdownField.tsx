@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useTheme } from '@mui/material/styles';
 import '@mdxeditor/editor/style.css';
 import {
   MDXEditor,
@@ -31,6 +32,7 @@ interface Props {
  * Replaces the legacy react-simplemde-editor and plain textarea implementations.
  */
 function MarkdownField({ compositeKey }: Props) {
+  const theme = useTheme();
   const { field, value, setValue, meta } = useField<string>(compositeKey);
   const config = field as MarkdownFieldConfig;
   const editorRef = useRef<MDXEditorMethods>(null);
@@ -96,7 +98,7 @@ function MarkdownField({ compositeKey }: Props) {
                 display: 'block',
                 marginBottom: '8px',
                 fontSize: '12px',
-                color: 'rgba(0, 0, 0, 0.6)',
+                color: theme.palette.text.secondary,
               }}
             >
               {config.title}
@@ -104,10 +106,12 @@ function MarkdownField({ compositeKey }: Props) {
           )}
           <div
             style={{
-              border: '1px solid rgba(0, 0, 0, 0.23)',
+              border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'}`,
               borderRadius: '4px',
               overflow: 'hidden',
+              backgroundColor: theme.palette.background.paper,
             }}
+            className="mdx-editor-wrapper"
           >
             <MDXEditor
               ref={editorRef}
