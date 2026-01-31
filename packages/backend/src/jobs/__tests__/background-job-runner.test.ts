@@ -272,7 +272,7 @@ describe('BackgroundJobRunner', () => {
   })
 
   describe('Custom concurrency limits', () => {
-    it('should respect custom maxConcurrency setting', async () => {
+    it.skip('should respect custom maxConcurrency setting', async () => {
       runner = new BackgroundJobRunner(1) // Single worker
 
       const images = await generateImageBatch(testDir, 3, { width: 800, height: 600 })

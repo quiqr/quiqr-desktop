@@ -1,13 +1,12 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
-- **BREAKING CHANGE:** Removed legacy direct OpenAI field AI assist
-  - Removed `openAiApiKey` configuration from Advanced Preferences
-  - Removed direct OpenAI API calls from frontend (`openai` npm package)
-  - Removed `meta.enableAiAssist` flag from form system
-  - **Migration:** Use template-based field AI assist with `field_prompt_templates/`
-  - **Migration:** Configure LLM providers via `QUIQR_LLM_PROVIDER_*` environment variables
-  - **See:** Documentation in `prompts_templates.md` for migration guide
+
+## 0.22.0 (2026-01-31) FOSDEM RELEASE
+- Removed legacy direct OpenAI field AI assist
+  Removed `openAiApiKey` configuration from Advanced Preferences
+  Removed direct OpenAI API calls from frontend (`openai` npm package)
+  Removed `meta.enableAiAssist` flag from form system
 - feature: Field AI Assist with Prompt Templates
   - Add `field_prompt_templates/` directory for field-specific AI templates
   - Support both `.yaml` and `.yml` file extensions for all templates
