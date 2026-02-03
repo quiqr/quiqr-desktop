@@ -217,15 +217,15 @@ For each type being migrated:
 
 ### Type Safety Validation
 ```bash
-# Frontend type checking
+# Frontend type checking (from project root)
 cd packages/frontend && npx tsc --noEmit
 
-# Verify no duplicate types
-rg "interface LogQueryOptions" --type ts
+# Verify no duplicate types (from project root)
+grep -r "interface LogQueryOptions" packages/*/src/ --include="*.ts"
 
-# Verify imports
-rg "from '@quiqr/types'" packages/frontend/src/
-rg "from '@quiqr/types'" packages/backend/src/
+# Verify imports (from project root)
+grep -r "from '@quiqr/types'" packages/frontend/src/ --include="*.ts"
+grep -r "from '@quiqr/types'" packages/backend/src/ --include="*.ts"
 ```
 
 ### Build Validation
