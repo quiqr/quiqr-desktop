@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import service from './../../services/service';
+import { useSingle, useWorkspaceDetails, useUpdateSingle } from './../../queries/hooks';
+import { siteQueryOptions } from './../../queries/options';
 import { SukohForm } from './../../components/SukohForm';
 import Spinner from './../../components/Spinner';
-import type { Field, BuildAction, WorkspaceDetails } from '@quiqr/types';
+import type { Field, BuildAction } from '@quiqr/types';
 
 interface SingleProps {
   siteKey: string;
@@ -15,38 +18,25 @@ interface SingleProps {
 }
 
 function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey, nestPath }: SingleProps) {
-  const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
-  const [singleValues, setSingleValues] = useState<Record<string, unknown> | null>(null);
-  const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
-  const isMountedRef = useRef(true);
+  // Replace manual state management with TanStack Query
+  const { data: singleValues, isLoading: singleLoading, isError: singleError } = useSingle(
+    siteKey,
+    workspaceKey,
+    singleKey,
+    fileOverride || undefined
+  );
 
-  useEffect(() => {
-    isMountedRef.current = true;
+  const { data: selectedWorkspaceDetails, isLoading: workspaceLoading } = useWorkspaceDetails(
+    siteKey,
+    workspaceKey
+  );
 
-    const loadData = async () => {
-      try {
-        const [single, workspaceDetails, baseUrlPath] = await Promise.all([
-          service.api.getSingle(siteKey, workspaceKey, singleKey, fileOverride),
-          service.api.getWorkspaceDetails(siteKey, workspaceKey),
-          service.api.getCurrentBaseUrl(),
-        ]);
+  const { data: currentBaseUrlPath } = useQuery(siteQueryOptions.currentBaseUrl());
 
-        if (isMountedRef.current) {
-          setSingleValues(single);
-          setSelectedWorkspaceDetails(workspaceDetails);
-          setCurrentBaseUrlPath(typeof baseUrlPath === 'string' ? baseUrlPath : undefined);
-        }
-      } catch (e) {
-        service.api.logToConsole(e, 'error');
-      }
-    };
-
-    loadData();
-
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, [siteKey, workspaceKey, singleKey, fileOverride, modelRefreshKey]);
+  // Log errors (if needed)
+  if (singleError) {
+    service.api.logToConsole('Error loading single', 'error');
+  }
 
   const handleOpenInEditor = useCallback(
     (context: { reject: (message: string) => void }) => {
@@ -63,19 +53,23 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
     [siteKey, workspaceKey, singleKey]
   );
 
+  const updateSingleMutation = useUpdateSingle();
+
   const handleSave = useCallback(
     (context: { data: Record<string, unknown>; accept: (values: Record<string, unknown>) => void; reject: (message: string) => void }) => {
-      const promise = service.api.updateSingle(siteKey, workspaceKey, singleKey, context.data);
-      promise.then(
-        function (updatedValues) {
-          context.accept(updatedValues);
-        },
-        function () {
-          context.reject('Something went wrong.');
+      updateSingleMutation.mutate(
+        { siteKey, workspaceKey, singleKey, document: context.data },
+        {
+          onSuccess: (updatedValues) => {
+            context.accept(updatedValues);
+          },
+          onError: () => {
+            context.reject('Something went wrong.');
+          },
         }
       );
     },
-    [siteKey, workspaceKey, singleKey]
+    [siteKey, workspaceKey, singleKey, updateSingleMutation]
   );
 
   const single = selectedWorkspaceDetails?.singles.find((x) => x.key === singleKey);
@@ -88,10 +82,11 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
       return '';
     }
 
-    let finalpath = currentBaseUrlPath || '';
+    const baseUrl = typeof currentBaseUrlPath === 'string' ? currentBaseUrlPath : '';
+    let finalpath = baseUrl;
 
     if (single.previewUrl) {
-      finalpath = (currentBaseUrlPath || '') + single.previewUrl;
+      finalpath = baseUrl + single.previewUrl;
     }
     finalpath = finalpath.replace('//', '/').replace('//', '/');
 
@@ -134,7 +129,7 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
     [siteKey, workspaceKey, singleKey]
   );
 
-  if (singleValues === undefined || selectedWorkspaceDetails == null) {
+  if (singleLoading || workspaceLoading || !singleValues || !selectedWorkspaceDetails) {
     return <Spinner />;
   }
 

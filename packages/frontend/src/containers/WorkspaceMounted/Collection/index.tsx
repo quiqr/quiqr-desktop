@@ -1,5 +1,6 @@
 import * as React                    from 'react';
 import { useNavigate }               from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 import DialogTitle                   from '@mui/material/DialogTitle';
 import Dialog                        from '@mui/material/Dialog';
 import DialogActions                 from '@mui/material/DialogActions';
@@ -28,8 +29,10 @@ import CopyItemToLanguageDialog      from './CopyItemToLanguageDialog'
 import Spinner                       from './../../../components/Spinner'
 import { createDebounce }            from './../../../utils/debounce';
 import { useSnackbar }               from './../../../contexts/SnackbarContext';
+import { useCollectionItems, useWorkspaceDetails, useDeleteCollectionItem } from './../../../queries/hooks';
+import { siteQueryOptions } from './../../../queries/options';
 import { api }                       from './../../../services/api-service'
-import type { CollectionItem, Language, WorkspaceDetails, CollectionConfig } from '@quiqr/types'
+import type { CollectionItem, CollectionConfig } from '@quiqr/types'
 
 const Fragment = React.Fragment;
 
@@ -229,17 +232,13 @@ type CollectionView =
   | { key: 'deleteItem'; item: CollectionItem }
   | { key: 'makePageBundleItem'; item: CollectionItem }
 
-interface CollectionState {
-  selectedWorkspaceDetails: WorkspaceDetails | null;
-  items: CollectionItem[] | null;
-  languages: Language[];
+interface CollectionLocalState {
   filter: string;
   filteredItems: CollectionItem[];
   view?: CollectionView;
   trunked: boolean;
   modalBusy: boolean;
   dirs: string[];
-  showSpinner?: boolean;
   sortDescending?: boolean;
   showSortValue?: boolean;
 }
@@ -248,14 +247,28 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
   const filterDebounce = React.useRef(createDebounce(200));
   const navigate = useNavigate();
   const { addSnackMessage } = useSnackbar();
-  
-  const [state, setState] = React.useState<CollectionState>({
-    selectedWorkspaceDetails: null,
-    items: null,
-    languages: [],
+
+  // Replace manual data state with TanStack Query
+  const { data: items = [], isLoading: itemsLoading } = useCollectionItems(
+    siteKey,
+    workspaceKey,
+    collectionKey
+  );
+
+  const { data: selectedWorkspaceDetails, isLoading: workspaceLoading } = useWorkspaceDetails(
+    siteKey,
+    workspaceKey
+  );
+
+  const { data: languages = [] } = useQuery(siteQueryOptions.languages(siteKey, workspaceKey));
+
+  const deleteCollectionItemMutation = useDeleteCollectionItem();
+
+  // Keep UI state local
+  const [state, setState] = React.useState<CollectionLocalState>({
     filter: '',
     filteredItems: [],
-    view: null,
+    view: undefined,
     trunked: false,
     modalBusy: false,
     dirs: []
@@ -289,61 +302,29 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     setState(prev => ({ ...prev, view: undefined, modalBusy: false }));
   };
 
+  // Update filtered items when items or filter changes
   React.useEffect(() => {
-    api.getLanguages(siteKey, workspaceKey).then((langs) => {
-      setState(prev => ({ ...prev, languages: langs }));
-    });
-
-    refreshItems();
+    if (items) {
+      const filteredData = resolveFilteredItems(items, state.filter);
+      setState(prev => ({ ...prev, ...filteredData }));
+    }
 
     return () => {
       filterDebounce.current.cancel();
     };
-  }, [siteKey, workspaceKey, collectionKey]);
-
-  const refreshItems = React.useCallback(() => {
-    if (siteKey && workspaceKey && collectionKey) {
-      Promise.all([
-        api.listCollectionItems(siteKey, workspaceKey, collectionKey).then((items) => {
-          const filteredData = resolveFilteredItems(items, state.filter);
-          setState(prev => ({ 
-            ...prev, 
-            items, 
-            ...filteredData 
-          }));
-        }),
-        api.getWorkspaceDetails(siteKey, workspaceKey).then((workspaceDetails) => {
-          setState(prev => ({ 
-            ...prev, 
-            selectedWorkspaceDetails: workspaceDetails 
-          }));
-        })
-      ]).catch(() => {
-        // Handle error if needed
-      });
-    }
-  }, [siteKey, workspaceKey, collectionKey, state.filter]);
+  }, [items, state.filter]);
 
   // componentWillUnmount is handled in useEffect cleanup
 
   const makePageBundleCollectionItem = () => {
     const view = state.view;
     if (view == null) return;
+    setState(prev => ({ ...prev, modalBusy: true }));
+
     api.makePageBundleCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
       .then(() => {
-        setState(prev => {
-          const itemsCopy = (prev.items || []).slice(0);
-          const itemIndex = itemsCopy.findIndex(x => x.key === view.item.key);
-          itemsCopy.splice(itemIndex, 1);
-          const filteredData = resolveFilteredItems(itemsCopy, prev.filter);
-          return {
-            ...prev,
-            items: itemsCopy,
-            modalBusy: false,
-            view: undefined,
-            ...filteredData
-          };
-        });
+        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+        // Queries will automatically refetch
       }, () => {
         setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
       });
@@ -353,44 +334,29 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     const view = state.view;
     if (view == null) return;
 
-    api.deleteCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
-      .then(() => {
-        setState(prev => {
-          const itemsCopy = (prev.items || []).slice(0);
-          const itemIndex = itemsCopy.findIndex(x => x.key === view.item.key);
-          itemsCopy.splice(itemIndex, 1);
-          const filteredData = resolveFilteredItems(itemsCopy, prev.filter);
-          return {
-            ...prev,
-            items: itemsCopy,
-            modalBusy: false,
-            view: undefined,
-            ...filteredData
-          };
-        });
-      }, () => {
-        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-      });
+    deleteCollectionItemMutation.mutate(
+      { siteKey, workspaceKey, collectionKey, collectionItemKey: view.item.key },
+      {
+        onSuccess: () => {
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          // TanStack Query automatically invalidates and refetches
+        },
+        onError: () => {
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+        },
+      }
+    );
   };
 
   const renameCollectionItem = (itemKey: string, itemOldKey: string) => {
     if (state.view == null) return;
+    setState(prev => ({ ...prev, modalBusy: true }));
+
     api.renameCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
       .then((result) => {
         if (result.renamed) {
-          setState(prev => {
-            const itemsCopy = (prev.items || []).slice(0);
-            const itemIndex = itemsCopy.findIndex(x => x.label === itemOldKey);
-            itemsCopy[itemIndex] = result.item;
-            const filteredData = resolveFilteredItems(itemsCopy, prev.filter);
-            return {
-              ...prev,
-              items: itemsCopy,
-              modalBusy: false,
-              view: undefined,
-              ...filteredData
-            };
-          });
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          // Queries will automatically refetch
         } else {
           //TODO: warn someone!
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
@@ -403,22 +369,13 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
 
   const copyCollectionItem = (itemKey: string, itemOldKey: string) => {
     if (state.view == null) return;
+    setState(prev => ({ ...prev, modalBusy: true }));
 
     api.copyCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
       .then((result) => {
         if (result.copied) {
-          setState(prev => {
-            const itemsCopy = (prev.items || []).slice(0);
-            itemsCopy.push(result.item);
-            const filteredData = resolveFilteredItems(itemsCopy, prev.filter);
-            return {
-              ...prev,
-              items: itemsCopy,
-              modalBusy: false,
-              view: undefined,
-              ...filteredData
-            };
-          });
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          // Queries will automatically refetch
         } else {
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
         }
@@ -452,13 +409,13 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
         if (unavailableReason) {
           setState(prev => ({ ...prev, modalBusy: false }));
         } else {
-          refreshItems();
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          // Queries will automatically refetch
+          const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`;
+          navigate(path);
         }
       }, () => {
         setState(prev => ({ ...prev, modalBusy: false }));
-      }).then(() => {
-        const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`;
-        navigate(path);
       });
   };
 
@@ -489,7 +446,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     setState(prev => ({ ...prev, filter: newFilter }));
 
     filterDebounce.current.debounce(() => {
-      const filteredData = resolveFilteredItems(state.items || [], newFilter);
+      const filteredData = resolveFilteredItems(items, newFilter);
       setState(prev => ({ ...prev, ...filteredData }));
     });
   };
@@ -523,7 +480,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     const newFilter = (e.currentTarget as HTMLElement).dataset.dir || '';
     setState(prev => ({ ...prev, filter: newFilter }));
     filterDebounce.current.debounce(() => {
-      const filteredData = resolveFilteredItems(state.items || [], newFilter);
+      const filteredData = resolveFilteredItems(items, newFilter);
       setState(prev => ({ ...prev, ...filteredData }));
     });
   };
@@ -543,11 +500,11 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
   const { filteredItems, trunked } = state;
   let dialog = undefined;
 
-  if (state.showSpinner || state.selectedWorkspaceDetails == null) {
+  if (itemsLoading || workspaceLoading || !selectedWorkspaceDetails) {
     return (<Spinner />);
   }
-  
-  const collection = state.selectedWorkspaceDetails.collections.find((x) => x.key === collectionKey);
+
+  const collection = selectedWorkspaceDetails.collections.find((x) => x.key === collectionKey);
   if (collection == null)
     return null;
 
@@ -680,7 +637,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
 
         <List>
           <CollectionListItems
-            languages={state.languages}
+            languages={languages}
             collectionExtension={collection.extension}
             filteredItems={filteredItems}
             onItemClick={handleItemClick}

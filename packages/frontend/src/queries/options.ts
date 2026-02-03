@@ -294,10 +294,11 @@ export const singleMutationOptions = {
       document: Record<string, unknown>;
     }) => api.updateSingle(params.siteKey, params.workspaceKey, params.singleKey, params.document),
 
-    onSuccess: (_data: unknown, variables: {
+    onSuccess: (data: Record<string, unknown>, variables: {
       siteKey: string;
       workspaceKey: string;
       singleKey: string;
+      document: Record<string, unknown>;
     }) => {
       // Invalidate the specific single item
       queryClient.invalidateQueries({
@@ -318,10 +319,11 @@ export const singleMutationOptions = {
       document: Record<string, unknown>;
     }) => api.saveSingle(params.siteKey, params.workspaceKey, params.singleKey, params.document),
 
-    onSuccess: (_data: unknown, variables: {
+    onSuccess: (data: Record<string, unknown>, variables: {
       siteKey: string;
       workspaceKey: string;
       singleKey: string;
+      document: Record<string, unknown>;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['getSingle', variables.siteKey, variables.workspaceKey, variables.singleKey],
@@ -369,11 +371,12 @@ export const collectionMutationOptions = {
         params.document
       ),
 
-    onSuccess: (_data: unknown, variables: {
+    onSuccess: (data: Record<string, unknown>, variables: {
       siteKey: string;
       workspaceKey: string;
       collectionKey: string;
       collectionItemKey: string;
+      document: Record<string, unknown>;
     }) => {
       // Invalidate the specific item
       queryClient.invalidateQueries({
