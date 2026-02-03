@@ -22,14 +22,13 @@
     "dev:frontend": "cd packages/frontend && npm run dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev:electron:wait": "wait-on http://localhost:4002 && npm run dev:electron",
-    "build": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder",
-    "build:appimage": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --linux AppImage",
-    "build:rpm": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --linux rpm",
-    "build:windows": "npm run _build_info && npm run build:packages && npm run build:frontend && npm run _pack_embgit && electron-builder --win",
-    "build:packages": "npm run build -w @quiqr/types && npm run build -w @quiqr/backend && npm run build -w @quiqr/adapter-electron && npm run build -w @quiqr/adapter-standalone",
+    "build": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge make",
+    "build:appimage": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge make --targets=@reforged/maker-appimage",
+    "build:rpm": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge make --targets=@electron-forge/maker-rpm",
+    "build:windows": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge make --targets=@electron-forge/maker-squirrel",
+    "build:packages": "npm run build -w @quiqr/types && npm run build -w @quiqr/backend && npm run build -w @quiqr/adapter-electron && npm run build -w @quiqr/adapter-standalone && npm run build -w @quiqr/frontend",
     "build:frontend": "cd packages/frontend && npm run build",
     "release": "release-script --addPlaceholder",
-    "dist": "electron-builder",
     "_pack_embgit": "node scripts/embgit-sh-runner.js",
     "_build_info": "node scripts/build_info.js",
     "_hugo_versions": "node scripts/getHugoVersions.js",
@@ -40,41 +39,37 @@
     "test:coverage": "vitest run --coverage",
     "test:frontend": "vitest run --project frontend",
     "test:backend": "vitest run --project backend",
-    "test:types": "vitest run --project types"
+    "test:types": "vitest run --project types",
+    "start": "electron-forge start",
+    "package": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge package",
+    "make": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge make",
+    "make:deb": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge make --targets=@electron-forge/maker-deb",
+    "publish": "npm run _build_info && npm run build:packages && npm run _pack_embgit && electron-forge publish"
   },
   "keywords": [],
-  "_comment_dependencies": "NOTE: Some dependencies below (glob, ai, @ai-sdk/*, gray-matter, sharp) are also declared in packages/backend/package.json. They must be duplicated here due to electron-builder limitation with npm workspaces - it only packages dependencies from root package.json, not workspace dependencies. See: https://github.com/electron-userland/electron-builder/issues/7103",
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.12",
-    "@ai-sdk/openai": "^3.0.9",
-    "7zip-bin": "3.1.0",
-    "adm-zip": "0.4.13",
-    "ai": "^6.0.33",
     "await-spawn": "4.0.1",
-    "chokidar": "^3.5.3",
     "cors": "^2.8.5",
-    "deepmerge": "^4.3.1",
     "electron-progressbar": "^1.2.0",
+    "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
-    "express": "^4.21.2",
-    "front-matter": "^4.0.2",
-    "fs-extra": "^11.2.0",
     "glob": "13.0.0",
-    "gray-matter": "^4.0.3",
-    "jimp": "^1.6.0",
-    "js-yaml": ">=3.13.1",
-    "markdown-it": "^14.1.0",
-    "react-scan": "^0.4.3",
-    "sharp": "^0.34.5",
-    "toml": "2.3.3",
-    "tomlify-j0.4": "3.0.0",
-    "ws": "^8.18.0",
-    "zod": "^3.24.1"
+    "react-scan": "^0.4.3"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^3.5.6",
+    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-deb": "^7.11.1",
+    "@electron-forge/maker-rpm": "^7.11.1",
+    "@electron-forge/maker-squirrel": "^7.11.1",
+    "@electron-forge/maker-zip": "^7.11.1",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
+    "@electron-forge/plugin-fuses": "^7.11.1",
+    "@electron-forge/publisher-github": "^7.11.1",
+    "@electron/fuses": "^1.8.0",
     "@electron/notarize": "^3.1.1",
     "@eslint/js": "^9.39.2",
+    "@reforged/maker-appimage": "^5.2.0",
     "@testing-library/dom": "^10.4.1",
     "@types/adm-zip": "^0.5.7",
     "@vitest/coverage-v8": "^4.0.15",
@@ -82,7 +77,6 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^39.2.3",
-    "electron-builder": "^26.3.3",
     "globals": "^17.0.0",
     "typescript-eslint": "^8.53.1",
     "vitest": "^4.0.15",
@@ -103,150 +97,6 @@
     "@babel/preset-react": "^7.26.3",
     "babel-loader": "^9.2.1",
     "vite": "^6.0.11"
-  },
-  "build": {
-    "appId": "org.quiqr.quiqr-desktop",
-    "artifactName": "quiqr_${version}_${os}_${arch}.${ext}",
-    "productName": "Quiqr",
-    "files": [
-      "packages/frontend/build/**/*",
-      "packages/adapters/electron/dist/**/*",
-      "packages/adapters/electron/package.json",
-      "packages/backend/dist/**/*",
-      "packages/backend/package.json",
-      "packages/types/dist/**/*",
-      "packages/types/package.json",
-      "resources/**/*",
-      "package.json",
-      {
-        "from": "packages/types",
-        "to": "node_modules/@quiqr/types",
-        "filter": [
-          "dist/**/*",
-          "package.json"
-        ]
-      },
-      {
-        "from": "packages/backend",
-        "to": "node_modules/@quiqr/backend",
-        "filter": [
-          "dist/**/*",
-          "package.json"
-        ]
-      },
-      {
-        "from": "packages/adapters/electron",
-        "to": "node_modules/@quiqr/adapter-electron",
-        "filter": [
-          "dist/**/*",
-          "package.json"
-        ]
-      }
-    ],
-    "asarUnpack": [
-      "node_modules/@quiqr/**/*",
-      "node_modules/7zip-bin/**/*",
-      "node_modules/7zip-bin-win/**/*",
-      "node_modules/7zip-bin-linux/**/*",
-      "node_modules/7zip-bin-mac/**/*"
-    ],
-    "directories": {
-      "buildResources": "packages/frontend/public",
-      "output": "dist"
-    },
-    "publish": [
-      {
-        "provider": "github"
-      }
-    ],
-    "protocols": [
-      {
-        "name": "quiqr",
-        "role": "Editor",
-        "schemes": [
-          "quiqr"
-        ]
-      }
-    ],
-    "extraResources": [
-      {
-        "from": "resources/${os}",
-        "to": "bin",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
-        "from": "resources/all",
-        "to": "all",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
-    "win": {
-      "icon": "icon.ico",
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    },
-    "nsisWeb": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowElevation": true,
-      "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": true,
-      "unicode": true,
-      "installerIcon": "icon.ico",
-      "differentialPackage": true
-    },
-    "mac": {
-      "icon": "icon",
-      "hardenedRuntime": true,
-      "entitlements": "build/entitlements.mac.plist",
-      "gatekeeperAssess": false,
-      "entitlementsInherit": "build/entitlements.mac.plist"
-    },
-    "linux": {
-      "icon": "icon",
-      "target": [
-        "AppImage",
-        "deb",
-        "rpm"
-      ],
-      "category": "office"
-    },
-    "fileAssociations": [
-      {
-        "ext": "pogosite",
-        "name": "Quiqr Site File",
-        "role": "Editor",
-        "icon": "iconfile"
-      },
-      {
-        "ext": "pogopass",
-        "name": "Quiqr Passport File",
-        "role": "Editor",
-        "icon": "iconfile"
-      },
-      {
-        "ext": "pogocontent",
-        "name": "Quiqr Content File",
-        "role": "Editor",
-        "icon": "iconfile"
-      },
-      {
-        "ext": "pogotheme",
-        "name": "Quiqr Theme File",
-        "role": "Editor",
-        "icon": "iconfile"
-      }
-    ]
   },
   "workspaces": [
     "packages/types",

@@ -9,6 +9,7 @@ on:
   # pull_request:
   #   branches:
   #     - master
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
 
 jobs:
   release:
@@ -23,45 +24,30 @@ jobs:
     steps:
       # Checkout the code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      # Navigate to frontend and install dependencies
-      - name: Install dependencies in frontend directory
-        working-directory: ./frontend
-        run: npm install
-
-      # Step 4: Build the frontend
-      - name: Build the frontend
-        env:
-          SKIP_PREFLIGHT_CHECK: "true"
-          NODE_OPTIONS: --openssl-legacy-provider
-        working-directory: ./frontend
-        run: SKIP_PREFLIGHT_CHECK=true NODE_OPTIONS=--openssl-legacy-provider npm run build && mkdir -p ../dist/frontend && rsync -av ./build/ ../dist/frontend/
-
-      # Install dependencies
+      # Install all dependencies (including workspaces)
+      # Using npm install instead of npm ci to avoid optional dependency issues
+      # See: https://github.com/npm/cli/issues/4828
       - name: Install dependencies
         run: npm install
 
-      # Build the app
-      - name: Build Electron App
-        run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for electron-builder
+      # Build all workspace packages (including frontend)
+      - name: Build Workspace Packages
+        run: |
+          npm run _build_info
+          npm run build:packages
+          npm run _pack_embgit
 
-      - name: Create Release and Upload Assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.AppImage
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # Package and publish with Electron Forge (creates installers and publishes to GitHub releases)
+      - name: Package and Publish Electron App
+        run: npm run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

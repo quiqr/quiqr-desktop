@@ -27,8 +27,12 @@
     "@ai-sdk/mistral": "^3.0.13",
     "@ai-sdk/openai": "^3.0.9",
     "@quiqr/types": "*",
+    "7zip-bin": "3.1.0",
+    "adm-zip": "0.4.13",
     "ai": "^6.0.33",
+    "chokidar": "^3.5.3",
     "cors": "^2.x.x",
+    "deepmerge": "^4.3.1",
     "express": "^4.x.x",
     "front-matter": "^4.x.x",
     "fs-extra": "^11.x.x",
@@ -37,6 +41,7 @@
     "js-yaml": "^4.x.x",
     "sharp": "^0.34.5",
     "toml": "^3.x.x",
+    "tomlify-j0.4": "3.0.0",
     "zod": "^3.x.x"
   },
   "devDependencies": {

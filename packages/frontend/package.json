@@ -19,6 +19,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-dragdata": "^2.3.1",
     "clsx": "^2.1.1",
+    "markdown-it": "^14.1.0",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.1",
