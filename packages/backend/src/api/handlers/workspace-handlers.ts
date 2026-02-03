@@ -674,6 +674,7 @@ export function createProcessAiPromptHandler(container: AppContainer) {
 
       // Return both prompt and response
       return {
+        status: 'ok',
         prompt: finalPrompt,
         response: llmResponse.text,
         llm_settings: templateConfig.llm_settings,
@@ -995,6 +996,7 @@ export function createProcessFieldAiPromptHandler(container: AppContainer) {
 
       // Return both prompt and response
       return {
+        status: 'ok',
         prompt: finalPrompt,
         response: llmResponse.text,
         llm_settings: templateConfig.llm_settings,
