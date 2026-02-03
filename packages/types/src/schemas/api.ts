@@ -148,9 +148,22 @@ export const publicKeyResponseSchema = z.object({
 })
 
 // AI Prompt schemas
+export const llmUsageSchema = z.object({
+  promptTokens: z.number(),
+  completionTokens: z.number(),
+  totalTokens: z.number()
+}).nullable()
+
 export const aiPromptResponseSchema = z.object({
   status: z.literal('ok'),
-  response: z.string()
+  response: z.string(),
+  prompt: z.string().optional(),
+  llm_settings: z.object({
+    model: z.string(),
+    temperature: z.number().optional()
+  }).optional(),
+  usage: llmUsageSchema.optional(),
+  provider: z.string().optional()
 })
 
 // Logging schemas

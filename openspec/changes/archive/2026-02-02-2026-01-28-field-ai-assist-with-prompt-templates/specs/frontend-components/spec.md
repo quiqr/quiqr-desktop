@@ -167,35 +167,7 @@ None - Existing component requirements remain unchanged. The functional componen
 
 ## REMOVED Requirements
 
-### Requirement: Direct OpenAI Integration in Frontend
-
-**Reason**: Removed for security - all LLM calls must go through backend service.
-
-**Migration**: Components using direct OpenAI API calls should use the new field AI assist components which route through the backend.
-
-The frontend SHALL NOT include the `openai` npm package dependency or make direct API calls to OpenAI or other LLM providers.
-
-#### Scenario: No OpenAI package dependency
-
-- **GIVEN** the frontend `package.json`
-- **WHEN** examining dependencies and devDependencies
-- **THEN** the `openai` package SHALL NOT be listed
-
-#### Scenario: No direct API key usage
-
-- **GIVEN** frontend component code
-- **WHEN** searching for OpenAI API usage
-- **THEN** no components SHALL import from `openai` package
-- **AND** no components SHALL directly call OpenAI endpoints
-- **AND** no components SHALL read OpenAI API keys from configuration
-
-#### Scenario: All AI calls through backend
-
-- **GIVEN** a component needs AI assistance
-- **WHEN** implementing the AI feature
-- **THEN** it SHALL use backend API methods: `getFieldPromptTemplateConfig` or `processFieldAiPrompt` (for fields)
-- **OR** it SHALL use backend API methods for page-level prompts (existing)
-- **AND** it SHALL NOT make direct HTTP requests to LLM provider APIs
+None - This capability adds new requirements without removing any existing ones.
 
 ## RENAMED Requirements
 

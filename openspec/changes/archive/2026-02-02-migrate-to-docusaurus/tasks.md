@@ -14,9 +14,9 @@ This document outlines the implementation tasks for migrating documentation to D
 4. Add `.gitignore` entries for `packages/docs/.docusaurus/` and `packages/docs/build/`
 
 **Validation**:
-- [ ] `npm install` succeeds in root
-- [ ] `cd packages/docs && npm start` launches dev server
-- [ ] Documentation site loads at http://localhost:3000
+- [x] `npm install` succeeds in root
+- [x] `cd packages/docs && npm start` launches dev server
+- [x] Documentation site loads at http://localhost:3000
 
 **Dependencies**: None
 
@@ -38,10 +38,10 @@ This document outlines the implementation tasks for migrating documentation to D
    - Add `"clear": "docusaurus clear"`
 
 **Validation**:
-- [ ] `npm run build -w @quiqr/docs` succeeds
-- [ ] Build output in `packages/docs/build/` contains HTML files
-- [ ] `npm run serve -w @quiqr/docs` serves built site correctly
-- [ ] All links work with `/quiqr-desktop/docs/` base path
+- [x] `npm run build -w @quiqr/docs` succeeds
+- [x] Build output in `packages/docs/build/` contains HTML files
+- [x] `npm run serve -w @quiqr/docs` serves built site correctly
+- [x] All links work with `/quiqr-desktop/docs/` base path
 
 **Dependencies**: Task 1.1
 
@@ -61,9 +61,9 @@ This document outlines the implementation tasks for migrating documentation to D
 
 **Validation**:
 - [ ] Site displays Quiqr branding correctly
-- [ ] Dark mode toggle works
-- [ ] Navbar links to GitHub and OpenSpec UI are functional
-- [ ] Footer displays proper attribution
+- [x] Dark mode toggle works
+- [x] Navbar links to GitHub and OpenSpec UI are functional
+- [x] Footer displays proper attribution
 
 **Dependencies**: Task 1.2
 
@@ -86,9 +86,9 @@ This document outlines the implementation tasks for migrating documentation to D
 3. Create `packages/docs/docs/intro.md` as landing page
 
 **Validation**:
-- [ ] Directory structure exists
-- [ ] Sidebar renders all categories correctly
-- [ ] Navigation between sections works
+- [x] Directory structure exists
+- [x] Sidebar renders all categories correctly
+- [x] Navigation between sections works
 
 **Dependencies**: Task 1.3
 
@@ -106,11 +106,11 @@ This document outlines the implementation tasks for migrating documentation to D
 6. Test all links and images
 
 **Validation**:
-- [ ] All getting started pages render correctly
-- [ ] Images display properly
-- [ ] Internal links work
-- [ ] External links work
-- [ ] Video embeds work (if applicable)
+- [x] All getting started pages render correctly
+- [x] Images display properly
+- [x] Internal links work
+- [x] External links work
+- [x] Video embeds work (if applicable)
 
 **Dependencies**: Task 2.1
 
@@ -128,10 +128,10 @@ This document outlines the implementation tasks for migrating documentation to D
 6. Update all links
 
 **Validation**:
-- [ ] All developer reference pages render correctly
-- [ ] Code examples have proper syntax highlighting
-- [ ] All images display properly
-- [ ] All links work
+- [x] All developer reference pages render correctly
+- [x] Code examples have proper syntax highlighting
+- [x] All images display properly
+- [x] All links work
 
 **Dependencies**: Task 2.1
 
@@ -149,10 +149,10 @@ This document outlines the implementation tasks for migrating documentation to D
 6. Cross-reference with `packages/types/src/schemas/fields.ts` for accuracy
 
 **Validation**:
-- [ ] All field type pages render correctly
-- [ ] Field examples have correct syntax
-- [ ] Images display properly
-- [ ] Each field type has working example configuration
+- [x] All field type pages render correctly
+- [x] Field examples have correct syntax
+- [x] Images display properly
+- [x] Each field type has working example configuration
 
 **Dependencies**: Task 2.1
 
@@ -169,10 +169,10 @@ This document outlines the implementation tasks for migrating documentation to D
 5. Test all code examples
 
 **Validation**:
-- [ ] NG documentation renders correctly
-- [ ] Code examples work with current codebase
-- [ ] Architecture diagrams display properly
-- [ ] Tutorial steps are accurate
+- [x] NG documentation renders correctly
+- [x] Code examples work with current codebase
+- [x] Architecture diagrams display properly
+- [x] Tutorial steps are accurate
 
 **Dependencies**: Task 2.1
 
@@ -189,9 +189,9 @@ This document outlines the implementation tasks for migrating documentation to D
 5. Include examples of good documentation
 
 **Validation**:
-- [ ] Contributing guide renders correctly
-- [ ] Documentation authoring guide is clear and actionable
-- [ ] Examples are helpful and accurate
+- [x] Contributing guide renders correctly
+- [x] Documentation authoring guide is clear and actionable
+- [x] Examples are helpful and accurate
 
 **Dependencies**: Task 2.1
 
@@ -208,9 +208,9 @@ This document outlines the implementation tasks for migrating documentation to D
 5. Add frontmatter with version metadata
 
 **Validation**:
-- [ ] Release notes render correctly
-- [ ] Versions are clearly differentiated
-- [ ] Links to CHANGELOG.md work
+- [x] Release notes render correctly
+- [x] Versions are clearly differentiated
+- [x] Links to CHANGELOG.md work
 
 **Dependencies**: Task 2.1
 
@@ -229,10 +229,10 @@ This document outlines the implementation tasks for migrating documentation to D
 5. Add caching for node_modules
 
 **Validation**:
-- [ ] PR checks build documentation successfully
-- [ ] Documentation build errors are visible in PR status
-- [ ] Build completes in under 3 minutes
-- [ ] Caching reduces build time on subsequent runs
+- [x] PR checks build documentation successfully
+- [x] Documentation build errors are visible in PR status
+- [x] Build completes in under 3 minutes
+- [x] Caching reduces build time on subsequent runs
 
 **Dependencies**: Task 2.7
 
@@ -250,12 +250,12 @@ This document outlines the implementation tasks for migrating documentation to D
 6. Test that both sites are accessible after deployment
 
 **Validation**:
-- [ ] Workflow builds both OpenSpec UI and Docusaurus
-- [ ] Both sites deploy to GitHub Pages
-- [ ] OpenSpec UI accessible at https://quiqr.github.io/quiqr-desktop/specs/
-- [ ] Docusaurus accessible at https://quiqr.github.io/quiqr-desktop/docs/
+- [x] Workflow builds both OpenSpec UI and Docusaurus
+- [x] Both sites deploy to GitHub Pages
+- [x] OpenSpec UI accessible at https://quiqr.github.io/quiqr-desktop/specs/
+- [x] Docusaurus accessible at https://quiqr.github.io/quiqr-desktop/docs/
 - [ ] Coverage badge remains accessible at https://quiqr.github.io/quiqr-desktop/badges/coverage.svg
-- [ ] Deployment completes within 5 minutes
+- [x] Deployment completes within 5 minutes
 
 **Dependencies**: Task 2.7, Task 3.1
 

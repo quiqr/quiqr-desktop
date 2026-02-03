@@ -1,4 +1,4 @@
-# Spec: ci-integration
+# Spec: ci-automation
 
 **Status**: draft  
 **Capability**: Continuous Integration and Deployment  
@@ -178,23 +178,37 @@ Documentation build errors MUST be clearly reported with actionable error messag
 
 ## MODIFIED Requirements
 
-### Requirement: GitHub Pages Deployment (from ci-automation spec)
+### Requirement: OpenSpec UI and Coverage Badge Coexistence
 
-GitHub Pages MUST serve coverage badge, OpenSpec UI, AND Docusaurus documentation with path-based routing.
+The OpenSpec UI deployment SHALL not interfere with existing GitHub Pages content such as code coverage badges or Docusaurus documentation.
 
-**Original**: GitHub Pages serves coverage badge and OpenSpec UI  
-**Modified**: GitHub Pages serves coverage badge, OpenSpec UI, AND Docusaurus documentation
+**Original**: The OpenSpec UI deployment SHALL not interfere with existing GitHub Pages content such as code coverage badges.  
+**Modified**: Extends to also include Docusaurus documentation as protected content.
 
 **Rationale**: Extending the existing GitHub Pages deployment to include Docusaurus documentation alongside existing resources.
 
-#### Scenario: Three-Resource Deployment
+#### Scenario: Coverage badge remains accessible after OpenSpec UI deployment
+- **GIVEN** the coverage badge is deployed at /badges/coverage.svg on GitHub Pages
+- **WHEN** the OpenSpec UI is published
+- **THEN** the coverage badge MUST remain accessible at its original URL
+- **AND** the badge MUST display correct coverage information
+- **AND** the badge MUST not be overwritten or corrupted
 
-**Given** the `deploy.yml` workflow  
-**When** the workflow completes successfully  
-**Then** three distinct resources are deployed:
-1. Coverage badge at `/badges/coverage.svg` (existing)
-2. OpenSpec UI at `/specs/` (existing)
-3. Docusaurus documentation at `/docs/` (new)
+#### Scenario: OpenSpec UI deployed to /specs/ path
+- **GIVEN** the OpenSpec UI publishing workflow is running
+- **WHEN** deploying to GitHub Pages
+- **THEN** the OpenSpec UI MUST be deployed to the /specs/ path
+- **AND** the deployment MUST not affect content in /badges/ subdirectory
+- **AND** the deployment MUST not affect content in /docs/ subdirectory
+- **AND** the GitHub Pages site MUST serve OpenSpec UI, badges, and docs correctly
+
+#### Scenario: Docusaurus deployed to /docs/ path
+- **GIVEN** the Docusaurus publishing workflow is running
+- **WHEN** deploying to GitHub Pages
+- **THEN** the Docusaurus site MUST be deployed to the /docs/ path
+- **AND** the deployment MUST not affect content in /badges/ subdirectory
+- **AND** the deployment MUST not affect content in /specs/ subdirectory
+- **AND** the GitHub Pages site MUST serve all three resources correctly
 
 ---
 
