@@ -37,7 +37,7 @@ jobs:
       # Using npm install instead of npm ci to avoid optional dependency issues
       # See: https://github.com/npm/cli/issues/4828
       - name: Install dependencies
-        run: npm install
+        run: npm install --include=optional
 
       # Build all workspace packages (including frontend)
       - name: Build Workspace Packages
