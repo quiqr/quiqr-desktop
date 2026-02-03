@@ -1,32 +1,18 @@
-# Type System Specification
+# Shared Types Organization Specification Delta
 
 ## Purpose
 
-The type system establishes a contract between frontend and backend using Zod schemas for runtime validation and TypeScript for compile-time checking.
+Define requirements for organizing and managing shared types between frontend and backend packages to support TanStack Query migration and maintain type safety.
 
-## Requirements
+## MODIFIED Requirements
 
-### Requirement: Shared Zod Schema Package
+### Requirement: Shared Zod Schema Package (MODIFIED)
 
 All data validation schemas SHALL be defined as Zod schemas in the `@quiqr/types` package.
 
-#### Scenario: API request validation
-- **WHEN** backend receives an API request
-- **THEN** it validates request data using Zod schemas from `@quiqr/types`
-- **AND** invalid data is rejected with clear error messages
-- **AND** valid data conforms to TypeScript types
+**No changes to existing requirement text.**
 
-#### Scenario: Frontend response validation
-- **WHEN** frontend receives API response
-- **THEN** it validates response data using Zod schemas from `@quiqr/types`
-- **AND** catches backend contract violations
-- **AND** TypeScript types match runtime data
-
-#### Scenario: Type inference from schemas
-- **WHEN** code needs TypeScript types
-- **THEN** it uses `z.infer<typeof schema>` to derive types from Zod schemas
-- **AND** types automatically stay in sync with schemas
-- **AND** no manual type definitions are needed
+**ADDED scenarios:**
 
 #### Scenario: API request/response types
 - **WHEN** defining types for API request parameters or response data
@@ -49,37 +35,7 @@ All data validation schemas SHALL be defined as Zod schemas in the `@quiqr/types
 - **AND** frontend and backend can import updated types
 - **AND** TypeScript compilation catches type mismatches
 
-### Requirement: Frontend-Backend Type Contract
-
-The frontend and backend SHALL maintain a strict type contract enforced at compile-time and runtime.
-
-#### Scenario: API response types match
-- **WHEN** backend handler returns data
-- **THEN** TypeScript verifies it matches the response schema
-- **AND** frontend receives data matching the same schema
-- **AND** type mismatches are caught at compile time
-
-#### Scenario: Schema changes break contract
-- **WHEN** a schema in `@quiqr/types` changes
-- **THEN** TypeScript compilation fails if frontend or backend violates new contract
-- **AND** developer must update code to match
-- **AND** contract violations cannot reach production
-
-### Requirement: Field Schema Definitions
-
-All form field types SHALL be defined as Zod schemas in `@quiqr/types/schemas/fields.ts`.
-
-#### Scenario: SukohForm field validation
-- **WHEN** rendering a form field
-- **THEN** field configuration is validated against its Zod schema
-- **AND** invalid configurations are caught at load time
-- **AND** TypeScript provides autocomplete for field properties
-
-#### Scenario: New field type addition
-- **WHEN** adding a new field type
-- **THEN** schema is added to `fields.ts`
-- **AND** TypeScript types are inferred from schema
-- **AND** both frontend and backend can use the new field type
+## ADDED Requirements
 
 ### Requirement: API Types Package Structure
 
@@ -180,3 +136,112 @@ The `@quiqr/types` package SHALL use barrel exports for clean imports.
 - **THEN** use `export type { TypeName }` for re-exports
 - **AND** prevents runtime imports
 - **AND** improves tree-shaking
+
+## REMOVED Requirements
+
+None. This modifies and extends existing type system requirements.
+
+## Examples
+
+### Good: Shared Type in api.ts
+```typescript
+// packages/types/src/types/api.ts
+export interface LogQueryOptions {
+  date?: string;
+  level?: 'debug' | 'info' | 'warning' | 'error';
+  category?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+// packages/types/src/index.ts
+export * from './types/api';
+
+// packages/frontend/src/queries/options.ts
+import { LogQueryOptions } from '@quiqr/types';
+
+export const logQueryOptions = {
+  application: (options: LogQueryOptions) => ({ ... }),
+};
+```
+
+### Bad: Inline Type Definition
+```typescript
+// ❌ BAD: Inline type in query options
+export const logQueryOptions = {
+  application: (options: {
+    date?: string;
+    level?: 'debug' | 'info' | 'warning' | 'error';
+    // ...
+  }) => ({ ... }),
+};
+```
+
+### Good: Import Hierarchy
+```typescript
+// ✅ Frontend imports from @quiqr/types
+import { LogQueryOptions, WorkspaceDetails } from '@quiqr/types';
+
+// ✅ Backend imports from @quiqr/types
+import { LogQueryOptions } from '@quiqr/types';
+```
+
+### Bad: Cross-Package Imports
+```typescript
+// ❌ Frontend importing from backend
+import { LogQueryOptions } from '@quiqr/backend/src/logging/types';
+
+// ❌ Duplicate type definition
+interface LogQueryOptions {  // Already defined in @quiqr/types
+  // ...
+}
+```
+
+## Migration Checklist
+
+For each type being migrated:
+
+- [ ] Identify type currently in backend used by frontend
+- [ ] Add type to `packages/types/src/types/api.ts`
+- [ ] Export type from `packages/types/src/index.ts`
+- [ ] Rebuild types package: `npm run build -w @quiqr/types`
+- [ ] Update backend imports to use `@quiqr/types`
+- [ ] Update frontend imports to use `@quiqr/types`
+- [ ] Delete original type definition from backend
+- [ ] Verify TypeScript compilation succeeds
+- [ ] Verify no duplicate type errors
+- [ ] Test affected components
+
+## Validation
+
+### Type Safety Validation
+```bash
+# Frontend type checking
+cd packages/frontend && npx tsc --noEmit
+
+# Verify no duplicate types
+rg "interface LogQueryOptions" --type ts
+
+# Verify imports
+rg "from '@quiqr/types'" packages/frontend/src/
+rg "from '@quiqr/types'" packages/backend/src/
+```
+
+### Build Validation
+```bash
+# Rebuild types package
+npm run build -w @quiqr/types
+
+# Verify build output
+ls packages/types/dist/
+
+# Test import in frontend
+node -e "require('@quiqr/types')"
+```
+
+## References
+
+- Existing specification: `openspec/specs/type-system/spec.md`
+- Types package: `packages/types/`
+- Design document: `openspec/changes/migrate-to-tanstack-query/design.md`
