@@ -221,58 +221,10 @@ Commit messages for documentation changes MUST follow project conventional commi
 
 ---
 
-## MODIFIED Requirements
-
-### Requirement: Documentation Organization (from documentation spec)
-
-The project MUST maintain README.md, RELEASE.md, CHANGELOG.md, AGENTS.md, AND a Docusaurus documentation site, with each resource serving a distinct purpose.
-
-**Original**: Project must maintain README.md, RELEASE.md, CHANGELOG.md, and AGENTS.md  
-**Modified**: Project must maintain README.md, RELEASE.md, CHANGELOG.md, AGENTS.md, AND Docusaurus documentation site
-
-**Rationale**: Adding Docusaurus as an additional documentation resource while preserving existing root-level documentation files.
-
-#### Scenario: Documentation Resources Available
-
-**Given** the project repository  
-**When** documentation is examined  
-**Then** README.md exists in root (project overview)  
-**And** RELEASE.md exists in root (release runbook)  
-**And** CHANGELOG.md exists in root (version history)  
-**And** AGENTS.md exists in root (AI agent guidelines)  
-**And** Docusaurus documentation site exists at `packages/docs/` (comprehensive guides)  
-**And** each resource serves a distinct purpose
-
-#### Scenario: Documentation Cross-References
-
-**Given** multiple documentation resources  
-**When** documentation needs to reference other docs  
-**Then** README.md links to Docusaurus site for detailed guides  
-**And** AGENTS.md links to Docusaurus authoring guide  
-**And** Docusaurus contributing guide links to CONTRIBUTING.md  
-**And** Docusaurus release notes link to CHANGELOG.md for full history
-
----
-
-### Requirement: Release Documentation (from documentation spec)
-
-The release process MUST include documentation validation and deployment steps in RELEASE.md.
-
-**Original**: The project must have a RELEASE.md file documenting the release process  
-**Modified**: Release process must include documentation validation and deployment steps
-
-**Rationale**: Expanding the release documentation requirement to explicitly include documentation validation and deployment.
-
-#### Scenario: Release Runbook Includes Documentation
-
-**Given** the RELEASE.md file  
-**When** the release process is followed  
-**Then** documentation validation is a pre-release step  
-**And** documentation deployment is verified post-release  
-**And** release notes include documentation updates
-
----
-
 ## REMOVED Requirements
 
 *No existing requirements are removed by this capability.*
+
+## MODIFIED Requirements
+
+*No existing requirements are modified by this capability (this is a new spec).*

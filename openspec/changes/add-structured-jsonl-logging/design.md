@@ -306,3 +306,162 @@ If critical issues arise:
 
 5. **Should retention be global or per-site?**
    - Global preference applies to both application and site logs. Keep it simple.
+
+## Implementation Details
+
+### As-Built Architecture
+
+The structured logging system has been implemented according to the design above. Key implementation details:
+
+**Backend Logging Infrastructure (`packages/backend/src/logging/`):**
+- `types.ts`: TypeScript interfaces for LogEntry, LogLevel, GlobalLogEntry, SiteLogEntry, query options
+- `categories.ts`: Category constants (GLOBAL_CATEGORIES, SITE_CATEGORIES) with validation
+- `log-writer.ts`: JSONL file writer with daily rotation and batched async writes
+- `log-cleaner.ts`: Retention policy enforcement with configurable cleanup (runs daily)
+- `logger.ts`: Singleton Logger class with public API (info, error, debug, warning, infoSite, errorSite, etc.)
+- `index.ts`: Module exports for easy importing throughout backend
+
+**API Endpoints (`packages/backend/src/api/handlers/log-handlers.ts`):**
+- `getApplicationLogs`: Retrieve and filter global application logs with pagination
+- `getSiteLogs`: Retrieve and filter site-specific workspace logs with pagination
+- `getLogDates`: List available log dates for a given log type (application or site)
+- All endpoints support filtering by level, category, search term with offset/limit pagination
+
+**Container Integration:**
+- Logger added to AppContainer interface (`packages/backend/src/config/container.ts`)
+- Logger instantiated in `createContainer()` with userDataPath
+- Logger initialized at startup in both Electron (`packages/adapters/electron/src/main.ts`) and standalone (`packages/adapters/standalone/src/main.ts`) modes
+- Graceful shutdown handling to flush pending log writes (SIGINT, SIGTERM, window-all-closed)
+
+**User Preferences:**
+- `logRetentionDays` preference added to schema in `packages/types/src/schemas/config.ts`
+- Default: 30 days, Range: 0-365 (0 = never delete)
+- Retention policy enforcement runs daily via scheduled task
+- UI control in Preferences > Advanced > Log Retention (TextField with validation and helper text)
+
+**Frontend LogViewer Component (`packages/frontend/src/components/LogViewer/`):**
+- `LogViewer.tsx`: Main component with fetching, filtering, pagination, date selection
+- `LogFilters.tsx`: Filter controls (level dropdown, category dropdown, search field)
+- `LogTable.tsx`: Table display of log entries with MUI Table component
+- `LogRow.tsx`: Individual log entry row with copy-to-clipboard functionality
+- Full MUI v7 styling with responsive layout and proper spacing
+
+**Frontend Views:**
+- Application Logs (`packages/frontend/src/containers/ApplicationLogs/`): Route `/logs/application`, displays global logs
+- Site Logs (`packages/frontend/src/containers/SiteLogs/`): Route `/sites/:siteKey/workspaces/:workspaceKey/logs`, displays site-specific logs
+- Workspace toolbar: "Application Logs" button (renamed from "Log"), "Site Log" button added (siteDeveloper role only, next to Tools)
+
+**Legacy System Removal:**
+- Removed `ConsoleContext.tsx` and `ConsoleProvider` (React context system)
+- Removed `Console` container component and `/console` route
+- Removed `log-window-manager.ts` (separate Electron BrowserWindow for logs)
+- Removed `showLogWindow()` API method from frontend api.ts and backend window-handlers.ts
+- Removed `logToConsole()` API method from frontend api.ts and backend shell-handlers.ts
+- Removed `showLogWindow()` from WindowAdapter interface and all adapter implementations
+- Removed logToConsole usage from AiAssist.tsx component
+
+### Usage Examples
+
+**Backend - Logging:**
+```typescript
+import { logger, GLOBAL_CATEGORIES, SITE_CATEGORIES } from '@quiqr/backend/logging';
+
+// Global logging
+logger.info(GLOBAL_CATEGORIES.CONFIG, 'Configuration saved', { key: 'theme' });
+logger.error(GLOBAL_CATEGORIES.LLM_CONNECTION, 'LLM request failed', { 
+  errorCode: 'LLM_TIMEOUT',
+  requestId: '123'
+});
+
+// Site logging
+logger.infoSite(siteKey, workspaceKey, SITE_CATEGORIES.SYNC, 'Git push completed', {
+  commit: 'abc123'
+});
+logger.errorSite(siteKey, workspaceKey, SITE_CATEGORIES.BUILDACTION, 'Hugo build failed', {
+  errorCode: 'BUILD_ERROR',
+  exitCode: 1
+});
+
+// Debug logging (only written when QUIQR_LOGLEVEL=debug)
+logger.debug(GLOBAL_CATEGORIES.BACKEND_SERVER, 'API request received', {
+  method: 'POST',
+  path: '/api/getSiteLogs'
+});
+```
+
+**Frontend - Viewing Logs:**
+- Click "Application Logs" button in workspace toolbar to view global logs
+- Click "Site Log" button in workspace toolbar (siteDeveloper only) to view site-specific logs
+- Use filter controls to narrow down logs:
+  - Level dropdown: Filter by debug/info/warning/error
+  - Category dropdown: Filter by specific category (e.g., sync, buildaction)
+  - Search field: Free-text search across log messages
+- Click copy icon (📋) to copy individual log entry JSON to clipboard
+- Use date selector to view logs from different days
+- Pagination automatically loads when scrolling to bottom of log list
+
+**User Configuration:**
+- Set log retention: Preferences > Advanced > Log Retention (days)
+  - Enter 0 to never delete logs
+  - Enter 1-365 to automatically delete logs older than N days
+  - Default is 30 days
+- Set log level via environment variable before starting app:
+  ```bash
+  QUIQR_LOGLEVEL=debug npm run dev  # Show all logs including debug
+  QUIQR_LOGLEVEL=info npm run dev   # Default: info, warning, error
+  ```
+
+**Accessing Log Files Directly:**
+- Global application logs: `$HOME/Quiqr/logs/application-2026-02-02.jsonl`
+- Site logs: `$HOME/Quiqr/sites/mysite/main-2026-02-02.jsonl`
+- Each line is valid JSON (JSONL format), can be parsed with:
+  ```bash
+  cat application-2026-02-02.jsonl | jq .
+  grep "error" application-2026-02-02.jsonl | jq .
+  tail -f application-2026-02-02.jsonl | jq .
+  ```
+
+### Log Schema (As-Built)
+
+**Global Log Entry:**
+```json
+{
+  "type": "global",
+  "timestamp": "2026-01-29T10:30:45.123Z",
+  "level": "info",
+  "category": "electron-init",
+  "message": "Application started",
+  "errorCode": "OPTIONAL_ERROR_CODE",
+  "metadata": { "version": "1.0.0" }
+}
+```
+
+**Site Log Entry:**
+```json
+{
+  "type": "site",
+  "siteKey": "mysite",
+  "workspaceKey": "main",
+  "timestamp": "2026-01-29T10:30:45.123Z",
+  "level": "info",
+  "category": "sync",
+  "message": "Git push completed",
+  "errorCode": "OPTIONAL_ERROR_CODE",
+  "metadata": { "commit": "abc123" }
+}
+```
+
+### Success Criteria Met
+
+✅ Persistent, structured JSONL logging with daily rotation  
+✅ Separate global and site-specific logs in dedicated locations  
+✅ Configurable retention policy (0-365 days)  
+✅ Environment variable log level control (QUIQR_LOGLEVEL)  
+✅ In-app log viewing with filtering, search, and pagination  
+✅ Legacy console system completely removed  
+✅ User preferences for retention control  
+✅ Graceful shutdown with log flushing  
+✅ Container-based dependency injection for logger  
+✅ Batched async writes for performance  
+
+The structured logging system is fully functional and ready for production use.
