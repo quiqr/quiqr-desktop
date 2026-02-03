@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import Sidebar from './../Sidebar';
-import service from './../../services/service';
+import { useConfigurations } from '../../queries/hooks';
 
 interface SiteLibrarySidebarProps {
   hideItems?: boolean;
@@ -10,26 +10,26 @@ interface SiteLibrarySidebarProps {
 }
 
 export const SiteLibrarySidebar = (props: SiteLibrarySidebarProps) => {
-  const [tags, setTags] = useState<string[]>([]);
+  // Query: Fetch configurations with cache invalidation
+  const { data: configurations } = useConfigurations(true);
 
-  useEffect(() => {
-    const loadTags = async () => {
-      const c = await service.getConfigurations(true);
-      const collectedTags: string[] = [];
-      c.sites.forEach((site) => {
-        if (site.tags) {
-          site.tags.forEach((t) => {
-            if (!collectedTags.includes(t)) {
-              collectedTags.push(t);
-            }
-          });
-        }
-      });
-      collectedTags.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-      setTags(collectedTags);
-    };
-    loadTags();
-  }, []);
+  // Derive tags from configurations
+  const tags = useMemo(() => {
+    if (!configurations?.sites) return [];
+
+    const collectedTags: string[] = [];
+    configurations.sites.forEach((site) => {
+      if (site.tags) {
+        site.tags.forEach((t) => {
+          if (!collectedTags.includes(t)) {
+            collectedTags.push(t);
+          }
+        });
+      }
+    });
+    collectedTags.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    return collectedTags;
+  }, [configurations]);
 
   const basePath = `/sites`;
 
