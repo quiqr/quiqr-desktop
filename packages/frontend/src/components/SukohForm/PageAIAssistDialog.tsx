@@ -249,6 +249,14 @@ export function PageAIAssistDialog({
     handleClose,
   ]);
 
+  const handleReset = useCallback(() => {
+    setFormValues({});
+    setFormDirty(false);
+    setError(null);
+    setAiResponse(null);
+    setResponseMetadata(null);
+  }, []);
+
   // Create metadata for the form
   const meta: FormMeta = useMemo(() => ({
     siteKey,
@@ -390,9 +398,9 @@ export function PageAIAssistDialog({
                 <Box
                   component="pre"
                   sx={{
-                    backgroundColor: 'grey.100',
+                    backgroundColor: 'background.paper',
                     border: '1px solid',
-                    borderColor: 'grey.300',
+                    borderColor: 'divider',
                     borderRadius: 1,
                     p: 2,
                     maxHeight: '400px',
@@ -415,6 +423,11 @@ export function PageAIAssistDialog({
         <Button onClick={handleClose} disabled={sending}>
           {aiResponse ? 'Close' : 'Cancel'}
         </Button>
+        {aiResponse && (
+          <Button variant="outlined" onClick={handleReset} disabled={sending}>
+            Reset
+          </Button>
+        )}
         {!aiResponse && (
           <Button
             variant="contained"

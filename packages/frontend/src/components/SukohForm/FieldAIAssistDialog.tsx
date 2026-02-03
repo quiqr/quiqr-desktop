@@ -230,6 +230,14 @@ export function FieldAIAssistDialog({
     handleClose();
   }, [aiResponse, onAppend, handleClose]);
 
+  const handleReset = useCallback(() => {
+    setFormValues({});
+    setFormDirty(false);
+    setError(null);
+    setAiResponse(null);
+    setResponseMetadata(null);
+  }, []);
+
   // Create metadata for the form
   const meta: FormMeta = useMemo(
     () => ({
@@ -299,9 +307,9 @@ export function FieldAIAssistDialog({
                 <Box
                   component="pre"
                   sx={{
-                    backgroundColor: 'grey.50',
+                    backgroundColor: 'background.paper',
                     border: '1px solid',
-                    borderColor: 'grey.300',
+                    borderColor: 'divider',
                     borderRadius: 1,
                     p: 1.5,
                     maxHeight: '150px',
@@ -310,6 +318,7 @@ export function FieldAIAssistDialog({
                     wordBreak: 'break-word',
                     fontFamily: 'monospace',
                     fontSize: '0.75rem',
+                    color: 'text.primary',
                   }}
                 >
                   {fieldContent}
@@ -406,9 +415,9 @@ export function FieldAIAssistDialog({
                 <Box
                   component="pre"
                   sx={{
-                    backgroundColor: 'grey.100',
+                    backgroundColor: 'background.paper',
                     border: '1px solid',
-                    borderColor: 'grey.300',
+                    borderColor: 'divider',
                     borderRadius: 1,
                     p: 2,
                     maxHeight: '400px',
@@ -417,6 +426,7 @@ export function FieldAIAssistDialog({
                     wordBreak: 'break-word',
                     fontFamily: 'monospace',
                     fontSize: '0.875rem',
+                    color: 'text.primary',
                   }}
                 >
                   {aiResponse}
@@ -431,6 +441,11 @@ export function FieldAIAssistDialog({
         <Button onClick={handleClose} disabled={sending}>
           {aiResponse ? 'Close' : 'Cancel'}
         </Button>
+        {aiResponse && (
+          <Button variant="outlined" onClick={handleReset} disabled={sending}>
+            Reset
+          </Button>
+        )}
         {!aiResponse && (
           <Button
             variant="contained"
