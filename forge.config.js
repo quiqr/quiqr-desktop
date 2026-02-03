@@ -190,24 +190,22 @@ module.exports = {
   ],
 
   makers: [
-    // Temporarily disabled for testing - Windows build
-    // {
-    //   name: '@electron-forge/maker-squirrel',
-    //   config: {
-    //     name: 'Quiqr',
-    //     authors: 'Quiqr Organization',
-    //     description: 'Local-first CMS for static files and engines like Quarto or Hugo SSG',
-    //     setupIcon: 'packages/frontend/public/icon.ico',
-    //     iconUrl: 'https://raw.githubusercontent.com/quiqr/quiqr-desktop/main/packages/frontend/public/icon.ico',
-    //     loadingGif: undefined,
-    //     noMsi: true,
-    //   },
-    // },
-    // Temporarily disabled for testing - macOS build
-    // {
-    //   name: '@electron-forge/maker-zip',
-    //   platforms: ['darwin'],
-    // },
+    {
+      name: '@electron-forge/maker-squirrel',
+      config: {
+        name: 'Quiqr',
+        authors: 'Quiqr Organization',
+        description: 'Local-first CMS for static files and engines like Quarto or Hugo SSG',
+        setupIcon: 'packages/frontend/public/icon.ico',
+        iconUrl: 'https://raw.githubusercontent.com/quiqr/quiqr-desktop/main/packages/frontend/public/icon.ico',
+        loadingGif: undefined,
+        noMsi: true,
+      },
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['darwin'],
+    },
     {
       name: '@electron-forge/maker-deb',
       config: {

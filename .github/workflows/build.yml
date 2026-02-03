@@ -15,9 +15,7 @@ jobs:
   release:
     strategy:
       matrix:
-        # Temporarily disabled for testing - only building Linux
-        # os: [macos-latest, windows-latest, ubuntu-latest]
-        os: [ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
         node-version: [22]
       fail-fast: false
 
