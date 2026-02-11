@@ -21,6 +21,7 @@ import { Pogozipper } from '../import/pogozipper.js';
 import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 import { ModelWatcher, createModelWatcher } from '../services/workspace/model-watcher.js';
+import { ScaffoldModelService, createScaffoldModelService } from '../services/scaffold-model/index.js';
 import { BuildActionService } from '../build-actions/index.js';
 import { ProviderFactory } from '../ssg-providers/provider-factory.js';
 import type { EnvironmentInfo } from '../utils/path-helper.js';
@@ -171,6 +172,15 @@ export interface AppContainer {
    * Structured logging service
    */
   logger: Logger;
+
+  /**
+   * Helper to get a ScaffoldModelService instance
+   * Handles the common pattern of: get site → get workspace → create service
+   */
+  getScaffoldModelService: (
+    siteKey: string,
+    workspaceKey: string
+  ) => Promise<ScaffoldModelService>;
 }
 
 /**
@@ -469,6 +479,24 @@ export function createContainer(options: ContainerOptions): AppContainer {
   // Get the currently cached WorkspaceService
   container.getCurrentWorkspaceService = () => {
     return cachedWorkspaceService;
+  };
+
+  // Helper to get ScaffoldModelService
+  container.getScaffoldModelService = async (
+    siteKey: string,
+    workspaceKey: string
+  ): Promise<ScaffoldModelService> => {
+    // First get the workspace service to ensure we have a valid workspace path
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    
+    // Create and return a ScaffoldModelService instance
+    return createScaffoldModelService(
+      workspaceService.getWorkspacePath(),
+      {
+        dialogAdapter: adapters.dialog,
+        formatResolver,
+      }
+    );
   };
 
   // Backward compatibility accessors (deprecated)

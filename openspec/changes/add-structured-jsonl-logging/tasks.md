@@ -59,7 +59,7 @@
 - [x] 7.2 Create `packages/frontend/src/containers/SiteLogs/` directory
 - [x] 7.3 Create `SiteLogs.tsx` container component (uses LogViewer with site log API)
 - [x] 7.4 Add "Site Log" button to workspace toolbar in `useWorkspaceToolbarItems.tsx` (next to Tools button, only for siteDeveloper role)
-- [ ] 7.5 Test Site Logs navigation from workspace
+- [x] 7.5 Test Site Logs navigation from workspace
 
 ## 8. Frontend - Remove Legacy Console System
 
