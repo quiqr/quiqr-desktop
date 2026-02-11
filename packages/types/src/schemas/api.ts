@@ -278,6 +278,14 @@ export const environmentInfoSchema = z.object({
   isPackaged: z.boolean()
 })
 
+// Scaffold model schemas
+export const scaffoldResultSchema = z.object({
+  success: z.boolean(),
+  modelKey: z.string().optional(),
+  modelPath: z.string().optional(),
+  error: z.string().optional()
+})
+
 // API Schemas mapping - maps API method names to their response schemas
 export const apiSchemas = {
   // Workspace operations
@@ -418,7 +426,11 @@ export const apiSchemas = {
 
   // Menu operations (web mode)
   getMenuState: webMenuStateSchema,
-  executeMenuAction: webMenuActionResultSchema
+  executeMenuAction: webMenuActionResultSchema,
+
+  // Scaffold model operations
+  scaffoldSingleFromFile: scaffoldResultSchema,
+  scaffoldCollectionFromFile: scaffoldResultSchema
 } as const
 
 // Type exports

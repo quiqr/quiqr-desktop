@@ -605,6 +605,21 @@ export function executeMenuAction(params: { action: string; data?: unknown }) {
   return request('executeMenuAction', params);
 }
 
+/**
+ * Scaffold a single model from an existing data file
+ * Opens a file dialog to select the source file
+ */
+export function scaffoldSingleFromFile(siteKey: string, workspaceKey: string, dataType: 'yaml' | 'toml' | 'json' | 'markdown') {
+  return request('scaffoldSingleFromFile', { siteKey, workspaceKey, dataType });
+}
+
+/**
+ * Scaffold a collection model from an existing data file
+ * Opens a file dialog to select the source file
+ */
+export function scaffoldCollectionFromFile(siteKey: string, workspaceKey: string, dataType: 'yaml' | 'toml' | 'json' | 'markdown') {
+  return request('scaffoldCollectionFromFile', { siteKey, workspaceKey, dataType });
+}
 
 // Type interface for all API methods (for type inference in hooks)
 export interface API {
@@ -703,4 +718,6 @@ export interface API {
   getEnvironmentInfo: typeof getEnvironmentInfo;
   getMenuState: typeof getMenuState;
   executeMenuAction: typeof executeMenuAction;
+  scaffoldSingleFromFile: typeof scaffoldSingleFromFile;
+  scaffoldCollectionFromFile: typeof scaffoldCollectionFromFile;
 }
