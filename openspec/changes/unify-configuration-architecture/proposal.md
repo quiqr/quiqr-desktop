@@ -91,7 +91,7 @@ $HOME/.config/quiqr/
 
 1. All configuration persists correctly across app restarts
 2. Lift-and-shift migration preserves existing user preferences
-3. Environment variables can override file-based config for secrets
+3. Environment variables can override file-based config
 4. Zod schemas fully document the configuration tree
 5. Firefox-style "about:config" property inspection possible
 6. Multi-user support without breaking single-user desktop mode

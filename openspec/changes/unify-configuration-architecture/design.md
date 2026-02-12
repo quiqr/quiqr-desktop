@@ -196,12 +196,12 @@ const userConfigSchema = z.object({
 **Mapping:**
 ```
 OLD                           → NEW
-lastOpenedSite               → instance.settings.lastOpenedSite
+lastOpenedSite               → instance.users[key].lastOpenedSite
 prefs.*                      → user_prefs_default.preferences.*
 skipWelcomeScreen            → user_prefs_default.preferences.skipWelcomeScreen
 experimentalFeatures         → instance.settings.experimentalFeatures
 devLocalApi                  → instance.settings.dev.localApi
-hugoServeDraftMode           → instance.settings.hugo.serveDraftMode
+hugoServeDraftMode           → instance.sites[key].hugo.serveDraftMode 
 lastOpenedPublishTargetForSite → instance.sites[key].lastPublishTarget
 ```
 
@@ -250,11 +250,17 @@ lastOpenedPublishTargetForSite → instance.sites[key].lastPublishTarget
 1. **Site-level settings file granularity:** Should each site have its own file, or store all in `instance_settings.json`?
    - Recommendation: Separate files for deployments with many sites
 
+> Answer: Seperate files
+
 2. **Group membership storage:** Where to store user-to-group mappings in multi-user mode?
    - Recommendation: In `instance_settings.json` for admin control
 
+> Answer: This is out of scope for now. This is a seperate concern.
+
 3. **Config file permissions:** Should config files have restricted permissions (0600)?
    - Recommendation: Yes, especially for files that may contain secrets
+
+> Anser: Out of scope: This is not a concern for the Quiqr application.
 
 ## Alternatives Considered
 

@@ -28,7 +28,9 @@ The system SHALL organize configuration as a hierarchical tree with dot-notation
 
 ### Requirement: CONFIG-LAYER-001 - Layered Configuration Precedence
 
-The system SHALL resolve configuration values through 5 layers in order of precedence: App Defaults (lowest), Instance Defaults, Group Preferences, User Preferences, Instance Forced (highest).
+The system SHALL resolve configuration values through 4 layers in order of precedence: App Defaults (lowest), Instance Defaults, User Preferences, Instance Forced (highest).
+
+> **Note:** Group-based preferences are out of scope for this change. Group membership and group preferences may be added in a future change as a separate concern.
 
 #### Scenario: User preference overrides instance default
 - GIVEN instance default `interfaceStyle` is "quiqr10-light"
@@ -42,13 +44,11 @@ The system SHALL resolve configuration values through 5 layers in order of prece
 - WHEN resolving `logRetentionDays` for the user
 - THEN the system SHALL return 30 (forced value)
 
-#### Scenario: Group preference overrides instance default
-- GIVEN instance default `dataFolder` is "~/Quiqr"
-- AND group "editors" preference `dataFolder` is "~/QuiqrEditors"
-- AND user belongs to group "editors"
-- AND user has no personal `dataFolder` preference
+#### Scenario: App defaults used when no override exists
+- GIVEN app default `dataFolder` is "~/Quiqr"
+- AND no instance default or user preference is set for `dataFolder`
 - WHEN resolving `dataFolder` for the user
-- THEN the system SHALL return "~/QuiqrEditors"
+- THEN the system SHALL return "~/Quiqr" (app default)
 
 ---
 
@@ -70,6 +70,12 @@ The system SHALL store configuration in JSON files in the platform-specific conf
 - GIVEN a single-user desktop deployment
 - WHEN the system loads user configuration
 - THEN the system SHALL read from `$HOME/.config/quiqr/user_prefs_default.json`
+
+#### Scenario: Site settings use separate files
+- GIVEN a site with key "my-blog"
+- WHEN the system loads site configuration
+- THEN the system SHALL read from `$HOME/.config/quiqr/site_settings_my-blog.json`
+- AND each site SHALL have its own separate settings file
 
 ---
 
