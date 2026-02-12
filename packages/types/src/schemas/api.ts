@@ -29,7 +29,8 @@ export const resolvedPreferenceSchema = z.object({
 export const collectionItemSchema = z.object({
   key: z.string(),
   label: z.string(),
-  sortval: z.string()
+  sortval: z.string().optional(),
+  isPageBundle: z.boolean().optional()
 })
 
 export const languageSchema = z.object({

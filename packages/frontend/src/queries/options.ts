@@ -456,7 +456,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string;
     }) => {
       // Invalidate the collection list
       queryClient.invalidateQueries({
@@ -484,7 +484,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; itemTitle: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -511,7 +511,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; collectionItemNewKey: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -542,7 +542,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; collectionItemNewKey: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -571,7 +571,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; collectionItemNewKey: string; destLang: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],

@@ -29,10 +29,9 @@ import CopyItemToLanguageDialog      from './CopyItemToLanguageDialog'
 import Spinner                       from './../../../components/Spinner'
 import { createDebounce }            from './../../../utils/debounce';
 import { useSnackbar }               from './../../../contexts/SnackbarContext';
-import { useCollectionItems, useWorkspaceDetails, useDeleteCollectionItem } from './../../../queries/hooks';
+import { useCollectionItems, useWorkspaceDetails, useDeleteCollectionItem, useRenameCollectionItem, useCopyCollectionItem, useCopyCollectionItemToLang, useMakePageBundle, useCreateCollectionItemKey } from './../../../queries/hooks';
 import { siteQueryOptions } from './../../../queries/options';
-import { api }                       from './../../../services/api-service'
-import type { CollectionItem, CollectionConfig } from '@quiqr/types'
+import type { CollectionItem, CollectionConfig, Language } from '@quiqr/types'
 
 const Fragment = React.Fragment;
 
@@ -72,7 +71,7 @@ const MakePageBundleItemKeyDialog = ({
     <Dialog open={true}>
       <DialogTitle id='simple-dialog-title'>Convert as Page Bundle</DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText component="div">
           {!state.valid && (
             <div>
               Do you really want to make a page bundle from the item <b>"{itemLabel}"</b>?
@@ -180,10 +179,15 @@ const CollectionListItems = React.memo(({
         }}>Delete</MenuItem>
 
         {collectionExtension === 'md' && (
-          <MenuItem onClick={() => {
-            handleClose();
-            onMakePageBundleItemClick(currentItem);
-          }}>Make Page Bundle</MenuItem>
+          <MenuItem 
+            disabled={currentItem?.isPageBundle === true}
+            onClick={() => {
+              handleClose();
+              onMakePageBundleItemClick(currentItem);
+            }}
+          >
+            Make Page Bundle
+          </MenuItem>
         )}
       </Menu>
       
@@ -263,6 +267,11 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
   const { data: languages = [] } = useQuery(siteQueryOptions.languages(siteKey, workspaceKey));
 
   const deleteCollectionItemMutation = useDeleteCollectionItem();
+  const renameCollectionItemMutation = useRenameCollectionItem();
+  const copyCollectionItemMutation = useCopyCollectionItem();
+  const copyCollectionItemToLangMutation = useCopyCollectionItemToLang();
+  const makePageBundleMutation = useMakePageBundle();
+  const createCollectionItemKeyMutation = useCreateCollectionItemKey();
 
   // Keep UI state local
   const [state, setState] = React.useState<CollectionLocalState>({
@@ -319,15 +328,20 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
   const makePageBundleCollectionItem = () => {
     const view = state.view;
     if (view == null) return;
-    setState(prev => ({ ...prev, modalBusy: true }));
 
-    api.makePageBundleCollectionItem(siteKey, workspaceKey, collectionKey, view.item.key)
-      .then(() => {
-        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-        // Queries will automatically refetch
-      }, () => {
-        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-      });
+    makePageBundleMutation.mutate(
+      { siteKey, workspaceKey, collectionKey, collectionItemKey: view.item.key },
+      {
+        onSuccess: () => {
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          addSnackMessage('Successfully converted to page bundle', { severity: 'success' });
+        },
+        onError: (error) => {
+          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          addSnackMessage(`Failed to convert to page bundle: ${error.message}`, { severity: 'error' });
+        },
+      }
+    );
   };
 
   const deleteCollectionItem = () => {
@@ -339,10 +353,11 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
       {
         onSuccess: () => {
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-          // TanStack Query automatically invalidates and refetches
+          addSnackMessage('Item deleted successfully', { severity: 'success' });
         },
-        onError: () => {
+        onError: (error: any) => {
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+          addSnackMessage(`Failed to delete item: ${error.message}`, { severity: 'error' });
         },
       }
     );
@@ -350,73 +365,117 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
 
   const renameCollectionItem = (itemKey: string, itemOldKey: string) => {
     if (state.view == null) return;
-    setState(prev => ({ ...prev, modalBusy: true }));
 
-    api.renameCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
-      .then((result) => {
-        if (result.renamed) {
+    // Check if the target key already exists (and is different from the old key)
+    if (itemKey !== itemOldKey) {
+      const keyExists = items.some(item => item.key === itemKey);
+      if (keyExists) {
+        addSnackMessage(`Cannot rename: An item with key "${itemKey}" already exists.`, { severity: "warning" });
+        return;
+      }
+    }
+
+    renameCollectionItemMutation.mutate(
+      { siteKey, workspaceKey, collectionKey, collectionItemKey: itemOldKey, collectionItemNewKey: itemKey },
+      {
+        onSuccess: (result: any) => {
+          if (result.renamed) {
+            setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+            addSnackMessage('Item renamed successfully', { severity: 'success' });
+          } else {
+            setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+            addSnackMessage('Failed to rename item', { severity: 'warning' });
+          }
+        },
+        onError: (error: any) => {
           setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-          // Queries will automatically refetch
-        } else {
-          //TODO: warn someone!
-          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-        }
-      }, () => {
-        //TODO: warn someone!
-        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-      });
+          addSnackMessage(`Error renaming item: ${error.message}`, { severity: 'error' });
+        },
+      }
+    );
   };
 
   const copyCollectionItem = (itemKey: string, itemOldKey: string) => {
     if (state.view == null) return;
-    setState(prev => ({ ...prev, modalBusy: true }));
 
-    api.copyCollectionItem(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey)
-      .then((result) => {
-        if (result.copied) {
-          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-          // Queries will automatically refetch
-        } else {
-          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+    // Check if the target key already exists
+    const keyExists = items.some(item => item.key === itemKey);
+    if (keyExists) {
+      addSnackMessage(`Cannot copy: An item with key "${itemKey}" already exists.`, { severity: "warning" });
+      return;
+    }
+
+    copyCollectionItemMutation.mutate(
+      { siteKey, workspaceKey, collectionKey, collectionItemKey: itemOldKey, collectionItemNewKey: itemKey },
+      {
+        onSuccess: () => {
+          setState(prev => ({ ...prev, view: undefined }));
+          addSnackMessage(`Copied ${itemKey} successfully.`, { severity: "success" });
+        },
+        onError: () => {
+          addSnackMessage(`Failed to copy ${itemKey}.`, { severity: "error" });
         }
-      }, () => {
-        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-      });
+      }
+    );
   };
 
   const copyCollectionItemToLang = (itemKey: string, itemOldKey: string, destLang: string) => {
     console.log(destLang);
     if (state.view == null) return;
 
-    api.copyCollectionItemToLang(siteKey, workspaceKey, collectionKey, itemOldKey, itemKey, destLang)
-      .then((result) => {
-        if (result.copied) {
-          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-          //api.logToConsole("copied to "+ destLang);
-          addSnackMessage(`Copies ${itemKey} to ${destLang}.`, { severity: "success" });
-        } else {
-          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
+    // Check if the target key already exists
+    const keyExists = items.some(item => item.key === itemKey);
+    if (keyExists) {
+      addSnackMessage(`Cannot copy: An item with key "${itemKey}" already exists.`, { severity: "warning" });
+      return;
+    }
+
+    copyCollectionItemToLangMutation.mutate(
+      { siteKey, workspaceKey, collectionKey, collectionItemKey: itemOldKey, collectionItemNewKey: itemKey, destLang },
+      {
+        onSuccess: (result) => {
+          if (result.copied) {
+            setState(prev => ({ ...prev, view: undefined }));
+            addSnackMessage(`Copied ${itemKey} to ${destLang}.`, { severity: "success" });
+          } else {
+            setState(prev => ({ ...prev, view: undefined }));
+          }
+        },
+        onError: (error: any) => {
+          setState(prev => ({ ...prev, view: undefined }));
+          addSnackMessage(`Failed to copy to ${destLang}: ${error.message}`, { severity: 'error' });
         }
-      }, () => {
-        setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-      });
+      }
+    );
   };
 
   const createCollectionItemKey = (itemKey: string, itemTitle: string) => {
-    setState(prev => ({ ...prev, modalBusy: true }));
-    api.createCollectionItemKey(siteKey, workspaceKey, collectionKey, itemKey, itemTitle)
-      .then(({ unavailableReason }) => {
-        if (unavailableReason) {
-          setState(prev => ({ ...prev, modalBusy: false }));
-        } else {
-          setState(prev => ({ ...prev, modalBusy: false, view: undefined }));
-          // Queries will automatically refetch
-          const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`;
-          navigate(path);
+    // Check if the key already exists
+    const keyExists = items.some(item => item.key === itemKey);
+    if (keyExists) {
+      addSnackMessage(`Cannot create: An item with key "${itemKey}" already exists.`, { severity: "warning" });
+      return;
+    }
+
+    createCollectionItemKeyMutation.mutate(
+      { siteKey, workspaceKey, collectionKey, collectionItemKey: itemKey, itemTitle },
+      {
+        onSuccess: (data) => {
+          if (data.unavailableReason) {
+            addSnackMessage(`Cannot create item: ${data.unavailableReason}`, { severity: 'warning' });
+          } else {
+            setState(prev => ({ ...prev, view: undefined }));
+            addSnackMessage('Item created successfully', { severity: 'success' });
+            // Navigate to the new item
+            const path = `/sites/${encodeURIComponent(siteKey)}/workspaces/${encodeURIComponent(workspaceKey)}/collections/${encodeURIComponent(collectionKey)}/${encodeURIComponent(itemKey)}%2Findex.md`;
+            navigate(path);
+          }
+        },
+        onError: (error: any) => {
+          addSnackMessage(`Failed to create item: ${error.message}`, { severity: 'error' });
         }
-      }, () => {
-        setState(prev => ({ ...prev, modalBusy: false }));
-      });
+      }
+    );
   };
 
   const resolveFilteredItems = React.useCallback((items: CollectionItem[], filter: string) => {
@@ -551,7 +610,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
         title="Copy To Language"
         viewKey={view.key}
         textfieldlabel="item key"
-        languages={state.languages}
+        languages={languages}
         value={state.view.item.label}
         busy={state.modalBusy}
         handleClose={setRootView}

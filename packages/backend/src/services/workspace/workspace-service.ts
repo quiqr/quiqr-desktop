@@ -597,7 +597,10 @@ export class WorkspaceService {
           sortval = label;
         }
 
-        return { key, label, sortval };
+        // Detect if this is a page bundle (file is named index.md/index.html in a directory)
+        const isPageBundle = /\/index\.(md|html|markdown|qmd)$/.test(item);
+
+        return { key, label, sortval, isPageBundle };
       });
 
       return retFiles;
@@ -611,7 +614,9 @@ export class WorkspaceService {
       const files = await glob(globExpression, {});
       return files.map(function (item) {
         const key = item.replace(folder, '');
-        return { key, label: key };
+        const label = key;
+        const sortval = key; // Default sortval to key for data folders
+        return { key, label, sortval };
       });
     }
   }
