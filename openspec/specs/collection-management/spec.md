@@ -1,9 +1,8 @@
-# collection-management Specification Deltas
+# collection-management Specification
 
-This document defines the delta changes for stabilizing collection listing functionality.
-
-## ADDED Requirements
-
+## Purpose
+TBD - created by archiving change stabilize-collection-listing. Update Purpose after archive.
+## Requirements
 ### Requirement: Collection List Automatic Refresh
 
 The collection listing SHALL automatically refresh after any mutation operation (create, rename, copy, delete, convert to page bundle).
@@ -173,27 +172,3 @@ The `CollectionItem` type SHALL include all necessary metadata for determining i
 - **AND** the Zod schema in types.ts SHALL validate all item structures
 - **AND** no items SHALL fail schema validation at runtime
 
-## MODIFIED Requirements
-
-### Requirement: Collection Component State Management
-
-The Collection component SHALL use TanStack Query for server state and local `useState` only for UI-specific state (view modals, filters).
-
-#### Scenario: Separate server and UI state
-- **WHEN** the Collection component manages state
-- **THEN** server data (items, workspace details, languages) SHALL be managed by TanStack Query
-- **AND** UI state (filter, current view/dialog, filter options) SHALL be managed by `useState`
-- **AND** loading states for server data SHALL derive from query states
-- **AND** `modalBusy` state SHALL derive from mutation `isPending` states
-- **AND** no manual API calls with `setState` for loading/data are used
-
-#### Scenario: Cleanup deprecated state patterns
-- **WHEN** refactoring the Collection component
-- **THEN** all TODO comments related to error handling SHALL be addressed
-- **AND** manual promise-based API calls SHALL be replaced with mutation hooks
-- **AND** manual `setState` for busy/loading SHALL be removed
-- **AND** error handling SHALL use mutation.error and query.error states
-
-## REMOVED Requirements
-
-None. This change adds functionality and fixes bugs without removing existing requirements.

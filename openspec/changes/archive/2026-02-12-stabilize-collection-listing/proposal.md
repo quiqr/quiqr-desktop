@@ -51,6 +51,43 @@ and:
 index.tsx:309 Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
 ```
 
+## What Changes
+
+### Root Causes Identified and Fixed
+
+**PROBLEM-1 & 2 (Rename doesn't refresh/work)**: Manual `api.renameCollectionItem()` calls bypassed TanStack Query cache invalidation. Migrated to `useRenameCollectionItem()` mutation hook with automatic cache invalidation.
+
+**PROBLEM-3 (Page bundle conversion not working)**: Manual `api.makePageBundleCollectionItem()` didn't trigger list refresh. Migrated to `useMakePageBundle()` mutation hook.
+
+**PROBLEM-4 (Page bundle menu not disabled)**: Missing `isPageBundle` metadata in CollectionItem schema. Added backend detection for page bundles (`/index.md` files) and disabled menu item in frontend.
+
+**PROBLEM-5 (Copy to language crash)**: Manual `api.copyCollectionItemToLang()` lacked error boundaries. Migrated to `useCopyCollectionItemToLang()` mutation hook with proper error handling.
+
+**PROBLEM-6 (Copy doesn't refresh)**: Manual `api.copyCollectionItem()` bypassed cache. Migrated to `useCopyCollectionItem()` mutation hook.
+
+**PROBLEM-7 (Unclear refresh state)**: No visual indicators during refetch. Added `LinearProgress` indicator when `isFetching || isRefetching`.
+
+**PROBLEM-8 (YAML validation errors)**: CollectionItemSchema required `sortval: z.string()` but YAML items didn't have it. Made `sortval` optional and backend now always returns it (defaults to key for data folders).
+
+### Additional Fixes
+
+- **Delete snackbar**: Added success/error feedback to delete operation
+- **Duplicate key prevention**: Added validation to prevent copying/renaming/creating items with existing keys
+- **Hydration errors**: Fixed `DialogContentText` components to use `component="div"` instead of default `<p>` tag
+- **Controlled input warning**: Fixed `EditItemKeyDialog` to initialize state with empty string instead of undefined
+- **Bundle files error**: Fixed `getFilesInBundle` to return empty array instead of throwing errors or returning undefined
+- **Mutation type safety**: Fixed TanStack Query mutation options to include all parameters in `onSuccess` variables type
+
+### Implementation Details
+
+All collection operations now use TanStack Query mutation hooks:
+- ✅ deleteCollectionItem
+- ✅ renameCollectionItem  
+- ✅ copyCollectionItem
+- ✅ copyCollectionItemToLang
+- ✅ makePageBundleCollectionItem
+- ✅ createCollectionItemKey
+
 ## Proposed Solution
 
 Iterate through all problems, and when a problem is fixed document the root cause and solution in this openspec change. When the user has confirmed the fix, create specs to describe the correct functionality and create unit and/or integration tests to prevent future problems.

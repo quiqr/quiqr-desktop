@@ -4,103 +4,65 @@
 **Capability**: user-feedback  
 **Owner**: frontend
 
-## Overview
+## Purpose
 
 This spec defines requirements for providing user feedback when application state changes or operations complete. Users must receive clear, timely feedback for all state-changing operations to understand what happened and whether their actions succeeded.
-
 ## Requirements
-
 ### Requirement: Snackbar Messages for State Changes
 
-**Description**: All operations that change application state, workspace state, or site content MUST display a snackbar message indicating success or failure.
+All operations that change application state, workspace state, or site content MUST display a snackbar message indicating success or failure.
 
-**Rationale**: Users need immediate feedback to:
-- Confirm their action was executed
-- Understand whether the operation succeeded or failed
-- Know what to do if an error occurred
-
-**Implementation**:
-- Use the `useSnackbar()` hook from the snackbar context
-- Call `addSnackMessage(message, { severity })` after operations complete
-- Severity levels:
-  - `success` - Operation completed successfully
-  - `error` - Operation failed due to an error
-  - `warning` - Operation completed but with issues
-  - `info` - Informational message about operation
+**Severity levels**:
+- `success` - Operation completed successfully
+- `error` - Operation failed due to an error
+- `warning` - Operation completed but with issues
+- `info` - Informational message
 
 **Examples of state-changing operations**:
 - Creating, updating, or deleting content items
 - Renaming or copying files
-- Converting file structures (e.g., Make Page Bundle)
+- Converting file structures
 - Saving form data
-- Publishing or unpublishing content
-- Importing or exporting data
-- Changing application settings
+- Publishing content
+- Changing settings
 
-**Scenario 1: Successful delete operation**
-```
-GIVEN a user has a collection item selected
-WHEN they delete the item
-AND the operation succeeds
-THEN a success snackbar appears with message "Item deleted successfully"
-AND the item disappears from the collection list
-```
+#### Scenario: Delete item shows success message
 
-**Scenario 2: Failed delete operation**
-```
-GIVEN a user has a collection item selected
-WHEN they delete the item
-AND the operation fails with error "Permission denied"
-THEN an error snackbar appears with message "Failed to delete item: Permission denied"
-AND the item remains in the collection list
-```
+WHEN a user deletes a collection item and the operation succeeds  
+THEN a success snackbar SHALL display "Item deleted successfully"
 
-**Scenario 3: Rename operation**
-```
-GIVEN a user renames a collection item from "old-name" to "new-name"
-WHEN the operation succeeds
-THEN a success snackbar appears with message "Item renamed successfully"
-```
+#### Scenario: Create item shows error on failure
 
-**Scenario 4: Copy operation**
-```
-GIVEN a user copies a collection item
-WHEN the operation succeeds
-THEN a success snackbar appears with message "Copied {itemName} successfully"
-```
+WHEN a user creates a collection item and the operation fails  
+THEN an error snackbar SHALL display "Failed to create item: {error reason}"
 
 ### Requirement: Error Messages Must Be Actionable
 
-**Description**: Error messages in snackbars MUST include the underlying error reason when available, helping users understand what went wrong.
+Error messages MUST include the underlying error reason when available to help users understand and resolve issues.
 
-**Implementation**:
+**Pattern**:
 ```typescript
 onError: (error: any) => {
   addSnackMessage(`Failed to {operation}: ${error.message}`, { severity: 'error' });
 }
 ```
 
-**Scenario: Include error details**
-```
-GIVEN an operation fails with error "File already exists"
-WHEN displaying the error snackbar
-THEN the message includes the specific error: "Failed to copy item: File already exists"
-```
+#### Scenario: Error includes specific reason
+
+WHEN a mutation fails with an error  
+THEN the error snackbar SHALL include the error message text from the exception
 
 ### Requirement: Read-Only Operations Do Not Require Feedback
 
-**Description**: Operations that only read data (queries) do NOT require snackbar messages. Loading states should be shown through UI indicators (spinners, skeletons) instead.
+Operations that only read data (queries) SHALL NOT display snackbar messages. Instead, they MUST use loading indicators:
+- `<LinearProgress />` for background refetching
+- `<CircularProgress />` or skeleton UI for initial loading
 
-**Examples of read-only operations** (no snackbar needed):
-- Loading collection items
-- Fetching workspace details
-- Reading configuration
-- Displaying content
+#### Scenario: Query shows loading indicator instead of snackbar
 
-**Loading state indicators**:
-- Use `isLoading`, `isFetching`, `isRefetching` from TanStack Query
-- Show `<LinearProgress />` for background refetching
-- Show `<CircularProgress />` or skeleton UI for initial loading
+WHEN a collection items query is fetching or refetching data  
+THEN a LinearProgress indicator SHALL be displayed at the top of the collection list  
+AND no snackbar messages SHALL be shown for the query
 
 ## Migration Notes
 

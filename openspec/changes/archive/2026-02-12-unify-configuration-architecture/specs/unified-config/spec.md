@@ -177,20 +177,6 @@ The system SHALL expose a unified API for reading and writing configuration that
 
 ---
 
-## MODIFIED Requirements
-
-### Requirement: (Modifies backend-architecture) CONFIG-CONTAINER-001 - Container Integration
-
-The `UnifiedConfigService` SHALL be integrated into the dependency injection container, replacing the current `AppConfig` for preference resolution.
-
-#### Scenario: Container provides config service
-- GIVEN a properly initialized container
-- WHEN accessing `container.config`
-- THEN the system SHALL return a `UnifiedConfigService` instance
-- AND the service SHALL support all layered resolution methods
-
----
-
 ## Cross-References
 
 - **backend-architecture**: Container and service patterns

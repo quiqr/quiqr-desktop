@@ -8,7 +8,7 @@
 
 This is a NEW spec that defines requirements for user feedback on state-changing operations.
 
-## Added Requirements
+## MODIFIED Requirements
 
 ### Requirement: Snackbar Messages for State Changes
 
@@ -21,23 +21,26 @@ All operations that change application state, workspace state, or site content M
 - `info` - Informational message
 
 **Examples of state-changing operations**:
-- Creating, updating, or deleting content items (✅ Applied to Collection)
-- Renaming or copying files (✅ Applied to Collection)
-- Converting file structures (✅ Applied to Collection)
+- Creating, updating, or deleting content items
+- Renaming or copying files
+- Converting file structures
 - Saving form data
 - Publishing content
 - Changing settings
 
-**Scenario: Delete item shows success message**
-```
-GIVEN a user deletes a collection item
-WHEN the operation succeeds
-THEN a success snackbar shows "Item deleted successfully"
-```
+#### Scenario: Delete item shows success message
+
+WHEN a user deletes a collection item and the operation succeeds  
+THEN a success snackbar SHALL display "Item deleted successfully"
+
+#### Scenario: Create item shows error on failure
+
+WHEN a user creates a collection item and the operation fails  
+THEN an error snackbar SHALL display "Failed to create item: {error reason}"
 
 ### Requirement: Error Messages Must Be Actionable
 
-Error messages MUST include the underlying error reason when available.
+Error messages MUST include the underlying error reason when available to help users understand and resolve issues.
 
 **Pattern**:
 ```typescript
@@ -46,11 +49,22 @@ onError: (error: any) => {
 }
 ```
 
+#### Scenario: Error includes specific reason
+
+WHEN a mutation fails with an error  
+THEN the error snackbar SHALL include the error message text from the exception
+
 ### Requirement: Read-Only Operations Do Not Require Feedback
 
-Operations that only read data (queries) do NOT require snackbar messages. Use loading indicators instead:
+Operations that only read data (queries) SHALL NOT display snackbar messages. Instead, they MUST use loading indicators:
 - `<LinearProgress />` for background refetching
 - `<CircularProgress />` or skeleton UI for initial loading
+
+#### Scenario: Query shows loading indicator instead of snackbar
+
+WHEN a collection items query is fetching or refetching data  
+THEN a LinearProgress indicator SHALL be displayed at the top of the collection list  
+AND no snackbar messages SHALL be shown for the query
 
 ## Implementation in Collection Component
 
