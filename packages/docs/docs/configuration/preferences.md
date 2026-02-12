@@ -1,68 +1,155 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-# General Preferences
+# User Preferences
 
-General preferences control basic application behavior and appearance in Quiqr Desktop.
+User preferences control your personal Quiqr experience. These settings are stored per-user and can be changed through the Preferences UI or configuration files.
 
-## Quiqr Data Folder
+## Accessing Preferences
 
-The Quiqr Data Folder is the central location where Quiqr Desktop stores all your sites, workspaces, and temporary files.
+Open the Preferences panel:
+- **Menu**: File → Preferences (or Quiqr → Preferences on macOS)
+- **Keyboard**: `Ctrl+,` (or `Cmd+,` on macOS)
 
-### Default Locations
+## General Preferences
 
-- **Linux:** `~/.local/share/quiqr/`
-- **macOS:** `~/Library/Application Support/quiqr/`
-- **Windows:** `%AppData%\quiqr\`
+### Data Folder
 
-### Changing the Data Folder
+The data folder is where Quiqr stores your sites and content.
 
-You can customize the data folder location through the preferences interface:
+| Setting | `dataFolder` |
+|---------|--------------|
+| **Default** | `~/Quiqr` |
+| **Type** | Directory path |
 
-1. Open **Preferences** from the main menu
-2. Navigate to **General** settings
-3. Click **Choose Folder** next to the Quiqr Data Folder setting
-4. Select your desired location
-5. Restart Quiqr Desktop for changes to take effect
+You can change this to any directory where you have read/write permissions. The path supports the `~` shorthand for your home directory.
 
-:::warning Important
-Changing the data folder location will not automatically migrate existing sites. You'll need to manually copy your site data to the new location or re-import your sites.
-:::
+### Interface Style
 
-### What's Stored in the Data Folder
+Choose between light and dark themes.
 
-The data folder contains:
-- **Sites:** All imported Hugo/Quarto site configurations
-- **Workspaces:** Content and workspace-specific settings for each site
-- **Cache:** Temporary build files and preview data
-- **Logs:** Application and build logs for troubleshooting
+| Setting | `interfaceStyle` |
+|---------|------------------|
+| **Default** | `quiqr10-light` |
+| **Options** | `quiqr10-light`, `quiqr10-dark` |
 
-:::tip Backup Recommendation
-The Quiqr Data Folder contains all your site content and configurations. Back up this folder regularly to prevent data loss.
-:::
+The theme changes immediately when you select a new option.
 
-## Interface Style
+### Sites Listing View
 
-Quiqr Desktop supports both light and dark interface themes to match your preference and reduce eye strain.
+Control how sites are displayed in the library.
 
-### Available Themes
+| Setting | `sitesListingView` |
+|---------|-------------------|
+| **Default** | `all` |
+| **Options** | `all`, `recent`, `favorites` |
 
-- **Light:** Traditional light interface with dark text on light backgrounds
-- **Dark:** Dark interface with light text on dark backgrounds
+### Library View
 
-### Changing the Theme
+Control the library display mode.
 
-1. Open **Preferences** from the main menu
-2. Navigate to **General** settings
-3. Select your preferred theme from the **Interface Style** dropdown
-4. The theme will be applied immediately (no restart required)
+| Setting | `libraryView` |
+|---------|---------------|
+| **Default** | `default` |
 
-:::tip System Theme
-Future versions of Quiqr Desktop may support automatic theme switching based on your operating system's theme preference.
-:::
+### Show Splash at Startup
 
-## Related Configuration
+Whether to show the welcome splash screen when Quiqr starts.
 
-- [Variables](./variables.md) - Configure global variables for build actions
-- [Advanced Settings](./advanced-settings.md) - Power-user configuration options
+| Setting | `showSplashAtStartup` |
+|---------|----------------------|
+| **Default** | `true` |
+| **Type** | boolean |
+
+### Log Retention Days
+
+How long to keep log files.
+
+| Setting | `logRetentionDays` |
+|---------|-------------------|
+| **Default** | `30` |
+| **Range** | `0` - `365` days |
+
+Set to `0` to disable log retention (logs are deleted immediately).
+
+## Advanced Preferences
+
+### System Git Path
+
+Path to a custom Git binary.
+
+| Setting | `systemGitBinPath` |
+|---------|-------------------|
+| **Default** | (uses bundled Git) |
+| **Type** | File path |
+
+Only set this if you need to use a specific Git installation instead of the bundled one.
+
+### Custom Open Command
+
+Custom command to open sites in external editors.
+
+| Setting | `customOpenInCommand` |
+|---------|----------------------|
+| **Default** | (none) |
+| **Type** | Command string |
+
+Supports these variables:
+- `%SITE_PATH` - Full path to the site directory
+- `%SITE_NAME` - Name of the site
+
+Example:
+```
+code %SITE_PATH
+```
+
+## Configuration File
+
+Preferences are stored in `user_prefs_default.json`:
+
+### Electron App Locations
+
+| Platform | Path |
+|----------|------|
+| **Linux** | `~/.config/quiqr/user_prefs_default.json` |
+| **macOS** | `~/Library/Application Support/quiqr/user_prefs_default.json` |
+| **Windows** | `%AppData%\quiqr\user_prefs_default.json` |
+
+### Standalone Development
+
+```
+~/.quiqr-standalone/user_prefs_default.json
+```
+
+### File Format
+
+```json
+{
+  "userId": "default",
+  "preferences": {
+    "dataFolder": "~/Quiqr",
+    "interfaceStyle": "quiqr10-light",
+    "sitesListingView": "all",
+    "libraryView": "default",
+    "showSplashAtStartup": true,
+    "logRetentionDays": 30
+  },
+  "lastOpenedSite": {
+    "siteKey": "my-site",
+    "workspaceKey": "main",
+    "sitePath": "/home/user/Quiqr/my-site"
+  },
+  "skipWelcomeScreen": false
+}
+```
+
+## Locked Preferences
+
+Administrators can lock certain preferences to prevent users from changing them. Locked preferences:
+
+- Are displayed as read-only in the UI
+- Cannot be changed through the Preferences panel
+- Can only be overridden via environment variables
+
+See [Environment Variables](./environment-variables.md) for override options.

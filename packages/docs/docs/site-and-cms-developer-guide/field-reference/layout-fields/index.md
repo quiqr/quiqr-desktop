@@ -37,6 +37,6 @@ The info field is particularly useful for providing inline documentation, warnin
 
 ## Related Documentation
 
-- [Data Fields](../data-fields/) - Fields that store simple values
-- [Container Fields](../container-fields/) - Fields that contain other fields
-- [Special Fields](../special-fields/) - File and image handling fields
+- **Data Fields** - Fields that store simple values
+- **Container Fields** - Fields that contain other fields
+- **Special Fields** - File and image handling fields

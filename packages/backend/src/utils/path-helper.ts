@@ -15,6 +15,12 @@ export interface PathHelperConfig {
   currentSitePath?: string;
 }
 
+/**
+ * Dynamic config getter function type
+ * Allows PathHelper to always get the current config values
+ */
+export type PathHelperConfigGetter = () => PathHelperConfig;
+
 export interface EnvironmentInfo {
   platform: 'macOS' | 'windows' | 'linux';
   isPackaged: boolean;
@@ -26,18 +32,34 @@ export interface EnvironmentInfo {
  */
 export class PathHelper {
   private _lastBuildDir?: string;
-  private config: PathHelperConfig;
+  private configGetter: PathHelperConfigGetter;
   private appInfo: AppInfoAdapter;
   private rootPath: string;
 
+  /**
+   * Create a PathHelper instance
+   * @param appInfo Platform adapter for app info
+   * @param rootPath Root path of the application
+   * @param configOrGetter Either a static config object or a function that returns the current config
+   */
   constructor(
     appInfo: AppInfoAdapter,
     rootPath: string,
-    config: PathHelperConfig = {}
+    configOrGetter: PathHelperConfig | PathHelperConfigGetter = {}
   ) {
     this.appInfo = appInfo;
     this.rootPath = rootPath;
-    this.config = config;
+    // Support both static config (for backward compatibility) and dynamic getter
+    this.configGetter = typeof configOrGetter === 'function' 
+      ? configOrGetter 
+      : () => configOrGetter;
+  }
+
+  /**
+   * Get the current config (always fresh from getter)
+   */
+  private get config(): PathHelperConfig {
+    return this.configGetter();
   }
 
   /* DIRS */
@@ -47,14 +69,15 @@ export class PathHelper {
    */
   getRoot(): string {
     let thedir = '';
+    const config = this.config;
 
-    if (this.config.dataFolder && fs.existsSync(this.config.dataFolder)) {
-      thedir = this.config.dataFolder;
+    if (config.dataFolder && fs.existsSync(config.dataFolder)) {
+      thedir = config.dataFolder;
     } else {
       thedir = path.join(this.appInfo.getPath('home'), 'Quiqr');
       fs.ensureDirSync(thedir);
-      // Caller should update config with this value
-      this.config.dataFolder = thedir;
+      // Note: We no longer mutate config here since it may be a dynamic getter
+      // The caller should update the config source directly if needed
     }
 
     return thedir;

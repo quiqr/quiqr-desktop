@@ -65,11 +65,11 @@ collections:
 
 A complete content model consists of several sections:
 
-### [Model File Structure](./content-model/model-file-structure/index.md)
+### [Model File Structure](./model-file-structure/index.md)
 
 Learn about the overall structure of the model file and how different sections work together.
 
-### [Root Properties](./content-model/model-file-structure/root-properties/index.md)
+### [Root Properties](./model-file-structure/root-properties/index.md)
 
 Top-level configuration properties:
 - **build** - Hugo build configuration
@@ -78,13 +78,8 @@ Top-level configuration properties:
 - **menu** - Sidebar menu structure
 - **singles** - Individual page definitions
 - **collections** - Repeating content definitions
-- **dynamics** - Dynamic content loading
 
-### [Includes and Partials](./content-model/model-file-structure/includes.md)
-
-Reuse field definitions and configuration across multiple content types.
-
-### [Build Actions](./content-model/build-actions/index.md)
+### [Build Actions](./build-actions/index.md)
 
 Configure Hugo build commands and customizations.
 
@@ -218,13 +213,13 @@ singles:
 
 ## Next Steps
 
-- [Model File Structure](./content-model/model-file-structure/index.md) - Deep dive into model structure
-- [Root Properties](./content-model/model-file-structure/root-properties/index.md) - All top-level properties
+- [Model File Structure](./model-file-structure/index.md) - Deep dive into model structure
+- [Root Properties](./model-file-structure/root-properties/index.md) - All top-level properties
 - [Field Reference](../field-reference/index.md) - Available field types
-- [Build Actions](./content-model/build-actions/index.md) - Hugo build configuration
+- [Build Actions](./build-actions/index.md) - Hugo build configuration
 
 ## Related Documentation
 
-- [Anatomy of a Quiqr Site](./anatomy-of-a-quiqr-site.md) - Site structure overview
-- [User Roles](./user-roles.md) - Content Editor vs Site Developer
-- [Field Development Guide](../developer-guide/field-system.md) - Creating custom fields
+- [Anatomy of a Quiqr Site](../anatomy-of-a-quiqr-site.md) - Site structure overview
+- [User Roles](../user-roles.md) - Content Editor vs Site Developer
+- [Field Development Guide](../../quiqr-internals-developer-guide/field-system.md) - Creating custom fields

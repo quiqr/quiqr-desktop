@@ -457,7 +457,7 @@ team:
 
 ## Related Fields
 
-- [List](./list.md) - Simple array container
+- [List](./leaf-array.md) - Simple array container
 - [Nested](./nested.md) - Hierarchical tree structure
 - [Bundle](./bundle.md) - File-based content manager
-- [Object](./object.md) - Single grouped object
+- [Object](./section.md) - Single grouped object

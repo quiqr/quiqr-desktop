@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 15
 ---
 
 # Getting Started
@@ -17,7 +17,7 @@ In this section, you'll find guides for:
 - **[Installation](./installation.md)** - Download and install Quiqr on your system
 - **[Quick Start](./quick-start.md)** - Create your first site in minutes
 - **[Import Existing Site](./import-site.md)** - Bring your existing project into Quiqr
-- **[Configuration](./configuration.md)** - Customize Quiqr settings and preferences
+- **[Configuration](../configuration/index.md)** - Customize Quiqr settings and preferences
 
 ## Choose Your Path
 
@@ -31,7 +31,7 @@ Jump to [Import Existing Site](./import-site.md) to learn how to bring your Hugo
 
 ### I'm a Developer
 
-Check out the [Developer Guide](../developer-guide/index.md) to learn about Quiqr's architecture, content models, and field system.
+Check out the [Developer Guide](../site-and-cms-developer-guide/index.md) to learn about Quiqr's architecture, content models, and field system.
 
 ## System Requirements
 

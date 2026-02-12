@@ -141,55 +141,7 @@ collections:
     fields: [...]
 ```
 
-### [dynamics](./root-properties/dynamics.md)
 
-Defines reusable dynamic form definitions:
-
-```yaml
-dynamics:
-  - key: seo_fields
-    fields: [...]
-```
-
-## Organizing Complex Models
-
-For complex sites, you can split your model into multiple files using includes and partials.
-
-### [Includes](./includes.md)
-
-Include external files to break up large models:
-
-```yaml
-singles:
-  - include: singles/homepage.yaml
-  - include: singles/about.yaml
-
-collections:
-  - include: collections/posts.yaml
-  - include: collections/products.yaml
-```
-
-### [Partials](./partials.md)
-
-Reuse field definitions across multiple content types:
-
-```yaml
-# Define a partial
-partials:
-  seo_fields:
-    - key: meta_title
-      type: string
-    - key: meta_description
-      type: text
-
-# Use the partial
-singles:
-  - key: homepage
-    fields:
-      - partial: seo_fields
-      - key: content
-        type: markdown
-```
 
 ## Example: Complete Model Structure
 
@@ -306,8 +258,6 @@ singles:
 ## Next Steps
 
 - [Root Properties](./root-properties/index.md) - Detailed property documentation
-- [Includes](./includes.md) - Organizing large models
-- [Partials](./partials.md) - Reusing field definitions
 - [Build Actions](../build-actions/index.md) - Hugo build configuration
 
 ## Related

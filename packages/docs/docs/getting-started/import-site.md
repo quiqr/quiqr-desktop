@@ -60,7 +60,7 @@ Check that Quiqr has detected your content directories:
 
 ### 2. Configure Model File (Optional)
 
-If you want custom form fields for your content, create a `model.yaml` or `model.json` file in your site root. See [Content Model](../developer-guide/content-model.md) for details.
+If you want custom form fields for your content, create a `model.yaml` or `model.json` file in your site root. See [Content Model](../site-and-cms-developer-guide/content-model/index.md) for details.
 
 ### 3. Set Up Preview
 
@@ -173,7 +173,7 @@ my-docs/
 - Create or update `model.yaml` in site root
 - Define fields for each content type
 - Restart Quiqr after model changes
-- See [Content Model Guide](../developer-guide/content-model.md)
+- See [Content Model Guide](../site-and-cms-developer-guide/content-model/index.md)
 
 ## Advanced Import Options
 
@@ -204,9 +204,9 @@ If you have a specific Hugo version:
 
 After importing your site:
 
-- [Configure Quiqr](./configuration.md) - Customize settings
-- [Content Model](../developer-guide/content-model.md) - Define custom forms
-- [Field Reference](../field-reference/index.md) - Learn about field types
+- [Configure Quiqr](../configuration/index.md) - Customize settings
+- [Content Model](../site-and-cms-developer-guide/content-model/index.md) - Define custom forms
+- [Field Reference](../site-and-cms-developer-guide/field-reference/index.md) - Learn about field types
 - [Publishing](./publishing.md) - Deploy your site
 
 ## Video Tutorial

@@ -1,5 +1,16 @@
 import { request } from './utils/main-process-bridge';
-import type { ExtraBuildConfig, GitPublishConf, ReadConfKeyMap, SiteConfig, HugoThemeInfo } from '../types';
+import type {
+  ExtraBuildConfig,
+  GitPublishConf,
+  ReadConfKeyMap,
+  SiteConfig,
+  HugoThemeInfo,
+  UserPreferences,
+  InstanceSettings,
+  SiteSettings,
+  ConfigPropertyMetadata,
+  ConfigLayer,
+} from '../types';
 
 
 export function getConfigurations(options?: {invalidateCache: boolean}) {
@@ -619,6 +630,130 @@ export function scaffoldSingleFromFile(siteKey: string, workspaceKey: string, da
  */
 export function scaffoldCollectionFromFile(siteKey: string, workspaceKey: string, dataType: 'yaml' | 'toml' | 'json' | 'markdown') {
   return request('scaffoldCollectionFromFile', { siteKey, workspaceKey, dataType });
+}
+
+// =============================================================================
+// Unified Configuration API
+// =============================================================================
+
+/**
+ * Get the effective value of a user preference, resolved through all layers
+ * Returns the value along with metadata about its source
+ */
+export function getEffectivePreference<K extends keyof UserPreferences>(prefKey: K): Promise<{
+  value: UserPreferences[K];
+  source: ConfigLayer;
+  locked: boolean;
+  path: string;
+}> {
+  return request('getEffectivePreference', { prefKey }) as Promise<{
+    value: UserPreferences[K];
+    source: ConfigLayer;
+    locked: boolean;
+    path: string;
+  }>;
+}
+
+/**
+ * Get all effective user preferences merged from all layers
+ */
+export function getEffectivePreferences(): Promise<UserPreferences> {
+  return request('getEffectivePreferences', {}) as Promise<UserPreferences>;
+}
+
+/**
+ * Set a user preference value
+ * This will be stored in the user's config file
+ */
+export function setUserPreference<K extends keyof UserPreferences>(
+  prefKey: K,
+  value: UserPreferences[K]
+): Promise<boolean> {
+  return request('setUserPreference', { prefKey, value }) as Promise<boolean>;
+}
+
+/**
+ * Set multiple user preferences at once
+ */
+export function setUserPreferences(preferences: Partial<UserPreferences>): Promise<boolean> {
+  return request('setUserPreferences', { preferences }) as Promise<boolean>;
+}
+
+/**
+ * Check if a preference is locked (forced by instance admin)
+ */
+export function isPreferenceLocked<K extends keyof UserPreferences>(prefKey: K): Promise<boolean> {
+  return request('isPreferenceLocked', { prefKey }) as Promise<boolean>;
+}
+
+/**
+ * Get all property metadata for the about:config style inspection
+ */
+export function getAllPropertyMetadata(): Promise<ConfigPropertyMetadata[]> {
+  return request('getAllPropertyMetadata', {}) as Promise<ConfigPropertyMetadata[]>;
+}
+
+/**
+ * Get all instance settings
+ */
+export function getInstanceSettings(): Promise<InstanceSettings> {
+  return request('getInstanceSettings', {}) as Promise<InstanceSettings>;
+}
+
+/**
+ * Get a specific instance setting
+ */
+export function getInstanceSetting<K extends keyof InstanceSettings>(key: K): Promise<InstanceSettings[K]> {
+  return request('getInstanceSetting', { key }) as Promise<InstanceSettings[K]>;
+}
+
+/**
+ * Update instance settings (partial update)
+ */
+export function updateInstanceSettings(settings: Partial<InstanceSettings>): Promise<boolean> {
+  return request('updateInstanceSettings', { settings }) as Promise<boolean>;
+}
+
+/**
+ * Get site-specific settings
+ */
+export function getSiteSettings(siteKey: string): Promise<SiteSettings> {
+  return request('getSiteSettings', { siteKey }) as Promise<SiteSettings>;
+}
+
+/**
+ * Update site-specific settings
+ */
+export function updateSiteSettings(siteKey: string, settings: Partial<SiteSettings['settings']>): Promise<boolean> {
+  return request('updateSiteSettings', { siteKey, settings }) as Promise<boolean>;
+}
+
+/**
+ * Get the current user ID (defaults to 'default' in single-user mode)
+ */
+export function getCurrentUserId(): Promise<string> {
+  return request('getCurrentUserId', {}) as Promise<string>;
+}
+
+/**
+ * Switch to a different user context
+ */
+export function switchUser(userId: string): Promise<boolean> {
+  return request('switchUser', { userId }) as Promise<boolean>;
+}
+
+/**
+ * List all configured users
+ */
+export function listUsers(): Promise<string[]> {
+  return request('listUsers', {}) as Promise<string[]>;
+}
+
+/**
+ * Check if experimental features are enabled
+ */
+export function isExperimentalFeaturesEnabled(): Promise<boolean> {
+  return request('isExperimentalFeaturesEnabled', {}) as Promise<boolean>;
 }
 
 // Type interface for all API methods (for type inference in hooks)

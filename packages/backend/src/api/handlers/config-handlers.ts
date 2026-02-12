@@ -237,11 +237,173 @@ export function createGetEnvironmentInfoHandler(container: AppContainer) {
   };
 }
 
+// =============================================================================
+// Unified Configuration System Handlers (New Architecture)
+// =============================================================================
+
+/**
+ * Get a resolved preference value with layered resolution
+ * Returns the effective value after applying all layers (app-default < instance-default < user < instance-forced)
+ */
+export function createGetEffectivePreferenceHandler(container: AppContainer) {
+  return async ({ prefKey }: { prefKey: string }) => {
+    // Use resolvePreference to get full metadata including source and locked status
+    const resolved = container.unifiedConfig.resolvePreference(prefKey as keyof import('@quiqr/types').UserPreferences);
+    return {
+      value: resolved.value,
+      source: resolved.source,
+      locked: resolved.locked,
+      path: resolved.path,
+    };
+  };
+}
+
+/**
+ * Get all effective preferences with their resolution metadata
+ */
+export function createGetEffectivePreferencesHandler(container: AppContainer) {
+  return async () => {
+    return container.unifiedConfig.getEffectivePreferences();
+  };
+}
+
+/**
+ * Set a user preference value
+ * Will fail if the preference is locked by instance-forced settings
+ */
+export function createSetUserPreferenceHandler(container: AppContainer) {
+  return async ({ prefKey, value }: { prefKey: string; value: unknown }) => {
+    await container.unifiedConfig.setUserPreference(prefKey, value);
+    return true;
+  };
+}
+
+/**
+ * Set multiple user preferences at once
+ */
+export function createSetUserPreferencesHandler(container: AppContainer) {
+  return async ({ preferences }: { preferences: Record<string, unknown> }) => {
+    await container.unifiedConfig.setUserPreferences(preferences);
+    return true;
+  };
+}
+
+/**
+ * Check if a preference is locked by instance-forced settings
+ */
+export function createIsPreferenceLockedHandler(container: AppContainer) {
+  return async ({ prefKey }: { prefKey: string }) => {
+    return container.unifiedConfig.isPreferenceLocked(prefKey);
+  };
+}
+
+/**
+ * Get all property metadata (Firefox about:config style)
+ * Returns all config properties with their values, sources, and types
+ */
+export function createGetAllPropertyMetadataHandler(container: AppContainer) {
+  return async () => {
+    return container.unifiedConfig.getAllPropertyMetadata();
+  };
+}
+
+/**
+ * Get instance settings
+ */
+export function createGetInstanceSettingsHandler(container: AppContainer) {
+  return async () => {
+    return container.unifiedConfig.getInstanceSettings();
+  };
+}
+
+/**
+ * Get a specific instance setting by path
+ */
+export function createGetInstanceSettingHandler(container: AppContainer) {
+  return async ({ path }: { path: string }) => {
+    // Cast path to valid InstanceSettings key - frontend is responsible for valid paths
+    return container.unifiedConfig.getInstanceSetting(path as keyof import('@quiqr/types').InstanceSettings);
+  };
+}
+
+/**
+ * Update instance settings (partial update)
+ */
+export function createUpdateInstanceSettingsHandler(container: AppContainer) {
+  return async ({ settings }: { settings: Record<string, unknown> }) => {
+    await container.unifiedConfig.updateInstanceSettings(settings);
+    return true;
+  };
+}
+
+/**
+ * Get site-specific settings
+ */
+export function createGetSiteSettingsHandler(container: AppContainer) {
+  return async ({ siteKey }: { siteKey: string }) => {
+    return container.unifiedConfig.getSiteSettings(siteKey);
+  };
+}
+
+/**
+ * Update site-specific settings
+ */
+export function createUpdateSiteSettingsHandler(container: AppContainer) {
+  return async ({
+    siteKey,
+    settings,
+  }: {
+    siteKey: string;
+    settings: Record<string, unknown>;
+  }) => {
+    await container.unifiedConfig.updateSiteSettings(siteKey, settings);
+    return true;
+  };
+}
+
+/**
+ * Get the current user ID
+ */
+export function createGetCurrentUserIdHandler(container: AppContainer) {
+  return async () => {
+    return container.unifiedConfig.getCurrentUserId();
+  };
+}
+
+/**
+ * Switch to a different user
+ */
+export function createSwitchUserHandler(container: AppContainer) {
+  return async ({ userId }: { userId: string }) => {
+    await container.unifiedConfig.switchUser(userId);
+    return true;
+  };
+}
+
+/**
+ * List all users with config files
+ */
+export function createListUsersHandler(container: AppContainer) {
+  return async () => {
+    return container.unifiedConfig.listUsers();
+  };
+}
+
+/**
+ * Check if experimental features are enabled (unified config)
+ */
+export function createIsExperimentalFeaturesEnabledHandler(container: AppContainer) {
+  return async () => {
+    return container.unifiedConfig.isExperimentalFeaturesEnabled();
+  };
+}
+
 /**
  * Create all config-related handlers
  */
 export function createConfigHandlers(container: AppContainer) {
   return {
+    // Legacy handlers (backward compatibility)
     readConfKey: createReadConfKeyHandler(container),
     readConfPrefKey: createReadConfPrefKeyHandler(container),
     saveConfPrefKey: createSaveConfPrefKeyHandler(container),
@@ -262,5 +424,22 @@ export function createConfigHandlers(container: AppContainer) {
     toggleAutoHugoServe: createToggleAutoHugoServeHandler(container),
     changeApplicationRole: createChangeApplicationRoleHandler(container),
     getEnvironmentInfo: createGetEnvironmentInfoHandler(container),
+
+    // Unified config handlers (new architecture)
+    getEffectivePreference: createGetEffectivePreferenceHandler(container),
+    getEffectivePreferences: createGetEffectivePreferencesHandler(container),
+    setUserPreference: createSetUserPreferenceHandler(container),
+    setUserPreferences: createSetUserPreferencesHandler(container),
+    isPreferenceLocked: createIsPreferenceLockedHandler(container),
+    getAllPropertyMetadata: createGetAllPropertyMetadataHandler(container),
+    getInstanceSettings: createGetInstanceSettingsHandler(container),
+    getInstanceSetting: createGetInstanceSettingHandler(container),
+    updateInstanceSettings: createUpdateInstanceSettingsHandler(container),
+    getSiteSettings: createGetSiteSettingsHandler(container),
+    updateSiteSettings: createUpdateSiteSettingsHandler(container),
+    getCurrentUserId: createGetCurrentUserIdHandler(container),
+    switchUser: createSwitchUserHandler(container),
+    listUsers: createListUsersHandler(container),
+    isExperimentalFeaturesEnabled: createIsExperimentalFeaturesEnabledHandler(container),
   };
 }
