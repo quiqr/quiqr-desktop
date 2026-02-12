@@ -1,40 +1,38 @@
-import { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import service from './../../services/service';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { prefsQueryOptions, prefsMutationOptions } from '../../queries/options';
 import FolderPicker from '../../components/FolderPicker';
-import { UserPreferences } from '../../../types';
 import { useAppTheme } from '../../contexts/ThemeContext';
 
 function PrefsGeneral() {
-  const [dataFolder, setDataFolder] = useState('');
-  const [interfaceStyle, setInterfaceStyle] = useState('');
   const { updateTheme } = useAppTheme();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    service.api.readConfKey('prefs').then((value: UserPreferences) => {
-      setInterfaceStyle(value.interfaceStyle ?? 'quiqr10');
-      setDataFolder(value.dataFolder ?? '~/Quiqr');
-    });
-  }, []);
+  // Query: Fetch preferences
+  const { data: prefs } = useQuery(prefsQueryOptions.all());
+
+  // Mutation: Save preference key
+  const savePrefMutation = useMutation(prefsMutationOptions.save(queryClient));
+
+  const dataFolder = prefs?.dataFolder ?? '~/Quiqr';
+  const interfaceStyle = prefs?.interfaceStyle ?? 'quiqr10-light';
 
   const handleFolderSelected = (folder: string | null) => {
     if (folder) {
-      service.api.saveConfPrefKey('dataFolder', folder);
-      setDataFolder(folder);
+      savePrefMutation.mutate({ prefKey: 'dataFolder', prefValue: folder });
     }
   };
 
   const handleInterfaceStyleChange = (value: string) => {
     // Optimistically update the theme immediately
     updateTheme(value);
-    setInterfaceStyle(value);
-    // Save to backend
-    service.api.saveConfPrefKey('interfaceStyle', value);
+    // Save to backend (automatic cache invalidation via mutation)
+    savePrefMutation.mutate({ prefKey: 'interfaceStyle', prefValue: value });
   };
 
   return (
