@@ -141,8 +141,9 @@ const AppContent = ({ theme }: { theme: Theme }) => {
         {/* Workspace child routes - all inherit site/workspace params */}
         <Route index element={<DashboardRoute />} />
         <Route path="prefs/*" element={<PrefsLayout />} />
-        <Route path="collections/:collection/*" element={<CollectionRoute refreshed={false} />} />
-        <Route path="collections/:collection/:refresh" element={<CollectionRoute refreshed={true} />} />
+        <Route path="collections/:collection/:item" element={<CollectionItemRoute />} />
+        <Route path="collections/:collection/:item/nest/*" element={<CollectionItemRoute />} />
+        <Route path="collections/:collection/*" element={<CollectionRoute />} />
         <Route path="singles/:single/*" element={<SingleRoute refreshed={false} />} />
         <Route path="singles/:single/nest/*" element={<SingleRoute refreshed={false} />} />
         <Route path="singles/:single/:refresh" element={<SingleRoute refreshed={true} />} />
@@ -199,7 +200,7 @@ const App = () => {
 
   // Load theme from preferences on mount
   useEffect(() => {
-    service.api.readConfKey("prefs").then((value: UserPreferences) => {
+    service.api.getEffectivePreferences().then((value: UserPreferences) => {
       if (value.interfaceStyle) {
         updateTheme(value.interfaceStyle);
       }

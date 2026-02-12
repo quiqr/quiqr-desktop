@@ -1,65 +1,61 @@
 ---
-sidebar_position: 4
+sidebar_position: 20
 ---
 
-# Configuration
+# Configuration Overview
 
-Quiqr Desktop allows you to customize application behavior through global preferences, environment variables, and advanced settings. All preferences are stored in a JSON configuration file on your local system.
+Quiqr Desktop uses a unified configuration system that supports multiple layers of settings, environment variable overrides, and automatic migration from older versions.
 
-## Configuration File Location
+## Configuration File Locations
 
-The configuration file `quiqr-app-config.json` is stored in platform-specific locations:
+Configuration files are stored in different locations depending on how you run Quiqr:
 
-- **Linux:** `~/.config/quiqr/quiqr-app-config.json`
-- **macOS:** `~/Library/Application Support/quiqr/quiqr-app-config.json`
-- **Windows:** `%AppData%\quiqr\quiqr-app-config.json`
+### Electron App (Production)
 
-:::tip Backup Your Configuration
-The configuration file contains important settings for your Quiqr Desktop installation. Consider backing up this file along with your Quiqr Data Folder.
-:::
+| Platform | Location |
+|----------|----------|
+| **Linux** | `~/.config/quiqr/` |
+| **macOS** | `~/Library/Application Support/quiqr/` |
+| **Windows** | `%AppData%\quiqr\` |
 
-## Configuration Sections
+### Standalone Development Server
 
-### [General Preferences](./preferences.md)
+When running `npm run dev:backend:standalone`, configuration is stored in:
 
-Configure basic application settings:
-- **Quiqr Data Folder:** Location where all sites and temporary files are stored
-- **Interface Style:** Choose between Light and Dark themes
+```
+~/.quiqr-standalone/
+```
 
-### [Variables](./variables.md)
+## Configuration Files
 
-Set global variables that can be used as overrides in build actions. Useful for:
-- Custom executable paths that differ across systems
-- Environment-specific configuration values
-- Template variables for build scripts
+The unified configuration system uses these files:
 
-### [LLM Provider Configuration](./llm-providers.md)
+| File | Description |
+|------|-------------|
+| `instance_settings.json` | Instance-level settings (storage, forced preferences, experimental features) |
+| `user_prefs_default.json` | User preferences (theme, data folder, UI settings) |
+| `site_settings_<siteKey>.json` | Per-site settings and publish status |
 
-Configure AI-powered content assistance with support for multiple LLM providers:
-- OpenAI (GPT-4, GPT-3.5, o1)
-- AWS Bedrock (Claude, Llama, Titan, Cohere, Mistral)
-- Anthropic Direct (Claude)
-- Google Gemini
-- Azure OpenAI
-- Mistral AI
-- Cohere
+### Legacy Configuration
 
-### [Advanced Settings](./advanced-settings.md)
+Older versions of Quiqr used a single `quiqr-app-config.json` file. When upgrading, this file is automatically migrated to the new format. See [Migration](./migration.md) for details.
 
-Configure power-user features:
-- **Custom Open-In Command:** Custom shell commands to open site directories
+## Configuration Layers
 
-## Accessing Configuration
+Settings are resolved using a layered system with the following priority (highest to lowest):
 
-Most configuration options can be accessed through the Quiqr Desktop preferences interface. You can also manually edit the `quiqr-app-config.json` file when the application is closed.
+1. **Environment Variables** - Override any setting via `QUIQR_*` variables
+2. **Instance Forced** - Admin-enforced settings that users cannot change
+3. **User Preferences** - User-configurable settings
+4. **Instance Defaults** - Default values set by the instance
+5. **Application Defaults** - Built-in default values
 
-:::warning Manual Editing
-When manually editing the configuration file, ensure Quiqr Desktop is closed to prevent your changes from being overwritten. Always validate JSON syntax before saving.
-:::
+This allows administrators to lock certain settings while still giving users control over others.
 
-## Next Steps
+## Quick Links
 
-- Learn about [General Preferences](./preferences.md)
-- Configure [LLM Providers](./llm-providers.md) for AI features
-- Configure [Global Variables](./variables.md)
-- Explore [Advanced Settings](./advanced-settings.md)
+- [User Preferences](./preferences.md) - Theme, data folder, and UI settings
+- [Environment Variables](./environment-variables.md) - Override settings via environment
+- [Migration Guide](./migration.md) - Upgrading from older versions
+- [All Settings Reference](./all-settings.md) - Complete settings reference
+- [LLM Providers](./llm-providers.md) - AI assistant configuration

@@ -8,7 +8,7 @@ This reference documents all available field types in Quiqr's form system.
 
 ## Field Categories
 
-### [Data Fields](./data-fields/)
+### Data Fields
 
 Data fields are the primary input fields for content editing:
 
@@ -44,18 +44,18 @@ Data fields are the primary input fields for content editing:
 **Advanced:**
 - [Eisenhouwer](./data-fields/eisenhouwer.md) - Priority matrix (Eisenhower Matrix)
 
-### [Container Fields](./container-fields/)
+### Container Fields
 
 Container fields organize and group other fields:
 
 - [Bundle](./container-fields/bundle.md) - File-based content manager with visual list
-- [Object](./container-fields/object.md) - Single nested object with sub-fields
-- [List](./container-fields/list.md) - Array of repeating items
+- [Object](./container-fields/section.md) - Single nested object with sub-fields
+- [List](./container-fields/leaf-array.md) - Array of repeating items
 - [Nested](./container-fields/nested.md) - Hierarchical tree structure
 - [Accordion](./container-fields/accordion.md) - Collapsible array items
 - [Pull](./container-fields/pull.md) - Inline container (logical grouping without visual nesting)
 
-### [Layout Fields](./layout-fields/)
+### Layout Fields
 
 Layout fields organize form presentation without storing data:
 
@@ -63,7 +63,7 @@ Layout fields organize form presentation without storing data:
 - [Empty Line](./layout-fields/empty-line.md) - Add vertical spacing between fields
 - [Bundle Image Thumbnail](./layout-fields/bundle-image-thumbnail.md) - Display thumbnails in bundles
 
-### [Special Fields](./special-fields/)
+### Special Fields
 
 File handling fields:
 
@@ -105,5 +105,5 @@ fields:
 ## Next Steps
 
 - Browse individual field documentation for detailed properties and examples
-- See [Content Model Guide](../developer-guide/content-model.md) for using fields in your model
-- Check [Field Development Guide](../developer-guide/field-system.md) for creating custom fields
+- See [Content Model Guide](/docs/site-and-cms-developer-guide/content-model) for using fields in your model
+- Check [Field Development Guide](../../quiqr-internals-developer-guide/field-system.md) for creating custom fields

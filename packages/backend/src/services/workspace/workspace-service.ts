@@ -306,13 +306,16 @@ export class WorkspaceService {
 
     const single = config.singles.find((x) => x.key === singleKey);
     if (single == null) throw new Error('Could not find single.');
+    
     if (!single.file && !fileOverride) {
       throw new Error(`Single '${singleKey}' has no file configured`);
     }
 
     let fileLastPath = single.file || '';
 
-    if (typeof fileOverride === 'string') fileLastPath = fileOverride;
+    if (typeof fileOverride === 'string' && fileOverride.length > 0) {
+      fileLastPath = fileOverride;
+    }
 
     const filePath = path.join(this.workspacePath, fileLastPath);
 
@@ -497,6 +500,10 @@ export class WorkspaceService {
     if (collection == null) throw new Error('Could not find collection.');
     const filePath = path.join(this.workspacePath, collection.folder, collectionItemKey);
     if (await fs.exists(filePath)) {
+      const stats = await fs.stat(filePath);
+      if (stats.isDirectory()) {
+        throw new Error(`EISDIR: illegal operation on a directory, read: ${filePath}`);
+      }
       const data = await fs.readFile(filePath, { encoding: 'utf8' });
       const obj = await this._smartParse(filePath, [collection.extension], data);
 
@@ -590,7 +597,10 @@ export class WorkspaceService {
           sortval = label;
         }
 
-        return { key, label, sortval };
+        // Detect if this is a page bundle (file is named index.md/index.html in a directory)
+        const isPageBundle = /\/index\.(md|html|markdown|qmd)$/.test(item);
+
+        return { key, label, sortval, isPageBundle };
       });
 
       return retFiles;
@@ -604,7 +614,9 @@ export class WorkspaceService {
       const files = await glob(globExpression, {});
       return files.map(function (item) {
         const key = item.replace(folder, '');
-        return { key, label: key };
+        const label = key;
+        const sortval = key; // Default sortval to key for data folders
+        return { key, label, sortval };
       });
     }
   }

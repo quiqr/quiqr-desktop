@@ -263,18 +263,62 @@ export const bundleQueryOptions = {
 };
 
 /**
- * User preferences queries
+ * User preferences queries (unified config API)
  */
 export const prefsQueryOptions = {
+  /**
+   * Get all effective preferences (resolved through all layers)
+   */
   all: () => ({
+    queryKey: ['getEffectivePreferences'] as const,
+    queryFn: () => api.getEffectivePreferences(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  }),
+
+  /**
+   * Legacy: Get all prefs from old API (for backward compatibility)
+   * @deprecated Use prefsQueryOptions.all() instead
+   */
+  allLegacy: () => ({
     queryKey: ['readConfKey', 'prefs'] as const,
     queryFn: () => api.readConfKey('prefs'),
     staleTime: 5 * 60 * 1000, // 5 minutes
   }),
 
+  /**
+   * Get a single preference with full metadata (value, source, locked status)
+   */
+  withMetadata: <K extends keyof import('../../types').UserPreferences>(prefKey: K) => ({
+    queryKey: ['getEffectivePreference', prefKey] as const,
+    queryFn: () => api.getEffectivePreference(prefKey),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  }),
+
+  /**
+   * Check if a preference is locked (forced by instance settings)
+   */
+  isLocked: <K extends keyof import('../../types').UserPreferences>(prefKey: K) => ({
+    queryKey: ['isPreferenceLocked', prefKey] as const,
+    queryFn: () => api.isPreferenceLocked(prefKey),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  }),
+
+  /**
+   * Legacy: Get single preference key
+   * @deprecated Use prefsQueryOptions.withMetadata() for full info
+   */
   key: (confkey: string) => ({
     queryKey: ['readConfPrefKey', confkey] as const,
     queryFn: () => api.readConfPrefKey(confkey),
+  }),
+
+  /**
+   * Get all property metadata (for about:config style UI)
+   */
+  allMetadata: () => ({
+    queryKey: ['getAllPropertyMetadata'] as const,
+    queryFn: () => api.getAllPropertyMetadata(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   }),
 };
 
@@ -412,7 +456,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string;
     }) => {
       // Invalidate the collection list
       queryClient.invalidateQueries({
@@ -440,7 +484,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; itemTitle: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -467,7 +511,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; collectionItemNewKey: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -498,7 +542,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; collectionItemNewKey: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -527,7 +571,7 @@ export const collectionMutationOptions = {
     onSuccess: (_data: unknown, variables: {
       siteKey: string;
       workspaceKey: string;
-      collectionKey: string;
+      collectionKey: string; collectionItemKey: string; collectionItemNewKey: string; destLang: string;
     }) => {
       queryClient.invalidateQueries({
         queryKey: ['listCollectionItems', variables.siteKey, variables.workspaceKey, variables.collectionKey],
@@ -825,19 +869,73 @@ export const bundleMutationOptions = {
 };
 
 /**
- * User preferences mutations
+ * User preferences mutations (unified config API)
  */
 export const prefsMutationOptions = {
+  /**
+   * Save a single user preference using the unified config API
+   */
   save: (queryClient: QueryClient) => ({
     mutationFn: (params: { prefKey: string; prefValue: unknown }) =>
-      api.saveConfPrefKey(params.prefKey, params.prefValue),
+      api.setUserPreference(params.prefKey as keyof import('../../types').UserPreferences, params.prefValue),
 
-    onSuccess: (_data: unknown, variables: { prefKey: string }) => {
-      // Invalidate the specific pref key
+    onSuccess: (_data: unknown, variables: { prefKey: string; prefValue: unknown }) => {
+      // Invalidate unified config queries
+      queryClient.invalidateQueries({
+        queryKey: ['getEffectivePreferences'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['getEffectivePreference', variables.prefKey],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['getAllPropertyMetadata'],
+      });
+      // Also invalidate legacy queries for backward compatibility
       queryClient.invalidateQueries({
         queryKey: ['readConfPrefKey', variables.prefKey],
       });
-      // Invalidate all prefs
+      queryClient.invalidateQueries({
+        queryKey: ['readConfKey', 'prefs'],
+      });
+    },
+  }),
+
+  /**
+   * Save multiple user preferences at once
+   */
+  saveMultiple: (queryClient: QueryClient) => ({
+    mutationFn: (params: { preferences: Partial<import('../../types').UserPreferences> }) =>
+      api.setUserPreferences(params.preferences),
+
+    onSuccess: () => {
+      // Invalidate all preference-related queries
+      queryClient.invalidateQueries({
+        queryKey: ['getEffectivePreferences'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['getEffectivePreference'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['getAllPropertyMetadata'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['readConfKey', 'prefs'],
+      });
+    },
+  }),
+
+  /**
+   * Legacy save using old API
+   * @deprecated Use prefsMutationOptions.save() instead
+   */
+  saveLegacy: (queryClient: QueryClient) => ({
+    mutationFn: (params: { prefKey: string; prefValue: unknown }) =>
+      api.saveConfPrefKey(params.prefKey, params.prefValue),
+
+    onSuccess: (_data: unknown, variables: { prefKey: string; prefValue: unknown }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['readConfPrefKey', variables.prefKey],
+      });
       queryClient.invalidateQueries({
         queryKey: ['readConfKey', 'prefs'],
       });

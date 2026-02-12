@@ -91,10 +91,9 @@ Your changes are now live on GitHub! Set up GitHub Pages or Netlify to deploy au
 
 Now that you have a working site:
 
-- [Site Configuration](./configuration.md) - Customize your site settings
-- [Content Model](../developer-guide/content-model.md) - Understand how content is structured
-- [Field Types](../field-reference/index.md) - Learn about available field types
-- [Hugo Integration](../developer-guide/hugo-integration.md) - Work with Hugo features
+- [Site Configuration](../configuration/index.md) - Customize your site settings
+- [Content Model](../site-and-cms-developer-guide/content-model/index.md) - Understand how content is structured
+- [Field Types](../site-and-cms-developer-guide/field-reference/index.md) - Learn about available field types
 
 ## Common Workflows
 

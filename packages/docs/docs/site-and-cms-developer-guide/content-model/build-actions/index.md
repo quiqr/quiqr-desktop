@@ -8,7 +8,7 @@ Build actions allow you to customize and extend Hugo's build process. This secti
 
 ## Overview
 
-While the [`build`](./model-file-structure/root-properties/build.md) property handles basic Hugo build commands, build actions enable more sophisticated workflows:
+While the [`build`](../model-file-structure/root-properties/build.md) property handles basic Hugo build commands, build actions enable more sophisticated workflows:
 
 - Custom pre-build and post-build scripts
 - Asset optimization pipelines
@@ -25,7 +25,7 @@ build:
   command: hugo --minify
 ```
 
-See [build property reference](./model-file-structure/root-properties/build.md) for complete details.
+See [build property reference](../model-file-structure/root-properties/build.md) for complete details.
 
 ## Advanced Build Patterns
 
@@ -499,11 +499,11 @@ With `package.json`:
 
 ## Next Steps
 
-- [build property](./model-file-structure/root-properties/build.md) - Basic build configuration
-- [serve property](./model-file-structure/root-properties/serve.md) - Development server
-- [hugover property](./model-file-structure/root-properties/hugover.md) - Version management
+- [build property](../model-file-structure/root-properties/build.md) - Basic build configuration
+- [serve property](../model-file-structure/root-properties/serve.md) - Development server
+- [hugover property](../model-file-structure/root-properties/hugover.md) - Version management
 
 ## Related
 
-- [Content Model](./index.md) - Back to content model overview
-- [Root Properties](./model-file-structure/root-properties/index.md) - All properties
+- [Content Model](../index.md) - Back to content model overview
+- [Root Properties](../model-file-structure/root-properties/index.md) - All properties

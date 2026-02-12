@@ -107,7 +107,7 @@ collections:
     fields: [...]
 ```
 
-### [dynamics](./dynamics.md)
+### dynamics
 
 Defines reusable dynamic form definitions for advanced use cases.
 
@@ -121,6 +121,10 @@ dynamics:
     fields: [...]
 ```
 
+:::note
+Detailed documentation for dynamics is coming soon.
+:::
+
 ## Required vs Optional
 
 | Property | Required | Default | Purpose |
@@ -132,7 +136,6 @@ dynamics:
 | `menu` | Optional | Auto-generated | Sidebar structure |
 | `singles` | Optional | None | Individual pages |
 | `collections` | Optional | None | Repeating content |
-| `dynamics` | Optional | None | Dynamic forms |
 
 ## Minimal Model
 
@@ -217,14 +220,7 @@ collections:
       - key: content
         type: markdown
 
-dynamics:
-  - key: author_bio
-    title: Author Bio
-    fields:
-      - key: name
-        type: string
-      - key: bio
-        type: text
+
 ```
 
 ## Property Loading Order
@@ -235,7 +231,6 @@ Quiqr loads properties in this order:
 2. **build/serve** - Sets up Hugo commands
 3. **menu** - Creates sidebar structure
 4. **singles/collections** - Loads content types
-5. **dynamics** - Prepares dynamic forms
 
 ## Validation
 
@@ -266,10 +261,7 @@ Explore each root property in detail:
 - [menu](./menu.md) - Menu structure configuration
 - [singles](./singles.md) - Individual page configuration
 - [collections](./collections.md) - Collection configuration
-- [dynamics](./dynamics.md) - Dynamic forms
 
 ## Related
 
 - [Model File Structure](../index.md) - Overall structure
-- [Includes](../includes.md) - Organizing large models
-- [Partials](../partials.md) - Reusing field definitions

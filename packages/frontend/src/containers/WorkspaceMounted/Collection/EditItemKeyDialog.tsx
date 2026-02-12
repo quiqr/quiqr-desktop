@@ -38,7 +38,7 @@ function EditItemKeyDialog({
 }: EditItemKeyDialogProps) {
   const initialValue = propValue || '';
   const [value, setValue] = useState(getInitialValue(propValue));
-  const [titleToKey, setTitleToKey] = useState<string | undefined>();
+  const [titleToKey, setTitleToKey] = useState<string>('');
 
   const validate = () => {
     const v = value || '';
@@ -78,7 +78,7 @@ function EditItemKeyDialog({
     <Dialog fullWidth={true} maxWidth="sm" open={true} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText component="div">
           <TextField
             label={textfieldlabel}
             value={value}

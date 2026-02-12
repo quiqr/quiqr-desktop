@@ -396,7 +396,7 @@ params:
 
 ## Related Fields
 
-- [Object](./object.md) - Container with visual grouping
+- [Object](./section.md) - Container with visual grouping
 - [Nested](./nested.md) - Hierarchical tree structure
 - [Accordion](./accordion.md) - Collapsible array items
 - [Bundle](./bundle.md) - File-based content manager

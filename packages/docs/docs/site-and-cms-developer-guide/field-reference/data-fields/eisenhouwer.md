@@ -261,6 +261,6 @@ The eisenhouwer field is highly configurable but complex. Refer to the kitchensi
 
 ## Related Fields
 
-- [List](../container-fields/list.md) - For simple ordered lists
-- [Object](../container-fields/object.md) - For grouped data
+- [List](../container-fields/leaf-array.md) - For simple ordered lists
+- [Object](../container-fields/section.md) - For grouped data
 - [Nested](../container-fields/nested.md) - For hierarchical data

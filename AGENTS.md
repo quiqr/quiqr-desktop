@@ -240,50 +240,108 @@ See `FIELD_DEVELOPMENT_GUIDE.md` in the SukohForm directory for detailed documen
 3. Add the method to `/frontend/src/api.ts` with proper typing
 4. Use generic typing for methods that return different types based on parameters
 
-### Working with User Preferences
+### Unified Configuration System
 
-**New Backend Pattern (packages/backend):**
+The application uses a layered configuration system with clear separation between instance settings, user preferences, and site-specific settings.
 
-The backend uses dependency injection with a container holding all dependencies:
+#### Configuration File Locations
 
-```typescript
-// Creating the container
-import { createContainer, createDevAdapters } from '@quiqr/backend';
+**Electron (Production):**
+| Platform | Config Directory |
+|----------|------------------|
+| Linux | `~/.config/quiqr/` |
+| macOS | `~/Library/Application Support/quiqr/` |
+| Windows | `%APPDATA%\quiqr\` |
 
-const container = createContainer({
-  userDataPath: '/path/to/user/data',
-  rootPath: '/path/to/app/root',
-  adapters: createDevAdapters(),  // or createElectronAdapters() for production
-});
-
-// AppConfig - replaces global.pogoconf
-container.config.setLastOpenedSite(siteKey, workspaceKey, sitePath);
-const prefs = container.config.prefs;
-
-// AppState - replaces global.currentSiteKey, global.currentSitePath, etc.
-container.state.setCurrentSite('my-site', 'main', '/path/to/site');
+**Standalone Development (`npm run dev:backend:standalone`):**
+```
+~/.quiqr-standalone/
 ```
 
-**Legacy Pattern (still in use in some places):**
+#### Configuration Files
 
-User preferences stored in `global.pogoconf` (backend) and accessed via:
-- Backend: `global.pogoconf` (QuiqrAppConfig instance)
-- Frontend: `service.api.readConfKey("prefs")` returns typed `UserPreferences`
+| File | Purpose |
+|------|---------|
+| `instance_settings.json` | Instance-level settings (storage, forced prefs, dev options) |
+| `user_prefs_default.json` | User preferences (theme, data folder, UI settings) |
+| `site_settings_<siteKey>.json` | Per-site settings and publish status |
 
-The `appConfigSchema` in types.ts defines the structure of the global config object.
+#### Layer Priority (highest to lowest)
 
-### Type-Safe Config Access
+1. **Environment Variables** - Override any setting via `QUIQR_*` vars
+2. **Instance Forced** - Admin-locked settings in `instance_settings.json`
+3. **User Preferences** - User's choices in `user_prefs_*.json`
+4. **Instance Defaults** - Defaults from `instance_settings.json`
+5. **Application Defaults** - Hardcoded fallbacks
 
-The `readConfKey` API method uses generic typing to automatically infer return types:
+#### Backend API Usage
+
 ```typescript
-api.readConfKey("prefs")  // Returns Promise<UserPreferences>
-api.readConfKey("skipWelcomeScreen")  // Returns Promise<boolean>
+// Reading preferences (uses layered resolution)
+const prefs = await container.unifiedConfig.getEffectivePreferences();
+const theme = await container.unifiedConfig.getEffectivePreference('interfaceStyle');
+
+// Check if preference is admin-locked
+const isLocked = container.unifiedConfig.isPreferenceLocked('dataFolder');
+
+// Writing preferences (respects locks)
+await container.unifiedConfig.setUserPreference('interfaceStyle', 'quiqr10-dark');
+
+// Instance settings
+const settings = container.unifiedConfig.getInstanceSettings();
+const isExperimental = container.unifiedConfig.isExperimentalFeaturesEnabled();
+
+// Site-specific settings
+const siteSettings = await container.unifiedConfig.getSiteSettings('my-site');
+await container.unifiedConfig.updateSiteSettings('my-site', { customOption: true });
 ```
 
-This is achieved through:
-1. `ReadConfKeyMap` type extracted from `appConfigSchema`
-2. Generic method signature: `readConfKey<K extends keyof ReadConfKeyMap>(confkey: K)`
-3. Return type automatically inferred as `ReadConfKeyMap[K]`
+#### Frontend API Usage
+
+```typescript
+// Get all effective preferences
+const prefs = await service.api.getEffectivePreferences();
+
+// Get single preference with metadata
+const result = await service.api.getEffectivePreference('interfaceStyle');
+// Returns: { value: 'quiqr10-dark', source: 'user', locked: false, path: 'user.preferences.interfaceStyle' }
+
+// Save preference
+await service.api.setUserPreference('interfaceStyle', 'quiqr10-dark');
+
+// Check if locked
+const locked = await service.api.isPreferenceLocked('dataFolder');
+```
+
+#### Environment Variable Overrides
+
+Override any setting with environment variables:
+
+```bash
+# Instance settings
+export QUIQR_STORAGE_TYPE=s3
+export QUIQR_STORAGE_DATAFOLDER=/custom/path
+export QUIQR_EXPERIMENTAL_FEATURES=true
+
+# Developer options
+export QUIQR_DEV_LOCAL_API=true
+export QUIQR_DEV_DISABLE_AUTO_HUGO_SERVE=true
+
+# Hugo settings
+export QUIQR_HUGO_SERVE_DRAFT_MODE=true
+```
+
+#### Legacy API (Deprecated)
+
+The legacy `readConfKey`/`saveConfPrefKey` APIs still work but should be migrated:
+
+```typescript
+// OLD (deprecated)
+const prefs = await service.api.readConfKey("prefs");
+
+// NEW (preferred)
+const prefs = await service.api.getEffectivePreferences();
+```
 
 ### Site and Workspace Concepts
 

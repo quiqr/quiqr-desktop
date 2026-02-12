@@ -30,7 +30,7 @@ function DeleteItemKeyDialog({ busy, itemLabel, handleClose, handleConfirm }: De
     <Dialog fullWidth={true} maxWidth="sm" open={true} onClose={onClose}>
       <DialogTitle>Delete Item</DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText component="div">
           <div>
             Do you really want to delete <b>"{itemLabel}"</b>?
           </div>

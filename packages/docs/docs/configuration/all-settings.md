@@ -427,9 +427,8 @@ Experimental features may be unstable and could change or be removed in future v
 
 ## Next Steps
 
-- [General Settings](./general.md) - Basic preferences
 - [Variables](./variables.md) - Custom variables
-- [Developer Guide](../developer-guide/index.md) - Advanced development
+- [Site & CMS Developer Guide](../site-and-cms-developer-guide/index.md) - Advanced development
 
 ## Related
 

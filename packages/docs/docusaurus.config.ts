@@ -105,8 +105,8 @@ const config: Config = {
               to: '/docs/intro',
             },
             {
-              label: 'Developer Guide',
-              to: '/docs/developer-guide',
+              label: 'Site & CMS Developer Guide',
+              to: '/docs/site-and-cms-developer-guide',
             },
           ],
         },
