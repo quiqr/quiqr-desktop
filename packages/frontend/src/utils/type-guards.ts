@@ -54,6 +54,24 @@ export interface HugoSiteDirResponse {
   hugoDataDirExists?: boolean;
 }
 
+export interface ErrorWithResponse {
+  response: {
+    status: number;
+  };
+}
+
+export const isErrorWithResponse = (error: unknown): error is ErrorWithResponse => {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'response' in error &&
+    error.response !== null &&
+    typeof error.response === 'object' &&
+    'status' in error.response &&
+    typeof error.response.status === 'number'
+  );
+};
+
 export const isHugoSiteDirResponse = (response: unknown): response is HugoSiteDirResponse => {
   if (typeof response !== "object" || response === null) {
     return false;

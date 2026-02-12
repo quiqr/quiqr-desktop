@@ -7,19 +7,16 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '../../test-utils';
 import PrefsGeneral from '../../../src/containers/Prefs/PrefsGeneral';
 import { ThemeContext } from '../../../src/contexts/ThemeContext';
-import service from '../../../src/services/service';
+import * as api from '../../../src/api';
 
-// Mock the service module
-vi.mock('../../../src/services/service', () => ({
-  default: {
-    api: {
-      readConfKey: vi.fn(),
-      saveConfPrefKey: vi.fn(),
-    },
-  },
+// Mock the api module (used by query options)
+vi.mock('../../../src/api', () => ({
+  readConfKey: vi.fn(),
+  saveConfPrefKey: vi.fn(),
 }));
 
 // Mock FolderPicker component
@@ -38,8 +35,8 @@ describe('PrefsGeneral - Theme Core Functionality', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(service.api.readConfKey).mockResolvedValue(mockPreferences as any);
-    vi.mocked(service.api.saveConfPrefKey).mockResolvedValue(true);
+    vi.mocked(api.readConfKey).mockResolvedValue(mockPreferences as any);
+    vi.mocked(api.saveConfPrefKey).mockResolvedValue(true);
   });
 
   const renderWithThemeContext = () => {
@@ -63,7 +60,7 @@ describe('PrefsGeneral - Theme Core Functionality', () => {
     renderWithThemeContext();
 
     await waitFor(() => {
-      expect(service.api.readConfKey).toHaveBeenCalledWith('prefs');
+      expect(api.readConfKey).toHaveBeenCalledWith('prefs');
     });
   });
 
@@ -78,7 +75,7 @@ describe('PrefsGeneral - Theme Core Functionality', () => {
 
   it('saves preference using the API when theme changes', async () => {
     // This test verifies the API method exists and can be called
-    const result = await service.api.saveConfPrefKey('interfaceStyle', 'quiqr10-dark');
+    const result = await api.saveConfPrefKey('interfaceStyle', 'quiqr10-dark');
     expect(result).toBe(true);
   });
 });

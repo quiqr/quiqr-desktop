@@ -1,8 +1,11 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import service from './../../../services/service';
+import { useCollectionItem, useWorkspaceDetails, useUpdateCollectionItem } from './../../../queries/hooks';
+import { siteQueryOptions } from './../../../queries/options';
 import { SukohForm } from './../../../components/SukohForm';
 import Spinner from './../../../components/Spinner';
-import type { Field, BuildAction, WorkspaceDetails } from '@quiqr/types';
+import type { Field, BuildAction } from '@quiqr/types';
 
 interface CollectionItemProps {
   siteKey: string;
@@ -14,52 +17,42 @@ interface CollectionItemProps {
 }
 
 function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey, nestPath }: CollectionItemProps) {
-  const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
-  const [collectionItemValues, setCollectionItemValues] = useState<Record<string, unknown> | null>(null);
-  const [currentBaseUrlPath, setCurrentBaseUrlPath] = useState<string | undefined>();
-  const isMountedRef = useRef(true);
+  // Replace manual state management with TanStack Query
+  const { data: selectedWorkspaceDetails, isLoading: workspaceLoading } = useWorkspaceDetails(
+    siteKey,
+    workspaceKey
+  );
 
-  useEffect(() => {
-    isMountedRef.current = true;
+  const { data: collectionItemValues, isLoading: itemLoading } = useCollectionItem(
+    siteKey,
+    workspaceKey,
+    collectionKey,
+    collectionItemKey
+  );
 
-    const loadData = async () => {
-      const [workspaceDetails, itemValues, baseUrlPath] = await Promise.all([
-        service.api.getWorkspaceDetails(siteKey, workspaceKey),
-        service.api.getCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey),
-        service.api.getCurrentBaseUrl(),
-      ]);
-
-      if (isMountedRef.current) {
-        setSelectedWorkspaceDetails(workspaceDetails);
-        setCollectionItemValues(itemValues);
-        setCurrentBaseUrlPath(typeof baseUrlPath === 'string' ? baseUrlPath : undefined);
-      }
-    };
-
-    loadData();
-
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, [siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey]);
+  const { data: currentBaseUrlPath } = useQuery(siteQueryOptions.currentBaseUrl());
 
   const handleOpenInEditor = useCallback(() => {
     service.api.openCollectionItemInEditor(siteKey, workspaceKey, collectionKey, collectionItemKey);
   }, [siteKey, workspaceKey, collectionKey, collectionItemKey]);
 
+  const updateCollectionItemMutation = useUpdateCollectionItem();
+
   const handleSave = useCallback(
     (context: { data: Record<string, unknown>; accept: (values: Record<string, unknown>) => void; reject: (message: string) => void }) => {
-      const promise = service.api.updateCollectionItem(siteKey, workspaceKey, collectionKey, collectionItemKey, context.data);
-      promise.then(
-        function (updatedValues) {
-          context.accept(updatedValues);
-        },
-        function () {
-          context.reject('Something went wrong.');
+      updateCollectionItemMutation.mutate(
+        { siteKey, workspaceKey, collectionKey, collectionItemKey, document: context.data },
+        {
+          onSuccess: (updatedValues) => {
+            context.accept(updatedValues);
+          },
+          onError: () => {
+            context.reject('Something went wrong.');
+          },
         }
       );
     },
-    [siteKey, workspaceKey, collectionKey, collectionItemKey]
+    [siteKey, workspaceKey, collectionKey, collectionItemKey, updateCollectionItemMutation]
   );
 
   const collection = selectedWorkspaceDetails?.collections.find((x) => x.key === collectionKey);
@@ -85,7 +78,8 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
       path = CollectionPath.join('/') + '/' + ItemPathElements.join('/');
     }
 
-    let finalpath = (currentBaseUrlPath || '') + path.toLowerCase();
+    const baseUrl = typeof currentBaseUrlPath === 'string' ? currentBaseUrlPath : '';
+    let finalpath = baseUrl + path.toLowerCase();
     finalpath = finalpath.replace('//', '/').replace('//', '/');
     if (Array.from(finalpath)[0] !== '/') {
       finalpath = '/' + finalpath;
@@ -117,7 +111,7 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
     [siteKey, workspaceKey, collectionKey, collectionItemKey]
   );
 
-  if (collectionItemValues === undefined || selectedWorkspaceDetails == null) {
+  if (workspaceLoading || itemLoading || !collectionItemValues || !selectedWorkspaceDetails) {
     return <Spinner />;
   }
 

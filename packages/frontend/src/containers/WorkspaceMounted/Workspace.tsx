@@ -1,25 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation, Outlet } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import service from '../../services/service';
+import { useSiteAndWorkspaceData } from '../../queries/hooks';
 import { AppLayout } from '../../layouts/AppLayout';
-import { SiteConfig } from '../../../types';
+import type { SiteConfig, WorkspaceDetails } from '@quiqr/types';
 import { useSSGDownload } from '../../hooks/useSSGDownload';
 import { useModelCacheEvents } from '../../hooks/useModelCacheEvents';
 import ProgressDialog from '../../components/ProgressDialog';
 import { openExternal } from '../../utils/platform';
 import useWorkspaceToolbarItems from './hooks/useWorkspaceToolbarItems';
 import WorkspaceSidebarSelector from './components/WorkspaceSidebarSelector';
-
-interface WorkspaceConfig {
-  serve?: Array<{
-    hugoHidePreviewSite?: boolean;
-    [key: string]: unknown;
-  }>;
-  ssgType?: string;
-  ssgVersion?: string;
-  hugover?: string; // Deprecated, for backward compatibility
-  [key: string]: unknown;
-}
 
 interface WorkspaceProps {
   siteKey: string;
@@ -31,18 +22,23 @@ interface WorkspaceProps {
 export interface WorkspaceOutletContext {
   siteKey: string;
   workspaceKey: string;
-  site: SiteConfig | null;
-  workspace: WorkspaceConfig | null;
+  site: SiteConfig | undefined;
+  workspace: WorkspaceDetails | undefined;
   modelRefreshKey: number;
   ssgReady: boolean;
 }
 
 const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) => {
   const location = useLocation();
+  const queryClient = useQueryClient();
 
-  const [site, setSite] = useState<SiteConfig | null>(null);
-  const [workspace, setWorkspace] = useState<WorkspaceConfig | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Replace manual state management with TanStack Query
+  const { data, isError, error: queryError } = useSiteAndWorkspaceData(siteKey, workspaceKey);
+
+  const site = data?.site;
+  const workspace = data?.workspaceDetails;
+  const error = isError ? String(queryError) : null;
+
   const [modelRefreshKey, setModelRefreshKey] = useState(0);
 
   const {
@@ -54,33 +50,11 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     setSSGReady,
   } = useSSGDownload();
 
-  const refresh = useCallback(() => {
-    if (siteKey && workspaceKey) {
-      service
-        .getSiteAndWorkspaceData(siteKey, workspaceKey)
-        .then((bundle) => {
-          setSite(bundle.site as SiteConfig);
-          setWorkspace(bundle.workspaceDetails as WorkspaceConfig);
-          setError(null);
-        })
-        .catch((e: unknown) => {
-          setSite(null);
-          setWorkspace(null);
-          setError(String(e));
-        });
-    }
-  }, [siteKey, workspaceKey]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  // Callback for model cache events - clear frontend cache then refresh
+  // Callback for model cache events - invalidate queries instead of manual refresh
   const handleModelCacheCleared = useCallback(() => {
-    service.clearCache();
+    queryClient.invalidateQueries();
     setModelRefreshKey((k) => k + 1);
-    refresh();
-  }, [refresh]);
+  }, [queryClient]);
 
   // Subscribe to model cache events - refresh workspace data when model files change
   useModelCacheEvents(siteKey, workspaceKey, handleModelCacheCleared);
@@ -88,13 +62,13 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
   // Check Hugo version when workspace is loaded
   useEffect(() => {
     // Wait for workspace data to load before deciding on SSG status
-    if (workspace === null) {
+    if (!workspace) {
       return;
     }
 
-    // Get SSG type and version (with backward compatibility for old hugover field)
-    const ssgType = workspace.ssgType || 'hugo';
-    const ssgVersion = workspace.ssgVersion || workspace.hugover;
+    // Get SSG type and version (hugover is preprocessed to ssgVersion by Zod schema)
+    const ssgType = workspace.ssgType;
+    const ssgVersion = workspace.ssgVersion;
 
     if (ssgVersion) {
       const checkAndDownloadSSG = async () => {
@@ -127,9 +101,9 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
    * If SSG is not ready (download failed/cancelled), trigger a new download.
    */
   const openPreviewInBrowser = useCallback(async () => {
-    // Get SSG type and version with backward compatibility
+    // Get SSG type and version (hugover is preprocessed to ssgVersion by Zod schema)
     const ssgType = workspace?.ssgType || 'hugo';
-    const ssgVersion = workspace?.ssgVersion || workspace?.hugover;
+    const ssgVersion = workspace?.ssgVersion;
 
     // If SSG is not ready, try to download it first
     if (!ssgReady && ssgVersion) {
@@ -145,7 +119,7 @@ const Workspace = ({ siteKey, workspaceKey, applicationRole }: WorkspaceProps) =
     if (typeof path === 'string') {
       await openExternal('http://localhost:13131' + path);
     }
-  }, [ssgReady, workspace?.ssgType, workspace?.ssgVersion, workspace?.hugover, downloadSSG]);
+  }, [ssgReady, workspace?.ssgType, workspace?.ssgVersion, downloadSSG]);
 
   // Determine active section based on path
   const path = location.pathname;
