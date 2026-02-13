@@ -112,9 +112,19 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: we-cli/coverage-badge-action@main
 
+      # Step 10: Upload coverage reports as artifact
+      # This makes the coverage reports available to the publish-openspec job
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: ./coverage
+          retention-days: 1
+
   publish-openspec:
     name: Publish OpenSpec UI and Documentation
     runs-on: ubuntu-latest
+    needs: coverage  # Wait for coverage job to complete
 
     # GitHub Pages environment configuration
     environment:
@@ -135,7 +145,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Install Nix with flakes support
+      # Step 2: Download coverage reports from previous job
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: ./coverage
+
+      # Step 3: Install Nix with flakes support
       # Uses cachix/install-nix-action which is the standard for Nix in GitHub Actions
       # Enables experimental features needed for the openspecui fork
       - name: Install Nix
@@ -145,7 +162,7 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      # Step 3: Generate OpenSpec UI static export
+      # Step 4: Generate OpenSpec UI static export
       # Uses a fork of openspecui that adds static export functionality
       # Fork: github:mipmip/openspecui/feature/nixFlake
       # The fork is required because the official openspecui doesn't support static export
@@ -157,23 +174,23 @@ jobs:
             --base-path /quiqr-desktop/specs/ \
             --output ./openspec-export
 
-      # Step 4: Set up Node.js for Docusaurus build
+      # Step 5: Set up Node.js for Docusaurus build
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '22.x'
           cache: 'npm'
 
-      # Step 5: Install dependencies and build documentation
+      # Step 6: Install dependencies and build documentation
       - name: Install dependencies
         run: npm install
 
-      # Step 6: Build documentation
+      # Step 7: Build documentation
       - name: Build documentation
         working-directory: ./packages/docs
         run: npm run build
 
-      # Step 7: Combine OpenSpec UI, Docusaurus, and Coverage reports
+      # Step 8: Combine OpenSpec UI, Docusaurus, and Coverage reports
       # OpenSpec UI goes to /specs/, Docusaurus goes to /docs/, Coverage reports go to /coverage/
       # Coverage badge remains at /badges/coverage.svg
       - name: Combine outputs
@@ -237,14 +254,14 @@ jobs:
           echo "Coverage structure:"
           ls -la ./combined-output/coverage/ || true
 
-      # Step 8: Upload the combined site as a Pages artifact
+      # Step 9: Upload the combined site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./combined-output
 
-      # Step 9: Deploy to GitHub Pages
+      # Step 10: Deploy to GitHub Pages
       # Deploys all content:
       # - /index.html (landing page with links to all resources)
       # - /specs/ (OpenSpec UI)
