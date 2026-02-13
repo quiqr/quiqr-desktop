@@ -201,16 +201,16 @@ jobs:
           mkdir -p ./combined-output/coverage
           cp -r ./coverage/* ./combined-output/coverage/
 
-#          if [ -d "./packages/frontend/coverage" ]; then
-#            mkdir -p ./combined-output/coverage/frontend
-#            cp -r ./packages/frontend/coverage/* ./combined-output/coverage/frontend/
-#            echo "Copied frontend coverage reports"
-#          fi
-#          if [ -d "./packages/backend/coverage" ]; then
-#            mkdir -p ./combined-output/coverage/backend
-#            cp -r ./packages/backend/coverage/* ./combined-output/coverage/backend/
-#            echo "Copied backend coverage reports"
-#          fi
+          #if [ -d "./packages/frontend/coverage" ]; then
+          #  mkdir -p ./combined-output/coverage/frontend
+          #  cp -r ./packages/frontend/coverage/* ./combined-output/coverage/frontend/
+          #  echo "Copied frontend coverage reports"
+          #fi
+          #if [ -d "./packages/backend/coverage" ]; then
+          #  mkdir -p ./combined-output/coverage/backend
+          #  cp -r ./packages/backend/coverage/* ./combined-output/coverage/backend/
+          #  echo "Copied backend coverage reports"
+          #fi
 
           # Fetch and preserve existing badges from gh-pages branch
           # This ensures the coverage badge persists across deployments
