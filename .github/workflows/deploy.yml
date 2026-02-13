@@ -1,4 +1,4 @@
-name: Deploy Coverage Badge and OpenSpec UI
+name: CI
 
 # This workflow runs on push to main branches only (after PR merge)
 # It generates coverage reports, updates the coverage badge, and publishes OpenSpec UI
@@ -44,60 +44,65 @@ jobs:
           npm run build -w @quiqr/types
           npm run build -w @quiqr/backend
 
-      # Step 6: Run frontend tests with coverage
-      # This executes all tests in the packages/frontend/test directory
-      # Coverage is generated for badge updates
-      # See: https://vitest.dev/
-      - name: Run frontend tests with coverage
-        working-directory: ./packages/frontend
+      # Step 6: Run all tests with coverage
+      # This executes all tests
+      - name: Run tests with coverage
         run: npm run test:coverage
 
-      # Step 7: Run backend tests with coverage
-      # This executes all tests in the packages/backend directory
-      # Backend has 260+ tests covering SSG providers, jobs, and utilities
-      # Continue even if tests fail to ensure coverage is collected
-      - name: Run backend tests with coverage
-        working-directory: ./packages/backend
-        run: npm run test:coverage || true
+#      # Step 6: Run frontend tests with coverage
+#      # This executes all tests in the packages/frontend/test directory
+#      # Coverage is generated for badge updates
+#      # See: https://vitest.dev/
+#      - name: Run frontend tests with coverage
+#        working-directory: ./packages/frontend
+#        run: npm run test:coverage
 
-      # Step 8: Combine coverage from frontend and backend
-      # Calculate the combined coverage percentage from both packages
-      - name: Combine coverage reports
-        run: |
-          # Check if both coverage files exist
-          if [ ! -f "./packages/frontend/coverage/coverage-summary.json" ]; then
-            echo "Error: Frontend coverage file not found"
-            exit 1
-          fi
+#      # Step 7: Run backend tests with coverage
+#      # This executes all tests in the packages/backend directory
+#      # Backend has 260+ tests covering SSG providers, jobs, and utilities
+#      # Continue even if tests fail to ensure coverage is collected
+#      - name: Run backend tests with coverage
+#        working-directory: ./packages/backend
+#        run: npm run test:coverage || true
 
-          # If backend coverage exists, combine; otherwise use frontend only
-          if [ -f "./packages/backend/coverage/coverage-summary.json" ]; then
-            echo "Combining coverage from frontend and backend..."
-
-            # Extract coverage percentages from both packages
-            FRONTEND_COV=$(node -p 't=require("./packages/frontend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
-            BACKEND_COV=$(node -p 't=require("./packages/backend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
-
-            # Calculate weighted average based on total statements
-            FRONTEND_STMTS=$(node -p 'require("./packages/frontend/coverage/coverage-summary.json").total.statements.total')
-            BACKEND_STMTS=$(node -p 'require("./packages/backend/coverage/coverage-summary.json").total.statements.total')
-            TOTAL_STMTS=$((FRONTEND_STMTS + BACKEND_STMTS))
-
-            # Weighted average coverage
-            COMBINED_COV=$(node -p "((${FRONTEND_COV} * ${FRONTEND_STMTS} + ${BACKEND_COV} * ${BACKEND_STMTS}) / ${TOTAL_STMTS}).toFixed(2)")
-
-            echo "Frontend coverage: ${FRONTEND_COV}%"
-            echo "Backend coverage: ${BACKEND_COV}%"
-            echo "Combined coverage: ${COMBINED_COV}%"
-
-            # Create combined coverage summary for badge
-            mkdir -p ./coverage
-            node -p "JSON.stringify({total:{lines:{pct:${COMBINED_COV}},statements:{pct:${COMBINED_COV}},functions:{pct:${COMBINED_COV}},branches:{pct:${COMBINED_COV}}}})" > ./coverage/coverage-summary.json
-          else
-            echo "Backend coverage not found, using frontend coverage only..."
-            mkdir -p ./coverage
-            cp ./packages/frontend/coverage/coverage-summary.json ./coverage/coverage-summary.json
-          fi
+#      # Step 8: Combine coverage from frontend and backend
+#      # Calculate the combined coverage percentage from both packages
+#      - name: Combine coverage reports
+#        run: |
+#          # Check if both coverage files exist
+#          if [ ! -f "./packages/frontend/coverage/coverage-summary.json" ]; then
+#            echo "Error: Frontend coverage file not found"
+#            exit 1
+#          fi
+#
+#          # If backend coverage exists, combine; otherwise use frontend only
+#          if [ -f "./packages/backend/coverage/coverage-summary.json" ]; then
+#            echo "Combining coverage from frontend and backend..."
+#
+#            # Extract coverage percentages from both packages
+#            FRONTEND_COV=$(node -p 't=require("./packages/frontend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
+#            BACKEND_COV=$(node -p 't=require("./packages/backend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
+#
+#            # Calculate weighted average based on total statements
+#            FRONTEND_STMTS=$(node -p 'require("./packages/frontend/coverage/coverage-summary.json").total.statements.total')
+#            BACKEND_STMTS=$(node -p 'require("./packages/backend/coverage/coverage-summary.json").total.statements.total')
+#            TOTAL_STMTS=$((FRONTEND_STMTS + BACKEND_STMTS))
+#
+#            # Weighted average coverage
+#            COMBINED_COV=$(node -p "((${FRONTEND_COV} * ${FRONTEND_STMTS} + ${BACKEND_COV} * ${BACKEND_STMTS}) / ${TOTAL_STMTS}).toFixed(2)")
+#
+#            echo "Frontend coverage: ${FRONTEND_COV}%"
+#            echo "Backend coverage: ${BACKEND_COV}%"
+#            echo "Combined coverage: ${COMBINED_COV}%"
+#
+#            # Create combined coverage summary for badge
+#            mkdir -p ./coverage
+#            node -p "JSON.stringify({total:{lines:{pct:${COMBINED_COV}},statements:{pct:${COMBINED_COV}},functions:{pct:${COMBINED_COV}},branches:{pct:${COMBINED_COV}}}})" > ./coverage/coverage-summary.json
+#          else
+#            echo "Backend coverage not found, using frontend coverage only..."
+#            mkdir -p ./coverage
+#            cp ./packages/frontend/coverage/coverage-summary.json ./coverage/coverage-summary.json
+#          fi
 
       # Step 9: Update coverage badge (main branch only)
       # Requires: gh-pages branch exists and GitHub Pages is enabled
@@ -175,36 +180,38 @@ jobs:
         run: |
           # Create combined output directory
           mkdir -p ./combined-output
-          
+
           # Copy landing page to root
           cp .github/index.html ./combined-output/index.html
-          
+
           # Copy OpenSpec UI to /specs/
           mkdir -p ./combined-output/specs
           cp -r ./openspec-export/* ./combined-output/specs/
-          
+
           # Copy Docusaurus build to /docs/
           # Docusaurus builds with /quiqr-desktop/docs/ base path
           # GitHub Pages deploys combined-output to /quiqr-desktop/
           # So we put files in combined-output/docs/ to get /quiqr-desktop/docs/
           mkdir -p ./combined-output/docs
           cp -r ./packages/docs/build/* ./combined-output/docs/
-          
+
           # Copy coverage HTML reports to /coverage/
           # Frontend coverage goes to /coverage/frontend/
           # Backend coverage goes to /coverage/backend/
           mkdir -p ./combined-output/coverage
-          if [ -d "./packages/frontend/coverage" ]; then
-            mkdir -p ./combined-output/coverage/frontend
-            cp -r ./packages/frontend/coverage/* ./combined-output/coverage/frontend/
-            echo "Copied frontend coverage reports"
-          fi
-          if [ -d "./packages/backend/coverage" ]; then
-            mkdir -p ./combined-output/coverage/backend
-            cp -r ./packages/backend/coverage/* ./combined-output/coverage/backend/
-            echo "Copied backend coverage reports"
-          fi
-          
+          cp -r ./coverage/* ./combined-output/coverage/
+
+#          if [ -d "./packages/frontend/coverage" ]; then
+#            mkdir -p ./combined-output/coverage/frontend
+#            cp -r ./packages/frontend/coverage/* ./combined-output/coverage/frontend/
+#            echo "Copied frontend coverage reports"
+#          fi
+#          if [ -d "./packages/backend/coverage" ]; then
+#            mkdir -p ./combined-output/coverage/backend
+#            cp -r ./packages/backend/coverage/* ./combined-output/coverage/backend/
+#            echo "Copied backend coverage reports"
+#          fi
+
           # Fetch and preserve existing badges from gh-pages branch
           # This ensures the coverage badge persists across deployments
           git fetch origin gh-pages --depth=1 || true
@@ -217,7 +224,7 @@ jobs:
               echo "Preserved existing badges from gh-pages"
             fi
           fi
-          
+
           # Verify structure
           echo "Combined output structure:"
           ls -la ./combined-output/

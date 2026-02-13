@@ -15,7 +15,7 @@
   <a href="https://github.com/quiqr/quiqr-desktop/actions/workflows/deploy.yml">
     <img src="https://github.com/quiqr/quiqr-desktop/actions/workflows/deploy.yml/badge.svg?branch=main" alt="Deploy Status">
   </a>
-  <a href="https://github.com/quiqr/quiqr-desktop/actions">
+  <a href="https://quiqr.github.io/quiqr-desktop/coverage">
     <img src="https://quiqr.github.io/quiqr-desktop/badges/coverage.svg" alt="Coverage">
   </a>
   <a href="https://github.com/quiqr/quiqr-desktop/releases">
@@ -24,12 +24,14 @@
   <a href="https://github.com/quiqr/quiqr-desktop/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
   </a>
+<!--
   <a href="https://github.com/quiqr/quiqr-desktop/stargazers">
     <img src="https://img.shields.io/github/stars/quiqr/quiqr-desktop?style=social" alt="Stars">
   </a>
   <a href="https://github.com/quiqr/quiqr-desktop/graphs/contributors">
     <img src="https://img.shields.io/github/contributors/quiqr/quiqr-desktop" alt="Contributors">
   </a>
+-->
 </p>
 
 # Quiqr
