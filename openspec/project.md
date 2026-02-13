@@ -203,7 +203,7 @@ describe('myFunction', () => {
 - **MAY**: Simple presentational components
 
 #### CI/CD Testing
-- **Automated PR Testing**: Pull requests to `main` or `ng` (Next Generation) branches automatically trigger tests
+- **Automated PR Testing**: Pull requests to `main` branches automatically trigger tests
 - **Workflow File**: `.github/workflows/test.yml` runs frontend tests and type checking
 - **Test Results**: Visible in PR status checks within 5 minutes
 - **Viewing Results**: Click "Details" next to the test check in the PR to see logs

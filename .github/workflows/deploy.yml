@@ -168,13 +168,16 @@ jobs:
         working-directory: ./packages/docs
         run: npm run build
 
-      # Step 7: Combine OpenSpec UI and Docusaurus output
-      # OpenSpec UI goes to /specs/, Docusaurus goes to /docs/
+      # Step 7: Combine OpenSpec UI, Docusaurus, and Coverage reports
+      # OpenSpec UI goes to /specs/, Docusaurus goes to /docs/, Coverage reports go to /coverage/
       # Coverage badge remains at /badges/coverage.svg
       - name: Combine outputs
         run: |
           # Create combined output directory
           mkdir -p ./combined-output
+          
+          # Copy landing page to root
+          cp .github/index.html ./combined-output/index.html
           
           # Copy OpenSpec UI to /specs/
           mkdir -p ./combined-output/specs
@@ -186,6 +189,21 @@ jobs:
           # So we put files in combined-output/docs/ to get /quiqr-desktop/docs/
           mkdir -p ./combined-output/docs
           cp -r ./packages/docs/build/* ./combined-output/docs/
+          
+          # Copy coverage HTML reports to /coverage/
+          # Frontend coverage goes to /coverage/frontend/
+          # Backend coverage goes to /coverage/backend/
+          mkdir -p ./combined-output/coverage
+          if [ -d "./packages/frontend/coverage" ]; then
+            mkdir -p ./combined-output/coverage/frontend
+            cp -r ./packages/frontend/coverage/* ./combined-output/coverage/frontend/
+            echo "Copied frontend coverage reports"
+          fi
+          if [ -d "./packages/backend/coverage" ]; then
+            mkdir -p ./combined-output/coverage/backend
+            cp -r ./packages/backend/coverage/* ./combined-output/coverage/backend/
+            echo "Copied backend coverage reports"
+          fi
           
           # Fetch and preserve existing badges from gh-pages branch
           # This ensures the coverage badge persists across deployments
@@ -203,10 +221,14 @@ jobs:
           # Verify structure
           echo "Combined output structure:"
           ls -la ./combined-output/
+          echo "Index page:"
+          ls -la ./combined-output/index.html || true
           echo "Docs structure:"
           ls -la ./combined-output/docs/ || true
           echo "Specs structure:"
           ls -la ./combined-output/specs/ || true
+          echo "Coverage structure:"
+          ls -la ./combined-output/coverage/ || true
 
       # Step 8: Upload the combined site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
@@ -216,7 +238,12 @@ jobs:
           path: ./combined-output
 
       # Step 9: Deploy to GitHub Pages
-      # Deploys all content: /specs/ (OpenSpec), /docs/ (Docusaurus), /badges/ (coverage)
+      # Deploys all content:
+      # - /index.html (landing page with links to all resources)
+      # - /specs/ (OpenSpec UI)
+      # - /docs/ (Docusaurus documentation)
+      # - /coverage/ (HTML coverage reports)
+      # - /badges/ (coverage badge SVG)
       # Requires: Repository settings > Pages > Source = "GitHub Actions"
       - name: Deploy to GitHub Pages
         id: deployment
