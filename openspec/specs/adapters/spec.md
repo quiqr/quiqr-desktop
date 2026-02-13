@@ -122,3 +122,41 @@ The system SHALL provide a WindowAdapter with minimal functionality for reload a
 - **WHEN** application needs to navigate to a different route
 - **THEN** WindowAdapter performs the redirect
 - **AND** uses platform-appropriate navigation method
+
+### Requirement: Adapter Testing Infrastructure
+
+Both adapter packages SHALL have comprehensive test coverage using Vitest to ensure platform abstractions work correctly.
+
+#### Scenario: Electron adapter tests configured
+- **WHEN** @quiqr/adapter-electron package is built
+- **THEN** it includes vitest.config.ts with Node environment
+- **AND** includes test scripts in package.json
+- **AND** provides setup.ts with Electron API mocks
+- **AND** is registered in root vitest.config.ts projects array
+
+#### Scenario: Standalone adapter tests configured
+- **WHEN** @quiqr/adapter-standalone package is built
+- **THEN** it includes vitest.config.ts with Node environment
+- **AND** includes test scripts in package.json
+- **AND** provides setup.ts for test infrastructure
+- **AND** is registered in root vitest.config.ts projects array
+
+#### Scenario: Adapter implementations tested
+- **WHEN** running adapter test suites
+- **THEN** all adapter implementations have unit tests
+- **AND** tests use mocked external dependencies (Electron APIs, Node APIs)
+- **AND** coverage targets 50%+ for adapter code (excluding main.ts orchestration)
+- **AND** tests verify correct API wrapping and state management
+
+#### Scenario: Menu adapter state management tested
+- **WHEN** testing menu adapters
+- **THEN** tests verify menu state updates correctly
+- **AND** tests verify menu item enabling/disabling
+- **AND** tests verify menu structure generation
+- **AND** tests use mocked container configuration
+
+#### Scenario: Factory functions tested
+- **WHEN** testing adapter creation functions
+- **THEN** tests verify all required adapters are created
+- **AND** tests verify adapters are properly wired together
+- **AND** tests verify factory handles dependencies correctly
