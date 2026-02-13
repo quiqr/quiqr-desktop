@@ -244,8 +244,6 @@ procedures, see [RELEASE.md](./RELEASE.md).
 		</tr>
 	<tbody>
 </table>
-
-
 <!-- readme: contributors -end -->
 
 Special thanks to Juliano Appel Klein who started [Hokus](https://github.com/julianoappelklein/hokus).
