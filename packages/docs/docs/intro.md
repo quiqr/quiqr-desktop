@@ -3,6 +3,12 @@ sidebar_position: 1
 sidebar_label: Introduction
 ---
 
+:::warning
+
+This documentation is not complete and may contain errors.
+
+:::
+
 # Welcome to Quiqr Desktop
 
 **Quiqr is a local-first Content Management System designed for static site generators.** Built for Hugo, with expanding support for Quarto, Jekyll, and Eleventy, Quiqr provides a powerful visual interface for managing your static sites without sacrificing the benefits of local development.
