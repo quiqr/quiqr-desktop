@@ -4,7 +4,8 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: true,
-      reporter: ['text', 'json-summary', 'json'],
+      reporter: ['text', 'json-summary', 'json', 'html'],
+      reportsDirectory: './coverage',
       //provider: 'istanbul'
     },
     projects: [
