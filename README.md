@@ -169,14 +169,8 @@ procedures, see [RELEASE.md](./RELEASE.md).
 - [mipmip](https://github.com/mipmip)
 - [bert-janzwanepol](https://github.com/bert-janzwanepol)
 
-<h2 align="center">Supporters</h2>
-<p align="center">
-    <a href="https://technative.eu">
-        <img width="300" alt="horz - dark" src="https://raw.githubusercontent.com/wearetechnative/technative-agent-factbook/refs/heads/main/TechNative_logo_colour_RGB.svg" />
-    </a>
-</p>
-
 ### Contributors
+
 
 <!-- readme: contributors -start -->
 <table>
@@ -250,4 +244,17 @@ procedures, see [RELEASE.md](./RELEASE.md).
 		</tr>
 	<tbody>
 </table>
+
+
 <!-- readme: contributors -end -->
+
+Special thanks to Juliano Appel Klein who started [Hokus](https://github.com/julianoappelklein/hokus).
+
+<h2 align="center">Supporters</h2>
+<p align="center">
+    <a href="https://technative.eu">
+        <img width="300" alt="horz - dark" src="https://raw.githubusercontent.com/wearetechnative/technative-agent-factbook/refs/heads/main/TechNative_logo_colour_RGB.svg" />
+    </a>
+</p>
+
+
