@@ -1,4 +1,4 @@
-name: Deploy Coverage Badge and OpenSpec UI
+name: CI
 
 # This workflow runs on push to main branches only (after PR merge)
 # It generates coverage reports, updates the coverage badge, and publishes OpenSpec UI
