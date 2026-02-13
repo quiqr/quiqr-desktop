@@ -135,6 +135,61 @@ export function createExecuteMenuActionHandler(container: AppContainer) {
           }
 
         // ====================================================================
+        // Scaffold Model actions
+        // ====================================================================
+        case 'scaffoldSingle':
+          {
+            const state = container.state;
+            if (!state.currentSiteKey || !state.currentWorkspaceKey) {
+              return { type: 'error', message: 'No site selected' };
+            }
+
+            const scaffoldService = await container.getScaffoldModelService(
+              state.currentSiteKey,
+              state.currentWorkspaceKey
+            );
+            const result = await scaffoldService.scaffoldSingleFromFile('single');
+
+            if (result.success) {
+              return {
+                type: 'success',
+                refresh: true,
+                message: `Scaffolded single model: ${result.modelKey}`
+              };
+            } else if (result.error) {
+              return { type: 'error', message: result.error };
+            }
+            // User cancelled
+            return { type: 'success' };
+          }
+
+        case 'scaffoldCollection':
+          {
+            const state = container.state;
+            if (!state.currentSiteKey || !state.currentWorkspaceKey) {
+              return { type: 'error', message: 'No site selected' };
+            }
+
+            const scaffoldService = await container.getScaffoldModelService(
+              state.currentSiteKey,
+              state.currentWorkspaceKey
+            );
+            const result = await scaffoldService.scaffoldCollectionFromFile('collection');
+
+            if (result.success) {
+              return {
+                type: 'success',
+                refresh: true,
+                message: `Scaffolded collection model: ${result.modelKey}`
+              };
+            } else if (result.error) {
+              return { type: 'error', message: result.error };
+            }
+            // User cancelled
+            return { type: 'success' };
+          }
+
+        // ====================================================================
         // External actions
         // ====================================================================
         case 'openExternal':

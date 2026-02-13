@@ -1,6 +1,10 @@
 # Quiqr App CHANGELOG
 
 ## NEXT RELEASE
+- fix: stablelize collectionitem management.
+- refactor: new Unified Configuration Framework
+- feature: restore model-scaffold function in electron-edition
+- fix: leaf-array and section documentation. Remove some hallucinations :rat:
 
 ## 0.22.0 (2026-01-31) FOSDEM RELEASE
 - Removed legacy direct OpenAI field AI assist

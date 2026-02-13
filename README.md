@@ -12,85 +12,73 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mipmip/quiqr-desktop/actions/workflows/test.yml">
-    <img src="https://github.com/mipmip/quiqr-desktop/actions/workflows/test.yml/badge.svg?branch=ng" alt="Test Status">
+  <a href="https://github.com/quiqr/quiqr-desktop/actions/workflows/deploy.yml">
+    <img src="https://github.com/quiqr/quiqr-desktop/actions/workflows/deploy.yml/badge.svg?branch=main" alt="Deploy Status">
   </a>
-  <a href="https://github.com/mipmip/quiqr-desktop/actions">
-    <img src="https://mipmip.github.io/quiqr-desktop/badges/coverage.svg" alt="Coverage">
+  <a href="https://quiqr.github.io/quiqr-desktop/coverage">
+    <img src="https://quiqr.github.io/quiqr-desktop/badges/coverage.svg" alt="Coverage">
   </a>
+  <a href="https://github.com/quiqr/quiqr-desktop/releases">
+    <img src="https://img.shields.io/github/v/release/quiqr/quiqr-desktop?label=version" alt="Version">
+  </a>
+  <a href="https://github.com/quiqr/quiqr-desktop/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+  </a>
+<!--
+  <a href="https://github.com/quiqr/quiqr-desktop/stargazers">
+    <img src="https://img.shields.io/github/stars/quiqr/quiqr-desktop?style=social" alt="Stars">
+  </a>
+  <a href="https://github.com/quiqr/quiqr-desktop/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/quiqr/quiqr-desktop" alt="Contributors">
+  </a>
+-->
 </p>
 
 # Quiqr
 
-Quiqr is a local-first CMS for static site generators like Hugo, Quarto,
-Jekyll, and Eleventy. Available as a desktop application (Electron) or web
-server, it provides fast content management with zero network latency while
+Quiqr is a local-first CMS, available as a desktop application (Electron) or web
+application. It provides fast content management with zero network latency while
 keeping your data local for privacy and developer-friendly workflows.
 
 ## Key Features
 
-- **Local-First Architecture**: All data stays on your computer for maximum privacy and speed
+**Local first with max performance**
+
+- **Local-First Architecture**: Data stays on your computer for maximum privacy and speed
+- **Built-in Git Client**: Publish directly to GitHub, GitLab, or BitBucket
+
+**Be creative**
+
 - **Multi-SSG Support**: Built for Hugo with expanding support for Quarto, Jekyll, and Eleventy
 - **Integrated Hugo Server**: Preview your site changes instantly
-- **Built-in Git Client**: Publish directly to GitHub, GitLab, or BitBucket
+- **Generic Builder Support**: Any system working with static serialized data can be integrated.
 - **Template Gallery**: Quick-start with pre-built site templates
+
+**Declarative workflows**
+
 - **Schema-Driven Forms**: Powerful, customizable content editing interface
-- **Dual Deployment**: Run as desktop app or standalone web server
-- **Modern Stack**: React frontend with Node.js backend for reliability and performance
-
-## Documentation
-
-Full documentation is available at [https://quiqr.github.io/quiqr-desktop/docs](https://quiqr.github.io/quiqr-desktop/docs) including:
-
-- [Getting Started Guide](https://quiqr.github.io/quiqr-desktop/docs/getting-started/installation)
-- [Developer Guide](https://quiqr.github.io/quiqr-desktop/docs/developer-guide)
-- [Field Reference](https://quiqr.github.io/quiqr-desktop/docs/field-reference)
-- [Contributing Guide](https://quiqr.github.io/quiqr-desktop/docs/contributing)
-
-## NG (Next Generation)
-
-Quiqr Desktop NG is a major upgrade of the Quiqr source code including:
-
-- Electron updates
-- React updates
-- MUI updates
-- Migrate to Vite
-- Experimental standalone server mode
-- And many more updates
-
-This `ng`-branch will replace the current `main` which we will rename to `legacy` ASAP.
+- **Loved by AI Agents**: AI love Markdown, Json and Yaml our Schema-Driven architecture.
+- **Advanced Prompt Templating System**: Share and pre-write prompts for harnassing teams.
 
 ## Quiqr Editions
 
-Though the repository still is named quiqr-desktop, The Quiqr application can
-run in two modes: Desktop Mode (Electron) or Server Mode (Standalone). 
+The Quiqr application can run in two modes: Desktop Mode (Electron) or Server
+Mode (Standalone). 
 
-### Desktop Mode
+|                   | Quiqr Desktop | Quiqr Server             |
+|------------------:|:--------------|:-------------------------|
+|   **Performance** | 🚀            | 🏎️                       |
+|    **Multi-user** | ❌            | ✅                       |
+| **Fast boarding** | ❌            | ✅                       |
+|   **Local First** | ✅            | ❌                       |
+|      **Audience** | Developers    | Teams/Non-technical users|
 
-Quiqr Desktop runs on your computer. As a desktop application
-users gain all advantages of a local first application.
+## Use cases
 
-- No latencies, blazingly fast;
-- All data is stored on your computer;
-- Perfect setup for Site developers as site code changes can be done on the same computer.
-
-### Server Mode 
-
-Quiqr Server allowes Quiqr to be installed as a web application. This allowed
-short user boarding times.
-
-- Ideal for sites or applications which have many users;
-- Users don't have install Quiqr on their computer, just use the web browser;
-- Users don't have to import sites, this can be pre-setup;
-- Users don't have to configure synchronizations, this can be pre-setup,
-
-In version 0.21, this setup is experimental and not production ready. 
-
-## Open Source & Contributing
-
-Quiqr is open source and we appreciate contributions and positive feedback.
-
-For detailed information about contributing to this project, including PR requirements, testing guidelines, and the OpenSpec workflow, please see [CONTRIBUTING.md](./CONTRIBUTING.md).
+- Static Site CMS (Hugo, Quarto, Eleventy and Jekyll)
+- Control Panel for Terraform managed clouds
+- CMS for advanced PDF's using Quarto and pandoc
+- Shared LLM Prompt libraries
 
 ## Support and Questions
 
@@ -98,17 +86,15 @@ Please don't hesitate to reach out via [Discord](https://discord.gg/nJ2JH7jvmV).
 
 ## Community Guidelines
 
-At a high level, we ask everyone be respectful and empathetic. We follow the
-[Github Community Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
+Quiqr is open source and we appreciate contributions and positive feedback.
 
 * Be welcoming and open-minded
-* Respect each other
 * Communicate with empathy
 * Be clear and stay on topic
 
-## Known Issues
-
-- The github action that's supposed to build the installers, builds a broken `.dmg` file, due to it not being signed.
+For detailed information about contributing to this project, including PR
+requirements, testing guidelines, and the OpenSpec workflow, please see
+[CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Development
 
@@ -170,12 +156,21 @@ nix run .#quiqr.server
 
 Installers will be generated in the `dist` folder.
 
-## Releasing
+### Releasing
 
 For information about the release process, versioning policy, and release
 procedures, see [RELEASE.md](./RELEASE.md).
 
-## Contributors
+
+## About the Quiqr Project
+
+### Maintainers
+
+- [mipmip](https://github.com/mipmip)
+- [bert-janzwanepol](https://github.com/bert-janzwanepol)
+
+### Contributors
+
 
 <!-- readme: contributors -start -->
 <table>
@@ -250,3 +245,14 @@ procedures, see [RELEASE.md](./RELEASE.md).
 	<tbody>
 </table>
 <!-- readme: contributors -end -->
+
+Special thanks to Juliano Appel Klein who started [Hokus](https://github.com/julianoappelklein/hokus).
+
+<h2 align="center">Supporters</h2>
+<p align="center">
+    <a href="https://technative.eu">
+        <img width="300" alt="horz - dark" src="https://raw.githubusercontent.com/wearetechnative/technative-agent-factbook/refs/heads/main/TechNative_logo_colour_RGB.svg" />
+    </a>
+</p>
+
+

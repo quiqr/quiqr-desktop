@@ -50,7 +50,7 @@ This allows you to create developer-specific navigation items for:
 - Advanced settings
 - System content
 
-See [Menu Properties](../developer-guide/content-model.md) for more details on configuring role-specific menu items.
+See [Menu Properties](./content-model/model-file-structure/root-properties/menu.md) for more details on configuring role-specific menu items.
 
 ## Switch Role
 
@@ -111,6 +111,6 @@ Roles are in the **Quiqr Menu**:
 
 ## Related Documentation
 
-- [Content Model](../developer-guide/content-model.md) - Learn about configuring content models
-- [Menu Configuration](../developer-guide/content-model.md) - Set up role-specific menus
-- [Site Configuration](../developer-guide/index.md) - Developer guide overview
+- [Content Model](./content-model/index.md) - Learn about configuring content models
+- [Menu Configuration](./content-model/model-file-structure/root-properties/menu.md) - Set up role-specific menus
+- [Site Configuration](./index.md) - Developer guide overview

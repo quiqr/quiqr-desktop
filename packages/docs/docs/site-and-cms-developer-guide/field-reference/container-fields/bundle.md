@@ -127,6 +127,6 @@ bundle_key:
 
 ## Related Fields
 
-- [Object](./object.md) - Similar nesting without the UI grouping
-- [List](./list.md) - For arrays of items
+- [Object](./section.md) - Similar nesting without the UI grouping
+- [List](./leaf-array.md) - For arrays of items
 - [Nested](./nested.md) - For deeply nested structures

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 30
 sidebar_label: Site & CMS Development
 ---
 
@@ -22,7 +22,7 @@ Understand the difference between Content Editor and Site Developer roles. Learn
 
 Learn about the structure of a Quiqr site and how different components work together.
 
-### [Content Model](./content-model.md)
+### [Content Model](./content-model/index.md)
 
 Deep dive into creating and customizing content models that define how your content is structured and edited.
 
@@ -83,7 +83,7 @@ New to Quiqr development? Start here:
 
 1. **[User Roles](./user-roles.md)** - Understand the roles
 2. **[Anatomy of a Quiqr Site](./anatomy-of-a-quiqr-site.md)** - Learn the structure
-3. **[Content Model](./content-model.md)** - Create your first model
+3. **[Content Model](./content-model/index.md)** - Create your first model
 4. **[Field Reference](./field-reference/index.md)** - Explore available fields
 
 ## Advanced Topics
@@ -99,4 +99,4 @@ Once you're familiar with the basics:
 
 - [Discord Community](https://discord.gg/nJ2JH7jvmV) - Ask questions, share tips
 - [GitHub Issues](https://github.com/quiqr/quiqr-desktop/issues) - Report bugs
-- [Developer Guide](../developer-guide/index.md) - Architecture and APIs
+- [Quiqr Internals Developer Guide](../quiqr-internals-developer-guide/index.md) - Architecture and APIs

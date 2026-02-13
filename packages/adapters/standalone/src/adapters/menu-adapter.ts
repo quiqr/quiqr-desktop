@@ -113,6 +113,29 @@ export class WebMenuAdapter implements MenuAdapter {
               enabled: siteSelected,
               action: 'closeSite',
             },
+            { id: 'sep-3', type: 'separator' },
+            {
+              id: 'scaffold-model',
+              type: 'submenu',
+              label: 'Scaffold Model',
+              enabled: siteSelected,
+              submenu: [
+                {
+                  id: 'scaffold-single',
+                  type: 'normal',
+                  label: 'Scaffold Single from File...',
+                  enabled: siteSelected,
+                  action: 'scaffoldSingle',
+                },
+                {
+                  id: 'scaffold-collection',
+                  type: 'normal',
+                  label: 'Scaffold Collection from File...',
+                  enabled: siteSelected,
+                  action: 'scaffoldCollection',
+                },
+              ],
+            },
           ],
         },
 

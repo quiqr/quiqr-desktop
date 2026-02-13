@@ -6,7 +6,11 @@ import {
   workspaceConfigSchema,
   siteConfigSchema,
   userPreferencesSchema,
-  promptItemConfigSchema
+  promptItemConfigSchema,
+  instanceSettingsSchema,
+  siteSettingsSchema,
+  configLayerSchema,
+  configPropertyMetadataSchema
 } from './config.js'
 import {
   quiqrSiteRepoInfoSchema,
@@ -14,10 +18,19 @@ import {
 } from './embgit.js'
 import { fieldSchema } from './fields.js'
 
+// Schema for resolved preference with metadata
+export const resolvedPreferenceSchema = z.object({
+  value: z.unknown(),
+  source: configLayerSchema,
+  locked: z.boolean(),
+  path: z.string()
+})
+
 export const collectionItemSchema = z.object({
   key: z.string(),
   label: z.string(),
-  sortval: z.string()
+  sortval: z.string().optional(),
+  isPageBundle: z.boolean().optional()
 })
 
 export const languageSchema = z.object({
@@ -278,6 +291,14 @@ export const environmentInfoSchema = z.object({
   isPackaged: z.boolean()
 })
 
+// Scaffold model schemas
+export const scaffoldResultSchema = z.object({
+  success: z.boolean(),
+  modelKey: z.string().optional(),
+  modelPath: z.string().optional(),
+  error: z.string().optional()
+})
+
 // API Schemas mapping - maps API method names to their response schemas
 export const apiSchemas = {
   // Workspace operations
@@ -418,7 +439,28 @@ export const apiSchemas = {
 
   // Menu operations (web mode)
   getMenuState: webMenuStateSchema,
-  executeMenuAction: webMenuActionResultSchema
+  executeMenuAction: webMenuActionResultSchema,
+
+  // Scaffold model operations
+  scaffoldSingleFromFile: scaffoldResultSchema,
+  scaffoldCollectionFromFile: scaffoldResultSchema,
+
+  // Unified config operations
+  getEffectivePreference: resolvedPreferenceSchema,
+  getEffectivePreferences: userPreferencesSchema,
+  setUserPreference: z.boolean(),
+  setUserPreferences: z.boolean(),
+  isPreferenceLocked: z.boolean(),
+  getAllPropertyMetadata: z.array(configPropertyMetadataSchema),
+  getInstanceSettings: instanceSettingsSchema,
+  getInstanceSetting: z.unknown(),
+  updateInstanceSettings: z.boolean(),
+  getSiteSettings: siteSettingsSchema,
+  updateSiteSettings: z.boolean(),
+  getCurrentUserId: z.string(),
+  switchUser: z.boolean(),
+  listUsers: z.array(z.string()),
+  isExperimentalFeaturesEnabled: z.boolean()
 } as const
 
 // Type exports

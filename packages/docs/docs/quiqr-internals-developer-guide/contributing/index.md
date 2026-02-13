@@ -165,7 +165,7 @@ When creating new form fields:
 3. Create component in `/packages/frontend/src/components/SukohForm/fields/`
 4. Register in `FieldRegistry.ts`
 
-See [Field Development Guide](../developer-guide/field-system.md) for details.
+See [Field Development Guide](../field-system.md) for details.
 
 ## Documentation
 
@@ -247,7 +247,7 @@ By contributing, you agree that your contributions will be licensed under the sa
 
 If you have questions:
 
-1. Check the [Developer Guide](../developer-guide/index.md)
+1. Check the [Quiqr Internals Developer Guide](../index.md)
 2. Search existing issues
 3. Ask on Discord
 4. Open a discussion on GitHub

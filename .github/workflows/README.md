@@ -9,7 +9,6 @@ This directory contains automated workflows for the Quiqr Desktop project.
 
 **Triggers**:
 - Pull requests targeting `main` branch
-- Pull requests targeting `ng` (Next Generation) branch
 - Manual dispatch via GitHub UI
 
 **What it does**:

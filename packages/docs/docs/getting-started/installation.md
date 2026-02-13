@@ -77,7 +77,7 @@ Once installed:
 
 1. [Quick Start Guide](./quick-start.md) - Create your first site
 2. [Import Existing Site](./import-site.md) - Work with your existing Hugo project
-3. [Configuration](./configuration.md) - Customize Quiqr settings
+3. [Configuration](../configuration/index.md) - Customize Quiqr settings
 
 ## Troubleshooting
 
@@ -112,4 +112,4 @@ npm install
 npm run dev
 ```
 
-See the [Developer Guide](../developer-guide/index.md) for more details.
+See the [Developer Guide](../site-and-cms-developer-guide/index.md) for more details.

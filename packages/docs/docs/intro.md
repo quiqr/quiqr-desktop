@@ -3,6 +3,12 @@ sidebar_position: 1
 sidebar_label: Introduction
 ---
 
+:::warning
+
+This documentation is not complete and may contain errors.
+
+:::
+
 # Welcome to Quiqr Desktop
 
 **Quiqr is a local-first Content Management System designed for static site generators.** Built for Hugo, with expanding support for Quarto, Jekyll, and Eleventy, Quiqr provides a powerful visual interface for managing your static sites without sacrificing the benefits of local development.
@@ -135,9 +141,10 @@ This documentation is organized into sections:
 
 - **[Getting Started](./getting-started/index.md)** - Installation, quick start, import guides
 - **[User Guide](./getting-started/quick-start.md)** - Day-to-day usage, editing content, publishing
-- **[Developer Guide](./developer-guide/index.md)** - Architecture, content models, customization
-- **[Field Reference](./field-reference/index.md)** - Complete reference for all 18+ field types
-- **[Contributing](./contributing/index.md)** - How to contribute to Quiqr
+- **[Site & CMS Developer Guide](./site-and-cms-developer-guide/index.md)** - Content models, customization
+- **[Quiqr Internals Developer Guide](./quiqr-internals-developer-guide/index.md)** - Architecture and contributing
+- **[Field Reference](./site-and-cms-developer-guide/field-reference/index.md)** - Complete reference for all 18+ field types
+- **[Contributing](./quiqr-internals-developer-guide/contributing/index.md)** - How to contribute to Quiqr
 
 ## Community & Support
 
@@ -158,7 +165,7 @@ This documentation is organized into sections:
 Quiqr Desktop is **free and open source** (MIT License). We welcome contributions from the community!
 
 - **Source code**: [github.com/quiqr/quiqr-desktop](https://github.com/quiqr/quiqr-desktop)
-- **Contributing**: See our [Contributing Guide](./contributing/index.md)
+- **Contributing**: See our [Contributing Guide](./quiqr-internals-developer-guide/contributing/index.md)
 - **Roadmap**: Check [GitHub Projects](https://github.com/quiqr/quiqr-desktop/projects)
 
 ## Technology Stack

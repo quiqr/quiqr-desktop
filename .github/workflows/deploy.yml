@@ -1,12 +1,9 @@
-name: Deploy Coverage Badge and OpenSpec UI
+name: CI
 
-# This workflow runs on push to main or ng branches only (after PR merge)
-# It generates coverage reports, updates the coverage badge, and publishes OpenSpec UI
 on:
   push:
     branches:
       - main
-      - ng
   workflow_dispatch:
 
 jobs:
@@ -45,72 +42,46 @@ jobs:
           npm run build -w @quiqr/types
           npm run build -w @quiqr/backend
 
-      # Step 6: Run frontend tests with coverage
-      # This executes all tests in the packages/frontend/test directory
-      # Coverage is generated for badge updates
-      # See: https://vitest.dev/
-      - name: Run frontend tests with coverage
-        working-directory: ./packages/frontend
+      # Step 6: Run all tests with coverage
+      # This executes all tests
+      - name: Run tests with coverage
         run: npm run test:coverage
 
-      # Step 7: Run backend tests with coverage
-      # This executes all tests in the packages/backend directory
-      # Backend has 260+ tests covering SSG providers, jobs, and utilities
-      # Continue even if tests fail to ensure coverage is collected
-      - name: Run backend tests with coverage
-        working-directory: ./packages/backend
-        run: npm run test:coverage || true
-
-      # Step 8: Combine coverage from frontend and backend
-      # Calculate the combined coverage percentage from both packages
-      - name: Combine coverage reports
+      # Step 7: Verify and upload coverage reports as artifact
+      # IMPORTANT: This must happen BEFORE the badge action, as the badge action
+      # modifies the coverage directory when it pushes to gh-pages
+      - name: Verify coverage directory
         run: |
-          # Check if both coverage files exist
-          if [ ! -f "./packages/frontend/coverage/coverage-summary.json" ]; then
-            echo "Error: Frontend coverage file not found"
+          echo "Checking coverage directory..."
+          ls -la ./coverage/ || echo "Coverage directory not found!"
+          if [ -d "./coverage" ]; then
+            echo "Coverage directory exists with contents:"
+            find ./coverage -type f
+          else
+            echo "ERROR: Coverage directory does not exist!"
             exit 1
           fi
 
-          # If backend coverage exists, combine; otherwise use frontend only
-          if [ -f "./packages/backend/coverage/coverage-summary.json" ]; then
-            echo "Combining coverage from frontend and backend..."
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: ./coverage
+          retention-days: 1
 
-            # Extract coverage percentages from both packages
-            FRONTEND_COV=$(node -p 't=require("./packages/frontend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
-            BACKEND_COV=$(node -p 't=require("./packages/backend/coverage/coverage-summary.json").total,Math.min(...`lines|statements|functions|branches`.split(`|`).map(k=>t[k].pct))')
-
-            # Calculate weighted average based on total statements
-            FRONTEND_STMTS=$(node -p 'require("./packages/frontend/coverage/coverage-summary.json").total.statements.total')
-            BACKEND_STMTS=$(node -p 'require("./packages/backend/coverage/coverage-summary.json").total.statements.total')
-            TOTAL_STMTS=$((FRONTEND_STMTS + BACKEND_STMTS))
-
-            # Weighted average coverage
-            COMBINED_COV=$(node -p "((${FRONTEND_COV} * ${FRONTEND_STMTS} + ${BACKEND_COV} * ${BACKEND_STMTS}) / ${TOTAL_STMTS}).toFixed(2)")
-
-            echo "Frontend coverage: ${FRONTEND_COV}%"
-            echo "Backend coverage: ${BACKEND_COV}%"
-            echo "Combined coverage: ${COMBINED_COV}%"
-
-            # Create combined coverage summary for badge
-            mkdir -p ./coverage
-            node -p "JSON.stringify({total:{lines:{pct:${COMBINED_COV}},statements:{pct:${COMBINED_COV}},functions:{pct:${COMBINED_COV}},branches:{pct:${COMBINED_COV}}}})" > ./coverage/coverage-summary.json
-          else
-            echo "Backend coverage not found, using frontend coverage only..."
-            mkdir -p ./coverage
-            cp ./packages/frontend/coverage/coverage-summary.json ./coverage/coverage-summary.json
-          fi
-
-      # Step 9: Update coverage badge (ng branch only)
+      # Step 8: Update coverage badge (main branch only)
       # Requires: gh-pages branch exists and GitHub Pages is enabled
       # Requires: Workflow permissions set to "Read and write permissions"
       # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
+      # Note: This action modifies the coverage directory, so artifact upload must happen first
       - name: Update Coverage Badge
-        if: github.ref == 'refs/heads/ng'
+        if: github.ref == 'refs/heads/main'
         uses: we-cli/coverage-badge-action@main
 
   publish-openspec:
     name: Publish OpenSpec UI and Documentation
     runs-on: ubuntu-latest
+    needs: coverage  # Wait for coverage job to complete
 
     # GitHub Pages environment configuration
     environment:
@@ -131,7 +102,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Install Nix with flakes support
+      # Step 2: Download coverage reports from previous job
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
+          path: ./coverage
+
+      # Step 3: Install Nix with flakes support
       # Uses cachix/install-nix-action which is the standard for Nix in GitHub Actions
       # Enables experimental features needed for the openspecui fork
       - name: Install Nix
@@ -141,7 +119,7 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      # Step 3: Generate OpenSpec UI static export
+      # Step 4: Generate OpenSpec UI static export
       # Uses a fork of openspecui that adds static export functionality
       # Fork: github:mipmip/openspecui/feature/nixFlake
       # The fork is required because the official openspecui doesn't support static export
@@ -153,41 +131,61 @@ jobs:
             --base-path /quiqr-desktop/specs/ \
             --output ./openspec-export
 
-      # Step 4: Set up Node.js for Docusaurus build
+      # Step 5: Set up Node.js for Docusaurus build
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '22.x'
           cache: 'npm'
 
-      # Step 5: Install dependencies and build documentation
+      # Step 6: Install dependencies and build documentation
       - name: Install dependencies
         run: npm install
 
-      # Step 6: Build documentation
+      # Step 7: Build documentation
       - name: Build documentation
         working-directory: ./packages/docs
         run: npm run build
 
-      # Step 7: Combine OpenSpec UI and Docusaurus output
-      # OpenSpec UI goes to /specs/, Docusaurus goes to /docs/
+      # Step 8: Combine OpenSpec UI, Docusaurus, and Coverage reports
+      # OpenSpec UI goes to /specs/, Docusaurus goes to /docs/, Coverage reports go to /coverage/
       # Coverage badge remains at /badges/coverage.svg
       - name: Combine outputs
         run: |
           # Create combined output directory
           mkdir -p ./combined-output
-          
+
+          # Copy landing page to root
+          cp .github/index.html ./combined-output/index.html
+
           # Copy OpenSpec UI to /specs/
           mkdir -p ./combined-output/specs
           cp -r ./openspec-export/* ./combined-output/specs/
-          
+
           # Copy Docusaurus build to /docs/
           # Docusaurus builds with /quiqr-desktop/docs/ base path
           # GitHub Pages deploys combined-output to /quiqr-desktop/
           # So we put files in combined-output/docs/ to get /quiqr-desktop/docs/
           mkdir -p ./combined-output/docs
           cp -r ./packages/docs/build/* ./combined-output/docs/
-          
+
+          # Copy coverage HTML reports to /coverage/
+          # Frontend coverage goes to /coverage/frontend/
+          # Backend coverage goes to /coverage/backend/
+          mkdir -p ./combined-output/coverage
+          cp -r ./coverage/* ./combined-output/coverage/
+
+          #if [ -d "./packages/frontend/coverage" ]; then
+          #  mkdir -p ./combined-output/coverage/frontend
+          #  cp -r ./packages/frontend/coverage/* ./combined-output/coverage/frontend/
+          #  echo "Copied frontend coverage reports"
+          #fi
+          #if [ -d "./packages/backend/coverage" ]; then
+          #  mkdir -p ./combined-output/coverage/backend
+          #  cp -r ./packages/backend/coverage/* ./combined-output/coverage/backend/
+          #  echo "Copied backend coverage reports"
+          #fi
+
           # Fetch and preserve existing badges from gh-pages branch
           # This ensures the coverage badge persists across deployments
           git fetch origin gh-pages --depth=1 || true
@@ -200,24 +198,33 @@ jobs:
               echo "Preserved existing badges from gh-pages"
             fi
           fi
-          
+
           # Verify structure
           echo "Combined output structure:"
           ls -la ./combined-output/
+          echo "Index page:"
+          ls -la ./combined-output/index.html || true
           echo "Docs structure:"
           ls -la ./combined-output/docs/ || true
           echo "Specs structure:"
           ls -la ./combined-output/specs/ || true
+          echo "Coverage structure:"
+          ls -la ./combined-output/coverage/ || true
 
-      # Step 8: Upload the combined site as a Pages artifact
+      # Step 9: Upload the combined site as a Pages artifact
       # GitHub's official action handles artifact upload for Pages deployment
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./combined-output
 
-      # Step 9: Deploy to GitHub Pages
-      # Deploys all content: /specs/ (OpenSpec), /docs/ (Docusaurus), /badges/ (coverage)
+      # Step 10: Deploy to GitHub Pages
+      # Deploys all content:
+      # - /index.html (landing page with links to all resources)
+      # - /specs/ (OpenSpec UI)
+      # - /docs/ (Docusaurus documentation)
+      # - /coverage/ (HTML coverage reports)
+      # - /badges/ (coverage badge SVG)
       # Requires: Repository settings > Pages > Source = "GitHub Actions"
       - name: Deploy to GitHub Pages
         id: deployment

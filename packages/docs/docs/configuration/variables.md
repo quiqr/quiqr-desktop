@@ -156,4 +156,4 @@ If a build action fails after variable substitution:
 ## Related Configuration
 
 - [Build Actions](/docs/site-and-cms-developer-guide/content-model/build-actions/) - Learn how to create custom build actions
-- [Advanced Settings](./advanced-settings.md) - Configure additional power-user features
+- [Advanced Preferences](./advanced-preferences.md) - Configure additional power-user features

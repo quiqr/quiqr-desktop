@@ -8,6 +8,10 @@
 import type { PlatformAdapters } from '../adapters/types.js';
 import { AppConfig } from './app-config.js';
 import { AppState } from './app-state.js';
+import { createUnifiedConfigService, type UnifiedConfigService } from './unified-config-service.js';
+import { createConfigMigrator } from './config-migrator.js';
+import { ConfigStore } from './config-store.js';
+import * as path from 'node:path';
 import { PathHelper } from '../utils/path-helper.js';
 import { FormatProviderResolver } from '../utils/format-provider-resolver.js';
 import { ConfigurationDataProvider, ConsoleLogger } from '../services/configuration/index.js';
@@ -21,6 +25,7 @@ import { Pogozipper } from '../import/pogozipper.js';
 import { Embgit } from '../embgit/embgit.js';
 import { WorkspaceService, type WorkspaceServiceDependencies } from '../services/workspace/workspace-service.js';
 import { ModelWatcher, createModelWatcher } from '../services/workspace/model-watcher.js';
+import { ScaffoldModelService, createScaffoldModelService } from '../services/scaffold-model/index.js';
 import { BuildActionService } from '../build-actions/index.js';
 import { ProviderFactory } from '../ssg-providers/provider-factory.js';
 import type { EnvironmentInfo } from '../utils/path-helper.js';
@@ -42,9 +47,16 @@ export interface ModelChangeEvent {
  */
 export interface AppContainer {
   /**
-   * Application configuration (persistent)
+   * Application configuration (persistent) - LEGACY
+   * @deprecated Use unifiedConfig for new code
    */
   config: AppConfig;
+
+  /**
+   * Unified configuration service (hierarchical, multi-user ready)
+   * Provides layered config resolution with env var overrides
+   */
+  unifiedConfig: UnifiedConfigService;
 
   /**
    * Application runtime state (non-persistent)
@@ -171,6 +183,15 @@ export interface AppContainer {
    * Structured logging service
    */
   logger: Logger;
+
+  /**
+   * Helper to get a ScaffoldModelService instance
+   * Handles the common pattern of: get site → get workspace → create service
+   */
+  getScaffoldModelService: (
+    siteKey: string,
+    workspaceKey: string
+  ) => Promise<ScaffoldModelService>;
 }
 
 /**
@@ -204,18 +225,47 @@ export interface ContainerOptions {
 export function createContainer(options: ContainerOptions): AppContainer {
   const { userDataPath, rootPath, adapters, configFileName } = options;
 
-  // Create config and state
+  // Create unified config service (new architecture)
+  // Note: Migration is handled lazily when first accessing config
+  const unifiedConfig = createUnifiedConfigService({ configDir: userDataPath });
+
+  // Schedule async migration check (non-blocking)
+  // This allows the container to be created synchronously while migration happens in background
+  const configStore = new ConfigStore(userDataPath);
+  const legacyConfigPath = path.join(userDataPath, configFileName || 'quiqr-app-config.json');
+  const migrator = createConfigMigrator(configStore, legacyConfigPath);
+  migrator.needsMigration().then(async (needsMigration) => {
+    if (needsMigration) {
+      console.log('[Config Migration] Legacy config detected, running migration...');
+      const result = await migrator.migrate();
+      if (result.success) {
+        console.log('[Config Migration] Migration completed successfully');
+        if (result.backupPath) {
+          console.log(`[Config Migration] Backup created at: ${result.backupPath}`);
+        }
+        // Reload unified config after migration
+        unifiedConfig.reload();
+      } else {
+        console.error('[Config Migration] Migration failed:', result.errors?.join(', '));
+      }
+    }
+  }).catch((err) => {
+    console.error('[Config Migration] Error checking migration status:', err);
+  });
+
+  // Create legacy config and state (for backward compatibility)
   const config = new AppConfig(userDataPath, configFileName);
   const state = new AppState();
 
-  // Create path helper with dependencies
+  // Create path helper with dynamic config getter
+  // This ensures PathHelper always reads the current dataFolder from UnifiedConfigService
   const pathHelper = new PathHelper(
     adapters.appInfo,
     rootPath,
-    {
-      dataFolder: config.prefs.dataFolder,
+    () => ({
+      dataFolder: unifiedConfig.getEffectivePreference('dataFolder'),
       currentSitePath: state.currentSitePath,
-    }
+    })
   );
 
   // Create format resolver
@@ -283,6 +333,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
   // Create the container object first (needed for circular dependency)
   const container: AppContainer = {
     config,
+    unifiedConfig,
     state,
     adapters,
     pathHelper,
@@ -469,6 +520,24 @@ export function createContainer(options: ContainerOptions): AppContainer {
   // Get the currently cached WorkspaceService
   container.getCurrentWorkspaceService = () => {
     return cachedWorkspaceService;
+  };
+
+  // Helper to get ScaffoldModelService
+  container.getScaffoldModelService = async (
+    siteKey: string,
+    workspaceKey: string
+  ): Promise<ScaffoldModelService> => {
+    // First get the workspace service to ensure we have a valid workspace path
+    const workspaceService = await container.getWorkspaceService(siteKey, workspaceKey);
+    
+    // Create and return a ScaffoldModelService instance
+    return createScaffoldModelService(
+      workspaceService.getWorkspacePath(),
+      {
+        dialogAdapter: adapters.dialog,
+        formatResolver,
+      }
+    );
   };
 
   // Backward compatibility accessors (deprecated)

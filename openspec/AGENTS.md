@@ -207,6 +207,10 @@ If multiple capabilities are affected, create multiple delta files under `change
 - [ ] 1.4 Write tests
 ```
 
+**IMPORTANT:** All tasks in `tasks.md` MUST have checkboxes (`- [ ]` or `- [x]`) to track implementation status. This allows clear visibility into what has been completed and what remains. Update checkboxes as tasks progress:
+- `- [ ]` for incomplete tasks
+- `- [x]` for completed tasks
+
 5. **Create design.md when needed:**
 Create `design.md` if any of the following apply; otherwise omit it:
 - Cross-cutting change (multiple services/modules) or a new architectural pattern

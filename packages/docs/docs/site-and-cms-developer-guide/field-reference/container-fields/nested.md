@@ -192,6 +192,6 @@ Each item in a nested field can have:
 
 ## Related Fields
 
-- [List](./list.md) - For flat arrays without nesting
-- [Object](./object.md) - For single-level nesting
+- [List](./leaf-array.md) - For flat arrays without nesting
+- [Object](./section.md) - For single-level nesting
 - [Bundle](./bundle.md) - For grouping fields visually

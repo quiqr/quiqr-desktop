@@ -300,4 +300,4 @@ The empty line field generates **no output** in your content files. It only affe
 ## Related Fields
 
 - [Info](./info.md) - Display informational content with markdown
-- [Object](../container-fields/object.md) - Group fields within a container (alternative to visual grouping)
+- [Object](../container-fields/section.md) - Group fields within a container (alternative to visual grouping)

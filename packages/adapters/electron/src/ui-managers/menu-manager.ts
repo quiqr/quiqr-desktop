@@ -290,6 +290,82 @@ export class MenuManager {
             click: () => this.showSiteLibrary()
           },
           { type: 'separator' },
+          {
+            id: 'scaffold-model',
+            label: 'Scaffold Model',
+            enabled: this.options.siteSelected,
+            submenu: [
+              {
+                id: 'scaffold-single',
+                label: 'Scaffold Single from File...',
+                enabled: this.options.siteSelected,
+                click: async () => {
+                  if (!this.container) return;
+
+                  try {
+                    const state = this.container.state;
+                    if (!state.currentSiteKey || !state.currentWorkspaceKey) {
+                      console.warn('No site selected');
+                      return;
+                    }
+
+                    const scaffoldService = await this.container.getScaffoldModelService(
+                      state.currentSiteKey,
+                      state.currentWorkspaceKey
+                    );
+                    const result = await scaffoldService.scaffoldSingleFromFile('single');
+
+                    if (result.success) {
+                      console.log(`Scaffolded single model: ${result.modelKey}`);
+                      // Notify frontend to refresh
+                      if (this.mainWindow) {
+                        this.mainWindow.webContents.send('model-changed');
+                      }
+                    } else if (result.error) {
+                      console.error('Scaffold failed:', result.error);
+                    }
+                  } catch (error) {
+                    console.error('Failed to scaffold single:', error);
+                  }
+                }
+              },
+              {
+                id: 'scaffold-collection',
+                label: 'Scaffold Collection from File...',
+                enabled: this.options.siteSelected,
+                click: async () => {
+                  if (!this.container) return;
+
+                  try {
+                    const state = this.container.state;
+                    if (!state.currentSiteKey || !state.currentWorkspaceKey) {
+                      console.warn('No site selected');
+                      return;
+                    }
+
+                    const scaffoldService = await this.container.getScaffoldModelService(
+                      state.currentSiteKey,
+                      state.currentWorkspaceKey
+                    );
+                    const result = await scaffoldService.scaffoldCollectionFromFile('collection');
+
+                    if (result.success) {
+                      console.log(`Scaffolded collection model: ${result.modelKey}`);
+                      // Notify frontend to refresh
+                      if (this.mainWindow) {
+                        this.mainWindow.webContents.send('model-changed');
+                      }
+                    } else if (result.error) {
+                      console.error('Scaffold failed:', result.error);
+                    }
+                  } catch (error) {
+                    console.error('Failed to scaffold collection:', error);
+                  }
+                }
+              }
+            ]
+          },
+          { type: 'separator' },
           isMac ? { role: 'close' as const } : { role: 'quit' as const }
         ]
       },
