@@ -47,16 +47,9 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
 
-      # Step 7: Update coverage badge (main branch only)
-      # Requires: gh-pages branch exists and GitHub Pages is enabled
-      # Requires: Workflow permissions set to "Read and write permissions"
-      # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
-      - name: Update Coverage Badge
-        if: github.ref == 'refs/heads/main'
-        uses: we-cli/coverage-badge-action@main
-
-      # Step 8: Verify and upload coverage reports as artifact
-      # This makes the coverage reports available to the publish-openspec job
+      # Step 7: Verify and upload coverage reports as artifact
+      # IMPORTANT: This must happen BEFORE the badge action, as the badge action
+      # modifies the coverage directory when it pushes to gh-pages
       - name: Verify coverage directory
         run: |
           echo "Checking coverage directory..."
@@ -75,6 +68,15 @@ jobs:
           name: coverage-reports
           path: ./coverage
           retention-days: 1
+
+      # Step 8: Update coverage badge (main branch only)
+      # Requires: gh-pages branch exists and GitHub Pages is enabled
+      # Requires: Workflow permissions set to "Read and write permissions"
+      # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
+      # Note: This action modifies the coverage directory, so artifact upload must happen first
+      - name: Update Coverage Badge
+        if: github.ref == 'refs/heads/main'
+        uses: we-cli/coverage-badge-action@main
 
   publish-openspec:
     name: Publish OpenSpec UI and Documentation
