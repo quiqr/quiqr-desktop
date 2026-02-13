@@ -1,12 +1,11 @@
 name: Deploy Coverage Badge and OpenSpec UI
 
-# This workflow runs on push to main or ng branches only (after PR merge)
+# This workflow runs on push to main branches only (after PR merge)
 # It generates coverage reports, updates the coverage badge, and publishes OpenSpec UI
 on:
   push:
     branches:
       - main
-      - ng
   workflow_dispatch:
 
 jobs:
@@ -100,12 +99,12 @@ jobs:
             cp ./packages/frontend/coverage/coverage-summary.json ./coverage/coverage-summary.json
           fi
 
-      # Step 9: Update coverage badge (ng branch only)
+      # Step 9: Update coverage badge (main branch only)
       # Requires: gh-pages branch exists and GitHub Pages is enabled
       # Requires: Workflow permissions set to "Read and write permissions"
       # Badge will be hosted at: https://<username>.github.io/<repo>/badges/coverage.svg
       - name: Update Coverage Badge
-        if: github.ref == 'refs/heads/ng'
+        if: github.ref == 'refs/heads/main'
         uses: we-cli/coverage-badge-action@main
 
   publish-openspec:

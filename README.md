@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/mipmip/quiqr-desktop/actions/workflows/test.yml">
-    <img src="https://github.com/mipmip/quiqr-desktop/actions/workflows/test.yml/badge.svg?branch=ng" alt="Test Status">
+    <img src="https://github.com/mipmip/quiqr-desktop/actions/workflows/test.yml/badge.svg?branch=main" alt="Test Status">
   </a>
   <a href="https://github.com/mipmip/quiqr-desktop/actions">
     <img src="https://mipmip.github.io/quiqr-desktop/badges/coverage.svg" alt="Coverage">
