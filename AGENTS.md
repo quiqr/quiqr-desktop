@@ -55,6 +55,20 @@ npm run build:rpm
 cd packages/frontend && npx tsc --noEmit
 ```
 
+**Testing:**
+```bash
+npm run test                    # Run all tests
+npm run test:watch              # Watch mode
+npm run test:coverage           # Generate coverage report
+
+# Package-specific tests
+npm run test -w @quiqr/backend
+npm run test -w @quiqr/types
+npm run test -w @quiqr/frontend
+npm run test -w @quiqr/adapter-electron
+npm run test -w @quiqr/adapter-standalone
+```
+
 ## Architecture Overview
 
 ### Three-Layer Architecture
@@ -135,6 +149,26 @@ When adding methods that read/write config values, use generic typing with a typ
 
 ### Resources (`/resources/`)
 Platform-specific binaries and assets packaged with the application (Hugo binaries, Git binaries, etc.)
+
+### Adapters (`/packages/adapters/`)
+Platform abstraction layer packages with comprehensive test coverage:
+
+**Electron Adapter** (`/packages/adapters/electron/`)
+- `src/adapters/` - Electron-specific adapter implementations wrapping Electron APIs
+- `src/adapters/index.ts` - ElectronDialogAdapter, ElectronShellAdapter, ElectronWindowAdapter, ElectronMenuAdapter, ElectronAppInfoAdapter
+- `src/adapters/index.test.ts` - Comprehensive unit tests with mocked Electron APIs
+- `test/setup.ts` - Vitest setup with Electron API mocks
+- `vitest.config.ts` - Node environment, 50% coverage thresholds
+
+**Standalone Adapter** (`/packages/adapters/standalone/`)
+- `src/adapters/` - Web-based adapter implementations for standalone server mode
+- `src/adapters/menu-adapter.ts` - WebMenuAdapter with in-memory menu state
+- `src/adapters/window-adapter.ts` - WebWindowAdapter for browser environments
+- `src/adapters/index.test.ts` - Comprehensive unit tests for all adapters
+- `test/setup.ts` - Vitest setup for standalone tests
+- `vitest.config.ts` - Node environment, 50% coverage thresholds
+
+Both packages are registered in root `vitest.config.ts` and include test scripts in their package.json files. Tests verify adapter implementations through mocked external dependencies and focus on business logic rather than API wrappers.
 
 ## Dynamic Form System
 
