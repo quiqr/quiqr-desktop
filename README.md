@@ -15,7 +15,7 @@
   <a href="https://github.com/quiqr/quiqr-desktop/actions/workflows/deploy.yml">
     <img src="https://github.com/quiqr/quiqr-desktop/actions/workflows/deploy.yml/badge.svg?branch=main" alt="Deploy Status">
   </a>
-  <a href="https://github.com/quiqr/quiqr-desktop/actions">
+  <a href="https://quiqr.github.io/quiqr-desktop/coverage">
     <img src="https://quiqr.github.io/quiqr-desktop/badges/coverage.svg" alt="Coverage">
   </a>
   <a href="https://github.com/quiqr/quiqr-desktop/releases">
