@@ -6,11 +6,9 @@ on:
   pull_request:
     branches:
       - main
-      - ng
   push:
     branches:
       - main
-      - ng
   workflow_dispatch:
 
 jobs:

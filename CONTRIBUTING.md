@@ -4,6 +4,9 @@ Thank you for your interest in contributing to Quiqr Desktop! We welcome contrib
 
 This guide will help you understand our contribution process and ensure your contributions can be reviewed and merged efficiently.
 
+At a high level, we follow the [Github Community
+Guidelines](https://docs.github.com/en/github/site-policy/github-community-guidelines):
+
 ## Getting Started
 
 ### Development Setup
