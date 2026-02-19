@@ -32,7 +32,7 @@ Guidelines](https://docs.github.com/en/github/site-policy/github-community-guide
    npm run dev
    ```
 
-For detailed development instructions, see `AGENTS.md` and `openspec/project.md`.
+For detailed development instructions, see `AGENTS.md`.
 
 ### Where to Ask Questions
 
@@ -121,7 +121,7 @@ Testing requirements scale with the size and impact of your contribution:
 - **React components**: Should have tests for critical functionality and user interactions
 - **Integration features**: Require integration tests for cross-cutting concerns
 
-See `openspec/project.md` for detailed testing patterns and examples.
+See `openspec/specs/` for detailed testing requirements.
 
 ## OpenSpec Workflow
 
@@ -148,7 +148,7 @@ Large changes (new features, architectural changes, breaking changes) require Op
 **How to create a proposal:**
 
 ```bash
-# See openspec/AGENTS.md for detailed instructions
+# See openspec/specs/ for detailed requirements
 openspec list --specs  # Check existing specifications
 # Create your proposal in openspec/changes/your-change-name/
 # Include proposal.md, tasks.md, and spec deltas
@@ -222,8 +222,7 @@ When updating dependencies:
 ## Need Help?
 
 - Check `AGENTS.md` for detailed development guidance
-- Review `openspec/project.md` for project conventions
-- See `openspec/AGENTS.md` for OpenSpec workflow details
+- See `openspec/specs/` for project requirements and conventions
 - Ask questions in GitHub Issues or Discussions
 
 ## License
