@@ -6,12 +6,13 @@ export default defineConfig({
       enabled: true,
       reporter: ['text', 'json-summary', 'json', 'html'],
       reportsDirectory: './coverage',
-      //provider: 'istanbul'
     },
     projects: [
       './packages/types/vitest.config.ts',
       './packages/backend/vitest.config.ts',
       './packages/frontend/vitest.config.ts',
+      './packages/adapters/electron/vitest.config.ts',
+      './packages/adapters/standalone/vitest.config.ts',
     ],
   },
 });
