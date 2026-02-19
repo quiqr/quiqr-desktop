@@ -73,16 +73,16 @@ Every requirement in spec deltas SHALL have at least one scenario using the form
 - **WHEN** a scenario uses bullet points, bold text, or wrong heading level
 - **THEN** validation SHALL fail with clear error message
 
-### Requirement: Project Context Documentation
-The project SHALL maintain a `project.md` file in the openspec directory documenting project purpose, tech stack, conventions, domain context, constraints, and external dependencies.
+### Requirement: Project Context Configuration
+The project SHALL maintain project context and per-artifact rules in `openspec/config.yaml`, providing tech stack, conventions, architecture, and domain knowledge to AI assistants during artifact creation.
 
 #### Scenario: AI assistant onboarding
-- **WHEN** an AI assistant needs project context
-- **THEN** project.md provides all necessary information about architecture, patterns, and conventions
+- **WHEN** an AI assistant creates an artifact (proposal, spec, design, or tasks)
+- **THEN** `config.yaml` context is injected into the artifact instructions, providing architecture, conventions, and domain knowledge
 
 #### Scenario: Consistent coding standards
 - **WHEN** implementing changes
-- **THEN** developers and AI assistants follow conventions documented in project.md
+- **THEN** developers and AI assistants follow conventions from the `config.yaml` context and per-artifact rules
 
 ### Requirement: Agent Instructions
 The project SHALL maintain an `AGENTS.md` file with detailed instructions for AI assistants on using the OpenSpec workflow.
