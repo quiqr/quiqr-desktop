@@ -1,0 +1,50 @@
+schema: spec-driven
+
+context: |
+  Quiqr Desktop: Electron-based desktop CMS for local-first static site management (Hugo, Quarto).
+
+  Tech stack: Electron, React, TypeScript, Vite, MUI v7, Node.js, Express, Zod
+  Monorepo: NPM workspaces — packages/frontend, packages/backend, packages/types, packages/adapters
+  Testing: Vitest, coverage thresholds per package
+  Build: electron-builder for multi-platform installers
+
+  Architecture: dual-runtime (Electron desktop + standalone Node/browser)
+  - Frontend (React+TS) communicates with backend (Express) via HTTP REST only (no IPC)
+  - Backend DI container pattern replacing legacy global.pogoconf
+  - SukohForm: schema-driven dynamic form system using Zod field schemas + React Context
+  - Platform-specific binaries bundled in /resources/ (Hugo, Git)
+
+  Domain concepts:
+  - Site = Hugo/Quarto project config
+  - Workspace = specific instance/branch of a site with its own content
+  - Single = single-file content item (homepage, about)
+  - Collection = folder of content items (blog posts)
+
+  Code conventions:
+  - TypeScript + ESM for all code (frontend and backend)
+  - Zod schemas for validation + type inference, centralized in packages/types/src/schemas/
+  - No React.FC; destructure props in function args
+  - Prefer generic typing over union types with manual type guards
+  - Prefer editing existing files over creating new ones
+
+rules:
+  proposal:
+    - Account for dual-runtime (Electron + standalone) — changes must work in both modes
+    - Note if change affects the legacy-to-DI-container migration
+    - Identify which packages/layers are affected (frontend, backend, types, adapters)
+    - Include a "Non-goals" section to keep scope clear
+  specs:
+    - Be explicit about mechanisms, not just outcomes (say HOW, not just WHAT)
+    - Specify Zod schemas for any new data structures or API responses
+    - Define behavior for both Electron and standalone runtime modes
+    - Include error scenarios and edge cases
+  design:
+    - Follow the existing communication pattern (Component → api.ts → bridge → Express → handler)
+    - Use DI container pattern for new backend services, not globals
+    - New field types must follow SukohForm field component pattern (useField hook + FormItemWrapper)
+    - Document which existing patterns/files serve as reference implementations
+  tasks:
+    - Break tasks into chunks that can be independently tested
+    - Include "verify" steps (type-check with tsc --noEmit, run tests with npm test)
+    - When adding API methods: add handler in backend/src/api/handlers/, schema in types/src/schemas/api.ts, client in frontend/src/api.ts
+    - When adding field types: schema in packages/types, component in SukohForm/fields, register in FieldRegistry
