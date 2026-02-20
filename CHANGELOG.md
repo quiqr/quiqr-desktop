@@ -1,10 +1,29 @@
 # Quiqr App CHANGELOG
 
-## NEXT RELEASE
-- fix: stablelize collectionitem management.
+## Next Release
+
+## 0.22.1 (2026-02-20) 
+- restore: release packages for all platforms 🥳
+- fix: stablelize collectionitem management
 - refactor: new Unified Configuration Framework
+- refactor: migrate to TanStack Query for data fetching and state management
+- refactor: migrate build system from electron-builder to Electron Forge
 - feature: restore model-scaffold function in electron-edition
-- fix: leaf-array and section documentation. Remove some hallucinations :rat:
+- feature: rename OpenSpec to OPSX across the project
+- chore: upgrade Node.js to v24
+- chore: upgrade Express from v4 to v5
+- chore: security updates for npm dependencies (tar, tmp)
+- fix: leaf-array and section documentation. Remove some hallucinations
+- fix: AI assistant dark mode styling
+- fix: AI assistant functionality with added tests
+- fix: embgit bin to use platform specific directory
+- fix: preserve license file
+- fix: set tsconfig for tests
+- fix: add url param typecheck
+- fix: prune devdependencies after copying @quiqr packages to root
+- fix: move jsdom to root for testing
+- fix: coverage directory and reporting issues
+- fix: restore original package url
 
 ## 0.22.0 (2026-01-31) FOSDEM RELEASE
 - Removed legacy direct OpenAI field AI assist
