@@ -66,7 +66,7 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
     "@electron-forge/plugin-fuses": "^7.11.1",
     "@electron-forge/publisher-github": "^7.11.1",
-    "@electron/fuses": "^2.0.0",
+    "@electron/fuses": "^1.8.0",
     "@electron/notarize": "^3.1.1",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.0.0",
