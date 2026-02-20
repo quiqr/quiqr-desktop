@@ -1,7 +1,10 @@
-const path = require('path');
-const fs = require('fs-extra');
-const { FusesPlugin } = require('@electron-forge/plugin-fuses');
-const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+import { fileURLToPath } from 'url';
+import { dirname, join, resolve } from 'path';
+import fs from 'fs-extra';
+import { FusesPlugin } from '@electron-forge/plugin-fuses';
+import { FuseV1Options, FuseVersion } from '@electron/fuses';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Determine platform-specific resource directory
 function getPlatformResourceDir() {
@@ -22,7 +25,7 @@ const workspacePackages = [
   { name: '@quiqr/adapter-electron', src: 'packages/adapters/electron' },
 ];
 
-module.exports = {
+export default {
   buildIdentifier: 'prod',
 
   packagerConfig: {
@@ -44,8 +47,8 @@ module.exports = {
           console.log('Copying workspace packages to node_modules...');
 
           for (const ws of workspacePackages) {
-            const srcDir = path.resolve(__dirname, ws.src);
-            const destDir = path.join(buildPath, 'node_modules', ws.name);
+            const srcDir = resolve(__dirname, ws.src);
+            const destDir = join(buildPath, 'node_modules', ws.name);
 
             // Remove existing symlink or directory first
             // Use lstatSync to detect symlinks (existsSync returns false for broken symlinks)
@@ -63,8 +66,8 @@ module.exports = {
             fs.ensureDirSync(destDir);
 
             // Copy dist folder
-            const srcDist = path.join(srcDir, 'dist');
-            const destDist = path.join(destDir, 'dist');
+            const srcDist = join(srcDir, 'dist');
+            const destDist = join(destDir, 'dist');
             if (fs.existsSync(srcDist)) {
               fs.copySync(srcDist, destDist);
               console.log(`  Copied ${ws.name}/dist`);
@@ -73,16 +76,16 @@ module.exports = {
             }
 
             // Copy package.json
-            const srcPkg = path.join(srcDir, 'package.json');
-            const destPkg = path.join(destDir, 'package.json');
+            const srcPkg = join(srcDir, 'package.json');
+            const destPkg = join(destDir, 'package.json');
             if (fs.existsSync(srcPkg)) {
               fs.copySync(srcPkg, destPkg);
               console.log(`  Copied ${ws.name}/package.json`);
             }
 
             // Copy workspace's own node_modules (for non-hoisted dependencies)
-            const srcNodeModules = path.join(srcDir, 'node_modules');
-            const destNodeModules = path.join(destDir, 'node_modules');
+            const srcNodeModules = join(srcDir, 'node_modules');
+            const destNodeModules = join(destDir, 'node_modules');
             if (fs.existsSync(srcNodeModules)) {
               fs.copySync(srcNodeModules, destNodeModules);
               console.log(`  Copied ${ws.name}/node_modules`);
@@ -90,8 +93,8 @@ module.exports = {
           }
 
           // Also copy the frontend build
-          const frontendSrc = path.resolve(__dirname, 'packages/frontend/build');
-          const frontendDest = path.join(buildPath, 'packages/frontend/build');
+          const frontendSrc = resolve(__dirname, 'packages/frontend/build');
+          const frontendDest = join(buildPath, 'packages/frontend/build');
           if (fs.existsSync(frontendSrc)) {
             fs.ensureDirSync(frontendDest);
             fs.copySync(frontendSrc, frontendDest);
@@ -109,8 +112,8 @@ module.exports = {
 
     // Platform-specific binaries
     extraResource: [
-      path.join('resources', getPlatformResourceDir()),
-      path.join('resources', 'all'),
+      join('resources', getPlatformResourceDir()),
+      join('resources', 'all'),
     ],
 
     // Unpack these from asar for filesystem access
