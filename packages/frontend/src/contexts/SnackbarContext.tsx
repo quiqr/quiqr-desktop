@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode, useRef } from 'react';
-import { SnackMessage } from '../../types';
+import { SnackMessage, uiServiceSchemas } from '../../types';
+import { validateServiceResponse } from '../utils/validation';
 
 interface SnackbarContextValue {
   currentSnackMessage: SnackMessage | undefined;
@@ -52,9 +53,25 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
     }
   }, [current, queue]);
 
+  const getCurrentSnackMessage = useCallback(() => {
+    return validateServiceResponse(
+      'getCurrentSnackMessage',
+      uiServiceSchemas.getCurrentSnackMessage,
+      current
+    );
+  }, [current]);
+
+  const getPreviousSnackMessage = useCallback(() => {
+    return validateServiceResponse(
+      'getPreviousSnackMessage',
+      uiServiceSchemas.getPreviousSnackMessage,
+      previous
+    );
+  }, [previous]);
+
   const value: SnackbarContextValue = {
-    currentSnackMessage: current,
-    previousSnackMessage: previous,
+    currentSnackMessage: getCurrentSnackMessage(),
+    previousSnackMessage: getPreviousSnackMessage(),
     addSnackMessage,
     reportSnackDismiss
   };
