@@ -120,7 +120,7 @@ export class Embgit {
     }
 
     if (this.appInfo.isPackaged()) {
-      return path.join(this.pathHelper.getApplicationResourcesDir(this.environmentInfo), 'bin', executable);
+      return path.join(this.pathHelper.getApplicationResourcesDir(this.environmentInfo), platform, executable);
     } else {
       return path.join(this.rootPath, 'resources', platform, executable);
     }
