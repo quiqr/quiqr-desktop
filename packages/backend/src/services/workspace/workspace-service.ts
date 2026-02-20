@@ -569,14 +569,14 @@ export class WorkspaceService {
       let globExpression = path.join(
         folder,
         `${subDirStars}/*.{${supportedContentExt.join(',')}}`
-      );
+      ).replace(/\\/g, '/');
 
       // WHEN WE WANT TO IGNORE _index.md front pages
       if ('hideIndex' in collection && collection.hideIndex === true) {
         globExpression = path.join(
           folder,
           `${subDirStars}/!(_index).{${supportedContentExt.join(',')}}`
-        );
+        ).replace(/\\/g, '/');
       }
 
       const files = await glob(globExpression, {});
@@ -609,7 +609,7 @@ export class WorkspaceService {
       const globExpression = path.join(
         folder,
         `**/*.{${this.formatProviderResolver.allFormatsExt().join(',')}}`
-      );
+      ).replace(/\\/g, '/');
 
       const files = await glob(globExpression, {});
       return files.map(function (item) {
