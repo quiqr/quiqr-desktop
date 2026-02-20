@@ -138,15 +138,13 @@ export default {
           }
 
           // Write a trimmed package.json: no workspaces, no devDependencies.
-          // Preserve fields that electron-packager needs (main, author, description).
-          fs.writeFileSync(buildPkgPath, JSON.stringify({
-            name: buildPkg.name,
-            version: buildPkg.version,
-            main: buildPkg.main,
-            author: buildPkg.author,
-            description: buildPkg.description,
-            dependencies: runtimeDeps,
-          }, null, 2));
+          // Preserve fields that electron-packager and makers read for metadata.
+          const preservedFields = ['name', 'version', 'main', 'author', 'description', 'license', 'homepage', 'repository', 'bugs'];
+          const trimmedPkg = Object.fromEntries(
+            preservedFields.filter(k => buildPkg[k] != null).map(k => [k, buildPkg[k]])
+          );
+          trimmedPkg.dependencies = runtimeDeps;
+          fs.writeFileSync(buildPkgPath, JSON.stringify(trimmedPkg, null, 2));
 
           execSync('npm prune --production --no-package-lock', {
             cwd: buildPath,
