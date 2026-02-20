@@ -233,7 +233,7 @@ export default {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'bert-janzwanepol',
+          owner: 'quiqr',
           name: 'quiqr-desktop',
         },
         prerelease: false,
