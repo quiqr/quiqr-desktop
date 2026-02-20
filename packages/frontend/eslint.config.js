@@ -54,6 +54,10 @@ export default [
         ...globals.node,
         ...globals.es2021,
       },
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       ...reactYouMightNotNeedAnEffect.configs.recommended.rules,
