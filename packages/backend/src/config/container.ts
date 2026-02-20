@@ -479,7 +479,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       cachedWorkspaceService.stopHugoServer();
     }
     if (currentModelWatcher) {
-      currentModelWatcher.stop();
+      await currentModelWatcher.stop();
       currentModelWatcher = undefined;
     }
 

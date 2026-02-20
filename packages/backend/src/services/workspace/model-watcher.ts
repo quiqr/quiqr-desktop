@@ -5,7 +5,7 @@
  * configuration cache when files are added, changed, or removed.
  */
 
-import chokidar, { type FSWatcher } from 'chokidar';
+import chokidar, { type FSWatcher, type ChokidarOptions } from 'chokidar';
 import path from 'path';
 import type { WorkspaceConfigProvider } from './workspace-config-provider.js';
 
@@ -45,7 +45,7 @@ export class ModelWatcher {
 
     const watchDir = path.join(this.workspacePath, 'quiqr', 'model');
 
-    const watchOptions: chokidar.WatchOptions = {
+    const watchOptions: ChokidarOptions = {
       ignored: /(^|[/\\])\../, // ignore dotfiles
       persistent: true,
       ignoreInitial: true, // Don't fire events for existing files on startup
@@ -67,9 +67,9 @@ export class ModelWatcher {
   /**
    * Stop watching and clean up resources
    */
-  stop(): void {
+  async stop(): Promise<void> {
     if (this.watcher) {
-      this.watcher.close();
+      await this.watcher.close();
       this.watcher = undefined;
     }
   }

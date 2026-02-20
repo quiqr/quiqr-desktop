@@ -93,7 +93,7 @@ async function startBackend() {
         expressApp.use(express.static(frontendDir));
 
         // SPA catch-all: serve index.html for any non-API route
-        expressApp.get('*', (req, res) => {
+        expressApp.get('/{*path}', (req, res) => {
           // Don't catch API routes
           if (req.path.startsWith('/api')) {
             res.status(404).json({ error: 'API endpoint not found' });

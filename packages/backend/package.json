@@ -27,9 +27,13 @@
     "@ai-sdk/mistral": "^3.0.13",
     "@ai-sdk/openai": "^3.0.9",
     "@quiqr/types": "*",
+    "7zip-bin": "^5.2.0",
+    "adm-zip": "^0.5.16",
     "ai": "^6.0.33",
+    "chokidar": "^5.0.0",
     "cors": "^2.x.x",
-    "express": "^4.x.x",
+    "deepmerge": "^4.3.1",
+    "express": "^5.x.x",
     "front-matter": "^4.x.x",
     "fs-extra": "^11.x.x",
     "glob": "13.0.0",
@@ -37,14 +41,15 @@
     "js-yaml": "^4.x.x",
     "sharp": "^0.34.5",
     "toml": "^3.x.x",
+    "tomlify-j0.4": "3.0.0",
     "zod": "^3.x.x"
   },
   "devDependencies": {
     "@types/cors": "^2.x.x",
-    "@types/express": "^4.x.x",
+    "@types/express": "^5.x.x",
     "@types/fs-extra": "^11.x.x",
     "@types/js-yaml": "^4.x.x",
-    "@types/node": "^20.x.x",
+    "@types/node": "^24",
     "typescript": "^5.x.x"
   }
 }

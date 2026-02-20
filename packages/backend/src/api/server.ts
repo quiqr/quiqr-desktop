@@ -69,6 +69,11 @@ export function createServer(
       const { method } = req.params;
       const { data } = req.body;
 
+      if (typeof method !== 'string') {
+        res.status(400).json({ error: 'Invalid parameters' });
+        return;
+      }
+
       // Get the handler for this method
       const handler = getHandler(apiHandlers, method);
 
@@ -90,6 +95,11 @@ export function createServer(
     '/api/ssg/download/:ssgType/:version',
     async (req: Request, res: Response) => {
       const { ssgType, version } = req.params;
+
+      if (typeof ssgType !== 'string' || typeof version !== 'string') {
+        res.status(400).json({ error: 'Invalid parameters' });
+        return;
+      }
 
       // Set SSE headers
       res.setHeader('Content-Type', 'text/event-stream');
