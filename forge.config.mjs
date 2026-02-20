@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
+import { execSync } from 'child_process';
 import fs from 'fs-extra';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
@@ -103,6 +104,56 @@ export default {
             console.warn('  Warning: frontend/build does not exist');
           }
 
+          // Prune non-production packages from node_modules.
+          //
+          // Why we can't use packagerConfig.prune = true:
+          //   Forge's built-in prune runs BEFORE afterCopy. At that point
+          //   @quiqr/* are still workspace symlinks, not listed in root
+          //   `dependencies`, so npm prune deletes them.
+          //
+          // Strategy: now that workspace symlinks are resolved, patch the
+          // build's package.json to list @quiqr/* as regular deps, then
+          // run npm prune --production ourselves. This collapses deps from
+          // all workspace packages into one dep tree so npm prune can walk
+          // the full graph and remove devDeps, build tools, frontend-only
+          // packages (already bundled by Vite), etc.
+          console.log('Pruning non-production packages...');
+
+          const buildPkgPath = join(buildPath, 'package.json');
+          const buildPkg = JSON.parse(fs.readFileSync(buildPkgPath, 'utf8'));
+
+          // Merge runtime deps from all workspace packages
+          const runtimeDeps = { ...buildPkg.dependencies };
+          for (const ws of workspacePackages) {
+            const wsPkgPath = join(buildPath, 'node_modules', ws.name, 'package.json');
+            if (fs.existsSync(wsPkgPath)) {
+              const wsPkg = JSON.parse(fs.readFileSync(wsPkgPath, 'utf8'));
+              Object.assign(runtimeDeps, wsPkg.dependencies || {});
+            }
+          }
+
+          // Register workspace packages as regular deps so npm prune keeps them
+          for (const ws of workspacePackages) {
+            runtimeDeps[ws.name] = '*';
+          }
+
+          // Write a trimmed package.json: no workspaces, no devDependencies.
+          // Preserve fields that electron-packager needs (main, author, description).
+          fs.writeFileSync(buildPkgPath, JSON.stringify({
+            name: buildPkg.name,
+            version: buildPkg.version,
+            main: buildPkg.main,
+            author: buildPkg.author,
+            description: buildPkg.description,
+            dependencies: runtimeDeps,
+          }, null, 2));
+
+          execSync('npm prune --production --no-package-lock', {
+            cwd: buildPath,
+            stdio: 'inherit',
+          });
+          console.log('  Prune complete.');
+
           callback();
         } catch (error) {
           callback(error);
@@ -131,6 +182,7 @@ export default {
       /^\/dist($|\/)/,
       /^\/scripts($|\/)/,
       /^\/openspec($|\/)/,
+      /^\/packages\/docs($|\/)/,
       // Ignore source files, only keep dist
       /^\/packages\/.*\/src($|\/)/,
       /^\/packages\/.*\/node_modules($|\/)/,
