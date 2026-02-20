@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm outdated:*)",
+      "Bash(node -e:*)",
+      "Bash(git stash:*)",
+      "Read(//home/bjz/.npm/_logs/**)"
+    ]
+  }
+}
