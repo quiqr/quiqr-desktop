@@ -219,7 +219,7 @@ For significant changes, we use OpenSpec:
 2. Get feedback from maintainers
 3. Implement according to the approved design
 
-See `openspec/AGENTS.md` for details.
+See `openspec/config.yaml` for project context and `openspec/specs/` for detailed requirements.
 
 ## Code Review
 
