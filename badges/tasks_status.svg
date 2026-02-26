@@ -1,0 +1,20 @@
+<svg width="169.6" height="20" viewBox="0 0 1696 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="OpenSpec: 78/272 tasks">
+  <title>OpenSpec: 78/272 tasks</title>
+  <linearGradient id="PfzMK" x2="0" y2="100%">
+    <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <mask id="tQpBL"><rect width="1696" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#tQpBL)">
+    <rect width="869" height="200" fill="#555"/>
+    <rect width="827" height="200" fill="#F73" x="869"/>
+    <rect width="1696" height="200" fill="url(#PfzMK)"/>
+  </g>
+  <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
+    <text x="270" y="148" textLength="559" fill="#000" opacity="0.25">OpenSpec</text>
+    <text x="260" y="138" textLength="559">OpenSpec</text>
+    <text x="924" y="148" textLength="727" fill="#000" opacity="0.25">78/272 tasks</text>
+    <text x="914" y="138" textLength="727">78/272 tasks</text>
+  </g>
+  <image x="40" y="35" width="180" height="130" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxMjAgMTQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik00MCAwQzUzLjIgMCA2Ni40IDAgODAgMEM4MCA2LjYgODAgMTMuMiA4MCAyMEM2Ni44IDIwIDUzLjYgMjAgNDAgMjBDNDAgMTMuNCA0MCA2LjggNDAgMFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMjAgMjBDMjYuNiAyMCAzMy4yIDIwIDQwIDIwQzQwIDI2LjYgNDAgMzMuMiA0MCA0MEMzMy40IDQwIDI2LjggNDAgMjAgNDBDMjAgMzMuNCAyMCAyNi44IDIwIDIwWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik04MCAyMEM4Ni42IDIwIDkzLjIgMjAgMTAwIDIwQzEwMCAyNi42IDEwMCAzMy4yIDEwMCA0MEM5My40IDQwIDg2LjggNDAgODAgNDBDODAgMzMuNCA4MCAyNi44IDgwIDIwWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0wIDQwQzYuNiA0MCAxMy4yIDQwIDIwIDQwQzIwIDU5LjggMjAgNzkuNiAyMCAxMDBDMTMuNCAxMDAgNi44IDEwMCAwIDEwMEMwIDgwLjIgMCA2MC40IDAgNDBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTQwIDQwQzUzLjIgNDAgNjYuNCA0MCA4MCA0MEM4MCA1OS44IDgwIDc5LjYgODAgMTAwQzY2LjggMTAwIDUzLjYgMTAwIDQwIDEwMEM0MCA4MC4yIDQwIDYwLjQgNDAgNDBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTEwMCA0MEMxMDYuNiA0MCAxMTMuMiA0MCAxMjAgNDBDMTIwIDU5LjggMTIwIDc5LjYgMTIwIDEwMEMxMTMuNCAxMDAgMTA2LjggMTAwIDEwMCAxMDBDMTAwIDgwLjIgMTAwIDYwLjQgMTAwIDQwWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMCAxMDBDMjYuNiAxMDAgMzMuMiAxMDAgNDAgMTAwQzQwIDEwNi42IDQwIDExMy4yIDQwIDEyMEMzMy40IDEyMCAyNi44IDEyMCAyMCAxMjBDMjAgMTEzLjQgMjAgMTA2LjggMjAgMTAwWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik04MCAxMDBDODYuNiAxMDAgOTMuMiAxMDAgMTAwIDEwMEMxMDAgMTA2LjYgMTAwIDExMy4yIDEwMCAxMjBDOTMuNCAxMjAgODYuOCAxMjAgODAgMTIwQzgwIDExMy40IDgwIDEwNi44IDgwIDEwMFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDAgMTIwQzUzLjIgMTIwIDY2LjQgMTIwIDgwIDEyMEM4MCAxMjYuNiA4MCAxMzMuMiA4MCAxNDBDNjYuOCAxNDAgNTMuNiAxNDAgNDAgMTQwQzQwIDEzMy40IDQwIDEyNi44IDQwIDEyMFoiIGZpbGw9IiNmZmYiLz48L3N2Zz4="/>
+</svg>
