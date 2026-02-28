@@ -1,6 +1,12 @@
 # Quiqr App CHANGELOG
 
 ## Next Release
+- TBD
+
+## 0.22.4 (2026-02-28)
+- fix: load embgit from asar and apply same path fix for macOS
+- fix: restore legacy nest field behaviour in accordions
+
 ## 0.22.3 (2026-02-26)
 - chore: remove unused release script
 
