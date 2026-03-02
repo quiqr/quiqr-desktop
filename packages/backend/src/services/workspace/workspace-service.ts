@@ -581,7 +581,11 @@ export class WorkspaceService {
 
       const files = await glob(globExpression, {});
       const retFiles = files.map(function (item) {
-        const key = item.replace(folder, '').replace(/^\//, '');
+        // Use path.posix.relative: both `item` (from glob) and `folder` are
+        // already normalised to forward slashes, so posix relative gives a
+        // reliable cross-platform relative key even when the drive-letter case
+        // differs on Windows (which would silently break a string .replace()).
+        const key = path.posix.relative(folder, item);
         const label = key.replace(/^\/?(.+)\/[^/]+$/, '$1');
 
         let sortval: string | null = null;
@@ -613,7 +617,7 @@ export class WorkspaceService {
 
       const files = await glob(globExpression, {});
       return files.map(function (item) {
-        const key = item.replace(folder, '');
+        const key = path.posix.relative(folder, item);
         const label = key;
         const sortval = key; // Default sortval to key for data folders
         return { key, label, sortval };
