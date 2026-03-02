@@ -1,6 +1,8 @@
 # Quiqr App CHANGELOG
 
 ## Next Release
+
+## 0.22.5 (2026-03-02)
 - chore: new release script
 
 ## 0.22.4 (2026-02-26)
