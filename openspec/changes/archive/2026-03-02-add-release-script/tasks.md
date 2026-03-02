@@ -47,4 +47,4 @@
 - [x] 9.2 Verify error handling when CHANGELOG has no content under Next Release
 - [x] 9.3 Verify error handling when git working directory is dirty
 - [x] 9.4 Verify error handling when `gh` is not authenticated
-- [ ] 9.5 Test actual release on a test branch (optional)
+- [x] 9.5 Test actual release on a test branch (optional)

@@ -25,62 +25,88 @@ Major versions (v0.X.0) will each have their own documentation website. This all
 
 Currently, we remain on the 0.x.x series until the project reaches sufficient maturity for a 1.0.0 release.
 
+## Release Script
+
+The release process is automated via `npm run release`. The script handles:
+
+- Validating CHANGELOG.md has content under "## Next Release"
+- Verifying the git working directory is clean
+- Interactive version selection (patch/minor/major)
+- Updating CHANGELOG.md with version header and date
+- Updating package.json and package-lock.json versions
+- Creating git commit and tag
+- Pushing to remote
+- Creating GitHub release with release notes
+
+### Usage
+
+```bash
+# Run the release script
+npm run release
+
+# Preview what would happen (no changes made)
+npm run release -- --dry-run
+```
+
+### Prerequisites
+
+- `gh` CLI must be installed and authenticated (`gh auth login`)
+- Working directory must be clean (no uncommitted changes)
+- CHANGELOG.md must have content under "## Next Release"
+
 ## Release Runbook
 
-Follow these steps when preparing a release:
+### 1. Pre-Release Validation
 
-### Pre-Release Validation
+Before releasing, verify the build succeeds:
 
-1. **Verify build succeeds**
-   ```bash
-   npm run build
-   ```
-   Ensure the build completes without warnings or errors.
+```bash
+npm run build
+```
 
-### Update CHANGELOG
+Ensure the build completes without warnings or errors.
 
-2. **Update CHANGELOG.md**
-   - Set the new version number
-   - Set the release date
-   - List all changes since the last release
-   - If this is a public release, add statistics:
-     - New GitHub stars
-     - NPM costs/downloads
-     - New community templates
+### 2. Update CHANGELOG
 
-### Update Version Numbers
+Add your changes under the `## Next Release` section in CHANGELOG.md:
 
-3. **Update package.json**
-   - Update the `version` field in `/package.json` to the new version number
+```markdown
+## Next Release
+- feature: description of new feature
+- fix: description of bug fix
+- chore: description of maintenance task
+```
 
-### Create Release Commit and Tag
+For major public releases, consider adding statistics:
+- New GitHub stars
+- NPM costs/downloads
+- New community templates
 
-4. **Commit changes**
-   ```bash
-   git add package.json CHANGELOG.md
-   git commit -m "release: prepare v[version]"
-   ```
+### 3. Run the Release Script
 
-5. **Create Git tag**
-   ```bash
-   git tag v[version]
-   ```
+```bash
+npm run release
+```
 
-6. **Push tag to remote**
-   ```bash
-   git push --tags
-   ```
+The script will:
+1. Validate prerequisites
+2. Prompt for version bump type (patch/minor/major)
+3. Update all version files
+4. Create commit with message "Release X.Y.Z"
+5. Create git tag vX.Y.Z
+6. Push commits and tags
+7. Prompt for pre-release status and title
+8. Create GitHub release
 
-### Post-Release
+### 4. Post-Release
 
-After pushing the tag, the GitHub Actions workflow will automatically:
+After the release script completes, GitHub Actions will automatically:
 - Build installers for all platforms
-- Create a GitHub release
-- Attach installers to the release
+- Attach installers to the GitHub release
 - Deploy documentation to GitHub Pages at `https://quiqr.github.io/quiqr-desktop/docs/`
 - Deploy OpenSpec UI to GitHub Pages at `https://quiqr.github.io/quiqr-desktop/specs/`
 
-### Documentation Updates
+### Documentation Updates (Major Releases)
 
 For major releases (v0.X.0):
 - Ensure all documentation is up to date in `/packages/docs/`
@@ -90,9 +116,9 @@ For major releases (v0.X.0):
 
 ## Best Practices
 
-- **Test before release**: Always run the full build and test locally before tagging
-- **CHANGELOG first**: Update the CHANGELOG before committing the version bump
-- **Consistent format**: Use the `release: prepare v[version]` commit message format
+- **Test before release**: Always run the full build and test locally before releasing
+- **CHANGELOG first**: Add your changes to CHANGELOG.md before running the release script
+- **Use dry-run**: Preview the release with `npm run release -- --dry-run` before committing
 - **Coordinate major releases**: Major version updates should be coordinated with documentation updates and press releases
 
 ## Known Issues
