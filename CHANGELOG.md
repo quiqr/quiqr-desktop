@@ -1,6 +1,11 @@
 # Quiqr App CHANGELOG
 
 ## Next Release
+- chore: new release script
+
+## 0.22.4 (2026-02-26)
+- fix: #650
+
 ## 0.22.3 (2026-02-26)
 - chore: remove unused release script
 

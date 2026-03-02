@@ -11,7 +11,7 @@
     "url": "https://github.com/quiqr/quiqr-desktop.git"
   },
   "description": "Local-first CMS for static files and engines like Quarto or Hugo SSG",
-  "version": "0.22.3",
+  "version": "0.22.4",
   "main": "packages/adapters/electron/dist/main.js",
   "scripts": {
     "clean": "rm -rf node_modules dist build packages/frontend/node_modules packages/frontend/dist packages/frontend/build packages/types/node_modules packages/types/dist packages/types/build packages/backend/node_modules packages/backend/dist packages/backend/build packages/adapters/electron/node_modules packages/adapters/electron/dist packages/adapters/electron/build packages/adapters/standalone/node_modules packages/adapters/standalone/dist packages/adapters/standalone/build packages/types/tsconfig.tsbuildinfo packages/backend/tsconfig.tsbuildinfo packages/frontend/tsconfig.tsbuildinfo packages/adapters/electron/tsconfig.tsbuildinfo packages/adapters/standalone/tsconfig.tsbuildinfo",
@@ -32,6 +32,7 @@
     "_build_info": "node scripts/build_info.js",
     "_hugo_versions": "node scripts/getHugoVersions.js",
     "scaffold:field": "node scripts/scaffold-field.js",
+    "release": "node scripts/release.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -67,6 +68,7 @@
     "@electron/fuses": "^1.8.0",
     "@electron/notarize": "^3.1.1",
     "@eslint/js": "^10.0.1",
+    "@inquirer/prompts": "^6.0.1",
     "@reforged/maker-appimage": "^5.2.0",
     "@testing-library/dom": "^10.4.1",
     "@types/adm-zip": "^0.5.7",
@@ -78,6 +80,7 @@
     "eslint": "^10.0.0",
     "globals": "^17.0.0",
     "jsdom": "^28.1.0",
+    "semver": "^7.7.4",
     "typescript-eslint": "^8.56.0",
     "vitest": "^4.0.15",
     "wait-on": "^8.0.4"
