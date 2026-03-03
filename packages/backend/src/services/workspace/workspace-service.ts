@@ -585,7 +585,10 @@ export class WorkspaceService {
         // already normalised to forward slashes, so posix relative gives a
         // reliable cross-platform relative key even when the drive-letter case
         // differs on Windows (which would silently break a string .replace()).
-        const key = path.posix.relative(folder, item);
+        // On Windows, normalize drive letters to lowercase for case-insensitive comparison
+        const normalizedFolder = folder.replace(/^[A-Z]:/, (m) => m.toLowerCase());
+        const normalizedItem = item.replace(/^[A-Z]:/, (m) => m.toLowerCase());
+        const key = path.posix.relative(normalizedFolder, normalizedItem);
         const label = key.replace(/^\/?(.+)\/[^/]+$/, '$1');
 
         let sortval: string | null = null;
@@ -617,7 +620,10 @@ export class WorkspaceService {
 
       const files = await glob(globExpression, {});
       return files.map(function (item) {
-        const key = path.posix.relative(folder, item);
+        // On Windows, normalize drive letters to lowercase for case-insensitive comparison
+        const normalizedFolder = folder.replace(/^[A-Z]:/, (m) => m.toLowerCase());
+        const normalizedItem = item.replace(/^[A-Z]:/, (m) => m.toLowerCase());
+        const key = path.posix.relative(normalizedFolder, normalizedItem);
         const label = key;
         const sortval = key; // Default sortval to key for data folders
         return { key, label, sortval };
