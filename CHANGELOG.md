@@ -3,6 +3,7 @@
 ## Next Release
 
 - fix: broken collection paths on windows in #646
+- fix: additional path normalization for windows #655
 
 ## 0.22.5 (2026-03-02)
 - chore: new release script
