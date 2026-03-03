@@ -1,6 +1,8 @@
 # Quiqr App CHANGELOG
 
 ## Next Release
+
+## 0.22.6 (2026-03-03)
 - fix: broken collection paths on windows in #646
 
 ## 0.22.5 (2026-03-02)
