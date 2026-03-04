@@ -7,7 +7,6 @@
 
 import path from 'path';
 import fs from 'fs-extra';
-import { path7za } from '7zip-bin';
 import type { AppInfoAdapter } from '../adapters/types.js';
 
 export interface PathHelperConfig {
@@ -263,24 +262,6 @@ export class PathHelper {
     } else {
       return path.join(this.getRoot(), 'sites', siteKey, 'config.json');
     }
-  }
-
-  /**
-   * Get the 7-Zip binary path
-   * When packaged, the binary is in app.asar.unpacked instead of app.asar
-   */
-  get7zaBin(): string {
-    if (process.env.P7ZIP_PATH) {
-      return process.env.P7ZIP_PATH;
-    }
-
-    // When running in a packaged Electron app, the 7za binary is extracted
-    // to app.asar.unpacked but path7za still points to app.asar
-    if (this.appInfo.isPackaged() && path7za.includes('app.asar')) {
-      return path7za.replace('app.asar', 'app.asar.unpacked');
-    }
-
-    return path7za;
   }
 
   /**
