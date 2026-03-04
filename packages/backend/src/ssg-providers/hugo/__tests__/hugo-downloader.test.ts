@@ -9,17 +9,22 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { HugoDownloader, OfficialHugoSourceUrlBuilder, OfficialHugoUnpacker } from '../hugo-downloader.js';
 import { createMockSSGProviderDependencies } from '../../../../test/mocks/ssg-dependencies.js';
 import fs from 'fs-extra';
-import * as childProcess from 'child_process';
-import { globSync } from 'glob';
 
 // Mock fs-extra
 vi.mock('fs-extra');
 
-// Mock child_process for unpacker tests
-vi.mock('child_process');
+// Mock tar for unpacker tests
+vi.mock('tar', () => ({
+  extract: vi.fn().mockResolvedValue(undefined),
+}));
 
-// Mock glob for unpacker tests
-vi.mock('glob');
+// Mock adm-zip for unpacker tests
+vi.mock('adm-zip', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    getEntries: vi.fn().mockReturnValue([]),
+    extractEntryTo: vi.fn().mockReturnValue(true),
+  })),
+}));
 
 // Mock global fetch for download tests
 const mockFetch = vi.fn();
@@ -42,7 +47,6 @@ describe('HugoDownloader', () => {
     // Setup pathHelper mocks
     mockDeps.pathHelper.getSSGBinForVer = vi.fn((ssgType: string, version: string) => `/mock/${ssgType}-${version}/${ssgType}`);
     mockDeps.pathHelper.getSSGBinDirForVer = vi.fn((ssgType: string, version: string) => `/mock/${ssgType}-${version}`);
-    mockDeps.pathHelper.get7zaBin = vi.fn(() => '/mock/7za');
 
     // Setup fs-extra mocks
     // Note: Don't set a default for existsSync - let tests configure it as needed
@@ -59,26 +63,6 @@ describe('HugoDownloader', () => {
         return this;
       }),
     } as any);
-
-    // Setup glob mocks - return a tar file path for the unpacker
-    vi.mocked(globSync).mockReturnValue(['/mock/hugo-0.120.0/download']);
-
-    // Setup child_process mocks
-    // Note: The implementation uses promisify(execFile), so we need to mock it to work with both
-    // callback style and promise style
-    vi.mocked(childProcess.execFile).mockImplementation((...args: any[]) => {
-      // Find the callback (last function argument)
-      const callback = args.find((arg: any) => typeof arg === 'function');
-      if (callback) {
-        // Callback style
-        setTimeout(() => callback(null, { stdout: '', stderr: '' }), 0);
-      }
-      // Return a ChildProcess-like object that promisify can work with
-      return {
-        on: vi.fn(),
-        removeListener: vi.fn(),
-      } as any;
-    });
 
     downloader = new HugoDownloader({
       pathHelper: mockDeps.pathHelper,
@@ -454,7 +438,7 @@ describe('HugoDownloader', () => {
     let unpacker: OfficialHugoUnpacker;
 
     beforeEach(() => {
-      unpacker = new OfficialHugoUnpacker(mockDeps.pathHelper);
+      unpacker = new OfficialHugoUnpacker();
     });
 
     it('throws error for unsupported platform', async () => {

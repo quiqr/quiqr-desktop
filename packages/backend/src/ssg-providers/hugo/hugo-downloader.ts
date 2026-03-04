@@ -5,15 +5,12 @@
  * Uses async generators for streaming progress updates via SSE.
  */
 
-import { execFile } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs-extra';
 import path from 'path';
-import { globSync } from 'glob';
+import { extract } from 'tar';
+import AdmZip from 'adm-zip';
 import type { PathHelper, EnvironmentInfo } from '../../utils/path-helper.js';
 import type { OutputConsole } from '../../adapters/types.js';
-
-const execFileAsync = promisify(execFile);
 
 // ============================================================================
 // Types
@@ -99,51 +96,42 @@ export class OfficialHugoSourceUrlBuilder {
 }
 
 /**
- * Unpacks downloaded Hugo archives using 7za
+ * Unpacks downloaded Hugo archives using node-tar (Linux/macOS) and adm-zip (Windows)
  */
 export class OfficialHugoUnpacker {
-  constructor(private pathHelper: PathHelper) {}
-
   /**
    * Unpack a Hugo archive for Linux/macOS (tar.gz format)
-   * Two-step extraction: tar.gz -> tar -> hugo binary
    */
   private async unpackLinux(packagePath: string): Promise<void> {
     packagePath = path.normalize(packagePath);
     const output = path.dirname(packagePath);
-    const sevenZaBin = this.pathHelper.get7zaBin();
 
-    // Step 1: Extract tar.gz to tar
-    await execFileAsync(sevenZaBin, ['e', packagePath, '-o' + output, '*', '-r', '-y']);
+    await extract({
+      file: packagePath,
+      cwd: output,
+      filter: (filePath: string) => {
+        const basename = path.basename(filePath);
+        return basename === 'hugo' || basename.startsWith('hugo.');
+      },
+    });
 
-    // Step 2: Find the tar file
-    const globExpression = packagePath.replace('download.partial', 'download');
-    const matches = globSync(globExpression);
-
-    if (matches.length !== 1) {
-      throw new Error(`Expecting one "tar" file, found ${matches.length}.`);
-    }
-
-    const tarFile = matches[0];
-
-    // Step 3: Extract hugo binary from tar
-    await execFileAsync(sevenZaBin, ['e', tarFile, '-o' + output, 'hugo*', '-r', '-y']);
-
-    // Step 4: Set execute permission
-    const hugoBinary = packagePath.replace('download.partial', 'hugo');
+    const hugoBinary = path.join(output, 'hugo');
     await fs.chmod(hugoBinary, 0o722);
   }
 
   /**
    * Unpack a Hugo archive for Windows (zip format)
-   * Direct extraction of exe files
    */
   private async unpackWindows(packagePath: string): Promise<void> {
     packagePath = path.normalize(packagePath);
     const output = path.dirname(packagePath);
-    const sevenZaBin = this.pathHelper.get7zaBin();
 
-    await execFileAsync(sevenZaBin, ['e', packagePath, '-o' + output, '*.exe', '-r', '-y']);
+    const zip = new AdmZip(packagePath);
+    for (const entry of zip.getEntries()) {
+      if (!entry.isDirectory && entry.name.endsWith('.exe')) {
+        zip.extractEntryTo(entry, output, false, true);
+      }
+    }
   }
 
   /**
@@ -181,7 +169,7 @@ export class HugoDownloader {
     this.outputConsole = dependencies.outputConsole;
     this.environmentInfo = dependencies.environmentInfo;
     this.urlBuilder = new OfficialHugoSourceUrlBuilder();
-    this.unpacker = new OfficialHugoUnpacker(this.pathHelper);
+    this.unpacker = new OfficialHugoUnpacker();
   }
 
   /**

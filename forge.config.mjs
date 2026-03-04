@@ -167,7 +167,7 @@ export default {
 
     // Unpack these from asar for filesystem access
     asar: {
-      unpack: '{node_modules/@quiqr/**/*,node_modules/7zip-bin/**/*,node_modules/sharp/**/*}',
+      unpack: '{node_modules/@quiqr/**/*,node_modules/sharp/**/*}',
     },
 
     // Ignore patterns - exclude dev/build artifacts but include workspace packages
