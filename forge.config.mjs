@@ -163,6 +163,7 @@ export default {
     extraResource: [
       join('resources', getPlatformResourceDir()),
       join('resources', 'all'),
+      'THIRD-PARTY-NOTICES.md',
     ],
 
     // Unpack these from asar for filesystem access
