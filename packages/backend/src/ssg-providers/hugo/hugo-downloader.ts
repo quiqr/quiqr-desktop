@@ -43,8 +43,8 @@ export class OfficialHugoSourceUrlBuilder {
    */
   build(environment: HugoEnvironment, version: string): string {
     // Strip leading 'v' if present
-    version = version.replace(/^v/i, '');
-    const versionMain = parseInt(version.split('.')[1], 10);
+    const normalizedVersion = version.replace(/^v/i, '');
+    const versionMain = parseInt(normalizedVersion.split('.')[1], 10);
 
     // Determine architecture string
     let arch: string;
@@ -90,8 +90,8 @@ export class OfficialHugoSourceUrlBuilder {
     }
 
     // Build URL - note: extended_ prefix is part of version string, not URL path
-    const cleanVersion = version.replace('extended_', '');
-    return `https://github.com/gohugoio/hugo/releases/download/v${cleanVersion}/hugo_${version}_${platform}-${arch}.${format}`;
+    const cleanVersion = normalizedVersion.replace('extended_', '');
+    return `https://github.com/gohugoio/hugo/releases/download/v${cleanVersion}/hugo_${normalizedVersion}_${platform}-${arch}.${format}`;
   }
 }
 
@@ -103,11 +103,11 @@ export class OfficialHugoUnpacker {
    * Unpack a Hugo archive for Linux/macOS (tar.gz format)
    */
   private async unpackLinux(packagePath: string): Promise<void> {
-    packagePath = path.normalize(packagePath);
-    const output = path.dirname(packagePath);
+    const normalizedPath = path.normalize(packagePath);
+    const output = path.dirname(normalizedPath);
 
     await extract({
-      file: packagePath,
+      file: normalizedPath,
       cwd: output,
       filter: (filePath: string) => {
         const basename = path.basename(filePath);
@@ -123,10 +123,10 @@ export class OfficialHugoUnpacker {
    * Unpack a Hugo archive for Windows (zip format)
    */
   private async unpackWindows(packagePath: string): Promise<void> {
-    packagePath = path.normalize(packagePath);
-    const output = path.dirname(packagePath);
+    const normalizedPath = path.normalize(packagePath);
+    const output = path.dirname(normalizedPath);
 
-    const zip = new AdmZip(packagePath);
+    const zip = new AdmZip(normalizedPath);
     for (const entry of zip.getEntries()) {
       if (!entry.isDirectory && entry.name.endsWith('.exe')) {
         zip.extractEntryTo(entry, output, false, true);
