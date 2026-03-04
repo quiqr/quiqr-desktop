@@ -2,6 +2,8 @@
 
 ## Next Release
 
+- refactor/fix: replace old zip binaries with `node-tar` to fix hugo downloads not extracting
+
 ## 0.22.6 (2026-03-03)
 
 - fix: broken collection paths on windows in #646
