@@ -5,13 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: './', // Use relative paths for Electron file:// protocol
   plugins: [
-    react({
-      babel: {
-        plugins: [
-          ['@babel/plugin-transform-flow-strip-types']
-        ]
-      }
-    })
+    react(),
   ],
   server: {
     port: 4002,
