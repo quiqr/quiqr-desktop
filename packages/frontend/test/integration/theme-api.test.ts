@@ -43,7 +43,7 @@ describe('Theme API Integration', () => {
 
       // Setup handler to capture the request
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', async ({ request }) => {
+        http.post('/api/saveConfPrefKey', async ({ request }) => {
           requestBody = await request.json();
           return HttpResponse.json(true);
         })
@@ -63,7 +63,7 @@ describe('Theme API Integration', () => {
 
     it('successfully saves light theme preference', async () => {
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', () => {
+        http.post('/api/saveConfPrefKey', () => {
           return HttpResponse.json(true);
         })
       );
@@ -74,7 +74,7 @@ describe('Theme API Integration', () => {
 
     it('successfully saves dark theme preference', async () => {
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', () => {
+        http.post('/api/saveConfPrefKey', () => {
           return HttpResponse.json(true);
         })
       );
@@ -86,7 +86,7 @@ describe('Theme API Integration', () => {
     it('handles network errors when saving theme preference', async () => {
       // Temporarily remove the handler to simulate network error
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', () => {
+        http.post('/api/saveConfPrefKey', () => {
           return new HttpResponse(null, { status: 503 });
         })
       );
@@ -99,7 +99,7 @@ describe('Theme API Integration', () => {
 
     it('handles server errors (500) when saving theme preference', async () => {
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', () => {
+        http.post('/api/saveConfPrefKey', () => {
           return HttpResponse.json(
             false,
             { status: 500 }
@@ -117,7 +117,7 @@ describe('Theme API Integration', () => {
       let requestUrl = '';
 
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', ({ request }) => {
+        http.post('/api/saveConfPrefKey', ({ request }) => {
           requestUrl = request.url;
           return HttpResponse.json(true);
         })
@@ -125,7 +125,7 @@ describe('Theme API Integration', () => {
 
       await service.api.saveConfPrefKey('interfaceStyle', 'quiqr10-dark');
 
-      expect(requestUrl).toBe('http://localhost:5150/api/saveConfPrefKey');
+      expect(requestUrl).toContain('/api/saveConfPrefKey');
     });
   });
 
@@ -145,7 +145,7 @@ describe('Theme API Integration', () => {
       };
 
       server.use(
-        http.post('http://localhost:5150/api/readConfKey', () => {
+        http.post('/api/readConfKey', () => {
           return HttpResponse.json(mockPreferences);
         })
       );
@@ -161,7 +161,7 @@ describe('Theme API Integration', () => {
     it('completes full workflow: read current preference, change theme, save new preference', async () => {
       // Step 1: Read current preference
       server.use(
-        http.post('http://localhost:5150/api/readConfKey', () => {
+        http.post('/api/readConfKey', () => {
           return HttpResponse.json({
             interfaceStyle: 'quiqr10-light',
             dataFolder: '~/Quiqr',
@@ -181,7 +181,7 @@ describe('Theme API Integration', () => {
       let savedValue: string | null = null;
 
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', async ({ request }) => {
+        http.post('/api/saveConfPrefKey', async ({ request }) => {
           const body = await request.json();
           const parsed = saveConfPrefKeyRequestSchema.parse(body);
           if (parsed.data.prefKey === 'interfaceStyle') {
@@ -200,7 +200,7 @@ describe('Theme API Integration', () => {
       const savedValues: string[] = [];
 
       server.use(
-        http.post('http://localhost:5150/api/saveConfPrefKey', async ({ request }) => {
+        http.post('/api/saveConfPrefKey', async ({ request }) => {
           const body = await request.json();
           const parsed = saveConfPrefKeyRequestSchema.parse(body);
           if (parsed.data.prefKey === 'interfaceStyle') {

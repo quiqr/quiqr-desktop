@@ -6,6 +6,7 @@
  */
 
 import express, { type Express, type Request, type Response } from 'express';
+import path from 'path';
 import cors from 'cors';
 import type { AppContainer } from '../config/container.js';
 import { createApiHandlers, getHandler } from './router.js';
@@ -21,9 +22,16 @@ export interface ServerOptions {
   port?: number;
 
   /**
-   * Enable CORS (default: true)
+   * Enable CORS. Defaults to true when frontendPath is not set,
+   * false when frontendPath is set (same-origin, CORS not needed).
    */
   cors?: boolean;
+
+  /**
+   * Path to the frontend build directory. When set, the server
+   * serves static files and provides SPA catch-all routing.
+   */
+  frontendPath?: string;
 }
 
 /**
@@ -34,7 +42,8 @@ export function createServer(
   options: ServerOptions = {}
 ): Express {
   const app = express();
-  const { cors: enableCors = true } = options;
+  const { frontendPath } = options;
+  const enableCors = options.cors ?? !frontendPath;
 
   // Middleware
   if (enableCors) {
@@ -55,12 +64,15 @@ export function createServer(
    */
   const apiHandlers = createApiHandlers(container);
 
-  // this does not work well when express also serves frontend
-  /*
-  app.get("/", (req, res) => {
-    res.send("Hello from Quiqr API Server!");
-  });
-  */
+  /** Set standard SSE headers, including CORS when enabled */
+  function setSseHeaders(res: Response) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    if (enableCors) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+  }
 
   // API route - handles all POST /api/:method requests
   app.post(
@@ -101,11 +113,7 @@ export function createServer(
         return;
       }
 
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      setSseHeaders(res);
 
       // Track if connection was closed by client
       let connectionClosed = false;
@@ -172,11 +180,7 @@ export function createServer(
     (req: Request, res: Response) => {
       const { siteKey, workspaceKey } = req.params;
 
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      setSseHeaders(res);
 
       let connectionClosed = false;
 
@@ -205,11 +209,7 @@ export function createServer(
     async (req: Request, res: Response) => {
       const { siteKey, publishConf } = req.body;
 
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      setSseHeaders(res);
 
       try {
         // Create progress callback that writes to SSE stream
@@ -241,11 +241,7 @@ export function createServer(
     async (req: Request, res: Response) => {
       const { siteKey, publishConf } = req.body;
 
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      setSseHeaders(res);
 
       try {
         // Create progress callback that writes to SSE stream
@@ -276,11 +272,7 @@ export function createServer(
     async (req: Request, res: Response) => {
       const { siteKey, publishConf, action, actionParameters } = req.body;
 
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      setSseHeaders(res);
 
       try {
         // Create progress callback that writes to SSE stream
@@ -305,6 +297,20 @@ export function createServer(
     }
   );
 
+  // Serve frontend SPA build when frontendPath is configured
+  if (frontendPath) {
+    app.use(express.static(frontendPath));
+
+    // SPA catch-all: serve index.html for any non-API route
+    app.get('/{*path}', (req, res) => {
+      if (req.path.startsWith('/api')) {
+        res.status(404).json({ error: 'API endpoint not found' });
+        return;
+      }
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+  }
+
   // Error handling middleware (must be last)
   app.use(errorHandler);
 
@@ -327,6 +333,6 @@ export function startServer(
       port,
       url: `http://localhost:${port}`
     });
-    console.log(`API Server running on http://localhost:${port}`);
+    console.log(`Server running on http://localhost:${port}`);
   });
 }

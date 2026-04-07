@@ -1,5 +1,4 @@
-# Quiqr Desktop - Standalone Server
-# Proof of Concept Dockerfile
+# Quiqr Desktop - Standalone Server (API + Frontend)
 
 FROM node:22-alpine
 
@@ -10,6 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY packages/types/package*.json ./packages/types/
 COPY packages/backend/package*.json ./packages/backend/
+COPY packages/frontend/package*.json ./packages/frontend/
 COPY packages/adapters/standalone/package*.json ./packages/adapters/standalone/
 
 # Install dependencies (this will handle all workspaces)
@@ -19,22 +19,31 @@ RUN npm install
 COPY tsconfig.base.json ./
 COPY packages/types/ ./packages/types/
 COPY packages/backend/ ./packages/backend/
+COPY packages/frontend/ ./packages/frontend/
 COPY packages/adapters/standalone/ ./packages/adapters/standalone/
 
-# Copy resources folder (contains Hugo binaries, Git binaries, etc.)
+# Copy resources folder and scripts
 COPY resources/ ./resources/
+COPY scripts/ ./scripts/
 
-# Build only the packages we need (types, backend, standalone)
+# Download embgit binary for the container's platform
+RUN apk add --no-cache bash curl && \
+    bash ./scripts/embgit.sh -p && \
+    apk del bash curl
+
+# Build all packages (types, backend, frontend, standalone)
 RUN npm run build -w @quiqr/types && \
     npm run build -w @quiqr/backend && \
+    npm run build -w @quiqr/frontend && \
     npm run build -w @quiqr/adapter-standalone
 
-# Expose the backend API port
+# Expose the application port
 EXPOSE 5150
+EXPOSE 13131
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=5150
 
-# Start the standalone server
-CMD ["npm", "run", "start", "-w", "@quiqr/adapter-standalone"]
+# Start the standalone server (serves both API and frontend)
+CMD ["npm", "run", "start:backend:standalone"]

@@ -1,21 +1,26 @@
-version: '3.8'
-
 services:
-  quiqr-backend:
+  quiqr:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "5150:5150"
+      - "13131:13131" # Hugo live preview server
     environment:
       - NODE_ENV=production
       - PORT=5150
+      # Optional: override frontend build path inside the container
+      # - FRONTEND_PATH=/app/packages/frontend/build
     volumes:
-      # Mount a volume for persistent user data
-      - quiqr-data:/root/.quiqr-standalone
+      # Mount a volume for persistent user data (config, preferences)
+      - quiqr-conf:/root/.quiqr-standalone
+      # Mount a volume for persistent sites directory
+      - quiqr-sites:/root/Quiqr
     restart: unless-stopped
-    container_name: quiqr-standalone
+    container_name: quiqr
 
 volumes:
-  quiqr-data:
+  quiqr-conf:
+    driver: local
+  quiqr-sites:
     driver: local

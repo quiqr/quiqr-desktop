@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "dev:start": "node dist/main.js",
-    "start": "npm run build && npm run dev:start",
+    "dev:start": "NODE_ENV=development node dist/main.js",
+    "start": "npm run build && node dist/main.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

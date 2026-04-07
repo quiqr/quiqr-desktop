@@ -32,7 +32,7 @@ describe('API Client - Workspace Operations', () => {
     let receivedBody: ApiRequest | null = null;
 
     server.use(
-      http.post('http://localhost:5150/api/getConfigurations', async ({ request }) => {
+      http.post('/api/getConfigurations', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ sites: [], lastOpenedSite: null });
@@ -48,7 +48,7 @@ describe('API Client - Workspace Operations', () => {
     let receivedBody: ApiRequest | null = null;
 
     server.use(
-      http.post('http://localhost:5150/api/listWorkspaces', async ({ request }) => {
+      http.post('/api/listWorkspaces', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json([
@@ -67,7 +67,7 @@ describe('API Client - Workspace Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/mountWorkspace', async ({ request }) => {
+      http.post('/api/mountWorkspace', async ({ request }) => {
         requestUrl = request.url;
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
@@ -78,7 +78,7 @@ describe('API Client - Workspace Operations', () => {
 
     const result = await api.mountWorkspace('my-site', 'workspace1');
     
-    expect(requestUrl).toBe('http://localhost:5150/api/mountWorkspace');
+    expect(requestUrl).toContain('/api/mountWorkspace');
     expect(receivedBody).toEqual({ data: { siteKey: 'my-site', workspaceKey: 'workspace1' } });
     expect(result).toBe('workspace1');
   });
@@ -87,7 +87,7 @@ describe('API Client - Workspace Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/getWorkspaceDetails', async ({ request }) => {
+      http.post('/api/getWorkspaceDetails', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ 
@@ -111,7 +111,7 @@ describe('API Client - Workspace Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/serveWorkspace', async ({ request }) => {
+      http.post('/api/serveWorkspace', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json(undefined);
@@ -138,7 +138,7 @@ describe('API Client - Single Content Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/getSingle', async ({ request }) => {
+      http.post('/api/getSingle', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ title: 'My Single Page', content: 'Page content' });
@@ -160,7 +160,7 @@ describe('API Client - Single Content Operations', () => {
     const document = { title: 'Updated Title', content: 'Updated content' };
     
     server.use(
-      http.post('http://localhost:5150/api/updateSingle', async ({ request }) => {
+      http.post('/api/updateSingle', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json(document);
@@ -182,7 +182,7 @@ describe('API Client - Single Content Operations', () => {
     const document = { title: 'My Page', content: 'Content here' };
 
     server.use(
-      http.post('http://localhost:5150/api/saveSingle', async ({ request }) => {
+      http.post('/api/saveSingle', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ success: true });
@@ -203,7 +203,7 @@ describe('API Client - Single Content Operations', () => {
   // This test is commented out but the method signature is verified by TypeScript
   // it('should call openSingleInEditor method', async () => {
   //   server.use(
-  //     http.post('http://localhost:5150/api/openSingleInEditor', ({ request }) => {
+  //     http.post('/api/openSingleInEditor', ({ request }) => {
   //       return new HttpResponse(null, { status: 204 });
   //     })
   //   );
@@ -214,7 +214,7 @@ describe('API Client - Single Content Operations', () => {
     const endpoints: string[] = [];
     
     server.use(
-      http.post('http://localhost:5150/api/*', ({ request }) => {
+      http.post('/api/*', ({ request }) => {
         endpoints.push(new URL(request.url).pathname);
         return HttpResponse.json({});
       })
@@ -241,7 +241,7 @@ describe('API Client - Collection Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/listCollectionItems', async ({ request }) => {
+      http.post('/api/listCollectionItems', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json([
@@ -263,7 +263,7 @@ describe('API Client - Collection Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/getCollectionItem', async ({ request }) => {
+      http.post('/api/getCollectionItem', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ title: 'Blog Post', content: 'Post content' });
@@ -284,7 +284,7 @@ describe('API Client - Collection Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/createCollectionItemKey', async ({ request }) => {
+      http.post('/api/createCollectionItemKey', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ key: 'new-post', itemPath: '/content/blog/new-post.md' });
@@ -306,7 +306,7 @@ describe('API Client - Collection Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/deleteCollectionItem', async ({ request }) => {
+      http.post('/api/deleteCollectionItem', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ deleted: true });
@@ -327,7 +327,7 @@ describe('API Client - Collection Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/renameCollectionItem', async ({ request }) => {
+      http.post('/api/renameCollectionItem', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json({ renamed: true, newKey: 'post-1-renamed' });
@@ -353,7 +353,7 @@ describe('API Client - Preferences Operations', () => {
 
   it('should call readConfKey with generic type inference', async () => {
     server.use(
-      http.post('http://localhost:5150/api/readConfKey', () => {
+      http.post('/api/readConfKey', () => {
         return HttpResponse.json({
           interfaceStyle: 'quiqr10-light',
           dataFolder: '~/Quiqr',
@@ -373,7 +373,7 @@ describe('API Client - Preferences Operations', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/saveConfPrefKey', async ({ request }) => {
+      http.post('/api/saveConfPrefKey', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         return HttpResponse.json(true);
@@ -390,7 +390,7 @@ describe('API Client - Preferences Operations', () => {
 
   it('should verify type-safe return types', async () => {
     server.use(
-      http.post('http://localhost:5150/api/readConfKey', () => {
+      http.post('/api/readConfKey', () => {
         return HttpResponse.json('test-value');
       })
     );
@@ -411,7 +411,7 @@ describe('API Client - Special Cases', () => {
   it('should use custom timeout for stopHugoServer (100000ms)', async () => {
     // stopHugoServer has hugoServerResponseSchema with { stopped: boolean }
     server.use(
-      http.post('http://localhost:5150/api/stopHugoServer', () => {
+      http.post('/api/stopHugoServer', () => {
         return HttpResponse.json({ stopped: true });
       })
     );
@@ -425,7 +425,7 @@ describe('API Client - Special Cases', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/logToConsole', async ({ request }) => {
+      http.post('/api/logToConsole', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         // logToConsole returns boolean according to schema
@@ -443,7 +443,7 @@ describe('API Client - Special Cases', () => {
 
   it('should handle methods with optional parameters', async () => {
     server.use(
-      http.post('http://localhost:5150/api/getConfigurations', () => {
+      http.post('/api/getConfigurations', () => {
         return HttpResponse.json({ sites: [], lastOpenedSite: null });
       })
     );
@@ -456,7 +456,7 @@ describe('API Client - Special Cases', () => {
 
   it('should call deprecated method getFilteredHugoVersions', async () => {
     server.use(
-      http.post('http://localhost:5150/api/getFilteredHugoVersions', () => {
+      http.post('/api/getFilteredHugoVersions', () => {
         return HttpResponse.json(['0.120.0', '0.119.0']);
       })
     );
@@ -471,7 +471,7 @@ describe('API Client - Special Cases', () => {
     let receivedBody: ApiRequest | null = null;
     
     server.use(
-      http.post('http://localhost:5150/api/importSiteFromPublicGitUrl', async ({ request }) => {
+      http.post('/api/importSiteFromPublicGitUrl', async ({ request }) => {
         const body = await request.json();
         receivedBody = apiRequestSchema.parse(body);
         // importSiteFromPublicGitUrl returns string (siteKey) according to schema

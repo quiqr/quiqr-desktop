@@ -74,11 +74,9 @@ export function dispatchMessage(type: string, data: unknown) {
 
 export function request<M extends ApiMethod>(method: M, data?: unknown, opts: RequestOptions = {timeout:90000}): Promise<ApiResponse<M>> {
 
-  const host = window.location.hostname;
-
   const promise = new Promise<ApiResponse<M>>((resolve, reject)=>{
     axios
-      .post("http://"+host+":5150/api/"+method, {
+      .post("/api/"+method, {
         data: data,
       }, {
         timeout: opts.timeout

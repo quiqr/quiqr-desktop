@@ -71,7 +71,7 @@ export function useSSGDownload(): SSGDownloadState {
         visible: true,
       });
 
-      const sseUrl = `http://${window.location.hostname}:5150/api/ssg/download/${encodeURIComponent(ssgType)}/${encodeURIComponent(version)}`;
+      const sseUrl = `/api/ssg/download/${encodeURIComponent(ssgType)}/${encodeURIComponent(version)}`;
       console.log('[useSSGDownload] Opening SSE connection to:', sseUrl);
 
       const eventSource = new EventSource(sseUrl);

@@ -3,9 +3,7 @@
 ## Purpose
 
 The adapter system provides platform abstraction for Quiqr Desktop, enabling deployment across multiple environments (Electron, web browsers, Docker, serverless) without changing core application logic.
-
 ## Requirements
-
 ### Requirement: FilesystemAdapter Interface
 
 The backend SHALL provide a FilesystemAdapter interface that abstracts file system operations, enabling different storage backends (local filesystem, S3, in-memory, etc.).
@@ -160,3 +158,26 @@ Both adapter packages SHALL have comprehensive test coverage using Vitest to ens
 - **THEN** tests verify all required adapters are created
 - **AND** tests verify adapters are properly wired together
 - **AND** tests verify factory handles dependencies correctly
+
+#### Scenario: Frontend build path resolution tested
+- **WHEN** testing the standalone adapter
+- **THEN** tests SHALL verify frontend build path resolution from default location
+- **AND** tests SHALL verify `FRONTEND_PATH` environment variable override
+- **AND** tests SHALL verify graceful fallback to API-only mode when build is missing
+
+### Requirement: Standalone Adapter Frontend Serving
+
+The standalone adapter SHALL resolve the frontend build path and pass it to the shared `createServer()` factory, enabling unified frontend+API serving.
+
+#### Scenario: Standalone serves frontend in production
+- **WHEN** the standalone adapter starts
+- **AND** the frontend build is present
+- **THEN** it SHALL pass the `frontendPath` option to `createServer()`
+- **AND** the Express server SHALL serve both API and frontend on the same port
+
+#### Scenario: Electron adapter uses shared frontend serving
+- **WHEN** the Electron adapter starts in production mode
+- **THEN** it SHALL resolve the frontend build directory using `findFrontendBuildDir()`
+- **AND** pass the resolved path as `frontendPath` to `createServer()`
+- **AND** SHALL NOT add `express.static()` or SPA catch-all middleware directly
+

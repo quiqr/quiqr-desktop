@@ -9,7 +9,7 @@ import { http, HttpResponse } from 'msw';
 
 export const handlers = [
   // Default handler for readConfKey
-  http.post('http://localhost:5150/api/readConfKey', () => {
+  http.post('/api/readConfKey', () => {
     return HttpResponse.json({
       interfaceStyle: 'quiqr10-light',
       dataFolder: '~/Quiqr',
@@ -19,7 +19,7 @@ export const handlers = [
   }),
 
   // Default handler for saveConfPrefKey
-  http.post('http://localhost:5150/api/saveConfPrefKey', () => {
+  http.post('/api/saveConfPrefKey', () => {
     return HttpResponse.json(true);
   }),
 ];

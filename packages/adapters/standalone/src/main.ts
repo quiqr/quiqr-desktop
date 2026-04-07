@@ -8,6 +8,7 @@
 import { createDevAdapters, createContainer } from '@quiqr/backend';
 import { startServer } from '@quiqr/backend/api';
 import { createWebAdapters } from './adapters/index.js';
+import { findFrontendBuildDir } from './frontend-path.js';
 import { GLOBAL_CATEGORIES } from '@quiqr/backend/logging';
 import { homedir } from 'os';
 import { join, dirname } from 'path';
@@ -106,26 +107,37 @@ async function startStandaloneBackend() {
       logRetentionDays
     });
 
+    // Resolve frontend build path (skip in dev mode — use Vite dev server instead)
+    let frontendPath: string | undefined;
+    if (isDev) {
+      console.log('Development mode: skipping frontend serving. Use Vite dev server on :4002 for hot reload.');
+    } else {
+      frontendPath = findFrontendBuildDir(rootPath);
+      if (frontendPath) {
+        console.log(`Serving frontend from: ${frontendPath}`);
+      } else {
+        console.warn(`WARNING: Frontend build not found.`);
+        console.warn(`  Run 'npm run build -w @quiqr/frontend' to build the frontend.`);
+        console.warn(`  The API server is running, but no frontend will be served.`);
+      }
+    }
+
     // Start the Express server
-    startServer(container, { port });
+    startServer(container, { port, frontendPath });
 
     container.logger.info(GLOBAL_CATEGORIES.STANDALONE_INIT, 'Quiqr Backend ready', {
       api: `http://localhost:${port}`,
-      mode: 'production',
+      frontend: frontendPath ? `http://localhost:${port}` : 'not served',
+      mode: isDev ? 'development' : 'production',
       note: 'Standalone mode - UI operations will log to console'
     });
 
-    console.log('🚀 Quiqr Backend ready!');
-    console.log(`   API:  http://localhost:${port}`);
-    console.log('   Mode: production');
-    console.log('');
-    console.log('Note: This is standalone mode. UI operations will log to console.');
-    console.log('');
-    console.log('🚀 Quiqr Backend ready!');
-    console.log(`   API:  http://localhost:${port}`);
-    console.log(`   Mode: ${isDev ? 'development' : 'production'}`);
-    console.log('');
-    console.log('Note: This is standalone mode. UI operations will log to console.');
+    console.log(`Quiqr Standalone ready!`);
+    console.log(`   API:      http://localhost:${port}/api/`);
+    if (frontendPath) {
+      console.log(`   Frontend: http://localhost:${port}`);
+    }
+    console.log(`   Mode:     ${isDev ? 'development' : 'production'}`);
     console.log('');
   } catch (error) {
     console.error('Failed to start backend:', error);

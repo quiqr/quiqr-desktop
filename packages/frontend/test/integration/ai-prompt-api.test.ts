@@ -39,7 +39,7 @@ describe('AI Prompt API Integration', () => {
       };
 
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json(mockResponse);
         })
       );
@@ -72,7 +72,7 @@ describe('AI Prompt API Integration', () => {
       };
 
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json(minimalResponse);
         })
       );
@@ -95,7 +95,7 @@ describe('AI Prompt API Integration', () => {
 
     it('should throw validation error when status is missing', async () => {
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json({
             response: 'Missing status field'
           });
@@ -119,7 +119,7 @@ describe('AI Prompt API Integration', () => {
 
     it('should throw validation error when status is not "ok"', async () => {
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json({
             status: 'error',
             response: 'Error response'
@@ -144,7 +144,7 @@ describe('AI Prompt API Integration', () => {
 
     it('should throw validation error when response field is missing', async () => {
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json({
             status: 'ok'
           });
@@ -174,7 +174,7 @@ describe('AI Prompt API Integration', () => {
       };
 
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json(responseWithNullUsage);
         })
       );
@@ -197,7 +197,7 @@ describe('AI Prompt API Integration', () => {
 
     it('should throw validation error for invalid usage structure', async () => {
       server.use(
-        http.post('http://localhost:5150/api/processFieldAiPrompt', () => {
+        http.post('/api/processFieldAiPrompt', () => {
           return HttpResponse.json({
             status: 'ok',
             response: 'Test',
@@ -244,7 +244,7 @@ describe('AI Prompt API Integration', () => {
       };
 
       server.use(
-        http.post('http://localhost:5150/api/processAiPrompt', () => {
+        http.post('/api/processAiPrompt', () => {
           return HttpResponse.json(mockResponse);
         })
       );
@@ -272,7 +272,7 @@ describe('AI Prompt API Integration', () => {
       };
 
       server.use(
-        http.post('http://localhost:5150/api/processAiPrompt', () => {
+        http.post('/api/processAiPrompt', () => {
           return HttpResponse.json(minimalResponse);
         })
       );
@@ -294,7 +294,7 @@ describe('AI Prompt API Integration', () => {
 
     it('should throw error when backend returns invalid schema', async () => {
       server.use(
-        http.post('http://localhost:5150/api/processAiPrompt', () => {
+        http.post('/api/processAiPrompt', () => {
           return HttpResponse.json({
             status: 'success', // Wrong literal value
             response: 'Response text'
@@ -317,7 +317,7 @@ describe('AI Prompt API Integration', () => {
       const longText = 'Lorem ipsum dolor sit amet. '.repeat(100);
       
       server.use(
-        http.post('http://localhost:5150/api/processAiPrompt', () => {
+        http.post('/api/processAiPrompt', () => {
           return HttpResponse.json({
             status: 'ok',
             response: longText
@@ -339,7 +339,7 @@ describe('AI Prompt API Integration', () => {
 
     it('should handle response with unicode and special characters', async () => {
       server.use(
-        http.post('http://localhost:5150/api/processAiPrompt', () => {
+        http.post('/api/processAiPrompt', () => {
           return HttpResponse.json({
             status: 'ok',
             response: 'Response with emoji 😀 and unicode: 日本語 中文'

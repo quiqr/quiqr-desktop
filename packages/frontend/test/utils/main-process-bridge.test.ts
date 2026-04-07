@@ -24,7 +24,7 @@ describe('main-process-bridge', () => {
 
     it('should make successful request with valid response', async () => {
       server.use(
-        http.post('http://localhost:5150/api/listWorkspaces', () => {
+        http.post('/api/listWorkspaces', () => {
           return HttpResponse.json([
             { key: 'workspace1', path: '/path/to/workspace', state: 'active' }
           ]);
@@ -42,7 +42,7 @@ describe('main-process-bridge', () => {
       let receivedBody: unknown = null;
 
       server.use(
-        http.post('http://localhost:5150/api/listWorkspaces', async ({ request }) => {
+        http.post('/api/listWorkspaces', async ({ request }) => {
           receivedBody = await request.json();
           return HttpResponse.json([]);
         })
@@ -53,11 +53,11 @@ describe('main-process-bridge', () => {
       expect(receivedBody).toEqual({ data: { input: 'test data' } });
     });
 
-    it('should construct correct endpoint URL (localhost:5150/api/method)', async () => {
+    it('should construct correct relative endpoint URL (/api/method)', async () => {
       let requestUrl: string = '';
 
       server.use(
-        http.post('http://localhost:5150/api/getCurrentSiteKey', ({ request }) => {
+        http.post('/api/getCurrentSiteKey', ({ request }) => {
           requestUrl = request.url;
           return HttpResponse.json('site-key-123');
         })
@@ -65,7 +65,7 @@ describe('main-process-bridge', () => {
 
       await request('getCurrentSiteKey', {});
 
-      expect(requestUrl).toBe('http://localhost:5150/api/getCurrentSiteKey');
+      expect(requestUrl).toContain('/api/getCurrentSiteKey');
     });
 
     it('should validate response with Zod schema when available', async () => {
@@ -74,7 +74,7 @@ describe('main-process-bridge', () => {
 
       // Use listWorkspaces which has a schema in apiSchemas
       server.use(
-        http.post('http://localhost:5150/api/listWorkspaces', () => {
+        http.post('/api/listWorkspaces', () => {
           return HttpResponse.json([
             { key: 'workspace1', path: '/path/to/workspace', state: 'active' }
           ]);
@@ -95,7 +95,7 @@ describe('main-process-bridge', () => {
 
       // Use listWorkspaces which expects an array, but return invalid data
       server.use(
-        http.post('http://localhost:5150/api/listWorkspaces', () => {
+        http.post('/api/listWorkspaces', () => {
           // Return invalid data that doesn't match the array schema
           return HttpResponse.json({ invalid: 'data structure' });
         })
@@ -114,7 +114,7 @@ describe('main-process-bridge', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       server.use(
-        http.post('http://localhost:5150/api/invalidateCache', () => {
+        http.post('/api/invalidateCache', () => {
           return HttpResponse.error();
         })
       );
@@ -136,7 +136,7 @@ describe('main-process-bridge', () => {
       // Actual timeout behavior is difficult to test reliably with MSW
 
       server.use(
-        http.post('http://localhost:5150/api/checkFreeSiteName', () => {
+        http.post('/api/checkFreeSiteName', () => {
           return HttpResponse.json(true);
         })
       );
@@ -149,7 +149,7 @@ describe('main-process-bridge', () => {
     it('should use default timeout of 90000ms when not specified', async () => {
       // This test verifies the default by checking that a reasonable request completes
       server.use(
-        http.post('http://localhost:5150/api/matchRole', () => {
+        http.post('/api/matchRole', () => {
           return HttpResponse.json(true);
         })
       );
