@@ -86,6 +86,10 @@ environment:
   - FRONTEND_PATH=/custom/path/to/frontend/build
 ```
 
+## Authentication
+
+By default, the standalone server has no authentication. To secure your deployment, see the [Authentication](./authentication.md) guide.
+
 ## API-only Mode
 
 If the frontend build is not available, the server starts in API-only mode and serves only the REST API. This is useful when running the frontend separately during development.

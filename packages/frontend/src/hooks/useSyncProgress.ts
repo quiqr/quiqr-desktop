@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { getAccessToken } from '../auth/token-storage';
 
 export interface SyncProgress {
   message: string;
@@ -64,11 +65,17 @@ export function useSyncProgress() {
     abortControllerRef.current = new AbortController();
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      const token = getAccessToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(body),
         signal: abortControllerRef.current.signal,
       });

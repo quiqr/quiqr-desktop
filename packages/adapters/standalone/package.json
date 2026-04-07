@@ -8,6 +8,7 @@
     "dev": "tsc --watch",
     "dev:start": "NODE_ENV=development node dist/main.js",
     "start": "npm run build && node dist/main.js",
+    "user": "node dist/cli/user-admin.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

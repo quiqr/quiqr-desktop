@@ -80,6 +80,7 @@ async function startBackend() {
     });
 
     // Create the Express app from backend
+    // Auth is intentionally disabled in Electron — it's a single-user desktop app
     // In production, serve the frontend from the same Express server
     const frontendPath = isDev ? undefined : findFrontendBuildDir() ?? undefined;
     if (!isDev && frontendPath) {

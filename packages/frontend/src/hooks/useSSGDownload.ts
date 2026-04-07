@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { withAuthToken } from '../auth/sse-auth';
 
 export interface ProgressConfig {
   title: string;
@@ -71,7 +72,7 @@ export function useSSGDownload(): SSGDownloadState {
         visible: true,
       });
 
-      const sseUrl = `/api/ssg/download/${encodeURIComponent(ssgType)}/${encodeURIComponent(version)}`;
+      const sseUrl = withAuthToken(`/api/ssg/download/${encodeURIComponent(ssgType)}/${encodeURIComponent(version)}`);
       console.log('[useSSGDownload] Opening SSE connection to:', sseUrl);
 
       const eventSource = new EventSource(sseUrl);

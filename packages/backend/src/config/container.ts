@@ -29,6 +29,7 @@ import type { EnvironmentInfo } from '../utils/path-helper.js';
 import { HugoDownloader } from '../ssg-providers/hugo/hugo-downloader.js';
 import { HugoUtils } from '../ssg-providers/hugo/hugo-utils.js';
 import { Logger } from '../logging/logger.js';
+import type { AuthProvider } from '../auth/types.js';
 
 /**
  * Event emitted when the model cache is cleared
@@ -180,6 +181,11 @@ export interface AppContainer {
    * Structured logging service
    */
   logger: Logger;
+
+  /**
+   * Auth provider (optional — only set when auth is enabled in standalone mode)
+   */
+  authProvider?: AuthProvider;
 
   /**
    * Helper to get a ScaffoldModelService instance

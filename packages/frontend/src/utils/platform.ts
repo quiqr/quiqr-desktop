@@ -27,9 +27,13 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export async function openExternal(url: string): Promise<void> {
   try {
     // Try backend API first (works in Electron via ShellAdapter)
-    await service.api.openExternal(url);
+    const opened = await service.api.openExternal(url);
+    if (!opened) {
+      // Standalone mode: backend can't open URLs, use browser fallback
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   } catch {
-    // Fallback to window.open for web environments or if API fails
+    // Fallback to window.open if API call fails entirely
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 }

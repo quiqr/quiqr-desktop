@@ -230,6 +230,15 @@ export function createExecuteMenuActionHandler(container: AppContainer) {
           }
 
         // ====================================================================
+        // User / Auth actions
+        // ====================================================================
+        case 'logout':
+          return { type: 'logout' };
+
+        case 'changePassword':
+          return { type: 'changePassword' };
+
+        // ====================================================================
         // Unknown action
         // ====================================================================
         default:

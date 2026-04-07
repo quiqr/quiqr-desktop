@@ -10,6 +10,9 @@
 // Adapters
 export * from './adapters/index.js';
 
+// Auth
+export * from './auth/index.js';
+
 // Configuration
 export * from './config/index.js';
 

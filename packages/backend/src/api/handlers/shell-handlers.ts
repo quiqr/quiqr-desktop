@@ -83,9 +83,10 @@ export function createOpenExternalHandler(container: AppContainer) {
     try {
       await container.adapters.shell.openExternal(url);
       return true;
-    } catch (e) {
-      console.log('Error opening external URL:', e);
-      throw e;
+    } catch {
+      // In standalone mode, openExternal is not supported.
+      // Return false so the frontend knows to use window.open() fallback.
+      return false;
     }
   };
 }

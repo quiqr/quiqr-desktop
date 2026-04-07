@@ -4,7 +4,7 @@
  * Re-exports all API-related functionality.
  */
 
-export { createServer, startServer, type ServerOptions } from './server.js';
+export { createServer, startServer, type ServerOptions, type ServerAuthOptions } from './server.js';
 export { createApiHandlers, getHandler, type ApiHandlers } from './router.js';
 export { errorHandler, asyncHandler, type ErrorResponse } from './middleware/error-handler.js';
 

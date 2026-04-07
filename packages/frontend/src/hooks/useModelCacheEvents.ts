@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { withAuthToken } from '../auth/sse-auth';
 
 interface ModelChangeEvent {
   type: 'model-cache-cleared' | 'connected';
@@ -35,7 +36,7 @@ export function useModelCacheEvents(
       return;
     }
 
-    const url = `/api/workspace/${encodeURIComponent(siteKey)}/${encodeURIComponent(workspaceKey)}/model-events`;
+    const url = withAuthToken(`/api/workspace/${encodeURIComponent(siteKey)}/${encodeURIComponent(workspaceKey)}/model-events`);
 
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;

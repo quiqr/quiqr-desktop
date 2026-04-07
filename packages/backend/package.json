@@ -29,6 +29,7 @@
     "@quiqr/types": "*",
     "adm-zip": "^0.5.16",
     "ai": "^6.0.33",
+    "bcryptjs": "^3.0.3",
     "chokidar": "^5.0.0",
     "cors": "^2.x.x",
     "deepmerge": "^4.3.1",
@@ -38,6 +39,7 @@
     "glob": "13.0.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.x.x",
+    "jsonwebtoken": "^9.0.3",
     "sharp": "^0.34.5",
     "tar": "^7.0.0",
     "toml": "^3.x.x",
@@ -45,10 +47,12 @@
     "zod": "^3.x.x"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.x.x",
     "@types/express": "^5.x.x",
     "@types/fs-extra": "^11.x.x",
     "@types/js-yaml": "^4.x.x",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24",
     "@types/supertest": "^7.2.0",
     "supertest": "^7.2.2",

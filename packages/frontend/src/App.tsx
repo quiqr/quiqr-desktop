@@ -20,6 +20,7 @@ import { DialogProvider } from "./contexts/DialogProvider";
 import { useDialog } from "./hooks/useDialog";
 import SyncRoutedWithContext from "./containers/WorkspaceMounted/components/SyncRoutedWithContext";
 import SiteConfRoutedWithContext from "./containers/WorkspaceMounted/components/SiteConfRoutedWithContext";
+import ChangePasswordRoute from "./auth/ChangePasswordRoute";
 import { prefsQueryOptions } from "./queries/options";
 
 const defaultApplicationRole = "contentEditor";
@@ -163,6 +164,9 @@ const AppContent = ({ theme }: { theme: Theme }) => {
           </StyledEngineProvider>
         }
       />
+
+      {/* Change password route (from User menu) */}
+      <Route path="/change-password" element={<ChangePasswordRoute />} />
 
       {/* Refresh route - empty */}
       <Route

@@ -5,14 +5,19 @@ scan({
   enabled: false,
 });
 
+import { lazy, Suspense }  from 'react';
 import { createRoot }    from 'react-dom/client';
 import { BrowserRouter } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import App               from './App.jsx';
+import AuthWrapper       from './auth/AuthWrapper';
 import SnackbarManager   from './components/SnackbarManager.jsx';
 import { SnackbarProvider } from './contexts/SnackbarContext';
 import { isErrorWithResponse } from './utils/type-guards';
+
+// Lazy-load App so its module-level API calls (useEnvironment, useMenuState)
+// only fire after AuthWrapper has set up the auth interceptors
+const App = lazy(() => import('./App.jsx'));
 
 // Import theme CSS files
 import './theme/fonts.css';
@@ -51,10 +56,14 @@ root.render(
   <QueryClientProvider client={queryClient}>
     <SnackbarProvider>
       <BrowserRouter>
-        <div>
-          <SnackbarManager />
-          <App />
-        </div>
+        <AuthWrapper>
+          <Suspense fallback={null}>
+            <div>
+              <SnackbarManager />
+              <App />
+            </div>
+          </Suspense>
+        </AuthWrapper>
       </BrowserRouter>
     </SnackbarProvider>
     <ReactQueryDevtools initialIsOpen={false} />
