@@ -3,7 +3,6 @@
 ## Purpose
 
 This specification defines documentation requirements for the Quiqr Desktop project, including release documentation, user-facing documentation (Docusaurus), and developer guidelines.
-
 ## Requirements
 ### Requirement: Release Documentation
 
@@ -182,4 +181,25 @@ The AGENTS.md file SHALL include a Documentation section that references this sp
 - **AND** the section SHALL reference this OpenSpec documentation specification
 - **AND** the section SHALL provide quick links to documentation commands
 - **AND** the section SHALL summarize when to document (new features, API changes, etc.)
+
+### Requirement: Standalone Deployment Documentation
+
+The documentation site SHALL include a guide for deploying Quiqr in standalone (non-Electron) mode.
+
+#### Scenario: Standalone deployment guide exists
+- **WHEN** a user wants to deploy Quiqr as a standalone server
+- **THEN** documentation at `packages/docs/docs/getting-started/` SHALL describe:
+  - How to build the frontend and backend
+  - How to start the unified server
+  - Environment variables (`PORT`, `FRONTEND_PATH`)
+  - Expected behavior (single port, SPA + API)
+
+#### Scenario: Docker deployment guide exists
+- **WHEN** a user wants to deploy Quiqr using Docker
+- **THEN** documentation SHALL describe:
+  - How to build the Docker image
+  - How to run with `docker-compose`
+  - Volume mounts for persistent data
+  - Environment variable configuration
+  - The `docker-compose.yml` as a reference example
 

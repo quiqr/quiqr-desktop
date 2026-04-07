@@ -4,7 +4,6 @@
  */
 
 import { app, BrowserWindow } from 'electron';
-import express from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import { createElectronAdapters } from './adapters/index.js';
@@ -81,30 +80,14 @@ async function startBackend() {
     });
 
     // Create the Express app from backend
-    const expressApp = createServer(container, { port: 5150 });
-
     // In production, serve the frontend from the same Express server
-    if (!isDev) {
-      const frontendDir = findFrontendBuildDir();
-      if (frontendDir) {
-        console.log(`Serving frontend from: ${frontendDir}`);
-
-        // Serve static files from the frontend build directory
-        expressApp.use(express.static(frontendDir));
-
-        // SPA catch-all: serve index.html for any non-API route
-        expressApp.get('/{*path}', (req, res) => {
-          // Don't catch API routes
-          if (req.path.startsWith('/api')) {
-            res.status(404).json({ error: 'API endpoint not found' });
-            return;
-          }
-          res.sendFile(path.join(frontendDir, 'index.html'));
-        });
-      } else {
-        console.warn('Frontend build directory not found!');
-      }
+    const frontendPath = isDev ? undefined : findFrontendBuildDir() ?? undefined;
+    if (!isDev && frontendPath) {
+      console.log(`Serving frontend from: ${frontendPath}`);
+    } else if (!isDev) {
+      console.warn('Frontend build directory not found!');
     }
+    const expressApp = createServer(container, { port: 5150, frontendPath });
 
     // Start listening
     expressApp.listen(5150, () => {

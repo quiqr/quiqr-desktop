@@ -9,7 +9,10 @@ export default defineConfig({
   ],
   server: {
     port: 4002,
-    open: false
+    open: false,
+    proxy: {
+      '/api': 'http://localhost:5150'
+    }
   },
   build: {
     outDir: 'build',
