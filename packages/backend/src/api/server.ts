@@ -11,10 +11,23 @@ import cors from 'cors';
 import type { AppContainer } from '../config/container.js';
 import { createApiHandlers, getHandler } from './router.js';
 import { errorHandler, asyncHandler } from './middleware/error-handler.js';
+import { createAuthMiddleware } from './middleware/auth-middleware.js';
+import { createAuthRoutes } from './routes/auth-routes.js';
+import { TokenService } from '../auth/token-service.js';
 
 /**
  * Server configuration options
  */
+/**
+ * Auth configuration for the server
+ */
+export interface ServerAuthOptions {
+  enabled: boolean;
+  secret: string;
+  accessTokenExpiry: string;
+  refreshTokenExpiry: string;
+}
+
 export interface ServerOptions {
   /**
    * Port to listen on (default: 5150)
@@ -32,6 +45,13 @@ export interface ServerOptions {
    * serves static files and provides SPA catch-all routing.
    */
   frontendPath?: string;
+
+  /**
+   * Authentication configuration. When set with enabled: true,
+   * JWT auth middleware protects all API routes.
+   * Electron mode should never set this.
+   */
+  auth?: ServerAuthOptions;
 }
 
 /**
@@ -50,10 +70,32 @@ export function createServer(
     app.use(cors());
   }
 
+  // Serve frontend SPA static files (public — login page must load without auth)
+  if (frontendPath) {
+    app.use(express.static(frontendPath));
+  }
+
   // We need to raise this limit because we import theme screenshots and bundle files.
   // The files are base64 encoded and can get quite large (base64 adds ~33% overhead).
   // For a local Electron app, 100mb is a reasonable limit.
   app.use(express.json({ limit: '100mb' }));
+
+  // Auth routes and middleware (when auth is enabled)
+  const { auth } = options;
+  if (auth?.enabled && container.authProvider) {
+    const tokenService = new TokenService(auth.secret, auth.accessTokenExpiry, auth.refreshTokenExpiry);
+
+    // Auth API routes are public (login, refresh, check)
+    app.use(createAuthRoutes(container.authProvider, tokenService));
+
+    // Auth middleware protects all routes registered after this point
+    app.use(createAuthMiddleware(tokenService));
+  } else {
+    // When auth is disabled, provide a check endpoint that says so
+    app.get('/api/auth/check', (_req: Request, res: Response) => {
+      res.json({ authEnabled: false });
+    });
+  }
 
   /**
    * Create handler registry
@@ -297,11 +339,8 @@ export function createServer(
     }
   );
 
-  // Serve frontend SPA build when frontendPath is configured
+  // SPA catch-all: serve index.html for any non-API route (public)
   if (frontendPath) {
-    app.use(express.static(frontendPath));
-
-    // SPA catch-all: serve index.html for any non-API route
     app.get('/{*path}', (req, res) => {
       if (req.path.startsWith('/api')) {
         res.status(404).json({ error: 'API endpoint not found' });

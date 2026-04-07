@@ -274,6 +274,33 @@ export class WebMenuAdapter implements MenuAdapter {
             },
           ],
         },
+
+        // User menu (only when auth is enabled)
+        ...(this.container.authProvider
+          ? [
+              {
+                id: 'user',
+                label: 'User',
+                items: [
+                  {
+                    id: 'change-password',
+                    type: 'normal' as const,
+                    label: 'Change Password',
+                    enabled: true,
+                    action: 'changePassword',
+                  },
+                  { id: 'sep-1', type: 'separator' as const },
+                  {
+                    id: 'logout',
+                    type: 'normal' as const,
+                    label: 'Logout',
+                    enabled: true,
+                    action: 'logout',
+                  },
+                ],
+              },
+            ]
+          : []),
       ],
     };
   }

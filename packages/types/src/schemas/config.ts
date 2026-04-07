@@ -1,5 +1,6 @@
 import { object, z } from 'zod'
 import { fieldSchema } from './fields.js'
+import { authConfigSchema } from './auth.js'
 
 export const baseConfigSchema = z.object({
   key: z.string(),
@@ -477,6 +478,9 @@ export const instanceSettingsSchema = z.object({
     serveDraftMode: z.boolean().default(false),
     disableAutoHugoServe: z.boolean().default(false),
   }).default({ serveDraftMode: false, disableAutoHugoServe: false }),
+
+  // Authentication configuration (standalone mode only)
+  auth: authConfigSchema.optional(),
 })
 
 /**
@@ -591,6 +595,8 @@ export const standardEnvMappings: z.infer<typeof envVarMappingSchema>[] = [
   { envVar: 'DEV_DISABLE_PARTIAL_CACHE', configPath: 'dev.disablePartialCache', transform: 'boolean' },
   { envVar: 'HUGO_SERVE_DRAFT_MODE', configPath: 'hugo.serveDraftMode', transform: 'boolean' },
   { envVar: 'HUGO_DISABLE_AUTO_SERVE', configPath: 'hugo.disableAutoHugoServe', transform: 'boolean' },
+  { envVar: 'AUTH_ENABLED', configPath: 'auth.enabled', transform: 'boolean' },
+  { envVar: 'AUTH_SESSION_SECRET', configPath: 'auth.session.secret', transform: 'string' },
 ]
 
 /**

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import service from '../services/service';
 import { useSnackbar } from '../contexts/SnackbarContext';
 import { useDialog } from './useDialog';
+import { logout } from '../auth/logout';
 import type { WebMenuState, WebMenuActionResult } from '@quiqr/types';
 
 // Fetch once at module level
@@ -153,6 +154,16 @@ export function useMenuState() {
           setTimeout(() => {
             window.location.reload();
           }, 500);
+          break;
+
+        case 'logout':
+          await logout();
+          break;
+
+        case 'changePassword':
+          // Navigate to a temporary change-password route
+          // The AuthWrapper will handle rendering the change-password form
+          navigate('/change-password');
           break;
       }
     } catch (error) {
