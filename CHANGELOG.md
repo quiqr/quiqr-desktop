@@ -2,6 +2,19 @@
 
 ## Next Release
 
+- feature: unified frontend serving — standalone server serves both API and frontend from a single Express server
+- feature: JWT-based authentication for standalone mode with local file user provider
+- feature: login page, forced password change on first login, User menu with logout and change password
+- feature: CLI user management tool (add, list, remove, reset-password)
+- feature: Vite dev proxy for `/api` — frontend uses relative URLs in all modes
+- feature: conditional CORS — disabled when serving frontend from same origin
+- feature: SSE auth via query parameter for EventSource compatibility
+- feature: first-run default admin user creation with console-printed credentials
+- chore: Dockerfile updated to build and serve frontend, download embgit binary
+- chore: docker-compose updated with Hugo preview port, persistent sites volume
+- fix: openExternal graceful fallback to window.open() in standalone mode
+- chore: upgrade to vite 8
+
 ## 0.22.7 (2026-03-04)
 
 - refactor/fix: replace old zip binaries with `node-tar` to fix hugo downloads not extracting
