@@ -1,14 +1,14 @@
 <svg width="169.6" height="20" viewBox="0 0 1696 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="OpenSpec: 78/272 tasks">
   <title>OpenSpec: 78/272 tasks</title>
-  <linearGradient id="aPYpY" x2="0" y2="100%">
+  <linearGradient id="lIpal" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="kYGSp"><rect width="1696" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#kYGSp)">
+  <mask id="ZQMOq"><rect width="1696" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#ZQMOq)">
     <rect width="869" height="200" fill="#555"/>
     <rect width="827" height="200" fill="#F73" x="869"/>
-    <rect width="1696" height="200" fill="url(#aPYpY)"/>
+    <rect width="1696" height="200" fill="url(#lIpal)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="270" y="148" textLength="559" fill="#000" opacity="0.25">OpenSpec</text>
