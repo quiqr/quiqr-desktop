@@ -117,6 +117,43 @@ packages/docs/docs/
 
 Deploys automatically to GitHub Pages on merge to main.
 
+## Corpus Testing
+
+Quiqr uses two-layer corpus testing to validate that code changes don't break community template loading or rendering.
+
+### The Two Layers
+
+1. **Backend schema test** (`packages/backend/src/services/workspace/__tests__/template-corpus.test.ts`)
+   — Discovers templates under `{dataFolder}/sites/`, loads each through `WorkspaceConfigProvider`, asserts Zod validation passes, and checks that all field types are registered in `FieldRegistry`.
+
+2. **Frontend smoke test** (`packages/frontend/test/components/SukohForm/template-corpus-smoke.test.tsx`)
+   — Discovers templates under `{dataFolder}/sites/`, loads each through `WorkspaceConfigProvider`, renders `FormProvider` with each collection/single's `Field[]` in JSDOM, and asserts no React rendering errors occur.
+
+Both layers directly read from `{dataFolder}/sites/` (where `{dataFolder}` respects the user's `storage.dataFolder` configuration setting, defaulting to `~/Quiqr` when not set). No intermediate fixture generation step. Tests are skipped (not failed) when no templates are cloned locally.
+
+### When to Run Corpus Tests
+
+Changes that touch any of the following MUST include a corpus test run as part of their task checklist:
+
+- `WorkspaceConfigProvider` or `WorkspaceConfigValidator` (config loading / merging / validation)
+- `FieldRegistry` (field type registration)
+- Field type schemas in `packages/types/src/schemas/fields.ts`
+- Field component implementations in `packages/frontend/src/components/SukohForm/fields/`
+
+### Running Corpus Tests
+
+Run these commands locally before releases or when changing config/field code:
+
+```bash
+# Backend validation (loads configs, validates schema, checks field types)
+npm run test -w @quiqr/backend -- template-corpus
+
+# Frontend smoke tests (renders forms, checks for crashes)
+npm run test -w @quiqr/frontend -- template-corpus
+```
+
+Both tests require locally-cloned community templates in the `sites/` subdirectory of your configured data folder (defaults to `~/Quiqr/sites/`). Clone templates before running corpus tests to ensure full coverage.
+
 ## Specs Reference
 
 For detailed requirements, consult the relevant spec in `openspec/specs/`:
