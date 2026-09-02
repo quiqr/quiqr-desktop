@@ -87,6 +87,15 @@ export function createServer(
   // For a local Electron app, 100mb is a reasonable limit.
   app.use(express.json({ limit: '100mb' }));
 
+  // Public endpoint: environment info (needed before auth for frontend mode detection)
+  app.post('/api/getEnvironmentInfo', (_req: Request, res: Response) => {
+    res.json({
+      platform: container.environmentInfo.platform,
+      isPackaged: container.environmentInfo.isPackaged,
+      runtime: container.environmentInfo.runtime,
+    });
+  });
+
   // Auth routes and middleware (when auth is enabled)
   const { auth } = options;
   if (auth?.enabled && container.authProvider) {

@@ -213,17 +213,17 @@ The Electron adapter SHALL explicitly disable authentication.
 - **AND** no auth middleware SHALL be active
 - **AND** no auth-related config SHALL be read or written
 
-### Requirement: QUIQR_DATA_DIR environment variable
+### Requirement: QUIQR_CONF_DIR environment variable
 
-The standalone adapter SHALL support a `QUIQR_DATA_DIR` environment variable that overrides the default data directory (`~/.quiqr-standalone`).
+The standalone adapter SHALL support a `QUIQR_CONF_DIR` environment variable that overrides the default configuration directory (`~/.quiqr-standalone`). This directory contains configuration files, auth data, runtime state, and logs — not site content.
 
-#### Scenario: QUIQR_DATA_DIR is set
-- **WHEN** the `QUIQR_DATA_DIR` environment variable is set to `/var/lib/quiqr`
-- **THEN** the server SHALL use `/var/lib/quiqr` as the `userDataPath`
-- **AND** all data files (config, logs, sites, runtime state) SHALL be stored under that directory
+#### Scenario: QUIQR_CONF_DIR is set
+- **WHEN** the `QUIQR_CONF_DIR` environment variable is set to `/var/lib/quiqr`
+- **THEN** the server SHALL use `/var/lib/quiqr` as the `configDirPath`
+- **AND** all configuration files (instance_settings.json, runtime_state.json, users.json, logs) SHALL be stored under that directory
 
-#### Scenario: QUIQR_DATA_DIR is not set
-- **WHEN** the `QUIQR_DATA_DIR` environment variable is not set
+#### Scenario: QUIQR_CONF_DIR is not set
+- **WHEN** the `QUIQR_CONF_DIR` environment variable is not set
 - **THEN** the server SHALL default to `~/.quiqr-standalone` (unchanged behavior)
 
 ### Requirement: HOST / BIND_ADDRESS environment variable
@@ -257,7 +257,7 @@ The standalone adapter SHALL support `HOST` and `BIND_ADDRESS` environment varia
 
 ### Requirement: Separate runtime state from config
 
-The standalone adapter SHALL separate server-managed runtime state from read-only configuration by using a dedicated `runtime_state.json` file in the data directory.
+The standalone adapter SHALL separate server-managed runtime state from read-only configuration by using a dedicated `runtime_state.json` file in the configuration directory.
 
 #### Scenario: Session secret auto-generation
 - **WHEN** the server starts and no session secret exists in `runtime_state.json`
@@ -280,10 +280,10 @@ The standalone adapter SHALL support a `QUIQR_CONFIG_FILE` environment variable 
 
 #### Scenario: QUIQR_CONFIG_FILE is set
 - **WHEN** `QUIQR_CONFIG_FILE` is set to `/etc/quiqr/instance_settings.json`
-- **THEN** the server SHALL copy that file to `<userDataPath>/instance_settings.json` on startup
+- **THEN** the server SHALL copy that file to `<configDirPath>/instance_settings.json` on startup
 - **AND** the unified config service SHALL read from the copied file
 
 #### Scenario: QUIQR_CONFIG_FILE is not set
 - **WHEN** `QUIQR_CONFIG_FILE` is not set
-- **THEN** the server SHALL read config from `<userDataPath>/instance_settings.json` (unchanged behavior)
+- **THEN** the server SHALL read config from `<configDirPath>/instance_settings.json` (unchanged behavior)
 

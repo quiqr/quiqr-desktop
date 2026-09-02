@@ -10,7 +10,8 @@ interface SingleRouteProps {
 function SingleRoute({ refreshed }: SingleRouteProps) {
   const { single } = useParams();
   const location = useLocation();
-  const { siteKey, workspaceKey, modelRefreshKey } = useOutletContext<WorkspaceOutletContext>();
+  const { siteKey, workspaceKey, modelRefreshKey, previewBaseUrl } =
+    useOutletContext<WorkspaceOutletContext>();
   const nestPath = parseNestPath(location.pathname);
 
   return (
@@ -22,6 +23,7 @@ function SingleRoute({ refreshed }: SingleRouteProps) {
       singleKey={decodeURIComponent(single || '')}
       modelRefreshKey={modelRefreshKey}
       nestPath={nestPath}
+      previewBaseUrl={previewBaseUrl}
     />
   );
 }

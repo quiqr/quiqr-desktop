@@ -17,9 +17,11 @@ interface SingleProps {
   refreshed?: boolean;
   modelRefreshKey?: number;
   nestPath?: string;
+  /** Resolved preview base URL (runtime-mode aware). Falls back to Electron localhost when absent. */
+  previewBaseUrl?: string;
 }
 
-function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey, nestPath }: SingleProps) {
+function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, modelRefreshKey, nestPath, previewBaseUrl }: SingleProps) {
   // Replace manual state management with TanStack Query
   const { data: singleValues, isLoading: singleLoading, isError: singleError } = useSingle(
     siteKey,
@@ -118,8 +120,8 @@ function Single({ siteKey, workspaceKey, singleKey, fileOverride, refreshed, mod
       finalpath = '/' + finalpath;
     }
 
-    return 'http://localhost:13131' + finalpath;
-  }, [single, currentBaseUrlPath]);
+    return (previewBaseUrl ?? 'http://localhost:13131') + finalpath;
+  }, [single, currentBaseUrlPath, previewBaseUrl]);
 
   const plugins = useMemo(
     () => ({

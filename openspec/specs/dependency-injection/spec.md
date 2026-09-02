@@ -34,7 +34,7 @@ The backend SHALL use an AppConfig class instead of global state for application
 
 #### Scenario: Load configuration
 - **WHEN** AppConfig is instantiated
-- **THEN** it loads configuration from user data directory
+- **THEN** it loads configuration from the configuration directory (`configDirPath`)
 - **AND** validates config against `appConfigSchema` from `@quiqr/types`
 - **AND** provides typed getters for all config values
 

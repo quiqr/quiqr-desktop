@@ -1,4 +1,5 @@
 import Sidebar from './../Sidebar';
+import { useEnvironment } from '../../hooks/useEnvironment';
 
 interface PrefsSidebarProps {
   menus?: unknown[];
@@ -9,6 +10,7 @@ interface PrefsSidebarProps {
 }
 
 export const PrefsSidebar = (props: PrefsSidebarProps) => {
+  const { isStandalone } = useEnvironment();
   const preferencesMenu = {
     title: 'Preferences',
     items: [
@@ -69,5 +71,9 @@ export const PrefsSidebar = (props: PrefsSidebarProps) => {
     ],
   };
 
-  return <Sidebar {...props} menus={[preferencesMenu, applicationSettingsMenu]} />;
+  const menus = isStandalone
+    ? [preferencesMenu]
+    : [preferencesMenu, applicationSettingsMenu];
+
+  return <Sidebar {...props} menus={menus} />;
 };

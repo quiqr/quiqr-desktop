@@ -27,8 +27,8 @@
                 pkgs.nodejs
                 pkgs.electron
                 pkgs.pnpm
-                pkgs.nodePackages.typescript
-                pkgs.nodePackages.typescript-language-server
+                pkgs.typescript
+                pkgs.typescript-language-server
               ];
             };
         });

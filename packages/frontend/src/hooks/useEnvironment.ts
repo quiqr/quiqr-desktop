@@ -10,6 +10,7 @@ const environmentInfoPromise: Promise<EnvironmentInfo> = service.api
     return {
       platform: 'linux' as const,
       isPackaged: false,
+      runtime: 'electron' as const,
     };
   });
 
@@ -27,8 +28,8 @@ export function useEnvironment() {
     loading: false, // Already resolved by the time we get here
     /** True if running in packaged Electron app */
     isPackaged: environmentInfo.isPackaged,
-    /** True if running in standalone browser mode */
-    isStandalone: !environmentInfo.isPackaged,
+    /** True if running in standalone server mode */
+    isStandalone: environmentInfo.runtime === 'standalone',
     platform: environmentInfo.platform,
   };
 }

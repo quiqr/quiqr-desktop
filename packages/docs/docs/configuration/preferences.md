@@ -62,11 +62,11 @@ Whether to show the welcome splash screen when Quiqr starts.
 | **Default** | `true` |
 | **Type** | boolean |
 
-### Log Retention Days
+### Log Retention
 
-How long to keep log files.
+How long to keep log files. Configured via instance settings at `logging.retention`.
 
-| Setting | `logRetentionDays` |
+| Setting | `logging.retention` |
 |---------|-------------------|
 | **Default** | `30` |
 | **Range** | `0` - `365` days |
@@ -132,8 +132,7 @@ Preferences are stored in `user_prefs_default.json`:
     "interfaceStyle": "quiqr10-light",
     "sitesListingView": "all",
     "libraryView": "default",
-    "showSplashAtStartup": true,
-    "logRetentionDays": 30
+    "showSplashAtStartup": true
   },
   "lastOpenedSite": {
     "siteKey": "my-site",

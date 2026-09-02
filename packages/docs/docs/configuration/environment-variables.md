@@ -89,8 +89,8 @@ export QUIQR_STORAGE_DATAFOLDER="/custom/data/path"
 # Enable experimental features
 export QUIQR_EXPERIMENTAL_FEATURES=true
 
-# Start Quiqr
-npm run dev
+# Start Quiqr (standalone server mode)
+npm run dev:standalone
 ```
 
 ### Development Configuration
@@ -101,7 +101,7 @@ export QUIQR_DEV_LOCAL_API=true
 export QUIQR_DEV_DISABLE_AUTO_HUGO_SERVE=true
 export QUIQR_HUGO_SERVE_DRAFT_MODE=true
 
-npm run dev:backend:standalone
+npm run dev:standalone
 ```
 
 ### Docker Deployment

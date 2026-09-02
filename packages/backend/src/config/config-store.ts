@@ -21,10 +21,11 @@ export type ConfigType = 'instance' | 'user' | 'site';
 const DEFAULT_INSTANCE_SETTINGS: InstanceSettings = {
   storage: { type: 'fs', dataFolder: '~/Quiqr' },
   git: { binaryPath: undefined },
-  logging: { logRetentionDays: 30, retention: 30, logLevel: 'info' },
+  logging: { retention: 30, logLevel: 'info' },
   experimentalFeatures: false,
-  dev: { localApi: false, showCurrentUser: false, disablePartialCache: false },
+  dev: { disablePartialCache: false },
   hugo: { serveDraftMode: false, disableAutoHugoServe: false },
+  preview: { enabled: true, baseUrl: '' },
   variables: {},
 };
 

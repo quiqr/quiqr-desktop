@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/main.js",
+  "bin": {
+    "quiqr-admin": "dist/cli/user-admin.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

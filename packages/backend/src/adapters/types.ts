@@ -153,6 +153,11 @@ export interface AppInfoAdapter {
   isPackaged(): boolean;
 
   /**
+   * Get the runtime mode ('electron' or 'standalone')
+   */
+  getRuntime(): 'electron' | 'standalone';
+
+  /**
    * Get the application's installation path
    */
   getAppPath(): string;

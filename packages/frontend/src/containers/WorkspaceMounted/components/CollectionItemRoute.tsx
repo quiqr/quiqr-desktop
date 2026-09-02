@@ -6,7 +6,8 @@ import { parseNestPath } from '../../../utils/nestPath';
 function CollectionItemRoute() {
   const { collection, item } = useParams();
   const location = useLocation();
-  const { siteKey, workspaceKey, modelRefreshKey } = useOutletContext<WorkspaceOutletContext>();
+  const { siteKey, workspaceKey, modelRefreshKey, previewBaseUrl } =
+    useOutletContext<WorkspaceOutletContext>();
   const nestPath = parseNestPath(location.pathname);
 
   return (
@@ -18,6 +19,7 @@ function CollectionItemRoute() {
       collectionItemKey={decodeURIComponent(item || '')}
       modelRefreshKey={modelRefreshKey}
       nestPath={nestPath}
+      previewBaseUrl={previewBaseUrl}
     />
   );
 }

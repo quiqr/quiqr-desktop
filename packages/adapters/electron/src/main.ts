@@ -51,15 +51,15 @@ async function startBackend() {
     console.log('Electron adapters created');
 
     // Get paths
-    const userDataPath = app.getPath('userData');
+    const configDirPath = app.getPath('userData');
     const rootPath = app.getAppPath();
 
-    console.log(`User Data: ${userDataPath}`);
+    console.log(`Config Dir: ${configDirPath}`);
     console.log(`App Path: ${rootPath}`);
 
     // Create container with all dependencies
     const container = createContainer({
-      userDataPath,
+      configDirPath,
       rootPath,
       adapters,
       configFileName: 'quiqr-app-config.json'
@@ -68,15 +68,14 @@ async function startBackend() {
     console.log('Container created with dependency injection');
 
     // Initialize structured logger
-    const prefs = container.config.prefs;
-    const logRetentionDays = prefs.logRetentionDays ?? 30;
-    container.logger.initCleanup(logRetentionDays);
-    
+    const logRetention = (container.unifiedConfig.getInstanceSetting('logging.retention') as number) ?? 30;
+    container.logger.initCleanup(logRetention);
+
     // Log application start
     container.logger.info(GLOBAL_CATEGORIES.ELECTRON_INIT, 'Quiqr Desktop started in Electron mode', {
       version: app.getVersion(),
-      userDataPath,
-      logRetentionDays
+      configDirPath,
+      logRetention
     });
 
     // Create the Express app from backend

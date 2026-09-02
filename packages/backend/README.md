@@ -33,7 +33,7 @@ import { createContainer, createDevAdapters } from '@quiqr/backend';
 
 // For development/testing with no-op adapters
 const container = createContainer({
-  userDataPath: '/path/to/user/data',
+  configDirPath: '/path/to/user/data',
   rootPath: '/path/to/app/root',
   adapters: createDevAdapters(),
 });
@@ -42,7 +42,7 @@ const container = createContainer({
 import { createElectronAdapters } from '@quiqr/adapter-electron';
 
 const container = createContainer({
-  userDataPath: app.getPath('userData'),
+  configDirPath: app.getPath('userData'),
   rootPath: app.getAppPath(),
   adapters: createElectronAdapters(),
 });

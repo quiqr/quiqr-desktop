@@ -5,11 +5,14 @@ Operational guide for AI agents working in this repository. For architecture, co
 ## Development Commands
 
 ```bash
-# Start dev environment (frontend + Electron)
-npm run dev
+# Start dev environment — Electron edition (frontend + backend + Electron)
+npm run dev:electron
 
-# Frontend only (Vite on http://localhost:4002)
-cd packages/frontend && npm run dev
+# Start dev environment — Standalone server edition (frontend + backend + server)
+npm run dev:standalone
+
+# Frontend only (Vite on http://localhost:4002, binds 0.0.0.0)
+npm run dev:frontend
 
 # Build
 npm run build                   # Full build with installers

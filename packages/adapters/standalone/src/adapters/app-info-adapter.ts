@@ -49,6 +49,10 @@ export class WebAppInfoAdapter implements AppInfoAdapter {
     return true;
   }
 
+  getRuntime(): 'electron' | 'standalone' {
+    return 'standalone';
+  }
+
   /**
    * Get the application's installation path
    */

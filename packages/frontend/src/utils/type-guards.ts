@@ -1,17 +1,12 @@
 import type { AccordionField } from "@quiqr/types";
 
 // Types previously defined in HoForm/types.ts
-export type PreviewConfig = { enable: boolean; preview_url: string };
 export interface HugoConfigParsed {
   theme?: string;
   title?: string;
 }
 export interface QuiqrModelParsed {
   hugover?: string;
-}
-
-export const isValidPreviewConfiguration = (config: unknown): config is PreviewConfig => {
-  return typeof config === "object" && "enable" in config && typeof config.enable === "boolean" && 'preview_url' in config && typeof config.preview_url === 'string';
 }
 
 export const isValidAppThemeConfiguration = (config: unknown): config is { interfaceStyle: "quiqr10-light" | "quiqr10-dark" } => {

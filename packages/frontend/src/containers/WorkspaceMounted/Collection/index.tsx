@@ -226,6 +226,8 @@ interface CollectionProps {
   siteKey: string;
   workspaceKey: string;
   collectionKey: string;
+  /** Resolved preview base URL (runtime-mode aware). Falls back to Electron localhost when absent. */
+  previewBaseUrl?: string;
 }
 
 type CollectionView =
@@ -247,7 +249,7 @@ interface CollectionLocalState {
   showSortValue?: boolean;
 }
 
-const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) => {
+const Collection = ({ siteKey, workspaceKey, collectionKey, previewBaseUrl }: CollectionProps) => {
   const filterDebounce = React.useRef(createDebounce(200));
   const navigate = useNavigate();
   const { addSnackMessage } = useSnackbar();
@@ -551,7 +553,7 @@ const Collection = ({ siteKey, workspaceKey, collectionKey }: CollectionProps) =
     CollectionPath.shift();
 
     const path = CollectionPath.join("/");
-    const url = 'http://localhost:13131/'+path.toLowerCase();
+    const url = (previewBaseUrl ?? 'http://localhost:13131') + '/' + path.toLowerCase();
 
     return url;
   }

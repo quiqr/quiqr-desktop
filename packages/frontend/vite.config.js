@@ -8,6 +8,7 @@ export default defineConfig({
     react(),
   ],
   server: {
+    host: '0.0.0.0',
     port: 4002,
     open: false,
     proxy: {

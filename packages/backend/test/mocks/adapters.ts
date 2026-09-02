@@ -54,6 +54,7 @@ export function createMockMenuAdapter(): MenuAdapter {
 export function createMockAppInfoAdapter(overrides?: Partial<AppInfoAdapter>): AppInfoAdapter {
   return {
     isPackaged: () => false,
+    getRuntime: () => 'electron' as const,
     getAppPath: () => '/mock/app/path',
     getVersion: () => '1.0.0-test',
     getPath: (name: 'home' | 'appData' | 'userData' | 'temp' | 'downloads') => {

@@ -106,13 +106,11 @@ describe('ConfigResolver - Simplified 2-Layer', () => {
           dataFolder: '/custom/data/path',
         },
         logging: {
-          logRetentionDays: 60,
+          retention: 60,
           logLevel: 'debug',
         },
         experimentalFeatures: true,
         dev: {
-          localApi: true,
-          showCurrentUser: false,
           disablePartialCache: true,
         },
         hugo: {
@@ -125,10 +123,9 @@ describe('ConfigResolver - Simplified 2-Layer', () => {
       resolver.initializeSync('ELECTRON');
 
       expect(resolver.getEffectiveInstanceSetting('storage.dataFolder')).toBe('/custom/data/path');
-      expect(resolver.getEffectiveInstanceSetting('logging.logRetentionDays')).toBe(60);
+      expect(resolver.getEffectiveInstanceSetting('logging.retention')).toBe(60);
       expect(resolver.getEffectiveInstanceSetting('logging.logLevel')).toBe('debug');
       expect(resolver.getEffectiveInstanceSetting('experimentalFeatures')).toBe(true);
-      expect(resolver.getEffectiveInstanceSetting('dev.localApi')).toBe(true);
       expect(resolver.getEffectiveInstanceSetting('hugo.serveDraftMode')).toBe(true);
     });
 
@@ -139,13 +136,11 @@ describe('ConfigResolver - Simplified 2-Layer', () => {
           dataFolder: '/default/path',
         },
         logging: {
-          logRetentionDays: 30,
+          retention: 30,
           logLevel: 'info',
         },
         experimentalFeatures: false,
         dev: {
-          localApi: false,
-          showCurrentUser: false,
           disablePartialCache: false,
         },
         hugo: {
@@ -254,7 +249,7 @@ describe('ConfigResolver - Simplified 2-Layer', () => {
           dataFolder: '/home/user/QuiqrData',
         },
         logging: {
-          logRetentionDays: 30,
+          retention: 30,
           logLevel: 'info',
           retention: 30,
         },
@@ -263,13 +258,15 @@ describe('ConfigResolver - Simplified 2-Layer', () => {
         },
         experimentalFeatures: false,
         dev: {
-          localApi: false,
-          showCurrentUser: false,
           disablePartialCache: false,
         },
         hugo: {
           serveDraftMode: false,
           disableAutoHugoServe: false,
+        },
+        preview: {
+          enabled: true,
+          baseUrl: 'http://localhost:13131',
         },
         variables: {},
       };

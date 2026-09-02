@@ -50,8 +50,13 @@ const queryClient = new QueryClient({
   },
 });
 
-const container = document.getElementById('root');
-const root = createRoot(container!);
+const container = document.getElementById('root')!;
+// Reuse an existing root if the entry module is re-executed in the same document
+// (Vite dependency re-optimization / HMR triggers a client reload that re-runs this
+// module). A second createRoot() on the same container corrupts the DOM, producing
+// insertBefore/removeChild NotFoundError crashes and a blank window.
+const rootHolder = container as unknown as { __quiqrRoot?: ReturnType<typeof createRoot> };
+const root = rootHolder.__quiqrRoot ?? (rootHolder.__quiqrRoot = createRoot(container));
 root.render(
   <QueryClientProvider client={queryClient}>
     <SnackbarProvider>

@@ -301,8 +301,20 @@ export const SukohForm = ({
               if (pathHasArrayIndex(nestPath)) {
                 const topLevelKey = getTopLevelKey(nestPath);
                 const topLevelField = fields.find((f) => f.key === topLevelKey);
-                if (topLevelField?.type === 'accordion') {
+                if (!topLevelField) {
+                  return <div>Nested field not found: {nestPath}</div>;
+                }
+                // An accordion renders itself and drills to the targeted item/sub-field
+                // via the global nestPath.
+                if (topLevelField.type === 'accordion') {
                   return <FieldRenderer key={topLevelKey} compositeKey={`root.${topLevelKey}`} />;
+                }
+                // A static container (nest/section) wrapping a deeper indexed field:
+                // render its children so the nested accordion inside can drill to the target.
+                if ('fields' in topLevelField && Array.isArray(topLevelField.fields)) {
+                  return (topLevelField.fields as Field[]).map((field) => (
+                    <FieldRenderer key={field.key} compositeKey={`root.${topLevelKey}.${field.key}`} />
+                  ));
                 }
                 return <div>Nested field not found: {nestPath}</div>;
               }

@@ -16,9 +16,11 @@ interface CollectionItemProps {
   collectionItemKey: string;
   modelRefreshKey?: number;
   nestPath?: string;
+  /** Resolved preview base URL (runtime-mode aware). Falls back to Electron localhost when absent. */
+  previewBaseUrl?: string;
 }
 
-function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey, nestPath }: CollectionItemProps) {
+function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKey, modelRefreshKey, nestPath, previewBaseUrl }: CollectionItemProps) {
   // Replace manual state management with TanStack Query
   const { data: selectedWorkspaceDetails, isLoading: workspaceLoading } = useWorkspaceDetails(
     siteKey,
@@ -108,8 +110,8 @@ function CollectionItem({ siteKey, workspaceKey, collectionKey, collectionItemKe
     if (Array.from(finalpath)[0] !== '/') {
       finalpath = '/' + finalpath;
     }
-    return 'http://localhost:13131' + finalpath;
-  }, [collection, collectionItemKey, currentBaseUrlPath]);
+    return (previewBaseUrl ?? 'http://localhost:13131') + finalpath;
+  }, [collection, collectionItemKey, currentBaseUrlPath, previewBaseUrl]);
 
   const plugins = useMemo(
     () => ({

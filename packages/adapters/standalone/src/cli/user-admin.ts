@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * CLI User Management Tool
  *
@@ -14,7 +15,7 @@ import { homedir } from 'os';
 import { join } from 'path';
 import { createInterface } from 'readline';
 
-const configDir = join(homedir(), '.quiqr-standalone');
+const configDir = process.env.QUIQR_CONF_DIR || join(homedir(), '.quiqr-standalone');
 
 function promptPassword(prompt: string): Promise<string> {
   const rl = createInterface({
@@ -92,13 +93,17 @@ async function main() {
     }
 
     default:
-      console.log('Usage: user-admin <command> [args]');
+      console.log('Usage: quiqr-admin <command> [args]');
       console.log('');
       console.log('Commands:');
       console.log('  add <email>            Add a new user');
       console.log('  list                   List all users');
       console.log('  remove <email>         Remove a user');
       console.log('  reset-password <email> Reset a user\'s password');
+      console.log('');
+      console.log('Environment:');
+      console.log('  QUIQR_CONF_DIR         Configuration directory (default: ~/.quiqr-standalone)');
+      console.log(`                         Current: ${configDir}`);
       process.exit(command ? 1 : 0);
   }
 }

@@ -38,7 +38,7 @@ function useWorkspaceToolbarItems({
   onPreviewClick,
 }: UseWorkspaceToolbarItemsConfig): ToolbarItemsResult {
   const navigate = useNavigate();
-  
+
   // Get active states from shared hook
   const {
     isContentActive,

@@ -8,12 +8,25 @@
 - feature: file download endpoint for `stdout_type: file_path` build results (path-restricted to site directory)
 - feature: global build action variables in instance settings, overriding YAML defaults
 - feature: Variables section in Preferences UI for managing global build action variables
-- feature: `QUIQR_DATA_DIR` env var to override standalone data directory
+- feature: `QUIQR_CONF_DIR` env var to override standalone configuration directory
 - feature: `HOST` / `BIND_ADDRESS` env var to control server bind address (for reverse proxy setups)
 - feature: `QUIQR_CONFIG_FILE` env var to use an external config file (NixOS/Docker integration)
 - feature: separate `runtime_state.json` for server-managed state (session secret), keeping `instance_settings.json` read-only
+- feature: configurable preview URL via `preview.baseUrl` instance setting (replaces hardcoded `localhost:13131`)
+- feature: preview can be disabled via `preview.enabled` instance setting
+- feature: hide Application Settings section in Preferences UI when running in standalone mode
+- feature: `quiqr-admin` CLI binary with `QUIQR_CONF_DIR` support and help output
+- feature: `runtime` field in environment info to distinguish Electron from standalone mode
+- refactor: rename internal `userDataPath` to `configDirPath` across all packages
+- refactor: rename env var `QUIQR_DATA_DIR` to `QUIQR_CONF_DIR`
+- refactor: consolidate duplicate `logRetentionDays` setting into `logging.retention`
+- refactor: remove dead `dev.localApi` and `dev.showCurrentUser` settings
+- refactor: remove dead `PreviewConfig` type guard
 - fix: accept both `buildActions` (camelCase) and `build_actions` (snake_case) in site model YAML
 - fix: global variables not persisted via Preferences UI (`updateInstanceSettings` missing `variables` merge)
+- fix: `isStandalone` detection uses `runtime` field instead of `isPackaged` (fixes Electron dev mode)
+- fix: `getEnvironmentInfo` endpoint made public (pre-auth) so frontend can detect runtime mode before login
+- fix: standalone adapter uses `WebAppInfoAdapter` at container creation so `runtime: 'standalone'` is set from the start
 - feature: unified frontend serving — standalone server serves both API and frontend from a single Express server
 - feature: JWT-based authentication for standalone mode with local file user provider
 - feature: login page, forced password change on first login, User menu with logout and change password

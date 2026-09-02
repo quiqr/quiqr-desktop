@@ -287,7 +287,8 @@ export const webMenuActionResultSchema = z.object({
 
 export const environmentInfoSchema = z.object({
   platform: z.enum(['macOS', 'windows', 'linux']),
-  isPackaged: z.boolean()
+  isPackaged: z.boolean(),
+  runtime: z.enum(['electron', 'standalone']).default('electron'),
 })
 
 // Scaffold model schemas

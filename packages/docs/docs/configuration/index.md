@@ -20,7 +20,7 @@ Configuration files are stored in different locations depending on how you run Q
 
 ### Standalone Development Server
 
-When running `npm run dev:backend:standalone`, configuration is stored in:
+When running `npm run dev:standalone`, configuration is stored in:
 
 ```
 ~/.quiqr-standalone/

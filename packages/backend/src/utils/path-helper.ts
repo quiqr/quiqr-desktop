@@ -23,6 +23,7 @@ export type PathHelperConfigGetter = () => PathHelperConfig;
 export interface EnvironmentInfo {
   platform: 'macOS' | 'windows' | 'linux';
   isPackaged: boolean;
+  runtime: 'electron' | 'standalone';
 }
 
 /**

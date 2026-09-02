@@ -126,6 +126,10 @@ export class ElectronAppInfoAdapter implements AppInfoAdapter {
     return app.isPackaged;
   }
 
+  getRuntime(): 'electron' | 'standalone' {
+    return 'electron';
+  }
+
   getAppPath(): string {
     return app.getAppPath();
   }

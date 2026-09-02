@@ -18,9 +18,9 @@ export class AppConfig {
   private configPath: string;
   private configFile: string;
 
-  constructor(userDataPath: string, configFileName: string = 'quiqr-app-config.json') {
-    this.configPath = userDataPath;
-    this.configFile = path.join(userDataPath, configFileName);
+  constructor(configDirPath: string, configFileName: string = 'quiqr-app-config.json') {
+    this.configPath = configDirPath;
+    this.configFile = path.join(configDirPath, configFileName);
     this.config = this.loadConfig();
   }
 
@@ -45,16 +45,13 @@ export class AppConfig {
       prefs: {
         dataFolder: '~/Quiqr',
         interfaceStyle: 'quiqr10-light',
-        logRetentionDays: 30, // Default retention period
       },
       lastOpenedPublishTargetForSite: {},
       skipWelcomeScreen: false,
       experimentalFeatures: false,
       disablePartialCache: false,
-      devLocalApi: false,
       devDisableAutoHugoServe: false,
       hugoServeDraftMode: false,
-      devShowCurrentUser: false,
       sitesListingView: 'all',
       currentUsername: null,
     };
@@ -136,20 +133,12 @@ export class AppConfig {
     return this.config.disablePartialCache;
   }
 
-  get devLocalApi() {
-    return this.config.devLocalApi;
-  }
-
   get devDisableAutoHugoServe() {
     return this.config.devDisableAutoHugoServe;
   }
 
   get hugoServeDraftMode() {
     return this.config.hugoServeDraftMode;
-  }
-
-  get devShowCurrentUser() {
-    return this.config.devShowCurrentUser;
   }
 
   get sitesListingView() {
@@ -188,20 +177,12 @@ export class AppConfig {
     this.config.disablePartialCache = toggle;
   }
 
-  setDevLocalApi(toggle: boolean): void {
-    this.config.devLocalApi = toggle;
-  }
-
   setDevDisableAutoHugoServe(toggle: boolean): void {
     this.config.devDisableAutoHugoServe = toggle;
   }
 
   setHugoServeDraftMode(toggle: boolean): void {
     this.config.hugoServeDraftMode = toggle;
-  }
-
-  setDevShowCurrentUser(toggle: boolean): void {
-    this.config.devShowCurrentUser = toggle;
   }
 
   setSitesListingView(view: string): void {

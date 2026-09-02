@@ -26,18 +26,19 @@ const APP_DEFAULT_INSTANCE: InstanceSettings = {
   },
   logging: {
     retention: 30,
-    logRetentionDays: 30,
     logLevel: 'info',
   },
   experimentalFeatures: false,
   dev: {
-    localApi: false,
-    showCurrentUser: false,
     disablePartialCache: false,
   },
   hugo: {
     serveDraftMode: false,
     disableAutoHugoServe: false,
+  },
+  preview: {
+    enabled: true,
+    baseUrl: '',
   },
   variables: {},
 };
@@ -252,11 +253,9 @@ export class ConfigResolver {
     const instancePaths = [
       'storage.type',
       'storage.dataFolder',
-      'logging.logRetentionDays',
+      'logging.retention',
       'logging.logLevel',
       'experimentalFeatures',
-      'dev.localApi',
-      'dev.showCurrentUser',
       'dev.disablePartialCache',
       'hugo.serveDraftMode',
       'hugo.disableAutoHugoServe',

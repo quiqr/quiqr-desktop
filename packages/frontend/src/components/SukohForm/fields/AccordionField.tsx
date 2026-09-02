@@ -19,7 +19,7 @@ import DangerButton from '../../DangerButton';
 import { useField, useRenderFields } from '../useField';
 import service from '../../../services/service';
 import { isValidAppThemeConfiguration } from '../../../utils/type-guards';
-import { buildNestUrl, getBasePath, parseNestPath } from '../../../utils/nestPath';
+import { getBasePath, parseNestPath } from '../../../utils/nestPath';
 import { getSubTargetIndex } from '../../../utils/findFieldByPath';
 import type { AccordionField as AccordionFieldConfig, Field, DynFormFields } from '@quiqr/types';
 import Box from '@mui/material/Box';
@@ -324,10 +324,12 @@ function AccordionField({ compositeKey }: Props) {
   // Navigate to this accordion field (for collapsed view)
   const handleNavigateToAccordion = useCallback(() => {
     const basePath = getBasePath(location.pathname);
-    const currentNestPath = parseNestPath(location.pathname);
-    const url = buildNestUrl(basePath, config.key, currentNestPath);
-    navigate(url);
-  }, [location.pathname, config.key, navigate]);
+    // Navigate using this accordion's own full path (which preserves any ancestor
+    // array indices, e.g. "content_blocks[4].logos"), mirroring NestField. Rebuilding
+    // the path from the URL's current nest path would drop the parent item index and
+    // produce an unresolvable path like "content_blocks.logos".
+    navigate(`${basePath}/nest/${encodeURIComponent(fieldPath)}`);
+  }, [location.pathname, fieldPath, navigate]);
 
   // Toggle expanded view (for expanded header - collapse back)
   const handleToggleExpand = useCallback(() => {
@@ -361,7 +363,11 @@ function AccordionField({ compositeKey }: Props) {
   if (isSubTarget && subFieldKey !== null) {
     const componentKey = `item-${subTargetIndex}`;
     const itemFields = getFieldsForItem(componentKey);
-    const targetField = itemFields.find((f) => f.key === subFieldKey);
+    // subFieldKey may be a deeper path (e.g. "logos[2].image" when the target sits inside
+    // a nested accordion). The immediate child is its first segment; anything beyond it is
+    // resolved recursively by the child field reading the same global nestPath.
+    const childKey = subFieldKey.split(/[.[]/)[0];
+    const targetField = itemFields.find((f) => f.key === childKey);
 
     if (!targetField) {
       // Dynamic fields are still loading for this item
@@ -372,13 +378,23 @@ function AccordionField({ compositeKey }: Props) {
       );
     }
 
+    const itemPath = `${fieldPath}[${subTargetIndex}]`;
+
+    // A nested accordion renders itself: it reads the global nestPath and either shows its
+    // own item list (when it is the target) or drills further (when the path continues
+    // through it). Flattening its children here would break that list/drill behaviour.
+    if (targetField.type === 'accordion') {
+      return <>{renderFields(itemPath, [targetField as Field])}</>;
+    }
+
+    // Nest/section sub-fields delegate their own rendering to the parent, so render their
+    // children; those children self-resolve against the global nestPath for deeper paths.
     if ('fields' in targetField && Array.isArray(targetField.fields)) {
-      const childPath = `${fieldPath}[${subTargetIndex}].${subFieldKey}`;
+      const childPath = `${itemPath}.${childKey}`;
       return <>{renderFields(childPath, targetField.fields as Field[])}</>;
     }
 
-    // Sub-field has no children — render the field itself
-    const itemPath = `${fieldPath}[${subTargetIndex}]`;
+    // Leaf sub-field — render the field itself.
     return <>{renderFields(itemPath, [targetField as Field])}</>;
   }
 

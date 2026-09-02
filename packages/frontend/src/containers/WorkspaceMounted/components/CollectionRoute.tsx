@@ -5,7 +5,7 @@ import type { WorkspaceOutletContext } from '../Workspace';
 function CollectionRoute() {
   const { collection } = useParams();
   const location = useLocation();
-  const { siteKey, workspaceKey } = useOutletContext<WorkspaceOutletContext>();
+  const { siteKey, workspaceKey, previewBaseUrl } = useOutletContext<WorkspaceOutletContext>();
 
   return (
     <Collection
@@ -13,6 +13,7 @@ function CollectionRoute() {
       siteKey={siteKey}
       workspaceKey={workspaceKey}
       collectionKey={decodeURIComponent(collection || '')}
+      previewBaseUrl={previewBaseUrl}
     />
   );
 }

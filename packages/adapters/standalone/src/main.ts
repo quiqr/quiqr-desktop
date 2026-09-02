@@ -9,6 +9,7 @@ import { createDevAdapters, createContainer, LocalFileAuthProvider } from '@quiq
 import { startServer } from '@quiqr/backend/api';
 import type { ServerAuthOptions } from '@quiqr/backend/api';
 import { createWebAdapters } from './adapters/index.js';
+import { WebAppInfoAdapter } from './adapters/app-info-adapter.js';
 import { findFrontendBuildDir } from './frontend-path.js';
 import { GLOBAL_CATEGORIES } from '@quiqr/backend/logging';
 import { randomBytes } from 'crypto';
@@ -64,25 +65,23 @@ async function startStandaloneBackend() {
   console.log('='.repeat(60));
 
   try {
-    // Get paths
-    // For standalone mode, use QUIQR_DATA_DIR env var or default to ~/.quiqr-standalone
-    const userDataPath = process.env.QUIQR_DATA_DIR
+    const configDirPath = process.env.QUIQR_CONF_DIR
       || join(homedir(), '.quiqr-standalone');
 
     // Find the project root (where resources folder is located)
     const rootPath = findProjectRoot();
 
-    console.log(`User Data: ${userDataPath}`);
+    console.log(`Config Dir: ${configDirPath}`);
     console.log(`Root Path: ${rootPath}`);
 
     // Ensure data directory exists
-    mkdirSync(userDataPath, { recursive: true });
+    mkdirSync(configDirPath, { recursive: true });
 
     // If QUIQR_CONFIG_FILE is set, copy external config into the data directory
     // so the unified config service reads from its expected location.
     const externalConfigFile = process.env.QUIQR_CONFIG_FILE;
     if (externalConfigFile) {
-      const targetPath = join(userDataPath, 'instance_settings.json');
+      const targetPath = join(configDirPath, 'instance_settings.json');
       try {
         copyFileSync(externalConfigFile, targetPath);
         console.log(`Config copied from ${externalConfigFile}`);
@@ -92,11 +91,13 @@ async function startStandaloneBackend() {
       }
     }
 
-    // Create container first with dev adapters (temporary)
+    // Create container with dev adapters but standalone appInfo (so runtime is correct from the start)
+    const devAdapters = createDevAdapters();
+    devAdapters.appInfo = new WebAppInfoAdapter(rootPath);
     const container = createContainer({
-      userDataPath,
+      configDirPath,
       rootPath,
-      adapters: createDevAdapters(), // Temporary placeholder
+      adapters: devAdapters,
       configFileName: 'quiqr-app-config.json'
     });
 
@@ -114,7 +115,7 @@ async function startStandaloneBackend() {
       // Read session secret from runtime state (not instance_settings.json).
       // This separation allows instance_settings.json to be externally managed
       // (e.g., by NixOS) without the server overwriting it.
-      const runtimeStatePath = join(userDataPath, 'runtime_state.json');
+      const runtimeStatePath = join(configDirPath, 'runtime_state.json');
       let runtimeState: Record<string, unknown> = {};
       try {
         if (existsSync(runtimeStatePath)) {
@@ -145,7 +146,7 @@ async function startStandaloneBackend() {
 
       // Create auth provider
       const usersFile = authConfig.local?.usersFile || 'users.json';
-      const authProvider = new LocalFileAuthProvider(userDataPath, usersFile);
+      const authProvider = new LocalFileAuthProvider(configDirPath, usersFile);
       container.authProvider = authProvider;
 
       // First-run: create default admin user if users file doesn't exist
@@ -185,16 +186,15 @@ async function startStandaloneBackend() {
     const host = process.env.HOST || process.env.BIND_ADDRESS || undefined;
 
     // Initialize structured logger
-    const prefs = container.config.prefs;
-    const logRetentionDays = prefs.logRetentionDays ?? 30;
-    container.logger.initCleanup(logRetentionDays);
+    const logRetention = (container.unifiedConfig.getInstanceSetting('logging.retention') as number) ?? 30;
+    container.logger.initCleanup(logRetention);
 
     // Log application start
     container.logger.info(GLOBAL_CATEGORIES.STANDALONE_INIT, 'Quiqr Backend started in standalone mode', {
-      userDataPath,
+      configDirPath,
       rootPath,
       port,
-      logRetentionDays
+      logRetention
     });
 
     // Resolve frontend build path (skip in dev mode — use Vite dev server instead)

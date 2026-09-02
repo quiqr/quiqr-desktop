@@ -14,6 +14,7 @@ function createNoopMenuAdapter() {
 function createDevAppInfoAdapter() {
   return {
     isPackaged: () => false,
+    getRuntime: () => 'electron' as const,
     getAppPath: () => process.cwd(),
     getVersion: () => '0.0.0-dev',
     getPath: (name: 'home' | 'appData' | 'userData' | 'temp' | 'downloads') => {

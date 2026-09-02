@@ -202,9 +202,9 @@ export interface AppContainer {
  */
 export interface ContainerOptions {
   /**
-   * Path to user data directory
+   * Path to configuration directory (config files, auth data, runtime state, logs)
    */
-  userDataPath: string;
+  configDirPath: string;
 
   /**
    * Root path of the application
@@ -226,14 +226,14 @@ export interface ContainerOptions {
  * Create the application container with all dependencies
  */
 export function createContainer(options: ContainerOptions): AppContainer {
-  const { userDataPath, rootPath, adapters, configFileName } = options;
+  const { configDirPath, rootPath, adapters, configFileName } = options;
 
   // Create unified config service (new architecture)
   // Relies on hardcoded defaults for initial values
-  const unifiedConfig = createUnifiedConfigService({ configDir: userDataPath });
+  const unifiedConfig = createUnifiedConfigService({ configDir: configDirPath });
 
   // Create legacy config and state (for backward compatibility)
-  const config = new AppConfig(userDataPath, configFileName);
+  const config = new AppConfig(configDirPath, configFileName);
   const state = new AppState();
 
   // Create path helper with dynamic config getter
@@ -275,6 +275,7 @@ export function createContainer(options: ContainerOptions): AppContainer {
       process.platform === 'win32' ? 'windows' as const :
       'linux' as const,
     isPackaged: adapters.appInfo.isPackaged(),
+    runtime: adapters.appInfo.getRuntime(),
   };
 
   // Create provider factory for SSG providers

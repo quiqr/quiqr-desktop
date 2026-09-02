@@ -89,14 +89,15 @@ requirements, testing guidelines, and the OpenSpec workflow, please see
 
 ### Running the Desktop Mode Application locally
 
-1. Run `npm run dev` to start the development server and the Electron app. The
-   app will start and open the frontend automatically.
+1. Run `npm run dev:electron` to start the development servers and the Electron
+   app. The app will start and open the frontend automatically.
 
 ### Running the Standalone Server Mode Application locally
 
-1. Start a terminal to run the backend with the command: `npm run dev:backend:standalone`
-2. Start a terminal to run the frontend with the command: `npm run dev:frontend`
-3. Visit http://localhost:4002 in your browser.
+1. Run `npm run dev:standalone` to start the backend, the standalone server, and
+   the frontend dev server together.
+2. Visit http://localhost:4002 in your browser. The dev server also binds all
+   interfaces, so it is reachable from other devices at `http://<your-host>:4002`.
 
 ### Development on Nix
 
@@ -107,7 +108,10 @@ nix develop
 npm install
 
 # Run desktop
-npm run dev
+npm run dev:electron
+
+# Or run standalone server mode
+npm run dev:standalone
 ```
 ### Packaging for Nix
 

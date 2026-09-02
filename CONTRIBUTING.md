@@ -29,7 +29,8 @@ Guidelines](https://docs.github.com/en/github/site-policy/github-community-guide
 
 4. **Start development environment**
    ```bash
-   npm run dev
+   npm run dev:electron      # Electron desktop edition
+   npm run dev:standalone    # Standalone server edition
    ```
 
 For detailed development instructions, see `AGENTS.md`.
